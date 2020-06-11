@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JustDecompile.Tools.MSBuildProjectBuilder</RootNamespace>
+    <AssemblyName>JustDecompile.Tools.MSBuildProjectBuilder</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\UI\DebugBuild\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug .NET 3.5|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\UI\DebugBuild\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET35</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\UI\ReleaseBuild\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release Server Engineonly|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\EngineOnlyBuild\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '.NET 3.5 Release Server EngineOnly|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\EngineOnlyBuild\</OutputPath>
+    <DefineConstants>TRACE;NET35; ENGINEONLYBUILD</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../JDKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release EngineOnly|AnyCPU'">
+    <OutputPath>bin\Release EngineOnly\</OutputPath>
+    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug EngineOnly|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug EngineOnly\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ENGINEONLYBUILD</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug JustAssembly|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug JustAssembly\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;JUSTASSEMBLY</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release JustAssembly|AnyCPU'">
+    <OutputPath>bin\Release JustAssembly\</OutputPath>
+    <DefineConstants>TRACE;JUSTASSEMBLY</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release Server JustAssembly|AnyCPU'">
+    <OutputPath>bin\Release Server JustAssembly\</OutputPath>
+    <DefineConstants>TRACE;JUSTASSEMBLY</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../BuildUtilities/JDKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Condition=" '$(Configuration)' == 'Release Server JustAssembly' " Include="..\..\CompanyAssemblyInfo.cs">
+      <Link>Properties\CompanyAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\CommonVersionAssemblyInfo.cs">
+      <Link>Properties\CommonVersionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="BaseProjectBuilder.cs" />
+    <Compile Include="Constants\LanguageConstants.cs" />
+    <Compile Include="Constants\UAPConstants.cs" />
+    <Compile Include="Constants\WinRTConstants.cs" />
+    <Compile Include="Contracts\FileManagers\IMsBuildProjectManager.cs" />
+    <Compile Include="Contracts\FileManagers\INetCoreProjectManager.cs" />
+    <Compile Include="Contracts\FileManagers\IWinRTProjectManager.cs" />
+    <Compile Include="Contracts\IAppDefinitionProjectItemWriter.cs" />
+    <Compile Include="Contracts\FileManagers\IProjectManager.cs" />
+    <Compile Include="Contracts\IProjectItemWriter.cs" />
+    <Compile Include="Contracts\IRegularProjectItemWriter.cs" />
+    <Compile Include="Contracts\IResourceProjectItemWriter.cs" />
+    <Compile Include="Contracts\IResXDesignerProjectItemWriter.cs" />
+    <Compile Include="Contracts\IWinFormsProjectItemWriter.cs" />
+    <Compile Include="Contracts\IXamlPageProjectItemWriter.cs" />
+    <Compile Include="Contracts\IXamlProjectItemWriter.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IProjectGenerationNotifier.cs" />
+    <Compile Include="NetCore\NetCoreProject.cs">
+      <DependentUpon>NetCoreProject.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="NetCore\NetCoreProjectBuilder.cs" />
+    <Compile Include="ProjectFileManagers\MsBuildProjectFileManager.cs" />
+    <Compile Include="ProjectFileManagers\NetCoreProjectFileManager.cs" />
+    <Compile Include="ProjectFileManagers\ProjectFileManager.cs" />
+    <Compile Include="ProjectFileManagers\TestNetCoreProjectFileManager.cs" />
+    <Compile Include="ProjectFileManagers\WinRTProjectFileManager.cs" />
+    <Compile Include="ProjectGenerationSettings.cs" />
+    <Compile Include="FilePathsServices\DefaultFilePathsAnalyzer.cs" />
+    <Compile Include="FilePathsServices\DefaultFilePathsService.cs" />
+    <Compile Include="FilePathsServices\IFilePathsAnalyzer.cs" />
+    <Compile Include="FilePathsServices\IFilePathsService.cs" />
+    <Compile Include="ProjectGenerationSettingsProvider.cs" />
+    <Compile Include="ProjectJsonWriter.cs" />
+    <Compile Include="SolutionWriter.cs" />
+    <Compile Include="TestMSBuildProjectBuilder.cs" />
+    <Compile Include="TestNetCoreProjectBuilder.cs" />
+    <Compile Include="TestWinRTProjectBuilder.cs" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="MSBuildProject.cs">
+      <DependentUpon>MSBuildProject.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MSBuildProjectBuilder.cs" />
+    <Compile Include="ProjectFileCreated.cs" />
+    <Compile Include="ProjectItemFileWriters\AppDefinitionItemWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\BaseProjectItemFileWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\BaseXamlFileWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\IProjectItemFileWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\RegularProjectItemWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\ProjectItemWriterFactory.cs" />
+    <Compile Include="ProjectItemFileWriters\ResXDesignerWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\WinFormsItemWriter.cs" />
+    <Compile Include="ProjectItemFileWriters\XamlPageItemWriter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VisualStudioVersion.cs" />
+    <Compile Include="WinRTProjectBuilder.cs" />
+    <Compile Include="WinRTProjectType.cs" />
+    <Compile Include="WinRTProjectTypeDetector.cs" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MSBuildProject.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="NetCore\NetCoreProject.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="UpdateClassGeenratedFromSchema.bat" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' ">
+    <ProjectReference Include="..\..\Tools\Telerik.Baml\Telerik.Baml.csproj">
+      <Project>{A6BAD2BA-76BA-461C-8B6D-418607591247}</Project>
+      <Name>Telerik.Baml</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cecil.Decompiler\JustDecompiler.csproj">
+      <Project>{ED1BE103-1699-4116-A732-616BEB142EB2}</Project>
+      <Name>JustDecompiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Cecil\Mono.Cecil.csproj">
+      <Project>{D68133BD-1E63-496E-9EDE-4FBDBF77B486}</Project>
+      <Name>Mono.Cecil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EngineInfrastructure\JustDecompile.EngineInfrastructure.csproj">
+      <Project>{246289A4-53FD-4BB3-923A-08B1D3D905AA}</Project>
+      <Name>JustDecompile.EngineInfrastructure</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

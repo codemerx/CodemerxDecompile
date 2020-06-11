@@ -1,0 +1,165 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Decompiler", "Decompiler", "{BA3E9C54-C13F-491A-BB0A-56BA256C0000}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cecil", "Cecil", "{EAE3F1A6-069F-4FE1-B296-9CAF30B21D5D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{8542719A-6735-4D4C-BCB6-E1DADD1500CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil", "Mono.Cecil\Mono.Cecil.csproj", "{D68133BD-1E63-496E-9EDE-4FBDBF77B486}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil.Mdb", "Mono.Cecil\symbols\mdb\Mono.Cecil.Mdb.csproj", "{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil.Pdb", "Mono.Cecil\symbols\pdb\Mono.Cecil.Pdb.csproj", "{63E6915C-7EA4-4D76-AB28-0D7191EEA626}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompiler", "Cecil.Decompiler\JustDecompiler.csproj", "{ED1BE103-1699-4116-A732-616BEB142EB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompile.EngineInfrastructure", "EngineInfrastructure\JustDecompile.EngineInfrastructure.csproj", "{246289A4-53FD-4BB3-923A-08B1D3D905AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompileCmd", "JustDecompileCmdShell\JustDecompileCmd.csproj", "{E6B1469D-911C-4AFC-A0F8-1ED00886910B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.MSBuildProjectBuilder", "MSBuildProjectCreator\Tools.MSBuildProjectBuilder.csproj", "{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleRunner", "ConsoleRunner\ConsoleRunner.csproj", "{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemInformationHelpers", "SystemInformationHelpers\SystemInformationHelpers.csproj", "{CED63F54-9464-4CC0-9F3F-D42014C85AC6}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 10
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfs:8082/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Cecil.Decompiler\\JustDecompiler.csproj
+		SccProjectTopLevelParentUniqueName1 = CodemerxDecompileEngine.sln
+		SccProjectName1 = Cecil.Decompiler
+		SccLocalPath1 = Cecil.Decompiler
+		SccProjectUniqueName2 = ConsoleRunner\\ConsoleRunner.csproj
+		SccProjectName2 = ConsoleRunner
+		SccLocalPath2 = ConsoleRunner
+		SccProjectUniqueName3 = EngineInfrastructure\\JustDecompile.EngineInfrastructure.csproj
+		SccProjectTopLevelParentUniqueName3 = CodemerxDecompileEngine.sln
+		SccProjectName3 = EngineInfrastructure
+		SccLocalPath3 = EngineInfrastructure
+		SccProjectUniqueName4 = JustDecompileCmdShell\\JustDecompileCmd.csproj
+		SccProjectTopLevelParentUniqueName4 = CodemerxDecompileEngine.sln
+		SccProjectName4 = JustDecompileCmdShell
+		SccLocalPath4 = JustDecompileCmdShell
+		SccProjectUniqueName5 = Mono.Cecil\\Mono.Cecil.csproj
+		SccProjectTopLevelParentUniqueName5 = CodemerxDecompileEngine.sln
+		SccProjectName5 = Mono.Cecil
+		SccLocalPath5 = Mono.Cecil
+		SccProjectUniqueName6 = Mono.Cecil\\symbols\\mdb\\Mono.Cecil.Mdb.csproj
+		SccProjectTopLevelParentUniqueName6 = CodemerxDecompileEngine.sln
+		SccProjectName6 = Mono.Cecil/symbols/mdb
+		SccLocalPath6 = Mono.Cecil\\symbols\\mdb
+		SccProjectUniqueName7 = Mono.Cecil\\symbols\\pdb\\Mono.Cecil.Pdb.csproj
+		SccProjectTopLevelParentUniqueName7 = CodemerxDecompileEngine.sln
+		SccProjectName7 = Mono.Cecil/symbols/pdb
+		SccLocalPath7 = Mono.Cecil\\symbols\\pdb
+		SccProjectUniqueName8 = MSBuildProjectCreator\\Tools.MSBuildProjectBuilder.csproj
+		SccProjectTopLevelParentUniqueName8 = CodemerxDecompileEngine.sln
+		SccProjectName8 = MSBuildProjectCreator
+		SccLocalPath8 = MSBuildProjectCreator
+		SccProjectUniqueName9 = SystemInformationHelpers\\SystemInformationHelpers.csproj
+		SccProjectTopLevelParentUniqueName9 = CodemerxDecompileEngine.sln
+		SccProjectName9 = SystemInformationHelpers
+		SccLocalPath9 = SystemInformationHelpers
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Debug|x86.ActiveCfg = Debug EngineOnly|x86
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Debug|x86.Build.0 = Debug EngineOnly|x86
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Release|x86.ActiveCfg = Release EngineOnly|x86
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B}.Release|x86.Build.0 = Release EngineOnly|x86
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Debug|x86.Build.0 = Debug|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Release|x86.ActiveCfg = Release|Any CPU
+		{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}.Release|x86.Build.0 = Release|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Debug|Any CPU.ActiveCfg = Debug EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Debug|Any CPU.Build.0 = Debug EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Debug|x86.ActiveCfg = Debug EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Debug|x86.Build.0 = Debug EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Release|Any CPU.ActiveCfg = Release EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Release|Any CPU.Build.0 = Release EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Release|x86.ActiveCfg = Release EngineOnly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Release|x86.Build.0 = Release EngineOnly|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ED1BE103-1699-4116-A732-616BEB142EB2} = {BA3E9C54-C13F-491A-BB0A-56BA256C0000}
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA} = {BA3E9C54-C13F-491A-BB0A-56BA256C0000}
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486} = {EAE3F1A6-069F-4FE1-B296-9CAF30B21D5D}
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD} = {EAE3F1A6-069F-4FE1-B296-9CAF30B21D5D}
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626} = {EAE3F1A6-069F-4FE1-B296-9CAF30B21D5D}
+		{E6B1469D-911C-4AFC-A0F8-1ED00886910B} = {8542719A-6735-4D4C-BCB6-E1DADD1500CA}
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D} = {8542719A-6735-4D4C-BCB6-E1DADD1500CA}
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6} = {8542719A-6735-4D4C-BCB6-E1DADD1500CA}
+	EndGlobalSection
+EndGlobal

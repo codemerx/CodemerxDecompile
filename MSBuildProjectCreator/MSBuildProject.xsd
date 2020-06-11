@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/developer/msbuild/2003" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="Project">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice maxOccurs="unbounded">
+					<xs:element maxOccurs="unbounded" name="PropertyGroup">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element minOccurs="0" name="PreBuildEvent" type="xs:string" />
+								<xs:element minOccurs="0" name="PostBuildEvent" type="xs:string" />
+								<xs:element minOccurs="0" name="OutputPath" type="xs:string" />
+								<xs:element minOccurs="0" name="AllowUnsafeBlocks" type="xs:boolean" />
+								<xs:element minOccurs="0" name="BaseAddress" type="xs:unsignedInt" />
+								<xs:element minOccurs="0" name="CheckForOverflowUnderflow" type="xs:boolean" />
+								<xs:element minOccurs="0" name="ConfigurationOverrideFile" type="xs:string" />
+								<xs:element minOccurs="0" name="DebugSymbols" type="xs:boolean" />
+								<xs:element minOccurs="0" name="DefineConstants" type="xs:string" />
+                <xs:element minOccurs="0" name="DefineDebug" type="xs:boolean" />
+                <xs:element minOccurs="0" name="DefineTrace" type="xs:boolean" />
+								<xs:element minOccurs="0" name="DocumentationFile" type="xs:string" />
+								<xs:element minOccurs="0" name="FileAlignment" type="xs:unsignedShort" />
+								<xs:element minOccurs="0" name="NoStdLib" type="xs:boolean" />
+                <xs:element minOccurs="0" name="NoConfig" type="xs:boolean" />
+								<xs:element minOccurs="0" name="NoWarn" type="xs:string" />
+								<xs:element minOccurs="0" name="Optimize" type="xs:boolean" />
+								<xs:element minOccurs="0" name="RegisterForComInterop" type="xs:boolean" />
+								<xs:element minOccurs="0" name="RemoveIntegerChecks" type="xs:boolean" />
+								<xs:element minOccurs="0" name="TreatWarningsAsErrors" type="xs:boolean" />
+								<xs:element minOccurs="0" name="WarningLevel" type="xs:unsignedByte" />
+								<xs:element minOccurs="0" name="DebugType" type="xs:string" />
+								<xs:element minOccurs="0" name="ErrorReport" type="xs:string" />
+								<xs:element minOccurs="0" name="CodeAnalysisRuleSet" type="xs:string" />
+								<xs:element minOccurs="0" name="ProductVersion" type="xs:string" />
+								<xs:element minOccurs="0" name="ProjectGuid" type="xs:string" />
+								<xs:element minOccurs="0" name="ProjectType" type="xs:string" />
+								<xs:element minOccurs="0" name="SchemaVersion" type="xs:decimal" />
+								<xs:element minOccurs="0" name="Configuration">
+									<xs:complexType>
+										<xs:simpleContent>
+											<xs:extension base="xs:string">
+												<xs:attribute name="Condition" type="xs:string" use="required" />
+											</xs:extension>
+										</xs:simpleContent>
+									</xs:complexType>
+								</xs:element>
+								<xs:element minOccurs="0" name="Platform">
+									<xs:complexType>
+										<xs:simpleContent>
+											<xs:extension base="xs:string">
+												<xs:attribute name="Condition" type="xs:string" use="required" />
+											</xs:extension>
+										</xs:simpleContent>
+									</xs:complexType>
+								</xs:element>
+								<xs:element minOccurs="0" name="ApplicationIcon" type="xs:string" />
+								<xs:element minOccurs="0" name="AssemblyKeyContainerName" type="xs:string" />
+								<xs:element minOccurs="0" name="AssemblyName" type="xs:string" />
+								<xs:element minOccurs="0" name="AssemblyOriginatorKeyFile" type="xs:string" />
+								<xs:element minOccurs="0" name="DefaultClientScript" type="xs:string" />
+								<xs:element minOccurs="0" name="DefaultHTMLPageLayout" type="xs:string" />
+								<xs:element minOccurs="0" name="DefaultTargetSchema" type="xs:string" />
+								<xs:element minOccurs="0" name="DelaySign" type="xs:boolean" />
+								<xs:element minOccurs="0" name="OutputType" type="xs:string" />
+								<xs:element minOccurs="0" name="AppDesignerFolder" type="xs:string" />
+								<xs:element minOccurs="0" name="RootNamespace" type="xs:string" />
+								<xs:element minOccurs="0" name="RunPostBuildEvent" type="xs:string" />
+								<xs:element minOccurs="0" name="StartupObject" type="xs:string" />
+								<xs:element minOccurs="0" name="FileUpgradeFlags" type="xs:string" />
+								<xs:element minOccurs="0" name="UpgradeBackupLocation" type="xs:string" />
+								<xs:element minOccurs="0" name="OldToolsVersion" type="xs:decimal" />
+								<xs:element minOccurs="0" name="TargetFrameworkVersion" type="xs:string" />
+								<xs:element minOccurs="0" name="PublishUrl" type="xs:string" />
+								<xs:element minOccurs="0" name="Install" type="xs:boolean" />
+								<xs:element minOccurs="0" name="InstallFrom" type="xs:string" />
+								<xs:element minOccurs="0" name="UpdateEnabled" type="xs:boolean" />
+								<xs:element minOccurs="0" name="UpdateMode" type="xs:string" />
+								<xs:element minOccurs="0" name="UpdateInterval" type="xs:unsignedByte" />
+								<xs:element minOccurs="0" name="UpdateIntervalUnits" type="xs:string" />
+								<xs:element minOccurs="0" name="UpdatePeriodically" type="xs:boolean" />
+								<xs:element minOccurs="0" name="UpdateRequired" type="xs:boolean" />
+								<xs:element minOccurs="0" name="MapFileExtensions" type="xs:boolean" />
+								<xs:element minOccurs="0" name="ApplicationRevision" type="xs:unsignedByte" />
+								<xs:element minOccurs="0" name="ApplicationVersion" type="xs:string" />
+								<xs:element minOccurs="0" name="IsWebBootstrapper" type="xs:boolean" />
+								<xs:element minOccurs="0" name="UseApplicationTrust" type="xs:boolean" />
+								<xs:element minOccurs="0" name="BootstrapperEnabled" type="xs:boolean" />
+								<xs:element minOccurs="0" name="SccProjectName" type="xs:string" />
+								<xs:element minOccurs="0" name="SccLocalPath" type="xs:string" />
+								<xs:element minOccurs="0" name="SccAuxPath" type="xs:string" />
+								<xs:element minOccurs="0" name="SccProvider" type="xs:string" />
+                <xs:element minOccurs="0" name="PlatformTarget" type="xs:string" />
+                <xs:element minOccurs="0" name="ProjectTypeGuids" type="xs:string" />
+                <xs:element minOccurs="0" name="VisualStudioVersion" type="xs:string" />
+                <xs:element minOccurs="0" name="MinimumVisualStudioVersion" type="xs:string" />
+                <xs:element minOccurs="0" name="TargetPlatformVersion" type="xs:string" />
+                <xs:element minOccurs="0" name="TargetPlatformMinVersion" type="xs:string" />
+                <xs:element minOccurs="0" name="TargetFrameworkProfile" type="xs:string" />
+                <xs:element minOccurs="0" name="TargetPlatformIdentifier" type="xs:string" />
+                <xs:element minOccurs="0" name="UseVSHostingProcess" type="xs:boolean" />
+                <xs:element minOccurs="0" name="Prefer32Bit" type="xs:boolean" />
+                <xs:element minOccurs="0" name="OptionExplicit" type="xs:string" />
+                <xs:element minOccurs="0" name="OptionCompare" type="xs:string" />
+                <xs:element minOccurs="0" name="OptionStrict" type="xs:string" />
+                <xs:element minOccurs="0" name="OptionInfer" type="xs:string" />
+                <xs:element minOccurs="0" name="AutoGenerateBindingRedirects" type="xs:boolean" />
+                <xs:element minOccurs="0" name="AllowCrossPlatformRetargeting" type="xs:boolean" />
+                <xs:element minOccurs="0" name="UseDotNetNativeToolchain" type="xs:boolean" />
+							</xs:sequence>
+							<xs:attribute name="Condition" type="xs:string" use="optional" />
+						</xs:complexType>
+					</xs:element>
+					<xs:element maxOccurs="unbounded" name="ItemGroup">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element minOccurs="0" name="ProjectReference">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="Project" type="xs:string" />
+											<xs:element name="Name" type="xs:string" />
+										</xs:sequence>
+										<xs:attribute name="Include" type="xs:string" use="required" />
+									</xs:complexType>
+								</xs:element>
+							<xs:element minOccurs="0" name="Folder">
+								<xs:complexType>
+									<xs:attribute name="Include" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>
+							<xs:element minOccurs="0" name="None">
+								<xs:complexType>
+									<xs:attribute name="Include" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>
+							<xs:element minOccurs="0" name="Content">
+								<xs:complexType>
+									<xs:attribute name="Include" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>								
+								<xs:element minOccurs="0" maxOccurs="unbounded" name="BootstrapperPackage">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="Visible" type="xs:string" />
+											<xs:element name="ProductName" type="xs:string" />
+											<xs:element name="Install" type="xs:boolean" />
+										</xs:sequence>
+										<xs:attribute name="Include" type="xs:string" use="required" />
+									</xs:complexType>
+								</xs:element>
+								<xs:element minOccurs="0" maxOccurs="unbounded" name="Reference">
+									<xs:complexType>
+										<xs:choice>
+											<xs:element name="HintPath" type="xs:string"/>
+										</xs:choice>
+										<xs:attribute name="Include" type="xs:string" use="required" />
+									</xs:complexType>
+								</xs:element>
+								<xs:element minOccurs="0" maxOccurs="unbounded" name ="AddModules">
+									<xs:complexType>
+										<xs:attribute name="Include" type="xs:string" use="required" />
+										<xs:attribute name="Condition" type="xs:string" />
+									</xs:complexType>
+								</xs:element>
+								<xs:element minOccurs="0" maxOccurs="unbounded" name="Compile">
+									<xs:complexType>
+										<xs:sequence minOccurs="0">
+											<xs:element name="Link" type="xs:string" />
+                      <xs:element name="AutoGen" type="xs:boolean" />
+                      <xs:element name="DependentUpon" type="xs:string"/>
+                      <xs:element name="DesignTimeSharedInput" type="xs:boolean"/>
+                      <xs:element name="SubType" type="xs:string"/>
+										</xs:sequence>
+										<xs:attribute name="Include" type="xs:string" use="required" />
+									</xs:complexType>
+								</xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="EmbeddedResource">
+                  <xs:complexType>
+                    <xs:sequence minOccurs="0">
+                      <xs:element name="DependentUpon" type="xs:string"/>
+                      <xs:element name="Generator" type="xs:string"/>
+                      <xs:element name="LastGenOutput" type="xs:string"/>
+                      <xs:element name="CustomToolNamespace" type="xs:string"/>
+                      <xs:element name="Link" type="xs:string"/>
+                      <xs:element name="SubType" type="xs:string"/>
+                      <xs:element name="CopyToOutputDirectory" type="xs:string"/>
+                      <xs:element name="LogicalName" type="xs:string"/>
+                    </xs:sequence>
+                    <xs:attribute name="Include" type="xs:string" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="1" name="ApplicationDefinition">
+                  <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                      <xs:element name="Generator" type="xs:string"/>
+                      <xs:element name="SubType" type="xs:string"/>
+                    </xs:sequence>
+                    <xs:attribute name="Include" type="xs:string" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Page">
+                  <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                      <xs:element name="Generator" type="xs:string"/>
+                      <xs:element name="SubType" type="xs:string"/>
+                    </xs:sequence>
+                    <xs:attribute name="Include" type="xs:string" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Resource">
+                  <xs:complexType>
+                    <xs:attribute name ="Include" type="xs:string" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="TargetPlatform">
+                  <xs:complexType>
+                    <xs:attribute name="Include" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="Import">
+						<xs:complexType>
+							<xs:attribute name="Project" type="xs:string" use="required" />
+              <xs:attribute name="Condition" type="xs:string" use="optional" />
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+			<xs:attribute name="DefaultTargets" type="xs:string" use="required" />
+			<xs:attribute name="ToolsVersion" type="xs:decimal" use="required" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

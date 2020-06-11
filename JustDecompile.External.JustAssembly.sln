@@ -1,0 +1,109 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompile.External.JustAssembly", "JustDecompile.External.JustAssembly\JustDecompile.External.JustAssembly.csproj", "{B97B9235-C5A9-4F00-AA22-D7E88FBBB4F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompiler", "Cecil.Decompiler\JustDecompiler.csproj", "{ED1BE103-1699-4116-A732-616BEB142EB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil", "Mono.Cecil\Mono.Cecil.csproj", "{D68133BD-1E63-496E-9EDE-4FBDBF77B486}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompile.EngineInfrastructure", "EngineInfrastructure\JustDecompile.EngineInfrastructure.csproj", "{246289A4-53FD-4BB3-923A-08B1D3D905AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.MSBuildProjectBuilder", "MSBuildProjectCreator\Tools.MSBuildProjectBuilder.csproj", "{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil.Pdb", "Mono.Cecil\symbols\pdb\Mono.Cecil.Pdb.csproj", "{63E6915C-7EA4-4D76-AB28-0D7191EEA626}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil.Mdb", "Mono.Cecil\symbols\mdb\Mono.Cecil.Mdb.csproj", "{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemInformationHelpers", "SystemInformationHelpers\SystemInformationHelpers.csproj", "{CED63F54-9464-4CC0-9F3F-D42014C85AC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B97B9235-C5A9-4F00-AA22-D7E88FBBB4F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97B9235-C5A9-4F00-AA22-D7E88FBBB4F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97B9235-C5A9-4F00-AA22-D7E88FBBB4F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97B9235-C5A9-4F00-AA22-D7E88FBBB4F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{ED1BE103-1699-4116-A732-616BEB142EB2}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{D68133BD-1E63-496E-9EDE-4FBDBF77B486}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{246289A4-53FD-4BB3-923A-08B1D3D905AA}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{63E6915C-7EA4-4D76-AB28-0D7191EEA626}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{8559DD7F-A16F-46D0-A05A-9139FAEBA8FD}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Debug|Any CPU.ActiveCfg = Debug JustAssembly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Debug|Any CPU.Build.0 = Debug JustAssembly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Release|Any CPU.ActiveCfg = Release JustAssembly|Any CPU
+		{CED63F54-9464-4CC0-9F3F-D42014C85AC6}.Release|Any CPU.Build.0 = Release JustAssembly|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 8
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfs:8082/defaultcollection
+		SccProjectUniqueName0 = EngineInfrastructure\\JustDecompile.EngineInfrastructure.csproj
+		SccProjectName0 = EngineInfrastructure
+		SccAuxPath0 = http://tfs:8082/defaultcollection
+		SccLocalPath0 = EngineInfrastructure
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName1 = JustDecompile.External.JustAssembly\\JustDecompile.External.JustAssembly.csproj
+		SccProjectName1 = JustDecompile.External.JustAssembly
+		SccAuxPath1 = http://tfs:8082/defaultcollection
+		SccLocalPath1 = JustDecompile.External.JustAssembly
+		SccProvider1 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName2 = Cecil.Decompiler\\JustDecompiler.csproj
+		SccProjectName2 = Cecil.Decompiler
+		SccAuxPath2 = http://tfs:8082/defaultcollection
+		SccLocalPath2 = Cecil.Decompiler
+		SccProvider2 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName3 = Mono.Cecil\\Mono.Cecil.csproj
+		SccProjectName3 = Mono.Cecil
+		SccAuxPath3 = http://tfs:8082/defaultcollection
+		SccLocalPath3 = Mono.Cecil
+		SccProvider3 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName4 = Mono.Cecil\\symbols\\mdb\\Mono.Cecil.Mdb.csproj
+		SccProjectName4 = Mono.Cecil/symbols/mdb
+		SccAuxPath4 = http://tfs:8082/defaultcollection
+		SccLocalPath4 = Mono.Cecil\\symbols\\mdb
+		SccProvider4 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName5 = Mono.Cecil\\symbols\\pdb\\Mono.Cecil.Pdb.csproj
+		SccProjectName5 = Mono.Cecil/symbols/pdb
+		SccAuxPath5 = http://tfs:8082/defaultcollection
+		SccLocalPath5 = Mono.Cecil\\symbols\\pdb
+		SccProvider5 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName6 = MSBuildProjectCreator\\Tools.MSBuildProjectBuilder.csproj
+		SccProjectName6 = MSBuildProjectCreator
+		SccAuxPath6 = http://tfs:8082/defaultcollection
+		SccLocalPath6 = MSBuildProjectCreator
+		SccProvider6 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName7 = SystemInformationHelpers\\SystemInformationHelpers.csproj
+		SccProjectName7 = SystemInformationHelpers
+		SccAuxPath7 = http://tfs:8082/defaultcollection
+		SccLocalPath7 = SystemInformationHelpers
+		SccProvider7 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+	EndGlobalSection
+EndGlobal

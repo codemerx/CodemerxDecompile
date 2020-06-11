@@ -1,0 +1,17 @@
+name: Build in Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Build Solution
+      run: dotnet build CodemerxDecompileEngine.sln -c Release

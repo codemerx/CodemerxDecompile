@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4f6e327d-4d0a-485c-9eda-67c52d593aa2</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Mono.Cecil.Mdb.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Mdb\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Mdb\MdbReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Mdb\MdbWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.CompilerServices.SymbolWriter\MonoSymbolFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.CompilerServices.SymbolWriter\MonoSymbolTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.CompilerServices.SymbolWriter\MonoSymbolWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.CompilerServices.SymbolWriter\SourceMethodBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.CompilerServices.SymbolWriter\SymbolWriterImpl.cs" />
+  </ItemGroup>
+</Project>

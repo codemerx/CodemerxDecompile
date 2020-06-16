@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4d460b44-5552-4fb6-ac35-725e4d1bd9f8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Mono.Cecil.Pdb.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\BitAccess.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\BitSet.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\CvInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\DataStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\DbiDbgHdr.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\DbiHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\DbiModuleInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\DbiSecCon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\Interfaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\IntHashTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\MsfDirectory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbConstant.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbDebugException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbFileHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbFunction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbLine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbLines.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbScope.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbSlot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\PdbTokenLine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Microsoft.Cci.Pdb\SourceLocationProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\ISymUnmanagedDocumentWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\ISymUnmanagedWriter2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\ModuleMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\PdbHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\PdbReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\PdbWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\SymDocumentWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mono.Cecil.Pdb\SymWriter.cs" />
+  </ItemGroup>
+</Project>

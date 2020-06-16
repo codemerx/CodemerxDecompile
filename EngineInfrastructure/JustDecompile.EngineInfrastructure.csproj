@@ -140,50 +140,7 @@
     <Compile Include="..\CommonVersionAssemblyInfo.cs">
       <Link>Properties\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="AssemblyLocators\BaseFrameworkAssemblyLocator.cs" />
-    <Compile Include="AssemblyLocators\DotNet2\FrameworkAssemblyLocator2Base.cs" />
-    <Compile Include="AssemblyLocators\DotNet2\FrameworkAssemblyLocator2x64.cs" />
-    <Compile Include="AssemblyLocators\DotNet2\FrameworkAssemblyLocator2x86.cs" />
-    <Compile Include="AssemblyLocators\DotNet3x\FrameworkAssemblyLocator3xBase.cs" />
-    <Compile Include="AssemblyLocators\DotNet3x\FrameworkAssemblyLocator3x86.cs" />
-    <Compile Include="AssemblyLocators\DotNet4x\FrameworkAssembly4xLocatorFactory.cs" />
-    <Compile Include="AssemblyLocators\DotNet3x\FrameworkAssemblyLocator3x64.cs" />
-    <Compile Include="AssemblyLocators\DotNet4x\FrameworkAssemblyLocator4x64.cs" />
-    <Compile Include="AssemblyLocators\DotNet4x\FrameworkAssemblyLocator4x86.cs" />
-    <Compile Include="AssemblyLocators\DotNet4x\FrameworkAssemblyLocator4xBase.cs" />
-    <Compile Include="AssemblyLocators\IFrameworkAssemblyLocator.cs" />
-    <Compile Include="AssemblyLocators\Silverlight\SilverlightAssembliesLocatorBase.cs" />
-    <Compile Include="AssemblyLocators\Silverlight\SilverlightX64AssembliesLocator.cs" />
-    <Compile Include="AssemblyTypes.cs" />
-    <Compile Include="CLRHelper.cs" />
-    <Compile Include="CodeViewer\CodeClassificationSpan.cs" />
-    <Compile Include="CodeViewer\CodeFormatterBase.cs" />
-    <Compile Include="CodeViewer\DecompiledSourceCode.cs" />
-    <Compile Include="CodeViewer\ICodeFormatter.cs" />
-    <Compile Include="CodeViewer\JDClassificationTypes.cs" />
-    <Compile Include="DangerousResourceIdentifier.cs" />
-    <Compile Include="EmptyResolver.cs" />
-    <Compile Include="IAssemblyInfoService.cs" />
-    <Compile Include="ILanguageSelector.cs" />
-    <Compile Include="ILanguageSelectorService.cs" />
-    <Compile Include="Infrastructure\AccessTypes.cs" />
-    <Compile Include="Infrastructure\ICodeClassificationSpan.cs" />
-    <Compile Include="Infrastructure\ICodeViewerResults.cs" />
-    <Compile Include="Infrastructure\ITabCodeSettings.cs" />
-    <Compile Include="Infrastructure\MessageToken.cs" />
-    <Compile Include="Infrastructure\PositionToken.cs" />
-    <Compile Include="Infrastructure\Token.cs" />
-    <Compile Include="Infrastructure\TokenKind.cs" />
-    <Compile Include="LanguageSelectorServiceDefault.cs" />
-    <Compile Include="AssemblyLocators\NumberedFrameworkAssemblyLocator.cs" />
-    <Compile Include="NoCacheAssemblyInfoService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AssemblyLocators\Silverlight\SilverlightX86AssembliesLocator.cs" />
-    <Compile Include="AssemblyLocators\WinRTMetadataAssembliesLocator.cs" />
-    <Compile Include="Framework4VersionResolver.cs" />
-    <Compile Include="ResourceStrings.cs" />
-    <Compile Include="Xaml\ITextFormatter.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
     <Compile Include="..\..\CommonAssemblyInfo.cs">
@@ -205,6 +162,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

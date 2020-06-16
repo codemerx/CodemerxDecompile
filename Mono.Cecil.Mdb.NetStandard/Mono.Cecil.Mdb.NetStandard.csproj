@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>Telerik.JustDecompile.Mono.Cecil.Mdb.NetStandard</AssemblyName>
+  </PropertyGroup>
+
+  <Import Project="..\Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
+  </ItemGroup>
+
+</Project>

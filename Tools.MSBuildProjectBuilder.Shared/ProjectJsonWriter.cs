@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if NETSTANDARD
+using System.Text.Json;
+#else
 using System.Web.Script.Serialization;
+#endif
 using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.External.Interfaces;
 
@@ -35,7 +39,19 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
         public bool WriteProjectJsonFile()
         {
             ProjectJson projectJson = new ProjectJson(this.dependencies, this.framework, this.runtimes);
-            string jsonContent = new JavaScriptSerializer().Serialize(projectJson);
+            string jsonContent;
+
+            // AGPL License
+#if NETSTANDARD
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            jsonContent = JsonSerializer.Serialize(projectJson, typeof(ProjectJson), options);
+#else
+            jsonContent = new JavaScriptSerializer().Serialize(projectJson);
+#endif
 
             try
             {

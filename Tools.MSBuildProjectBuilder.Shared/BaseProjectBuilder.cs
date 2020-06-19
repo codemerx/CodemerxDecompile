@@ -28,6 +28,9 @@ using Telerik.JustDecompiler.Languages;
 using JustDecompile.Tools.MSBuildProjectBuilder.FilePathsServices;
 using JustDecompile.Tools.MSBuildProjectBuilder.ProjectItemFileWriters;
 using JustDecompile.Tools.MSBuildProjectBuilder.Contracts.FileManagers;
+#if NETSTANDARD
+using System.Resources.NetStandard;
+#endif
 
 #if !ENGINEONLYBUILD && !JUSTASSEMBLY
 using Telerik.Baml;

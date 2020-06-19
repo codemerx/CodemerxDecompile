@@ -104,7 +104,9 @@
     <Compile Include="..\..\..\CommonVersionAssemblyInfo.cs">
       <Link>Mono.Cecil.Mdb\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\ProjectInfo.cs" />
+    <Compile Include="..\..\..\Mono.Cecil.Shared\ProjectInfo.cs">
+      <Link>ProjectInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="..\..\..\Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

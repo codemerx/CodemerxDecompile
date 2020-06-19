@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyName>Telerik.JustDecompile.Mono.Cecil.Mdb.NetStandard</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems" Label="Shared" />

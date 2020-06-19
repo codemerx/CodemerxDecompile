@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4588ebf7-b0ac-4c58-9841-e8c8353f8e50</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>JustDecompileCmd.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CmdShell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandLineError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandLineHelpError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandLineManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConsoleFrameworkResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeneratorProjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IProjectGenerationError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestCmdShell.cs" />
+  </ItemGroup>
+</Project>

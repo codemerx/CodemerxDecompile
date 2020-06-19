@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
 
 namespace SystemInformationHelpers
@@ -20,14 +21,14 @@ namespace SystemInformationHelpers
             {
                 if (versionInfo.FileMinorPart == 7)
                 {
-					if (versionInfo.FileBuildPart >= 2558)
-					{
-						return FrameworkVersion.v4_7_1;
-					}
-					else
-					{
-						return FrameworkVersion.v4_7;
-					}
+                    if (versionInfo.FileBuildPart >= 2558)
+                    {
+                        return FrameworkVersion.v4_7_1;
+                    }
+                    else
+                    {
+                        return FrameworkVersion.v4_7;
+                    }
                 }
                 else if (versionInfo.FileMinorPart == 6)
                 {
@@ -83,8 +84,24 @@ namespace SystemInformationHelpers
                 {
                     try
                     {
-                        RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                                                        .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\");
+                        RegistryKey ndpKey;
+
+                        // AGPL License
+#if NETSTANDARD
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+#endif
+                            // Registry Code
+                            ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                                                            .OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\");
+#if NETSTANDARD
+                        }
+                        else
+                        {
+                            throw new NotSupportedException("Assembly type is not supported on this OS.");
+                        }
+#endif
+
                         using (ndpKey)
                         {
                             // At this line is the only chance for NullReferenceException. If it's thrown there is something wrong
@@ -98,11 +115,11 @@ namespace SystemInformationHelpers
                             // The following values are taken from here: https://msdn.microsoft.com/en-us/library/hh925568%28v=vs.110%29.aspx
                             int releaseKey = Convert.ToInt32(releaseKeyAsObject);
 
-							if (releaseKey >= 461308)
-							{
-								installedFramework4Version = FrameworkVersion.v4_7_1;
-							}
-							else if (releaseKey >= 460798)
+                            if (releaseKey >= 461308)
+                            {
+                                installedFramework4Version = FrameworkVersion.v4_7_1;
+                            }
+                            else if (releaseKey >= 460798)
                             {
                                 installedFramework4Version = FrameworkVersion.v4_7;
                             }

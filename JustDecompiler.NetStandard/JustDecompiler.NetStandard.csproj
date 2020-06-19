@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
+    <ProjectReference Include="..\Mono.Cecil.Pdb.NetStandard\Mono.Cecil.Pdb.NetStandard.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\JustDecompiler.Shared\JustDecompiler.Shared.projitems" Label="Shared" />
+
+</Project>

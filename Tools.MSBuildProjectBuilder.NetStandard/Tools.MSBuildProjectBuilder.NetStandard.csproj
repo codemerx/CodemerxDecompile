@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="..\Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <PackageReference Include="ResXResourceReader.NetStandard" Version="1.0.1" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JustDecompile.EngineInfrastructure.NetStandard\JustDecompile.EngineInfrastructure.NetStandard.csproj" />
+    <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -130,7 +130,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Condition=" '$(Configuration)' == 'Release Server JustAssembly' " Include="..\..\CompanyAssemblyInfo.cs">
@@ -139,78 +138,11 @@
     <Compile Include="..\CommonVersionAssemblyInfo.cs">
       <Link>Properties\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="BaseProjectBuilder.cs" />
-    <Compile Include="Constants\LanguageConstants.cs" />
-    <Compile Include="Constants\UAPConstants.cs" />
-    <Compile Include="Constants\WinRTConstants.cs" />
-    <Compile Include="Contracts\FileManagers\IMsBuildProjectManager.cs" />
-    <Compile Include="Contracts\FileManagers\INetCoreProjectManager.cs" />
-    <Compile Include="Contracts\FileManagers\IWinRTProjectManager.cs" />
-    <Compile Include="Contracts\IAppDefinitionProjectItemWriter.cs" />
-    <Compile Include="Contracts\FileManagers\IProjectManager.cs" />
-    <Compile Include="Contracts\IProjectItemWriter.cs" />
-    <Compile Include="Contracts\IRegularProjectItemWriter.cs" />
-    <Compile Include="Contracts\IResourceProjectItemWriter.cs" />
-    <Compile Include="Contracts\IResXDesignerProjectItemWriter.cs" />
-    <Compile Include="Contracts\IWinFormsProjectItemWriter.cs" />
-    <Compile Include="Contracts\IXamlPageProjectItemWriter.cs" />
-    <Compile Include="Contracts\IXamlProjectItemWriter.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="IProjectGenerationNotifier.cs" />
-    <Compile Include="NetCore\NetCoreProject.cs">
-      <DependentUpon>NetCoreProject.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="NetCore\NetCoreProjectBuilder.cs" />
-    <Compile Include="ProjectFileManagers\MsBuildProjectFileManager.cs" />
-    <Compile Include="ProjectFileManagers\NetCoreProjectFileManager.cs" />
-    <Compile Include="ProjectFileManagers\ProjectFileManager.cs" />
-    <Compile Include="ProjectFileManagers\TestNetCoreProjectFileManager.cs" />
-    <Compile Include="ProjectFileManagers\WinRTProjectFileManager.cs" />
-    <Compile Include="ProjectGenerationSettings.cs" />
-    <Compile Include="FilePathsServices\DefaultFilePathsAnalyzer.cs" />
-    <Compile Include="FilePathsServices\DefaultFilePathsService.cs" />
-    <Compile Include="FilePathsServices\IFilePathsAnalyzer.cs" />
-    <Compile Include="FilePathsServices\IFilePathsService.cs" />
-    <Compile Include="ProjectGenerationSettingsProvider.cs" />
-    <Compile Include="ProjectJsonWriter.cs" />
-    <Compile Include="SolutionWriter.cs" />
-    <Compile Include="TestMSBuildProjectBuilder.cs" />
-    <Compile Include="TestNetCoreProjectBuilder.cs" />
-    <Compile Include="TestWinRTProjectBuilder.cs" />
-    <Compile Include="Utilities.cs" />
-    <Compile Include="MSBuildProject.cs">
-      <DependentUpon>MSBuildProject.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="MSBuildProjectBuilder.cs" />
-    <Compile Include="ProjectFileCreated.cs" />
-    <Compile Include="ProjectItemFileWriters\AppDefinitionItemWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\BaseProjectItemFileWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\BaseXamlFileWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\IProjectItemFileWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\RegularProjectItemWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\ProjectItemWriterFactory.cs" />
-    <Compile Include="ProjectItemFileWriters\ResXDesignerWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\WinFormsItemWriter.cs" />
-    <Compile Include="ProjectItemFileWriters\XamlPageItemWriter.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VisualStudioVersion.cs" />
-    <Compile Include="WinRTProjectBuilder.cs" />
-    <Compile Include="WinRTProjectType.cs" />
-    <Compile Include="WinRTProjectTypeDetector.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MSBuildProject.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="NetCore\NetCoreProject.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="UpdateClassGeenratedFromSchema.bat" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' ">
     <ProjectReference Include="..\..\Tools\Telerik.Baml\Telerik.Baml.csproj">
@@ -232,6 +164,7 @@
       <Name>JustDecompile.EngineInfrastructure</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

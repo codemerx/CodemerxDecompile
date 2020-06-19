@@ -116,10 +116,7 @@
     <Compile Include="..\CommonVersionAssemblyInfo.cs">
       <Link>Properties\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Framework4VersionResolver.cs" />
-    <Compile Include="FrameworkVersion.cs" />
-    <Compile Include="MachineInformation.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <Import Project="..\SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

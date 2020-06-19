@@ -19,11 +19,11 @@
   </PropertyGroup>
   <!--Telerik Authorship-->
   <PropertyGroup Condition=" $(Configuration.EndsWith('Debug')) ">
-	<OutputPath>..\..\..\..\UI\DebugBuild\</OutputPath>
+    <OutputPath>..\..\..\..\UI\DebugBuild\</OutputPath>
   </PropertyGroup>
   <!--Telerik Authorship-->
   <PropertyGroup Condition=" $(Configuration.EndsWith('Release')) ">
-	<OutputPath>..\..\..\..\UI\ReleaseBuild\</OutputPath>
+    <OutputPath>..\..\..\..\UI\ReleaseBuild\</OutputPath>
   </PropertyGroup>
   <!--Telerik Authorship-->
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'net_3_5_ReleaseServer|AnyCPU' ">
@@ -104,16 +104,10 @@
     <Compile Include="..\..\..\CommonVersionAssemblyInfo.cs">
       <Link>Mono.Cecil.Mdb\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    
-    <Compile Include="..\..\ProjectInfo.cs" />
-    <Compile Include="Mono.Cecil.Mdb\AssemblyInfo.cs" />
-    <Compile Include="Mono.Cecil.Mdb\MdbReader.cs" />
-    <Compile Include="Mono.Cecil.Mdb\MdbWriter.cs" />
-    <Compile Include="Mono.CompilerServices.SymbolWriter\MonoSymbolFile.cs" />
-    <Compile Include="Mono.CompilerServices.SymbolWriter\MonoSymbolTable.cs" />
-    <Compile Include="Mono.CompilerServices.SymbolWriter\MonoSymbolWriter.cs" />
-    <Compile Include="Mono.CompilerServices.SymbolWriter\SourceMethodBuilder.cs" />
-    <Compile Include="Mono.CompilerServices.SymbolWriter\SymbolWriterImpl.cs" />
+    <Compile Include="..\..\..\Mono.Cecil.Shared\ProjectInfo.cs">
+      <Link>ProjectInfo.cs</Link>
+    </Compile>
   </ItemGroup>
+  <Import Project="..\..\..\Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

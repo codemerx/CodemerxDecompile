@@ -9,6 +9,10 @@
     <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
     <ProjectReference Include="..\Mono.Cecil.Pdb.NetStandard\Mono.Cecil.Pdb.NetStandard.csproj" />

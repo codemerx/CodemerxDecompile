@@ -8,6 +8,10 @@
     <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+  </PropertyGroup>
+
   <Import Project="..\JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems" Label="Shared" />
 
   <ItemGroup>

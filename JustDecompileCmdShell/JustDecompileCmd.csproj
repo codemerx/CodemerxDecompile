@@ -197,7 +197,6 @@
     <Compile Include="..\CommonVersionAssemblyInfo.cs">
       <Link>Properties\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cecil.Decompiler\JustDecompiler.csproj">

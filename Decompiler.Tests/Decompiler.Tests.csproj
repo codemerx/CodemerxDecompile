@@ -1,0 +1,2141 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\CustomAttributeExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\DecompilationLocker.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\EventDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\FieldReferenceExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ICustomAttributeProviderExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\IGenericInstanceExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\IGenericParameterProviderExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ImplementedMember.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\InstructionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MemberDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MemberNamingExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MethodDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MethodReferenceExtentions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ModuleDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ParameterDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ParameterReferenceExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\PropertyDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\SecurityAttributeExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\SecurityDeclarationExtension.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\TypeDefinitionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\TypeReferenceExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\GenericHelper.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BaseCodeNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BaseCodeTransformer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BaseCodeVisitor.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BinaryOperator.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\CodeNodeType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ExpressionExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AnonymousObjectCreationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AnonymousPropertyInitializerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArgumentReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayAssignmentFieldReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayCreationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayIndexerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayLengthExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayVariableDeclarationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayVariableReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AutoPropertyConstructorInitializerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AwaitExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BaseCtorExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BaseReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BinaryExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BlockExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BoxExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\CanCastExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\CastExpressionBase.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\CheckedExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ConditionExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DefaultObjectExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DelegateCreationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DelegateInvokeExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DynamicConstructorInvocationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DynamicIndexerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DynamicMemberReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\EnumExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\EventReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ExplicitCastExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\Expression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ExpressionCollection.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\FieldInitializerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\FieldReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\FromClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\GroupClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ImplicitCastExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\InitializerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\InitializerType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\IntoClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\JoinClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LambdaExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LambdaParameterExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LetClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LinqQueryExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LiteralExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MakeRefExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MemberHandleExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MemberReferenceExpresion.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MethodInvocationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MethodReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ObjectCreationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\OrderByClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ParenthesesExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\PropertyInitializerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\PropertyReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\QueryClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\RaiseEventExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\RefReturnExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\RefVariableDeclarationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ReturnExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\SafeCastExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\SelectClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ShortFormReturnExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\SizeOfExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\StackAllocExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ThisCtorExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ThisReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ThrowExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\TypeOfExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\TypeReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\UnaryExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\VariableDeclarationExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\VariableReferenceExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\WhereClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\YieldBreakExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\YieldReturnExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ICodeNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ICodeTransformer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ICodeVisitor.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\IIndexerExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\IPdbCodeNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\OrderDirection.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\StatementExtensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BasePdbStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BlockStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BreakStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BreakSwitchCaseStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CaseGotoStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CatchClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CatchClauseCollection.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CompilerOptimizedSwitchByStringStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ConditionCase.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ConditionStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ContinueStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\DefaultCase.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\DoWhileStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\EmptyStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ExceptionStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ExpressionStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\FinallyClause.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\FixedStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ForEachStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ForStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\GotoStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\IfElseIfStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\IfStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\LockStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\Statement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\StatementCollection.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\SwitchCase.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\SwitchCaseCollection.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\SwitchStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\TryStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\UnsafeBlockStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\UsingStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\WhileStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\UnaryOperator.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\BaseInstructionVisitor.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\BlockRange.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ControlFlowGraph.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ControlFlowGraphAnalyser.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ControlFlowGraphBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\Formatter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\IInstructionVisitor.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\InstructionBlock.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\InstructionDispatcher.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ISingleEntrySubGraph.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\SwitchData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\DynamicHelper.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\EnumValueToFieldCombinationMatcher.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\ExpressionType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\Extensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\LambdaExpressionsHelper.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\NamespaceHierarchy\NamespaceHierarchyNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\NamespaceHierarchy\NamespaceHierarchyTree.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\NamespaceHierarchy\NamespaceHierarchyTreeBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\PairList_K, V_.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\SwitchHelpers.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\UnionFinder_T_.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\VariableFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Constants.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\DecompilationException.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssemblySpecificContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentAnalyzer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentFlowNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentNodeState.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\BaseAssignmentAnalysisStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\BaseUsageFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\FieldUsageFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\OutParameterUsageFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\UsageFinderSearchResult.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\VariableUsageFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AsyncData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AttributesUtilities.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AutoImplementedEventMatcher.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\BlockDecompilationPipeline.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\CachedDecompiledMember.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\DecompilationCache_Key, Value_.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\DefaultDecompilationCacheService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\EmptyDecompilationCacheService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\IDecompilationCacheService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\IDecompilationCache_Key, Value_.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\ProjectGenerationDecompilationCacheService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\CompilerOptimizedSwitchByStringData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompilationAnalysisResults.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompilationContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompilationPipeline.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompiledMember.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompiledType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DefineUseAnalysis\StackUsageAnalysis.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DefineUseAnalysis\StackUsageData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DefineUseAnalysis\StackVariableDefineUseInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DependsOnAnalysisVisitor.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DocumentationCache.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExplicitlyImplementedMembersCollection.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExpressionDecompilerData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExpressionDecompilerStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExpressionPropagation\ExpressionPropagationStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Extensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\FilterMethodToBeDecompiled.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GeneratedMethod.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\AfterGotoCleanupStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\ContinueAndBreakFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\GotoCancelation.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\TotalGotoEliminationStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\InitializationAssignment.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\BaseVariablesInliner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\EmptyVariablesToNotInlineFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\IVariableInliner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\IVariablesToNotInlineFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\MethodVariablesInliner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\RestrictedVariableInliner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\SideEffectsFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\SimpleVariableInliner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\StackVariablesInliner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\VisualBasicVariablesToNotInlineFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\IStateMachineData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\BlockLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\CFGBlockLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\CFGBlockSplitter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Common\TreeNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\ConditionBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\ConditionLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\IfBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\IfLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTEdge.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTree.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DominatorTreeDependentStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\BaseDominatorTreeBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\DominatorTree.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\DTNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\FastDominatorTreeBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\EmptyBlockLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\ExceptionHandlingBlockCatch.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\ExceptionHandlingBlockFilter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\ExceptionHandlingLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\FilteringExceptionHandlerType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\GuardedBlocksBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\GuardedBlocksFollowNodesFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\IFilteringExceptionHandler.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\TryCatchFilterLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\TryFaultLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\TryFinallyLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\FollowNodeLoopCleanUpStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\FollowNodes\FollowNodeDeterminator.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\FollowNodes\MaxWeightDisjointPathsFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IBreaksContainer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IInstructionBlockContainer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\ILogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IntervalAnalyzer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IntervalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalConstructBase.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalFlowBuilderContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalFlowBuilderStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalFlowUtilities.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Loops\LoopBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Loops\LoopLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Loops\LoopType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\PartialCFGBlockLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Switches\CaseLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Switches\SwitchBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Switches\SwitchLogicalConstruct.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\YieldGuardedBlocksBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\DefaultMemberRenamingService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\IMemberRenamingService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\MemberRenamingData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\WinRTRenamingService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MethodSpecificContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ModuleSpecificContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\PropertyDecompiler.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\AsyncMoveNextMethodAnalyzer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\AsyncStateControllerRemover.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\AsyncStateMachineVersion.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\DisposingStateControllerRemover.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateControllerRemover.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineCFGCleaner.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineDisposeAnalyzer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineDoFinallyCheckRemover.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineFinallyCheckRemoverBase.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineFinallyStateCheckRemover.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineUtilities.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\YieldStateMachineControlFlowRebuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StatementDecompilerStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ClassHierarchyBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ClassHierarchyNode.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ConnectedComponentsFinder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ExpressionTypeInferer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\GreedyTypeInferer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\IntegerTypeInferer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\IntegerTypesHierarchyBuilder.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\TypeInferer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\UsedAsTypeHelper.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeNamesComparer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeSpecificContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\UsageBasedExpressionFixer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Utilities.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\BaseWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\FrameworkFoldersWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\IWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\SimpleWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\TypeCollisionWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\TypeDeclarationsWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\WinRTWriterContextService.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldExceptionHandlerInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldExceptionHandlerType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldFieldsInformation.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldStateMachineVersion.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Architecture.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\AssemblyIdentifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\DecompilationPreferences.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\ExceptionThrownNotifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\ExternallyVisibleDecompilationUtilities.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\FileGeneratedInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\IFileGenerationNotifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IDecompilationPreferences.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IDecompiler.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IExceptionThrownNotifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IFileGeneratedInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IFrameworkResolver.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IFrameworkResolverWithUserInteraction.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\ITypeGeneratedInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IUniqueMemberIdentifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\MemberIdentifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\TypeGeneratedInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\UniqueMemberIdentifier.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\AttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseAssemblyAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseImperativeLanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseLanguage.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseLanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CodeMappingInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CodePosition.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CodeSpan.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpAssemblyAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpKeyWordWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpVersion.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\ICSharp.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IAssemblyAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IExceptionFormatter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IFormatter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IKeyWordWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\ILanguage.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\ILanguageTestCaseWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\ILanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\CodeMappings.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\FlagsWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILBlock.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILBlockType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILHelpers.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILRange.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguage.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguageAssemblyAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguageAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\MemberMapping.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\OpCodeInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\SourceCodeMapping.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\INamespaceLanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\InfinityConstants.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IWriterSettings.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\LanguageFactory.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\MemberNamingUtils.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\NamespaceImperativeLanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\OffsetSpan.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\PlainTextFormatter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\SimpleExceptionFormatter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\TestCaseExceptionFormatter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\TestCaseWriters\IntermediateDecompilationCSharpLanguageWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\TestCaseWriters\TestCaseCSharpWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\IVisualBasic.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\StatementState.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicAssemblyAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicAttributeWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicKeyWordWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicVersion.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicWriter.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\WriterSettings.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\WritingInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Assignment.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Binary.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\CodePattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\CodePattern_TNode_.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Constant.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ContextData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ContextVariableReference.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ExpressionStatement.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Extensions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ICodePattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Literal.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\MatchContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\MatchData.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\SafeCast.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\VariableReference.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ArrayVariablesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\AssignOutParametersStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\BaseStateMachineRemoverStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CanCastStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CaseGotoTransformerStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CastEnumsToIntegersStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CastIntegersStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatternsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\ArrayInitialisationPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\BaseInitialisationPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CatchClausesFilterPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CodePatternsContext.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CollectionInitializationPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CommonPatterns.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\DefineUseCount.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\ICodePattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\InitializationPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\MultiAssignPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\NullCoalescingPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\ObjectInitialisationPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\RaiseEventPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\TernaryConditionPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\TernaryConditionPatternAgressive.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\VariableInliningPattern.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\VariableInliningPatternAggressive.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CombinedTransformerStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CreateCompilerOptimizedSwitchByStringStatementsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CreateIfElseIfStatementsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DeclareTopLevelVariables.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DeclareVariablesOnFirstAssignment.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DeduceImplicitDelegates.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DependsOnAnalysisStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DetermineCtorInvocationStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DetermineDestructorStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DetermineNotSupportedVBCodeStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\CallSiteBinderType.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\CallSiteInfo.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\CallSiteInvocationReplacer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\DynamicElementAnalyzer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\EnumHelper.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ExpressionComparer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FieldAssignmentAnalysisStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FindAutoBoxesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixBinaryExpressionsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixMethodOverloadsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixSwitchCasesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixSwitchConditionStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\HandleVirtualMethodInvocations.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\IDecompilationStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\Inflector.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\InstructionMappingsCheck.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ManagedPointersRemovalStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\MapUnconditionalBranchesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\Matcher.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\MergeUnaryAndBinaryExpression.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\Negator.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\OperatorStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\OutParameterAssignmentAnalysisStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ParenthesizeExpressionsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\PropertyRecognizer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildAnonymousDelegatesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildAnonymousTypesInitializersStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildAsyncStatementsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildCatchClausesFilterStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildDoWhileStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildEventsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildExpressionTreesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildFixedStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildForeachArrayStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildForeachStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildForStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildLambdaExpressions.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildLinqQueriesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildLockStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildUsingStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildVBForStatements.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildYieldStatementsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveAsyncStateMachineStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveCompilerOptimizationsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveConditionOnlyVariables.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveDelegateCachingStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveLastReturn.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemovePrivateImplementationDetailsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveUnreachableBlocksStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveUnusedVariablesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveYieldStateMachineStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameEnumValues.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameSplitPropertiesMethodsAndBackingFields.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameVariables.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameVBVariables.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ReplaceDelegateInvokeStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ResolveDynamicVariablesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SelfAssignment.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SentinelStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SimpleDereferencer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SwitchByString\RebuildSwitchByString.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SwitchByString\SwitchByStringFixer.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SwitchByString\SwitchByStringMatcher.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\TransformCatchClausesFilterExpressionStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\TransformMemberHandlersStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\TypeOfStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\UnsafeMethodBodyStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VariableAssignmentAnalysisStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VariableMatcher.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VBCodePatternsStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VBSelfAssignment.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VisualBasicRemoveDelegateCachingStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VisualBasicRemoveUnusedVariablesStep.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\SupportedLanguages.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\ThreadSafeWeakAssemblyResolver.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\TwoDimensionalString.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\WeakAssemblyResolver.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\XmlDocumentationReaders\DocumentationManager.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\XmlDocumentationReaders\XmlDocumentationReader.cs" />
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\XmlDocumentationReaders\XmlDocumentationResolver.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Integration\Actual\JustDecompileCmd.NetStandard.dll" />
+    <None Remove="Integration\Expected\JustDecompiler.NetStandard\JustDecompiler.NetStandardReferences\Telerik.JustDecompile.Mono.Cecil.NetStandard.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Integration\Actual\JustDecompileCmd.NetStandard.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\JustDecompiler.NetStandardReferences\Telerik.JustDecompile.Mono.Cecil.NetStandard.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\CustomAttributeExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\DecompilationLocker.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\EventDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\FieldReferenceExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ICustomAttributeProviderExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\IGenericInstanceExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\IGenericParameterProviderExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ImplementedMember.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\InstructionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MemberDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MemberNamingExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MethodDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\MethodReferenceExtentions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ModuleDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ParameterDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\ParameterReferenceExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\PropertyDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\SecurityAttributeExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\SecurityDeclarationExtension.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\TypeDefinitionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\Extensions\TypeReferenceExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Mono.Cecil\GenericHelper.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BaseCodeNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BaseCodeTransformer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BaseCodeVisitor.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\BinaryOperator.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\CodeNodeType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ExpressionExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AnonymousObjectCreationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AnonymousPropertyInitializerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArgumentReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayAssignmentFieldReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayCreationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayIndexerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayLengthExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayVariableDeclarationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ArrayVariableReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AutoPropertyConstructorInitializerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\AwaitExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BaseCtorExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BaseReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BinaryExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BlockExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\BoxExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\CanCastExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\CastExpressionBase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\CheckedExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ConditionExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DefaultObjectExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DelegateCreationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DelegateInvokeExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DynamicConstructorInvocationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DynamicIndexerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\DynamicMemberReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\EnumExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\EventReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ExplicitCastExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\Expression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ExpressionCollection.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\FieldInitializerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\FieldReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\FromClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\GroupClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ImplicitCastExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\InitializerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\InitializerType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\IntoClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\JoinClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LambdaExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LambdaParameterExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LetClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LinqQueryExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\LiteralExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MakeRefExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MemberHandleExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MemberReferenceExpresion.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MethodInvocationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\MethodReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ObjectCreationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\OrderByClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ParenthesesExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\PropertyInitializerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\PropertyReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\QueryClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\RaiseEventExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\RefReturnExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\RefVariableDeclarationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ReturnExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\SafeCastExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\SelectClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ShortFormReturnExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\SizeOfExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\StackAllocExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ThisCtorExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ThisReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\ThrowExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\TypeOfExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\TypeReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\UnaryExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\VariableDeclarationExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\VariableReferenceExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\WhereClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\YieldBreakExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Expressions\YieldReturnExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ICodeNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ICodeTransformer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\ICodeVisitor.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\IIndexerExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\IPdbCodeNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\OrderDirection.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\StatementExtensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BasePdbStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BlockStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BreakStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\BreakSwitchCaseStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CaseGotoStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CatchClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CatchClauseCollection.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\CompilerOptimizedSwitchByStringStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ConditionCase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ConditionStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ContinueStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\DefaultCase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\DoWhileStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\EmptyStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ExceptionStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ExpressionStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\FinallyClause.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\FixedStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ForEachStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\ForStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\GotoStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\IfElseIfStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\IfStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\LockStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\Statement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\StatementCollection.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\SwitchCase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\SwitchCaseCollection.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\SwitchStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\TryStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\UnsafeBlockStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\UsingStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\Statements\WhileStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Ast\UnaryOperator.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\BaseInstructionVisitor.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\BlockRange.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ControlFlowGraph.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ControlFlowGraphAnalyser.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ControlFlowGraphBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\Formatter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\IInstructionVisitor.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\InstructionBlock.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\InstructionDispatcher.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\ISingleEntrySubGraph.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Cil\SwitchData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\DynamicHelper.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\EnumValueToFieldCombinationMatcher.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\ExpressionType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\Extensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\LambdaExpressionsHelper.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\NamespaceHierarchy\NamespaceHierarchyNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\NamespaceHierarchy\NamespaceHierarchyTree.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\NamespaceHierarchy\NamespaceHierarchyTreeBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\PairList_K, V_.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\SwitchHelpers.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\UnionFinder_T_.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Common\VariableFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Constants.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\DecompilationException.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssemblySpecificContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentAnalyzer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentFlowNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentNodeState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\AssignmentType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\BaseAssignmentAnalysisStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\BaseUsageFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\FieldUsageFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\OutParameterUsageFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\UsageFinderSearchResult.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AssignmentAnalysis\VariableUsageFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AsyncData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AttributesUtilities.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\AutoImplementedEventMatcher.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\BlockDecompilationPipeline.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\CachedDecompiledMember.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\DecompilationCache_Key, Value_.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\DefaultDecompilationCacheService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\EmptyDecompilationCacheService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\IDecompilationCacheService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\IDecompilationCache_Key, Value_.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Caching\ProjectGenerationDecompilationCacheService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\CompilerOptimizedSwitchByStringData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompilationAnalysisResults.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompilationContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompilationPipeline.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompiledMember.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DecompiledType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DefineUseAnalysis\StackUsageAnalysis.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DefineUseAnalysis\StackUsageData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DefineUseAnalysis\StackVariableDefineUseInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DependsOnAnalysisVisitor.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\DocumentationCache.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExplicitlyImplementedMembersCollection.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExpressionDecompilerData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExpressionDecompilerStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ExpressionPropagation\ExpressionPropagationStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Extensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\FilterMethodToBeDecompiled.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GeneratedMethod.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\AfterGotoCleanupStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\ContinueAndBreakFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\GotoCancelation.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\GotoElimination\TotalGotoEliminationStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\InitializationAssignment.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\BaseVariablesInliner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\EmptyVariablesToNotInlineFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\IVariableInliner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\IVariablesToNotInlineFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\MethodVariablesInliner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\RestrictedVariableInliner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\SideEffectsFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\SimpleVariableInliner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\StackVariablesInliner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Inlining\VisualBasicVariablesToNotInlineFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\IStateMachineData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\BlockLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\CFGBlockLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\CFGBlockSplitter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Common\TreeNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\ConditionBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\ConditionLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\IfBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Conditions\IfLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTEdge.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DFST\DFSTree.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DominatorTreeDependentStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\BaseDominatorTreeBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\DominatorTree.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\DTNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\DTree\FastDominatorTreeBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\EmptyBlockLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\ExceptionHandlingBlockCatch.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\ExceptionHandlingBlockFilter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\ExceptionHandlingLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\FilteringExceptionHandlerType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\GuardedBlocksBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\GuardedBlocksFollowNodesFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\IFilteringExceptionHandler.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\TryCatchFilterLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\TryFaultLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Exceptions\TryFinallyLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\FollowNodeLoopCleanUpStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\FollowNodes\FollowNodeDeterminator.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\FollowNodes\MaxWeightDisjointPathsFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IBreaksContainer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IInstructionBlockContainer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\ILogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IntervalAnalyzer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\IntervalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalConstructBase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalFlowBuilderContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalFlowBuilderStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\LogicalFlowUtilities.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Loops\LoopBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Loops\LoopLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Loops\LoopType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\PartialCFGBlockLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Switches\CaseLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Switches\SwitchBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\Switches\SwitchLogicalConstruct.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\LogicFlow\YieldGuardedBlocksBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\DefaultMemberRenamingService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\IMemberRenamingService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\MemberRenamingData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MemberRenamingServices\WinRTRenamingService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\MethodSpecificContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\ModuleSpecificContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\PropertyDecompiler.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\AsyncMoveNextMethodAnalyzer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\AsyncStateControllerRemover.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\AsyncStateMachineVersion.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\DisposingStateControllerRemover.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateControllerRemover.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineCFGCleaner.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineDisposeAnalyzer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineDoFinallyCheckRemover.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineFinallyCheckRemoverBase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineFinallyStateCheckRemover.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\StateMachineUtilities.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StateMachines\YieldStateMachineControlFlowRebuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\StatementDecompilerStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ClassHierarchyBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ClassHierarchyNode.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ConnectedComponentsFinder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\ExpressionTypeInferer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\GreedyTypeInferer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\IntegerTypeInferer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\IntegerTypesHierarchyBuilder.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\TypeInferer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeInference\UsedAsTypeHelper.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeNamesComparer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\TypeSpecificContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\UsageBasedExpressionFixer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\Utilities.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\BaseWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\FrameworkFoldersWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\IWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\SimpleWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\TypeCollisionWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\TypeDeclarationsWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\WriterContextServices\WinRTWriterContextService.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldExceptionHandlerInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldExceptionHandlerType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldFieldsInformation.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Decompiler\YieldStateMachineVersion.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Architecture.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\AssemblyIdentifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\DecompilationPreferences.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\ExceptionThrownNotifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\ExternallyVisibleDecompilationUtilities.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\FileGeneratedInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\IFileGenerationNotifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IDecompilationPreferences.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IDecompiler.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IExceptionThrownNotifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IFileGeneratedInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IFrameworkResolver.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IFrameworkResolverWithUserInteraction.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\ITypeGeneratedInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\Interfaces\IUniqueMemberIdentifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\MemberIdentifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\TypeGeneratedInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\External\UniqueMemberIdentifier.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\AttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseAssemblyAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseImperativeLanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseLanguage.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\BaseLanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CodeMappingInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CodePosition.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CodeSpan.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpAssemblyAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpKeyWordWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpVersion.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\CSharpWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\CSharp\ICSharp.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IAssemblyAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IExceptionFormatter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IFormatter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IKeyWordWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\ILanguage.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\ILanguageTestCaseWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\ILanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\CodeMappings.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\FlagsWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILBlock.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILBlockType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILHelpers.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\ILRange.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguage.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguageAssemblyAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguageAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\IntermediateLanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\MemberMapping.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\OpCodeInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IL\SourceCodeMapping.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\INamespaceLanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\InfinityConstants.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\IWriterSettings.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\LanguageFactory.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\MemberNamingUtils.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\NamespaceImperativeLanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\OffsetSpan.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\PlainTextFormatter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\SimpleExceptionFormatter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\TestCaseExceptionFormatter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\TestCaseWriters\IntermediateDecompilationCSharpLanguageWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\TestCaseWriters\TestCaseCSharpWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\IVisualBasic.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\StatementState.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicAssemblyAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicAttributeWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicKeyWordWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicVersion.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\VisualBasic\VisualBasicWriter.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\WriterSettings.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Languages\WritingInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Assignment.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Binary.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\CodePattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\CodePattern_TNode_.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Constant.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ContextData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ContextVariableReference.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ExpressionStatement.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Extensions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\ICodePattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\Literal.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\MatchContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\MatchData.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\SafeCast.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Pattern\VariableReference.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ArrayVariablesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\AssignOutParametersStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\BaseStateMachineRemoverStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CanCastStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CaseGotoTransformerStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CastEnumsToIntegersStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CastIntegersStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatternsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\ArrayInitialisationPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\BaseInitialisationPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CatchClausesFilterPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CodePatternsContext.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CollectionInitializationPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\CommonPatterns.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\DefineUseCount.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\ICodePattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\InitializationPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\MultiAssignPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\NullCoalescingPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\ObjectInitialisationPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\RaiseEventPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\TernaryConditionPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\TernaryConditionPatternAgressive.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\VariableInliningPattern.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CodePatterns\VariableInliningPatternAggressive.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CombinedTransformerStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CreateCompilerOptimizedSwitchByStringStatementsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\CreateIfElseIfStatementsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DeclareTopLevelVariables.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DeclareVariablesOnFirstAssignment.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DeduceImplicitDelegates.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DependsOnAnalysisStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DetermineCtorInvocationStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DetermineDestructorStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DetermineNotSupportedVBCodeStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\CallSiteBinderType.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\CallSiteInfo.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\CallSiteInvocationReplacer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\DynamicVariables\DynamicElementAnalyzer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\EnumHelper.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ExpressionComparer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FieldAssignmentAnalysisStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FindAutoBoxesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixBinaryExpressionsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixMethodOverloadsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixSwitchCasesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\FixSwitchConditionStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\HandleVirtualMethodInvocations.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\IDecompilationStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\Inflector.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\InstructionMappingsCheck.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ManagedPointersRemovalStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\MapUnconditionalBranchesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\Matcher.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\MergeUnaryAndBinaryExpression.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\Negator.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\OperatorStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\OutParameterAssignmentAnalysisStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ParenthesizeExpressionsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\PropertyRecognizer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildAnonymousDelegatesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildAnonymousTypesInitializersStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildAsyncStatementsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildCatchClausesFilterStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildDoWhileStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildEventsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildExpressionTreesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildFixedStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildForeachArrayStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildForeachStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildForStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildLambdaExpressions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildLinqQueriesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildLockStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildUsingStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildVBForStatements.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RebuildYieldStatementsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveAsyncStateMachineStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveCompilerOptimizationsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveConditionOnlyVariables.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveDelegateCachingStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveLastReturn.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemovePrivateImplementationDetailsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveUnreachableBlocksStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveUnusedVariablesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RemoveYieldStateMachineStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameEnumValues.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameSplitPropertiesMethodsAndBackingFields.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameVariables.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\RenameVBVariables.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ReplaceDelegateInvokeStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\ResolveDynamicVariablesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SelfAssignment.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SentinelStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SimpleDereferencer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SwitchByString\RebuildSwitchByString.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SwitchByString\SwitchByStringFixer.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\SwitchByString\SwitchByStringMatcher.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\TransformCatchClausesFilterExpressionStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\TransformMemberHandlersStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\TypeOfStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\UnsafeMethodBodyStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VariableAssignmentAnalysisStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VariableMatcher.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VBCodePatternsStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VBSelfAssignment.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VisualBasicRemoveDelegateCachingStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\Steps\VisualBasicRemoveUnusedVariablesStep.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\SupportedLanguages.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\ThreadSafeWeakAssemblyResolver.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\TwoDimensionalString.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\WeakAssemblyResolver.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\XmlDocumentationReaders\DocumentationManager.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\XmlDocumentationReaders\XmlDocumentationReader.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\Telerik.JustDecompiler\XmlDocumentationReaders\XmlDocumentationResolver.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JustDecompileCmd.NetStandard\JustDecompileCmd.NetStandard.csproj" />
+    <ProjectReference Include="..\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Expected\JustDecompiler.NetStandard\JustDecompiler.NetStandard.sln">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

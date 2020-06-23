@@ -15,3 +15,6 @@ jobs:
 
     - name: Build Solution
       run: dotnet build CodemerxDecompileEngine.sln -c Release
+
+    - name: Run Tests
+      run: dotnet test Decompiler.Tests

@@ -32,7 +32,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			return thenAssignExpression.Right.ExpressionType.FullName == elseAssignExpression.Right.ExpressionType.FullName;
+			return thenAssignExpression.Right.ExpressionType.get_FullName() == elseAssignExpression.Right.ExpressionType.get_FullName();
 		}
 
 		public bool TryMatch(StatementCollection statements, out int startIndex, out Statement result, out int replacedStatementsCount)
@@ -70,7 +70,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			if (variableReference != variableReference1)
+			if ((object)variableReference != (object)variableReference1)
 			{
 				return false;
 			}

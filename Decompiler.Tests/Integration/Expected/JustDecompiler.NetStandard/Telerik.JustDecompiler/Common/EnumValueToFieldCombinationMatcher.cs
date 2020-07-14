@@ -18,7 +18,7 @@ namespace Telerik.JustDecompiler.Common
 			bool flag = false;
 			foreach (CustomAttribute customAttribute in customAttributes)
 			{
-				if (customAttribute.AttributeType.FullName != "System.FlagsAttribute")
+				if (customAttribute.get_AttributeType().get_FullName() != "System.FlagsAttribute")
 				{
 					continue;
 				}
@@ -33,29 +33,29 @@ namespace Telerik.JustDecompiler.Common
 				num = (long)0;
 			}
 			List<FieldDefinition> fieldDefinitions1 = new List<FieldDefinition>();
-			for (int i = 1; i < fieldDefinitions.Count; i++)
+			for (int i = 1; i < fieldDefinitions.get_Count(); i++)
 			{
-				if (fieldDefinitions[i].Constant != null && fieldDefinitions[i].Constant.Value != null)
+				if (fieldDefinitions.get_Item(i).get_Constant() != null && fieldDefinitions.get_Item(i).get_Constant().get_Value() != null)
 				{
-					if (fieldDefinitions[i].Constant.Value.Equals(value))
+					if (fieldDefinitions.get_Item(i).get_Constant().get_Value().Equals(value))
 					{
 						fieldDefinitions1.Clear();
-						fieldDefinitions1.Add(fieldDefinitions[i]);
+						fieldDefinitions1.Add(fieldDefinitions.get_Item(i));
 						return fieldDefinitions1;
 					}
 					if (flag)
 					{
-						long num1 = Convert.ToInt64(fieldDefinitions[i].Constant.Value);
+						long num1 = Convert.ToInt64(fieldDefinitions.get_Item(i).get_Constant().get_Value());
 						if (num1 != 0)
 						{
 							if ((num1 & num) == num1)
 							{
-								fieldDefinitions1.Add(fieldDefinitions[i]);
+								fieldDefinitions1.Add(fieldDefinitions.get_Item(i));
 							}
 						}
 						else if (num == 0)
 						{
-							fieldDefinitions1.Add(fieldDefinitions[i]);
+							fieldDefinitions1.Add(fieldDefinitions.get_Item(i));
 						}
 					}
 				}

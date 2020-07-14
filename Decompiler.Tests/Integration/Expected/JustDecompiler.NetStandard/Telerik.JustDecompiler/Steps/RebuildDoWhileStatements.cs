@@ -121,13 +121,13 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			if (right.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 			{
-				return ((FieldReferenceExpression)right.Left).Field == ((FieldReferenceExpression)assingExpression.Left).Field;
+				return (object)((FieldReferenceExpression)right.Left).Field == (object)((FieldReferenceExpression)assingExpression.Left).Field;
 			}
 			if (right.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return true;
 			}
-			return ((VariableReferenceExpression)right.Left).Variable == ((VariableReferenceExpression)assingExpression.Left).Variable;
+			return (object)((VariableReferenceExpression)right.Left).Variable == (object)((VariableReferenceExpression)assingExpression.Left).Variable;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)

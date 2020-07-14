@@ -25,14 +25,14 @@ namespace Telerik.JustDecompiler.Languages.IL
 			for (int i = 0; i < (int)fields.Length; i++)
 			{
 				OpCode value = (OpCode)fields[i].GetValue(null);
-				strs.Add(value.Name);
+				strs.Add(value.get_Name());
 			}
 			return strs;
 		}
 
 		internal static MemberMapping CreateCodeMapping(MethodDefinition member, CodeMappings codeMappings)
 		{
-			if (member == null || !member.HasBody)
+			if (member == null || !member.get_HasBody())
 			{
 				return null;
 			}
@@ -41,17 +41,17 @@ namespace Telerik.JustDecompiler.Languages.IL
 				return null;
 			}
 			MemberMapping memberMapping = null;
-			if (codeMappings.FullName == member.DeclaringType.FullName)
+			if (codeMappings.FullName == member.get_DeclaringType().get_FullName())
 			{
 				List<MemberMapping> mapping = codeMappings.Mapping;
-				if (mapping.Find((MemberMapping map) => map.MetadataToken == member.MetadataToken.ToInt32()) == null)
+				if (mapping.Find((MemberMapping map) => map.MetadataToken == member.get_MetadataToken().ToInt32()) == null)
 				{
 					memberMapping = new MemberMapping()
 					{
-						MetadataToken = (uint)member.MetadataToken.ToInt32(),
-						MemberReference = member.DeclaringType.Resolve(),
+						MetadataToken = (uint)member.get_MetadataToken().ToInt32(),
+						MemberReference = member.get_DeclaringType().Resolve(),
 						MemberCodeMappings = new List<SourceCodeMapping>(),
-						CodeSize = member.Body.CodeSize
+						CodeSize = member.get_Body().get_CodeSize()
 					};
 					mapping.Add(memberMapping);
 				}

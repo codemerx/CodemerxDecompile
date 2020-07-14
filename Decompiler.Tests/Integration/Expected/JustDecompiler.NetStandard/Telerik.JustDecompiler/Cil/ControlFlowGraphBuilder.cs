@@ -20,8 +20,8 @@ namespace Telerik.JustDecompiler.Cil
 
 		internal ControlFlowGraphBuilder(MethodDefinition method)
 		{
-			this.body = method.Body;
-			if (this.body.ExceptionHandlers.Count > 0)
+			this.body = method.get_Body();
+			if (this.body.get_ExceptionHandlers().get_Count() > 0)
 			{
 				this.exceptionObjectsOffsets = new HashSet<int>();
 			}
@@ -48,31 +48,31 @@ namespace Telerik.JustDecompiler.Cil
 			OpCode opCode;
 			if (block.Last == null)
 			{
-				int offset = block.First.Offset;
+				int offset = block.First.get_Offset();
 				throw new ArgumentException(String.Concat("Undelimited block at offset ", offset.ToString()));
 			}
 			Instruction last = block.Last;
-			switch (last.OpCode.FlowControl)
+			switch (last.get_OpCode().get_FlowControl())
 			{
-				case FlowControl.Branch:
-				case FlowControl.Cond_Branch:
+				case 0:
+				case 3:
 				{
 					if (!ControlFlowGraphBuilder.HasMultipleBranches(last))
 					{
 						InstructionBlock branchTargetBlock = this.GetBranchTargetBlock(last);
-						if (last.OpCode.FlowControl != FlowControl.Cond_Branch || last.Next == null)
+						if (last.get_OpCode().get_FlowControl() != 3 || last.get_Next() == null)
 						{
 							block.Successors = new InstructionBlock[] { branchTargetBlock };
 							return;
 						}
-						block.Successors = new InstructionBlock[] { branchTargetBlock, this.GetBlock(last.Next) };
+						block.Successors = new InstructionBlock[] { branchTargetBlock, this.GetBlock(last.get_Next()) };
 						return;
 					}
 					InstructionBlock[] branchTargetsBlocks = this.GetBranchTargetsBlocks(last);
 					InstructionBlock instructionBlocks = null;
-					if (last.Next != null)
+					if (last.get_Next() != null)
 					{
-						instructionBlocks = this.GetBlock(last.Next);
+						instructionBlocks = this.GetBlock(last.get_Next());
 					}
 					this.switchBlocksInformation.Add(block, new SwitchData(block, instructionBlocks, branchTargetsBlocks));
 					if (instructionBlocks != null)
@@ -82,32 +82,32 @@ namespace Telerik.JustDecompiler.Cil
 					block.Successors = branchTargetsBlocks;
 					return;
 				}
-				case FlowControl.Break:
-				case FlowControl.Meta:
-				case FlowControl.Phi:
+				case 1:
+				case 4:
+				case 6:
 				{
-					opCode = last.OpCode;
-					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", opCode.FlowControl, Formatter.FormatInstruction(last)));
+					opCode = last.get_OpCode();
+					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", opCode.get_FlowControl(), Formatter.FormatInstruction(last)));
 				}
-				case FlowControl.Call:
-				case FlowControl.Next:
+				case 2:
+				case 5:
 				{
-					if (last.Next == null)
+					if (last.get_Next() == null)
 					{
 						return;
 					}
-					block.Successors = new InstructionBlock[] { this.GetBlock(last.Next) };
+					block.Successors = new InstructionBlock[] { this.GetBlock(last.get_Next()) };
 					return;
 				}
-				case FlowControl.Return:
-				case FlowControl.Throw:
+				case 7:
+				case 8:
 				{
 					return;
 				}
 				default:
 				{
-					opCode = last.OpCode;
-					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", opCode.FlowControl, Formatter.FormatInstruction(last)));
+					opCode = last.get_OpCode();
+					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", opCode.get_FlowControl(), Formatter.FormatInstruction(last)));
 				}
 			}
 		}
@@ -130,31 +130,31 @@ namespace Telerik.JustDecompiler.Cil
 
 		private void DelimitBlocks()
 		{
-			Collection<Instruction> instructions = this.body.Instructions;
+			Collection<Instruction> instructions = this.body.get_Instructions();
 			this.MarkBlockStarts(instructions);
-			this.MarkBlockStarts(this.body.ExceptionHandlers);
+			this.MarkBlockStarts(this.body.get_ExceptionHandlers());
 			this.MarkBlockEnds(instructions);
 		}
 
 		private void FillOffsetToInstruction()
 		{
 			this.offsetToInstruction = new Dictionary<int, Instruction>();
-			foreach (Instruction instruction in this.body.Instructions)
+			foreach (Instruction instruction in this.body.get_Instructions())
 			{
-				this.offsetToInstruction.Add(instruction.Offset, instruction);
+				this.offsetToInstruction.Add(instruction.get_Offset(), instruction);
 			}
 		}
 
 		private InstructionBlock GetBlock(Instruction firstInstruction)
 		{
 			InstructionBlock instructionBlocks;
-			this.blocks.TryGetValue(firstInstruction.Offset, out instructionBlocks);
+			this.blocks.TryGetValue(firstInstruction.get_Offset(), out instructionBlocks);
 			return instructionBlocks;
 		}
 
 		private static Instruction GetBranchTarget(Instruction instruction)
 		{
-			return (Instruction)instruction.Operand;
+			return (Instruction)instruction.get_Operand();
 		}
 
 		private InstructionBlock GetBranchTargetBlock(Instruction instruction)
@@ -164,7 +164,7 @@ namespace Telerik.JustDecompiler.Cil
 
 		private static Instruction[] GetBranchTargets(Instruction instruction)
 		{
-			return (Instruction[])instruction.Operand;
+			return (Instruction[])instruction.get_Operand();
 		}
 
 		private InstructionBlock[] GetBranchTargetsBlocks(Instruction instruction)
@@ -180,25 +180,25 @@ namespace Telerik.JustDecompiler.Cil
 
 		private static bool HasMultipleBranches(Instruction instruction)
 		{
-			return instruction.OpCode.Code == Code.Switch;
+			return instruction.get_OpCode().get_Code() == 68;
 		}
 
 		private static bool IsBlockDelimiter(Instruction instruction)
 		{
-			switch (instruction.OpCode.FlowControl)
+			switch (instruction.get_OpCode().get_FlowControl())
 			{
-				case FlowControl.Branch:
-				case FlowControl.Break:
-				case FlowControl.Cond_Branch:
-				case FlowControl.Return:
-				case FlowControl.Throw:
+				case 0:
+				case 1:
+				case 3:
+				case 7:
+				case 8:
 				{
 					return true;
 				}
-				case FlowControl.Call:
-				case FlowControl.Meta:
-				case FlowControl.Next:
-				case FlowControl.Phi:
+				case 2:
+				case 4:
+				case 5:
+				case 6:
 				{
 					return false;
 				}
@@ -220,10 +220,10 @@ namespace Telerik.JustDecompiler.Cil
 			for (int i = 1; i < (int)array.Length; i++)
 			{
 				InstructionBlock instructionBlocks = array[i];
-				previous.Last = instructionBlocks.First.Previous;
+				previous.Last = instructionBlocks.First.get_Previous();
 				previous = instructionBlocks;
 			}
-			previous.Last = instructions[instructions.Count - 1];
+			previous.Last = instructions.get_Item(instructions.get_Count() - 1);
 		}
 
 		private void MarkBlockStart(Instruction instruction)
@@ -237,28 +237,28 @@ namespace Telerik.JustDecompiler.Cil
 
 		private void MarkBlockStarts(Collection<ExceptionHandler> handlers)
 		{
-			for (int i = 0; i < handlers.Count; i++)
+			for (int i = 0; i < handlers.get_Count(); i++)
 			{
-				ExceptionHandler item = handlers[i];
-				this.MarkBlockStart(item.TryStart);
-				this.MarkBlockStart(item.HandlerStart);
-				if (item.HandlerType == ExceptionHandlerType.Filter)
+				ExceptionHandler item = handlers.get_Item(i);
+				this.MarkBlockStart(item.get_TryStart());
+				this.MarkBlockStart(item.get_HandlerStart());
+				if (item.get_HandlerType() == 1)
 				{
-					this.MarkExceptionObjectPosition(item.FilterStart);
-					this.MarkBlockStart(item.FilterStart);
+					this.MarkExceptionObjectPosition(item.get_FilterStart());
+					this.MarkBlockStart(item.get_FilterStart());
 				}
-				else if (item.HandlerType == ExceptionHandlerType.Catch)
+				else if (item.get_HandlerType() == null)
 				{
-					this.MarkExceptionObjectPosition(item.HandlerStart);
+					this.MarkExceptionObjectPosition(item.get_HandlerStart());
 				}
 			}
 		}
 
 		private void MarkBlockStarts(Collection<Instruction> instructions)
 		{
-			for (int i = 0; i < instructions.Count; i++)
+			for (int i = 0; i < instructions.get_Count(); i++)
 			{
-				Instruction item = instructions[i];
+				Instruction item = instructions.get_Item(i);
 				if (i == 0)
 				{
 					this.MarkBlockStart(item);
@@ -285,9 +285,9 @@ namespace Telerik.JustDecompiler.Cil
 							}
 						}
 					}
-					if (item.Next != null)
+					if (item.get_Next() != null)
 					{
-						this.MarkBlockStart(item.Next);
+						this.MarkBlockStart(item.get_Next());
 					}
 				}
 			}
@@ -295,12 +295,12 @@ namespace Telerik.JustDecompiler.Cil
 
 		private void MarkExceptionObjectPosition(Instruction instruction)
 		{
-			this.exceptionObjectsOffsets.Add(instruction.Offset);
+			this.exceptionObjectsOffsets.Add(instruction.get_Offset());
 		}
 
 		private void RegisterBlock(InstructionBlock block)
 		{
-			this.blocks.Add(block.First.Offset, block);
+			this.blocks.Add(block.First.get_Offset(), block);
 		}
 
 		private InstructionBlock[] ToArray()

@@ -30,7 +30,7 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 			if (currentExpression is MethodInvocationExpression)
 			{
 				MethodInvocationExpression methodInvocationExpression = currentExpression as MethodInvocationExpression;
-				if (assignedValue.ExpressionType.IsByReference && methodInvocationExpression.MethodExpression.Target != null)
+				if (assignedValue.ExpressionType.get_IsByReference() && methodInvocationExpression.MethodExpression.Target != null)
 				{
 					Expression target = methodInvocationExpression.MethodExpression.Target;
 					if (target.Equals(assignmentRecipient))
@@ -118,7 +118,7 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					continue;
 				}
 				VariableReferenceExpression left = binaryExpression.Left as VariableReferenceExpression;
-				if (!left.ExpressionType.IsByReference && !left.ExpressionType.IsPointer)
+				if (!left.ExpressionType.get_IsByReference() && !left.ExpressionType.get_IsPointer())
 				{
 					continue;
 				}
@@ -394,10 +394,10 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 							return this.Visit(operand.Operand);
 						}
 					}
-					if (node.Operand is ExplicitCastExpression && node.Operand.ExpressionType.IsByReference)
+					if (node.Operand is ExplicitCastExpression && node.Operand.ExpressionType.get_IsByReference())
 					{
 						ExplicitCastExpression explicitCastExpression = node.Operand as ExplicitCastExpression;
-						TypeReference elementType = (explicitCastExpression.ExpressionType as ByReferenceType).ElementType;
+						TypeReference elementType = (explicitCastExpression.ExpressionType as ByReferenceType).get_ElementType();
 						ExplicitCastExpression explicitCastExpression1 = new ExplicitCastExpression(explicitCastExpression.Expression, elementType, explicitCastExpression.MappedInstructions);
 						return this.Visit(explicitCastExpression1);
 					}

@@ -31,7 +31,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		protected override bool ShouldExecuteStep()
 		{
-			foreach (ParameterDefinition parameter in this.context.MethodContext.Method.Parameters)
+			foreach (ParameterDefinition parameter in this.context.MethodContext.Method.get_Parameters())
 			{
 				if (!parameter.IsOutParameter())
 				{

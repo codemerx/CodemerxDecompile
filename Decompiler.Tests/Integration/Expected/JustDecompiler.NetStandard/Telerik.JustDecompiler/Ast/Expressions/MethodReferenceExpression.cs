@@ -29,7 +29,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				if (this.expressionType == null)
 				{
-					this.expressionType = this.Method.FixedReturnType;
+					this.expressionType = this.Method.get_FixedReturnType();
 				}
 				return this.expressionType;
 			}
@@ -135,7 +135,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			if (this.Method.FullName != methodReferenceExpression.Method.FullName)
+			if (this.Method.get_FullName() != methodReferenceExpression.Method.get_FullName())
 			{
 				return false;
 			}

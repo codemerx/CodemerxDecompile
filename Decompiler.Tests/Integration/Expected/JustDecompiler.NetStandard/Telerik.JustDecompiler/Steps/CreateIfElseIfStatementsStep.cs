@@ -69,7 +69,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void InvertIfStatement(IfStatement theIf)
 		{
-			theIf.Condition = Negator.Negate(theIf.Condition, this.context.MethodContext.Method.Module.TypeSystem);
+			theIf.Condition = Negator.Negate(theIf.Condition, this.context.MethodContext.Method.get_Module().get_TypeSystem());
 			BlockStatement @else = theIf.Else;
 			theIf.Else = theIf.Then;
 			theIf.Then = @else;

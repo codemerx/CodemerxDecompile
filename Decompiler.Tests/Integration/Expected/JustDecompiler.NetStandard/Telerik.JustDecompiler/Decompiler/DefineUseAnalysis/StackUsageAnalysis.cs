@@ -57,31 +57,31 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 			this.RecursiveDfs(this.controlFlowGraph.Blocks[0], new Int32[0]);
 			foreach (ExceptionHandler exceptionHandler in this.exceptionHandlers)
 			{
-				InstructionBlock item = this.controlFlowGraph.InstructionToBlockMapping[exceptionHandler.HandlerStart.Offset];
-				if (exceptionHandler.HandlerType == ExceptionHandlerType.Fault || exceptionHandler.HandlerType == ExceptionHandlerType.Finally)
+				InstructionBlock item = this.controlFlowGraph.InstructionToBlockMapping[exceptionHandler.get_HandlerStart().get_Offset()];
+				if (exceptionHandler.get_HandlerType() == 4 || exceptionHandler.get_HandlerType() == 2)
 				{
 					this.RecursiveDfs(item, new Int32[0]);
 				}
 				else
 				{
-					if (exceptionHandler.HandlerType == ExceptionHandlerType.Filter)
+					if (exceptionHandler.get_HandlerType() == 1)
 					{
-						InstructionBlock instructionBlocks = this.controlFlowGraph.InstructionToBlockMapping[exceptionHandler.FilterStart.Offset];
-						this.RecursiveDfs(instructionBlocks, new Int32[] { -exceptionHandler.FilterStart.Offset });
+						InstructionBlock instructionBlocks = this.controlFlowGraph.InstructionToBlockMapping[exceptionHandler.get_FilterStart().get_Offset()];
+						this.RecursiveDfs(instructionBlocks, new Int32[] { -exceptionHandler.get_FilterStart().get_Offset() });
 						Dictionary<int, VariableDefinition> variableDefinition = this.instructionOffsetToVariableDefinitionMap;
-						int offset = -exceptionHandler.FilterStart.Offset;
+						int offset = -exceptionHandler.get_FilterStart().get_Offset();
 						num = this.exceptionVariableCount;
 						this.exceptionVariableCount = num + 1;
-						variableDefinition[offset] = new VariableDefinition(String.Concat("exception_", num.ToString()), Utilities.GetCorlibTypeReference(typeof(Exception), this.methodContext.Method.Module), this.methodContext.Method);
-						this.exceptionVariableInstructionsSet.Add(-exceptionHandler.FilterStart.Offset);
+						variableDefinition[offset] = new VariableDefinition(String.Concat("exception_", num.ToString()), Utilities.GetCorlibTypeReference(typeof(Exception), this.methodContext.Method.get_Module()), this.methodContext.Method);
+						this.exceptionVariableInstructionsSet.Add(-exceptionHandler.get_FilterStart().get_Offset());
 					}
-					this.RecursiveDfs(item, new Int32[] { -exceptionHandler.HandlerStart.Offset });
+					this.RecursiveDfs(item, new Int32[] { -exceptionHandler.get_HandlerStart().get_Offset() });
 					Dictionary<int, VariableDefinition> nums = this.instructionOffsetToVariableDefinitionMap;
-					int offset1 = -exceptionHandler.HandlerStart.Offset;
+					int offset1 = -exceptionHandler.get_HandlerStart().get_Offset();
 					num = this.exceptionVariableCount;
 					this.exceptionVariableCount = num + 1;
-					nums[offset1] = new VariableDefinition(String.Concat("exception_", num.ToString()), exceptionHandler.CatchType ?? Utilities.GetCorlibTypeReference(typeof(Exception), this.methodContext.Method.Module), this.methodContext.Method);
-					this.exceptionVariableInstructionsSet.Add(-exceptionHandler.HandlerStart.Offset);
+					nums[offset1] = new VariableDefinition(String.Concat("exception_", num.ToString()), exceptionHandler.get_CatchType() ?? Utilities.GetCorlibTypeReference(typeof(Exception), this.methodContext.Method.get_Module()), this.methodContext.Method);
+					this.exceptionVariableInstructionsSet.Add(-exceptionHandler.get_HandlerStart().get_Offset());
 				}
 			}
 			for (int i = 0; i < (int)this.controlFlowGraph.Blocks.Length; i++)
@@ -98,7 +98,7 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 			List<int> nums = new List<int>(this.blockToInitialStackMap[block.Index]);
 			foreach (Instruction instruction in block)
 			{
-				if (instruction.OpCode.Code != Code.Dup)
+				if (instruction.get_OpCode().get_Code() != 36)
 				{
 					uint popDelta = this.GetPopDelta((uint)nums.Count, instruction);
 					uint pushDelta = this.GetPushDelta(instruction);
@@ -111,13 +111,13 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 					}
 					if (pushDelta > 0)
 					{
-						this.stackVariableInstructionsSet.Add(instruction.Offset);
+						this.stackVariableInstructionsSet.Add(instruction.get_Offset());
 					}
 					for (int j = 0; (long)j < (ulong)pushDelta; j++)
 					{
-						nums.Add(instruction.Offset);
+						nums.Add(instruction.get_Offset());
 					}
-					this.instructionOffsetToUsedInstructionsMap[instruction.Offset] = new Stack<int>(nums1);
+					this.instructionOffsetToUsedInstructionsMap[instruction.get_Offset()] = new Stack<int>(nums1);
 				}
 				else
 				{
@@ -202,71 +202,71 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 
 		private uint GetPopDelta(uint stackHeight, Instruction instruction)
 		{
-			OpCode opCode = instruction.OpCode;
-			switch (opCode.StackBehaviourPop)
+			OpCode opCode = instruction.get_OpCode();
+			switch (opCode.get_StackBehaviourPop())
 			{
-				case StackBehaviour.Pop0:
+				case 0:
 				{
 					return (uint)0;
 				}
-				case StackBehaviour.Pop1:
-				case StackBehaviour.Popi:
-				case StackBehaviour.Popref:
+				case 1:
+				case 3:
+				case 10:
 				{
 					return (uint)1;
 				}
-				case StackBehaviour.Pop1_pop1:
-				case StackBehaviour.Popi_pop1:
-				case StackBehaviour.Popi_popi:
-				case StackBehaviour.Popi_popi8:
-				case StackBehaviour.Popi_popr4:
-				case StackBehaviour.Popi_popr8:
-				case StackBehaviour.Popref_pop1:
-				case StackBehaviour.Popref_popi:
+				case 2:
+				case 4:
+				case 5:
+				case 6:
+				case 8:
+				case 9:
+				case 11:
+				case 12:
 				{
 					return (uint)2;
 				}
-				case StackBehaviour.Popi_popi_popi:
-				case StackBehaviour.Popref_popi_popi:
-				case StackBehaviour.Popref_popi_popi8:
-				case StackBehaviour.Popref_popi_popr4:
-				case StackBehaviour.Popref_popi_popr8:
-				case StackBehaviour.Popref_popi_popref:
+				case 7:
+				case 13:
+				case 14:
+				case 15:
+				case 16:
+				case 17:
 				{
 					return (uint)3;
 				}
-				case StackBehaviour.PopAll:
+				case 18:
 				{
 					return stackHeight;
 				}
-				case StackBehaviour.Push0:
-				case StackBehaviour.Push1:
-				case StackBehaviour.Push1_push1:
-				case StackBehaviour.Pushi:
-				case StackBehaviour.Pushi8:
-				case StackBehaviour.Pushr4:
-				case StackBehaviour.Pushr8:
-				case StackBehaviour.Pushref:
+				case 19:
+				case 20:
+				case 21:
+				case 22:
+				case 23:
+				case 24:
+				case 25:
+				case 26:
 				{
 					throw new ArgumentException(Formatter.FormatInstruction(instruction));
 				}
-				case StackBehaviour.Varpop:
+				case 27:
 				{
-					if (opCode.FlowControl == FlowControl.Call)
+					if (opCode.get_FlowControl() == 2)
 					{
-						IMethodSignature operand = (IMethodSignature)instruction.Operand;
-						uint count = (uint)operand.Parameters.Count;
-						if (OpCodes.Newobj.Value != opCode.Value && operand.HasThis)
+						IMethodSignature operand = (IMethodSignature)instruction.get_Operand();
+						uint count = (uint)operand.get_Parameters().get_Count();
+						if (OpCodes.Newobj.get_Value() != opCode.get_Value() && operand.get_HasThis())
 						{
 							count++;
 						}
-						if (opCode.Code == Code.Calli)
+						if (opCode.get_Code() == 40)
 						{
 							count++;
 						}
 						return count;
 					}
-					if (opCode.Code != Code.Ret)
+					if (opCode.get_Code() != 41)
 					{
 						throw new ArgumentException(Formatter.FormatInstruction(instruction));
 					}
@@ -281,37 +281,37 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 
 		private uint GetPushDelta(Instruction instruction)
 		{
-			OpCode opCode = instruction.OpCode;
-			switch (opCode.StackBehaviourPush)
+			OpCode opCode = instruction.get_OpCode();
+			switch (opCode.get_StackBehaviourPush())
 			{
-				case StackBehaviour.Push0:
+				case 19:
 				{
 					return (uint)0;
 				}
-				case StackBehaviour.Push1:
-				case StackBehaviour.Pushi:
-				case StackBehaviour.Pushi8:
-				case StackBehaviour.Pushr4:
-				case StackBehaviour.Pushr8:
-				case StackBehaviour.Pushref:
+				case 20:
+				case 22:
+				case 23:
+				case 24:
+				case 25:
+				case 26:
 				{
 					return (uint)1;
 				}
-				case StackBehaviour.Push1_push1:
+				case 21:
 				{
 					return (uint)2;
 				}
-				case StackBehaviour.Varpop:
+				case 27:
 				{
 					throw new ArgumentException(Formatter.FormatInstruction(instruction));
 				}
-				case StackBehaviour.Varpush:
+				case 28:
 				{
-					if (opCode.FlowControl != FlowControl.Call)
+					if (opCode.get_FlowControl() != 2)
 					{
 						throw new ArgumentException(Formatter.FormatInstruction(instruction));
 					}
-					if (!this.IsVoid(((IMethodSignature)instruction.Operand).ReturnType))
+					if (!this.IsVoid(((IMethodSignature)instruction.get_Operand()).get_ReturnType()))
 					{
 						return (uint)1;
 					}
@@ -326,15 +326,15 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 
 		private bool IsVoid(TypeReference type)
 		{
-			if (type.IsPointer)
+			if (type.get_IsPointer())
 			{
 				return false;
 			}
 			if (type is IModifierType)
 			{
-				return this.IsVoid((type as IModifierType).ElementType);
+				return this.IsVoid((type as IModifierType).get_ElementType());
 			}
-			if (type.FullName == "System.Void")
+			if (type.get_FullName() == "System.Void")
 			{
 				return true;
 			}

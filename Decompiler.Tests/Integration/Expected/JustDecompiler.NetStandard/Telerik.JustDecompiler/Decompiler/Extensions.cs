@@ -32,7 +32,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			if (body != null)
 			{
-				MethodDefinition method = body.Method;
+				body.get_Method();
 			}
 			return Telerik.JustDecompiler.Decompiler.Extensions.RunPipeline(language.CreatePipeline(context), language, body, out context);
 		}
@@ -49,7 +49,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			if (body != null)
 			{
-				MethodDefinition method = body.Method;
+				body.get_Method();
 			}
 			return Telerik.JustDecompiler.Decompiler.Extensions.RunPipeline(language.CreateLambdaPipeline(context), language, body, out context);
 		}
@@ -110,7 +110,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return false;
 			}
-			if (!(unaryExpression.Operand as ArgumentReferenceExpression).Parameter.ParameterType.IsByReference)
+			if (!(unaryExpression.Operand as ArgumentReferenceExpression).Parameter.get_ParameterType().get_IsByReference())
 			{
 				return false;
 			}

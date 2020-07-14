@@ -41,7 +41,7 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 			if (expression.CodeNodeType == CodeNodeType.MethodInvocationExpression || expression.CodeNodeType == CodeNodeType.PropertyReferenceExpression)
 			{
 				MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
-				genericParameterReturnType = methodInvocationExpression.MethodExpression.Method.GenericParameterReturnType;
+				genericParameterReturnType = methodInvocationExpression.MethodExpression.Method.get_GenericParameterReturnType();
 				target = methodInvocationExpression.MethodExpression.Target;
 			}
 			else
@@ -65,26 +65,26 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 					return this.AnalyzeExpression((expression as UnaryExpression).Operand);
 				}
 				FieldReferenceExpression fieldReferenceExpression = expression as FieldReferenceExpression;
-				genericParameterReturnType = fieldReferenceExpression.Field.FieldType as GenericParameter;
+				genericParameterReturnType = fieldReferenceExpression.Field.get_FieldType() as GenericParameter;
 				target = fieldReferenceExpression.Target;
 			}
 			if (target == null || genericParameterReturnType == null)
 			{
 				return false;
 			}
-			if (!(genericParameterReturnType.Owner is TypeReference) || !target.ExpressionType.IsGenericInstance || genericParameterReturnType.Name[0] != '!' || genericParameterReturnType.Name[1] == '!')
+			if (!(genericParameterReturnType.get_Owner() is TypeReference) || !target.ExpressionType.get_IsGenericInstance() || genericParameterReturnType.get_Name()[0] != '!' || genericParameterReturnType.get_Name()[1] == '!')
 			{
 				return false;
 			}
 			GenericInstanceType expressionType = target.ExpressionType as GenericInstanceType;
-			int num = Int32.Parse(genericParameterReturnType.Name.Substring(1));
+			int num = Int32.Parse(genericParameterReturnType.get_Name().Substring(1));
 			this.dynamicPositioningFlags.AddFirst(false);
-			for (int i = 0; i < expressionType.GenericArguments.Count; i++)
+			for (int i = 0; i < expressionType.get_GenericArguments().get_Count(); i++)
 			{
 				if (i != num)
 				{
 					int num1 = 0;
-					this.CountTypeTokens(expressionType.GenericArguments[i], ref num1);
+					this.CountTypeTokens(expressionType.get_GenericArguments().get_Item(i), ref num1);
 					for (int j = 0; j < num1; j++)
 					{
 						if (i >= num)
@@ -131,37 +131,37 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 			count++;
 			if (typeRef is GenericInstanceType)
 			{
-				foreach (TypeReference genericArgument in (typeRef as GenericInstanceType).GenericArguments)
+				foreach (TypeReference genericArgument in (typeRef as GenericInstanceType).get_GenericArguments())
 				{
 					this.CountTypeTokens(genericArgument, ref count);
 				}
 			}
 			else if (typeRef is TypeSpecification)
 			{
-				this.CountTypeTokens((typeRef as TypeSpecification).ElementType, ref count);
+				this.CountTypeTokens((typeRef as TypeSpecification).get_ElementType(), ref count);
 			}
 		}
 
 		private bool FixDynamicFlags(IDynamicTypeContainer dynamicTypeContainer)
 		{
-			if (!dynamicTypeContainer.IsDynamic)
+			if (!dynamicTypeContainer.get_IsDynamic())
 			{
 				int num = 0;
-				this.CountTypeTokens(dynamicTypeContainer.DynamicContainingType, ref num);
+				this.CountTypeTokens(dynamicTypeContainer.get_DynamicContainingType(), ref num);
 				if (num != this.dynamicPositioningFlags.Count)
 				{
 					return false;
 				}
-				dynamicTypeContainer.DynamicPositioningFlags = new Boolean[num];
+				dynamicTypeContainer.set_DynamicPositioningFlags(new Boolean[num]);
 			}
-			else if ((int)dynamicTypeContainer.DynamicPositioningFlags.Length != this.dynamicPositioningFlags.Count)
+			else if ((int)dynamicTypeContainer.get_DynamicPositioningFlags().Length != this.dynamicPositioningFlags.Count)
 			{
 				throw new Exception("Inconsistent count of positioning flags.");
 			}
 			LinkedListNode<bool> first = this.dynamicPositioningFlags.First;
-			for (int i = 0; i < (int)dynamicTypeContainer.DynamicPositioningFlags.Length; i++)
+			for (int i = 0; i < (int)dynamicTypeContainer.get_DynamicPositioningFlags().Length; i++)
 			{
-				dynamicTypeContainer.DynamicPositioningFlags[i] |= first.Value;
+				dynamicTypeContainer.get_DynamicPositioningFlags()[i] |= first.Value;
 				first = first.Next;
 			}
 			return true;

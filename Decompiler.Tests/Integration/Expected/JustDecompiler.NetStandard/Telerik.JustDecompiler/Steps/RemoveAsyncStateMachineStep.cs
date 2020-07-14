@@ -22,11 +22,11 @@ namespace Telerik.JustDecompiler.Steps
 		private bool CheckForIsCompletedCall(InstructionBlock theBlock)
 		{
 			VariableReference variableReference;
-			for (Instruction i = theBlock.First; i != theBlock.Last; i = i.Next)
+			for (Instruction i = theBlock.First; (object)i != (object)theBlock.Last; i = i.get_Next())
 			{
-				if ((i.OpCode.Code == Code.Call || i.OpCode.Code == Code.Callvirt) && ((MethodReference)i.Operand).Name == "get_IsCompleted")
+				if ((i.get_OpCode().get_Code() == 39 || i.get_OpCode().get_Code() == 110) && ((MethodReference)i.get_Operand()).get_Name() == "get_IsCompleted")
 				{
-					if (!StateMachineUtilities.TryGetVariableFromInstruction(i.Previous, this.moveNextMethodContext.Body.Variables, out variableReference))
+					if (!StateMachineUtilities.TryGetVariableFromInstruction(i.get_Previous(), this.moveNextMethodContext.Body.get_Variables(), out variableReference))
 					{
 						return false;
 					}
@@ -39,9 +39,9 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckForStateFieldSet(InstructionBlock theBlock)
 		{
-			for (Instruction i = theBlock.First; i != theBlock.Last; i = i.Next)
+			for (Instruction i = theBlock.First; (object)i != (object)theBlock.Last; i = i.get_Next())
 			{
-				if (i.OpCode.Code == Code.Stfld && ((FieldReference)i.Operand).Resolve() == this.stateField)
+				if (i.get_OpCode().get_Code() == 122 && (object)((FieldReference)i.get_Operand()).Resolve() == (object)this.stateField)
 				{
 					return true;
 				}
@@ -100,12 +100,12 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			InstructionBlock blocks = this.theCFG.Blocks[(int)this.theCFG.Blocks.Length - 2];
-			for (Instruction i = blocks.First; i != blocks.Last; i = i.Next)
+			for (Instruction i = blocks.First; (object)i != (object)blocks.Last; i = i.get_Next())
 			{
-				if (i.OpCode.Code == Code.Stfld)
+				if (i.get_OpCode().get_Code() == 122)
 				{
-					this.stateField = ((FieldReference)i.Operand).Resolve();
-					return this.stateField.DeclaringType == this.moveNextMethodContext.Method.DeclaringType;
+					this.stateField = ((FieldReference)i.get_Operand()).Resolve();
+					return (object)this.stateField.get_DeclaringType() == (object)this.moveNextMethodContext.Method.get_DeclaringType();
 				}
 			}
 			return false;
@@ -158,11 +158,11 @@ namespace Telerik.JustDecompiler.Steps
 			bool flag;
 			InstructionBlock blocks = this.theCFG.Blocks[(int)this.theCFG.Blocks.Length - 1];
 			Instruction first = blocks.First;
-			while (first.OpCode.Code == Code.Nop && first != blocks.Last)
+			while (first.get_OpCode().get_Code() == null && (object)first != (object)blocks.Last)
 			{
-				first = first.Next;
+				first = first.get_Next();
 			}
-			if (first.OpCode.Code != Code.Ret)
+			if (first.get_OpCode().get_Code() != 41)
 			{
 				return false;
 			}

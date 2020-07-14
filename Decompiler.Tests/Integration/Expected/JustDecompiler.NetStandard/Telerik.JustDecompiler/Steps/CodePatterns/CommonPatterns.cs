@@ -85,7 +85,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if (node.Variable == this.theVariable)
+				if ((object)node.Variable == (object)this.theVariable)
 				{
 					this.Used = true;
 					return;

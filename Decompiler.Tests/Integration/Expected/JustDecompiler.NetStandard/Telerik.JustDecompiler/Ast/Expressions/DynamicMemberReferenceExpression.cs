@@ -175,7 +175,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 							return flag;
 						}
 					}
-					while (enumerator.Current == enumerator1.Current);
+					while ((object)enumerator.Current == (object)enumerator1.Current);
 					flag = false;
 				}
 			}

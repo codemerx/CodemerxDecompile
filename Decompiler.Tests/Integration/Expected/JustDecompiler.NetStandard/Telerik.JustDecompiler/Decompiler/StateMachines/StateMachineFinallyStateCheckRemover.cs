@@ -17,17 +17,17 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		{
 			VariableReference variableReference;
 			Instruction first = finallyEntry.First;
-			if (!StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out variableReference) || variableReference != this.stateVariable)
+			if (!StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out variableReference) || (object)variableReference != (object)this.stateVariable)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldc_I4_0)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 22)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Bge && first.OpCode.Code != Code.Bge_S)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 59 && first.get_OpCode().get_Code() != 46)
 			{
 				return false;
 			}

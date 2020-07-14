@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			MakeRefExpression makeRefExpression = other as MakeRefExpression;
-			if (this.theType.FullName != makeRefExpression.theType.FullName)
+			if (this.theType.get_FullName() != makeRefExpression.theType.get_FullName())
 			{
 				return false;
 			}

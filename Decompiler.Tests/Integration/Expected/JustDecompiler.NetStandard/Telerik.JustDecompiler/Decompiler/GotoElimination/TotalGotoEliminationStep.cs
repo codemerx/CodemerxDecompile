@@ -90,7 +90,7 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 				}
 				int num = parent.Statements.IndexOf(empty);
 				BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(labelVariable, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
-				binaryExpression.Right.ExpressionType = this.methodContext.Method.Module.TypeSystem.Boolean;
+				binaryExpression.Right.ExpressionType = this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean();
 				ExpressionStatement expressionStatement = new ExpressionStatement(binaryExpression)
 				{
 					Label = label
@@ -127,7 +127,7 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 				}
 				Statement item = this.variableToAssignment[key];
 				(item.Parent as BlockStatement).Statements.Remove(item);
-				this.labelToVariable.Remove(key.Name.Remove(key.Name.Length - 5));
+				this.labelToVariable.Remove(key.get_Name().Remove(key.get_Name().Length - 5));
 			}
 		}
 
@@ -335,7 +335,7 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 				this.assignedOnly[item] = false;
 				return item;
 			}
-			TypeReference flag = this.methodContext.Method.Module.TypeSystem.Boolean;
+			TypeReference flag = this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean();
 			VariableDefinition variableDefinition = new VariableDefinition(String.Concat(label, "_cond"), flag, this.methodContext.Method);
 			this.labelToVariable.Add(label, variableDefinition);
 			this.assignedOnly.Add(variableDefinition, true);
@@ -503,7 +503,7 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 			SwitchStatement parent = switchCase.Parent as SwitchStatement;
 			int num = outerBlock.Statements.IndexOf(gotoStatement);
 			int num1 = outerBlock.Statements.IndexOf(parent);
-			int offset = parent.ConditionBlock.First.Offset;
+			int offset = parent.ConditionBlock.First.get_Offset();
 			string str = String.Concat("switch", offset.ToString());
 			TypeReference switchType = this.GetSwitchType(parent);
 			VariableDefinition variableDefinition = new VariableDefinition(str, switchType, this.methodContext.Method);
@@ -611,9 +611,9 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 				from x in this.GetGotoPairs()
 				orderby x.Value.Label
 				select x;
-			this.breakVariable = new VariableDefinition("breakCondition", this.methodContext.Method.Module.TypeSystem.Boolean, this.methodContext.Method);
+			this.breakVariable = new VariableDefinition("breakCondition", this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean(), this.methodContext.Method);
 			this.methodContext.VariablesToRename.Add(this.breakVariable.Resolve());
-			this.continueVariable = new VariableDefinition("continueCondition", this.methodContext.Method.Module.TypeSystem.Boolean, this.methodContext.Method);
+			this.continueVariable = new VariableDefinition("continueCondition", this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean(), this.methodContext.Method);
 			this.methodContext.VariablesToRename.Add(this.continueVariable.Resolve());
 			return gotoPairs;
 		}
@@ -621,7 +621,7 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 		public virtual BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.methodContext = context.MethodContext;
-			this.typeSystem = this.methodContext.Method.Module.TypeSystem;
+			this.typeSystem = this.methodContext.Method.get_Module().get_TypeSystem();
 			this.body = body;
 			this.RemoveGotoStatements();
 			this.methodContext.Variables.AddRange(this.switchVariables);
@@ -689,14 +689,14 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 			if (oldCondition is BinaryExpression)
 			{
 				BinaryExpression binaryExpression = oldCondition as BinaryExpression;
-				if (binaryExpression.Left is VariableReferenceExpression && (binaryExpression.Left as VariableReferenceExpression).Variable == conditionVar.Variable)
+				if (binaryExpression.Left is VariableReferenceExpression && (object)(binaryExpression.Left as VariableReferenceExpression).Variable == (object)conditionVar.Variable)
 				{
 					return binaryExpression;
 				}
 			}
 			return new BinaryExpression(BinaryOperator.LogicalOr, conditionVar, oldCondition, this.typeSystem, null, false)
 			{
-				ExpressionType = this.methodContext.Method.Module.TypeSystem.Boolean
+				ExpressionType = this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean()
 			};
 		}
 

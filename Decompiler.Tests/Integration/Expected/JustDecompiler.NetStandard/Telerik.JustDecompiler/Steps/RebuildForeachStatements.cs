@@ -89,7 +89,7 @@ namespace Telerik.JustDecompiler.Steps
 			if (this.foreachVariables.Contains(this.foreachVariable))
 			{
 				VariableDefinition variableDefinition = this.foreachVariable;
-				this.foreachVariable = new VariableDefinition(this.foreachVariable.VariableType, this.methodContext.Method);
+				this.foreachVariable = new VariableDefinition(this.foreachVariable.get_VariableType(), this.methodContext.Method);
 				this.foreachVariableInstructions.Clear();
 				this.methodContext.Variables.Add(this.foreachVariable);
 				this.methodContext.VariablesToRename.Add(this.foreachVariable);
@@ -147,7 +147,7 @@ namespace Telerik.JustDecompiler.Steps
 			Expression thisReferenceExpression = this.foreachCollection.CloneAndAttachInstructions(this.foreachCollectionInstructions);
 			if (thisReferenceExpression is BaseReferenceExpression)
 			{
-				thisReferenceExpression = new ThisReferenceExpression(this.methodContext.Method.DeclaringType, thisReferenceExpression.UnderlyingSameMethodInstructions);
+				thisReferenceExpression = new ThisReferenceExpression(this.methodContext.Method.get_DeclaringType(), thisReferenceExpression.UnderlyingSameMethodInstructions);
 			}
 			this.@foreach = new ForEachStatement(variableDeclarationExpression, thisReferenceExpression, this.foreachBody, this.foreachConditionInstructions, this.theTry.Finally.UnderlyingSameMethodInstructions);
 			(new RebuildForeachStatements.GetCurrentFixer(this.theEnumerator, this.foreachVariable)).Visit(this.@foreach);
@@ -190,7 +190,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (methodInvocationExpression.MethodExpression.Method.Name == "Dispose")
+			if (methodInvocationExpression.MethodExpression.Method.get_Name() == "Dispose")
 			{
 				return true;
 			}
@@ -254,13 +254,13 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				return propertyReferenceExpression.Property.Name == "Current";
+				return propertyReferenceExpression.Property.get_Name() == "Current";
 			}
-			if (!(methodInvocationExpression.MethodExpression.Target is VariableReferenceExpression) || methodInvocationExpression.MethodExpression.Method.Name != "get_Current")
+			if (!(methodInvocationExpression.MethodExpression.Target is VariableReferenceExpression) || methodInvocationExpression.MethodExpression.Method.get_Name() != "get_Current")
 			{
 				return false;
 			}
-			if ((methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != this.theEnumerator)
+			if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)this.theEnumerator)
 			{
 				return false;
 			}
@@ -269,7 +269,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsGetEnumerator(MethodInvocationExpression supposedGetEnumerator)
 		{
-			if (supposedGetEnumerator.MethodExpression.Method.Name != "GetEnumerator")
+			if (supposedGetEnumerator.MethodExpression.Method.get_Name() != "GetEnumerator")
 			{
 				return false;
 			}
@@ -287,10 +287,10 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (invocation.MethodExpression.Method.Name == "MoveNext")
+			if (invocation.MethodExpression.Method.get_Name() == "MoveNext")
 			{
 				VariableReferenceExpression target = invocation.MethodExpression.Target as VariableReferenceExpression;
-				if (target != null && target.Variable == this.theEnumerator)
+				if (target != null && (object)target.Variable == (object)this.theEnumerator)
 				{
 					return true;
 				}
@@ -549,13 +549,13 @@ namespace Telerik.JustDecompiler.Steps
 					{
 						return false;
 					}
-					return propertyReferenceExpression.Property.Name == "Current";
+					return propertyReferenceExpression.Property.get_Name() == "Current";
 				}
-				if (!(methodInvocationExpression.MethodExpression.Target is VariableReferenceExpression) || methodInvocationExpression.MethodExpression.Method.Name != "get_Current")
+				if (!(methodInvocationExpression.MethodExpression.Target is VariableReferenceExpression) || methodInvocationExpression.MethodExpression.Method.get_Name() != "get_Current")
 				{
 					return false;
 				}
-				if ((methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != this.theEnumerator)
+				if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)this.theEnumerator)
 				{
 					return false;
 				}
@@ -599,7 +599,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 			{
-				if (node.Variable == this.oldVariable)
+				if ((object)node.Variable == (object)this.oldVariable)
 				{
 					node.Variable = this.newVariable;
 				}
@@ -628,7 +628,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				if (!(node.MethodExpression.Target is VariableReferenceExpression) || (node.MethodExpression.Target as VariableReferenceExpression).Variable != this.enumerator || !(node.MethodExpression.Method.Name == "get_Current"))
+				if (!(node.MethodExpression.Target is VariableReferenceExpression) || (object)(node.MethodExpression.Target as VariableReferenceExpression).Variable != (object)this.enumerator || !(node.MethodExpression.Method.get_Name() == "get_Current"))
 				{
 					return base.VisitMethodInvocationExpression(node);
 				}
@@ -637,10 +637,10 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override ICodeNode VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 			{
-				if (node.Property.Name == "Current")
+				if (node.Property.get_Name() == "Current")
 				{
 					VariableReferenceExpression target = node.Target as VariableReferenceExpression;
-					if (target != null && target.Variable == this.enumerator)
+					if (target != null && (object)target.Variable == (object)this.enumerator)
 					{
 						return new VariableReferenceExpression(this.foreachVariable, null);
 					}
@@ -667,7 +667,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				if (node.MethodExpression.Target is VariableReferenceExpression && (node.MethodExpression.Target as VariableReferenceExpression).Variable == this.enumerator && node.MethodExpression.Method.Name != "get_Current")
+				if (node.MethodExpression.Target is VariableReferenceExpression && (object)(node.MethodExpression.Target as VariableReferenceExpression).Variable == (object)this.enumerator && node.MethodExpression.Method.get_Name() != "get_Current")
 				{
 					this.IsEnumeratorUsed = true;
 				}
@@ -676,10 +676,10 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 			{
-				if (node.Property.Name != "Current")
+				if (node.Property.get_Name() != "Current")
 				{
 					VariableReferenceExpression target = node.Target as VariableReferenceExpression;
-					if (target != null && target.Variable == this.enumerator)
+					if (target != null && (object)target.Variable == (object)this.enumerator)
 					{
 						this.IsEnumeratorUsed = true;
 					}
@@ -689,7 +689,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if (node.Variable == this.enumerator)
+				if ((object)node.Variable == (object)this.enumerator)
 				{
 					this.IsEnumeratorUsed = true;
 				}
@@ -738,7 +738,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return;
 				}
-				if (left.Variable != this.enumeratorVariable)
+				if ((object)left.Variable != (object)this.enumeratorVariable)
 				{
 					return;
 				}

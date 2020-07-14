@@ -36,12 +36,12 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			FieldDefinition right = (condition.Left as FieldReferenceExpression).Field.Resolve();
-			if (right == null || !right.IsStatic || !right.IsPrivate)
+			if (right == null || !right.get_IsStatic() || !right.get_IsPrivate())
 			{
 				return false;
 			}
 			BinaryExpression expression = (theIf.Then.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
-			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (expression.Left as FieldReferenceExpression).Field.Resolve() != right)
+			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(expression.Left as FieldReferenceExpression).Field.Resolve() != (object)right)
 			{
 				return false;
 			}
@@ -53,8 +53,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			TypeDefinition typeDefinition = right.FieldType.Resolve();
-			if (typeDefinition == null || typeDefinition.BaseType == null || typeDefinition.BaseType.FullName != "System.MulticastDelegate")
+			TypeDefinition typeDefinition = right.get_FieldType().Resolve();
+			if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 			{
 				return false;
 			}
@@ -144,7 +144,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			int num = (this.cachingVersion == RemoveDelegateCachingStep.DelegateCachingVersion.V1 ? 0 : 1);
 			BinaryExpression expression = (theIf.Then.Statements[num] as ExpressionStatement).Expression as BinaryExpression;
-			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (expression.Left as VariableReferenceExpression).Variable != variable)
+			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Left as VariableReferenceExpression).Variable != (object)variable)
 			{
 				return false;
 			}
@@ -152,8 +152,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				throw new Exception("A caching variable cannot be assigned more than once.");
 			}
-			TypeDefinition typeDefinition = variable.VariableType.Resolve();
-			if (typeDefinition == null || typeDefinition.BaseType == null || typeDefinition.BaseType.FullName != "System.MulticastDelegate")
+			TypeDefinition typeDefinition = variable.get_VariableType().Resolve();
+			if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 			{
 				return false;
 			}
@@ -185,12 +185,12 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				FieldReferenceExpression fieldReferenceExpression = right as FieldReferenceExpression;
 				TypeDefinition typeDefinition = fieldReferenceExpression.ExpressionType.Resolve();
-				if (typeDefinition == null || typeDefinition.BaseType == null || typeDefinition.BaseType.FullName != "System.MulticastDelegate")
+				if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 				{
 					return false;
 				}
 				FieldDefinition fieldDefinition = fieldReferenceExpression.Field.Resolve();
-				if (fieldDefinition.DeclaringType != this.context.MethodContext.Method.DeclaringType && !fieldDefinition.DeclaringType.IsNestedIn(this.context.MethodContext.Method.DeclaringType) || !fieldDefinition.DeclaringType.IsCompilerGenerated())
+				if ((object)fieldDefinition.get_DeclaringType() != (object)this.context.MethodContext.Method.get_DeclaringType() && !fieldDefinition.get_DeclaringType().IsNestedIn(this.context.MethodContext.Method.get_DeclaringType()) || !fieldDefinition.get_DeclaringType().IsCompilerGenerated())
 				{
 					return false;
 				}

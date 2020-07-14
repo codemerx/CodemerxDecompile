@@ -22,7 +22,7 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 		{
 			if (this.writerContext == null || this.writerContext.ModuleContext.Module == null)
 			{
-				return @event.Name;
+				return @event.get_Name();
 			}
 			return base.GetEventName(@event);
 		}
@@ -31,7 +31,7 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 		{
 			if (this.writerContext == null || this.writerContext.ModuleContext.Module == null)
 			{
-				return field.Name;
+				return field.get_Name();
 			}
 			return base.GetFieldName(field);
 		}
@@ -44,7 +44,7 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 			}
 			if (this.writerContext == null || this.writerContext.ModuleContext.Module == null)
 			{
-				return method.Name;
+				return method.get_Name();
 			}
 			return base.GetMethodName(method);
 		}
@@ -53,7 +53,7 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 		{
 			if (this.writerContext == null || this.writerContext.ModuleContext.Module == null)
 			{
-				return property.Name;
+				return property.get_Name();
 			}
 			return base.GetPropertyName(property);
 		}
@@ -64,7 +64,7 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 			{
 				return base.GetTypeName(type);
 			}
-			return GenericHelper.GetNonGenericName(type.Name);
+			return GenericHelper.GetNonGenericName(type.get_Name());
 		}
 
 		protected override bool IsTypeNameInCollision(string typeName)
@@ -107,20 +107,20 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 			if (node.MemberReference is MethodReference)
 			{
 				MethodReference memberReference = node.MemberReference as MethodReference;
-				this.WriteReference(this.GetTypeName(memberReference.DeclaringType), memberReference.DeclaringType);
+				this.WriteReference(this.GetTypeName(memberReference.get_DeclaringType()), memberReference.get_DeclaringType());
 				this.WriteToken(".");
 				this.WriteReference(this.GetMethodName(memberReference), memberReference);
 			}
 			else if (node.MemberReference is FieldReference)
 			{
 				FieldReference fieldReference = node.MemberReference as FieldReference;
-				this.WriteReference(this.GetTypeName(fieldReference.DeclaringType), fieldReference.DeclaringType);
+				this.WriteReference(this.GetTypeName(fieldReference.get_DeclaringType()), fieldReference.get_DeclaringType());
 				this.WriteToken(".");
 				this.WriteReference(this.GetFieldName(fieldReference), fieldReference);
 			}
 			else if (!(node.MemberReference is TypeReference))
 			{
-				this.Write(String.Format("Invalid member reference: {0} {1}.", node.MemberReference.GetType(), node.MemberReference.FullName));
+				this.Write(String.Format("Invalid member reference: {0} {1}.", node.MemberReference.GetType(), node.MemberReference.get_FullName()));
 			}
 			else
 			{

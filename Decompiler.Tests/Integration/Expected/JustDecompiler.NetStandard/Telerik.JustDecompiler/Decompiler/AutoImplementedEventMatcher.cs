@@ -37,15 +37,15 @@ namespace Telerik.JustDecompiler.Decompiler
 				return false;
 			}
 			BinaryExpression binaryExpression = (loopBody.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
-			if (binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (binaryExpression.Right as VariableReferenceExpression).Variable != v0Variable)
+			if (binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(binaryExpression.Right as VariableReferenceExpression).Variable != (object)v0Variable)
 			{
 				return false;
 			}
-			if ((binaryExpression.Left as VariableReferenceExpression).Variable != v1Variable)
+			if ((object)(binaryExpression.Left as VariableReferenceExpression).Variable != (object)v1Variable)
 			{
 				return false;
 			}
-			if (!this.IsDelegateOperationStatement(loopBody.Statements[1], operationName, out expression, out expression1) || expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression1.CodeNodeType != CodeNodeType.VariableReferenceExpression || (expression1 as VariableReferenceExpression).Variable != v1Variable)
+			if (!this.IsDelegateOperationStatement(loopBody.Statements[1], operationName, out expression, out expression1) || expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression1.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression1 as VariableReferenceExpression).Variable != (object)v1Variable)
 			{
 				return false;
 			}
@@ -55,21 +55,21 @@ namespace Telerik.JustDecompiler.Decompiler
 				return false;
 			}
 			BinaryExpression binaryExpression1 = (loopBody.Statements[2] as ExpressionStatement).Expression as BinaryExpression;
-			if (binaryExpression1.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (binaryExpression1.Left as VariableReferenceExpression).Variable != v0Variable || binaryExpression1.Right.CodeNodeType != CodeNodeType.MethodInvocationExpression)
+			if (binaryExpression1.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(binaryExpression1.Left as VariableReferenceExpression).Variable != (object)v0Variable || binaryExpression1.Right.CodeNodeType != CodeNodeType.MethodInvocationExpression)
 			{
 				return false;
 			}
 			MethodInvocationExpression right = binaryExpression1.Right as MethodInvocationExpression;
-			if (right.MethodExpression.Method.DeclaringType.FullName != "System.Threading.Interlocked" || right.MethodExpression.Method.HasThis || right.MethodExpression.Method.Name != "CompareExchange" || right.Arguments.Count != 3 || right.Arguments[0].CodeNodeType != CodeNodeType.UnaryExpression)
+			if (right.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Threading.Interlocked" || right.MethodExpression.Method.get_HasThis() || right.MethodExpression.Method.get_Name() != "CompareExchange" || right.Arguments.Count != 3 || right.Arguments[0].CodeNodeType != CodeNodeType.UnaryExpression)
 			{
 				return false;
 			}
 			UnaryExpression item = right.Arguments[0] as UnaryExpression;
-			if (item.Operator != UnaryOperator.AddressReference || item.Operand.CodeNodeType != CodeNodeType.FieldReferenceExpression || (item.Operand as FieldReferenceExpression).Field.Resolve() != this.eventField)
+			if (item.Operator != UnaryOperator.AddressReference || item.Operand.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item.Operand as FieldReferenceExpression).Field.Resolve() != (object)this.eventField)
 			{
 				return false;
 			}
-			if (right.Arguments[1].CodeNodeType == CodeNodeType.VariableReferenceExpression && (right.Arguments[1] as VariableReferenceExpression).Variable == variable && right.Arguments[2].CodeNodeType == CodeNodeType.VariableReferenceExpression && (right.Arguments[2] as VariableReferenceExpression).Variable == v1Variable)
+			if (right.Arguments[1].CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(right.Arguments[1] as VariableReferenceExpression).Variable == (object)variable && right.Arguments[2].CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(right.Arguments[2] as VariableReferenceExpression).Variable == (object)v1Variable)
 			{
 				return true;
 			}
@@ -78,24 +78,24 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private bool CheckMethodAndDecompile(MethodDefinition methodDef, out BlockStatement methodBody)
 		{
-			if (!methodDef.HasParameters || methodDef.Parameters.Count != 1)
+			if (!methodDef.get_HasParameters() || methodDef.get_Parameters().get_Count() != 1)
 			{
 				methodBody = null;
 				return false;
 			}
 			DecompilationPipeline intermediateRepresenationPipeline = BaseLanguage.IntermediateRepresenationPipeline;
-			intermediateRepresenationPipeline.Run(methodDef.Body, this.language);
+			intermediateRepresenationPipeline.Run(methodDef.get_Body(), this.language);
 			methodBody = intermediateRepresenationPipeline.Body;
 			return true;
 		}
 
 		private FieldDefinition GetField(EventDefinition eventDef)
 		{
-			if (eventDef.InvokeMethod != null || eventDef.AddMethod == null || eventDef.RemoveMethod == null)
+			if (eventDef.get_InvokeMethod() != null || eventDef.get_AddMethod() == null || eventDef.get_RemoveMethod() == null)
 			{
 				return null;
 			}
-			FieldDefinition fieldWithName = AutoImplementedEventMatcher.GetFieldWithName(eventDef.DeclaringType, eventDef.EventType.FullName, String.Concat(eventDef.Name, "Event")) ?? AutoImplementedEventMatcher.GetFieldWithName(eventDef.DeclaringType, eventDef.EventType.FullName, eventDef.Name);
+			FieldDefinition fieldWithName = AutoImplementedEventMatcher.GetFieldWithName(eventDef.get_DeclaringType(), eventDef.get_EventType().get_FullName(), String.Concat(eventDef.get_Name(), "Event")) ?? AutoImplementedEventMatcher.GetFieldWithName(eventDef.get_DeclaringType(), eventDef.get_EventType().get_FullName(), eventDef.get_Name());
 			if (fieldWithName == null)
 			{
 				return null;
@@ -110,13 +110,13 @@ namespace Telerik.JustDecompiler.Decompiler
 		private static FieldDefinition GetFieldWithName(TypeDefinition typeDef, string eventTypeFullName, string name)
 		{
 			FieldDefinition fieldDefinition;
-			Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = typeDef.Fields.GetEnumerator();
+			Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = typeDef.get_Fields().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					FieldDefinition current = enumerator.Current;
-					if (!(current.Name == name) || !(current.FieldType.FullName == eventTypeFullName))
+					FieldDefinition current = enumerator.get_Current();
+					if (!(current.get_Name() == name) || !(current.get_FieldType().get_FullName() == eventTypeFullName))
 					{
 						continue;
 					}
@@ -127,7 +127,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return fieldDefinition;
 		}
@@ -135,7 +135,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		public bool IsAutoImplemented(out FieldDefinition eventField)
 		{
 			eventField = this.GetField(this.eventDef);
-			return eventField != null;
+			return (object)eventField != (object)null;
 		}
 
 		public bool IsAutoImplemented()
@@ -158,7 +158,7 @@ namespace Telerik.JustDecompiler.Decompiler
 				return false;
 			}
 			MethodInvocationExpression methodInvocationExpression = (expression.Right as ExplicitCastExpression).Expression as MethodInvocationExpression;
-			if (methodInvocationExpression.Arguments.Count != 2 || methodInvocationExpression.MethodExpression.Method.HasThis || methodInvocationExpression.MethodExpression.Method.DeclaringType.FullName != "System.Delegate" || methodInvocationExpression.MethodExpression.Method.Name != operationName)
+			if (methodInvocationExpression.Arguments.Count != 2 || methodInvocationExpression.MethodExpression.Method.get_HasThis() || methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Delegate" || methodInvocationExpression.MethodExpression.Method.get_Name() != operationName)
 			{
 				return false;
 			}
@@ -185,7 +185,7 @@ namespace Telerik.JustDecompiler.Decompiler
 				return false;
 			}
 			BinaryExpression expression = (blockStatement.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
-			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.FieldReferenceExpression || (expression.Right as FieldReferenceExpression).Field.Resolve() != this.eventField)
+			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(expression.Right as FieldReferenceExpression).Field.Resolve() != (object)this.eventField)
 			{
 				return false;
 			}
@@ -207,11 +207,11 @@ namespace Telerik.JustDecompiler.Decompiler
 			BinaryExpression binaryExpression = condition as BinaryExpression;
 			ExplicitCastExpression left = binaryExpression.Left as ExplicitCastExpression;
 			ExplicitCastExpression right = binaryExpression.Right as ExplicitCastExpression;
-			if (binaryExpression.Operator != BinaryOperator.ValueInequality || left == null || left.TargetType.Name != "Object" || left.Expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || right == null || right.Expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || right.TargetType.Name != "Object")
+			if (binaryExpression.Operator != BinaryOperator.ValueInequality || left == null || left.TargetType.get_Name() != "Object" || left.Expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || right == null || right.Expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || right.TargetType.get_Name() != "Object")
 			{
 				return false;
 			}
-			if ((left.Expression as VariableReferenceExpression).Variable != variable)
+			if ((object)(left.Expression as VariableReferenceExpression).Variable != (object)variable)
 			{
 				return false;
 			}
@@ -222,21 +222,21 @@ namespace Telerik.JustDecompiler.Decompiler
 		private bool IsThreadSafeEvent(FieldDefinition eventField)
 		{
 			this.eventField = eventField;
-			if (!this.IsThreadSafeAutoImplOperation(this.eventDef.AddMethod, "Combine"))
+			if (!this.IsThreadSafeAutoImplOperation(this.eventDef.get_AddMethod(), "Combine"))
 			{
 				return false;
 			}
-			return this.IsThreadSafeAutoImplOperation(this.eventDef.RemoveMethod, "Remove");
+			return this.IsThreadSafeAutoImplOperation(this.eventDef.get_RemoveMethod(), "Remove");
 		}
 
 		private bool IsThreadUnsafeEvent(FieldDefinition eventField)
 		{
 			this.eventField = eventField;
-			if (!this.IsThreadUnsafeOperation(this.eventDef.AddMethod, "Combine"))
+			if (!this.IsThreadUnsafeOperation(this.eventDef.get_AddMethod(), "Combine"))
 			{
 				return false;
 			}
-			return this.IsThreadUnsafeOperation(this.eventDef.RemoveMethod, "Remove");
+			return this.IsThreadUnsafeOperation(this.eventDef.get_RemoveMethod(), "Remove");
 		}
 
 		private bool IsThreadUnsafeOperation(MethodDefinition methodDef, string operationName)
@@ -256,7 +256,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return false;
 			}
-			if (expression.CodeNodeType == CodeNodeType.FieldReferenceExpression && (expression as FieldReferenceExpression).Field.Resolve() == this.eventField && expression1.CodeNodeType == CodeNodeType.FieldReferenceExpression && (expression1 as FieldReferenceExpression).Field.Resolve() == this.eventField)
+			if (expression.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(expression as FieldReferenceExpression).Field.Resolve() == (object)this.eventField && expression1.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(expression1 as FieldReferenceExpression).Field.Resolve() == (object)this.eventField)
 			{
 				return true;
 			}

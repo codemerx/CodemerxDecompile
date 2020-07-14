@@ -112,7 +112,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			return (BlockStatement)this.VisitBlockStatement(body);
 		}
 
@@ -204,7 +204,7 @@ namespace Telerik.JustDecompiler.Steps
 					if (node.CodeNodeType == CodeNodeType.UnaryExpression)
 					{
 						UnaryExpression unaryExpression = node as UnaryExpression;
-						if (unaryExpression.Operator == UnaryOperator.AddressDereference && (this.includePointers || unaryExpression.Operand.HasType && !unaryExpression.Operand.ExpressionType.IsPointer))
+						if (unaryExpression.Operator == UnaryOperator.AddressDereference && (this.includePointers || unaryExpression.Operand.HasType && !unaryExpression.Operand.ExpressionType.get_IsPointer()))
 						{
 							base.Visit(node);
 							return;

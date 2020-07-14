@@ -37,7 +37,7 @@ namespace Telerik.JustDecompiler.Cil
 		{
 			get
 			{
-				return this.MethodBody.ExceptionHandlers;
+				return this.MethodBody.get_ExceptionHandlers();
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace Telerik.JustDecompiler.Cil
 			{
 				throw new ArgumentNullException("method");
 			}
-			if (!method.HasBody)
+			if (!method.get_HasBody())
 			{
 				throw new ArgumentException();
 			}
@@ -72,7 +72,7 @@ namespace Telerik.JustDecompiler.Cil
 		internal void RemoveBlockAt(int index)
 		{
 			InstructionBlock blocks = this.Blocks[index];
-			Instruction next = blocks.Last.Next;
+			Instruction next = blocks.Last.get_Next();
 			if (blocks.Predecessors.Count > 0)
 			{
 				throw new Exception("The block to be removed cannot have predecessors");
@@ -85,49 +85,49 @@ namespace Telerik.JustDecompiler.Cil
 				this.Blocks[i] = instructionBlockArrays[i + num];
 				this.Blocks[i].Index = i;
 				this.Blocks[i].Predecessors.Remove(blocks);
-				if (this.Blocks[i].First.Previous == blocks.Last)
+				if ((object)this.Blocks[i].First.get_Previous() == (object)blocks.Last)
 				{
-					this.Blocks[i].First.Previous = blocks.First.Previous;
+					this.Blocks[i].First.set_Previous(blocks.First.get_Previous());
 				}
-				if (this.Blocks[i].Last.Next == blocks.First)
+				if ((object)this.Blocks[i].Last.get_Next() == (object)blocks.First)
 				{
-					this.Blocks[i].Last.Next = blocks.Last.Next;
+					this.Blocks[i].Last.set_Next(blocks.Last.get_Next());
 				}
 			}
-			this.InstructionToBlockMapping.Remove(blocks.First.Offset);
+			this.InstructionToBlockMapping.Remove(blocks.First.get_Offset());
 			this.SwitchBlocksInformation.Remove(blocks);
 			blocks.Successors = new InstructionBlock[0];
 			foreach (Instruction block in blocks)
 			{
-				this.OffsetToInstruction.Remove(block.Offset);
+				this.OffsetToInstruction.Remove(block.get_Offset());
 			}
-			foreach (ExceptionHandler exceptionHandler in this.MethodBody.ExceptionHandlers)
+			foreach (ExceptionHandler exceptionHandler in this.MethodBody.get_ExceptionHandlers())
 			{
-				if (exceptionHandler.TryStart == blocks.First)
+				if ((object)exceptionHandler.get_TryStart() == (object)blocks.First)
 				{
-					exceptionHandler.TryStart = next;
+					exceptionHandler.set_TryStart(next);
 				}
-				if (exceptionHandler.TryEnd == blocks.First)
+				if ((object)exceptionHandler.get_TryEnd() == (object)blocks.First)
 				{
-					exceptionHandler.TryEnd = next;
+					exceptionHandler.set_TryEnd(next);
 				}
-				if (exceptionHandler.HandlerStart == blocks.First)
+				if ((object)exceptionHandler.get_HandlerStart() == (object)blocks.First)
 				{
-					exceptionHandler.HandlerStart = next;
+					exceptionHandler.set_HandlerStart(next);
 				}
-				if (exceptionHandler.HandlerEnd == blocks.First)
+				if ((object)exceptionHandler.get_HandlerEnd() == (object)blocks.First)
 				{
-					exceptionHandler.HandlerEnd = next;
+					exceptionHandler.set_HandlerEnd(next);
 				}
-				if (exceptionHandler.FilterStart == blocks.First)
+				if ((object)exceptionHandler.get_FilterStart() == (object)blocks.First)
 				{
-					exceptionHandler.FilterStart = next;
+					exceptionHandler.set_FilterStart(next);
 				}
-				if (exceptionHandler.FilterEnd != blocks.First)
+				if ((object)exceptionHandler.get_FilterEnd() != (object)blocks.First)
 				{
 					continue;
 				}
-				exceptionHandler.FilterEnd = next;
+				exceptionHandler.set_FilterEnd(next);
 			}
 			blocks.Index = -1;
 		}

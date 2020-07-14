@@ -94,12 +94,12 @@ namespace Telerik.JustDecompiler.Steps
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			if (!context.MethodContext.Method.IsConstructor || body.Statements.Count == 0)
+			if (!context.MethodContext.Method.get_IsConstructor() || body.Statements.Count == 0)
 			{
 				return body;
 			}
 			this.methodContext = context.MethodContext;
-			this.typeSystem = this.methodContext.Method.Module.TypeSystem;
+			this.typeSystem = this.methodContext.Method.get_Module().get_TypeSystem();
 			this.methodBodyBlock = body;
 			this.context = context;
 			this.ProcessCtorInvocation();

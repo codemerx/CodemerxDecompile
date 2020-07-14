@@ -21,21 +21,21 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 		public UsedAsTypeHelper(MethodSpecificContext methodContext)
 		{
 			this.methodContext = methodContext;
-			this.typeSystem = methodContext.Method.Module.TypeSystem;
+			this.typeSystem = methodContext.Method.get_Module().get_TypeSystem();
 		}
 
 		public TypeReference GetUseExpressionTypeNode(Instruction instruction, Expression instructionExpression, VariableReference variable)
 		{
-			Code code = instruction.OpCode.Code;
-			if (code == Code.Ldobj)
+			Code code = instruction.get_OpCode().get_Code();
+			if (code == 112)
 			{
-				return instruction.Operand as TypeReference;
+				return instruction.get_Operand() as TypeReference;
 			}
 			if (UsedAsTypeHelper.IsConditionalBranch(code))
 			{
-				return this.typeSystem.Boolean;
+				return this.typeSystem.get_Boolean();
 			}
-			if (code == Code.Pop)
+			if (code == 37)
 			{
 				return null;
 			}
@@ -53,7 +53,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				}
 				if (codeNodeType == CodeNodeType.ReturnExpression)
 				{
-					return this.methodContext.Method.FixedReturnType;
+					return this.methodContext.Method.get_FixedReturnType();
 				}
 				if (codeNodeType == CodeNodeType.BoxExpression)
 				{
@@ -93,24 +93,24 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					case CodeNodeType.VariableReferenceExpression:
 					{
 						VariableReferenceExpression variableReferenceExpression = expression as VariableReferenceExpression;
-						if (variableReferenceExpression.Variable != variable)
+						if ((object)variableReferenceExpression.Variable != (object)variable)
 						{
 							return null;
 						}
-						return variableReferenceExpression.Variable.VariableType;
+						return variableReferenceExpression.Variable.get_VariableType();
 					}
 					case CodeNodeType.VariableDeclarationExpression:
 					{
-						return (expression as VariableDeclarationExpression).Variable.VariableType;
+						return (expression as VariableDeclarationExpression).Variable.get_VariableType();
 					}
 					case CodeNodeType.FieldReferenceExpression:
 					{
-						return (expression as FieldReferenceExpression).Field.DeclaringType;
+						return (expression as FieldReferenceExpression).Field.get_DeclaringType();
 					}
 					case CodeNodeType.ExplicitCastExpression:
 					case CodeNodeType.SafeCastExpression:
 					{
-						return this.typeSystem.Object;
+						return this.typeSystem.get_Object();
 					}
 					default:
 					{
@@ -145,11 +145,11 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			TypeReference num;
 			foreach (Expression dimension in arrayCreationExpression.Dimensions)
 			{
-				if (!(dimension is VariableReferenceExpression) || (dimension as VariableReferenceExpression).Variable != variable)
+				if (!(dimension is VariableReferenceExpression) || (object)(dimension as VariableReferenceExpression).Variable != (object)variable)
 				{
 					continue;
 				}
-				num = this.typeSystem.Int32;
+				num = this.typeSystem.get_Int32();
 				return num;
 			}
 			using (IEnumerator<Expression> enumerator = arrayCreationExpression.Initializer.Expressions.GetEnumerator())
@@ -157,7 +157,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				while (enumerator.MoveNext())
 				{
 					Expression current = enumerator.Current;
-					if (!(current is VariableReferenceExpression) || (current as VariableReferenceExpression).Variable != variable)
+					if (!(current is VariableReferenceExpression) || (object)(current as VariableReferenceExpression).Variable != (object)variable)
 					{
 						continue;
 					}
@@ -177,25 +177,25 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				while (enumerator.MoveNext())
 				{
 					Expression current = enumerator.Current;
-					if (!(current is VariableReferenceExpression) || (current as VariableReferenceExpression).Variable != variable)
+					if (!(current is VariableReferenceExpression) || (object)(current as VariableReferenceExpression).Variable != (object)variable)
 					{
 						continue;
 					}
-					num = this.typeSystem.Int32;
+					num = this.typeSystem.get_Int32();
 					return num;
 				}
-				return new TypeReference("System", "Array", this.typeSystem.Object.Module, this.typeSystem.Object.Scope);
+				return new TypeReference("System", "Array", this.typeSystem.get_Object().get_Module(), this.typeSystem.get_Object().get_Scope());
 			}
 			return num;
 		}
 
 		private TypeReference GetUseInBinaryExpression(BinaryExpression binaryExpression, VariableReference variable)
 		{
-			if (binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (binaryExpression.Right as VariableReferenceExpression).Variable == variable)
+			if (binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(binaryExpression.Right as VariableReferenceExpression).Variable == (object)variable)
 			{
 				return binaryExpression.Left.ExpressionType;
 			}
-			if (binaryExpression.Left is VariableReferenceExpression && (binaryExpression.Left as VariableReferenceExpression).Variable == variable)
+			if (binaryExpression.Left is VariableReferenceExpression && (object)(binaryExpression.Left as VariableReferenceExpression).Variable == (object)variable)
 			{
 				return binaryExpression.Right.ExpressionType;
 			}
@@ -207,7 +207,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			Expression expression = null;
 			foreach (Expression argument in methodInvocationExpression.Arguments)
 			{
-				if (!(argument is VariableReferenceExpression) || (argument as VariableReferenceExpression).Variable != variable)
+				if (!(argument is VariableReferenceExpression) || (object)(argument as VariableReferenceExpression).Variable != (object)variable)
 				{
 					continue;
 				}
@@ -215,15 +215,15 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			}
 			if (expression == null)
 			{
-				if ((methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != variable)
+				if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)variable)
 				{
 					return null;
 				}
-				return methodInvocationExpression.MethodExpression.Member.DeclaringType;
+				return methodInvocationExpression.MethodExpression.Member.get_DeclaringType();
 			}
 			int num = methodInvocationExpression.Arguments.IndexOf(expression);
 			MethodReference method = methodInvocationExpression.MethodExpression.Method;
-			return method.Parameters[num].ResolveParameterType(method);
+			return method.get_Parameters().get_Item(num).ResolveParameterType(method);
 		}
 
 		private TypeReference GetUseInObjectCreation(ObjectCreationExpression objectCreationExpression, VariableReference variable)
@@ -231,22 +231,22 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			Expression expression = null;
 			foreach (Expression argument in objectCreationExpression.Arguments)
 			{
-				if (!(argument is VariableReferenceExpression) || (argument as VariableReferenceExpression).Variable != variable)
+				if (!(argument is VariableReferenceExpression) || (object)(argument as VariableReferenceExpression).Variable != (object)variable)
 				{
 					continue;
 				}
 				expression = argument;
 			}
-			return objectCreationExpression.Constructor.Parameters[objectCreationExpression.Arguments.IndexOf(expression)].ResolveParameterType(objectCreationExpression.Constructor);
+			return objectCreationExpression.Constructor.get_Parameters().get_Item(objectCreationExpression.Arguments.IndexOf(expression)).ResolveParameterType(objectCreationExpression.Constructor);
 		}
 
 		private static bool IsConditionalBranch(Code instructionOpCode)
 		{
-			if (instructionOpCode == Code.Brtrue || instructionOpCode == Code.Brtrue_S || instructionOpCode == Code.Brfalse)
+			if (instructionOpCode == 57 || instructionOpCode == 44 || instructionOpCode == 56)
 			{
 				return true;
 			}
-			return instructionOpCode == Code.Brfalse_S;
+			return instructionOpCode == 43;
 		}
 	}
 }

@@ -34,11 +34,11 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				{
 					return false;
 				}
-				if (this.inferedType.MetadataType == MetadataType.Class)
+				if (this.inferedType.get_MetadataType() == 18)
 				{
 					return true;
 				}
-				return this.inferedType.MetadataType == MetadataType.Object;
+				return this.inferedType.get_MetadataType() == 28;
 			}
 		}
 
@@ -46,7 +46,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 		{
 			get
 			{
-				return this.inferedType != null;
+				return (object)this.inferedType != (object)null;
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private bool IsAssignable(TypeReference toAssign, TypeReference recipient)
 		{
-			if (!toAssign.IsPrimitive || !recipient.IsPrimitive)
+			if (!toAssign.get_IsPrimitive() || !recipient.get_IsPrimitive())
 			{
 				return true;
 			}
@@ -153,7 +153,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					{
 						continue;
 					}
-					if (!canAssignTo.IsHardNode || !canAssignTo.NodeType.IsPrimitive || !containedNode.IsHardNode || this.IsAssignable(containedNode.NodeType, canAssignTo.NodeType))
+					if (!canAssignTo.IsHardNode || !canAssignTo.NodeType.get_IsPrimitive() || !containedNode.IsHardNode || this.IsAssignable(containedNode.NodeType, canAssignTo.NodeType))
 					{
 						keyValuePairs.Add(new KeyValuePair<ClassHierarchyNode, ClassHierarchyNode>(containedNode, canAssignTo));
 					}
@@ -185,7 +185,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					{
 						continue;
 					}
-					if (!subType.IsHardNode || !subType.NodeType.IsPrimitive || !classHierarchyNode.IsHardNode || this.IsAssignable(subType.NodeType, classHierarchyNode.NodeType))
+					if (!subType.IsHardNode || !subType.NodeType.get_IsPrimitive() || !classHierarchyNode.IsHardNode || this.IsAssignable(subType.NodeType, classHierarchyNode.NodeType))
 					{
 						keyValuePairs.Add(new KeyValuePair<ClassHierarchyNode, ClassHierarchyNode>(classHierarchyNode, subType));
 					}
@@ -218,7 +218,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			}
 			if (this.ContainedNodes.Count <= 0)
 			{
-				return this.variable.Name;
+				return this.variable.get_Name();
 			}
 			StringBuilder stringBuilder = new StringBuilder();
 			foreach (ClassHierarchyNode containedNode in this.ContainedNodes)
@@ -237,7 +237,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			}
 			if (this.variable != null)
 			{
-				this.variable.VariableType = this.inferedType;
+				this.variable.set_VariableType(this.inferedType);
 			}
 		}
 	}

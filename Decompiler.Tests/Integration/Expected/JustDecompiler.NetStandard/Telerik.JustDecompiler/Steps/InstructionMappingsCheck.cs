@@ -25,7 +25,7 @@ namespace Telerik.JustDecompiler.Steps
 				context.MethodContext.IsMethodBodyChanged = false;
 			}
 			List<Instruction> instructions1 = new List<Instruction>();
-			foreach (Instruction instruction in context.MethodContext.Method.Body.Instructions)
+			foreach (Instruction instruction in context.MethodContext.Method.get_Body().get_Instructions())
 			{
 				if (instructions.Contains(instruction))
 				{

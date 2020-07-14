@@ -41,7 +41,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		public void AddAssemblyContextToCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers, AssemblySpecificContext assemblyContext)
 		{
-			DefaultDecompilationCacheService.assemblyContextsCache.Add(this.GetModuleKey(assembly.MainModule, language, renameInvalidMembers), assemblyContext);
+			DefaultDecompilationCacheService.assemblyContextsCache.Add(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers), assemblyContext);
 		}
 
 		public virtual void AddDecompiledMemberToCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers, CachedDecompiledMember decompiledMember)
@@ -78,7 +78,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		public AssemblySpecificContext GetAssemblyContextFromCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers)
 		{
-			return DefaultDecompilationCacheService.assemblyContextsCache.Get(this.GetModuleKey(assembly.MainModule, language, renameInvalidMembers));
+			return DefaultDecompilationCacheService.assemblyContextsCache.Get(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers));
 		}
 
 		public virtual CachedDecompiledMember GetDecompiledMemberFromCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers)
@@ -88,7 +88,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private string GetMemberKey(IMemberDefinition member, ILanguage language, bool renameInvalidMembers)
 		{
-			return String.Concat(new String[] { this.GetModuleKey(member.DeclaringType.Module, language, renameInvalidMembers), " : ", language.Name, " : ", Utilities.GetMemberUniqueName(member) });
+			return String.Concat(new String[] { this.GetModuleKey(member.get_DeclaringType().get_Module(), language, renameInvalidMembers), " : ", language.Name, " : ", Utilities.GetMemberUniqueName(member) });
 		}
 
 		public virtual ModuleSpecificContext GetModuleContextFromCache(ModuleDefinition module, ILanguage language, bool renameInvalidMembers)
@@ -98,11 +98,11 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private string GetModuleKey(ModuleDefinition module, ILanguage language, bool renameInvalidMembers)
 		{
-			FileInfo fileInfo = new FileInfo(module.FilePath);
-			String[] filePath = new String[] { module.FilePath, " : ", null, null, null, null, null, null, null };
+			FileInfo fileInfo = new FileInfo(module.get_FilePath());
+			String[] filePath = new String[] { module.get_FilePath(), " : ", null, null, null, null, null, null, null };
 			filePath[2] = fileInfo.LastWriteTime.ToString();
 			filePath[3] = " : ";
-			filePath[4] = module.Name.ToString();
+			filePath[4] = module.get_Name().ToString();
 			filePath[5] = " ";
 			filePath[6] = language.Name;
 			filePath[7] = " ";
@@ -122,12 +122,12 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private string GetTypeKey(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
 		{
-			return String.Concat(new String[] { this.GetModuleKey(type.Module, language, renameInvalidMembers), " : ", language.Name, " : ", type.FullName });
+			return String.Concat(new String[] { this.GetModuleKey(type.get_Module(), language, renameInvalidMembers), " : ", language.Name, " : ", type.get_FullName() });
 		}
 
 		public bool IsAssemblyContextInCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers)
 		{
-			return DefaultDecompilationCacheService.assemblyContextsCache.ContainsKey(this.GetModuleKey(assembly.MainModule, language, renameInvalidMembers));
+			return DefaultDecompilationCacheService.assemblyContextsCache.ContainsKey(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers));
 		}
 
 		public virtual bool IsDecompiledMemberInCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers)

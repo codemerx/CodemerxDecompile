@@ -93,7 +93,7 @@ namespace Telerik.JustDecompiler.Steps
 					return false;
 				}
 				this.theLocalVariable = (binaryExpression.Left as VariableReferenceExpression).Variable;
-				if ((binaryExpression.Right as VariableReferenceExpression).Variable != left.Variable)
+				if ((object)(binaryExpression.Right as VariableReferenceExpression).Variable != (object)left.Variable)
 				{
 					return false;
 				}
@@ -146,7 +146,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (variable != null && (item.Condition.CodeNodeType != CodeNodeType.UnaryExpression || (item.Condition as UnaryExpression).Operator != UnaryOperator.LogicalNot || (item.Condition as UnaryExpression).Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || ((item.Condition as UnaryExpression).Operand as VariableReferenceExpression).Variable != variable))
+			if (variable != null && (item.Condition.CodeNodeType != CodeNodeType.UnaryExpression || (item.Condition as UnaryExpression).Operator != UnaryOperator.LogicalNot || (item.Condition as UnaryExpression).Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)((item.Condition as UnaryExpression).Operand as VariableReferenceExpression).Variable != (object)variable))
 			{
 				return false;
 			}
@@ -170,11 +170,11 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			MethodReference method = theMethodInvocation.MethodExpression.Method;
-			if (method.DeclaringType.FullName != typeof(Monitor).FullName)
+			if (method.get_DeclaringType().get_FullName() != typeof(Monitor).FullName)
 			{
 				return false;
 			}
-			return method.Name == methodName;
+			return method.get_Name() == methodName;
 		}
 
 		private bool DetermineWithFlagLockTypeVersion(TryStatement @try)
@@ -261,7 +261,7 @@ namespace Telerik.JustDecompiler.Steps
 						ExpressionStatement item = @try.Try.Statements[num] as ExpressionStatement;
 						codeNodeType = codeNodeType & item.Expression.CodeNodeType == CodeNodeType.MethodInvocationExpression;
 						MethodInvocationExpression expression = item.Expression as MethodInvocationExpression;
-						codeNodeType = codeNodeType & (!this.CheckTheMethodInvocation(expression, "Enter") ? false : expression.MethodExpression.Method.Parameters.Count == 2);
+						codeNodeType = codeNodeType & (!this.CheckTheMethodInvocation(expression, "Enter") ? false : expression.MethodExpression.Method.get_Parameters().get_Count() == 2);
 						if (codeNodeType)
 						{
 							this.lockingInstructions.AddRange(expression.UnderlyingSameMethodInstructions);
@@ -299,7 +299,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			else if (item.CodeNodeType == CodeNodeType.ExpressionStatement && this.CheckTheMethodInvocation((item as ExpressionStatement).Expression as MethodInvocationExpression, "Enter"))
 			{
-				if (((item as ExpressionStatement).Expression as MethodInvocationExpression).MethodExpression.Method.Parameters.Count != 1)
+				if (((item as ExpressionStatement).Expression as MethodInvocationExpression).MethodExpression.Method.get_Parameters().get_Count() != 1)
 				{
 					return false;
 				}

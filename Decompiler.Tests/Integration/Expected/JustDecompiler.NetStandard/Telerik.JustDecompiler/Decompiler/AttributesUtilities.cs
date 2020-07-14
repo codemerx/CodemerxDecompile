@@ -16,22 +16,22 @@ namespace Telerik.JustDecompiler.Decompiler
 	{
 		private static void AddMethodCodeType(MethodDefinition method, Mono.Cecil.CustomAttribute attribute)
 		{
-			if (method.IsNative || method.IsOPTIL || method.IsRuntime)
+			if (method.get_IsNative() || method.get_IsOPTIL() || method.get_IsRuntime())
 			{
 				MethodCodeType methodCodeType = MethodCodeType.IL;
-				if (method.IsNative)
+				if (method.get_IsNative())
 				{
 					methodCodeType |= MethodCodeType.Native;
 				}
-				if (method.IsOPTIL)
+				if (method.get_IsOPTIL())
 				{
 					methodCodeType |= MethodCodeType.OPTIL;
 				}
-				if (method.IsRuntime)
+				if (method.get_IsRuntime())
 				{
 					methodCodeType |= MethodCodeType.Runtime;
 				}
-				attribute.Fields.Add(new Mono.Cecil.CustomAttributeNamedArgument("MethodCodeType", AttributesUtilities.GetMethodImplAttributeArgument(method, methodCodeType)));
+				attribute.get_Fields().Add(new Mono.Cecil.CustomAttributeNamedArgument("MethodCodeType", AttributesUtilities.GetMethodImplAttributeArgument(method, methodCodeType)));
 			}
 		}
 
@@ -40,69 +40,69 @@ namespace Telerik.JustDecompiler.Decompiler
 			if (AttributesUtilities.DoesMethodHaveMethodImplOptions(method))
 			{
 				MethodImplOptions methodImplOption = 0;
-				if (method.AggressiveInlining)
+				if (method.get_AggressiveInlining())
 				{
 					methodImplOption |= MethodImplOptions.AggressiveInlining;
 				}
-				if (method.IsForwardRef)
+				if (method.get_IsForwardRef())
 				{
 					methodImplOption |= MethodImplOptions.ForwardRef;
 				}
-				if (method.IsInternalCall)
+				if (method.get_IsInternalCall())
 				{
 					methodImplOption |= MethodImplOptions.InternalCall;
 				}
-				if (method.NoInlining)
+				if (method.get_NoInlining())
 				{
 					methodImplOption |= MethodImplOptions.NoInlining;
 				}
-				if (method.NoOptimization)
+				if (method.get_NoOptimization())
 				{
 					methodImplOption |= MethodImplOptions.NoOptimization;
 				}
-				if (method.IsPreserveSig && !method.HasPInvokeInfo)
+				if (method.get_IsPreserveSig() && !method.get_HasPInvokeInfo())
 				{
 					methodImplOption |= MethodImplOptions.PreserveSig;
 				}
-				if (method.IsSynchronized)
+				if (method.get_IsSynchronized())
 				{
 					methodImplOption |= MethodImplOptions.Synchronized;
 				}
-				if (method.IsUnmanaged)
+				if (method.get_IsUnmanaged())
 				{
 					methodImplOption |= MethodImplOptions.Unmanaged;
 				}
-				attribute.ConstructorArguments.Add(AttributesUtilities.GetMethodImplAttributeArgument(method, methodImplOption));
+				attribute.get_ConstructorArguments().Add(AttributesUtilities.GetMethodImplAttributeArgument(method, methodImplOption));
 			}
 		}
 
 		private static void CreateAndAddBestFitMappingFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			if (method.PInvokeInfo.IsBestFitDisabled)
+			if (method.get_PInvokeInfo().get_IsBestFitDisabled())
 			{
-				TypeReference flag = method.DeclaringType.Module.TypeSystem.Boolean;
+				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
 				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("BestFitMapping", new CustomAttributeArgument(flag, false));
-				dllImportAttr.Fields.Add(customAttributeNamedArgument);
+				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 			}
 		}
 
 		private static void CreateAndAddCallingConventionFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			if (!method.PInvokeInfo.IsCallConvWinapi)
+			if (!method.get_PInvokeInfo().get_IsCallConvWinapi())
 			{
-				TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(CallingConvention), method.DeclaringType.Module);
+				TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(CallingConvention), method.get_DeclaringType().get_Module());
 				int num = 0;
-				if (method.PInvokeInfo.IsCallConvFastcall)
+				if (method.get_PInvokeInfo().get_IsCallConvFastcall())
 				{
 					num = 5;
 				}
-				else if (method.PInvokeInfo.IsCallConvThiscall)
+				else if (method.get_PInvokeInfo().get_IsCallConvThiscall())
 				{
 					num = 4;
 				}
-				else if (!method.PInvokeInfo.IsCallConvStdCall)
+				else if (!method.get_PInvokeInfo().get_IsCallConvStdCall())
 				{
-					num = (!method.PInvokeInfo.IsCallConvCdecl ? 1 : 2);
+					num = (!method.get_PInvokeInfo().get_IsCallConvCdecl() ? 1 : 2);
 				}
 				else
 				{
@@ -110,87 +110,87 @@ namespace Telerik.JustDecompiler.Decompiler
 				}
 				CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(corlibTypeReference, (object)num);
 				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("CallingConvention", customAttributeArgument);
-				dllImportAttr.Fields.Add(customAttributeNamedArgument);
+				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 			}
 		}
 
 		private static void CreateAndAddCharSetFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
 			CharSet charSet = CharSet.None;
-			if (method.PInvokeInfo.IsCharSetAnsi)
+			if (method.get_PInvokeInfo().get_IsCharSetAnsi())
 			{
 				charSet = CharSet.Ansi;
 			}
-			if (method.PInvokeInfo.IsCharSetUnicode)
+			if (method.get_PInvokeInfo().get_IsCharSetUnicode())
 			{
 				charSet = CharSet.Unicode;
 			}
-			if (method.PInvokeInfo.IsCharSetAuto)
+			if (method.get_PInvokeInfo().get_IsCharSetAuto())
 			{
 				charSet = CharSet.Auto;
 			}
-			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(CharSet), method.DeclaringType.Module);
+			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(CharSet), method.get_DeclaringType().get_Module());
 			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(corlibTypeReference, (object)((Int32)charSet));
 			Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("CharSet", customAttributeArgument);
-			dllImportAttr.Fields.Add(customAttributeNamedArgument);
+			dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 		}
 
 		private static void CreateAndAddEntryPointFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			if (method.PInvokeInfo.EntryPoint != method.Name)
+			if (method.get_PInvokeInfo().get_EntryPoint() != method.get_Name())
 			{
-				TypeReference str = method.DeclaringType.Module.TypeSystem.String;
-				CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(str, method.PInvokeInfo.EntryPoint);
+				TypeReference str = method.get_DeclaringType().get_Module().get_TypeSystem().get_String();
+				CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(str, method.get_PInvokeInfo().get_EntryPoint());
 				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("EntryPoint", customAttributeArgument);
-				dllImportAttr.Fields.Add(customAttributeNamedArgument);
+				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 			}
 		}
 
 		private static void CreateAndAddExactSpellingFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			TypeReference flag = method.DeclaringType.Module.TypeSystem.Boolean;
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(flag, (object)method.PInvokeInfo.IsNoMangle);
+			TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
+			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(flag, (object)method.get_PInvokeInfo().get_IsNoMangle());
 			Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("ExactSpelling", customAttributeArgument);
-			dllImportAttr.Fields.Add(customAttributeNamedArgument);
+			dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 		}
 
 		private static void CreateAndAddPreserveSigFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			if (!method.IsPreserveSig)
+			if (!method.get_IsPreserveSig())
 			{
-				TypeReference flag = method.DeclaringType.Module.TypeSystem.Boolean;
+				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
 				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("PreserveSig", new CustomAttributeArgument(flag, false));
-				dllImportAttr.Fields.Add(customAttributeNamedArgument);
+				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 			}
 		}
 
 		private static void CreateAndAddSetLastErrorFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			if (method.PInvokeInfo.SupportsLastError)
+			if (method.get_PInvokeInfo().get_SupportsLastError())
 			{
-				TypeReference flag = method.DeclaringType.Module.TypeSystem.Boolean;
+				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
 				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("SetLastError", new CustomAttributeArgument(flag, true));
-				dllImportAttr.Fields.Add(customAttributeNamedArgument);
+				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 			}
 		}
 
 		private static void CreateAndAddThrowOnUnmappableCharFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
 		{
-			if (method.PInvokeInfo.IsThrowOnUnmappableCharEnabled)
+			if (method.get_PInvokeInfo().get_IsThrowOnUnmappableCharEnabled())
 			{
-				TypeReference flag = method.DeclaringType.Module.TypeSystem.Boolean;
+				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
 				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("ThrowOnUnmappableChar", new CustomAttributeArgument(flag, true));
-				dllImportAttr.Fields.Add(customAttributeNamedArgument);
+				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
 			}
 		}
 
 		private static bool DoesMethodHaveMethodImplOptions(MethodDefinition method)
 		{
-			if (method.AggressiveInlining || method.IsForwardRef || method.IsInternalCall || method.NoInlining || method.NoOptimization || method.IsPreserveSig && !method.HasPInvokeInfo || method.IsSynchronized)
+			if (method.get_AggressiveInlining() || method.get_IsForwardRef() || method.get_IsInternalCall() || method.get_NoInlining() || method.get_NoOptimization() || method.get_IsPreserveSig() && !method.get_HasPInvokeInfo() || method.get_IsSynchronized())
 			{
 				return true;
 			}
-			return method.IsUnmanaged;
+			return method.get_IsUnmanaged();
 		}
 
 		public static ICollection<TypeReference> GetAssemblyAttributesUsedTypes(AssemblyDefinition assembly)
@@ -200,34 +200,34 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				AttributesUtilities.GetAssemblyVersionAttribute(assembly)
 			};
-			foreach (Mono.Cecil.CustomAttribute customAttribute in assembly.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in assembly.get_CustomAttributes())
 			{
 				customAttribute.Resolve();
 				customAttributes.Add(customAttribute);
 			}
-			if (assembly.HasSecurityDeclarations)
+			if (assembly.get_HasSecurityDeclarations())
 			{
-				foreach (SecurityDeclaration securityDeclaration in assembly.SecurityDeclarations)
+				foreach (SecurityDeclaration securityDeclaration in assembly.get_SecurityDeclarations())
 				{
-					if (!securityDeclaration.HasSecurityAttributes)
+					if (!securityDeclaration.get_HasSecurityAttributes())
 					{
 						continue;
 					}
-					foreach (SecurityAttribute securityAttribute in securityDeclaration.SecurityAttributes)
+					foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
 					{
 						customAttributes.Add(securityAttribute);
 					}
 				}
 			}
-			if (assembly.MainModule.HasExportedTypes)
+			if (assembly.get_MainModule().get_HasExportedTypes())
 			{
-				foreach (ExportedType exportedType in assembly.MainModule.ExportedTypes)
+				foreach (ExportedType exportedType in assembly.get_MainModule().get_ExportedTypes())
 				{
-					if (exportedType.Scope is ModuleReference)
+					if (exportedType.get_Scope() is ModuleReference)
 					{
 						continue;
 					}
-					customAttributes.Add(AttributesUtilities.GetExportedTypeAttribute(exportedType, assembly.MainModule));
+					customAttributes.Add(AttributesUtilities.GetExportedTypeAttribute(exportedType, assembly.get_MainModule()));
 				}
 			}
 			foreach (ICustomAttribute customAttribute1 in customAttributes)
@@ -256,22 +256,22 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static Mono.Cecil.CustomAttribute GetAssemblyVersionAttribute(AssemblyDefinition assembly)
 		{
-			IMetadataScope scope = assembly.MainModule.TypeSystem.Boolean.Scope;
-			TypeReference typeReference = new TypeReference("System.Reflection", "AssemblyVersionAttribute", assembly.MainModule, scope);
-			MethodReference methodReference = new MethodReference(".ctor", assembly.MainModule.TypeSystem.Void, typeReference);
-			methodReference.Parameters.Add(new ParameterDefinition(assembly.MainModule.TypeSystem.String));
+			IMetadataScope scope = assembly.get_MainModule().get_TypeSystem().get_Boolean().get_Scope();
+			TypeReference typeReference = new TypeReference("System.Reflection", "AssemblyVersionAttribute", assembly.get_MainModule(), scope);
+			MethodReference methodReference = new MethodReference(".ctor", assembly.get_MainModule().get_TypeSystem().get_Void(), typeReference);
+			methodReference.get_Parameters().Add(new ParameterDefinition(assembly.get_MainModule().get_TypeSystem().get_String()));
 			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(methodReference);
-			string str = assembly.Name.Version.ToString(4);
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(assembly.MainModule.TypeSystem.String, str);
-			customAttribute.ConstructorArguments.Add(customAttributeArgument);
+			string str = assembly.get_Name().get_Version().ToString(4);
+			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(assembly.get_MainModule().get_TypeSystem().get_String(), str);
+			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
 			return customAttribute;
 		}
 
 		private static ICollection<TypeReference> GetAttributeArgumentArrayUsedTypes(CustomAttributeArgument argument)
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			CustomAttributeArgument[] value = argument.Value as CustomAttributeArgument[];
-			typeReferences.Add(argument.Type);
+			CustomAttributeArgument[] value = argument.get_Value() as CustomAttributeArgument[];
+			typeReferences.Add(argument.get_Type());
 			for (int i = 0; i < (int)value.Length; i++)
 			{
 				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(value[i]));
@@ -281,30 +281,30 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private static ICollection<TypeReference> GetAttributeArgumentValueUsedTypes(CustomAttributeArgument argument)
 		{
-			if (argument.Value is CustomAttributeArgument)
+			if (argument.get_Value() is CustomAttributeArgument)
 			{
-				return AttributesUtilities.GetAttributeArgumentValueUsedTypes((CustomAttributeArgument)argument.Value);
+				return AttributesUtilities.GetAttributeArgumentValueUsedTypes((CustomAttributeArgument)argument.get_Value());
 			}
-			if (argument.Value is CustomAttributeArgument[])
+			if (argument.get_Value() is CustomAttributeArgument[])
 			{
 				return AttributesUtilities.GetAttributeArgumentArrayUsedTypes(argument);
 			}
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			TypeDefinition typeDefinition = (argument.Type.IsDefinition ? argument.Type as TypeDefinition : argument.Type.Resolve());
-			if (typeDefinition != null && typeDefinition.IsEnum)
+			TypeDefinition typeDefinition = (argument.get_Type().get_IsDefinition() ? argument.get_Type() as TypeDefinition : argument.get_Type().Resolve());
+			if (typeDefinition != null && typeDefinition.get_IsEnum())
 			{
-				List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.Fields, argument.Value, typeDefinition.CustomAttributes);
+				List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.get_Fields(), argument.get_Value(), typeDefinition.get_CustomAttributes());
 				if (enumFieldDefinitionByValue.Count != 0)
 				{
 					for (int i = 0; i < enumFieldDefinitionByValue.Count; i++)
 					{
-						typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(enumFieldDefinitionByValue[i].DeclaringType));
+						typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(enumFieldDefinitionByValue[i].get_DeclaringType()));
 					}
 				}
 			}
-			else if (argument.Type.Name == "Type" && argument.Type.Namespace == "System")
+			else if (argument.get_Type().get_Name() == "Type" && argument.get_Type().get_Namespace() == "System")
 			{
-				typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(argument.Value as TypeReference));
+				typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(argument.get_Value() as TypeReference));
 			}
 			return typeReferences;
 		}
@@ -314,51 +314,51 @@ namespace Telerik.JustDecompiler.Decompiler
 			IList properties;
 			IList lists;
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			for (int i = 0; i < namedArguments.Count; i++)
+			for (int i = 0; i < namedArguments.get_Count(); i++)
 			{
 				if (attributeType != null)
 				{
 					if (fields)
 					{
-						properties = attributeType.Fields;
+						properties = attributeType.get_Fields();
 					}
 					else
 					{
-						properties = attributeType.Properties;
+						properties = attributeType.get_Properties();
 					}
 					MemberReference memberReference = null;
 					IList lists1 = properties;
 					TypeDefinition typeDefinition = attributeType;
 					do
 					{
-						memberReference = Utilities.FindMemberArgumentRefersTo(lists1, namedArguments[i]);
-						if (typeDefinition.BaseType == null)
+						memberReference = Utilities.FindMemberArgumentRefersTo(lists1, namedArguments.get_Item(i));
+						if (typeDefinition.get_BaseType() == null)
 						{
 							break;
 						}
-						typeDefinition = typeDefinition.BaseType.Resolve();
+						typeDefinition = typeDefinition.get_BaseType().Resolve();
 						if (typeDefinition == null)
 						{
 							break;
 						}
 						if (fields)
 						{
-							lists = typeDefinition.Fields;
+							lists = typeDefinition.get_Fields();
 						}
 						else
 						{
-							lists = typeDefinition.Properties;
+							lists = typeDefinition.get_Properties();
 						}
 						lists1 = lists;
 					}
 					while (memberReference == null);
 					if (memberReference != null)
 					{
-						typeReferences.Add(memberReference.DeclaringType);
+						typeReferences.Add(memberReference.get_DeclaringType());
 					}
 				}
-				Mono.Cecil.CustomAttributeNamedArgument item = namedArguments[i];
-				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(item.Argument));
+				Mono.Cecil.CustomAttributeNamedArgument item = namedArguments.get_Item(i);
+				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(item.get_Argument()));
 			}
 			return typeReferences;
 		}
@@ -367,22 +367,22 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
 			attribute.Resolve();
-			typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(attribute.AttributeType));
-			for (int i = 0; i < attribute.ConstructorArguments.Count; i++)
+			typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(attribute.get_AttributeType()));
+			for (int i = 0; i < attribute.get_ConstructorArguments().get_Count(); i++)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(attribute.ConstructorArguments[i]));
+				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(attribute.get_ConstructorArguments().get_Item(i)));
 			}
-			if (attribute.HasConstructorArguments || attribute.HasFields || attribute.HasProperties)
+			if (attribute.get_HasConstructorArguments() || attribute.get_HasFields() || attribute.get_HasProperties())
 			{
-				if (attribute.HasProperties)
+				if (attribute.get_HasProperties())
 				{
-					TypeDefinition typeDefinition = attribute.AttributeType.Resolve();
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.Properties, false));
+					TypeDefinition typeDefinition = attribute.get_AttributeType().Resolve();
+					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.get_Properties(), false));
 				}
-				if (attribute.HasFields)
+				if (attribute.get_HasFields())
 				{
-					TypeDefinition typeDefinition1 = attribute.AttributeType.Resolve();
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition1, attribute.Fields, true));
+					TypeDefinition typeDefinition1 = attribute.get_AttributeType().Resolve();
+					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition1, attribute.get_Fields(), true));
 				}
 			}
 			return typeReferences;
@@ -391,21 +391,21 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static ICollection<TypeReference> GetEventAttributesUsedTypes(EventDefinition @event, ILanguage language)
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in @event.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in @event.get_CustomAttributes())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
 			}
-			if (@event.AddMethod != null)
+			if (@event.get_AddMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.AddMethod, language));
+				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.get_AddMethod(), language));
 			}
-			if (@event.RemoveMethod != null)
+			if (@event.get_RemoveMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.RemoveMethod, language));
+				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.get_RemoveMethod(), language));
 			}
-			if (@event.InvokeMethod != null)
+			if (@event.get_InvokeMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.InvokeMethod, language));
+				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.get_InvokeMethod(), language));
 			}
 			return typeReferences;
 		}
@@ -415,22 +415,22 @@ namespace Telerik.JustDecompiler.Decompiler
 			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(TypeForwardedToAttribute), module, (IList<Type>)(new Type[] { typeof(Type) })));
 			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(Type), module);
 			TypeReference typeReference = exportedType.CreateReference();
-			customAttribute.ConstructorArguments.Add(new CustomAttributeArgument(corlibTypeReference, typeReference));
+			customAttribute.get_ConstructorArguments().Add(new CustomAttributeArgument(corlibTypeReference, typeReference));
 			return customAttribute;
 		}
 
 		public static ICollection<TypeReference> GetFieldAttributesUsedTypes(FieldDefinition field)
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in field.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in field.get_CustomAttributes())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
 			}
-			if (field.IsNotSerialized)
+			if (field.get_IsNotSerialized())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetFieldNotSerializedAttribute(field)));
 			}
-			if (field.DeclaringType.IsExplicitLayout)
+			if (field.get_DeclaringType().get_IsExplicitLayout())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetFieldFieldOffsetAttribute(field)));
 			}
@@ -439,33 +439,33 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static Mono.Cecil.CustomAttribute GetFieldFieldOffsetAttribute(FieldDefinition field)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(FieldOffsetAttribute), field.DeclaringType.Module, (IList<Type>)(new Type[] { typeof(Int32) })));
-			TypeReference num = field.FieldType.Module.TypeSystem.Int32;
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(num, (object)field.Offset);
-			customAttribute.ConstructorArguments.Add(customAttributeArgument);
+			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(FieldOffsetAttribute), field.get_DeclaringType().get_Module(), (IList<Type>)(new Type[] { typeof(Int32) })));
+			TypeReference num = field.get_FieldType().get_Module().get_TypeSystem().get_Int32();
+			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(num, (object)field.get_Offset());
+			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
 			return customAttribute;
 		}
 
 		public static Mono.Cecil.CustomAttribute GetFieldNotSerializedAttribute(FieldDefinition field)
 		{
-			return new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(NonSerializedAttribute), field.DeclaringType.Module, null));
+			return new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(NonSerializedAttribute), field.get_DeclaringType().get_Module(), null));
 		}
 
 		public static ICollection<TypeReference> GetMethodAttributesUsedTypes(MethodDefinition method, ILanguage language)
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in method.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in method.get_CustomAttributes())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
 			}
-			ModuleDefinition module = method.DeclaringType.Module;
-			if (method.HasSecurityDeclarations)
+			ModuleDefinition module = method.get_DeclaringType().get_Module();
+			if (method.get_HasSecurityDeclarations())
 			{
-				foreach (SecurityDeclaration securityDeclaration in method.SecurityDeclarations)
+				foreach (SecurityDeclaration securityDeclaration in method.get_SecurityDeclarations())
 				{
-					if (securityDeclaration.HasSecurityAttributes)
+					if (securityDeclaration.get_HasSecurityAttributes())
 					{
-						foreach (SecurityAttribute securityAttribute in securityDeclaration.SecurityAttributes)
+						foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
 						{
 							typeReferences.AddRange(AttributesUtilities.GetSecurityAttributeUsedTypes(securityAttribute));
 						}
@@ -473,22 +473,23 @@ namespace Telerik.JustDecompiler.Decompiler
 					typeReferences.Add(securityDeclaration.GetSecurityActionTypeReference(module));
 				}
 			}
-			foreach (ParameterDefinition parameter in method.Parameters)
+			foreach (ParameterDefinition parameter in method.get_Parameters())
 			{
 				if (parameter.IsOutParameter() && !language.HasOutKeyword)
 				{
-					typeReferences.Add(AttributesUtilities.GetOutAttributeTypeReference(method.DeclaringType.Module));
+					TypeReference outAttributeTypeReference = AttributesUtilities.GetOutAttributeTypeReference(method.get_DeclaringType().get_Module());
+					typeReferences.Add(outAttributeTypeReference);
 				}
-				foreach (Mono.Cecil.CustomAttribute customAttribute1 in parameter.CustomAttributes)
+				foreach (Mono.Cecil.CustomAttribute customAttribute1 in parameter.get_CustomAttributes())
 				{
 					typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute1));
 				}
 			}
-			if (method.HasPInvokeInfo && method.PInvokeInfo != null)
+			if (method.get_HasPInvokeInfo() && method.get_PInvokeInfo() != null)
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetMethodDllImportAttribute(method)));
 			}
-			if (method.HasImplAttributes && AttributesUtilities.ShouldWriteMethodImplAttribute(method))
+			if (method.get_HasImplAttributes() && AttributesUtilities.ShouldWriteMethodImplAttribute(method))
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetMethodImplAttribute(method)));
 			}
@@ -497,11 +498,11 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static Mono.Cecil.CustomAttribute GetMethodDllImportAttribute(MethodDefinition method)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(DllImportAttribute), method.DeclaringType.Module, (IList<Type>)(new Type[] { typeof(String) })));
-			string name = method.PInvokeInfo.Module.Name;
-			TypeReference str = method.DeclaringType.Module.TypeSystem.String;
+			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(DllImportAttribute), method.get_DeclaringType().get_Module(), (IList<Type>)(new Type[] { typeof(String) })));
+			string name = method.get_PInvokeInfo().get_Module().get_Name();
+			TypeReference str = method.get_DeclaringType().get_Module().get_TypeSystem().get_String();
 			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(str, name);
-			customAttribute.ConstructorArguments.Add(customAttributeArgument);
+			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
 			AttributesUtilities.CreateAndAddBestFitMappingFieldArgument(method, customAttribute);
 			AttributesUtilities.CreateAndAddCallingConventionFieldArgument(method, customAttribute);
 			AttributesUtilities.CreateAndAddCharSetFieldArgument(method, customAttribute);
@@ -516,7 +517,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static Mono.Cecil.CustomAttribute GetMethodImplAttribute(MethodDefinition method)
 		{
 			Type[] typeArray = (AttributesUtilities.DoesMethodHaveMethodImplOptions(method) ? new Type[] { typeof(MethodImplOptions) } : new Type[0]);
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(MethodImplAttribute), method.DeclaringType.Module, typeArray));
+			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(MethodImplAttribute), method.get_DeclaringType().get_Module(), typeArray));
 			AttributesUtilities.AddMethodImplOptions(method, customAttribute);
 			AttributesUtilities.AddMethodCodeType(method, customAttribute);
 			return customAttribute;
@@ -524,7 +525,7 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private static CustomAttributeArgument GetMethodImplAttributeArgument(MethodDefinition method, object value)
 		{
-			ModuleDefinition module = method.DeclaringType.Module;
+			ModuleDefinition module = method.get_DeclaringType().get_Module();
 			AssemblyNameReference assemblyNameReference = module.ReferencedMscorlibRef();
 			Type type = value.GetType();
 			return new CustomAttributeArgument(new TypeReference(type.Namespace, type.Name, module, assemblyNameReference), (object)((Int32)value));
@@ -534,14 +535,14 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
 			List<Mono.Cecil.CustomAttribute> customAttributes = new List<Mono.Cecil.CustomAttribute>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in module.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in module.get_CustomAttributes())
 			{
 				customAttribute.Resolve();
 				customAttributes.Add(customAttribute);
 			}
 			foreach (Mono.Cecil.CustomAttribute customAttribute1 in customAttributes)
 			{
-				if (customAttribute1.AttributeType.FullName.Equals("System.Security.UnverifiableCodeAttribute", StringComparison.Ordinal))
+				if (customAttribute1.get_AttributeType().get_FullName().Equals("System.Security.UnverifiableCodeAttribute", StringComparison.Ordinal))
 				{
 					continue;
 				}
@@ -561,17 +562,17 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static ICollection<TypeReference> GetPropertyAttributesUsedTypes(PropertyDefinition property, ILanguage language)
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in property.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in property.get_CustomAttributes())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
 			}
-			if (property.GetMethod != null)
+			if (property.get_GetMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.GetMethod, language));
+				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.get_GetMethod(), language));
 			}
-			if (property.SetMethod != null)
+			if (property.get_SetMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.SetMethod, language));
+				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.get_SetMethod(), language));
 			}
 			return typeReferences;
 		}
@@ -580,18 +581,18 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>()
 			{
-				attribute.AttributeType
+				attribute.get_AttributeType()
 			};
-			if (attribute.HasFields || attribute.HasProperties)
+			if (attribute.get_HasFields() || attribute.get_HasProperties())
 			{
-				TypeDefinition typeDefinition = attribute.AttributeType.Resolve();
-				if (attribute.HasProperties)
+				TypeDefinition typeDefinition = attribute.get_AttributeType().Resolve();
+				if (attribute.get_HasProperties())
 				{
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.Properties, false));
+					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.get_Properties(), false));
 				}
-				if (attribute.HasFields)
+				if (attribute.get_HasFields())
 				{
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.Fields, true));
+					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.get_Fields(), true));
 				}
 			}
 			return typeReferences;
@@ -600,27 +601,27 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static ICollection<TypeReference> GetTypeAttributesUsedTypes(TypeDefinition type)
 		{
 			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in type.CustomAttributes)
+			foreach (Mono.Cecil.CustomAttribute customAttribute in type.get_CustomAttributes())
 			{
 				customAttribute.Resolve();
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
 			}
-			if (type.IsSerializable)
+			if (type.get_IsSerializable())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetTypeSerializableAttribute(type)));
 			}
-			if (type.IsExplicitLayout)
+			if (type.get_IsExplicitLayout())
 			{
 				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetTypeExplicitLayoutAttribute(type)));
 			}
-			if (type.HasSecurityDeclarations)
+			if (type.get_HasSecurityDeclarations())
 			{
-				ModuleDefinition module = type.Module;
-				foreach (SecurityDeclaration securityDeclaration in type.SecurityDeclarations)
+				ModuleDefinition module = type.get_Module();
+				foreach (SecurityDeclaration securityDeclaration in type.get_SecurityDeclarations())
 				{
-					if (securityDeclaration.HasSecurityAttributes)
+					if (securityDeclaration.get_HasSecurityAttributes())
 					{
-						foreach (SecurityAttribute securityAttribute in securityDeclaration.SecurityAttributes)
+						foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
 						{
 							typeReferences.AddRange(AttributesUtilities.GetSecurityAttributeUsedTypes(securityAttribute));
 						}
@@ -633,25 +634,25 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static Mono.Cecil.CustomAttribute GetTypeExplicitLayoutAttribute(TypeDefinition type)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(StructLayoutAttribute), type.Module, (IList<Type>)(new Type[] { typeof(LayoutKind) })));
-			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(LayoutKind), type.Module);
+			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(StructLayoutAttribute), type.get_Module(), (IList<Type>)(new Type[] { typeof(LayoutKind) })));
+			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(LayoutKind), type.get_Module());
 			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(corlibTypeReference, (object)2);
-			customAttribute.ConstructorArguments.Add(customAttributeArgument);
+			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
 			return customAttribute;
 		}
 
 		public static Mono.Cecil.CustomAttribute GetTypeSerializableAttribute(TypeDefinition type)
 		{
-			return new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(SerializableAttribute), type.Module, null));
+			return new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(SerializableAttribute), type.get_Module(), null));
 		}
 
 		internal static bool ShouldWriteMethodImplAttribute(MethodDefinition method)
 		{
-			if (method.DeclaringType.IsDelegate())
+			if (method.get_DeclaringType().IsDelegate())
 			{
 				return false;
 			}
-			if (method.HasPInvokeInfo && method.ImplAttributes == Mono.Cecil.MethodImplAttributes.PreserveSig)
+			if (method.get_HasPInvokeInfo() && method.get_ImplAttributes() == 128)
 			{
 				return false;
 			}

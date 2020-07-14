@@ -22,15 +22,15 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				friendlyMemberName = friendlyMemberName.Substring(0, friendlyMemberName.IndexOf("<"));
 			}
-			if (method.IsGetter && friendlyMemberName.IndexOf("get_") == 0 || method.IsSetter && friendlyMemberName.IndexOf("set_") == 0)
+			if (method.get_IsGetter() && friendlyMemberName.IndexOf("get_") == 0 || method.get_IsSetter() && friendlyMemberName.IndexOf("set_") == 0)
 			{
 				return friendlyMemberName.Substring(4);
 			}
-			if (!method.IsConstructor)
+			if (!method.get_IsConstructor())
 			{
 				return friendlyMemberName;
 			}
-			return method.DeclaringType.GetFriendlyTypeName(this.context.Language, "<", ">");
+			return method.get_DeclaringType().GetFriendlyTypeName(this.context.Language, "<", ">");
 		}
 
 		protected override bool IsValidNameInContext(string name, VariableDefinition variable)

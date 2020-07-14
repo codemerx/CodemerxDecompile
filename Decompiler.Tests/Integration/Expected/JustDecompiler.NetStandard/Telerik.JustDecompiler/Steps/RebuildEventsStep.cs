@@ -54,20 +54,20 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			MethodReferenceExpression methodExpression = node.MethodExpression;
 			MethodReference method = methodExpression.Method;
-			if (method.Name == null)
+			if (method.get_Name() == null)
 			{
 				return null;
 			}
-			string eventMethodPrefix = this.GetEventMethodPrefix(method.Name);
+			string eventMethodPrefix = this.GetEventMethodPrefix(method.get_Name());
 			if (String.IsNullOrEmpty(eventMethodPrefix))
 			{
 				return null;
 			}
-			if (method.Parameters.Count != 1)
+			if (method.get_Parameters().get_Count() != 1)
 			{
 				return null;
 			}
-			TypeReference declaringType = method.DeclaringType;
+			TypeReference declaringType = method.get_DeclaringType();
 			EventDefinition eventDefinition = null;
 			do
 			{
@@ -80,13 +80,13 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					break;
 				}
-				string str = method.Name.Substring(eventMethodPrefix.Length);
-				eventDefinition = typeDefinition.Events.FirstOrDefault<EventDefinition>((EventDefinition e) => e.Name == str);
+				string str = method.get_Name().Substring(eventMethodPrefix.Length);
+				eventDefinition = typeDefinition.get_Events().FirstOrDefault<EventDefinition>((EventDefinition e) => e.get_Name() == str);
 				if (eventDefinition != null)
 				{
 					continue;
 				}
-				declaringType = typeDefinition.BaseType;
+				declaringType = typeDefinition.get_BaseType();
 			}
 			while (declaringType != null && eventDefinition == null);
 			if (eventDefinition == null)

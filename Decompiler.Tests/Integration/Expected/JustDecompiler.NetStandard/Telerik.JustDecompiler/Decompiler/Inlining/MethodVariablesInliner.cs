@@ -12,7 +12,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 {
 	internal class MethodVariablesInliner : BaseVariablesInliner
 	{
-		public MethodVariablesInliner(MethodSpecificContext methodContext, IVariablesToNotInlineFinder finder) : base(methodContext, new RestrictedVariableInliner(methodContext.Method.Module.TypeSystem), finder)
+		public MethodVariablesInliner(MethodSpecificContext methodContext, IVariablesToNotInlineFinder finder) : base(methodContext, new RestrictedVariableInliner(methodContext.Method.get_Module().get_TypeSystem()), finder)
 		{
 		}
 
@@ -49,7 +49,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 						if (this.variablesToInline.Contains(variableDefinition))
 						{
 							Expression right = item.Right;
-							if (this.IsEnumeratorGetCurrent(right) || this.IsQueryInvocation(right) || variableDefinition.VariableType != null && variableDefinition.VariableType.IsPinned)
+							if (this.IsEnumeratorGetCurrent(right) || this.IsQueryInvocation(right) || variableDefinition.get_VariableType() != null && variableDefinition.get_VariableType().get_IsPinned())
 							{
 								num = count;
 							}
@@ -89,7 +89,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			{
 				return false;
 			}
-			return (expression as MethodInvocationExpression).MethodExpression.Method.Name == "get_Current";
+			return (expression as MethodInvocationExpression).MethodExpression.Method.get_Name() == "get_Current";
 		}
 
 		private bool IsQueryInvocation(Expression expression)
@@ -99,7 +99,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			{
 				return false;
 			}
-			if (methodInvocationExpression.MethodExpression.Method.DeclaringType.FullName != "System.Linq.Enumerable")
+			if (methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Linq.Enumerable")
 			{
 				return false;
 			}

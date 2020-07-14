@@ -32,15 +32,15 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private Expression AddAssignmentCastIfNeeded(Expression expr)
 		{
-			TypeSystem typeSystem = this.context.MethodContext.Method.Module.TypeSystem;
+			TypeSystem typeSystem = this.context.MethodContext.Method.get_Module().get_TypeSystem();
 			if (expr is BinaryExpression && (expr as BinaryExpression).IsAssignmentExpression)
 			{
 				BinaryExpression chr = expr as BinaryExpression;
-				if (chr.Left.ExpressionType != chr.Right.ExpressionType && chr.Left.ExpressionType.IsPrimitive && chr.Right.ExpressionType.IsPrimitive && !this.IsSubtype(chr.Right.ExpressionType, chr.Left.ExpressionType) && chr.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+				if ((object)chr.Left.ExpressionType != (object)chr.Right.ExpressionType && chr.Left.ExpressionType.get_IsPrimitive() && chr.Right.ExpressionType.get_IsPrimitive() && !this.IsSubtype(chr.Right.ExpressionType, chr.Left.ExpressionType) && chr.Right.CodeNodeType != CodeNodeType.LiteralExpression)
 				{
-					if (chr.Right.CodeNodeType == CodeNodeType.ExplicitCastExpression && chr.Right.ExpressionType.FullName == typeSystem.UInt16.FullName && chr.Left.ExpressionType.FullName == typeSystem.Char.FullName)
+					if (chr.Right.CodeNodeType == CodeNodeType.ExplicitCastExpression && chr.Right.ExpressionType.get_FullName() == typeSystem.get_UInt16().get_FullName() && chr.Left.ExpressionType.get_FullName() == typeSystem.get_Char().get_FullName())
 					{
-						((ExplicitCastExpression)chr.Right).TargetType = typeSystem.Char;
+						((ExplicitCastExpression)chr.Right).TargetType = typeSystem.get_Char();
 						return expr;
 					}
 					chr.Right = new ExplicitCastExpression(chr.Right, chr.Left.ExpressionType, null);
@@ -60,18 +60,18 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					{
 						return false;
 					}
-					return (x as VariableReferenceExpression).Variable == variable;
+					return (object)(x as VariableReferenceExpression).Variable == (object)variable;
 				});
 				if (expression == null)
 				{
 					Expression target = explicitCastExpression.MethodExpression.Target;
-					if (target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (target as VariableReferenceExpression).Variable != variable)
+					if (target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(target as VariableReferenceExpression).Variable != (object)variable)
 					{
 						this.AddCastIfNeeded(target, variable);
 						return;
 					}
-					TypeReference declaringType = explicitCastExpression.MethodExpression.Method.DeclaringType;
-					if (!this.IsSubtype(declaringType, variable.VariableType))
+					TypeReference declaringType = explicitCastExpression.MethodExpression.Method.get_DeclaringType();
+					if (!this.IsSubtype(declaringType, variable.get_VariableType()))
 					{
 						explicitCastExpression.MethodExpression.Target = new ExplicitCastExpression(target, declaringType, null);
 						return;
@@ -80,10 +80,10 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				else
 				{
 					int num = explicitCastExpression.Arguments.IndexOf(expression);
-					TypeReference typeReference = explicitCastExpression.MethodExpression.Method.Parameters[num].ResolveParameterType(explicitCastExpression.MethodExpression.Method);
-					if (!this.IsSubtype(typeReference, variable.VariableType))
+					TypeReference typeReference = explicitCastExpression.MethodExpression.Method.get_Parameters().get_Item(num).ResolveParameterType(explicitCastExpression.MethodExpression.Method);
+					if (!this.IsSubtype(typeReference, variable.get_VariableType()))
 					{
-						if (typeReference.IsPrimitive && variable.VariableType.IsPrimitive && ExpressionTypeInferer.GetContainingType(typeReference.Resolve(), variable.VariableType.Resolve()).FullName == typeReference.FullName)
+						if (typeReference.get_IsPrimitive() && variable.get_VariableType().get_IsPrimitive() && ExpressionTypeInferer.GetContainingType(typeReference.Resolve(), variable.get_VariableType().Resolve()).get_FullName() == typeReference.get_FullName())
 						{
 							return;
 						}
@@ -99,10 +99,10 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					return;
 				}
 				BinaryExpression binaryExpression = useExpression as BinaryExpression;
-				if (binaryExpression.Operator == BinaryOperator.Assign && binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (binaryExpression.Right as VariableReferenceExpression).Variable == variable)
+				if (binaryExpression.Operator == BinaryOperator.Assign && binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(binaryExpression.Right as VariableReferenceExpression).Variable == (object)variable)
 				{
 					TypeReference expressionType = binaryExpression.Left.ExpressionType;
-					if (!this.IsSubtype(expressionType, variable.VariableType))
+					if (!this.IsSubtype(expressionType, variable.get_VariableType()))
 					{
 						binaryExpression.Right = new ExplicitCastExpression(binaryExpression.Right, expressionType, null);
 					}
@@ -127,7 +127,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				{
 					Expression item = this.offsetToExpression[definedAt];
 					InstructionBlock instructionBlock = this.GetInstructionBlock(definedAt);
-					IList<Expression> expressions = this.context.MethodContext.Expressions.BlockExpressions[instructionBlock.First.Offset];
+					IList<Expression> expressions = this.context.MethodContext.Expressions.BlockExpressions[instructionBlock.First.get_Offset()];
 					this.FixAssignmentInList(expressions, item);
 				}
 			}
@@ -252,9 +252,9 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 		{
 			InstructionBlock instructionBlocks;
 			Instruction item = this.context.MethodContext.ControlFlowGraph.OffsetToInstruction[instructionOffset];
-			while (!this.context.MethodContext.ControlFlowGraph.InstructionToBlockMapping.TryGetValue(item.Offset, out instructionBlocks))
+			while (!this.context.MethodContext.ControlFlowGraph.InstructionToBlockMapping.TryGetValue(item.get_Offset(), out instructionBlocks))
 			{
-				item = item.Previous;
+				item = item.get_Previous();
 			}
 			return instructionBlocks;
 		}
@@ -280,7 +280,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				while (enumerator.MoveNext())
 				{
 					ClassHierarchyNode current = enumerator.Current;
-					if (!current.IsHardNode || !(current.NodeType.FullName == "System.Object"))
+					if (!current.IsHardNode || !(current.NodeType.get_FullName() == "System.Object"))
 					{
 						continue;
 					}
@@ -332,11 +332,11 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			}
 			ArrayType arrayType = type as ArrayType;
 			ArrayType arrayType1 = supposedSubType as ArrayType;
-			if (!this.IsSubtype(arrayType.ElementType, arrayType1.ElementType))
+			if (!this.IsSubtype(arrayType.get_ElementType(), arrayType1.get_ElementType()))
 			{
 				return false;
 			}
-			return arrayType.Dimensions.Count == arrayType1.Dimensions.Count;
+			return arrayType.get_Dimensions().get_Count() == arrayType1.get_Dimensions().get_Count();
 		}
 
 		private bool IsSubtype(TypeReference type, TypeReference supposedSubType)
@@ -344,7 +344,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			bool flag;
 			type = this.RemoveModifiers(type);
 			supposedSubType = this.RemoveModifiers(supposedSubType);
-			if (supposedSubType.GetFriendlyFullName(null) == type.GetFriendlyFullName(null) || type.FullName == "System.Object")
+			if (supposedSubType.GetFriendlyFullName(null) == type.GetFriendlyFullName(null) || type.get_FullName() == "System.Object")
 			{
 				return true;
 			}
@@ -368,12 +368,12 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				{
 					return true;
 				}
-				Mono.Collections.Generic.Collection<TypeReference>.Enumerator enumerator = typeDefinition.Interfaces.GetEnumerator();
+				Mono.Collections.Generic.Collection<TypeReference>.Enumerator enumerator = typeDefinition.get_Interfaces().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						if (!TypeNamesComparer.AreEqual(type, enumerator.Current))
+						if (!TypeNamesComparer.AreEqual(type, enumerator.get_Current()))
 						{
 							continue;
 						}
@@ -384,17 +384,17 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 				return flag;
 			}
 			return false;
 		Label0:
-			if (typeDefinition.BaseType == null)
+			if (typeDefinition.get_BaseType() == null)
 			{
 				return false;
 			}
-			typeDefinition = typeDefinition.BaseType.Resolve();
+			typeDefinition = typeDefinition.get_BaseType().Resolve();
 			goto Label2;
 		}
 
@@ -568,13 +568,13 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 		{
 			if (type is OptionalModifierType)
 			{
-				return (type as OptionalModifierType).ElementType;
+				return (type as OptionalModifierType).get_ElementType();
 			}
 			if (!(type is RequiredModifierType))
 			{
 				return type;
 			}
-			return (type as RequiredModifierType).ElementType;
+			return (type as RequiredModifierType).get_ElementType();
 		}
 
 		private void RemoveSubtype(ClassHierarchyNode superType, ClassHierarchyNode subType)

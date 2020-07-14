@@ -62,12 +62,12 @@ namespace Telerik.JustDecompiler.Steps
 			if (method == null)
 			{
 				MethodReference methodReference = methodExpression.Method;
-				if (methodReference != null && !String.IsNullOrEmpty(methodReference.Name) && (methodReference.Name.StartsWith("set_") || methodReference.Name.StartsWith("get_") || methodReference.Name.StartsWith("put_")))
+				if (methodReference != null && !String.IsNullOrEmpty(methodReference.get_Name()) && (methodReference.get_Name().StartsWith("set_") || methodReference.get_Name().StartsWith("get_") || methodReference.get_Name().StartsWith("put_")))
 				{
 					method = methodReference.Resolve();
 				}
 			}
-			if (method == null || !method.IsGetter && !method.IsSetter)
+			if (method == null || !method.get_IsGetter() && !method.get_IsSetter())
 			{
 				return null;
 			}
@@ -77,7 +77,7 @@ namespace Telerik.JustDecompiler.Steps
 				return node;
 			}
 			Expression binaryExpression = propertyReferenceExpression;
-			if (method.IsSetter)
+			if (method.get_IsSetter())
 			{
 				int count = node.Arguments.Count - 1;
 				binaryExpression = new BinaryExpression(BinaryOperator.Assign, propertyReferenceExpression, node.Arguments[count], this.typeSystem, null, false);

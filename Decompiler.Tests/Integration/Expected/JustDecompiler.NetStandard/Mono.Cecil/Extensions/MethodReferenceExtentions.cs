@@ -28,7 +28,7 @@ namespace Mono.Cecil.Extensions
 				int num = 0;
 				while (num < source.Count)
 				{
-					if (source[num].ParameterType.Name == desitnation[num].ParameterType.Name)
+					if (source[num].get_ParameterType().get_Name() == desitnation[num].get_ParameterType().get_Name())
 					{
 						num++;
 					}
@@ -49,11 +49,11 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.IsInterface)
+			if (!@interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			if (method.DeclaringType.FullName == @interface.FullName)
+			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
 			{
 				return method;
 			}
@@ -62,20 +62,20 @@ namespace Mono.Cecil.Extensions
 			{
 				return null;
 			}
-			if (methodDefinition.HasOverrides)
+			if (methodDefinition.get_HasOverrides())
 			{
-				Collection<MethodDefinition>.Enumerator enumerator = @interface.Methods.GetEnumerator();
+				Collection<MethodDefinition>.Enumerator enumerator = @interface.get_Methods().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						MethodDefinition current = enumerator.Current;
-						Collection<MethodReference>.Enumerator enumerator1 = methodDefinition.Overrides.GetEnumerator();
+						MethodDefinition current = enumerator.get_Current();
+						Collection<MethodReference>.Enumerator enumerator1 = methodDefinition.get_Overrides().GetEnumerator();
 						try
 						{
 							while (enumerator1.MoveNext())
 							{
-								if (enumerator1.Current.Resolve().FullName != current.FullName)
+								if (enumerator1.get_Current().Resolve().get_FullName() != current.get_FullName())
 								{
 									continue;
 								}
@@ -85,14 +85,14 @@ namespace Mono.Cecil.Extensions
 						}
 						finally
 						{
-							((IDisposable)enumerator1).Dispose();
+							enumerator1.Dispose();
 						}
 					}
 					return null;
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 				return methodReference;
 			}
@@ -106,7 +106,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return implementedMembers;
 			}
-			foreach (TypeReference @interface in method.DeclaringType.Interfaces)
+			foreach (TypeReference @interface in method.get_DeclaringType().get_Interfaces())
 			{
 				TypeDefinition typeDefinition = @interface.Resolve();
 				if (typeDefinition == null)
@@ -139,7 +139,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return null;
 			}
-			Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.Methods.GetEnumerator();
+			Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.get_Methods().GetEnumerator();
 			try
 			{
 				do
@@ -147,21 +147,21 @@ namespace Mono.Cecil.Extensions
 				Label2:
 					if (enumerator.MoveNext())
 					{
-						current = enumerator.Current;
-						if (current.Name == self.Name)
+						current = enumerator.get_Current();
+						if (current.get_Name() == self.get_Name())
 						{
-							if (!current.HasParameters || !self.HasParameters || current.Parameters.Count != self.Parameters.Count)
+							if (!current.get_HasParameters() || !self.get_HasParameters() || current.get_Parameters().get_Count() != self.get_Parameters().get_Count())
 							{
 								goto Label1;
 							}
-							if (!current.ReturnType.IsGenericParameter)
+							if (!current.get_ReturnType().get_IsGenericParameter())
 							{
 								continue;
 							}
-							int position = (current.ReturnType as GenericParameter).Position;
-							if (type.PostionToArgument.TryGetValue(position, out typeReference))
+							int position = (current.get_ReturnType() as GenericParameter).get_Position();
+							if (type.get_PostionToArgument().TryGetValue(position, out typeReference))
 							{
-								if (typeReference.FullName == self.ReturnType.FullName)
+								if (typeReference.get_FullName() == self.get_ReturnType().get_FullName())
 								{
 									break;
 								}
@@ -182,18 +182,18 @@ namespace Mono.Cecil.Extensions
 						return null;
 					}
 				}
-				while (current.ReturnType.FullName != self.ReturnType.FullName);
-				for (int i = 0; i < current.Parameters.Count; i++)
+				while (current.get_ReturnType().get_FullName() != self.get_ReturnType().get_FullName());
+				for (int i = 0; i < current.get_Parameters().get_Count(); i++)
 				{
-					TypeReference parameterType = current.Parameters[i].ParameterType;
-					if (!parameterType.IsGenericParameter)
+					TypeReference parameterType = current.get_Parameters().get_Item(i).get_ParameterType();
+					if (!parameterType.get_IsGenericParameter())
 					{
-						bool fullName = parameterType.FullName != self.Parameters[i].ParameterType.FullName;
+						bool fullName = parameterType.get_FullName() != self.get_Parameters().get_Item(i).get_ParameterType().get_FullName();
 					}
 					else
 					{
-						int num = (parameterType as GenericParameter).Position;
-						if (type.PostionToArgument.TryGetValue(num, out typeReference1) && typeReference1.FullName != self.Parameters[i].ParameterType.FullName)
+						int num = (parameterType as GenericParameter).get_Position();
+						if (type.get_PostionToArgument().TryGetValue(num, out typeReference1) && typeReference1.get_FullName() != self.get_Parameters().get_Item(i).get_ParameterType().get_FullName())
 						{
 						}
 					}
@@ -203,7 +203,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return methodDefinition;
 		}
@@ -215,11 +215,11 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.IsInterface)
+			if (!@interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			TypeDefinition typeDefinition = method.DeclaringType.Resolve();
+			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
 			if (typeDefinition == null)
 			{
 				return null;
@@ -227,7 +227,7 @@ namespace Mono.Cecil.Extensions
 			bool flag = false;
 			foreach (TypeDefinition baseType in typeDefinition.GetBaseTypes())
 			{
-				if (baseType.FullName != @interface.FullName)
+				if (baseType.get_FullName() != @interface.get_FullName())
 				{
 					continue;
 				}
@@ -239,7 +239,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return null;
 			}
-			if (method.DeclaringType.FullName == @interface.FullName)
+			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
 			{
 				return method;
 			}
@@ -248,12 +248,12 @@ namespace Mono.Cecil.Extensions
 			{
 				return explicitlyImplementedMethodFromInterface;
 			}
-			Collection<MethodDefinition>.Enumerator enumerator = @interface.Methods.GetEnumerator();
+			Collection<MethodDefinition>.Enumerator enumerator = @interface.get_Methods().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					MethodDefinition current = enumerator.Current;
+					MethodDefinition current = enumerator.get_Current();
 					if (!method.HasSameSignatureWith(current))
 					{
 						continue;
@@ -265,7 +265,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return methodReference;
 		}
@@ -273,7 +273,7 @@ namespace Mono.Cecil.Extensions
 		public static ICollection<ImplementedMember> GetImplementedMethods(this MethodDefinition method)
 		{
 			HashSet<ImplementedMember> implementedMembers = new HashSet<ImplementedMember>();
-			foreach (TypeReference @interface in method.DeclaringType.Interfaces)
+			foreach (TypeReference @interface in method.get_DeclaringType().get_Interfaces())
 			{
 				if (@interface is GenericInstanceType)
 				{
@@ -310,7 +310,7 @@ namespace Mono.Cecil.Extensions
 
 		private static string GetMethodSignature(this MethodReference method)
 		{
-			string fullName = method.FullName;
+			string fullName = method.get_FullName();
 			return fullName.Substring(fullName.IndexOf("::"));
 		}
 
@@ -332,7 +332,7 @@ namespace Mono.Cecil.Extensions
 				}
 				methodDefinitions.Add(methodDefinition);
 			}
-			for (TypeReference i = method.DeclaringType.BaseType; i != null; i = baseType)
+			for (TypeReference i = method.get_DeclaringType().get_BaseType(); i != null; i = baseType)
 			{
 				TypeDefinition typeDefinition = i.Resolve();
 				if (i is GenericInstanceType)
@@ -343,9 +343,9 @@ namespace Mono.Cecil.Extensions
 						methodDefinitions.Add(implementedMethodFromGenericInstanceType);
 					}
 				}
-				else if (typeDefinition != null && typeDefinition.HasMethods)
+				else if (typeDefinition != null && typeDefinition.get_HasMethods())
 				{
-					foreach (MethodDefinition methodDefinition1 in typeDefinition.Methods)
+					foreach (MethodDefinition methodDefinition1 in typeDefinition.get_Methods())
 					{
 						if (!method.HasSameSignatureWith(methodDefinition1) || methodDefinitions.Contains(methodDefinition1))
 						{
@@ -354,13 +354,13 @@ namespace Mono.Cecil.Extensions
 						methodDefinitions.Add(methodDefinition1);
 					}
 				}
-				if (typeDefinition == null || typeDefinition.BaseType == null)
+				if (typeDefinition == null || typeDefinition.get_BaseType() == null)
 				{
 					baseType = null;
 				}
 				else
 				{
-					baseType = typeDefinition.BaseType;
+					baseType = typeDefinition.get_BaseType();
 				}
 			}
 			return methodDefinitions.ToList<MethodDefinition>();
@@ -369,17 +369,17 @@ namespace Mono.Cecil.Extensions
 		public static bool HasCompilerGeneratedAttribute(this ICustomAttributeProvider attributeProvider)
 		{
 			bool flag;
-			if (attributeProvider.CustomAttributes == null)
+			if (attributeProvider.get_CustomAttributes() == null)
 			{
 				return false;
 			}
-			Collection<CustomAttribute>.Enumerator enumerator = attributeProvider.CustomAttributes.GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = attributeProvider.get_CustomAttributes().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					CustomAttribute current = enumerator.Current;
-					if (current.Constructor == null || current.AttributeType == null || !(current.AttributeType.FullName == MethodReferenceExtentions.compilerGeneratedAttributeName))
+					CustomAttribute current = enumerator.get_Current();
+					if (current.get_Constructor() == null || current.get_AttributeType() == null || !(current.get_AttributeType().get_FullName() == MethodReferenceExtentions.compilerGeneratedAttributeName))
 					{
 						continue;
 					}
@@ -390,7 +390,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -401,11 +401,11 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.ReturnType.FullName == other.ReturnType.FullName)
+			if (self.get_ReturnType().get_FullName() == other.get_ReturnType().get_FullName())
 			{
 				return true;
 			}
-			if (self.ReturnType is GenericParameter && other.ReturnType is GenericParameter && (self.ReturnType as GenericParameter).Position == (other.ReturnType as GenericParameter).Position)
+			if (self.get_ReturnType() is GenericParameter && other.get_ReturnType() is GenericParameter && (self.get_ReturnType() as GenericParameter).get_Position() == (other.get_ReturnType() as GenericParameter).get_Position())
 			{
 				return true;
 			}
@@ -429,11 +429,11 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (!methodDefinition.IsPrivate)
+			if (!methodDefinition.get_IsPrivate())
 			{
 				return false;
 			}
-			return methodDefinition.HasOverrides;
+			return methodDefinition.get_HasOverrides();
 		}
 
 		public static bool IsExplicitImplementationOf(this MethodReference method, TypeDefinition @interface)
@@ -443,11 +443,11 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.IsInterface)
+			if (!@interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			if (method.DeclaringType.FullName == @interface.FullName)
+			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
 			{
 				return true;
 			}
@@ -456,15 +456,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (methodDefinition.HasOverrides)
+			if (methodDefinition.get_HasOverrides())
 			{
-				Collection<MethodReference>.Enumerator enumerator = methodDefinition.Overrides.GetEnumerator();
+				Collection<MethodReference>.Enumerator enumerator = methodDefinition.get_Overrides().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						MethodDefinition methodDefinition1 = enumerator.Current.Resolve();
-						if (!@interface.Methods.Contains(methodDefinition1))
+						MethodDefinition methodDefinition1 = enumerator.get_Current().Resolve();
+						if (!@interface.get_Methods().Contains(methodDefinition1))
 						{
 							continue;
 						}
@@ -475,7 +475,7 @@ namespace Mono.Cecil.Extensions
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 				return flag;
 			}
@@ -489,11 +489,11 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.IsInterface)
+			if (!@interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			if (method.DeclaringType.FullName == @interface.FullName)
+			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
 			{
 				return true;
 			}
@@ -503,7 +503,7 @@ namespace Mono.Cecil.Extensions
 			}
 			bool flag1 = false;
 			string methodSignature = method.GetMethodSignature();
-			foreach (MethodDefinition methodDefinition in @interface.Methods)
+			foreach (MethodDefinition methodDefinition in @interface.get_Methods())
 			{
 				if (methodDefinition.GetMethodSignature() != methodSignature)
 				{
@@ -515,7 +515,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			TypeDefinition typeDefinition = method.DeclaringType.Resolve();
+			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
 			if (typeDefinition == null)
 			{
 				return false;
@@ -525,7 +525,7 @@ namespace Mono.Cecil.Extensions
 			{
 				while (enumerator.MoveNext())
 				{
-					if (enumerator.Current.FullName != @interface.FullName)
+					if (enumerator.Current.get_FullName() != @interface.get_FullName())
 					{
 						continue;
 					}
@@ -543,21 +543,21 @@ namespace Mono.Cecil.Extensions
 
 		public static MethodDefinition ResolveDefinition(this MethodReference refernece, bool isAssemblyResolverChacheEnabled = true)
 		{
-			TypeDefinition declaringType = refernece.DeclaringType as TypeDefinition;
-			if (declaringType == null && refernece.DeclaringType != null)
+			TypeDefinition declaringType = refernece.get_DeclaringType() as TypeDefinition;
+			if (declaringType == null && refernece.get_DeclaringType() != null)
 			{
-				declaringType = refernece.DeclaringType.Resolve();
+				declaringType = refernece.get_DeclaringType().Resolve();
 			}
 			if (declaringType == null)
 			{
 				return null;
 			}
-			return declaringType.Methods.FirstOrDefault<MethodDefinition>((MethodDefinition x) => {
-				if (x.Name != refernece.Name)
+			return declaringType.get_Methods().FirstOrDefault<MethodDefinition>((MethodDefinition x) => {
+				if (x.get_Name() != refernece.get_Name())
 				{
 					return false;
 				}
-				return MethodReferenceExtentions.FilterParameter(x.Parameters, refernece.Parameters);
+				return MethodReferenceExtentions.FilterParameter(x.get_Parameters(), refernece.get_Parameters());
 			});
 		}
 	}

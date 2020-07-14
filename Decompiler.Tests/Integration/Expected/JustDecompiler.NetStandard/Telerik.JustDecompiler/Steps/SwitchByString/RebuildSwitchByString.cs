@@ -22,7 +22,7 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
 			this.context = context;
-			this.fixer = new SwitchByStringFixer(context.MethodContext.Method.Module.TypeSystem);
+			this.fixer = new SwitchByStringFixer(context.MethodContext.Method.get_Module().get_TypeSystem());
 			this.Visit(block);
 			return block;
 		}

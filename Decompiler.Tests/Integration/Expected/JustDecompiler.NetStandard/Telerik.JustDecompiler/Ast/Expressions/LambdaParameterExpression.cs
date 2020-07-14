@@ -36,7 +36,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Parameter.ParameterType;
+				return this.Parameter.get_ParameterType();
 			}
 			set
 			{

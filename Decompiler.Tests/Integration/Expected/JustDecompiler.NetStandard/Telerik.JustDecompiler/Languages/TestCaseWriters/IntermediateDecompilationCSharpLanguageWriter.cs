@@ -38,27 +38,27 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 
 		protected override string GetArgumentName(ParameterReference parameter)
 		{
-			return parameter.Name;
+			return parameter.get_Name();
 		}
 
 		protected override string GetFieldName(FieldReference field)
 		{
-			return field.Name;
+			return field.get_Name();
 		}
 
 		protected override string GetMethodName(MethodReference method)
 		{
-			return method.Name;
+			return method.get_Name();
 		}
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			this.WriteTypeAndName(node.Variable.VariableType, node.Variable.Name);
+			this.WriteTypeAndName(node.Variable.get_VariableType(), node.Variable.get_Name());
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			this.Write(node.Variable.Name);
+			this.Write(node.Variable.get_Name());
 		}
 	}
 }

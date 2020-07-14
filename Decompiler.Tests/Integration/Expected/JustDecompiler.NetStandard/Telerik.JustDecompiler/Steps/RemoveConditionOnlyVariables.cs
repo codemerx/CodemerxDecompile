@@ -56,7 +56,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool ContainsKey(VariableReference variableReference)
 		{
-			return this.variables.Any<RemoveConditionOnlyVariables.VariableStateAndExpression>((RemoveConditionOnlyVariables.VariableStateAndExpression v) => v.VariableReference == variableReference);
+			return this.variables.Any<RemoveConditionOnlyVariables.VariableStateAndExpression>((RemoveConditionOnlyVariables.VariableStateAndExpression v) => (object)v.VariableReference == (object)variableReference);
 		}
 
 		private Expression GetCurrentStatementExpression(RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression)
@@ -143,7 +143,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			return (
 				from v in this.variables
-				where v.VariableReference == variableReference
+				where (object)v.VariableReference == (object)variableReference
 				select v).FirstOrDefault<RemoveConditionOnlyVariables.VariableStateAndExpression>();
 		}
 
@@ -279,7 +279,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression1 = (
 				from v in this.variables
-				where v.VariableReference == variableReference
+				where (object)v.VariableReference == (object)variableReference
 				select v).FirstOrDefault<RemoveConditionOnlyVariables.VariableStateAndExpression>();
 			variableStateAndExpression = variableStateAndExpression1;
 			return variableStateAndExpression1 != null;
@@ -344,7 +344,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			if (expression.Right is MethodInvocationExpression && (expression.Left as VariableReferenceExpression).Variable.VariableType.Name != TypeCode.Boolean.ToString())
+			if (expression.Right is MethodInvocationExpression && (expression.Left as VariableReferenceExpression).Variable.get_VariableType().get_Name() != TypeCode.Boolean.ToString())
 			{
 				return;
 			}

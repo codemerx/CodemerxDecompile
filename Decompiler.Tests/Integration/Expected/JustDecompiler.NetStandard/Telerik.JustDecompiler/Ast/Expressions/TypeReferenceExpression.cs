@@ -42,7 +42,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Type != null;
+				return (object)this.Type != (object)null;
 			}
 		}
 
@@ -73,7 +73,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Type.FullName == (other as TypeReferenceExpression).Type.FullName;
+			TypeReferenceExpression typeReferenceExpression = other as TypeReferenceExpression;
+			return this.Type.get_FullName() == typeReferenceExpression.Type.get_FullName();
 		}
 	}
 }

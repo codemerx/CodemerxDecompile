@@ -30,7 +30,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Parameter.ParameterType;
+				return this.Parameter.get_ParameterType();
 			}
 			set
 			{
@@ -73,7 +73,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Parameter.Index == (other as ArgumentReferenceExpression).Parameter.Index;
+			return this.Parameter.get_Index() == (other as ArgumentReferenceExpression).Parameter.get_Index();
 		}
 	}
 }

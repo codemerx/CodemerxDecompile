@@ -20,7 +20,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return base.Property.SetMethod == null;
+				return base.Property.get_SetMethod() == null;
 			}
 		}
 

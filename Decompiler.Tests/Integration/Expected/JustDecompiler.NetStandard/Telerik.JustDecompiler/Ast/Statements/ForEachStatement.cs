@@ -108,13 +108,13 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			if (conditionInstructions != null)
 			{
 				this.mappedConditionInstructions.AddRange(conditionInstructions);
-				this.mappedConditionInstructions.Sort((Instruction x, Instruction y) => x.Offset.CompareTo(y.Offset));
+				this.mappedConditionInstructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
 			this.mappedFinallyInstructions = new List<Instruction>();
 			if (finallyInstructions != null)
 			{
 				this.mappedFinallyInstructions.AddRange(finallyInstructions);
-				this.mappedFinallyInstructions.Sort((Instruction x, Instruction y) => x.Offset.CompareTo(y.Offset));
+				this.mappedFinallyInstructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
 		}
 

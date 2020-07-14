@@ -116,7 +116,7 @@ namespace Telerik.JustDecompiler.Cil
 
 		public int CompareTo(InstructionBlock block)
 		{
-			return this.first.Offset - block.First.Offset;
+			return this.first.get_Offset() - block.First.get_Offset();
 		}
 
 		public bool Equals(InstructionBlock x, InstructionBlock y)
@@ -129,11 +129,11 @@ namespace Telerik.JustDecompiler.Cil
 			{
 				return false;
 			}
-			if (x.first.Offset != y.First.Offset)
+			if (x.first.get_Offset() != y.First.get_Offset())
 			{
 				return false;
 			}
-			return x.Last.Offset == y.Last.Offset;
+			return x.Last.get_Offset() == y.Last.get_Offset();
 		}
 
 		public override bool Equals(object obj)
@@ -198,17 +198,17 @@ namespace Telerik.JustDecompiler.Cil
 			while (true)
 			{
 				yield return next;
-				if (next == instructionBlocks.last)
+				if ((object)next == (object)instructionBlocks.last)
 				{
 					break;
 				}
-				next = next.Next;
+				next = next.get_Next();
 			}
 		}
 
 		public int GetHashCode(InstructionBlock obj)
 		{
-			return this.first.Offset.GetHashCode();
+			return this.first.get_Offset().GetHashCode();
 		}
 
 		private void Invalidate()

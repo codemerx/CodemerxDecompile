@@ -113,7 +113,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			if (expressionStatement != null)
 			{
 				BinaryExpression expression = expressionStatement.Expression as BinaryExpression;
-				if (expression == null || !expression.IsAssignmentExpression || expression.ExpressionType.FullName != variableDeclaration.ExpressionType.FullName)
+				if (expression == null || !expression.IsAssignmentExpression || expression.ExpressionType.get_FullName() != variableDeclaration.ExpressionType.get_FullName())
 				{
 					return false;
 				}
@@ -125,7 +125,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			if (expressionStatement1 != null)
 			{
 				MethodInvocationExpression methodInvocationExpression = expressionStatement1.Expression as MethodInvocationExpression;
-				if (methodInvocationExpression == null || methodInvocationExpression.MethodExpression.Method.FullName != "System.Void Microsoft.VisualBasic.CompilerServices.ProjectData::SetProjectError(System.Exception)")
+				if (methodInvocationExpression == null || methodInvocationExpression.MethodExpression.Method.get_FullName() != "System.Void Microsoft.VisualBasic.CompilerServices.ProjectData::SetProjectError(System.Exception)")
 				{
 					return false;
 				}
@@ -140,7 +140,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			if (!CatchClausesFilterPattern.TryMatchFilterExpression(item, variableDeclaration.Variable.VariableType, variableReferenceExpression, out filterExpression))
+			if (!CatchClausesFilterPattern.TryMatchFilterExpression(item, variableDeclaration.Variable.get_VariableType(), variableReferenceExpression, out filterExpression))
 			{
 				return false;
 			}
@@ -161,7 +161,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			if (expression.ExpressionType.FullName != "System.Boolean")
+			if (expression.ExpressionType.get_FullName() != "System.Boolean")
 			{
 				return false;
 			}
@@ -190,7 +190,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			if (expression.ExpressionType.FullName != "System.Boolean")
+			if (expression.ExpressionType.get_FullName() != "System.Boolean")
 			{
 				return false;
 			}

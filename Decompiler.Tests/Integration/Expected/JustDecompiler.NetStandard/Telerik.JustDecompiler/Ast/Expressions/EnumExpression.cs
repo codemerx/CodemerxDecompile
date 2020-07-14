@@ -30,7 +30,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.DeclaringType;
+				return this.Field.get_DeclaringType();
 			}
 			set
 			{
@@ -48,7 +48,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.Name;
+				return this.Field.get_Name();
 			}
 		}
 
@@ -81,7 +81,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Field.FullName == (other as EnumExpression).Field.FullName;
+			return this.Field.get_FullName() == (other as EnumExpression).Field.get_FullName();
 		}
 	}
 }

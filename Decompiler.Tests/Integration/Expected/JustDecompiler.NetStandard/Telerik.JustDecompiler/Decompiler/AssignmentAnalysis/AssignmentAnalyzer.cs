@@ -86,7 +86,7 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 			{
 				return;
 			}
-			foreach (Expression item in this.expressionsData.BlockExpressions[node.CFGBlock.First.Offset])
+			foreach (Expression item in this.expressionsData.BlockExpressions[node.CFGBlock.First.get_Offset()])
 			{
 				UsageFinderSearchResult usageFinderSearchResult = this.visitor.SearchForUsage(item);
 				if (usageFinderSearchResult != UsageFinderSearchResult.Assigned)

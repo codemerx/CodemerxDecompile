@@ -30,7 +30,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Type.Module.TypeSystem.UInt32;
+				return this.Type.get_Module().get_TypeSystem().get_UInt32();
 			}
 			set
 			{
@@ -76,7 +76,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Type.FullName == (other as SizeOfExpression).Type.FullName;
+			return this.Type.get_FullName() == (other as SizeOfExpression).Type.get_FullName();
 		}
 	}
 }

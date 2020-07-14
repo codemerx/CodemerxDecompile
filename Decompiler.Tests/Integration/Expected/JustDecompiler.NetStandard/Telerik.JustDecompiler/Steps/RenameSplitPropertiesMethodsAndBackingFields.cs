@@ -17,7 +17,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			PropertyDefinition propertyDefinition;
 			MethodDefinition method = context.MethodContext.Method;
-			if (method.IsGetter || method.IsSetter)
+			if (method.get_IsGetter() || method.get_IsSetter())
 			{
 				if (!context.TypeContext.MethodToPropertyMap.TryGetValue(method, out propertyDefinition))
 				{
@@ -25,12 +25,12 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				if (propertyDefinition.ShouldStaySplit())
 				{
-					string str = String.Concat("JustDecompileGenerated_", method.Name);
+					string str = String.Concat("JustDecompileGenerated_", method.get_Name());
 					context.TypeContext.MethodDefinitionToNameMap.Add(method, str);
 					FieldDefinition compileGeneratedBackingField = Utilities.GetCompileGeneratedBackingField(propertyDefinition);
 					if (compileGeneratedBackingField != null)
 					{
-						string str1 = compileGeneratedBackingField.Name.Replace(String.Concat("<", propertyDefinition.Name, ">"), String.Concat("JustDecompileGenerated_", propertyDefinition.Name, "_"));
+						string str1 = compileGeneratedBackingField.get_Name().Replace(String.Concat("<", propertyDefinition.get_Name(), ">"), String.Concat("JustDecompileGenerated_", propertyDefinition.get_Name(), "_"));
 						if (!context.TypeContext.BackingFieldToNameMap.ContainsKey(compileGeneratedBackingField))
 						{
 							context.TypeContext.BackingFieldToNameMap.Add(compileGeneratedBackingField, str1);

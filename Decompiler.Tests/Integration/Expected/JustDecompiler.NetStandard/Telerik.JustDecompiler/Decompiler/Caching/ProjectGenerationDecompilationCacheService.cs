@@ -37,7 +37,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		public void AddAssemblyContextToCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers, AssemblySpecificContext assemblyContext)
 		{
-			string moduleKey = this.GetModuleKey(assembly.MainModule, language, renameInvalidMembers);
+			string moduleKey = this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers);
 			if (ProjectGenerationDecompilationCacheService.assemblyContextsCache.ContainsKey(moduleKey))
 			{
 				throw new Exception("Key already in AssemblyContextsCache");
@@ -94,7 +94,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 		public AssemblySpecificContext GetAssemblyContextFromCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers)
 		{
 			AssemblySpecificContext assemblySpecificContext;
-			if (!ProjectGenerationDecompilationCacheService.assemblyContextsCache.TryGetValue(this.GetModuleKey(assembly.MainModule, language, renameInvalidMembers), out assemblySpecificContext))
+			if (!ProjectGenerationDecompilationCacheService.assemblyContextsCache.TryGetValue(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers), out assemblySpecificContext))
 			{
 				throw new Exception("Key not found in AssemblyContextsCache");
 			}
@@ -129,11 +129,11 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 					}
 					else
 					{
-						FileInfo fileInfo = new FileInfo(module.FilePath);
-						String[] filePath = new String[] { module.FilePath, " : ", null, null, null, null, null, null, null };
+						FileInfo fileInfo = new FileInfo(module.get_FilePath());
+						String[] filePath = new String[] { module.get_FilePath(), " : ", null, null, null, null, null, null, null };
 						filePath[2] = fileInfo.LastWriteTime.ToString();
 						filePath[3] = " : ";
-						filePath[4] = module.Name.ToString();
+						filePath[4] = module.get_Name().ToString();
 						filePath[5] = " ";
 						filePath[6] = language.Name;
 						filePath[7] = " ";
@@ -170,12 +170,12 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private string GetTypeKey(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
 		{
-			return String.Concat(new String[] { this.GetModuleKey(type.Module, language, renameInvalidMembers), " : ", language.Name, " : ", type.FullName });
+			return String.Concat(new String[] { this.GetModuleKey(type.get_Module(), language, renameInvalidMembers), " : ", language.Name, " : ", type.get_FullName() });
 		}
 
 		public bool IsAssemblyContextInCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers)
 		{
-			return ProjectGenerationDecompilationCacheService.assemblyContextsCache.ContainsKey(this.GetModuleKey(assembly.MainModule, language, renameInvalidMembers));
+			return ProjectGenerationDecompilationCacheService.assemblyContextsCache.ContainsKey(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers));
 		}
 
 		public bool IsDecompiledMemberInCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers)

@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		private void DoInitialRenamingAndEscaping(ModuleDefinition module, MemberRenamingData memberRenamingData)
 		{
-			foreach (TypeDefinition type in module.Types)
+			foreach (TypeDefinition type in module.get_Types())
 			{
 				this.ProcessType(type, memberRenamingData);
 			}
@@ -60,9 +60,9 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 		{
 			this.RenameType(type, memberRenamingData);
 			this.ProcessTypeMembers(type, memberRenamingData);
-			if (type.HasNestedTypes)
+			if (type.get_HasNestedTypes())
 			{
-				foreach (TypeDefinition nestedType in type.NestedTypes)
+				foreach (TypeDefinition nestedType in type.get_NestedTypes())
 				{
 					this.ProcessType(nestedType, memberRenamingData);
 				}
@@ -71,30 +71,30 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		private void ProcessTypeMembers(TypeDefinition type, MemberRenamingData memberRenamingData)
 		{
-			if (type.HasMethods)
+			if (type.get_HasMethods())
 			{
-				foreach (MethodDefinition method in type.Methods)
+				foreach (MethodDefinition method in type.get_Methods())
 				{
 					this.RenameMember(method, memberRenamingData);
 				}
 			}
-			if (type.HasProperties)
+			if (type.get_HasProperties())
 			{
-				foreach (PropertyDefinition property in type.Properties)
+				foreach (PropertyDefinition property in type.get_Properties())
 				{
 					this.RenameMember(property, memberRenamingData);
 				}
 			}
-			if (type.HasFields)
+			if (type.get_HasFields())
 			{
-				foreach (FieldDefinition field in type.Fields)
+				foreach (FieldDefinition field in type.get_Fields())
 				{
 					this.RenameMember(field, memberRenamingData);
 				}
 			}
-			if (type.HasEvents)
+			if (type.get_HasEvents())
 			{
-				foreach (EventDefinition @event in type.Events)
+				foreach (EventDefinition @event in type.get_Events())
 				{
 					this.RenameMember(@event, memberRenamingData);
 				}
@@ -103,7 +103,7 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		private void RenameMember(MemberReference member, MemberRenamingData memberRenamingData)
 		{
-			uint num = member.MetadataToken.ToUInt32();
+			uint num = member.get_MetadataToken().ToUInt32();
 			IMemberDefinition explicitMemberDefinition = this.GetExplicitMemberDefinition(member);
 			if (explicitMemberDefinition != null && Utilities.IsExplicitInterfaceImplementataion(explicitMemberDefinition))
 			{
@@ -111,7 +111,7 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 				memberRenamingData.RenamedMembersMap[num] = Utilities.EscapeNameIfNeeded(explicitName, this.language);
 				return;
 			}
-			string nonGenericName = GenericHelper.GetNonGenericName(member.Name);
+			string nonGenericName = GenericHelper.GetNonGenericName(member.get_Name());
 			string str = nonGenericName;
 			if (this.renameInvalidMembers && !this.language.IsValidIdentifier(str))
 			{
@@ -127,13 +127,13 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		protected void RenameType(TypeDefinition type, MemberRenamingData memberRenamingData)
 		{
-			string actualTypeName = this.GetActualTypeName(type.Name);
+			string actualTypeName = this.GetActualTypeName(type.get_Name());
 			string str = actualTypeName;
 			if (this.renameInvalidMembers && !this.language.IsValidIdentifier(str))
 			{
 				str = this.language.ReplaceInvalidCharactersInIdentifier(str);
 			}
-			uint num = type.MetadataToken.ToUInt32();
+			uint num = type.get_MetadataToken().ToUInt32();
 			if (actualTypeName != str)
 			{
 				memberRenamingData.RenamedMembers.Add(num);

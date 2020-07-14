@@ -27,20 +27,20 @@ namespace Mono.Cecil.Extensions
 			if (memberDefinition is PropertyDefinition)
 			{
 				PropertyDefinition propertyDefinition = (PropertyDefinition)memberDefinition;
-				if (propertyDefinition.GetMethod != null && propertyDefinition.GetMethod.HasBody)
+				if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasBody())
 				{
-					Collection<Instruction> instructions = MemberDefinitionExtensions.GetSafeBodyInstructions(propertyDefinition.GetMethod);
-					if (instructions != null)
+					Collection<Instruction> collection = MemberDefinitionExtensions.GetSafeBodyInstructions(propertyDefinition.get_GetMethod());
+					if (collection != null)
 					{
-						foreach (Instruction instruction in instructions)
+						foreach (Instruction instruction in collection)
 						{
 							yield return instruction;
 						}
 					}
 				}
-				if (propertyDefinition.SetMethod != null && propertyDefinition.SetMethod.HasBody)
+				if (propertyDefinition.get_SetMethod() != null && propertyDefinition.get_SetMethod().get_HasBody())
 				{
-					Collection<Instruction> safeBodyInstructions1 = MemberDefinitionExtensions.GetSafeBodyInstructions(propertyDefinition.SetMethod);
+					Collection<Instruction> safeBodyInstructions1 = MemberDefinitionExtensions.GetSafeBodyInstructions(propertyDefinition.get_SetMethod());
 					if (safeBodyInstructions1 != null)
 					{
 						foreach (Instruction safeBodyInstruction1 in safeBodyInstructions1)
@@ -57,17 +57,17 @@ namespace Mono.Cecil.Extensions
 		{
 			if (memberDefinition is MethodDefinition)
 			{
-				return ((MethodDefinition)memberDefinition).FixedReturnType;
+				return ((MethodDefinition)memberDefinition).get_FixedReturnType();
 			}
 			if (memberDefinition is PropertyDefinition)
 			{
-				return ((PropertyDefinition)memberDefinition).PropertyType;
+				return ((PropertyDefinition)memberDefinition).get_PropertyType();
 			}
 			if (!(memberDefinition is FieldDefinition))
 			{
 				return null;
 			}
-			return ((FieldDefinition)memberDefinition).FieldType;
+			return ((FieldDefinition)memberDefinition).get_FieldType();
 		}
 
 		private static Collection<Instruction> GetSafeBodyInstructions(MethodDefinition memberDefinition)
@@ -75,7 +75,7 @@ namespace Mono.Cecil.Extensions
 			Collection<Instruction> instructions = null;
 			try
 			{
-				instructions = memberDefinition.Body.Instructions;
+				instructions = memberDefinition.get_Body().get_Instructions();
 			}
 			catch
 			{
@@ -87,39 +87,39 @@ namespace Mono.Cecil.Extensions
 		{
 			if (memberDefinition is MethodDefinition)
 			{
-				return ((MethodDefinition)memberDefinition).HasBody;
+				return ((MethodDefinition)memberDefinition).get_HasBody();
 			}
 			if (!(memberDefinition is PropertyDefinition))
 			{
 				return false;
 			}
 			PropertyDefinition propertyDefinition = (PropertyDefinition)memberDefinition;
-			if (propertyDefinition.GetMethod != null && propertyDefinition.GetMethod.HasBody)
+			if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasBody())
 			{
 				return true;
 			}
-			if (propertyDefinition.SetMethod == null)
+			if (propertyDefinition.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return propertyDefinition.SetMethod.HasBody;
+			return propertyDefinition.get_SetMethod().get_HasBody();
 		}
 
 		public static bool TryGetDynamicAttribute(this ICustomAttributeProvider self, out CustomAttribute dynamicAttribute)
 		{
 			bool flag;
-			if (!self.HasCustomAttributes)
+			if (!self.get_HasCustomAttributes())
 			{
 				dynamicAttribute = null;
 				return false;
 			}
-			Collection<CustomAttribute>.Enumerator enumerator = self.CustomAttributes.GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					CustomAttribute current = enumerator.Current;
-					if (current.AttributeType.FullName != "System.Runtime.CompilerServices.DynamicAttribute")
+					CustomAttribute current = enumerator.get_Current();
+					if (current.get_AttributeType().get_FullName() != "System.Runtime.CompilerServices.DynamicAttribute")
 					{
 						continue;
 					}
@@ -132,7 +132,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}

@@ -38,19 +38,19 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 				for (int i = 0; i < exceptionHandlers.Count; i++)
 				{
 					ExceptionHandler item = exceptionHandlers[i];
-					if (this.GetNodeFromBlockOffset(item.TryStart.Offset).NodeState != AssignmentNodeState.Unknown)
+					if (this.GetNodeFromBlockOffset(item.get_TryStart().get_Offset()).NodeState != AssignmentNodeState.Unknown)
 					{
 						int num = i;
 						i = num - 1;
 						exceptionHandlers.RemoveAt(num);
-						this.CheckHandler(this.GetNodeFromBlockOffset(item.HandlerStart.Offset), assignmentAnalyzer, ref assignmentType1);
+						this.CheckHandler(this.GetNodeFromBlockOffset(item.get_HandlerStart().get_Offset()), assignmentAnalyzer, ref assignmentType1);
 						if (assignmentType1 == AssignmentType.NotAssigned)
 						{
 							return AssignmentType.NotAssigned;
 						}
-						if (item.HandlerType == ExceptionHandlerType.Filter)
+						if (item.get_HandlerType() == 1)
 						{
-							this.CheckHandler(this.GetNodeFromBlockOffset(item.FilterStart.Offset), assignmentAnalyzer, ref assignmentType1);
+							this.CheckHandler(this.GetNodeFromBlockOffset(item.get_FilterStart().get_Offset()), assignmentAnalyzer, ref assignmentType1);
 							if (assignmentType1 == AssignmentType.NotAssigned)
 							{
 								return AssignmentType.NotAssigned;

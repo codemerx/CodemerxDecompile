@@ -72,7 +72,7 @@ namespace Telerik.JustDecompiler.Steps
 					{
 						node.IsAutoBox = true;
 					}
-					if (binaryExpression.IsComparisonExpression && node.BoxedAs.IsGenericParameter)
+					if (binaryExpression.IsComparisonExpression && node.BoxedAs.get_IsGenericParameter())
 					{
 						if (binaryExpression.Left == node && binaryExpression.Right is LiteralExpression && (binaryExpression.Right as LiteralExpression).Value == null)
 						{
@@ -86,10 +86,10 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				else if (expression is ReturnExpression)
 				{
-					if (this.context.Method.ReturnType.FullName != "System.Object")
+					if (this.context.Method.get_ReturnType().get_FullName() != "System.Object")
 					{
 						TypeDefinition typeDefinition = node.BoxedExpression.ExpressionType.Resolve();
-						if (typeDefinition != null && typeDefinition.IsValueType)
+						if (typeDefinition != null && typeDefinition.get_IsValueType())
 						{
 							node.IsAutoBox = true;
 						}

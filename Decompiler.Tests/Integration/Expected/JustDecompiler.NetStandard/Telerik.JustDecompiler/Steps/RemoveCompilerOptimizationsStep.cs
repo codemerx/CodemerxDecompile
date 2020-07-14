@@ -40,7 +40,7 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			MethodInvocationExpression operand = item.Operand as MethodInvocationExpression;
-			if (operand.MethodExpression.Method.Name != "op_Equality" || operand.Arguments[1].CodeNodeType != CodeNodeType.LiteralExpression || (operand.Arguments[1] as LiteralExpression).ExpressionType.FullName != "System.String")
+			if (operand.MethodExpression.Method.get_Name() != "op_Equality" || operand.Arguments[1].CodeNodeType != CodeNodeType.LiteralExpression || (operand.Arguments[1] as LiteralExpression).ExpressionType.get_FullName() != "System.String")
 			{
 				return false;
 			}
@@ -63,12 +63,12 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			MethodInvocationExpression left = item.Left as MethodInvocationExpression;
-			if (left.MethodExpression.Method.FullName != "System.Int32 System.String::get_Length()" || left.MethodExpression.Target == null)
+			if (left.MethodExpression.Method.get_FullName() != "System.Int32 System.String::get_Length()" || left.MethodExpression.Target == null)
 			{
 				return false;
 			}
 			LiteralExpression right = item.Right as LiteralExpression;
-			if (right.ExpressionType.FullName != "System.Int32" && (Int32)right.Value != 0)
+			if (right.ExpressionType.get_FullName() != "System.Int32" && (Int32)right.Value != 0)
 			{
 				return false;
 			}
@@ -95,7 +95,7 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			LiteralExpression right = item.Right as LiteralExpression;
-			if (right.ExpressionType.FullName != "System.Object" || right.Value != null)
+			if (right.ExpressionType.get_FullName() != "System.Object" || right.Value != null)
 			{
 				return false;
 			}
@@ -113,7 +113,7 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			BinaryExpression item = expressions[0] as BinaryExpression;
-			if (item.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && item.Right.CodeNodeType == CodeNodeType.LiteralExpression && item.IsComparisonExpression && (item.Left as VariableReferenceExpression).Variable == optimizationVariable)
+			if (item.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && item.Right.CodeNodeType == CodeNodeType.LiteralExpression && item.IsComparisonExpression && (object)(item.Left as VariableReferenceExpression).Variable == (object)optimizationVariable)
 			{
 				return true;
 			}
@@ -122,7 +122,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsUnconditionJumpBlock(InstructionBlock block)
 		{
-			if (block.First != block.Last || block.First.OpCode.Code != Code.Br && block.First.OpCode.Code != Code.Br_S)
+			if ((object)block.First != (object)block.Last || block.First.get_OpCode().get_Code() != 55 && block.First.get_OpCode().get_Code() != 42)
 			{
 				return false;
 			}
@@ -141,41 +141,41 @@ namespace Telerik.JustDecompiler.Steps
 			while (instructionBlocks.Count > 0)
 			{
 				InstructionBlock last = instructionBlocks.Dequeue();
-				nums.Add(last.First.Offset);
-				if (!this.IsOptimizationBlock(this.blockExpressions[last.First.Offset], data.OptimizationVariable))
+				nums.Add(last.First.get_Offset());
+				if (!this.IsOptimizationBlock(this.blockExpressions[last.First.get_Offset()], data.OptimizationVariable))
 				{
-					if (!this.IsCaseBlock(this.blockExpressions[last.First.Offset], data.SwitchExpression) && !this.IsNullCaseBlock(this.blockExpressions[last.First.Offset], data.SwitchExpression))
+					if (!this.IsCaseBlock(this.blockExpressions[last.First.get_Offset()], data.SwitchExpression) && !this.IsNullCaseBlock(this.blockExpressions[last.First.get_Offset()], data.SwitchExpression))
 					{
 						continue;
 					}
-					this.switchBlocksToCasesMap[block.First.Offset].Add(last.First.Offset);
+					this.switchBlocksToCasesMap[block.First.get_Offset()].Add(last.First.get_Offset());
 					InstructionBlock successors1 = last.Successors[1];
-					if (this.IsEmptyStringCaseBlock(this.blockExpressions[successors1.First.Offset], data.SwitchExpression))
+					if (this.IsEmptyStringCaseBlock(this.blockExpressions[successors1.First.get_Offset()], data.SwitchExpression))
 					{
 						last.Last = successors1.Last;
 						last.Successors = successors1.Successors;
-						BinaryExpression item = this.blockExpressions[last.First.Offset][0] as BinaryExpression;
-						item.Right = new LiteralExpression("", this.methodContext.Method.Module.TypeSystem, null);
-						IEnumerable<Instruction> underlyingSameMethodInstructions = this.blockExpressions[successors1.First.Offset][0].UnderlyingSameMethodInstructions;
+						BinaryExpression item = this.blockExpressions[last.First.get_Offset()][0] as BinaryExpression;
+						item.Right = new LiteralExpression("", this.methodContext.Method.get_Module().get_TypeSystem(), null);
+						IEnumerable<Instruction> underlyingSameMethodInstructions = this.blockExpressions[successors1.First.get_Offset()][0].UnderlyingSameMethodInstructions;
 						item = item.CloneAndAttachInstructions(underlyingSameMethodInstructions) as BinaryExpression;
-						this.blockExpressions[last.First.Offset][0] = new UnaryExpression(UnaryOperator.None, item, null);
-						this.blocksToBeRemoved.Add(successors1.First.Offset);
+						this.blockExpressions[last.First.get_Offset()][0] = new UnaryExpression(UnaryOperator.None, item, null);
+						this.blocksToBeRemoved.Add(successors1.First.get_Offset());
 					}
 					this.MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(last);
 				}
 				else
 				{
 					InstructionBlock instructionBlocks1 = last.Successors[0];
-					if (!nums.Contains(instructionBlocks1.First.Offset))
+					if (!nums.Contains(instructionBlocks1.First.get_Offset()))
 					{
 						instructionBlocks.Enqueue(instructionBlocks1);
 					}
 					InstructionBlock instructionBlocks2 = this.MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(last);
-					if (!nums.Contains(instructionBlocks2.First.Offset) && this.IsOptimizationBlock(this.blockExpressions[last.First.Offset], data.OptimizationVariable))
+					if (!nums.Contains(instructionBlocks2.First.get_Offset()) && this.IsOptimizationBlock(this.blockExpressions[last.First.get_Offset()], data.OptimizationVariable))
 					{
 						instructionBlocks.Enqueue(instructionBlocks2);
 					}
-					this.blocksToBeRemoved.Add(last.First.Offset);
+					this.blocksToBeRemoved.Add(last.First.get_Offset());
 				}
 			}
 		}
@@ -187,7 +187,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				block.RemoveFromSuccessors(successors);
 				block.AddToSuccessors(successors.Successors[0]);
-				this.blocksToBeRemoved.Add(successors.First.Offset);
+				this.blocksToBeRemoved.Add(successors.First.get_Offset());
 				successors = successors.Successors[0];
 			}
 			return successors;
@@ -199,11 +199,11 @@ namespace Telerik.JustDecompiler.Steps
 			InstructionBlock last = this.instructionToBlockMapping[index];
 			last.Last = item.Last;
 			last.Successors = item.Successors;
-			foreach (Expression expression in this.blockExpressions[item.First.Offset])
+			foreach (Expression expression in this.blockExpressions[item.First.get_Offset()])
 			{
 				this.blockExpressions[index].Add(expression);
 			}
-			this.blocksToBeRemoved.Add(item.First.Offset);
+			this.blocksToBeRemoved.Add(item.First.get_Offset());
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)

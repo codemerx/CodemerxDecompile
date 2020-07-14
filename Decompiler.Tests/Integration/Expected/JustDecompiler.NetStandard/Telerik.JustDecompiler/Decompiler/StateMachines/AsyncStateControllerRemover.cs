@@ -39,15 +39,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		{
 			VariableReference variableReference;
 			Instruction first = theBlock.First;
-			if (first == theBlock.Last || first.OpCode.Code != Code.Ldc_I4_1)
+			if ((object)first == (object)theBlock.Last || first.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			if (!StateMachineUtilities.TryGetVariableFromInstruction(first.Next, this.methodContext.Body.Variables, out variableReference))
+			if (!StateMachineUtilities.TryGetVariableFromInstruction(first.get_Next(), this.methodContext.Body.get_Variables(), out variableReference))
 			{
 				return false;
 			}
-			return variableReference == this.doFinallyVariable;
+			return (object)variableReference == (object)this.doFinallyVariable;
 		}
 
 		protected override Queue<InstructionBlock> InitializeTheTraversalQueue()
@@ -76,17 +76,17 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			Instruction last = theBlock.Last;
 			if (!base.IsBeqInstruction(last))
 			{
-				if (last.OpCode.Code != Code.Switch)
+				if (last.get_OpCode().get_Code() != 68)
 				{
 					return false;
 				}
-				last = last.Previous;
-				if (last.OpCode.Code != Code.Sub)
+				last = last.get_Previous();
+				if (last.get_OpCode().get_Code() != 88)
 				{
 					return false;
 				}
 			}
-			last = last.Previous;
+			last = last.get_Previous();
 			if (!StateMachineUtilities.TryGetOperandOfLdc(last, out num) || num > -3)
 			{
 				return false;
@@ -102,12 +102,12 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				return false;
 			}
-			Instruction next = theBlock.First.Next;
-			if (next == theBlock.Last)
+			Instruction next = theBlock.First.get_Next();
+			if ((object)next == (object)theBlock.Last)
 			{
 				return true;
 			}
-			return this.IsNopTillEnd(theBlock, next.Next);
+			return this.IsNopTillEnd(theBlock, next.get_Next());
 		}
 
 		private bool IsDummyStateControllerBlock(InstructionBlock theBlock)
@@ -122,25 +122,25 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				Instruction last = theBlock.Last;
 				for (int i = 0; i < 2; i++)
 				{
-					if (last == theBlock.First || last.OpCode.Code != Code.Pop)
+					if ((object)last == (object)theBlock.First || last.get_OpCode().get_Code() != 37)
 					{
 						return false;
 					}
-					last = last.Previous;
+					last = last.get_Previous();
 				}
 				this.toBeRemoved.Add(theBlock);
 				return true;
 			}
 			Instruction first = theBlock.First;
-			if (!base.TryGetVariableFromInstruction(first, out variableReference) || variableReference != this.stateVariable)
+			if (!base.TryGetVariableFromInstruction(first, out variableReference) || (object)variableReference != (object)this.stateVariable)
 			{
 				return false;
 			}
-			if (first.Next.OpCode.Code != Code.Pop || first.Next.Next.OpCode.Code != Code.Nop)
+			if (first.get_Next().get_OpCode().get_Code() != 37 || first.get_Next().get_Next().get_OpCode().get_Code() != null)
 			{
 				return false;
 			}
-			if (first.Next.Next != theBlock.Last)
+			if ((object)first.get_Next().get_Next() != (object)theBlock.Last)
 			{
 				return false;
 			}
@@ -154,15 +154,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private bool IsNopTillEnd(InstructionBlock theBlock, Instruction currentInstruction)
 		{
-			while (currentInstruction != theBlock.Last)
+			while ((object)currentInstruction != (object)theBlock.Last)
 			{
-				if (currentInstruction.OpCode.Code != Code.Nop)
+				if (currentInstruction.get_OpCode().get_Code() != null)
 				{
 					return false;
 				}
-				currentInstruction = currentInstruction.Next;
+				currentInstruction = currentInstruction.get_Next();
 			}
-			return currentInstruction.OpCode.Code == Code.Nop;
+			return currentInstruction.get_OpCode().get_Code() == 0;
 		}
 
 		protected override bool IsUnconditionalBranchBlock(InstructionBlock theBlock)

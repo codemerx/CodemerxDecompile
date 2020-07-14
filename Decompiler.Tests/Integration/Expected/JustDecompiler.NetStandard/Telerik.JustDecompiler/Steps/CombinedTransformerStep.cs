@@ -49,7 +49,7 @@ namespace Telerik.JustDecompiler.Steps
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			TypeSystem typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			TypeSystem typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.operatorStep = new OperatorStep(this, typeSystem);
 			this.removePIDStep = new RemovePrivateImplementationDetailsStep(typeSystem);
 			this.rebuildEventsStep = new RebuildEventsStep(typeSystem);
@@ -102,7 +102,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (node.Right is LiteralExpression && node.Left.CodeNodeType != CodeNodeType.LiteralExpression)
 			{
-				if (node.Left.HasType && node.Left.ExpressionType.FullName == "System.Boolean")
+				if (node.Left.HasType && node.Left.ExpressionType.get_FullName() == "System.Boolean")
 				{
 					LiteralExpression right = node.Right as LiteralExpression;
 					bool flag = false;
@@ -118,7 +118,7 @@ namespace Telerik.JustDecompiler.Steps
 					return this.Visit(unaryExpression);
 				}
 			}
-			else if (node.Left is LiteralExpression && node.Right.CodeNodeType != CodeNodeType.LiteralExpression && node.Right.HasType && node.Right.ExpressionType.FullName == "System.Boolean")
+			else if (node.Left is LiteralExpression && node.Right.CodeNodeType != CodeNodeType.LiteralExpression && node.Right.HasType && node.Right.ExpressionType.get_FullName() == "System.Boolean")
 			{
 				LiteralExpression left = node.Left as LiteralExpression;
 				bool flag1 = false;
@@ -140,7 +140,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (!this.context.MethodContext.Method.IsConstructor || !(node.Field.DeclaringType.FullName == this.context.MethodContext.Method.DeclaringType.FullName))
+			if (!this.context.MethodContext.Method.get_IsConstructor() || !(node.Field.get_DeclaringType().get_FullName() == this.context.MethodContext.Method.get_DeclaringType().get_FullName()))
 			{
 				return base.VisitFieldReferenceExpression(node);
 			}

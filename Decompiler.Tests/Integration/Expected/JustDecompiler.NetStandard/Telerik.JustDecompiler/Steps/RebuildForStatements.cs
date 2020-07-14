@@ -37,7 +37,7 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			ExpressionStatement item = theWhile.Body.Statements[theWhile.Body.Statements.Count - 1] as ExpressionStatement;
-			if (item == null || !this.TryGetAssignedVariable(item, out variableReference) || forVariable != variableReference)
+			if (item == null || !this.TryGetAssignedVariable(item, out variableReference) || (object)forVariable != (object)variableReference)
 			{
 				return false;
 			}
@@ -100,7 +100,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				variable = ((VariableReferenceExpression)left).Variable;
 			}
-			return variable != null;
+			return (object)variable != (object)null;
 		}
 
 		public override void VisitBlockStatement(BlockStatement node)

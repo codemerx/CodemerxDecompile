@@ -136,7 +136,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			if (this.ElementType.FullName != arrayCreationExpression.ElementType.FullName)
+			if (this.ElementType.get_FullName() != arrayCreationExpression.ElementType.get_FullName())
 			{
 				return false;
 			}

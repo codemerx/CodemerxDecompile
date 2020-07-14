@@ -43,7 +43,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.InvokeMethodReference.FixedReturnType;
+				return this.InvokeMethodReference.get_FixedReturnType();
 			}
 			set
 			{

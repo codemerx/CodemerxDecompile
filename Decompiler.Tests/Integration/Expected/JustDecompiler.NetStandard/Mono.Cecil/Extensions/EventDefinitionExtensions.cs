@@ -15,9 +15,9 @@ namespace Mono.Cecil.Extensions
 			{
 				return implementedMembers;
 			}
-			if (self.AddMethod != null)
+			if (self.get_AddMethod() != null)
 			{
-				foreach (ImplementedMember explicitlyImplementedMethod in self.AddMethod.GetExplicitlyImplementedMethods())
+				foreach (ImplementedMember explicitlyImplementedMethod in self.get_AddMethod().GetExplicitlyImplementedMethods())
 				{
 					EventDefinition methodDeclaringEvent = EventDefinitionExtensions.GetMethodDeclaringEvent(explicitlyImplementedMethod.Member as MethodReference);
 					if (methodDeclaringEvent == null)
@@ -28,11 +28,11 @@ namespace Mono.Cecil.Extensions
 				}
 				return implementedMembers;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return implementedMembers;
 			}
-			foreach (ImplementedMember implementedMember in self.RemoveMethod.GetExplicitlyImplementedMethods())
+			foreach (ImplementedMember implementedMember in self.get_RemoveMethod().GetExplicitlyImplementedMethods())
 			{
 				EventDefinition eventDefinition = EventDefinitionExtensions.GetMethodDeclaringEvent(implementedMember.Member as MethodReference);
 				if (eventDefinition == null)
@@ -47,9 +47,9 @@ namespace Mono.Cecil.Extensions
 		public static ICollection<ImplementedMember> GetImplementedEvents(this EventDefinition self)
 		{
 			List<ImplementedMember> implementedMembers = new List<ImplementedMember>();
-			if (self.AddMethod != null)
+			if (self.get_AddMethod() != null)
 			{
-				foreach (ImplementedMember implementedMethod in self.AddMethod.GetImplementedMethods())
+				foreach (ImplementedMember implementedMethod in self.get_AddMethod().GetImplementedMethods())
 				{
 					EventDefinition methodDeclaringEvent = EventDefinitionExtensions.GetMethodDeclaringEvent(implementedMethod.Member as MethodReference);
 					if (methodDeclaringEvent == null)
@@ -60,11 +60,11 @@ namespace Mono.Cecil.Extensions
 				}
 				return implementedMembers;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return implementedMembers;
 			}
-			foreach (ImplementedMember implementedMember in self.RemoveMethod.GetImplementedMethods())
+			foreach (ImplementedMember implementedMember in self.get_RemoveMethod().GetImplementedMethods())
 			{
 				EventDefinition eventDefinition = EventDefinitionExtensions.GetMethodDeclaringEvent(implementedMember.Member as MethodReference);
 				if (eventDefinition == null)
@@ -83,16 +83,16 @@ namespace Mono.Cecil.Extensions
 			{
 				return null;
 			}
-			TypeDefinition typeDefinition = method.DeclaringType.Resolve();
+			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
 			if (typeDefinition != null)
 			{
-				Collection<EventDefinition>.Enumerator enumerator = typeDefinition.Events.GetEnumerator();
+				Collection<EventDefinition>.Enumerator enumerator = typeDefinition.get_Events().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						EventDefinition current = enumerator.Current;
-						if ((current.AddMethod == null || !current.AddMethod.HasSameSignatureWith(method)) && (current.RemoveMethod == null || !current.RemoveMethod.HasSameSignatureWith(method)))
+						EventDefinition current = enumerator.get_Current();
+						if ((current.get_AddMethod() == null || !current.get_AddMethod().HasSameSignatureWith(method)) && (current.get_RemoveMethod() == null || !current.get_RemoveMethod().HasSameSignatureWith(method)))
 						{
 							continue;
 						}
@@ -103,7 +103,7 @@ namespace Mono.Cecil.Extensions
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 				return eventDefinition;
 			}
@@ -116,9 +116,9 @@ namespace Mono.Cecil.Extensions
 			{
 				self
 			};
-			if (self.AddMethod != null)
+			if (self.get_AddMethod() != null)
 			{
-				foreach (MethodDefinition overridenAndImplementedMethod in self.AddMethod.GetOverridenAndImplementedMethods())
+				foreach (MethodDefinition overridenAndImplementedMethod in self.get_AddMethod().GetOverridenAndImplementedMethods())
 				{
 					EventDefinition methodDeclaringEvent = EventDefinitionExtensions.GetMethodDeclaringEvent(overridenAndImplementedMethod);
 					if (methodDeclaringEvent == null)
@@ -128,9 +128,9 @@ namespace Mono.Cecil.Extensions
 					eventDefinitions.Add(methodDeclaringEvent);
 				}
 			}
-			else if (self.RemoveMethod != null)
+			else if (self.get_RemoveMethod() != null)
 			{
-				foreach (MethodDefinition methodDefinition in self.RemoveMethod.GetOverridenAndImplementedMethods())
+				foreach (MethodDefinition methodDefinition in self.get_RemoveMethod().GetOverridenAndImplementedMethods())
 				{
 					EventDefinition eventDefinition = EventDefinitionExtensions.GetMethodDeclaringEvent(methodDefinition);
 					if (eventDefinition == null)
@@ -145,15 +145,15 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsAbstract(this EventDefinition self)
 		{
-			if (self.AddMethod != null && !self.AddMethod.IsAbstract)
+			if (self.get_AddMethod() != null && !self.get_AddMethod().get_IsAbstract())
 			{
 				return false;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return true;
 			}
-			return self.RemoveMethod.IsAbstract;
+			return self.get_RemoveMethod().get_IsAbstract();
 		}
 
 		public static bool IsExplicitImplementation(this EventDefinition self)
@@ -162,11 +162,11 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.AddMethod != null && self.AddMethod.HasOverrides && self.AddMethod.IsPrivate)
+			if (self.get_AddMethod() != null && self.get_AddMethod().get_HasOverrides() && self.get_AddMethod().get_IsPrivate())
 			{
 				return true;
 			}
-			if (self.RemoveMethod != null && self.RemoveMethod.HasOverrides && self.RemoveMethod.IsPrivate)
+			if (self.get_RemoveMethod() != null && self.get_RemoveMethod().get_HasOverrides() && self.get_RemoveMethod().get_IsPrivate())
 			{
 				return true;
 			}
@@ -179,7 +179,7 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.IsInterface)
+			if (!@interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
@@ -187,15 +187,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.DeclaringType.FullName == @interface.FullName)
+			if (self.get_DeclaringType().get_FullName() == @interface.get_FullName())
 			{
 				return true;
 			}
-			if (self.AddMethod != null && !self.AddMethod.IsExplicitImplementationOf(@interface))
+			if (self.get_AddMethod() != null && !self.get_AddMethod().IsExplicitImplementationOf(@interface))
 			{
 				return false;
 			}
-			if (self.RemoveMethod != null && !self.RemoveMethod.IsExplicitImplementationOf(@interface))
+			if (self.get_RemoveMethod() != null && !self.get_RemoveMethod().IsExplicitImplementationOf(@interface))
 			{
 				return false;
 			}
@@ -204,54 +204,54 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsFinal(this EventDefinition self)
 		{
-			if (self.AddMethod != null && !self.AddMethod.IsFinal)
+			if (self.get_AddMethod() != null && !self.get_AddMethod().get_IsFinal())
 			{
 				return false;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return true;
 			}
-			return self.RemoveMethod.IsFinal;
+			return self.get_RemoveMethod().get_IsFinal();
 		}
 
 		public static bool IsNewSlot(this EventDefinition self)
 		{
-			if (self.AddMethod != null && !self.AddMethod.IsNewSlot)
+			if (self.get_AddMethod() != null && !self.get_AddMethod().get_IsNewSlot())
 			{
 				return false;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return true;
 			}
-			return self.RemoveMethod.IsNewSlot;
+			return self.get_RemoveMethod().get_IsNewSlot();
 		}
 
 		public static bool IsStatic(this EventDefinition self)
 		{
-			if (self.AddMethod != null && !self.AddMethod.IsStatic)
+			if (self.get_AddMethod() != null && !self.get_AddMethod().get_IsStatic())
 			{
 				return false;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return true;
 			}
-			return self.RemoveMethod.IsStatic;
+			return self.get_RemoveMethod().get_IsStatic();
 		}
 
 		public static bool IsVirtual(this EventDefinition self)
 		{
-			if (self.AddMethod != null && !self.AddMethod.IsVirtual)
+			if (self.get_AddMethod() != null && !self.get_AddMethod().get_IsVirtual())
 			{
 				return false;
 			}
-			if (self.RemoveMethod == null)
+			if (self.get_RemoveMethod() == null)
 			{
 				return true;
 			}
-			return self.RemoveMethod.IsVirtual;
+			return self.get_RemoveMethod().get_IsVirtual();
 		}
 	}
 }

@@ -83,11 +83,11 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			string name;
 			HashSet<string> strs = new HashSet<string>(this.methodContext.VariableNamesCollection, this.context.Language.IdentifierComparer);
-			foreach (VariableDefinition variable in this.methodContext.Body.Variables)
+			foreach (VariableDefinition variable in this.methodContext.Body.get_Variables())
 			{
 				if (!this.methodContext.VariableDefinitionToNameMap.TryGetValue(variable, out name))
 				{
-					name = variable.Name;
+					name = variable.get_Name();
 				}
 				if (strs.Contains(name))
 				{
@@ -219,9 +219,9 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return this.GetFriendlyNameByType(typeReference);
 			}
-			if (!typeReference.IsGenericInstance)
+			if (!typeReference.get_IsGenericInstance())
 			{
-				if (typeReference.GenericParameters.Count != 0)
+				if (typeReference.get_GenericParameters().get_Count() != 0)
 				{
 					return this.Camelize(this.GetFriendlyGenericName(typeReference), RenameVariables.Conversion.Singular);
 				}
@@ -229,10 +229,10 @@ namespace Telerik.JustDecompiler.Steps
 				return this.Camelize(friendlyTypeName, RenameVariables.Conversion.Plural);
 			}
 			GenericInstanceType genericInstanceType = (GenericInstanceType)typeReference;
-			TypeReference item = genericInstanceType.GenericArguments[0];
-			if (genericInstanceType.PostionToArgument.ContainsKey(0))
+			TypeReference item = genericInstanceType.get_GenericArguments().get_Item(0);
+			if (genericInstanceType.get_PostionToArgument().ContainsKey(0))
 			{
-				item = genericInstanceType.PostionToArgument[0];
+				item = genericInstanceType.get_PostionToArgument()[0];
 			}
 			typeDefinition = item.Resolve();
 			if (typeDefinition != null && typeDefinition.HasCompilerGeneratedAttribute())
@@ -342,16 +342,16 @@ namespace Telerik.JustDecompiler.Steps
 		private bool HasGenericParameterWithSameName(string name)
 		{
 			bool flag;
-			if (!this.methodContext.Method.HasGenericParameters)
+			if (!this.methodContext.Method.get_HasGenericParameters())
 			{
 				return false;
 			}
-			Collection<GenericParameter>.Enumerator enumerator = this.methodContext.Method.GenericParameters.GetEnumerator();
+			Collection<GenericParameter>.Enumerator enumerator = this.methodContext.Method.get_GenericParameters().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					GenericParameter current = enumerator.Current;
+					GenericParameter current = enumerator.get_Current();
 					if (this.context.Language.IdentifierComparer.Compare(current.GetFriendlyFullName(this.context.Language), name) != 0)
 					{
 						continue;
@@ -363,7 +363,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -371,13 +371,13 @@ namespace Telerik.JustDecompiler.Steps
 		private bool HasMethodParameterWithSameName(string name)
 		{
 			bool flag;
-			Collection<ParameterDefinition>.Enumerator enumerator = this.methodContext.Method.Parameters.GetEnumerator();
+			Collection<ParameterDefinition>.Enumerator enumerator = this.methodContext.Method.get_Parameters().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					ParameterDefinition current = enumerator.Current;
-					if (this.context.Language.IdentifierComparer.Compare(current.Name, name) != 0)
+					ParameterDefinition current = enumerator.get_Current();
+					if (this.context.Language.IdentifierComparer.Compare(current.get_Name(), name) != 0)
 					{
 						continue;
 					}
@@ -388,7 +388,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -402,7 +402,7 @@ namespace Telerik.JustDecompiler.Steps
 				while (enumerator.MoveNext())
 				{
 					KeyValuePair<VariableDefinition, string> current = enumerator.Current;
-					if (current.Key == variable || this.context.Language.IdentifierComparer.Compare(current.Value, name) != 0)
+					if ((object)current.Key == (object)variable || this.context.Language.IdentifierComparer.Compare(current.Value, name) != 0)
 					{
 						continue;
 					}
@@ -424,13 +424,13 @@ namespace Telerik.JustDecompiler.Steps
 			TypeDefinition typeDefinition = typeReference.Resolve();
 			if (typeDefinition != null)
 			{
-				Collection<TypeReference>.Enumerator enumerator = typeDefinition.Interfaces.GetEnumerator();
+				Collection<TypeReference>.Enumerator enumerator = typeDefinition.get_Interfaces().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						TypeReference current = enumerator.Current;
-						if (!(current.FullName == "System.Collections.IEnumerable") && !(current.FullName == "System.Collections.IList") && !(current.FullName == "System.Collections.ICollection"))
+						TypeReference current = enumerator.get_Current();
+						if (!(current.get_FullName() == "System.Collections.IEnumerable") && !(current.get_FullName() == "System.Collections.IList") && !(current.get_FullName() == "System.Collections.ICollection"))
 						{
 							continue;
 						}
@@ -441,7 +441,7 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 				return flag;
 			}
@@ -504,23 +504,23 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				this.methodContext.ParameterDefinitionToNameMap[parameterDefinition.Key] = parameterDefinition.Value;
 			}
-			foreach (ParameterDefinition parameter in this.methodContext.Body.Method.Parameters)
+			foreach (ParameterDefinition parameter in this.methodContext.Body.get_Method().get_Parameters())
 			{
-				string name = parameter.Name;
+				string name = parameter.get_Name();
 				if (String.IsNullOrEmpty(name))
 				{
-					name = this.GetNameByType(parameter.ParameterType);
+					name = this.GetNameByType(parameter.get_ParameterType());
 				}
 				this.methodContext.ParameterDefinitionToNameMap.Add(parameter, name);
 			}
-			if (this.methodContext.Method.IsSetter && this.methodContext.Method.Parameters.Count == 1)
+			if (this.methodContext.Method.get_IsSetter() && this.methodContext.Method.get_Parameters().get_Count() == 1)
 			{
-				ParameterDefinition item = this.methodContext.Method.Parameters[0];
+				ParameterDefinition item = this.methodContext.Method.get_Parameters().get_Item(0);
 				this.methodContext.ParameterDefinitionToNameMap[item] = "value";
 			}
-			foreach (VariableDefinition variable in this.methodContext.Body.Variables)
+			foreach (VariableDefinition variable in this.methodContext.Body.get_Variables())
 			{
-				if (!this.methodContext.ParameterDefinitionToNameMap.ContainsValue(variable.Name))
+				if (!this.methodContext.ParameterDefinitionToNameMap.ContainsValue(variable.get_Name()))
 				{
 					continue;
 				}
@@ -552,7 +552,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (!this.methodContext.VariableDefinitionToNameMap.ContainsKey(node.Variable))
 			{
-				this.methodContext.VariableDefinitionToNameMap.Add(node.Variable, node.Variable.Name);
+				this.methodContext.VariableDefinitionToNameMap.Add(node.Variable, node.Variable.get_Name());
 			}
 			if (this.state == RenameVariables.State.SearchForPossibleNames)
 			{
@@ -577,11 +577,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool ShouldBePluralized(TypeReference typeReference)
 		{
-			if (typeReference.FullName == "System.String")
+			if (typeReference.get_FullName() == "System.String")
 			{
 				return false;
 			}
-			if (typeReference.IsPrimitive)
+			if (typeReference.get_IsPrimitive())
 			{
 				return false;
 			}
@@ -713,7 +713,7 @@ namespace Telerik.JustDecompiler.Steps
 					}
 					return;
 				}
-				if (this.TryRenameVariable(variable, this.GetNameByType(variable.VariableType), num))
+				if (this.TryRenameVariable(variable, this.GetNameByType(variable.get_VariableType()), num))
 				{
 					return;
 				}
@@ -786,7 +786,7 @@ namespace Telerik.JustDecompiler.Steps
 				return;
 			}
 			MethodReference method = ((MethodReferenceExpression)methodExpression).Method;
-			string name = method.Name ?? method.FullName;
+			string name = method.get_Name() ?? method.get_FullName();
 			if (name.Contains("`"))
 			{
 				name = name.Substring(0, name.IndexOf('\u0060'));
@@ -861,7 +861,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (node.Constructor != null)
 			{
-				this.TrySetObjectCreationPendingName(node.Constructor.DeclaringType);
+				this.TrySetObjectCreationPendingName(node.Constructor.get_DeclaringType());
 			}
 			this.ClearPendingForSuggestion();
 			base.VisitAnonymousObjectCreationExpression(node);
@@ -869,7 +869,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 		{
-			this.TrySetPendingName(node.Parameter.Name, false);
+			this.TrySetPendingName(node.Parameter.get_Name(), false);
 			base.VisitArgumentReferenceExpression(node);
 		}
 
@@ -930,14 +930,14 @@ namespace Telerik.JustDecompiler.Steps
 			if (node.Target is TypeReferenceExpression)
 			{
 				TypeReference type = ((TypeReferenceExpression)node.Target).Type;
-				if (type is TypeDefinition && ((TypeDefinition)type).IsEnum)
+				if (type is TypeDefinition && ((TypeDefinition)type).get_IsEnum())
 				{
 					base.VisitFieldReferenceExpression(node);
 					return;
 				}
 			}
 			FieldDefinition fieldDefinition = node.Field.Resolve();
-			str = (fieldDefinition == null || !this.typeContext.BackingFieldToNameMap.ContainsKey(fieldDefinition) ? node.Field.Name : this.typeContext.BackingFieldToNameMap[fieldDefinition]);
+			str = (fieldDefinition == null || !this.typeContext.BackingFieldToNameMap.ContainsKey(fieldDefinition) ? node.Field.get_Name() : this.typeContext.BackingFieldToNameMap[fieldDefinition]);
 			this.TrySetPendingName(str, true);
 			base.VisitFieldReferenceExpression(node);
 		}
@@ -975,7 +975,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (node.Constructor != null)
 			{
-				this.TrySetObjectCreationPendingName(node.Constructor.DeclaringType);
+				this.TrySetObjectCreationPendingName(node.Constructor.get_DeclaringType());
 			}
 			this.ClearPendingForSuggestion();
 			base.VisitObjectCreationExpression(node);
@@ -983,7 +983,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.TrySetPendingName(node.Property.Name, true);
+			this.TrySetPendingName(node.Property.get_Name(), true);
 			base.VisitPropertyReferenceExpression(node);
 		}
 
@@ -1004,7 +1004,7 @@ namespace Telerik.JustDecompiler.Steps
 			VariableDefinition name = node.Variable.Resolve();
 			if (!this.methodContext.VariableDefinitionToNameMap.ContainsKey(name))
 			{
-				this.methodContext.VariableDefinitionToNameMap[name] = name.Name;
+				this.methodContext.VariableDefinitionToNameMap[name] = name.get_Name();
 			}
 			if (this.state == RenameVariables.State.SearchForPossibleNames)
 			{

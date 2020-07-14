@@ -50,7 +50,7 @@ namespace Telerik.JustDecompiler.Languages
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
 			if (member is ISecurityDeclarationMemberDefinition)
 			{
-				foreach (SecurityDeclaration securityDeclaration in (member as ISecurityDeclarationMemberDefinition).SecurityDeclarations)
+				foreach (SecurityDeclaration securityDeclaration in (member as ISecurityDeclarationMemberDefinition).get_SecurityDeclarations())
 				{
 					customAttributes.AddRange(this.GetSecurityDeclaration(securityDeclaration));
 				}
@@ -60,8 +60,8 @@ namespace Telerik.JustDecompiler.Languages
 
 		private int CompareAttributes(ICustomAttribute x, ICustomAttribute y)
 		{
-			string name = x.AttributeType.Name;
-			string str = y.AttributeType.Name;
+			string name = x.get_AttributeType().get_Name();
+			string str = y.get_AttributeType().get_Name();
 			if (name != str)
 			{
 				return name.CompareTo(str);
@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		private int CompareSecurityAttributes(SecurityAttribute first, SecurityAttribute second)
 		{
-			if (first == second)
+			if ((object)first == (object)second)
 			{
 				return 0;
 			}
@@ -90,12 +90,12 @@ namespace Telerik.JustDecompiler.Languages
 
 		private string GetElementTypeName(CustomAttributeArgument argument)
 		{
-			return this.genericWriter.ToEscapedTypeString((argument.Type as ArrayType).ElementType);
+			return this.genericWriter.ToEscapedTypeString((argument.get_Type() as ArrayType).get_ElementType());
 		}
 
 		protected virtual CustomAttribute GetInAttribute(ParameterDefinition parameter)
 		{
-			if (parameter == null || !parameter.IsIn)
+			if (parameter == null || !parameter.get_IsIn())
 			{
 				return null;
 			}
@@ -104,23 +104,23 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected CustomAttribute GetInOrOutAttribute(ParameterDefinition parameter, bool isInAttribute)
 		{
-			ModuleDefinition module = parameter.Method.ReturnType.Module;
-			IMetadataScope corlib = module.TypeSystem.Corlib;
+			ModuleDefinition module = parameter.get_Method().get_ReturnType().get_Module();
+			IMetadataScope corlib = module.get_TypeSystem().get_Corlib();
 			TypeReference typeReference = new TypeReference("System.Runtime.InteropServices", (isInAttribute ? "InAttribute" : "OutAttribute"), module, corlib);
 			if (typeReference == null)
 			{
 				return null;
 			}
-			return new CustomAttribute(new MethodReference(".ctor", module.TypeSystem.Void, typeReference));
+			return new CustomAttribute(new MethodReference(".ctor", module.get_TypeSystem().get_Void(), typeReference));
 		}
 
 		private ModuleDefinition GetModuleDefinition(IMemberDefinition member)
 		{
 			if (member is TypeDefinition)
 			{
-				return (member as TypeDefinition).Module;
+				return (member as TypeDefinition).get_Module();
 			}
-			return member.DeclaringType.Module;
+			return member.get_DeclaringType().get_Module();
 		}
 
 		protected virtual CustomAttribute GetOutAttribute(ParameterDefinition parameter)
@@ -129,7 +129,7 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return null;
 			}
-			if (parameter == null || !parameter.IsOut)
+			if (parameter == null || !parameter.get_IsOut())
 			{
 				return null;
 			}
@@ -139,9 +139,9 @@ namespace Telerik.JustDecompiler.Languages
 		private IEnumerable<ICustomAttribute> GetSecurityDeclaration(SecurityDeclaration securityDeclaration)
 		{
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
-			if (securityDeclaration.HasSecurityAttributes)
+			if (securityDeclaration.get_HasSecurityAttributes())
 			{
-				foreach (SecurityAttribute securityAttribute in securityDeclaration.SecurityAttributes)
+				foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
 				{
 					customAttributes.Add(securityAttribute);
 					this.securityAttributeToDeclaration.Add(securityAttribute, securityDeclaration);
@@ -153,9 +153,9 @@ namespace Telerik.JustDecompiler.Languages
 		protected virtual List<ICustomAttribute> GetSortedReturnValueAttributes(IMethodSignature member)
 		{
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
-			if (member != null && member.MethodReturnType.HasCustomAttributes)
+			if (member != null && member.get_MethodReturnType().get_HasCustomAttributes())
 			{
-				customAttributes.AddRange(member.MethodReturnType.CustomAttributes);
+				customAttributes.AddRange(member.get_MethodReturnType().get_CustomAttributes());
 			}
 			this.SortAttributes(customAttributes);
 			return customAttributes;
@@ -163,16 +163,17 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool IsWinRTActivatableAttribute(CustomAttribute attribute)
 		{
-			if (attribute.AttributeType.FullName != "Windows.Foundation.Metadata.ActivatableAttribute" || attribute.ConstructorArguments.Count != 2)
+			if (attribute.get_AttributeType().get_FullName() != "Windows.Foundation.Metadata.ActivatableAttribute" || attribute.get_ConstructorArguments().get_Count() != 2)
 			{
 				return false;
 			}
-			TypeDefinition value = attribute.ConstructorArguments[0].Value as TypeDefinition;
+			CustomAttributeArgument item = attribute.get_ConstructorArguments().get_Item(0);
+			TypeDefinition value = item.get_Value() as TypeDefinition;
 			if (value == null)
 			{
 				return false;
 			}
-			return value.IsWindowsRuntime;
+			return value.get_IsWindowsRuntime();
 		}
 
 		private void SortAttributes(List<ICustomAttribute> attributes)
@@ -191,33 +192,33 @@ namespace Telerik.JustDecompiler.Languages
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
 			this.securityAttributeToDeclaration = new Dictionary<SecurityAttribute, SecurityDeclaration>();
 			customAttributes.Add(AttributesUtilities.GetAssemblyVersionAttribute(assembly));
-			foreach (CustomAttribute customAttribute in assembly.CustomAttributes)
+			foreach (CustomAttribute customAttribute in assembly.get_CustomAttributes())
 			{
 				customAttribute.Resolve();
 				customAttributes.Add(customAttribute);
 			}
-			if (assembly.HasSecurityDeclarations)
+			if (assembly.get_HasSecurityDeclarations())
 			{
-				foreach (SecurityDeclaration securityDeclaration in assembly.SecurityDeclarations)
+				foreach (SecurityDeclaration securityDeclaration in assembly.get_SecurityDeclarations())
 				{
 					customAttributes.AddRange(this.GetSecurityDeclaration(securityDeclaration));
 				}
 			}
-			if (assembly.MainModule.HasExportedTypes)
+			if (assembly.get_MainModule().get_HasExportedTypes())
 			{
-				foreach (ExportedType exportedType in assembly.MainModule.ExportedTypes)
+				foreach (ExportedType exportedType in assembly.get_MainModule().get_ExportedTypes())
 				{
-					if (exportedType.Scope is ModuleReference)
+					if (exportedType.get_Scope() is ModuleReference)
 					{
 						continue;
 					}
-					customAttributes.Add(AttributesUtilities.GetExportedTypeAttribute(exportedType, assembly.MainModule));
+					customAttributes.Add(AttributesUtilities.GetExportedTypeAttribute(exportedType, assembly.get_MainModule()));
 				}
 			}
 			customAttributes.Sort((ICustomAttribute x, ICustomAttribute y) => this.CompareAttributes(x, y));
 			foreach (ICustomAttribute customAttribute1 in customAttributes)
 			{
-				if (attributesToIgnore != null && attributesToIgnore.Contains(customAttribute1.AttributeType.FullName))
+				if (attributesToIgnore != null && attributesToIgnore.Contains(customAttribute1.get_AttributeType().get_FullName()))
 				{
 					continue;
 				}
@@ -227,7 +228,7 @@ namespace Telerik.JustDecompiler.Languages
 					{
 						continue;
 					}
-					this.WriteSecurityAttribute(assembly.MainModule, true, customAttribute1 as SecurityAttribute, this.securityAttributeToDeclaration[customAttribute1 as SecurityAttribute], out flag, false, false);
+					this.WriteSecurityAttribute(assembly.get_MainModule(), true, customAttribute1 as SecurityAttribute, this.securityAttributeToDeclaration[customAttribute1 as SecurityAttribute], out flag, false, false);
 				}
 				else
 				{
@@ -238,7 +239,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected void WriteAttribute(CustomAttribute attribute, bool skipNewLine = false, bool isReturnValueAtrribute = false)
 		{
-			if (this.attributesNotToShow.Contains(attribute.AttributeType.FullName))
+			if (this.attributesNotToShow.Contains(attribute.get_AttributeType().get_FullName()))
 			{
 				return;
 			}
@@ -265,12 +266,12 @@ namespace Telerik.JustDecompiler.Languages
 
 		private void WriteAttributeArgumentArray(CustomAttributeArgument argument)
 		{
-			CustomAttributeArgument[] value = argument.Value as CustomAttributeArgument[];
+			CustomAttributeArgument[] value = argument.get_Value() as CustomAttributeArgument[];
 			this.genericWriter.WriteKeyword(this.genericWriter.KeyWordWriter.New);
 			this.genericWriter.WriteSpace();
 			string str = String.Format("{0}{1}{2}", (object)this.GetElementTypeName(argument), this.genericWriter.IndexLeftBracket, this.genericWriter.IndexRightBracket);
-			this.genericWriter.WriteNamespaceIfTypeInCollision(argument.Type);
-			this.genericWriter.WriteReference(str, argument.Type);
+			this.genericWriter.WriteNamespaceIfTypeInCollision(argument.get_Type());
+			this.genericWriter.WriteReference(str, argument.get_Type());
 			this.genericWriter.WriteSpace();
 			this.genericWriter.WriteToken("{");
 			this.genericWriter.WriteSpace();
@@ -289,39 +290,39 @@ namespace Telerik.JustDecompiler.Languages
 
 		private void WriteAttributeArgumentValue(CustomAttributeArgument argument)
 		{
-			if (argument.Value is CustomAttributeArgument)
+			if (argument.get_Value() is CustomAttributeArgument)
 			{
-				this.WriteAttributeArgumentValue((CustomAttributeArgument)argument.Value);
+				this.WriteAttributeArgumentValue((CustomAttributeArgument)argument.get_Value());
 				return;
 			}
-			if (argument.Value is CustomAttributeArgument[])
+			if (argument.get_Value() is CustomAttributeArgument[])
 			{
 				this.WriteAttributeArgumentArray(argument);
 				return;
 			}
-			TypeDefinition typeDefinition = (argument.Type.IsDefinition ? argument.Type as TypeDefinition : argument.Type.Resolve());
-			if (typeDefinition == null || !typeDefinition.IsEnum)
+			TypeDefinition typeDefinition = (argument.get_Type().get_IsDefinition() ? argument.get_Type() as TypeDefinition : argument.get_Type().Resolve());
+			if (typeDefinition == null || !typeDefinition.get_IsEnum())
 			{
-				if (argument.Type.Name != "Type" || argument.Type.Namespace != "System")
+				if (argument.get_Type().get_Name() != "Type" || argument.get_Type().get_Namespace() != "System")
 				{
-					this.genericWriter.WriteLiteralInLanguageSyntax(argument.Value);
+					this.genericWriter.WriteLiteralInLanguageSyntax(argument.get_Value());
 					return;
 				}
 				this.genericWriter.WriteKeyword(this.genericWriter.KeyWordWriter.TypeOf);
 				this.genericWriter.WriteToken("(");
-				this.genericWriter.WriteGenericReference(argument.Value as TypeReference);
+				this.genericWriter.WriteGenericReference(argument.get_Value() as TypeReference);
 				this.genericWriter.WriteToken(")");
 				return;
 			}
-			List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.Fields, argument.Value, typeDefinition.CustomAttributes);
+			List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.get_Fields(), argument.get_Value(), typeDefinition.get_CustomAttributes());
 			if (enumFieldDefinitionByValue.Count == 0)
 			{
-				this.genericWriter.WriteLiteralInLanguageSyntax(argument.Value);
+				this.genericWriter.WriteLiteralInLanguageSyntax(argument.get_Value());
 				return;
 			}
 			for (int i = 0; i < enumFieldDefinitionByValue.Count; i++)
 			{
-				this.genericWriter.WriteReferenceAndNamespaceIfInCollision(enumFieldDefinitionByValue[i].DeclaringType);
+				this.genericWriter.WriteReferenceAndNamespaceIfInCollision(enumFieldDefinitionByValue[i].get_DeclaringType());
 				this.genericWriter.WriteToken(".");
 				this.genericWriter.WriteEnumValueField(enumFieldDefinitionByValue[i]);
 				if (i + 1 < enumFieldDefinitionByValue.Count)
@@ -338,7 +339,7 @@ namespace Telerik.JustDecompiler.Languages
 			CustomAttributeNamedArgument item;
 			IList properties;
 			IList lists;
-			for (int i = 0; i < namedArguments.Count; i++)
+			for (int i = 0; i < namedArguments.get_Count(); i++)
 			{
 				if (i == 0 & wroteArgument)
 				{
@@ -349,34 +350,34 @@ namespace Telerik.JustDecompiler.Languages
 				{
 					if (fields)
 					{
-						properties = attributeType.Fields;
+						properties = attributeType.get_Fields();
 					}
 					else
 					{
-						properties = attributeType.Properties;
+						properties = attributeType.get_Properties();
 					}
 					MemberReference memberReference = null;
 					IList lists1 = properties;
 					TypeDefinition typeDefinition = attributeType;
 					do
 					{
-						memberReference = Utilities.FindMemberArgumentRefersTo(lists1, namedArguments[i]);
-						if (typeDefinition.BaseType == null)
+						memberReference = Utilities.FindMemberArgumentRefersTo(lists1, namedArguments.get_Item(i));
+						if (typeDefinition.get_BaseType() == null)
 						{
 							break;
 						}
-						typeDefinition = typeDefinition.BaseType.Resolve();
+						typeDefinition = typeDefinition.get_BaseType().Resolve();
 						if (typeDefinition == null)
 						{
 							break;
 						}
 						if (fields)
 						{
-							lists = typeDefinition.Fields;
+							lists = typeDefinition.get_Fields();
 						}
 						else
 						{
-							lists = typeDefinition.Properties;
+							lists = typeDefinition.get_Properties();
 						}
 						lists1 = lists;
 					}
@@ -384,24 +385,24 @@ namespace Telerik.JustDecompiler.Languages
 					if (memberReference == null)
 					{
 						NamespaceImperativeLanguageWriter namespaceImperativeLanguageWriter = this.genericWriter;
-						item = namedArguments[i];
-						namespaceImperativeLanguageWriter.Write(item.Name);
+						item = namedArguments.get_Item(i);
+						namespaceImperativeLanguageWriter.Write(item.get_Name());
 					}
 					else
 					{
-						this.genericWriter.WriteReference(memberReference.Name, memberReference);
+						this.genericWriter.WriteReference(memberReference.get_Name(), memberReference);
 					}
 				}
 				else
 				{
 					NamespaceImperativeLanguageWriter namespaceImperativeLanguageWriter1 = this.genericWriter;
-					item = namedArguments[i];
-					namespaceImperativeLanguageWriter1.Write(item.Name);
+					item = namedArguments.get_Item(i);
+					namespaceImperativeLanguageWriter1.Write(item.get_Name());
 				}
 				this.genericWriter.WriteToken(this.EqualsSign);
-				item = namedArguments[i];
-				this.WriteAttributeArgumentValue(item.Argument);
-				if (i + 1 < namedArguments.Count)
+				item = namedArguments.get_Item(i);
+				this.WriteAttributeArgumentValue(item.get_Argument());
+				if (i + 1 < namedArguments.get_Count())
 				{
 					this.genericWriter.WriteToken(",");
 					this.genericWriter.WriteSpace();
@@ -413,40 +414,40 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool WriteAttributeSignature(CustomAttribute attribute, bool resolvingProblem)
 		{
-			string name = (attribute.AttributeType.Name.EndsWith("Attribute") ? attribute.AttributeType.Name.Remove(attribute.AttributeType.Name.LastIndexOf("Attribute")) : attribute.AttributeType.Name);
+			string name = (attribute.get_AttributeType().get_Name().EndsWith("Attribute") ? attribute.get_AttributeType().get_Name().Remove(attribute.get_AttributeType().get_Name().LastIndexOf("Attribute")) : attribute.get_AttributeType().get_Name());
 			if (this.genericWriter.Language.IsGlobalKeyword(name))
 			{
-				name = attribute.AttributeType.Name;
+				name = attribute.get_AttributeType().get_Name();
 			}
-			this.genericWriter.WriteNamespaceIfTypeInCollision(attribute.AttributeType);
-			this.genericWriter.WriteReference(name, attribute.AttributeType);
-			if (attribute.HasConstructorArguments || attribute.HasFields || attribute.HasProperties)
+			this.genericWriter.WriteNamespaceIfTypeInCollision(attribute.get_AttributeType());
+			this.genericWriter.WriteReference(name, attribute.get_AttributeType());
+			if (attribute.get_HasConstructorArguments() || attribute.get_HasFields() || attribute.get_HasProperties())
 			{
 				this.genericWriter.WriteToken("(");
 				bool flag = false;
-				for (int i = 0; i < attribute.ConstructorArguments.Count; i++)
+				for (int i = 0; i < attribute.get_ConstructorArguments().get_Count(); i++)
 				{
 					flag = true;
-					this.WriteAttributeArgumentValue(attribute.ConstructorArguments[i]);
-					if (i + 1 < attribute.ConstructorArguments.Count)
+					this.WriteAttributeArgumentValue(attribute.get_ConstructorArguments().get_Item(i));
+					if (i + 1 < attribute.get_ConstructorArguments().get_Count())
 					{
 						this.genericWriter.Write(",");
 						this.genericWriter.WriteSpace();
 					}
 				}
-				if (attribute.HasProperties)
+				if (attribute.get_HasProperties())
 				{
-					TypeDefinition typeDefinition = attribute.AttributeType.Resolve();
-					flag = this.WriteAttributeNamedArgs(typeDefinition, attribute.Properties, false, flag);
+					TypeDefinition typeDefinition = attribute.get_AttributeType().Resolve();
+					flag = this.WriteAttributeNamedArgs(typeDefinition, attribute.get_Properties(), false, flag);
 				}
-				if (attribute.HasFields)
+				if (attribute.get_HasFields())
 				{
-					TypeDefinition typeDefinition1 = attribute.AttributeType.Resolve();
-					this.WriteAttributeNamedArgs(typeDefinition1, attribute.Fields, true, flag);
+					TypeDefinition typeDefinition1 = attribute.get_AttributeType().Resolve();
+					this.WriteAttributeNamedArgs(typeDefinition1, attribute.get_Fields(), true, flag);
 				}
 				this.genericWriter.WriteToken(")");
 			}
-			else if (!attribute.IsResolved && (int)attribute.GetBlob().Length > 4)
+			else if (!attribute.get_IsResolved() && (int)attribute.GetBlob().Length > 4)
 			{
 				this.genericWriter.WriteToken("(");
 				this.genericWriter.Write(",");
@@ -480,11 +481,11 @@ namespace Telerik.JustDecompiler.Languages
 		private IEnumerable<ICustomAttribute> WriteFieldDefinitionFieldsAsAttributes(FieldDefinition member)
 		{
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
-			if (member.IsNotSerialized)
+			if (member.get_IsNotSerialized())
 			{
 				customAttributes.Add(AttributesUtilities.GetFieldNotSerializedAttribute(member));
 			}
-			if (member.DeclaringType.IsExplicitLayout)
+			if (member.get_DeclaringType().get_IsExplicitLayout())
 			{
 				customAttributes.Add(AttributesUtilities.GetFieldFieldOffsetAttribute(member));
 			}
@@ -493,7 +494,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		private void WriteGlobalAttribute(CustomAttribute attribute, string keyword)
 		{
-			if (this.attributesNotToShow.Contains(attribute.AttributeType.FullName))
+			if (this.attributesNotToShow.Contains(attribute.get_AttributeType().get_FullName()))
 			{
 				return;
 			}
@@ -537,7 +538,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.securityAttributeToDeclaration = new Dictionary<SecurityAttribute, SecurityDeclaration>();
 			List<ICustomAttribute> customAttributes = this.CollectSecurityAttributes(member);
-			foreach (CustomAttribute customAttribute in member.CustomAttributes)
+			foreach (CustomAttribute customAttribute in member.get_CustomAttributes())
 			{
 				customAttribute.Resolve();
 				if (isWinRTImplementation && this.IsWinRTActivatableAttribute(customAttribute))
@@ -556,11 +557,11 @@ namespace Telerik.JustDecompiler.Languages
 		private IEnumerable<ICustomAttribute> WriteMethodFieldsAsAttributes(MethodDefinition method)
 		{
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
-			if (method.HasPInvokeInfo)
+			if (method.get_HasPInvokeInfo())
 			{
 				customAttributes.Add(AttributesUtilities.GetMethodDllImportAttribute(method));
 			}
-			if (method.HasImplAttributes && AttributesUtilities.ShouldWriteMethodImplAttribute(method))
+			if (method.get_HasImplAttributes() && AttributesUtilities.ShouldWriteMethodImplAttribute(method))
 			{
 				customAttributes.Add(AttributesUtilities.GetMethodImplAttribute(method));
 			}
@@ -575,7 +576,7 @@ namespace Telerik.JustDecompiler.Languages
 		public void WriteModuleAttributes(ModuleDefinition module, ICollection<string> attributesToIgnore = null)
 		{
 			List<CustomAttribute> customAttributes = new List<CustomAttribute>();
-			foreach (CustomAttribute customAttribute in module.CustomAttributes)
+			foreach (CustomAttribute customAttribute in module.get_CustomAttributes())
 			{
 				customAttribute.Resolve();
 				customAttributes.Add(customAttribute);
@@ -583,7 +584,7 @@ namespace Telerik.JustDecompiler.Languages
 			customAttributes.Sort((CustomAttribute x, CustomAttribute y) => this.CompareAttributes(x, y));
 			foreach (CustomAttribute customAttribute1 in customAttributes)
 			{
-				if (attributesToIgnore != null && attributesToIgnore.Contains(customAttribute1.AttributeType.FullName))
+				if (attributesToIgnore != null && attributesToIgnore.Contains(customAttribute1.get_AttributeType().get_FullName()))
 				{
 					continue;
 				}
@@ -622,11 +623,11 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				customAttributes.Add(customAttribute1);
 			}
-			customAttributes.AddRange(parameter.CustomAttributes);
+			customAttributes.AddRange(parameter.get_CustomAttributes());
 			int num = 0;
 			foreach (CustomAttribute customAttribute2 in customAttributes)
 			{
-				if (this.attributesNotToShow.Contains(customAttribute2.AttributeType.FullName))
+				if (this.attributesNotToShow.Contains(customAttribute2.get_AttributeType().get_FullName()))
 				{
 					continue;
 				}
@@ -673,24 +674,24 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteReturnValueAttributeKeyword();
 			}
-			string str = (attribute.AttributeType.Name.EndsWith("Attribute") ? attribute.AttributeType.Name.Remove(attribute.AttributeType.Name.LastIndexOf("Attribute")) : attribute.AttributeType.Name);
-			this.genericWriter.WriteNamespaceIfTypeInCollision(attribute.AttributeType);
-			this.genericWriter.WriteReference(str, attribute.AttributeType);
+			string str = (attribute.get_AttributeType().get_Name().EndsWith("Attribute") ? attribute.get_AttributeType().get_Name().Remove(attribute.get_AttributeType().get_Name().LastIndexOf("Attribute")) : attribute.get_AttributeType().get_Name());
+			this.genericWriter.WriteNamespaceIfTypeInCollision(attribute.get_AttributeType());
+			this.genericWriter.WriteReference(str, attribute.get_AttributeType());
 			this.genericWriter.WriteToken("(");
 			TypeReference securityActionTypeReference = securityDeclaration.GetSecurityActionTypeReference(module);
-			TypeDefinition typeDefinition = (securityActionTypeReference.IsDefinition ? securityActionTypeReference as TypeDefinition : securityActionTypeReference.Resolve());
-			if (typeDefinition != null && typeDefinition.IsEnum)
+			TypeDefinition typeDefinition = (securityActionTypeReference.get_IsDefinition() ? securityActionTypeReference as TypeDefinition : securityActionTypeReference.Resolve());
+			if (typeDefinition != null && typeDefinition.get_IsEnum())
 			{
-				List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.Fields, (Int32)securityDeclaration.Action, typeDefinition.CustomAttributes);
+				List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.get_Fields(), (Int32)securityDeclaration.get_Action(), typeDefinition.get_CustomAttributes());
 				if (enumFieldDefinitionByValue.Count == 0)
 				{
-					this.WriteSecurityAttributeAction(securityDeclaration.Action);
+					this.WriteSecurityAttributeAction(securityDeclaration.get_Action());
 				}
 				else
 				{
 					for (int i = 0; i < enumFieldDefinitionByValue.Count; i++)
 					{
-						this.genericWriter.WriteReferenceAndNamespaceIfInCollision(enumFieldDefinitionByValue[i].DeclaringType);
+						this.genericWriter.WriteReferenceAndNamespaceIfInCollision(enumFieldDefinitionByValue[i].get_DeclaringType());
 						this.genericWriter.WriteToken(".");
 						this.genericWriter.WriteEnumValueField(enumFieldDefinitionByValue[i]);
 						if (i + 1 < enumFieldDefinitionByValue.Count)
@@ -703,16 +704,16 @@ namespace Telerik.JustDecompiler.Languages
 				}
 			}
 			wroteArgument = true;
-			if (attribute.HasFields || attribute.HasProperties)
+			if (attribute.get_HasFields() || attribute.get_HasProperties())
 			{
-				TypeDefinition typeDefinition1 = attribute.AttributeType.Resolve();
-				if (attribute.HasProperties)
+				TypeDefinition typeDefinition1 = attribute.get_AttributeType().Resolve();
+				if (attribute.get_HasProperties())
 				{
-					wroteArgument = this.WriteAttributeNamedArgs(typeDefinition1, attribute.Properties, false, wroteArgument);
+					wroteArgument = this.WriteAttributeNamedArgs(typeDefinition1, attribute.get_Properties(), false, wroteArgument);
 				}
-				if (attribute.HasFields)
+				if (attribute.get_HasFields())
 				{
-					this.WriteAttributeNamedArgs(typeDefinition1, attribute.Fields, true, wroteArgument);
+					this.WriteAttributeNamedArgs(typeDefinition1, attribute.get_Fields(), true, wroteArgument);
 				}
 			}
 			this.genericWriter.WriteToken(")");
@@ -731,57 +732,57 @@ namespace Telerik.JustDecompiler.Languages
 			this.genericWriter.WriteToken(".");
 			switch (action)
 			{
-				case SecurityAction.Request:
+				case 1:
 				{
 					this.genericWriter.Write("");
 					return;
 				}
-				case SecurityAction.Demand:
-				case SecurityAction.NonCasDemand:
+				case 2:
+				case 13:
 				{
 					this.genericWriter.Write("Demand");
 					return;
 				}
-				case SecurityAction.Assert:
-				case SecurityAction.PreJitGrant:
+				case 3:
+				case 11:
 				{
 					this.genericWriter.Write("Assert");
 					return;
 				}
-				case SecurityAction.Deny:
-				case SecurityAction.PreJitDeny:
+				case 4:
+				case 12:
 				{
 					this.genericWriter.Write("Deny");
 					return;
 				}
-				case SecurityAction.PermitOnly:
+				case 5:
 				{
 					this.genericWriter.Write("PermitOnly");
 					return;
 				}
-				case SecurityAction.LinkDemand:
-				case SecurityAction.NonCasLinkDemand:
+				case 6:
+				case 14:
 				{
 					this.genericWriter.Write("LinkDemand");
 					return;
 				}
-				case SecurityAction.InheritDemand:
-				case SecurityAction.NonCasInheritance:
+				case 7:
+				case 15:
 				{
 					this.genericWriter.Write("InheritanceDemand");
 					return;
 				}
-				case SecurityAction.RequestMinimum:
+				case 8:
 				{
 					this.genericWriter.Write("RequestMinimum");
 					return;
 				}
-				case SecurityAction.RequestOptional:
+				case 9:
 				{
 					this.genericWriter.Write("RequestOptional");
 					return;
 				}
-				case SecurityAction.RequestRefuse:
+				case 10:
 				{
 					this.genericWriter.Write("RequestRefuse");
 					return;
@@ -796,11 +797,11 @@ namespace Telerik.JustDecompiler.Languages
 		private IEnumerable<ICustomAttribute> WriteTypeDefinitionFieldsAsAttributes(TypeDefinition member)
 		{
 			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>();
-			if (member.IsSerializable)
+			if (member.get_IsSerializable())
 			{
 				customAttributes.Add(AttributesUtilities.GetTypeSerializableAttribute(member));
 			}
-			if (member.IsExplicitLayout)
+			if (member.get_IsExplicitLayout())
 			{
 				customAttributes.Add(AttributesUtilities.GetTypeExplicitLayoutAttribute(member));
 			}

@@ -28,8 +28,8 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			TypeDefinition systemTypeTypeDefinition = this.GetSystemTypeTypeDefinition();
 			MethodReference systemTypeMethodReference = this.GetSystemTypeMethodReference(systemTypeTypeDefinition, "GetField", new String[] { "System.String" });
-			MethodInvocationExpression methodInvocationExpression = new MethodInvocationExpression(new MethodReferenceExpression(new TypeOfExpression(fieldReference.DeclaringType, null), systemTypeMethodReference, null), null);
-			methodInvocationExpression.Arguments.Add(new LiteralExpression(fieldReference.Name, this.typeSystem, null));
+			MethodInvocationExpression methodInvocationExpression = new MethodInvocationExpression(new MethodReferenceExpression(new TypeOfExpression(fieldReference.get_DeclaringType(), null), systemTypeMethodReference, null), null);
+			methodInvocationExpression.Arguments.Add(new LiteralExpression(fieldReference.get_Name(), this.typeSystem, null));
 			MethodReference handlePropertyGetterReference = this.GetHandlePropertyGetterReference(typeof(FieldInfo), "get_FieldHandle");
 			return new PropertyReferenceExpression(new MethodInvocationExpression(new MethodReferenceExpression(methodInvocationExpression, handlePropertyGetterReference, null), instructions), null);
 		}
@@ -37,9 +37,9 @@ namespace Telerik.JustDecompiler.Steps
 		private MethodReference GetHandlePropertyGetterReference(Type type, string getterName)
 		{
 			MethodReference methodReference = null;
-			foreach (MethodDefinition method in Utilities.GetCorlibTypeReference(type, this.context.TypeContext.CurrentType.Module).Resolve().Methods)
+			foreach (MethodDefinition method in Utilities.GetCorlibTypeReference(type, this.context.TypeContext.CurrentType.get_Module()).Resolve().get_Methods())
 			{
-				if (!(method.Name == getterName) || !method.IsGetter)
+				if (!(method.get_Name() == getterName) || !method.get_IsGetter())
 				{
 					continue;
 				}
@@ -52,17 +52,17 @@ namespace Telerik.JustDecompiler.Steps
 		private Expression GetMethodHandleExpression(MethodReference methodReference, IEnumerable<Instruction> instructions)
 		{
 			TypeDefinition systemTypeTypeDefinition = this.GetSystemTypeTypeDefinition();
-			MethodReference systemTypeMethodReference = this.GetSystemTypeMethodReference(systemTypeTypeDefinition, "GetMethod", (methodReference.HasParameters ? new String[] { "System.String", "System.Type[]" } : new String[] { "System.String" }));
+			MethodReference systemTypeMethodReference = this.GetSystemTypeMethodReference(systemTypeTypeDefinition, "GetMethod", (methodReference.get_HasParameters() ? new String[] { "System.String", "System.Type[]" } : new String[] { "System.String" }));
 			MethodReference handlePropertyGetterReference = this.GetHandlePropertyGetterReference(typeof(MethodBase), "get_MethodHandle");
-			MethodInvocationExpression methodInvocationExpression = new MethodInvocationExpression(new MethodReferenceExpression(new TypeOfExpression(methodReference.DeclaringType, null), systemTypeMethodReference, null), null);
-			LiteralExpression literalExpression = new LiteralExpression(methodReference.Name, this.typeSystem, null);
+			MethodInvocationExpression methodInvocationExpression = new MethodInvocationExpression(new MethodReferenceExpression(new TypeOfExpression(methodReference.get_DeclaringType(), null), systemTypeMethodReference, null), null);
+			LiteralExpression literalExpression = new LiteralExpression(methodReference.get_Name(), this.typeSystem, null);
 			methodInvocationExpression.Arguments.Add(literalExpression);
-			if (methodReference.HasParameters)
+			if (methodReference.get_HasParameters())
 			{
 				BlockExpression blockExpression = new BlockExpression(null);
-				foreach (ParameterDefinition parameter in methodReference.Parameters)
+				foreach (ParameterDefinition parameter in methodReference.get_Parameters())
 				{
-					blockExpression.Expressions.Add(new TypeOfExpression(parameter.ParameterType, null));
+					blockExpression.Expressions.Add(new TypeOfExpression(parameter.get_ParameterType(), null));
 				}
 				ArrayCreationExpression arrayCreationExpression = new ArrayCreationExpression(systemTypeTypeDefinition, new InitializerExpression(blockExpression, InitializerType.ArrayInitializer), null);
 				arrayCreationExpression.Dimensions.Add(new LiteralExpression((object)blockExpression.Expressions.Count, this.typeSystem, null));
@@ -74,17 +74,17 @@ namespace Telerik.JustDecompiler.Steps
 		private MethodReference GetSystemTypeMethodReference(TypeDefinition corlibTypeTypeDefinition, string methodName, string[] parametersNames)
 		{
 			MethodReference methodReference = null;
-			foreach (MethodDefinition method in corlibTypeTypeDefinition.Methods)
+			foreach (MethodDefinition method in corlibTypeTypeDefinition.get_Methods())
 			{
-				if (!(method.Name == methodName) || method.Parameters.Count != (int)parametersNames.Length)
+				if (!(method.get_Name() == methodName) || method.get_Parameters().get_Count() != (int)parametersNames.Length)
 				{
 					continue;
 				}
 				bool flag = true;
 				int num = 0;
-				while (num < method.Parameters.Count)
+				while (num < method.get_Parameters().get_Count())
 				{
-					if (method.Parameters[num].ParameterType.FullName == parametersNames[num])
+					if (method.get_Parameters().get_Item(num).get_ParameterType().get_FullName() == parametersNames[num])
 					{
 						num++;
 					}
@@ -109,7 +109,7 @@ namespace Telerik.JustDecompiler.Steps
 			TypeDefinition typeDefinition = this.cachedSystemTypeTypeDefinition;
 			if (typeDefinition == null)
 			{
-				TypeDefinition typeDefinition1 = Utilities.GetCorlibTypeReference(typeof(Type), this.context.TypeContext.CurrentType.Module).Resolve();
+				TypeDefinition typeDefinition1 = Utilities.GetCorlibTypeReference(typeof(Type), this.context.TypeContext.CurrentType.get_Module()).Resolve();
 				TypeDefinition typeDefinition2 = typeDefinition1;
 				this.cachedSystemTypeTypeDefinition = typeDefinition1;
 				typeDefinition = typeDefinition2;
@@ -127,7 +127,7 @@ namespace Telerik.JustDecompiler.Steps
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.typeSystem = context.TypeContext.CurrentType.Module.TypeSystem;
+			this.typeSystem = context.TypeContext.CurrentType.get_Module().get_TypeSystem();
 			return (BlockStatement)this.Visit(body);
 		}
 

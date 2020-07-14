@@ -39,7 +39,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				MethodInvocationExpression methodInvocationExpression = expression1 as MethodInvocationExpression;
 				MethodDefinition methodDefinition = methodInvocationExpression.MethodExpression.MethodDefinition;
-				if (!base.CompareTargets(expression, methodInvocationExpression.MethodExpression.Target) || methodDefinition.Name != "Add" || methodInvocationExpression.Arguments.Count == 0)
+				if (!base.CompareTargets(expression, methodInvocationExpression.MethodExpression.Target) || methodDefinition.get_Name() != "Add" || methodInvocationExpression.Arguments.Count == 0)
 				{
 					break;
 				}

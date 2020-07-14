@@ -49,13 +49,13 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			string name;
 			List<Expression> expressions = new List<Expression>();
-			method.Parameters.Add(this.CreateParameter("JustDecompileGenerated_Exception", variable.Variable.VariableType));
+			method.get_Parameters().Add(this.CreateParameter("JustDecompileGenerated_Exception", variable.Variable.get_VariableType()));
 			expressions.Add(new UnaryExpression(UnaryOperator.AddressReference, new VariableReferenceExpression(variable.Variable, null), null));
 			if (this.catchClausesUsedVariablesMap.ContainsKey(catchClause))
 			{
 				foreach (VariableDefinition item in this.catchClausesUsedVariablesMap[catchClause])
 				{
-					if (!this.variablesUsedOutsideFilters.Contains(item) || item == variable.Variable)
+					if (!this.variablesUsedOutsideFilters.Contains(item) || (object)item == (object)variable.Variable)
 					{
 						continue;
 					}
@@ -65,10 +65,10 @@ namespace Telerik.JustDecompiler.Steps
 					}
 					else
 					{
-						name = item.Name;
+						name = item.get_Name();
 					}
 					string str = name;
-					ParameterDefinition parameterDefinition = this.CreateParameter(str, item.VariableType);
+					ParameterDefinition parameterDefinition = this.CreateParameter(str, item.get_VariableType());
 					if (str == null)
 					{
 						if (!this.catchClausesVariablesToParametersMap.ContainsKey(catchClause))
@@ -77,7 +77,7 @@ namespace Telerik.JustDecompiler.Steps
 						}
 						this.catchClausesVariablesToParametersMap[catchClause].Add(item, parameterDefinition);
 					}
-					method.Parameters.Add(parameterDefinition);
+					method.get_Parameters().Add(parameterDefinition);
 					expressions.Add(new UnaryExpression(UnaryOperator.AddressReference, new VariableReferenceExpression(item, null), null));
 				}
 			}
@@ -85,7 +85,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				foreach (ParameterDefinition item1 in this.catchClausesUsedParametersMap[catchClause])
 				{
-					method.Parameters.Add(this.CreateParameter(item1.Name, item1.ParameterType));
+					method.get_Parameters().Add(this.CreateParameter(item1.get_Name(), item1.get_ParameterType()));
 					expressions.Add(new UnaryExpression(UnaryOperator.AddressReference, new ArgumentReferenceExpression(item1, null), null));
 				}
 			}
@@ -151,17 +151,15 @@ namespace Telerik.JustDecompiler.Steps
 			ExpressionStatement returnExpression = filter.Statements.Last<Statement>() as ExpressionStatement;
 			returnExpression.Expression = new ReturnExpression(returnExpression.Expression, returnExpression.Expression.MappedInstructions);
 			int count = this.context.TypeContext.GeneratedFilterMethods.Count + this.methodsToBeDecompiled.Count;
-			MethodDefinition methodDefinition = new MethodDefinition(String.Format("JustDecompileGenerated_Filter_{0}", count), MethodAttributes.Private, this.context.MethodContext.Method.Module.TypeSystem.Boolean)
-			{
-				Body = new MethodBody(methodDefinition),
-				MetadataToken = new MetadataToken(Mono.Cecil.TokenType.Method, (uint)(0xffffff - count)),
-				IsStatic = this.context.MethodContext.Method.IsStatic,
-				HasThis = !methodDefinition.IsStatic,
-				DeclaringType = this.context.MethodContext.Method.DeclaringType,
-				SemanticsAttributes = MethodSemanticsAttributes.None,
-				IsJustDecompileGenerated = true
-			};
-			DecompilationContext decompilationContext = new DecompilationContext(this.CloneAndReplaceMethodBody(this.context.MethodContext, methodDefinition.Body), this.context.TypeContext, this.context.Language);
+			MethodDefinition methodDefinition = new MethodDefinition(String.Format("JustDecompileGenerated_Filter_{0}", count), 1, this.context.MethodContext.Method.get_Module().get_TypeSystem().get_Boolean());
+			methodDefinition.set_Body(new MethodBody(methodDefinition));
+			methodDefinition.set_MetadataToken(new MetadataToken(0x6000000, (uint)(0xffffff - count)));
+			methodDefinition.set_IsStatic(this.context.MethodContext.Method.get_IsStatic());
+			methodDefinition.set_HasThis(!methodDefinition.get_IsStatic());
+			methodDefinition.set_DeclaringType(this.context.MethodContext.Method.get_DeclaringType());
+			methodDefinition.set_SemanticsAttributes(0);
+			methodDefinition.set_IsJustDecompileGenerated(true);
+			DecompilationContext decompilationContext = new DecompilationContext(this.CloneAndReplaceMethodBody(this.context.MethodContext, methodDefinition.get_Body()), this.context.TypeContext, this.context.Language);
 			VariableDefinition variableDefinition = expression.Variable.Resolve();
 			if (decompilationContext.MethodContext.VariableDefinitionToNameMap.ContainsKey(variableDefinition))
 			{
@@ -180,13 +178,13 @@ namespace Telerik.JustDecompiler.Steps
 		private MethodInvocationExpression CreateMethodInvocation(MethodDefinition method, List<Expression> arguments)
 		{
 			Expression thisReferenceExpression;
-			if (method.IsStatic)
+			if (method.get_IsStatic())
 			{
 				thisReferenceExpression = null;
 			}
 			else
 			{
-				thisReferenceExpression = new ThisReferenceExpression(method.DeclaringType, null);
+				thisReferenceExpression = new ThisReferenceExpression(method.get_DeclaringType(), null);
 			}
 			MethodInvocationExpression methodInvocationExpression = new MethodInvocationExpression(new MethodReferenceExpression(thisReferenceExpression, method, null), null);
 			foreach (Expression argument in arguments)
@@ -198,7 +196,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private ParameterDefinition CreateParameter(string name, TypeReference type)
 		{
-			return new ParameterDefinition(name, ParameterAttributes.None, new ByReferenceType(type));
+			return new ParameterDefinition(name, 0, new ByReferenceType(type));
 		}
 
 		private void DecompileMethods()
@@ -207,9 +205,9 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				this.AddVariablesToNotDeclare(filterMethodToBeDecompiled.Context, filterMethodToBeDecompiled.CatchClause);
 				BlockDecompilationPipeline blockDecompilationPipeline = this.context.Language.CreateFilterMethodPipeline(filterMethodToBeDecompiled.Context);
-				DecompilationContext decompilationContext = blockDecompilationPipeline.Run(filterMethodToBeDecompiled.Method.Body, filterMethodToBeDecompiled.Block, this.context.Language);
+				DecompilationContext decompilationContext = blockDecompilationPipeline.Run(filterMethodToBeDecompiled.Method.get_Body(), filterMethodToBeDecompiled.Block, this.context.Language);
 				this.context.TypeContext.GeneratedFilterMethods.Add(new GeneratedMethod(filterMethodToBeDecompiled.Method, blockDecompilationPipeline.Body, decompilationContext.MethodContext));
-				this.context.TypeContext.GeneratedMethodDefinitionToNameMap.Add(filterMethodToBeDecompiled.Method, filterMethodToBeDecompiled.Method.Name);
+				this.context.TypeContext.GeneratedMethodDefinitionToNameMap.Add(filterMethodToBeDecompiled.Method, filterMethodToBeDecompiled.Method.get_Name());
 				this.FixVariablesNames(decompilationContext, filterMethodToBeDecompiled.CatchClause);
 			}
 		}
@@ -227,7 +225,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			if (!context.MethodContext.Body.ExceptionHandlers.Any<ExceptionHandler>((ExceptionHandler eh) => eh.HandlerType == ExceptionHandlerType.Filter))
+			if (!context.MethodContext.Body.get_ExceptionHandlers().Any<ExceptionHandler>((ExceptionHandler eh) => eh.get_HandlerType() == 1))
 			{
 				return body;
 			}
@@ -271,7 +269,7 @@ namespace Telerik.JustDecompiler.Steps
 			bool flag = CatchClausesFilterPattern.TryMatch(node.Filter as BlockStatement, out variableDeclarationExpression, out expression);
 			if (!flag)
 			{
-				if (variableDeclarationExpression == null || variableDeclarationExpression.ExpressionType.FullName == "System.Object" || !CatchClausesFilterPattern.TryMatchMethodStructure(node.Filter as BlockStatement))
+				if (variableDeclarationExpression == null || variableDeclarationExpression.ExpressionType.get_FullName() == "System.Object" || !CatchClausesFilterPattern.TryMatchMethodStructure(node.Filter as BlockStatement))
 				{
 					throw new NotSupportedException("Unsupported structure of filter clause.");
 				}

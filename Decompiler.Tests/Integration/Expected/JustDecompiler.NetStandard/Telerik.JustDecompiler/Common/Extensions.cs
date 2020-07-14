@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Common
 		public static bool? ResolveToOverloadedEqualityOperator(TypeReference type, out TypeReference lastResolvedType)
 		{
 			bool? nullable;
-			if (type.IsValueType || type.IsFunctionPointer || type.IsPrimitive || type.IsGenericParameter)
+			if (type.get_IsValueType() || type.get_IsFunctionPointer() || type.get_IsPrimitive() || type.get_IsGenericParameter())
 			{
 				throw new NotSupportedException();
 			}
@@ -90,24 +90,24 @@ namespace Telerik.JustDecompiler.Common
 				nullable = null;
 				return nullable;
 			}
-			if (typeDefinition.IsInterface)
+			if (typeDefinition.get_IsInterface())
 			{
 				return new bool?(false);
 			}
-			while (typeDefinition.Name != "Object")
+			while (typeDefinition.get_Name() != "Object")
 			{
-				if (typeDefinition.Methods.Any<MethodDefinition>((MethodDefinition m) => {
-					if (m.Name == "op_Equality")
+				if (typeDefinition.get_Methods().Any<MethodDefinition>((MethodDefinition m) => {
+					if (m.get_Name() == "op_Equality")
 					{
 						return true;
 					}
-					return m.Name == "op_Inequality";
+					return m.get_Name() == "op_Inequality";
 				}))
 				{
 					return new bool?(true);
 				}
-				lastResolvedType = typeDefinition.BaseType;
-				TypeDefinition typeDefinition1 = typeDefinition.BaseType.Resolve();
+				lastResolvedType = typeDefinition.get_BaseType();
+				TypeDefinition typeDefinition1 = typeDefinition.get_BaseType().Resolve();
 				if (typeDefinition1 == null)
 				{
 					nullable = null;
@@ -123,133 +123,133 @@ namespace Telerik.JustDecompiler.Common
 			string empty = String.Empty;
 			switch (self)
 			{
-				case FrameworkVersion.v1_0:
+				case 1:
 				{
 					empty = "1.0";
 					break;
 				}
-				case FrameworkVersion.v1_1:
-				case FrameworkVersion.WinRT_System:
+				case 2:
+				case 25:
 				{
 					return String.Empty;
 				}
-				case FrameworkVersion.v2_0:
+				case 3:
 				{
 					empty = "2.0";
 					break;
 				}
-				case FrameworkVersion.v3_0:
+				case 4:
 				{
 					empty = "3.0";
 					break;
 				}
-				case FrameworkVersion.v3_5:
+				case 5:
 				{
 					empty = "3.5";
 					break;
 				}
-				case FrameworkVersion.v4_0:
+				case 6:
 				{
 					empty = "4.0";
 					break;
 				}
-				case FrameworkVersion.v4_5:
+				case 7:
 				{
 					empty = "4.5";
 					break;
 				}
-				case FrameworkVersion.v4_5_1:
+				case 8:
 				{
 					empty = "4.5.1";
 					break;
 				}
-				case FrameworkVersion.v4_5_2:
+				case 9:
 				{
 					empty = "4.5.2";
 					break;
 				}
-				case FrameworkVersion.v4_6:
+				case 10:
 				{
 					empty = "4.6";
 					break;
 				}
-				case FrameworkVersion.v4_6_1:
+				case 11:
 				{
 					empty = "4.6.1";
 					break;
 				}
-				case FrameworkVersion.v4_6_2:
+				case 12:
 				{
 					empty = "4.6.2";
 					break;
 				}
-				case FrameworkVersion.v4_7:
+				case 13:
 				{
 					empty = "4.7";
 					break;
 				}
-				case FrameworkVersion.v4_7_1:
+				case 14:
 				{
 					empty = "4.7.1";
 					break;
 				}
-				case FrameworkVersion.Silverlight:
-				case FrameworkVersion.WindowsPhone:
-				case FrameworkVersion.WindowsCE:
+				case 15:
+				case 16:
+				case 17:
 				{
 					return self.ToString();
 				}
-				case FrameworkVersion.NetPortableV4_0:
+				case 18:
 				{
 					empty = ".NETPortable v4.0";
 					break;
 				}
-				case FrameworkVersion.NetPortableV4_6:
+				case 19:
 				{
 					empty = ".NETPortable v4.6";
 					break;
 				}
-				case FrameworkVersion.NetPortableV4_5:
+				case 20:
 				{
 					empty = ".NETPortable v4.5";
 					break;
 				}
-				case FrameworkVersion.NetPortableV5_0:
+				case 21:
 				{
 					empty = ".NETPortable v5.0";
 					break;
 				}
-				case FrameworkVersion.WinRT_4_5:
+				case 22:
 				{
 					empty = "WinRT - 4.5";
 					break;
 				}
-				case FrameworkVersion.WinRT_4_5_1:
+				case 23:
 				{
 					empty = "WinRT - 4.5.1";
 					break;
 				}
-				case FrameworkVersion.UWP:
+				case 24:
 				{
 					empty = "UWP";
 					break;
 				}
-				case FrameworkVersion.NetCoreV2_1:
+				case 26:
 				{
 					empty = "netcoreapp2.1";
 					break;
 				}
-				case FrameworkVersion.NetCoreV2_0:
+				case 27:
 				{
 					empty = "netcoreapp2.0";
 					break;
 				}
-				case FrameworkVersion.NetCoreV1_1:
+				case 28:
 				{
 					empty = "netcoreapp1.1";
 					break;
 				}
-				case FrameworkVersion.NetCoreV1_0:
+				case 29:
 				{
 					empty = "netcoreapp1.0";
 					break;

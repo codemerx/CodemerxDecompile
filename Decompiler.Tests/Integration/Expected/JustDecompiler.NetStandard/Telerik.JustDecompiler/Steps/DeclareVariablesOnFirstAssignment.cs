@@ -244,7 +244,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			if (variable.VariableType.IsByReference)
+			if (variable.get_VariableType().get_IsByReference())
 			{
 				return new RefVariableDeclarationExpression(variable, node.UnderlyingSameMethodInstructions);
 			}

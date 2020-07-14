@@ -10,16 +10,16 @@ namespace Mono.Cecil.Extensions
 	{
 		public static TypeReference FixedPropertyType(this PropertyReference self)
 		{
-			TypeReference propertyType = self.PropertyType;
+			TypeReference propertyType = self.get_PropertyType();
 			if (propertyType is GenericParameter)
 			{
 				GenericParameter genericParameter = propertyType as GenericParameter;
-				if (genericParameter.Owner is GenericInstanceType)
+				if (genericParameter.get_Owner() is GenericInstanceType)
 				{
-					GenericInstanceType owner = genericParameter.Owner as GenericInstanceType;
-					if (owner.PostionToArgument.ContainsKey(genericParameter.Position))
+					GenericInstanceType owner = genericParameter.get_Owner() as GenericInstanceType;
+					if (owner.get_PostionToArgument().ContainsKey(genericParameter.get_Position()))
 					{
-						propertyType = owner.PostionToArgument[genericParameter.Position];
+						propertyType = owner.get_PostionToArgument()[genericParameter.get_Position()];
 					}
 				}
 			}
@@ -33,9 +33,9 @@ namespace Mono.Cecil.Extensions
 			{
 				return implementedMembers;
 			}
-			if (self.GetMethod != null)
+			if (self.get_GetMethod() != null)
 			{
-				foreach (ImplementedMember explicitlyImplementedMethod in self.GetMethod.GetExplicitlyImplementedMethods())
+				foreach (ImplementedMember explicitlyImplementedMethod in self.get_GetMethod().GetExplicitlyImplementedMethods())
 				{
 					PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(explicitlyImplementedMethod.Member as MethodReference);
 					if (methodDeclaringProperty == null)
@@ -46,11 +46,11 @@ namespace Mono.Cecil.Extensions
 				}
 				return implementedMembers;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return implementedMembers;
 			}
-			foreach (ImplementedMember implementedMember in self.SetMethod.GetExplicitlyImplementedMethods())
+			foreach (ImplementedMember implementedMember in self.get_SetMethod().GetExplicitlyImplementedMethods())
 			{
 				PropertyDefinition propertyDefinition = PropertyDefinitionExtensions.GetMethodDeclaringProperty(implementedMember.Member as MethodReference);
 				if (propertyDefinition == null)
@@ -70,9 +70,9 @@ namespace Mono.Cecil.Extensions
 			{
 				return implementedMembers;
 			}
-			if (propertyDefinition.GetMethod != null)
+			if (propertyDefinition.get_GetMethod() != null)
 			{
-				foreach (ImplementedMember implementedMethod in propertyDefinition.GetMethod.GetImplementedMethods())
+				foreach (ImplementedMember implementedMethod in propertyDefinition.get_GetMethod().GetImplementedMethods())
 				{
 					PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(implementedMethod.Member as MethodReference);
 					if (methodDeclaringProperty == null)
@@ -83,11 +83,11 @@ namespace Mono.Cecil.Extensions
 				}
 				return implementedMembers;
 			}
-			if (propertyDefinition.SetMethod == null)
+			if (propertyDefinition.get_SetMethod() == null)
 			{
 				return implementedMembers;
 			}
-			foreach (ImplementedMember implementedMember in propertyDefinition.SetMethod.GetImplementedMethods())
+			foreach (ImplementedMember implementedMember in propertyDefinition.get_SetMethod().GetImplementedMethods())
 			{
 				PropertyDefinition methodDeclaringProperty1 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(implementedMember.Member as MethodReference);
 				if (methodDeclaringProperty1 == null)
@@ -106,16 +106,16 @@ namespace Mono.Cecil.Extensions
 			{
 				return null;
 			}
-			TypeDefinition typeDefinition = method.DeclaringType.Resolve();
+			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
 			if (typeDefinition != null)
 			{
-				Collection<PropertyDefinition>.Enumerator enumerator = typeDefinition.Properties.GetEnumerator();
+				Collection<PropertyDefinition>.Enumerator enumerator = typeDefinition.get_Properties().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						PropertyDefinition current = enumerator.Current;
-						if ((current.GetMethod == null || !current.GetMethod.HasSameSignatureWith(method)) && (current.SetMethod == null || !current.SetMethod.HasSameSignatureWith(method)))
+						PropertyDefinition current = enumerator.get_Current();
+						if ((current.get_GetMethod() == null || !current.get_GetMethod().HasSameSignatureWith(method)) && (current.get_SetMethod() == null || !current.get_SetMethod().HasSameSignatureWith(method)))
 						{
 							continue;
 						}
@@ -126,7 +126,7 @@ namespace Mono.Cecil.Extensions
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 				return propertyDefinition;
 			}
@@ -139,9 +139,9 @@ namespace Mono.Cecil.Extensions
 			{
 				property
 			};
-			if (property.GetMethod != null)
+			if (property.get_GetMethod() != null)
 			{
-				foreach (MethodDefinition overridenAndImplementedMethod in property.GetMethod.GetOverridenAndImplementedMethods())
+				foreach (MethodDefinition overridenAndImplementedMethod in property.get_GetMethod().GetOverridenAndImplementedMethods())
 				{
 					PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(overridenAndImplementedMethod);
 					if (methodDeclaringProperty == null)
@@ -151,9 +151,9 @@ namespace Mono.Cecil.Extensions
 					propertyDefinitions.Add(methodDeclaringProperty);
 				}
 			}
-			else if (property.SetMethod != null)
+			else if (property.get_SetMethod() != null)
 			{
-				foreach (MethodDefinition methodDefinition in property.SetMethod.GetOverridenAndImplementedMethods())
+				foreach (MethodDefinition methodDefinition in property.get_SetMethod().GetOverridenAndImplementedMethods())
 				{
 					PropertyDefinition propertyDefinition = PropertyDefinitionExtensions.GetMethodDeclaringProperty(methodDefinition);
 					if (propertyDefinition == null)
@@ -169,18 +169,18 @@ namespace Mono.Cecil.Extensions
 		private static bool HasAttribute(TypeDefinition declaringType, string attributeType, out CustomAttribute attribute)
 		{
 			bool flag;
-			Collection<CustomAttribute>.Enumerator enumerator = declaringType.CustomAttributes.GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = declaringType.get_CustomAttributes().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					CustomAttribute current = enumerator.Current;
-					if (current.AttributeType.FullName != attributeType)
+					CustomAttribute current = enumerator.get_Current();
+					if (current.get_AttributeType().get_FullName() != attributeType)
 					{
 						continue;
 					}
 					attribute = current;
-					if (!attribute.IsResolved)
+					if (!attribute.get_IsResolved())
 					{
 						attribute.Resolve();
 					}
@@ -192,22 +192,22 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
 
 		public static bool IsAbstract(this PropertyDefinition self)
 		{
-			if (self.GetMethod != null && !self.GetMethod.IsAbstract)
+			if (self.get_GetMethod() != null && !self.get_GetMethod().get_IsAbstract())
 			{
 				return false;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return true;
 			}
-			return self.SetMethod.IsAbstract;
+			return self.get_SetMethod().get_IsAbstract();
 		}
 
 		public static bool IsExplicitImplementation(this PropertyReference self)
@@ -217,11 +217,11 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (propertyDefinition.GetMethod != null && propertyDefinition.GetMethod.HasOverrides && propertyDefinition.GetMethod.IsPrivate)
+			if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasOverrides() && propertyDefinition.get_GetMethod().get_IsPrivate())
 			{
 				return true;
 			}
-			if (propertyDefinition.SetMethod != null && propertyDefinition.SetMethod.HasOverrides && propertyDefinition.SetMethod.IsPrivate)
+			if (propertyDefinition.get_SetMethod() != null && propertyDefinition.get_SetMethod().get_HasOverrides() && propertyDefinition.get_SetMethod().get_IsPrivate())
 			{
 				return true;
 			}
@@ -230,28 +230,28 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsExplicitImplementationOf(this PropertyDefinition self, TypeDefinition @interface)
 		{
-			if (self.GetMethod != null && self.GetMethod.IsExplicitImplementationOf(@interface))
+			if (self.get_GetMethod() != null && self.get_GetMethod().IsExplicitImplementationOf(@interface))
 			{
 				return true;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return self.SetMethod.IsExplicitImplementationOf(@interface);
+			return self.get_SetMethod().IsExplicitImplementationOf(@interface);
 		}
 
 		public static bool IsFinal(this PropertyDefinition self)
 		{
-			if (self.GetMethod != null && !self.GetMethod.IsFinal)
+			if (self.get_GetMethod() != null && !self.get_GetMethod().get_IsFinal())
 			{
 				return false;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return true;
 			}
-			return self.SetMethod.IsFinal;
+			return self.get_SetMethod().get_IsFinal();
 		}
 
 		public static bool IsIndexer(this PropertyReference self)
@@ -260,19 +260,20 @@ namespace Mono.Cecil.Extensions
 			Collection<MethodReference>.Enumerator enumerator;
 			bool flag;
 			TypeDefinition typeDefinition;
-			if (self.DeclaringType != null)
+			if (self.get_DeclaringType() != null)
 			{
-				typeDefinition = self.DeclaringType.Resolve();
+				typeDefinition = self.get_DeclaringType().Resolve();
 			}
 			else
 			{
 				typeDefinition = null;
 			}
 			TypeDefinition typeDefinition1 = typeDefinition;
-			if (typeDefinition1 != null && typeDefinition1.HasCustomAttributes && PropertyDefinitionExtensions.HasAttribute(typeDefinition1, "System.Reflection.DefaultMemberAttribute", out customAttribute))
+			if (typeDefinition1 != null && typeDefinition1.get_HasCustomAttributes() && PropertyDefinitionExtensions.HasAttribute(typeDefinition1, "System.Reflection.DefaultMemberAttribute", out customAttribute))
 			{
-				string str = customAttribute.ConstructorArguments[0].Value.ToString();
-				if (self.Name == str)
+				CustomAttributeArgument item = customAttribute.get_ConstructorArguments().get_Item(0);
+				string str = item.get_Value().ToString();
+				if (self.get_Name() == str)
 				{
 					return true;
 				}
@@ -280,14 +281,14 @@ namespace Mono.Cecil.Extensions
 				{
 					return false;
 				}
-				return self.Name.EndsWith(String.Concat(".", str));
+				return self.get_Name().EndsWith(String.Concat(".", str));
 			}
 			PropertyDefinition propertyDefinition = self.Resolve();
 			if (propertyDefinition != null)
 			{
-				if (propertyDefinition.GetMethod != null && propertyDefinition.GetMethod.HasOverrides)
+				if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasOverrides())
 				{
-					foreach (MethodReference @override in propertyDefinition.GetMethod.Overrides)
+					foreach (MethodReference @override in propertyDefinition.get_GetMethod().get_Overrides())
 					{
 						PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(@override);
 						if (methodDeclaringProperty == null || !methodDeclaringProperty.IsIndexer())
@@ -298,14 +299,14 @@ namespace Mono.Cecil.Extensions
 						return flag;
 					}
 				}
-				if (propertyDefinition.SetMethod != null && propertyDefinition.SetMethod.HasOverrides)
+				if (propertyDefinition.get_SetMethod() != null && propertyDefinition.get_SetMethod().get_HasOverrides())
 				{
-					enumerator = propertyDefinition.SetMethod.Overrides.GetEnumerator();
+					enumerator = propertyDefinition.get_SetMethod().get_Overrides().GetEnumerator();
 					try
 					{
 						while (enumerator.MoveNext())
 						{
-							PropertyDefinition methodDeclaringProperty1 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(enumerator.Current);
+							PropertyDefinition methodDeclaringProperty1 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(enumerator.get_Current());
 							if (methodDeclaringProperty1 == null || !methodDeclaringProperty1.IsIndexer())
 							{
 								continue;
@@ -317,7 +318,7 @@ namespace Mono.Cecil.Extensions
 					}
 					finally
 					{
-						((IDisposable)enumerator).Dispose();
+						enumerator.Dispose();
 					}
 				}
 				else
@@ -331,54 +332,54 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsNewSlot(this PropertyDefinition self)
 		{
-			if (self.GetMethod != null && !self.GetMethod.IsNewSlot)
+			if (self.get_GetMethod() != null && !self.get_GetMethod().get_IsNewSlot())
 			{
 				return false;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return true;
 			}
-			return self.SetMethod.IsNewSlot;
+			return self.get_SetMethod().get_IsNewSlot();
 		}
 
 		public static bool IsPrivate(this PropertyDefinition self)
 		{
-			if (self.GetMethod != null && !self.GetMethod.IsPrivate)
+			if (self.get_GetMethod() != null && !self.get_GetMethod().get_IsPrivate())
 			{
 				return false;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return true;
 			}
-			return self.SetMethod.IsPrivate;
+			return self.get_SetMethod().get_IsPrivate();
 		}
 
 		public static bool IsStatic(this PropertyDefinition self)
 		{
-			if (self.GetMethod != null && !self.GetMethod.IsStatic)
+			if (self.get_GetMethod() != null && !self.get_GetMethod().get_IsStatic())
 			{
 				return false;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return true;
 			}
-			return self.SetMethod.IsStatic;
+			return self.get_SetMethod().get_IsStatic();
 		}
 
 		public static bool IsVirtual(this PropertyDefinition self)
 		{
-			if (self.GetMethod != null && !self.GetMethod.IsVirtual)
+			if (self.get_GetMethod() != null && !self.get_GetMethod().get_IsVirtual())
 			{
 				return false;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return true;
 			}
-			return self.SetMethod.IsVirtual;
+			return self.get_SetMethod().get_IsVirtual();
 		}
 
 		public static bool ShouldStaySplit(this PropertyDefinition self)
@@ -396,15 +397,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.GetMethod != null && self.GetMethod.IsAbstract)
+			if (self.get_GetMethod() != null && self.get_GetMethod().get_IsAbstract())
 			{
 				return true;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return self.SetMethod.IsAbstract;
+			return self.get_SetMethod().get_IsAbstract();
 		}
 
 		private static bool SplitFinal(this PropertyDefinition self)
@@ -413,15 +414,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.GetMethod != null && self.GetMethod.IsFinal)
+			if (self.get_GetMethod() != null && self.get_GetMethod().get_IsFinal())
 			{
 				return true;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return self.SetMethod.IsFinal;
+			return self.get_SetMethod().get_IsFinal();
 		}
 
 		private static bool SplitNewslot(this PropertyDefinition self)
@@ -430,15 +431,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.GetMethod != null && self.GetMethod.IsNewSlot)
+			if (self.get_GetMethod() != null && self.get_GetMethod().get_IsNewSlot())
 			{
 				return true;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return self.SetMethod.IsNewSlot;
+			return self.get_SetMethod().get_IsNewSlot();
 		}
 
 		private static bool SplitStatic(this PropertyDefinition self)
@@ -447,15 +448,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.GetMethod != null && self.GetMethod.IsStatic)
+			if (self.get_GetMethod() != null && self.get_GetMethod().get_IsStatic())
 			{
 				return true;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return self.SetMethod.IsStatic;
+			return self.get_SetMethod().get_IsStatic();
 		}
 
 		private static bool SplitVirtual(this PropertyDefinition self)
@@ -464,15 +465,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.GetMethod != null && self.GetMethod.IsVirtual)
+			if (self.get_GetMethod() != null && self.get_GetMethod().get_IsVirtual())
 			{
 				return true;
 			}
-			if (self.SetMethod == null)
+			if (self.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return self.SetMethod.IsVirtual;
+			return self.get_SetMethod().get_IsVirtual();
 		}
 	}
 }

@@ -89,7 +89,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return Negator.NegateBinaryExpression(expression, typeSystem);
 				}
-				if (binaryExpression.ExpressionType.FullName == "System.Boolean")
+				if (binaryExpression.ExpressionType.get_FullName() == "System.Boolean")
 				{
 					return new UnaryExpression(UnaryOperator.LogicalNot, expression, null);
 				}
@@ -99,7 +99,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return Negator.NegateConditionExpression(expression, typeSystem);
 			}
-			if (expression.CodeNodeType == CodeNodeType.LiteralExpression && expression.ExpressionType.FullName == typeSystem.Boolean.FullName)
+			if (expression.CodeNodeType == CodeNodeType.LiteralExpression && expression.ExpressionType.get_FullName() == typeSystem.get_Boolean().get_FullName())
 			{
 				return new LiteralExpression((object)(!(Boolean)(expression as LiteralExpression).Value), typeSystem, expression.UnderlyingSameMethodInstructions);
 			}
@@ -108,7 +108,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return new UnaryExpression(UnaryOperator.LogicalNot, expression, null);
 			}
-			if (defaultValueExpression.ExpressionType.FullName == typeSystem.Boolean.FullName)
+			if (defaultValueExpression.ExpressionType.get_FullName() == typeSystem.get_Boolean().get_FullName())
 			{
 				return new UnaryExpression(UnaryOperator.LogicalNot, expression, null);
 			}
@@ -127,7 +127,7 @@ namespace Telerik.JustDecompiler.Steps
 				binaryExpression.Right = Negator.Negate(binaryExpression.Right, typeSystem);
 				return binaryExpression;
 			}
-			if (!Negator.IsBitwiseOperator(binaryExpression.Operator) || !(binaryExpression.ExpressionType.FullName == typeSystem.Boolean.FullName))
+			if (!Negator.IsBitwiseOperator(binaryExpression.Operator) || !(binaryExpression.ExpressionType.get_FullName() == typeSystem.get_Boolean().get_FullName()))
 			{
 				if (!Negator.TryGetInverseOperator(binaryExpression.Operator, out binaryOperator))
 				{

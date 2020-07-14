@@ -112,7 +112,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			if (this.ArrayType.FullName != arrayVariableDeclarationExpression.ArrayType.FullName)
+			if (this.ArrayType.get_FullName() != arrayVariableDeclarationExpression.ArrayType.get_FullName())
 			{
 				return false;
 			}

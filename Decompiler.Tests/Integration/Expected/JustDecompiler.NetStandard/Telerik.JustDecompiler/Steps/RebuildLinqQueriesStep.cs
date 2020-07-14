@@ -51,7 +51,7 @@ namespace Telerik.JustDecompiler.Steps
 			private void AddNewIdentifier(ParameterDefinition parameter)
 			{
 				VariableReference variableReference = this.currentIdentifier;
-				this.currentIdentifier = this.CreateNewIdentifier(parameter.Name, parameter.ParameterType);
+				this.currentIdentifier = this.CreateNewIdentifier(parameter.get_Name(), parameter.get_ParameterType());
 				QueryClause item = this.clauses[this.clauses.Count - 1];
 				if (item.CodeNodeType != CodeNodeType.SelectClause && item.CodeNodeType != CodeNodeType.GroupClause)
 				{
@@ -77,7 +77,7 @@ namespace Telerik.JustDecompiler.Steps
 				PropertyDefinition identifier = null;
 				foreach (KeyValuePair<PropertyDefinition, Expression> keyValuePair in propertyToValueMap)
 				{
-					if (!(keyValuePair.Key.Name == oldIdentifier.Name) || keyValuePair.Value.CodeNodeType != CodeNodeType.VariableReferenceExpression || (keyValuePair.Value as VariableReferenceExpression).Variable != oldIdentifier)
+					if (!(keyValuePair.Key.get_Name() == oldIdentifier.get_Name()) || keyValuePair.Value.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(keyValuePair.Value as VariableReferenceExpression).Variable != (object)oldIdentifier)
 					{
 						identifier = keyValuePair.Key;
 					}
@@ -91,7 +91,7 @@ namespace Telerik.JustDecompiler.Steps
 					return null;
 				}
 				Expression item = propertyToValueMap[identifier];
-				LetClause letClause = new LetClause(new VariableReferenceExpression(this.CreateNewIdentifier(identifier.Name, item.ExpressionType), null), item, null);
+				LetClause letClause = new LetClause(new VariableReferenceExpression(this.CreateNewIdentifier(identifier.get_Name(), item.ExpressionType), null), item, null);
 				propertyToValueMap[identifier] = letClause.Identifier;
 				return letClause;
 			}
@@ -102,17 +102,17 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return type;
 				}
-				if (type == null || type.GenericArguments.Count != 1)
+				if (type == null || type.get_GenericArguments().get_Count() != 1)
 				{
 					return null;
 				}
-				return type.GenericArguments[0] as GenericInstanceType;
+				return type.get_GenericArguments().get_Item(0) as GenericInstanceType;
 			}
 
 			private Expression GetIdentifierReference(VariableReference identifierReference, ref Expression target)
 			{
 				MethodInvocationExpression methodInvocationExpression = target as MethodInvocationExpression;
-				if (methodInvocationExpression == null || methodInvocationExpression.MethodExpression.MethodDefinition == null || !methodInvocationExpression.MethodExpression.MethodDefinition.IsStatic || !(methodInvocationExpression.MethodExpression.MethodDefinition.DeclaringType.FullName == "System.Linq.Enumerable") && !(methodInvocationExpression.MethodExpression.MethodDefinition.DeclaringType.FullName == "System.Linq.Queryable") || !(methodInvocationExpression.MethodExpression.Method.Name == "Cast"))
+				if (methodInvocationExpression == null || methodInvocationExpression.MethodExpression.MethodDefinition == null || !methodInvocationExpression.MethodExpression.MethodDefinition.get_IsStatic() || !(methodInvocationExpression.MethodExpression.MethodDefinition.get_DeclaringType().get_FullName() == "System.Linq.Enumerable") && !(methodInvocationExpression.MethodExpression.MethodDefinition.get_DeclaringType().get_FullName() == "System.Linq.Queryable") || !(methodInvocationExpression.MethodExpression.Method.get_Name() == "Cast"))
 				{
 					return new VariableReferenceExpression(identifierReference, null);
 				}
@@ -170,21 +170,21 @@ namespace Telerik.JustDecompiler.Steps
 
 			private bool IsTransparentIdentifier(VariableReference identifier)
 			{
-				if (identifier.Name.StartsWith("<>h__TransparentIdentifier"))
+				if (identifier.get_Name().StartsWith("<>h__TransparentIdentifier"))
 				{
 					return true;
 				}
-				return identifier.Name.StartsWith("$VB$");
+				return identifier.get_Name().StartsWith("$VB$");
 			}
 
 			private void ProcessCurrentIdentifier(Expression target, ParameterDefinition identifierParameter)
 			{
 				if (this.clauses.Count == 0)
 				{
-					this.AddInitialFromClause(target, identifierParameter.Name, identifierParameter.ParameterType);
+					this.AddInitialFromClause(target, identifierParameter.get_Name(), identifierParameter.get_ParameterType());
 					return;
 				}
-				if (this.currentIdentifier == null || this.currentIdentifier.Name != identifierParameter.Name)
+				if (this.currentIdentifier == null || this.currentIdentifier.get_Name() != identifierParameter.get_Name())
 				{
 					this.AddNewIdentifier(identifierParameter);
 				}
@@ -203,7 +203,7 @@ namespace Telerik.JustDecompiler.Steps
 						{
 							MethodInvocationExpression current = enumerator.Current;
 							bool flag = true;
-							string name = current.MethodExpression.MethodDefinition.Name;
+							string name = current.MethodExpression.MethodDefinition.get_Name();
 							if (name == null)
 							{
 								break;
@@ -439,7 +439,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				Expression variableReferenceExpression;
 				MethodDefinition methodDefinition = methodInvoke.MethodExpression.MethodDefinition;
-				if (methodDefinition.Parameters.Count > 3 || methodDefinition.Parameters.Count != methodDefinition.GenericParameters.Count || methodDefinition.GenericParameters.Count == 3 && methodDefinition.GenericParameters[2].Name != "TElement")
+				if (methodDefinition.get_Parameters().get_Count() > 3 || methodDefinition.get_Parameters().get_Count() != methodDefinition.get_GenericParameters().get_Count() || methodDefinition.get_GenericParameters().get_Count() == 3 && methodDefinition.get_GenericParameters().get_Item(2).get_Name() != "TElement")
 				{
 					return false;
 				}
@@ -479,7 +479,7 @@ namespace Telerik.JustDecompiler.Steps
 			private bool TryProcessJoinMethod(MethodInvocationExpression methodInvoke, bool isGroupJoin, bool queryable)
 			{
 				VariableReference variableReference;
-				if (methodInvoke.MethodExpression.MethodDefinition.Parameters.Count != 5)
+				if (methodInvoke.MethodExpression.MethodDefinition.get_Parameters().get_Count() != 5)
 				{
 					return false;
 				}
@@ -500,7 +500,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				VariableReference variableReference1 = this.CreateNewIdentifier(lambdaExpression1.Parameters[0].Name, lambdaExpression1.Parameters[0].ParameterType);
+				VariableReference variableReference1 = this.CreateNewIdentifier(lambdaExpression1.Parameters[0].get_Name(), lambdaExpression1.Parameters[0].get_ParameterType());
 				Expression expression2 = this.ProcessReturnExpression(lambdaExpression1, new VariableReference[] { variableReference1 });
 				if (expression2 == null)
 				{
@@ -514,7 +514,7 @@ namespace Telerik.JustDecompiler.Steps
 				ParameterReference[] parameters = lambdaExpression2.Parameters;
 				if (isGroupJoin)
 				{
-					variableReference = this.CreateNewIdentifier(parameters[1].Name, parameters[1].ParameterType);
+					variableReference = this.CreateNewIdentifier(parameters[1].get_Name(), parameters[1].get_ParameterType());
 				}
 				else
 				{
@@ -552,12 +552,12 @@ namespace Telerik.JustDecompiler.Steps
 			private bool TryProcessSelectManyMethod(MethodInvocationExpression methodInvoke, bool queryable)
 			{
 				MethodDefinition methodDefinition = methodInvoke.MethodExpression.MethodDefinition;
-				if (methodDefinition.Parameters.Count != 3)
+				if (methodDefinition.get_Parameters().get_Count() != 3)
 				{
 					return false;
 				}
-				GenericInstanceType funcGenericInstance = this.GetFuncGenericInstance(methodDefinition.Parameters[1].ParameterType as GenericInstanceType, queryable);
-				if (funcGenericInstance == null || funcGenericInstance.GenericArguments.Count != 2)
+				GenericInstanceType funcGenericInstance = this.GetFuncGenericInstance(methodDefinition.get_Parameters().get_Item(1).get_ParameterType() as GenericInstanceType, queryable);
+				if (funcGenericInstance == null || funcGenericInstance.get_GenericArguments().get_Count() != 2)
 				{
 					return false;
 				}
@@ -577,7 +577,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				VariableReference variableReference = this.CreateNewIdentifier(lambdaExpression1.Parameters[1].Name, lambdaExpression1.Parameters[1].ParameterType);
+				VariableReference variableReference = this.CreateNewIdentifier(lambdaExpression1.Parameters[1].get_Name(), lambdaExpression1.Parameters[1].get_ParameterType());
 				Expression expression1 = this.ProcessReturnExpression(lambdaExpression1, new VariableReference[] { this.currentIdentifier, variableReference });
 				if (expression1 == null)
 				{
@@ -606,12 +606,12 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				result = null;
 				MethodDefinition methodDefinition = methodInvoke.MethodExpression.MethodDefinition;
-				if (methodDefinition.Parameters.Count != 2)
+				if (methodDefinition.get_Parameters().get_Count() != 2)
 				{
 					return false;
 				}
-				GenericInstanceType funcGenericInstance = this.GetFuncGenericInstance(methodDefinition.Parameters[1].ParameterType as GenericInstanceType, queryable);
-				if (funcGenericInstance == null || funcGenericInstance.GenericArguments.Count != 2)
+				GenericInstanceType funcGenericInstance = this.GetFuncGenericInstance(methodDefinition.get_Parameters().get_Item(1).get_ParameterType() as GenericInstanceType, queryable);
+				if (funcGenericInstance == null || funcGenericInstance.get_GenericArguments().get_Count() != 2)
 				{
 					return false;
 				}
@@ -666,7 +666,7 @@ namespace Telerik.JustDecompiler.Steps
 				Dictionary<MethodDefinition, VariableReference> methodDefinitions = new Dictionary<MethodDefinition, VariableReference>();
 				foreach (KeyValuePair<PropertyDefinition, Expression> keyValuePair in propertyToValueMap)
 				{
-					methodDefinitions.Add(keyValuePair.Key.GetMethod, ((VariableReferenceExpression)keyValuePair.Value).Variable);
+					methodDefinitions.Add(keyValuePair.Key.get_GetMethod(), ((VariableReferenceExpression)keyValuePair.Value).Variable);
 				}
 				cleaner.TransparentIdentifierToPropertyValueMap.Add(identifier, methodDefinitions);
 			}

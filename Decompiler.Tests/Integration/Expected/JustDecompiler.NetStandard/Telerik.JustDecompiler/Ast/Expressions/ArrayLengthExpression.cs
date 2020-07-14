@@ -34,7 +34,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.theTypeSystem.Int32;
+				return this.theTypeSystem.get_Int32();
 			}
 			set
 			{

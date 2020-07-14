@@ -26,7 +26,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private bool AllEndsAreThrow(ILogicalConstruct entry)
 		{
-			if (!this.SubtreeEndsInInstructionCode(entry.FirstBlock.TheBlock, (IEnumerable<Code>)(new Code[] { Code.Throw })))
+			if (!this.SubtreeEndsInInstructionCode(entry.FirstBlock.TheBlock, new Code[] { 119 }))
 			{
 				return false;
 			}
@@ -116,17 +116,17 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 				foreach (CFGBlockLogicalConstruct cFGBlock in logicalConstruct.CFGBlocks)
 				{
 					int item = 0;
-					if (!this.blockToInstructionsCount.ContainsKey(cFGBlock.TheBlock.First.Offset))
+					if (!this.blockToInstructionsCount.ContainsKey(cFGBlock.TheBlock.First.get_Offset()))
 					{
 						foreach (Instruction theBlock in cFGBlock.TheBlock)
 						{
 							item++;
 						}
-						this.blockToInstructionsCount.Add(cFGBlock.TheBlock.First.Offset, item);
+						this.blockToInstructionsCount.Add(cFGBlock.TheBlock.First.get_Offset(), item);
 					}
 					else
 					{
-						item = this.blockToInstructionsCount[cFGBlock.TheBlock.First.Offset];
+						item = this.blockToInstructionsCount[cFGBlock.TheBlock.First.get_Offset()];
 					}
 					num += item;
 				}
@@ -256,11 +256,11 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 			while (instructionBlocks.Count > 0 & flag)
 			{
 				InstructionBlock instructionBlocks1 = instructionBlocks.Dequeue();
-				if (nums.Contains(instructionBlocks1.First.Offset))
+				if (nums.Contains(instructionBlocks1.First.get_Offset()))
 				{
 					continue;
 				}
-				nums.Add(instructionBlocks1.First.Offset);
+				nums.Add(instructionBlocks1.First.get_Offset());
 				if (instructionBlocks1.Successors.Length != 0)
 				{
 					InstructionBlock[] successors = instructionBlocks1.Successors;
@@ -274,8 +274,8 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 					bool code = false;
 					foreach (Code operationCode in operationCodes)
 					{
-						OpCode opCode = instructionBlocks1.Last.OpCode;
-						code = code | opCode.Code == operationCode;
+						OpCode opCode = instructionBlocks1.Last.get_OpCode();
+						code = code | opCode.get_Code() == operationCode;
 					}
 					flag &= code;
 				}
@@ -329,7 +329,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 			}
 			if (logicalConstructs != null && !this.HasSuccessors(blockBody))
 			{
-				if (this.SubtreeEndsInInstructionCode(trueSuccessor.FirstBlock.TheBlock, (IEnumerable<Code>)(new Code[] { Code.Ret, Code.Throw })))
+				if (this.SubtreeEndsInInstructionCode(trueSuccessor.FirstBlock.TheBlock, new Code[] { 41, 119 }))
 				{
 					logicalConstructs = null;
 				}

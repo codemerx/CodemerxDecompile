@@ -26,7 +26,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.Visit(block);
 			return block;
 		}

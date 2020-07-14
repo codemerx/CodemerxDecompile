@@ -16,7 +16,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private readonly MethodDefinition method;
 
-		public InitializationPattern(CodePatternsContext patternsContext, DecompilationContext context) : base(patternsContext, context.MethodContext.Method.Module.TypeSystem)
+		public InitializationPattern(CodePatternsContext patternsContext, DecompilationContext context) : base(patternsContext, context.MethodContext.Method.get_Module().get_TypeSystem())
 		{
 			this.typeContext = context.TypeContext;
 			this.method = context.MethodContext.Method;
@@ -37,7 +37,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			assignedValue = expression.Right;
-			propertyFullName = property.FullName;
+			propertyFullName = property.get_FullName();
 			return true;
 		}
 
@@ -56,7 +56,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			assignedValue = expression.Right;
-			fieldFullName = field.FullName;
+			fieldFullName = field.get_FullName();
 			return true;
 		}
 
@@ -108,7 +108,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			if (expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || (expression as VariableReferenceExpression).Variable != variableReference)
+			if (expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression as VariableReferenceExpression).Variable != (object)variableReference)
 			{
 				return false;
 			}

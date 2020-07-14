@@ -41,7 +41,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Event.EventType;
+				return this.Event.get_EventType();
 			}
 			set
 			{
@@ -107,7 +107,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Event.FullName == eventReferenceExpression.Event.FullName;
+			return this.Event.get_FullName() == eventReferenceExpression.Event.get_FullName();
 		}
 	}
 }

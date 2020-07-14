@@ -11,7 +11,7 @@ namespace Mono.Cecil.Extensions
 		public static bool HasAnonymousArgument(this IGenericInstance self)
 		{
 			bool flag;
-			foreach (TypeReference genericArgument in self.GenericArguments)
+			foreach (TypeReference genericArgument in self.get_GenericArguments())
 			{
 				if (!genericArgument.ContainsAnonymousType())
 				{
@@ -20,7 +20,7 @@ namespace Mono.Cecil.Extensions
 				flag = true;
 				return flag;
 			}
-			Dictionary<int, TypeReference>.ValueCollection.Enumerator enumerator = self.PostionToArgument.Values.GetEnumerator();
+			Dictionary<int, TypeReference>.ValueCollection.Enumerator enumerator = self.get_PostionToArgument().Values.GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())

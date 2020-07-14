@@ -16,43 +16,43 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		private bool GetDoFinallyVariable()
 		{
 			Instruction first = this.theCFG.Blocks[0].First;
-			if (first.OpCode.Code != Code.Ldc_I4_1)
+			if (first.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			return StateMachineUtilities.TryGetVariableFromInstruction(first.Next, this.methodVariables, out this.doFinallyVariable);
+			return StateMachineUtilities.TryGetVariableFromInstruction(first.get_Next(), this.methodVariables, out this.doFinallyVariable);
 		}
 
 		private bool IsCSharpDebugCheck(InstructionBlock theBlock, Instruction currentInstruction)
 		{
-			if (currentInstruction.OpCode.Code != Code.Ldc_I4_0)
+			if (currentInstruction.get_OpCode().get_Code() != 22)
 			{
 				return false;
 			}
-			if (theBlock.Last.OpCode.Code == Code.Brtrue)
+			if (theBlock.Last.get_OpCode().get_Code() == 57)
 			{
 				return true;
 			}
-			return theBlock.Last.OpCode.Code == Code.Brtrue_S;
+			return theBlock.Last.get_OpCode().get_Code() == 44;
 		}
 
 		protected override bool IsFinallyCheckBlock(InstructionBlock theBlock)
 		{
 			Instruction i;
 			VariableReference variableReference;
-			for (i = theBlock.First; i.OpCode.Code == Code.Nop; i = i.Next)
+			for (i = theBlock.First; i.get_OpCode().get_Code() == null; i = i.get_Next())
 			{
-				if (i == theBlock.Last)
+				if ((object)i == (object)theBlock.Last)
 				{
 					return false;
 				}
 			}
-			if (i == theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(i, this.methodVariables, out variableReference) || variableReference != this.doFinallyVariable)
+			if ((object)i == (object)theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(i, this.methodVariables, out variableReference) || (object)variableReference != (object)this.doFinallyVariable)
 			{
 				return false;
 			}
-			i = i.Next;
-			if (i.OpCode.Code == Code.Brfalse || i.OpCode.Code == Code.Brfalse_S)
+			i = i.get_Next();
+			if (i.get_OpCode().get_Code() == 56 || i.get_OpCode().get_Code() == 43)
 			{
 				return true;
 			}
@@ -67,25 +67,25 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		{
 			VariableReference variableReference;
 			VariableReference variableReference1;
-			if (currentInstruction == theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out variableReference))
+			if ((object)currentInstruction == (object)theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out variableReference))
 			{
 				return false;
 			}
-			currentInstruction = currentInstruction.Next;
-			if (currentInstruction == theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out variableReference1) || variableReference != variableReference1)
+			currentInstruction = currentInstruction.get_Next();
+			if ((object)currentInstruction == (object)theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out variableReference1) || (object)variableReference != (object)variableReference1)
 			{
 				return false;
 			}
-			currentInstruction = currentInstruction.Next;
-			if (currentInstruction != theBlock.Last)
+			currentInstruction = currentInstruction.get_Next();
+			if ((object)currentInstruction != (object)theBlock.Last)
 			{
 				return false;
 			}
-			if (currentInstruction.OpCode.Code == Code.Brfalse)
+			if (currentInstruction.get_OpCode().get_Code() == 56)
 			{
 				return true;
 			}
-			return currentInstruction.OpCode.Code == Code.Brfalse_S;
+			return currentInstruction.get_OpCode().get_Code() == 43;
 		}
 
 		public bool MarkFinallyConditionsForRemoval()

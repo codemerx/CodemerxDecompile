@@ -20,12 +20,12 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 			{
 				return false;
 			}
-			return (node as FieldReferenceExpression).Field.Resolve() == this.theField;
+			return (object)(node as FieldReferenceExpression).Field.Resolve() == (object)this.theField;
 		}
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (node.Field.Resolve() == this.theField)
+			if ((object)node.Field.Resolve() == (object)this.theField)
 			{
 				this.searchResult = UsageFinderSearchResult.Used;
 			}

@@ -166,7 +166,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			ExpressionCollection expressionCollection = this.ConvertInitialValues((values.MemberReference as FieldDefinition).InitialValue, expression.ElementType.Name);
+			ExpressionCollection expressionCollection = this.ConvertInitialValues((values.MemberReference as FieldDefinition).get_InitialValue(), expression.ElementType.get_Name());
 			if (expressionCollection == null || !this.CheckElementsCount(expressionCollection, expression.Dimensions))
 			{
 				return false;

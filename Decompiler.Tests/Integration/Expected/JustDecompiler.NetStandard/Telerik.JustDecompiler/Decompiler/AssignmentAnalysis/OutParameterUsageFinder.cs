@@ -20,7 +20,7 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 			{
 				return false;
 			}
-			return node.Parameter.Resolve() == this.parameter;
+			return (object)node.Parameter.Resolve() == (object)this.parameter;
 		}
 
 		public override bool CheckExpression(Expression node)
@@ -38,7 +38,7 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 		{
-			if (node.Parameter.Resolve() == this.parameter)
+			if ((object)node.Parameter.Resolve() == (object)this.parameter)
 			{
 				this.searchResult = UsageFinderSearchResult.Used;
 			}

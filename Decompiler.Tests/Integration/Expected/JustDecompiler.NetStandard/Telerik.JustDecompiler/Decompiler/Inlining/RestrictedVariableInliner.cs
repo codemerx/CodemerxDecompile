@@ -28,7 +28,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			MethodReference method = node.MethodExpression.Method;
 			for (int i = 0; i < node.Arguments.Count; i++)
 			{
-				if (!method.Parameters[i].ParameterType.IsByReference)
+				if (!method.get_Parameters().get_Item(i).get_ParameterType().get_IsByReference())
 				{
 					node.Arguments[i] = (Expression)this.Visit(node.Arguments[i]);
 					if (this.status != SimpleVariableInliner.InliningResult.NotFound)

@@ -53,7 +53,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		public TypeOfExpression(TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
 		{
 			this.Type = type;
-			this.typeReference = new TypeReference("System", "Type", this.Type.Module.TypeSystem.Boolean.Module, this.Type.Module.TypeSystem.Boolean.Scope);
+			this.typeReference = new TypeReference("System", "Type", this.Type.get_Module().get_TypeSystem().get_Boolean().get_Module(), this.Type.get_Module().get_TypeSystem().get_Boolean().get_Scope());
 		}
 
 		public override Expression Clone()
@@ -72,7 +72,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Type.FullName == (other as TypeOfExpression).Type.FullName;
+			return this.Type.get_FullName() == (other as TypeOfExpression).Type.get_FullName();
 		}
 	}
 }

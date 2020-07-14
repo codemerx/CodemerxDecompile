@@ -39,10 +39,11 @@ namespace Telerik.JustDecompiler
 
 		protected override bool TryGetResolvedAssembly(AssemblyStrongNameExtended assemblyKey, out List<AssemblyDefinition> assemblyList)
 		{
+			assemblyList = null;
 			bool flag;
 			lock (this.resolvedAssembliesAccessLock)
 			{
-				flag = base.TryGetResolvedAssembly(assemblyKey, out assemblyList);
+				flag = base.TryGetResolvedAssembly(assemblyKey, ref assemblyList);
 			}
 			return flag;
 		}

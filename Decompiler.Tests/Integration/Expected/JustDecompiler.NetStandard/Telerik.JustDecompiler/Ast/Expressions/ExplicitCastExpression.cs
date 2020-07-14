@@ -113,8 +113,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			foreach (Instruction instruction in this.instructions)
 			{
-				Code code = instruction.OpCode.Code;
-				if ((int)code - (int)Code.Conv_Ovf_I1_Un > (int)Code.Ldloc_3 && (int)code - (int)Code.Conv_Ovf_I1 > (int)Code.Ldloc_1 && (int)code - (int)Code.Conv_Ovf_I > (int)Code.Break)
+				Code code = instruction.get_OpCode().get_Code();
+				if (code - 127 > 9 && code - 163 > 7 && code - 178 > 1)
 				{
 					continue;
 				}

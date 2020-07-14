@@ -11,1014 +11,1014 @@ namespace Telerik.JustDecompiler.Cil
 
 		public static void Dispatch(Instruction instruction, IInstructionVisitor visitor)
 		{
-			switch (instruction.OpCode.Code)
+			switch (instruction.get_OpCode().get_Code())
 			{
-				case Code.Nop:
+				case 0:
 				{
 					visitor.OnNop(instruction);
 					return;
 				}
-				case Code.Break:
+				case 1:
 				{
 					visitor.OnBreak(instruction);
 					return;
 				}
-				case Code.Ldarg_0:
+				case 2:
 				{
 					visitor.OnLdarg_0(instruction);
 					return;
 				}
-				case Code.Ldarg_1:
+				case 3:
 				{
 					visitor.OnLdarg_1(instruction);
 					return;
 				}
-				case Code.Ldarg_2:
+				case 4:
 				{
 					visitor.OnLdarg_2(instruction);
 					return;
 				}
-				case Code.Ldarg_3:
+				case 5:
 				{
 					visitor.OnLdarg_3(instruction);
 					return;
 				}
-				case Code.Ldloc_0:
+				case 6:
 				{
 					visitor.OnLdloc_0(instruction);
 					return;
 				}
-				case Code.Ldloc_1:
+				case 7:
 				{
 					visitor.OnLdloc_1(instruction);
 					return;
 				}
-				case Code.Ldloc_2:
+				case 8:
 				{
 					visitor.OnLdloc_2(instruction);
 					return;
 				}
-				case Code.Ldloc_3:
+				case 9:
 				{
 					visitor.OnLdloc_3(instruction);
 					return;
 				}
-				case Code.Stloc_0:
+				case 10:
 				{
 					visitor.OnStloc_0(instruction);
 					return;
 				}
-				case Code.Stloc_1:
+				case 11:
 				{
 					visitor.OnStloc_1(instruction);
 					return;
 				}
-				case Code.Stloc_2:
+				case 12:
 				{
 					visitor.OnStloc_2(instruction);
 					return;
 				}
-				case Code.Stloc_3:
+				case 13:
 				{
 					visitor.OnStloc_3(instruction);
 					return;
 				}
-				case Code.Ldarg_S:
-				case Code.Ldarg:
+				case 14:
+				case 199:
 				{
 					visitor.OnLdarg(instruction);
 					return;
 				}
-				case Code.Ldarga_S:
-				case Code.Ldarga:
+				case 15:
+				case 200:
 				{
 					visitor.OnLdarga(instruction);
 					return;
 				}
-				case Code.Starg_S:
-				case Code.Starg:
+				case 16:
+				case 201:
 				{
 					visitor.OnStarg(instruction);
 					return;
 				}
-				case Code.Ldloc_S:
-				case Code.Ldloc:
+				case 17:
+				case 202:
 				{
 					visitor.OnLdloc(instruction);
 					return;
 				}
-				case Code.Ldloca_S:
-				case Code.Ldloca:
+				case 18:
+				case 203:
 				{
 					visitor.OnLdloca(instruction);
 					return;
 				}
-				case Code.Stloc_S:
-				case Code.Stloc:
+				case 19:
+				case 204:
 				{
 					visitor.OnStloc(instruction);
 					return;
 				}
-				case Code.Ldnull:
+				case 20:
 				{
 					visitor.OnLdnull(instruction);
 					return;
 				}
-				case Code.Ldc_I4_M1:
+				case 21:
 				{
 					visitor.OnLdc_I4_M1(instruction);
 					return;
 				}
-				case Code.Ldc_I4_0:
+				case 22:
 				{
 					visitor.OnLdc_I4_0(instruction);
 					return;
 				}
-				case Code.Ldc_I4_1:
+				case 23:
 				{
 					visitor.OnLdc_I4_1(instruction);
 					return;
 				}
-				case Code.Ldc_I4_2:
+				case 24:
 				{
 					visitor.OnLdc_I4_2(instruction);
 					return;
 				}
-				case Code.Ldc_I4_3:
+				case 25:
 				{
 					visitor.OnLdc_I4_3(instruction);
 					return;
 				}
-				case Code.Ldc_I4_4:
+				case 26:
 				{
 					visitor.OnLdc_I4_4(instruction);
 					return;
 				}
-				case Code.Ldc_I4_5:
+				case 27:
 				{
 					visitor.OnLdc_I4_5(instruction);
 					return;
 				}
-				case Code.Ldc_I4_6:
+				case 28:
 				{
 					visitor.OnLdc_I4_6(instruction);
 					return;
 				}
-				case Code.Ldc_I4_7:
+				case 29:
 				{
 					visitor.OnLdc_I4_7(instruction);
 					return;
 				}
-				case Code.Ldc_I4_8:
+				case 30:
 				{
 					visitor.OnLdc_I4_8(instruction);
 					return;
 				}
-				case Code.Ldc_I4_S:
-				case Code.Ldc_I4:
+				case 31:
+				case 32:
 				{
 					visitor.OnLdc_I4(instruction);
 					return;
 				}
-				case Code.Ldc_I8:
+				case 33:
 				{
 					visitor.OnLdc_I8(instruction);
 					return;
 				}
-				case Code.Ldc_R4:
+				case 34:
 				{
 					visitor.OnLdc_R4(instruction);
 					return;
 				}
-				case Code.Ldc_R8:
+				case 35:
 				{
 					visitor.OnLdc_R8(instruction);
 					return;
 				}
-				case Code.Dup:
+				case 36:
 				{
 					visitor.OnDup(instruction);
 					return;
 				}
-				case Code.Pop:
+				case 37:
 				{
 					visitor.OnPop(instruction);
 					return;
 				}
-				case Code.Jmp:
+				case 38:
 				{
 					visitor.OnJmp(instruction);
 					return;
 				}
-				case Code.Call:
+				case 39:
 				{
 					visitor.OnCall(instruction);
 					return;
 				}
-				case Code.Calli:
+				case 40:
 				{
 					visitor.OnCalli(instruction);
 					return;
 				}
-				case Code.Ret:
+				case 41:
 				{
 					visitor.OnRet(instruction);
 					return;
 				}
-				case Code.Br_S:
-				case Code.Br:
+				case 42:
+				case 55:
 				{
 					visitor.OnBr(instruction);
 					return;
 				}
-				case Code.Brfalse_S:
-				case Code.Brfalse:
+				case 43:
+				case 56:
 				{
 					visitor.OnBrfalse(instruction);
 					return;
 				}
-				case Code.Brtrue_S:
-				case Code.Brtrue:
+				case 44:
+				case 57:
 				{
 					visitor.OnBrtrue(instruction);
 					return;
 				}
-				case Code.Beq_S:
-				case Code.Beq:
+				case 45:
+				case 58:
 				{
 					visitor.OnBeq(instruction);
 					return;
 				}
-				case Code.Bge_S:
-				case Code.Bge:
+				case 46:
+				case 59:
 				{
 					visitor.OnBge(instruction);
 					return;
 				}
-				case Code.Bgt_S:
-				case Code.Bgt:
+				case 47:
+				case 60:
 				{
 					visitor.OnBgt(instruction);
 					return;
 				}
-				case Code.Ble_S:
-				case Code.Ble:
+				case 48:
+				case 61:
 				{
 					visitor.OnBle(instruction);
 					return;
 				}
-				case Code.Blt_S:
-				case Code.Blt:
+				case 49:
+				case 62:
 				{
 					visitor.OnBlt(instruction);
 					return;
 				}
-				case Code.Bne_Un_S:
-				case Code.Bne_Un:
+				case 50:
+				case 63:
 				{
 					visitor.OnBne_Un(instruction);
 					return;
 				}
-				case Code.Bge_Un_S:
-				case Code.Bge_Un:
+				case 51:
+				case 64:
 				{
 					visitor.OnBge_Un(instruction);
 					return;
 				}
-				case Code.Bgt_Un_S:
-				case Code.Bgt_Un:
+				case 52:
+				case 65:
 				{
 					visitor.OnBgt_Un(instruction);
 					return;
 				}
-				case Code.Ble_Un_S:
-				case Code.Ble_Un:
+				case 53:
+				case 66:
 				{
 					visitor.OnBle_Un(instruction);
 					return;
 				}
-				case Code.Blt_Un_S:
-				case Code.Blt_Un:
+				case 54:
+				case 67:
 				{
 					visitor.OnBlt_Un(instruction);
 					return;
 				}
-				case Code.Switch:
+				case 68:
 				{
 					visitor.OnSwitch(instruction);
 					return;
 				}
-				case Code.Ldind_I1:
+				case 69:
 				{
 					visitor.OnLdind_I1(instruction);
 					return;
 				}
-				case Code.Ldind_U1:
+				case 70:
 				{
 					visitor.OnLdind_U1(instruction);
 					return;
 				}
-				case Code.Ldind_I2:
+				case 71:
 				{
 					visitor.OnLdind_I2(instruction);
 					return;
 				}
-				case Code.Ldind_U2:
+				case 72:
 				{
 					visitor.OnLdind_U2(instruction);
 					return;
 				}
-				case Code.Ldind_I4:
+				case 73:
 				{
 					visitor.OnLdind_I4(instruction);
 					return;
 				}
-				case Code.Ldind_U4:
+				case 74:
 				{
 					visitor.OnLdind_U4(instruction);
 					return;
 				}
-				case Code.Ldind_I8:
+				case 75:
 				{
 					visitor.OnLdind_I8(instruction);
 					return;
 				}
-				case Code.Ldind_I:
+				case 76:
 				{
 					visitor.OnLdind_I(instruction);
 					return;
 				}
-				case Code.Ldind_R4:
+				case 77:
 				{
 					visitor.OnLdind_R4(instruction);
 					return;
 				}
-				case Code.Ldind_R8:
+				case 78:
 				{
 					visitor.OnLdind_R8(instruction);
 					return;
 				}
-				case Code.Ldind_Ref:
+				case 79:
 				{
 					visitor.OnLdind_Ref(instruction);
 					return;
 				}
-				case Code.Stind_Ref:
+				case 80:
 				{
 					visitor.OnStind_Ref(instruction);
 					return;
 				}
-				case Code.Stind_I1:
+				case 81:
 				{
 					visitor.OnStind_I1(instruction);
 					return;
 				}
-				case Code.Stind_I2:
+				case 82:
 				{
 					visitor.OnStind_I2(instruction);
 					return;
 				}
-				case Code.Stind_I4:
+				case 83:
 				{
 					visitor.OnStind_I4(instruction);
 					return;
 				}
-				case Code.Stind_I8:
+				case 84:
 				{
 					visitor.OnStind_I8(instruction);
 					return;
 				}
-				case Code.Stind_R4:
+				case 85:
 				{
 					visitor.OnStind_R4(instruction);
 					return;
 				}
-				case Code.Stind_R8:
+				case 86:
 				{
 					visitor.OnStind_R8(instruction);
 					return;
 				}
-				case Code.Add:
+				case 87:
 				{
 					visitor.OnAdd(instruction);
 					return;
 				}
-				case Code.Sub:
+				case 88:
 				{
 					visitor.OnSub(instruction);
 					return;
 				}
-				case Code.Mul:
+				case 89:
 				{
 					visitor.OnMul(instruction);
 					return;
 				}
-				case Code.Div:
+				case 90:
 				{
 					visitor.OnDiv(instruction);
 					return;
 				}
-				case Code.Div_Un:
+				case 91:
 				{
 					visitor.OnDiv_Un(instruction);
 					return;
 				}
-				case Code.Rem:
+				case 92:
 				{
 					visitor.OnRem(instruction);
 					return;
 				}
-				case Code.Rem_Un:
+				case 93:
 				{
 					visitor.OnRem_Un(instruction);
 					return;
 				}
-				case Code.And:
+				case 94:
 				{
 					visitor.OnAnd(instruction);
 					return;
 				}
-				case Code.Or:
+				case 95:
 				{
 					visitor.OnOr(instruction);
 					return;
 				}
-				case Code.Xor:
+				case 96:
 				{
 					visitor.OnXor(instruction);
 					return;
 				}
-				case Code.Shl:
+				case 97:
 				{
 					visitor.OnShl(instruction);
 					return;
 				}
-				case Code.Shr:
+				case 98:
 				{
 					visitor.OnShr(instruction);
 					return;
 				}
-				case Code.Shr_Un:
+				case 99:
 				{
 					visitor.OnShr_Un(instruction);
 					return;
 				}
-				case Code.Neg:
+				case 100:
 				{
 					visitor.OnNeg(instruction);
 					return;
 				}
-				case Code.Not:
+				case 101:
 				{
 					visitor.OnNot(instruction);
 					return;
 				}
-				case Code.Conv_I1:
+				case 102:
 				{
 					visitor.OnConv_I1(instruction);
 					return;
 				}
-				case Code.Conv_I2:
+				case 103:
 				{
 					visitor.OnConv_I2(instruction);
 					return;
 				}
-				case Code.Conv_I4:
+				case 104:
 				{
 					visitor.OnConv_I4(instruction);
 					return;
 				}
-				case Code.Conv_I8:
+				case 105:
 				{
 					visitor.OnConv_I8(instruction);
 					return;
 				}
-				case Code.Conv_R4:
+				case 106:
 				{
 					visitor.OnConv_R4(instruction);
 					return;
 				}
-				case Code.Conv_R8:
+				case 107:
 				{
 					visitor.OnConv_R8(instruction);
 					return;
 				}
-				case Code.Conv_U4:
+				case 108:
 				{
 					visitor.OnConv_U4(instruction);
 					return;
 				}
-				case Code.Conv_U8:
+				case 109:
 				{
 					visitor.OnConv_U8(instruction);
 					return;
 				}
-				case Code.Callvirt:
+				case 110:
 				{
 					visitor.OnCallvirt(instruction);
 					return;
 				}
-				case Code.Cpobj:
+				case 111:
 				{
 					visitor.OnCpobj(instruction);
 					return;
 				}
-				case Code.Ldobj:
+				case 112:
 				{
 					visitor.OnLdobj(instruction);
 					return;
 				}
-				case Code.Ldstr:
+				case 113:
 				{
 					visitor.OnLdstr(instruction);
 					return;
 				}
-				case Code.Newobj:
+				case 114:
 				{
 					visitor.OnNewobj(instruction);
 					return;
 				}
-				case Code.Castclass:
+				case 115:
 				{
 					visitor.OnCastclass(instruction);
 					return;
 				}
-				case Code.Isinst:
+				case 116:
 				{
 					visitor.OnIsinst(instruction);
 					return;
 				}
-				case Code.Conv_R_Un:
+				case 117:
 				{
 					visitor.OnConv_R_Un(instruction);
 					return;
 				}
-				case Code.Unbox:
+				case 118:
 				{
 					visitor.OnUnbox(instruction);
 					return;
 				}
-				case Code.Throw:
+				case 119:
 				{
 					visitor.OnThrow(instruction);
 					return;
 				}
-				case Code.Ldfld:
+				case 120:
 				{
 					visitor.OnLdfld(instruction);
 					return;
 				}
-				case Code.Ldflda:
+				case 121:
 				{
 					visitor.OnLdflda(instruction);
 					return;
 				}
-				case Code.Stfld:
+				case 122:
 				{
 					visitor.OnStfld(instruction);
 					return;
 				}
-				case Code.Ldsfld:
+				case 123:
 				{
 					visitor.OnLdsfld(instruction);
 					return;
 				}
-				case Code.Ldsflda:
+				case 124:
 				{
 					visitor.OnLdsflda(instruction);
 					return;
 				}
-				case Code.Stsfld:
+				case 125:
 				{
 					visitor.OnStsfld(instruction);
 					return;
 				}
-				case Code.Stobj:
+				case 126:
 				{
 					visitor.OnStobj(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I1_Un:
+				case 127:
 				{
 					visitor.OnConv_Ovf_I1_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I2_Un:
+				case 128:
 				{
 					visitor.OnConv_Ovf_I2_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I4_Un:
+				case 129:
 				{
 					visitor.OnConv_Ovf_I4_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I8_Un:
+				case 130:
 				{
 					visitor.OnConv_Ovf_I8_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U1_Un:
+				case 131:
 				{
 					visitor.OnConv_Ovf_U1_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U2_Un:
+				case 132:
 				{
 					visitor.OnConv_Ovf_U2_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U4_Un:
+				case 133:
 				{
 					visitor.OnConv_Ovf_U4_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U8_Un:
+				case 134:
 				{
 					visitor.OnConv_Ovf_U8_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I_Un:
+				case 135:
 				{
 					visitor.OnConv_Ovf_I_Un(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U_Un:
+				case 136:
 				{
 					visitor.OnConv_Ovf_U_Un(instruction);
 					return;
 				}
-				case Code.Box:
+				case 137:
 				{
 					visitor.OnBox(instruction);
 					return;
 				}
-				case Code.Newarr:
+				case 138:
 				{
 					visitor.OnNewarr(instruction);
 					return;
 				}
-				case Code.Ldlen:
+				case 139:
 				{
 					visitor.OnLdlen(instruction);
 					return;
 				}
-				case Code.Ldelema:
+				case 140:
 				{
 					visitor.OnLdelema(instruction);
 					return;
 				}
-				case Code.Ldelem_I1:
+				case 141:
 				{
 					visitor.OnLdelem_I1(instruction);
 					return;
 				}
-				case Code.Ldelem_U1:
+				case 142:
 				{
 					visitor.OnLdelem_U1(instruction);
 					return;
 				}
-				case Code.Ldelem_I2:
+				case 143:
 				{
 					visitor.OnLdelem_I2(instruction);
 					return;
 				}
-				case Code.Ldelem_U2:
+				case 144:
 				{
 					visitor.OnLdelem_U2(instruction);
 					return;
 				}
-				case Code.Ldelem_I4:
+				case 145:
 				{
 					visitor.OnLdelem_I4(instruction);
 					return;
 				}
-				case Code.Ldelem_U4:
+				case 146:
 				{
 					visitor.OnLdelem_U4(instruction);
 					return;
 				}
-				case Code.Ldelem_I8:
+				case 147:
 				{
 					visitor.OnLdelem_I8(instruction);
 					return;
 				}
-				case Code.Ldelem_I:
+				case 148:
 				{
 					visitor.OnLdelem_I(instruction);
 					return;
 				}
-				case Code.Ldelem_R4:
+				case 149:
 				{
 					visitor.OnLdelem_R4(instruction);
 					return;
 				}
-				case Code.Ldelem_R8:
+				case 150:
 				{
 					visitor.OnLdelem_R8(instruction);
 					return;
 				}
-				case Code.Ldelem_Ref:
+				case 151:
 				{
 					visitor.OnLdelem_Ref(instruction);
 					return;
 				}
-				case Code.Stelem_I:
+				case 152:
 				{
 					visitor.OnStelem_I(instruction);
 					return;
 				}
-				case Code.Stelem_I1:
+				case 153:
 				{
 					visitor.OnStelem_I1(instruction);
 					return;
 				}
-				case Code.Stelem_I2:
+				case 154:
 				{
 					visitor.OnStelem_I2(instruction);
 					return;
 				}
-				case Code.Stelem_I4:
+				case 155:
 				{
 					visitor.OnStelem_I4(instruction);
 					return;
 				}
-				case Code.Stelem_I8:
+				case 156:
 				{
 					visitor.OnStelem_I8(instruction);
 					return;
 				}
-				case Code.Stelem_R4:
+				case 157:
 				{
 					visitor.OnStelem_R4(instruction);
 					return;
 				}
-				case Code.Stelem_R8:
+				case 158:
 				{
 					visitor.OnStelem_R8(instruction);
 					return;
 				}
-				case Code.Stelem_Ref:
+				case 159:
 				{
 					visitor.OnStelem_Ref(instruction);
 					return;
 				}
-				case Code.Ldelem_Any:
+				case 160:
 				{
 					visitor.OnLdelem_Any(instruction);
 					return;
 				}
-				case Code.Stelem_Any:
+				case 161:
 				{
 					visitor.OnStelem_Any(instruction);
 					return;
 				}
-				case Code.Unbox_Any:
+				case 162:
 				{
 					visitor.OnUnbox_Any(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I1:
+				case 163:
 				{
 					visitor.OnConv_Ovf_I1(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U1:
+				case 164:
 				{
 					visitor.OnConv_Ovf_U1(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I2:
+				case 165:
 				{
 					visitor.OnConv_Ovf_I2(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U2:
+				case 166:
 				{
 					visitor.OnConv_Ovf_U2(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I4:
+				case 167:
 				{
 					visitor.OnConv_Ovf_I4(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U4:
+				case 168:
 				{
 					visitor.OnConv_Ovf_U4(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I8:
+				case 169:
 				{
 					visitor.OnConv_Ovf_I8(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U8:
+				case 170:
 				{
 					visitor.OnConv_Ovf_U8(instruction);
 					return;
 				}
-				case Code.Refanyval:
+				case 171:
 				{
 					visitor.OnRefanyval(instruction);
 					return;
 				}
-				case Code.Ckfinite:
+				case 172:
 				{
 					visitor.OnCkfinite(instruction);
 					return;
 				}
-				case Code.Mkrefany:
+				case 173:
 				{
 					visitor.OnMkrefany(instruction);
 					return;
 				}
-				case Code.Ldtoken:
+				case 174:
 				{
 					visitor.OnLdtoken(instruction);
 					return;
 				}
-				case Code.Conv_U2:
+				case 175:
 				{
 					visitor.OnConv_U2(instruction);
 					return;
 				}
-				case Code.Conv_U1:
+				case 176:
 				{
 					visitor.OnConv_U1(instruction);
 					return;
 				}
-				case Code.Conv_I:
+				case 177:
 				{
 					visitor.OnConv_I(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_I:
+				case 178:
 				{
 					visitor.OnConv_Ovf_I(instruction);
 					return;
 				}
-				case Code.Conv_Ovf_U:
+				case 179:
 				{
 					visitor.OnConv_Ovf_U(instruction);
 					return;
 				}
-				case Code.Add_Ovf:
+				case 180:
 				{
 					visitor.OnAdd_Ovf(instruction);
 					return;
 				}
-				case Code.Add_Ovf_Un:
+				case 181:
 				{
 					visitor.OnAdd_Ovf_Un(instruction);
 					return;
 				}
-				case Code.Mul_Ovf:
+				case 182:
 				{
 					visitor.OnMul_Ovf(instruction);
 					return;
 				}
-				case Code.Mul_Ovf_Un:
+				case 183:
 				{
 					visitor.OnMul_Ovf_Un(instruction);
 					return;
 				}
-				case Code.Sub_Ovf:
+				case 184:
 				{
 					visitor.OnSub_Ovf(instruction);
 					return;
 				}
-				case Code.Sub_Ovf_Un:
+				case 185:
 				{
 					visitor.OnSub_Ovf_Un(instruction);
 					return;
 				}
-				case Code.Endfinally:
+				case 186:
 				{
 					visitor.OnEndfinally(instruction);
 					return;
 				}
-				case Code.Leave:
-				case Code.Leave_S:
+				case 187:
+				case 188:
 				{
 					visitor.OnLeave(instruction);
 					return;
 				}
-				case Code.Stind_I:
+				case 189:
 				{
 					visitor.OnStind_I(instruction);
 					return;
 				}
-				case Code.Conv_U:
+				case 190:
 				{
 					visitor.OnConv_U(instruction);
 					return;
 				}
-				case Code.Arglist:
+				case 191:
 				{
 					visitor.OnArglist(instruction);
 					return;
 				}
-				case Code.Ceq:
+				case 192:
 				{
 					visitor.OnCeq(instruction);
 					return;
 				}
-				case Code.Cgt:
+				case 193:
 				{
 					visitor.OnCgt(instruction);
 					return;
 				}
-				case Code.Cgt_Un:
+				case 194:
 				{
 					visitor.OnCgt_Un(instruction);
 					return;
 				}
-				case Code.Clt:
+				case 195:
 				{
 					visitor.OnClt(instruction);
 					return;
 				}
-				case Code.Clt_Un:
+				case 196:
 				{
 					visitor.OnClt_Un(instruction);
 					return;
 				}
-				case Code.Ldftn:
+				case 197:
 				{
 					visitor.OnLdftn(instruction);
 					return;
 				}
-				case Code.Ldvirtftn:
+				case 198:
 				{
 					visitor.OnLdvirtftn(instruction);
 					return;
 				}
-				case Code.Localloc:
+				case 205:
 				{
 					visitor.OnLocalloc(instruction);
 					return;
 				}
-				case Code.Endfilter:
+				case 206:
 				{
 					visitor.OnEndfilter(instruction);
 					return;
 				}
-				case Code.Unaligned:
+				case 207:
 				{
 					visitor.OnUnaligned(instruction);
 					return;
 				}
-				case Code.Volatile:
+				case 208:
 				{
 					visitor.OnVolatile(instruction);
 					return;
 				}
-				case Code.Tail:
+				case 209:
 				{
 					visitor.OnTail(instruction);
 					return;
 				}
-				case Code.Initobj:
+				case 210:
 				{
 					visitor.OnInitobj(instruction);
 					return;
 				}
-				case Code.Constrained:
+				case 211:
 				{
 					visitor.OnConstrained(instruction);
 					return;
 				}
-				case Code.Cpblk:
+				case 212:
 				{
 					visitor.OnCpblk(instruction);
 					return;
 				}
-				case Code.Initblk:
+				case 213:
 				{
 					visitor.OnInitblk(instruction);
 					return;
 				}
-				case Code.No:
+				case 214:
 				{
 					throw new ArgumentException(Formatter.FormatInstruction(instruction), "instruction");
 				}
-				case Code.Rethrow:
+				case 215:
 				{
 					visitor.OnRethrow(instruction);
 					return;
 				}
-				case Code.Sizeof:
+				case 216:
 				{
 					visitor.OnSizeof(instruction);
 					return;
 				}
-				case Code.Refanytype:
+				case 217:
 				{
 					visitor.OnRefanytype(instruction);
 					return;
 				}
-				case Code.Readonly:
+				case 218:
 				{
 					return;
 				}

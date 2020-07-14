@@ -12,128 +12,128 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private FlagsWriter.EnumNameCollection<MethodAttributes> methodAttributeFlags = new FlagsWriter.EnumNameCollection<MethodAttributes>()
 		{
-			{ MethodAttributes.Final, "final" },
-			{ MethodAttributes.HideBySig, "hidebysig" },
-			{ MethodAttributes.SpecialName, "specialname" },
-			{ MethodAttributes.PInvokeImpl, null },
-			{ MethodAttributes.UnmanagedExport, "export" },
-			{ MethodAttributes.RTSpecialName, "rtspecialname" },
-			{ MethodAttributes.RequireSecObject, "reqsecobj" },
-			{ MethodAttributes.VtableLayoutMask, "newslot" },
-			{ MethodAttributes.CheckAccessOnOverride, "strict" },
-			{ MethodAttributes.Abstract, "abstract" },
-			{ MethodAttributes.Virtual, "virtual" },
-			{ MethodAttributes.Static, "static" },
-			{ MethodAttributes.HasSecurity, null }
+			{ 32, "final" },
+			{ 128, "hidebysig" },
+			{ 0x800, "specialname" },
+			{ 0x2000, null },
+			{ 8, "export" },
+			{ 0x1000, "rtspecialname" },
+			{ 0x8000, "reqsecobj" },
+			{ 0x100, "newslot" },
+			{ 0x200, "strict" },
+			{ 0x400, "abstract" },
+			{ 64, "virtual" },
+			{ 16, "static" },
+			{ 0x4000, null }
 		};
 
 		private FlagsWriter.EnumNameCollection<MethodAttributes> methodVisibility = new FlagsWriter.EnumNameCollection<MethodAttributes>()
 		{
-			{ MethodAttributes.Private, "private" },
-			{ MethodAttributes.FamANDAssem, "famandassem" },
-			{ MethodAttributes.Assembly, "assembly" },
-			{ MethodAttributes.Family, "family" },
-			{ MethodAttributes.FamORAssem, "famorassem" },
-			{ MethodAttributes.Public, "public" }
+			{ 1, "private" },
+			{ 2, "famandassem" },
+			{ 3, "assembly" },
+			{ 4, "family" },
+			{ 5, "famorassem" },
+			{ 6, "public" }
 		};
 
 		private FlagsWriter.EnumNameCollection<MethodCallingConvention> callingConvention = new FlagsWriter.EnumNameCollection<MethodCallingConvention>()
 		{
-			{ MethodCallingConvention.C, "unmanaged cdecl" },
-			{ MethodCallingConvention.StdCall, "unmanaged stdcall" },
-			{ MethodCallingConvention.ThisCall, "unmanaged thiscall" },
-			{ MethodCallingConvention.FastCall, "unmanaged fastcall" },
-			{ MethodCallingConvention.VarArg, "vararg" },
-			{ MethodCallingConvention.Generic, null }
+			{ 1, "unmanaged cdecl" },
+			{ 2, "unmanaged stdcall" },
+			{ 3, "unmanaged thiscall" },
+			{ 4, "unmanaged fastcall" },
+			{ 5, "vararg" },
+			{ 16, null }
 		};
 
 		private FlagsWriter.EnumNameCollection<MethodImplAttributes> methodCodeType = new FlagsWriter.EnumNameCollection<MethodImplAttributes>()
 		{
-			{ MethodImplAttributes.IL, "cil" },
-			{ MethodImplAttributes.Native, "native" },
-			{ MethodImplAttributes.OPTIL, "optil" },
-			{ MethodImplAttributes.CodeTypeMask, "runtime" }
+			{ 0, "cil" },
+			{ 1, "native" },
+			{ 2, "optil" },
+			{ 3, "runtime" }
 		};
 
 		private FlagsWriter.EnumNameCollection<MethodImplAttributes> methodImpl = new FlagsWriter.EnumNameCollection<MethodImplAttributes>()
 		{
-			{ MethodImplAttributes.Synchronized, "synchronized" },
-			{ MethodImplAttributes.NoInlining, "noinlining" },
-			{ MethodImplAttributes.NoOptimization, "nooptimization" },
-			{ MethodImplAttributes.PreserveSig, "preservesig" },
-			{ MethodImplAttributes.InternalCall, "internalcall" },
-			{ MethodImplAttributes.ForwardRef, "forwardref" },
-			{ MethodImplAttributes.AggressiveInlining, "aggressiveinlining" }
+			{ 32, "synchronized" },
+			{ 8, "noinlining" },
+			{ 64, "nooptimization" },
+			{ 128, "preservesig" },
+			{ 0x1000, "internalcall" },
+			{ 16, "forwardref" },
+			{ 0x100, "aggressiveinlining" }
 		};
 
 		private FlagsWriter.EnumNameCollection<FieldAttributes> fieldVisibility = new FlagsWriter.EnumNameCollection<FieldAttributes>()
 		{
-			{ FieldAttributes.Private, "private" },
-			{ FieldAttributes.FamANDAssem, "famandassem" },
-			{ FieldAttributes.Assembly, "assembly" },
-			{ FieldAttributes.Family, "family" },
-			{ FieldAttributes.FamORAssem, "famorassem" },
-			{ FieldAttributes.Public, "public" }
+			{ 1, "private" },
+			{ 2, "famandassem" },
+			{ 3, "assembly" },
+			{ 4, "family" },
+			{ 5, "famorassem" },
+			{ 6, "public" }
 		};
 
 		private FlagsWriter.EnumNameCollection<FieldAttributes> fieldAttributes = new FlagsWriter.EnumNameCollection<FieldAttributes>()
 		{
-			{ FieldAttributes.Static, "static" },
-			{ FieldAttributes.Literal, "literal" },
-			{ FieldAttributes.InitOnly, "initonly" },
-			{ FieldAttributes.SpecialName, "specialname" },
-			{ FieldAttributes.RTSpecialName, "rtspecialname" },
-			{ FieldAttributes.NotSerialized, "notserialized" }
+			{ 16, "static" },
+			{ 64, "literal" },
+			{ 32, "initonly" },
+			{ 0x200, "specialname" },
+			{ 0x400, "rtspecialname" },
+			{ 128, "notserialized" }
 		};
 
 		private FlagsWriter.EnumNameCollection<PropertyAttributes> propertyAttributes = new FlagsWriter.EnumNameCollection<PropertyAttributes>()
 		{
-			{ PropertyAttributes.SpecialName, "specialname" },
-			{ PropertyAttributes.RTSpecialName, "rtspecialname" },
-			{ PropertyAttributes.HasDefault, "hasdefault" }
+			{ 0x200, "specialname" },
+			{ 0x400, "rtspecialname" },
+			{ 0x1000, "hasdefault" }
 		};
 
 		private FlagsWriter.EnumNameCollection<EventAttributes> eventAttributes = new FlagsWriter.EnumNameCollection<EventAttributes>()
 		{
-			{ EventAttributes.SpecialName, "specialname" },
-			{ EventAttributes.RTSpecialName, "rtspecialname" }
+			{ 0x200, "specialname" },
+			{ 0x400, "rtspecialname" }
 		};
 
 		private FlagsWriter.EnumNameCollection<TypeAttributes> typeVisibility = new FlagsWriter.EnumNameCollection<TypeAttributes>()
 		{
-			{ TypeAttributes.Public, "public" },
-			{ TypeAttributes.NotPublic, "private" },
-			{ TypeAttributes.NestedPublic, "nested public" },
-			{ TypeAttributes.NestedPrivate, "nested private" },
-			{ TypeAttributes.NestedAssembly, "nested assembly" },
-			{ TypeAttributes.NestedFamily, "nested family" },
-			{ TypeAttributes.NestedFamANDAssem, "nested famandassem" },
-			{ TypeAttributes.VisibilityMask, "nested famorassem" }
+			{ 1, "public" },
+			{ 0, "private" },
+			{ 2, "nested public" },
+			{ 3, "nested private" },
+			{ 5, "nested assembly" },
+			{ 4, "nested family" },
+			{ 6, "nested famandassem" },
+			{ 7, "nested famorassem" }
 		};
 
 		private FlagsWriter.EnumNameCollection<TypeAttributes> typeLayout = new FlagsWriter.EnumNameCollection<TypeAttributes>()
 		{
-			{ TypeAttributes.NotPublic, "auto" },
-			{ TypeAttributes.SequentialLayout, "sequential" },
-			{ TypeAttributes.ExplicitLayout, "explicit" }
+			{ 0, "auto" },
+			{ 8, "sequential" },
+			{ 16, "explicit" }
 		};
 
 		private FlagsWriter.EnumNameCollection<TypeAttributes> typeStringFormat = new FlagsWriter.EnumNameCollection<TypeAttributes>()
 		{
-			{ TypeAttributes.AutoClass, "auto" },
-			{ TypeAttributes.NotPublic, "ansi" },
-			{ TypeAttributes.UnicodeClass, "unicode" }
+			{ 0x20000, "auto" },
+			{ 0, "ansi" },
+			{ 0x10000, "unicode" }
 		};
 
 		private FlagsWriter.EnumNameCollection<TypeAttributes> typeAttributes = new FlagsWriter.EnumNameCollection<TypeAttributes>()
 		{
-			{ TypeAttributes.Abstract, "abstract" },
-			{ TypeAttributes.Sealed, "sealed" },
-			{ TypeAttributes.SpecialName, "specialname" },
-			{ TypeAttributes.Import, "import" },
-			{ TypeAttributes.Serializable, "serializable" },
-			{ TypeAttributes.BeforeFieldInit, "beforefieldinit" },
-			{ TypeAttributes.HasSecurity, null }
+			{ 128, "abstract" },
+			{ 0x100, "sealed" },
+			{ 0x400, "specialname" },
+			{ 0x1000, "import" },
+			{ 0x2000, "serializable" },
+			{ 0x100000, "beforefieldinit" },
+			{ 0x40000, null }
 		};
 
 		internal FlagsWriter(BaseLanguageWriter languageWriter)
@@ -167,17 +167,17 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		internal void WriteEventFlags(EventDefinition @event)
 		{
-			this.WriteFlags<EventAttributes>(@event.Attributes, this.eventAttributes);
+			this.WriteFlags<EventAttributes>(@event.get_Attributes(), this.eventAttributes);
 		}
 
 		internal void WriteFieldFlags(FieldDefinition field)
 		{
-			this.WriteFlags<FieldAttributes>(field.Attributes & (FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Literal | FieldAttributes.NotSerialized | FieldAttributes.SpecialName | FieldAttributes.PInvokeImpl | FieldAttributes.RTSpecialName), this.fieldAttributes);
+			this.WriteFlags<FieldAttributes>(field.get_Attributes() & 0x6ef8, this.fieldAttributes);
 		}
 
 		internal void WriteFieldVisibility(FieldDefinition field)
 		{
-			this.WriteEnum<FieldAttributes>(field.Attributes & FieldAttributes.FieldAccessMask, this.fieldVisibility);
+			this.WriteEnum<FieldAttributes>(field.get_Attributes() & 7, this.fieldVisibility);
 		}
 
 		private void WriteFlags<T>(T flags, FlagsWriter.EnumNameCollection<T> flagNames)
@@ -203,52 +203,52 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		internal void WriteMethodCallingConvention(MethodDefinition method)
 		{
-			this.WriteEnum<MethodCallingConvention>(method.CallingConvention & (MethodCallingConvention.C | MethodCallingConvention.StdCall | MethodCallingConvention.ThisCall | MethodCallingConvention.FastCall | MethodCallingConvention.VarArg | MethodCallingConvention.Generic), this.callingConvention);
+			this.WriteEnum<MethodCallingConvention>(method.get_CallingConvention() & 31, this.callingConvention);
 		}
 
 		internal void WriteMethodCallType(MethodDefinition method)
 		{
-			this.WriteEnum<MethodImplAttributes>(method.ImplAttributes & MethodImplAttributes.CodeTypeMask, this.methodCodeType);
+			this.WriteEnum<MethodImplAttributes>(method.get_ImplAttributes() & 3, this.methodCodeType);
 		}
 
 		internal void WriteMethodFlags(MethodDefinition method)
 		{
-			this.WriteFlags<MethodAttributes>(method.Attributes & (MethodAttributes.Static | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.VtableLayoutMask | MethodAttributes.NewSlot | MethodAttributes.CheckAccessOnOverride | MethodAttributes.Abstract | MethodAttributes.SpecialName | MethodAttributes.PInvokeImpl | MethodAttributes.UnmanagedExport | MethodAttributes.RTSpecialName | MethodAttributes.HasSecurity | MethodAttributes.RequireSecObject), this.methodAttributeFlags);
+			this.WriteFlags<MethodAttributes>(method.get_Attributes() & 0xfff8, this.methodAttributeFlags);
 		}
 
 		internal void WriteMethodImplementationAttribute(MethodDefinition method)
 		{
-			this.WriteFlags<MethodImplAttributes>(method.ImplAttributes & (MethodImplAttributes.ForwardRef | MethodImplAttributes.PreserveSig | MethodImplAttributes.InternalCall | MethodImplAttributes.Synchronized | MethodImplAttributes.NoOptimization | MethodImplAttributes.NoInlining | MethodImplAttributes.AggressiveInlining), this.methodImpl);
+			this.WriteFlags<MethodImplAttributes>(method.get_ImplAttributes() & 0xfff8, this.methodImpl);
 		}
 
 		internal void WriteMethodVisibility(MethodDefinition method)
 		{
-			this.WriteEnum<MethodAttributes>(method.Attributes & MethodAttributes.MemberAccessMask, this.methodVisibility);
+			this.WriteEnum<MethodAttributes>(method.get_Attributes() & 7, this.methodVisibility);
 		}
 
 		internal void WritePropertyFlags(PropertyDefinition property)
 		{
-			this.WriteFlags<PropertyAttributes>(property.Attributes, this.propertyAttributes);
+			this.WriteFlags<PropertyAttributes>(property.get_Attributes(), this.propertyAttributes);
 		}
 
 		internal void WriteTypeAttributes(TypeDefinition type)
 		{
-			this.WriteFlags<TypeAttributes>(type.Attributes & (TypeAttributes.Abstract | TypeAttributes.Sealed | TypeAttributes.SpecialName | TypeAttributes.Import | TypeAttributes.Serializable | TypeAttributes.WindowsRuntime | TypeAttributes.BeforeFieldInit | TypeAttributes.RTSpecialName | TypeAttributes.HasSecurity | TypeAttributes.Forwarder), this.typeAttributes);
+			this.WriteFlags<TypeAttributes>(type.get_Attributes() & -196672, this.typeAttributes);
 		}
 
 		internal void WriteTypeLayoutFlags(TypeDefinition type)
 		{
-			this.WriteEnum<TypeAttributes>(type.Attributes & TypeAttributes.LayoutMask, this.typeLayout);
+			this.WriteEnum<TypeAttributes>(type.get_Attributes() & 24, this.typeLayout);
 		}
 
 		internal void WriteTypeStringFormat(TypeDefinition type)
 		{
-			this.WriteEnum<TypeAttributes>(type.Attributes & TypeAttributes.StringFormatMask, this.typeStringFormat);
+			this.WriteEnum<TypeAttributes>(type.get_Attributes() & 0x30000, this.typeStringFormat);
 		}
 
 		internal void WriteTypeVisibility(TypeDefinition type)
 		{
-			this.WriteEnum<TypeAttributes>(type.Attributes & TypeAttributes.VisibilityMask, this.typeVisibility);
+			this.WriteEnum<TypeAttributes>(type.get_Attributes() & 7, this.typeVisibility);
 		}
 
 		private sealed class EnumNameCollection<T> : IEnumerable<KeyValuePair<long, string>>, IEnumerable

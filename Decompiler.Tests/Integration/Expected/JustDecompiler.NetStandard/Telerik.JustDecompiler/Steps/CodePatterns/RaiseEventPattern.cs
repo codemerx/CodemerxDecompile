@@ -65,7 +65,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			VariableReferenceExpression variableReferenceExpression = condition.Left as VariableReferenceExpression;
-			if (left.Variable != variableReferenceExpression.Variable)
+			if ((object)left.Variable != (object)variableReferenceExpression.Variable)
 			{
 				return false;
 			}
@@ -89,7 +89,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			VariableReferenceExpression target = delegateInvokeExpression.Target as VariableReferenceExpression;
-			if (target.Variable != left.Variable)
+			if ((object)target.Variable != (object)left.Variable)
 			{
 				return false;
 			}

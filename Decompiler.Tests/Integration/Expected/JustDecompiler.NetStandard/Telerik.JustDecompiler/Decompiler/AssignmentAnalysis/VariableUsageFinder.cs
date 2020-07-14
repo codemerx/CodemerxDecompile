@@ -20,12 +20,12 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 			{
 				return false;
 			}
-			return (node as VariableReferenceExpression).Variable.Resolve() == this.variable;
+			return (object)(node as VariableReferenceExpression).Variable.Resolve() == (object)this.variable;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (node.Variable.Resolve() == this.variable)
+			if ((object)node.Variable.Resolve() == (object)this.variable)
 			{
 				this.searchResult = UsageFinderSearchResult.Used;
 			}

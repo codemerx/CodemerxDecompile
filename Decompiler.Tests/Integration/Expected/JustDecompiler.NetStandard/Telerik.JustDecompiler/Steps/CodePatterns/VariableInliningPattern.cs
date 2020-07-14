@@ -23,7 +23,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private SimpleDereferencer dereferencer;
 
-		public VariableInliningPattern(CodePatternsContext patternsContext, MethodSpecificContext methodContext, IVariablesToNotInlineFinder finder) : base(patternsContext, methodContext.Method.Module.TypeSystem)
+		public VariableInliningPattern(CodePatternsContext patternsContext, MethodSpecificContext methodContext, IVariablesToNotInlineFinder finder) : base(patternsContext, methodContext.Method.get_Module().get_TypeSystem())
 		{
 			this.methodContext = methodContext;
 			this.inliner = new RestrictedVariableInliner(this.typeSystem);

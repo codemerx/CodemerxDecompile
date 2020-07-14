@@ -36,12 +36,12 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			this.offsetToExpression = offsetToExpression;
 			this.offsetToInstruction = offsetToInstruction;
 			this.methodContext = context.MethodContext;
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 		}
 
 		private void AddObjectClassNodeIfMIssing()
 		{
-			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.Object);
+			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Object());
 			this.resultingGraph.Add(typeNode);
 		}
 
@@ -94,7 +94,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				{
 					continue;
 				}
-				baseType = typeDefinition.BaseType;
+				baseType = typeDefinition.get_BaseType();
 				if (baseType != null)
 				{
 					ClassHierarchyNode typeNode = this.GetTypeNode(baseType);
@@ -104,11 +104,11 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 						classHierarchyNodes.Enqueue(typeNode);
 					}
 				}
-				if (typeDefinition.IsInterface)
+				if (typeDefinition.get_IsInterface())
 				{
-					classHierarchyNode.AddSupertype(this.GetTypeNode(this.typeSystem.Object));
+					classHierarchyNode.AddSupertype(this.GetTypeNode(this.typeSystem.get_Object()));
 				}
-				foreach (TypeReference @interface in (IEnumerable<TypeReference>)classHierarchyNode.NodeType.Resolve().Interfaces)
+				foreach (TypeReference @interface in classHierarchyNode.NodeType.Resolve().get_Interfaces())
 				{
 					ClassHierarchyNode typeNode1 = this.GetTypeNode(@interface);
 					classHierarchyNode.AddSupertype(typeNode1);
@@ -124,7 +124,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		protected virtual ClassHierarchyNode GetTypeNode(TypeReference type)
 		{
-			string fullName = type.FullName;
+			string fullName = type.get_FullName();
 			if (fullName == "System.Byte" || fullName == "System.SByte" || fullName == "System.Char" || fullName == "System.Int16" || fullName == "System.UInt16" || fullName == "System.Boolean")
 			{
 				fullName = "System.Int32";
@@ -139,20 +139,20 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		protected ClassHierarchyNode GetUseExpressionTypeNode(Instruction instruction, VariableReference variable)
 		{
-			Code code = instruction.OpCode.Code;
-			if (code == Code.Ldobj)
+			Code code = instruction.get_OpCode().get_Code();
+			if (code == 112)
 			{
-				return this.GetTypeNode(instruction.Operand as TypeReference);
+				return this.GetTypeNode(instruction.get_Operand() as TypeReference);
 			}
 			if (ClassHierarchyBuilder.IsConditionalBranch(code))
 			{
-				return this.GetTypeNode(this.typeSystem.Boolean);
+				return this.GetTypeNode(this.typeSystem.get_Boolean());
 			}
-			if (code == Code.Switch)
+			if (code == 68)
 			{
-				return this.GetTypeNode(this.typeSystem.UInt32);
+				return this.GetTypeNode(this.typeSystem.get_UInt32());
 			}
-			Expression item = this.offsetToExpression[instruction.Offset];
+			Expression item = this.offsetToExpression[instruction.get_Offset()];
 			return this.GetUseExpressionTypeNode(item, variable);
 		}
 
@@ -184,17 +184,17 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					}
 					case CodeNodeType.VariableReferenceExpression:
 					{
-						return this.GetTypeNode((expression as VariableReferenceExpression).Variable.VariableType);
+						return this.GetTypeNode((expression as VariableReferenceExpression).Variable.get_VariableType());
 					}
 					case CodeNodeType.VariableDeclarationExpression:
 					{
-						return this.GetTypeNode((expression as VariableDeclarationExpression).Variable.VariableType);
+						return this.GetTypeNode((expression as VariableDeclarationExpression).Variable.get_VariableType());
 					}
 					default:
 					{
 						if (codeNodeType == CodeNodeType.ExplicitCastExpression || codeNodeType == CodeNodeType.SafeCastExpression)
 						{
-							return this.GetTypeNode(this.typeSystem.Object);
+							return this.GetTypeNode(this.typeSystem.get_Object());
 						}
 						break;
 					}
@@ -204,7 +204,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			{
 				if (codeNodeType == CodeNodeType.ReturnExpression)
 				{
-					return this.GetTypeNode(this.methodContext.Method.FixedReturnType);
+					return this.GetTypeNode(this.methodContext.Method.get_FixedReturnType());
 				}
 				if (codeNodeType == CodeNodeType.BoxExpression)
 				{
@@ -259,11 +259,11 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			ClassHierarchyNode typeNode;
 			foreach (Expression dimension in arrayCreationExpression.Dimensions)
 			{
-				if (!(dimension is VariableReferenceExpression) || (dimension as VariableReferenceExpression).Variable != variable)
+				if (!(dimension is VariableReferenceExpression) || (object)(dimension as VariableReferenceExpression).Variable != (object)variable)
 				{
 					continue;
 				}
-				typeNode = this.GetTypeNode(this.typeSystem.Int32);
+				typeNode = this.GetTypeNode(this.typeSystem.get_Int32());
 				return typeNode;
 			}
 			using (IEnumerator<Expression> enumerator = arrayCreationExpression.Initializer.Expressions.GetEnumerator())
@@ -271,7 +271,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				while (enumerator.MoveNext())
 				{
 					Expression current = enumerator.Current;
-					if (!(current is VariableReferenceExpression) || (current as VariableReferenceExpression).Variable != variable)
+					if (!(current is VariableReferenceExpression) || (object)(current as VariableReferenceExpression).Variable != (object)variable)
 					{
 						continue;
 					}
@@ -291,14 +291,14 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				while (enumerator.MoveNext())
 				{
 					Expression current = enumerator.Current;
-					if (!(current is VariableReferenceExpression) || (current as VariableReferenceExpression).Variable != variable)
+					if (!(current is VariableReferenceExpression) || (object)(current as VariableReferenceExpression).Variable != (object)variable)
 					{
 						continue;
 					}
-					typeNode = this.GetTypeNode(this.typeSystem.Int32);
+					typeNode = this.GetTypeNode(this.typeSystem.get_Int32());
 					return typeNode;
 				}
-				TypeReference typeReference = new TypeReference("System", "Array", this.typeSystem.Object.Module, this.typeSystem.Object.Scope);
+				TypeReference typeReference = new TypeReference("System", "Array", this.typeSystem.get_Object().get_Module(), this.typeSystem.get_Object().get_Scope());
 				return this.GetTypeNode(typeReference);
 			}
 			return typeNode;
@@ -306,7 +306,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private ClassHierarchyNode GetUseInBinaryExpression(BinaryExpression binaryExpression, VariableReference variable)
 		{
-			if (binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (binaryExpression.Right as VariableReferenceExpression).Variable == variable)
+			if (binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(binaryExpression.Right as VariableReferenceExpression).Variable == (object)variable)
 			{
 				if (!(binaryExpression.Left is VariableReferenceExpression) || binaryExpression.Left.HasType)
 				{
@@ -314,7 +314,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				}
 				return this.GetVariableNode((binaryExpression.Left as VariableReferenceExpression).Variable);
 			}
-			if (!(binaryExpression.Left is VariableReferenceExpression) || (binaryExpression.Left as VariableReferenceExpression).Variable != variable)
+			if (!(binaryExpression.Left is VariableReferenceExpression) || (object)(binaryExpression.Left as VariableReferenceExpression).Variable != (object)variable)
 			{
 				return this.GetUseExpressionTypeNode(binaryExpression.Left, variable);
 			}
@@ -330,7 +330,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			Expression expression = null;
 			foreach (Expression argument in methodInvocationExpression.Arguments)
 			{
-				if (!(argument is VariableReferenceExpression) || (argument as VariableReferenceExpression).Variable != variable)
+				if (!(argument is VariableReferenceExpression) || (object)(argument as VariableReferenceExpression).Variable != (object)variable)
 				{
 					continue;
 				}
@@ -339,13 +339,13 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			if (expression != null)
 			{
 				int num = methodInvocationExpression.Arguments.IndexOf(expression);
-				return this.GetTypeNode(methodInvocationExpression.MethodExpression.Method.Parameters[num].ParameterType);
+				return this.GetTypeNode(methodInvocationExpression.MethodExpression.Method.get_Parameters().get_Item(num).get_ParameterType());
 			}
-			if ((methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != variable)
+			if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)variable)
 			{
 				return null;
 			}
-			return this.GetTypeNode(methodInvocationExpression.MethodExpression.Member.DeclaringType);
+			return this.GetTypeNode(methodInvocationExpression.MethodExpression.Member.get_DeclaringType());
 		}
 
 		private ClassHierarchyNode GetUseInObjectCreation(ObjectCreationExpression objectCreationExpression, VariableReference variable)
@@ -353,18 +353,18 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			Expression expression = null;
 			foreach (Expression argument in objectCreationExpression.Arguments)
 			{
-				if (!(argument is VariableReferenceExpression) || (argument as VariableReferenceExpression).Variable != variable)
+				if (!(argument is VariableReferenceExpression) || (object)(argument as VariableReferenceExpression).Variable != (object)variable)
 				{
 					continue;
 				}
 				expression = argument;
 			}
-			return this.GetTypeNode(objectCreationExpression.Constructor.Parameters[objectCreationExpression.Arguments.IndexOf(expression)].ParameterType);
+			return this.GetTypeNode(objectCreationExpression.Constructor.get_Parameters().get_Item(objectCreationExpression.Arguments.IndexOf(expression)).get_ParameterType());
 		}
 
 		protected ClassHierarchyNode GetVariableNode(VariableReference variable)
 		{
-			string name = variable.Name;
+			string name = variable.get_Name();
 			if (!this.variableNameToNode.ContainsKey(name))
 			{
 				ClassHierarchyNode classHierarchyNode = this.MergeWithVariableTypeIfNeeded(variable, new ClassHierarchyNode(variable));
@@ -394,18 +394,18 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private static bool IsConditionalBranch(Code instructionOpCode)
 		{
-			if (instructionOpCode == Code.Brtrue || instructionOpCode == Code.Brtrue_S || instructionOpCode == Code.Brfalse)
+			if (instructionOpCode == 57 || instructionOpCode == 44 || instructionOpCode == 56)
 			{
 				return true;
 			}
-			return instructionOpCode == Code.Brfalse_S;
+			return instructionOpCode == 43;
 		}
 
 		protected virtual ClassHierarchyNode MergeWithVariableTypeIfNeeded(VariableReference variable, ClassHierarchyNode variableNode)
 		{
-			if (variable.VariableType != null)
+			if (variable.get_VariableType() != null)
 			{
-				ClassHierarchyNode typeNode = this.GetTypeNode(variable.VariableType);
+				ClassHierarchyNode typeNode = this.GetTypeNode(variable.get_VariableType());
 				variableNode = new ClassHierarchyNode(new ClassHierarchyNode[] { variableNode, typeNode });
 			}
 			return variableNode;
@@ -440,7 +440,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		protected virtual bool ShouldConsiderVariable(VariableReference variableReference)
 		{
-			return variableReference.VariableType == null;
+			return variableReference.get_VariableType() == null;
 		}
 	}
 }

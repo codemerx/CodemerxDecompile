@@ -46,7 +46,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.TargetType.Module.TypeSystem.Boolean;
+				return this.TargetType.get_Module().get_TypeSystem().get_Boolean();
 			}
 			set
 			{
@@ -91,7 +91,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			CanCastExpression canCastExpression = other as CanCastExpression;
-			if (this.TargetType.FullName != canCastExpression.TargetType.FullName)
+			if (this.TargetType.get_FullName() != canCastExpression.TargetType.get_FullName())
 			{
 				return false;
 			}

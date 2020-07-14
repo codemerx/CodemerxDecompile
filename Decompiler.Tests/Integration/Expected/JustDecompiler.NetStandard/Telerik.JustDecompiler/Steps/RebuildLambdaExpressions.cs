@@ -22,24 +22,24 @@ namespace Telerik.JustDecompiler.Steps
 
 		public bool CheckTypeForCompilerGeneratedAttribute(TypeDefinition typeDefinition)
 		{
-			while (typeDefinition.IsNested)
+			while (typeDefinition.get_IsNested())
 			{
 				if (typeDefinition.HasCompilerGeneratedAttribute())
 				{
 					return true;
 				}
-				typeDefinition = typeDefinition.DeclaringType;
+				typeDefinition = typeDefinition.get_DeclaringType();
 			}
 			return false;
 		}
 
 		private DecompilationContext CreateDecompilationContext(MethodDefinition lambdaMethodDefinition)
 		{
-			if (lambdaMethodDefinition.DeclaringType != this.context.TypeContext.CurrentType)
+			if ((object)lambdaMethodDefinition.get_DeclaringType() != (object)this.context.TypeContext.CurrentType)
 			{
-				return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.Body), new TypeSpecificContext(lambdaMethodDefinition.DeclaringType), this.context.Language);
+				return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.get_Body()), new TypeSpecificContext(lambdaMethodDefinition.get_DeclaringType()), this.context.Language);
 			}
-			return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.Body), this.context.TypeContext, this.context.ModuleContext, this.context.AssemblyContext, this.context.Language);
+			return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.get_Body()), this.context.TypeContext, this.context.ModuleContext, this.context.AssemblyContext, this.context.Language);
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -59,19 +59,19 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			MethodDefinition methodDefinition = node.Method.Resolve();
 			TypeDefinition currentType = this.context.TypeContext.CurrentType;
-			if (methodDefinition == null || methodDefinition.DeclaringType != currentType && !methodDefinition.DeclaringType.IsNestedIn(currentType))
+			if (methodDefinition == null || (object)methodDefinition.get_DeclaringType() != (object)currentType && !methodDefinition.get_DeclaringType().IsNestedIn(currentType))
 			{
 				return base.VisitMethodReferenceExpression(node);
 			}
-			if (methodDefinition.IsGetter || methodDefinition.IsSetter || !methodDefinition.IsCompilerGenerated(true) && !this.CheckTypeForCompilerGeneratedAttribute(methodDefinition.DeclaringType))
+			if (methodDefinition.get_IsGetter() || methodDefinition.get_IsSetter() || !methodDefinition.IsCompilerGenerated(true) && !this.CheckTypeForCompilerGeneratedAttribute(methodDefinition.get_DeclaringType()))
 			{
 				return base.VisitMethodReferenceExpression(node);
 			}
 			BlockStatement blockStatement = null;
-			if (methodDefinition.Body != null)
+			if (methodDefinition.get_Body() != null)
 			{
 				DecompilationContext decompilationContext = this.CreateDecompilationContext(methodDefinition);
-				blockStatement = methodDefinition.Body.DecompileLambda(this.context.Language, decompilationContext);
+				blockStatement = methodDefinition.get_Body().DecompileLambda(this.context.Language, decompilationContext);
 				if (blockStatement.Statements.Count == 1 && blockStatement.Statements[0].CodeNodeType == CodeNodeType.ExpressionStatement && (blockStatement.Statements[0] as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ReturnExpression)
 				{
 					ReturnExpression expression = (blockStatement.Statements[0] as ExpressionStatement).Expression as ReturnExpression;
@@ -86,12 +86,12 @@ namespace Telerik.JustDecompiler.Steps
 				this.context.MethodContext.GotoLabels.AddRange<string, Statement>(decompilationContext.MethodContext.GotoLabels);
 			}
 			ExpressionCollection expressionCollection = new ExpressionCollection();
-			bool flag = LambdaExpressionsHelper.HasAnonymousParameter(methodDefinition.Parameters);
-			foreach (ParameterDefinition parameter in methodDefinition.Parameters)
+			bool flag = LambdaExpressionsHelper.HasAnonymousParameter(methodDefinition.get_Parameters());
+			foreach (ParameterDefinition parameter in methodDefinition.get_Parameters())
 			{
 				expressionCollection.Add(new LambdaParameterExpression(parameter, !flag, null));
 			}
-			return new LambdaExpression(expressionCollection, blockStatement, methodDefinition.IsAsync(), methodDefinition.IsFunction(), node.Method.Parameters, false, node.MappedInstructions);
+			return new LambdaExpression(expressionCollection, blockStatement, methodDefinition.IsAsync(), methodDefinition.IsFunction(), node.Method.get_Parameters(), false, node.MappedInstructions);
 		}
 
 		public override ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
@@ -101,8 +101,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			TypeDefinition typeDefinition = node.Constructor.DeclaringType.Resolve();
-			if (typeDefinition == null || typeDefinition.BaseType == null || typeDefinition.BaseType.FullName != "System.MulticastDelegate" || node.Arguments.Count != 2 || node.Arguments[1].CodeNodeType != CodeNodeType.LambdaExpression)
+			TypeDefinition typeDefinition = node.Constructor.get_DeclaringType().Resolve();
+			if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate" || node.Arguments.Count != 2 || node.Arguments[1].CodeNodeType != CodeNodeType.LambdaExpression)
 			{
 				return node;
 			}

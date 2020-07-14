@@ -15,7 +15,7 @@ namespace Mono.Cecil.Extensions
 	{
 		public static IEnumerable<MethodDefinition> GetAllMethodsUnordered(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers, IEnumerable<string> attributesToSkip = null)
 		{
-			foreach (MethodDefinition method in typeDefinition.Methods)
+			foreach (MethodDefinition method in typeDefinition.get_Methods())
 			{
 				if (!showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute() || method.HasCustomAttribute(attributesToSkip))
 				{
@@ -36,7 +36,7 @@ namespace Mono.Cecil.Extensions
 			for (int i = 0; i < typeDefinitions.Count; i++)
 			{
 				TypeDefinition item = typeDefinitions[i];
-				TypeReference baseType = item.BaseType;
+				TypeReference baseType = item.get_BaseType();
 				if (baseType != null)
 				{
 					TypeDefinition typeDefinition = baseType.Resolve();
@@ -45,7 +45,7 @@ namespace Mono.Cecil.Extensions
 						typeDefinitions.Add(typeDefinition);
 					}
 				}
-				foreach (TypeReference @interface in item.Interfaces)
+				foreach (TypeReference @interface in item.get_Interfaces())
 				{
 					if (@interface == null)
 					{
@@ -66,7 +66,7 @@ namespace Mono.Cecil.Extensions
 		{
 			FieldDefinition fieldDefinition;
 			Dictionary<FieldDefinition, EventDefinition> fieldDefinitions = new Dictionary<FieldDefinition, EventDefinition>();
-			foreach (EventDefinition @event in typeDefinition.Events)
+			foreach (EventDefinition @event in typeDefinition.get_Events())
 			{
 				if (!(new AutoImplementedEventMatcher(@event, language)).IsAutoImplemented(out fieldDefinition))
 				{
@@ -81,7 +81,7 @@ namespace Mono.Cecil.Extensions
 		{
 			FieldDefinition fieldDefinition;
 			Dictionary<FieldDefinition, PropertyDefinition> fieldDefinitions = new Dictionary<FieldDefinition, PropertyDefinition>();
-			foreach (PropertyDefinition property in typeDefinition.Properties)
+			foreach (PropertyDefinition property in typeDefinition.get_Properties())
 			{
 				if (!(new PropertyDecompiler(property, language, null)).IsAutoImplemented(out fieldDefinition))
 				{
@@ -95,28 +95,28 @@ namespace Mono.Cecil.Extensions
 		public static IMemberDefinition GetMember(this TypeDefinition self, string fullName)
 		{
 			IMemberDefinition memberDefinition = (
-				from m in self.Methods
-				where m.FullName == fullName
+				from m in self.get_Methods()
+				where m.get_FullName() == fullName
 				select m).FirstOrDefault<MethodDefinition>();
-			if (memberDefinition == null && self.HasProperties)
+			if (memberDefinition == null && self.get_HasProperties())
 			{
 				memberDefinition = (
-					from p in self.Properties
-					where p.FullName == fullName
+					from p in self.get_Properties()
+					where p.get_FullName() == fullName
 					select p).FirstOrDefault<PropertyDefinition>();
 			}
-			if (memberDefinition == null && self.HasEvents)
+			if (memberDefinition == null && self.get_HasEvents())
 			{
 				memberDefinition = (
-					from e in self.Events
-					where e.FullName == fullName
+					from e in self.get_Events()
+					where e.get_FullName() == fullName
 					select e).FirstOrDefault<EventDefinition>();
 			}
-			if (memberDefinition == null && self.HasFields)
+			if (memberDefinition == null && self.get_HasFields())
 			{
 				memberDefinition = (
-					from f in self.Fields
-					where f.FullName == fullName
+					from f in self.get_Fields()
+					where f.get_FullName() == fullName
 					select f).FirstOrDefault<FieldDefinition>();
 			}
 			return memberDefinition;
@@ -134,23 +134,23 @@ namespace Mono.Cecil.Extensions
 			{
 				fieldReferences.UnionWith(typeDefinition.GetFieldToPropertyMap(language).Keys);
 			}
-			if (typeDefinition.HasFields)
+			if (typeDefinition.get_HasFields())
 			{
-				foreach (FieldDefinition field in typeDefinition.Fields)
+				foreach (FieldDefinition field in typeDefinition.get_Fields())
 				{
-					if (!showCompilerGeneratedMembers && field.IsCompilerGenerated(true) || field.HasCustomAttribute(attributesToSkip) || fieldReferences.Contains(field) || fieldsToSkip != null && fieldsToSkip.Contains(field.Name))
+					if (!showCompilerGeneratedMembers && field.IsCompilerGenerated(true) || field.HasCustomAttribute(attributesToSkip) || fieldReferences.Contains(field) || fieldsToSkip != null && fieldsToSkip.Contains(field.get_Name()))
 					{
 						continue;
 					}
 					yield return field;
 				}
 			}
-			if (typeDefinition.HasProperties)
+			if (typeDefinition.get_HasProperties())
 			{
-				Collection<PropertyDefinition> properties = typeDefinition.Properties;
+				Collection<PropertyDefinition> properties = typeDefinition.get_Properties();
 				foreach (PropertyDefinition propertyDefinition in 
 					from p in properties
-					orderby p.Name
+					orderby p.get_Name()
 					select p)
 				{
 					if (propertyDefinition.HasCustomAttribute(attributesToSkip))
@@ -160,9 +160,9 @@ namespace Mono.Cecil.Extensions
 					yield return propertyDefinition;
 				}
 			}
-			if (typeDefinition.HasMethods)
+			if (typeDefinition.get_HasMethods())
 			{
-				IEnumerable<MethodDefinition> methods = typeDefinition.Methods;
+				IEnumerable<MethodDefinition> methods = typeDefinition.get_Methods();
 				if (generatedFilterMethods != null)
 				{
 					methods = methods.Concat<MethodDefinition>(generatedFilterMethods);
@@ -170,22 +170,22 @@ namespace Mono.Cecil.Extensions
 				IEnumerable<MethodDefinition> methodDefinitions = methods;
 				foreach (MethodDefinition methodDefinition in 
 					from m in methodDefinitions
-					orderby m.Name
+					orderby m.get_Name()
 					select m)
 				{
-					if (methodDefinition.IsGetter || methodDefinition.IsSetter || methodDefinition.IsAddOn || methodDefinition.IsRemoveOn || !showCompilerGeneratedMembers && methodDefinition.HasCompilerGeneratedAttribute() || methodDefinition.HasCustomAttribute(attributesToSkip))
+					if (methodDefinition.get_IsGetter() || methodDefinition.get_IsSetter() || methodDefinition.get_IsAddOn() || methodDefinition.get_IsRemoveOn() || !showCompilerGeneratedMembers && methodDefinition.HasCompilerGeneratedAttribute() || methodDefinition.HasCustomAttribute(attributesToSkip))
 					{
 						continue;
 					}
 					yield return methodDefinition;
 				}
 			}
-			if (typeDefinition.HasEvents)
+			if (typeDefinition.get_HasEvents())
 			{
-				Collection<EventDefinition> events = typeDefinition.Events;
+				Collection<EventDefinition> events = typeDefinition.get_Events();
 				foreach (EventDefinition eventDefinition in 
 					from e in events
-					orderby e.Name
+					orderby e.get_Name()
 					select e)
 				{
 					if (eventDefinition.HasCustomAttribute(attributesToSkip))
@@ -195,12 +195,12 @@ namespace Mono.Cecil.Extensions
 					yield return eventDefinition;
 				}
 			}
-			if (typeDefinition.HasNestedTypes)
+			if (typeDefinition.get_HasNestedTypes())
 			{
-				Collection<TypeDefinition> nestedTypes = typeDefinition.NestedTypes;
+				Collection<TypeDefinition> nestedTypes = typeDefinition.get_NestedTypes();
 				foreach (TypeDefinition typeDefinition1 in 
 					from t in nestedTypes
-					orderby t.Name
+					orderby t.get_Name()
 					select t)
 				{
 					if (!showCompilerGeneratedMembers && typeDefinition1.HasCompilerGeneratedAttribute() || typeDefinition1.HasCustomAttribute(attributesToSkip))
@@ -214,34 +214,34 @@ namespace Mono.Cecil.Extensions
 
 		public static IEnumerable<IMemberDefinition> GetMembersToDecompile(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers = true)
 		{
-			foreach (PropertyDefinition property in typeDefinition.Properties)
+			foreach (PropertyDefinition property in typeDefinition.get_Properties())
 			{
 				yield return property;
 			}
-			if (typeDefinition.HasMethods)
+			if (typeDefinition.get_HasMethods())
 			{
-				foreach (MethodDefinition method in typeDefinition.Methods)
+				foreach (MethodDefinition method in typeDefinition.get_Methods())
 				{
-					if (method.IsGetter || method.IsSetter || method.IsAddOn || method.IsRemoveOn || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
+					if (method.get_IsGetter() || method.get_IsSetter() || method.get_IsAddOn() || method.get_IsRemoveOn() || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
 					{
 						continue;
 					}
 					yield return method;
 				}
 			}
-			if (typeDefinition.HasEvents)
+			if (typeDefinition.get_HasEvents())
 			{
-				foreach (EventDefinition @event in typeDefinition.Events)
+				foreach (EventDefinition @event in typeDefinition.get_Events())
 				{
 					yield return @event;
 				}
 			}
-			if (typeDefinition.HasNestedTypes)
+			if (typeDefinition.get_HasNestedTypes())
 			{
-				Collection<TypeDefinition> nestedTypes = typeDefinition.NestedTypes;
+				Collection<TypeDefinition> nestedTypes = typeDefinition.get_NestedTypes();
 				foreach (TypeDefinition typeDefinition1 in 
 					from t in nestedTypes
-					orderby t.Name
+					orderby t.get_Name()
 					select t)
 				{
 					if (!showCompilerGeneratedMembers && typeDefinition1.HasCompilerGeneratedAttribute())
@@ -255,9 +255,9 @@ namespace Mono.Cecil.Extensions
 
 		public static IEnumerable<IMemberDefinition> GetMembersUnordered(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers)
 		{
-			if (typeDefinition.HasFields)
+			if (typeDefinition.get_HasFields())
 			{
-				foreach (FieldDefinition field in typeDefinition.Fields)
+				foreach (FieldDefinition field in typeDefinition.get_Fields())
 				{
 					if (!showCompilerGeneratedMembers && field.IsCompilerGenerated(true))
 					{
@@ -266,27 +266,27 @@ namespace Mono.Cecil.Extensions
 					yield return field;
 				}
 			}
-			if (typeDefinition.HasProperties)
+			if (typeDefinition.get_HasProperties())
 			{
-				foreach (PropertyDefinition property in typeDefinition.Properties)
+				foreach (PropertyDefinition property in typeDefinition.get_Properties())
 				{
 					yield return property;
 				}
 			}
-			if (typeDefinition.HasMethods)
+			if (typeDefinition.get_HasMethods())
 			{
-				foreach (MethodDefinition method in typeDefinition.Methods)
+				foreach (MethodDefinition method in typeDefinition.get_Methods())
 				{
-					if (method.IsGetter || method.IsSetter || method.IsSpecialName && (method.Name.StartsWith("remove_") || method.Name.StartsWith("add_")) || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
+					if (method.get_IsGetter() || method.get_IsSetter() || method.get_IsSpecialName() && (method.get_Name().StartsWith("remove_") || method.get_Name().StartsWith("add_")) || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
 					{
 						continue;
 					}
 					yield return method;
 				}
 			}
-			if (typeDefinition.HasEvents)
+			if (typeDefinition.get_HasEvents())
 			{
-				foreach (EventDefinition @event in typeDefinition.Events)
+				foreach (EventDefinition @event in typeDefinition.get_Events())
 				{
 					yield return @event;
 				}
@@ -295,27 +295,27 @@ namespace Mono.Cecil.Extensions
 
 		public static IEnumerable<IMemberDefinition> GetMethodsEventsPropertiesUnordered(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers)
 		{
-			if (typeDefinition.HasProperties)
+			if (typeDefinition.get_HasProperties())
 			{
-				foreach (PropertyDefinition property in typeDefinition.Properties)
+				foreach (PropertyDefinition property in typeDefinition.get_Properties())
 				{
 					yield return property;
 				}
 			}
-			if (typeDefinition.HasMethods)
+			if (typeDefinition.get_HasMethods())
 			{
-				foreach (MethodDefinition method in typeDefinition.Methods)
+				foreach (MethodDefinition method in typeDefinition.get_Methods())
 				{
-					if (method.IsGetter || method.IsSetter || method.IsAddOn || method.IsRemoveOn || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
+					if (method.get_IsGetter() || method.get_IsSetter() || method.get_IsAddOn() || method.get_IsRemoveOn() || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
 					{
 						continue;
 					}
 					yield return method;
 				}
 			}
-			if (typeDefinition.HasEvents)
+			if (typeDefinition.get_HasEvents())
 			{
-				foreach (EventDefinition @event in typeDefinition.Events)
+				foreach (EventDefinition @event in typeDefinition.get_Events())
 				{
 					yield return @event;
 				}
@@ -325,17 +325,17 @@ namespace Mono.Cecil.Extensions
 		public static Dictionary<MethodDefinition, PropertyDefinition> GetMethodToPropertyMap(this TypeDefinition typeDefinition)
 		{
 			Dictionary<MethodDefinition, PropertyDefinition> methodDefinitions = new Dictionary<MethodDefinition, PropertyDefinition>();
-			foreach (PropertyDefinition property in typeDefinition.Properties)
+			foreach (PropertyDefinition property in typeDefinition.get_Properties())
 			{
-				if (property.GetMethod != null)
+				if (property.get_GetMethod() != null)
 				{
-					methodDefinitions.Add(property.GetMethod, property);
+					methodDefinitions.Add(property.get_GetMethod(), property);
 				}
-				if (property.SetMethod == null)
+				if (property.get_SetMethod() == null)
 				{
 					continue;
 				}
-				methodDefinitions.Add(property.SetMethod, property);
+				methodDefinitions.Add(property.get_SetMethod(), property);
 			}
 			return methodDefinitions;
 		}
@@ -343,38 +343,38 @@ namespace Mono.Cecil.Extensions
 		internal static bool IsAnonymous(this TypeDefinition self)
 		{
 			bool flag;
-			if (self == null || self.Namespace != String.Empty || !self.IsSealed || !self.IsNotPublic || self.BaseType.FullName != "System.Object" || !self.HasGenericParameters || !self.HasCompilerGeneratedAttribute())
+			if (self == null || self.get_Namespace() != String.Empty || !self.get_IsSealed() || !self.get_IsNotPublic() || self.get_BaseType().get_FullName() != "System.Object" || !self.get_HasGenericParameters() || !self.HasCompilerGeneratedAttribute())
 			{
 				return false;
 			}
 			int num = 0;
-			if (self.Interfaces.Count > 1)
+			if (self.get_Interfaces().get_Count() > 1)
 			{
 				return false;
 			}
-			if (self.Interfaces.Count == 1)
+			if (self.get_Interfaces().get_Count() == 1)
 			{
-				if (self.Interfaces[0].Name != "IEquatable`1")
+				if (self.get_Interfaces().get_Item(0).get_Name() != "IEquatable`1")
 				{
 					return false;
 				}
 				num = 1;
 			}
-			int count = self.Properties.Count;
-			if (count != self.GenericParameters.Count || count != self.Fields.Count)
+			int count = self.get_Properties().get_Count();
+			if (count != self.get_GenericParameters().get_Count() || count != self.get_Fields().get_Count())
 			{
 				return false;
 			}
 			int num1 = 0;
-			Collection<PropertyDefinition>.Enumerator enumerator = self.Properties.GetEnumerator();
+			Collection<PropertyDefinition>.Enumerator enumerator = self.get_Properties().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					PropertyDefinition current = enumerator.Current;
-					if (current.GetMethod != null)
+					PropertyDefinition current = enumerator.get_Current();
+					if (current.get_GetMethod() != null)
 					{
-						num1 = num1 + (current.SetMethod != null ? 2 : 1);
+						num1 = num1 + (current.get_SetMethod() != null ? 2 : 1);
 					}
 					else
 					{
@@ -382,7 +382,7 @@ namespace Mono.Cecil.Extensions
 						return flag;
 					}
 				}
-				int count1 = self.Methods.Count;
+				int count1 = self.get_Methods().get_Count();
 				if (num1 + num >= count1)
 				{
 					return false;
@@ -391,7 +391,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -399,12 +399,12 @@ namespace Mono.Cecil.Extensions
 		public static bool IsAsyncStateMachine(this TypeDefinition self)
 		{
 			bool flag;
-			Collection<TypeReference>.Enumerator enumerator = self.Interfaces.GetEnumerator();
+			Collection<TypeReference>.Enumerator enumerator = self.get_Interfaces().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					if (enumerator.Current.FullName != "System.Runtime.CompilerServices.IAsyncStateMachine")
+					if (enumerator.get_Current().get_FullName() != "System.Runtime.CompilerServices.IAsyncStateMachine")
 					{
 						continue;
 					}
@@ -415,7 +415,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -431,11 +431,11 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsDelegate(this TypeDefinition memberDefinition)
 		{
-			if (memberDefinition.BaseType == null)
+			if (memberDefinition.get_BaseType() == null)
 			{
 				return false;
 			}
-			return memberDefinition.BaseType.FullName == typeof(MulticastDelegate).FullName;
+			return memberDefinition.get_BaseType().get_FullName() == typeof(MulticastDelegate).FullName;
 		}
 
 		internal static bool IsNestedIn(this TypeDefinition self, TypeDefinition typeDef)
@@ -449,14 +449,14 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("typeDef");
 			}
-			for (TypeDefinition i = self; i.IsNested; i = typeDefinition)
+			for (TypeDefinition i = self; i.get_IsNested(); i = typeDefinition)
 			{
-				typeDefinition = i.DeclaringType.Resolve();
+				typeDefinition = i.get_DeclaringType().Resolve();
 				if (typeDefinition == null)
 				{
 					return false;
 				}
-				if (typeDefinition == typeDef)
+				if ((object)typeDefinition == (object)typeDef)
 				{
 					return true;
 				}

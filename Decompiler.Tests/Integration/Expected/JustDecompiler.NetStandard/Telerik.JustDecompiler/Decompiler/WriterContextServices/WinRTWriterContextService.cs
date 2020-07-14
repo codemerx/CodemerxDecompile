@@ -22,7 +22,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		protected override TypeSpecificContext GetTypeContext(TypeDefinition type, ILanguage language, Dictionary<string, DecompiledType> decompiledTypes)
 		{
 			TypeSpecificContext typeContext = base.GetTypeContext(type, language, decompiledTypes);
-			if (!typeContext.IsWinRTImplementation && typeContext.CurrentType.IsNotPublic && typeContext.CurrentType.IsSealed && typeContext.CurrentType.Name.StartsWith("<CLR>"))
+			if (!typeContext.IsWinRTImplementation && typeContext.CurrentType.get_IsNotPublic() && typeContext.CurrentType.get_IsSealed() && typeContext.CurrentType.get_Name().StartsWith("<CLR>"))
 			{
 				typeContext.IsWinRTImplementation = true;
 			}

@@ -55,7 +55,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 		private uint GetIndexFromLiteralExpression(LiteralExpression dimention)
 		{
 			object value = dimention.Value;
-			if (dimention.ExpressionType.FullName == "System.Int32")
+			if (dimention.ExpressionType.get_FullName() == "System.Int32")
 			{
 				Int32 num = (Int32)value;
 				if (num < 0)
@@ -64,11 +64,11 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				}
 				return (uint)num;
 			}
-			if (dimention.ExpressionType.FullName == "System.UInt32")
+			if (dimention.ExpressionType.get_FullName() == "System.UInt32")
 			{
 				return (UInt32)value;
 			}
-			if (dimention.ExpressionType.FullName == "System.Int16")
+			if (dimention.ExpressionType.get_FullName() == "System.Int16")
 			{
 				Int16 num1 = (Int16)value;
 				if (num1 < 0)
@@ -77,11 +77,11 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				}
 				return (uint)num1;
 			}
-			if (dimention.ExpressionType.FullName == "System.UInt16")
+			if (dimention.ExpressionType.get_FullName() == "System.UInt16")
 			{
 				return (UInt16)value;
 			}
-			if (dimention.ExpressionType.FullName == "System.Int8")
+			if (dimention.ExpressionType.get_FullName() == "System.Int8")
 			{
 				SByte num2 = (SByte)value;
 				if (num2 < 0)
@@ -90,11 +90,11 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				}
 				return (uint)num2;
 			}
-			if (dimention.ExpressionType.FullName == "System.UInt8")
+			if (dimention.ExpressionType.get_FullName() == "System.UInt8")
 			{
 				return (Byte)value;
 			}
-			if (dimention.ExpressionType.FullName == "System.Int64")
+			if (dimention.ExpressionType.get_FullName() == "System.Int64")
 			{
 				long num3 = (Int64)value;
 				if (num3 < (long)0 || num3 > (ulong)-1)
@@ -103,7 +103,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				}
 				return (uint)num3;
 			}
-			if (dimention.ExpressionType.FullName != "System.UInt64")
+			if (dimention.ExpressionType.get_FullName() != "System.UInt64")
 			{
 				throw new IndexOutOfRangeException();
 			}
@@ -117,7 +117,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private Expression GetTypeDefaultLiteralExpression(TypeReference arrayElementType)
 		{
-			if (arrayElementType.FullName == "System.Boolean")
+			if (arrayElementType.get_FullName() == "System.Boolean")
 			{
 				return new LiteralExpression(false, this.typeSystem, null);
 			}
@@ -130,11 +130,11 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return new DefaultObjectExpression(arrayElementType, null);
 			}
-			if (typeDefinition != null && typeDefinition.IsEnum)
+			if (typeDefinition != null && typeDefinition.get_IsEnum())
 			{
 				return EnumHelper.GetEnumExpression(typeDefinition, new LiteralExpression((object)0, this.typeSystem, null), this.typeSystem);
 			}
-			if (typeDefinition.IsValueType)
+			if (typeDefinition.get_IsValueType())
 			{
 				return new DefaultObjectExpression(arrayElementType, null);
 			}

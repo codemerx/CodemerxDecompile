@@ -8,7 +8,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 	{
 		internal static TypeReference GetContainingType(TypeDefinition leftType, TypeDefinition rightType)
 		{
-			if (leftType == rightType)
+			if ((object)leftType == (object)rightType)
 			{
 				return rightType;
 			}
@@ -30,12 +30,12 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 		internal static int GetTypeIndex(TypeReference type)
 		{
 			TypeDefinition typeDefinition = type.Resolve();
-			if (typeDefinition != null && typeDefinition.IsEnum && typeDefinition != null)
+			if (typeDefinition != null && typeDefinition.get_IsEnum() && typeDefinition != null)
 			{
 				FieldDefinition fieldDefinition = null;
-				foreach (FieldDefinition field in typeDefinition.Fields)
+				foreach (FieldDefinition field in typeDefinition.get_Fields())
 				{
-					if (field.Name != "value__")
+					if (field.get_Name() != "value__")
 					{
 						continue;
 					}
@@ -43,9 +43,9 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					goto Label0;
 				}
 			Label0:
-				type = fieldDefinition.FieldType;
+				type = fieldDefinition.get_FieldType();
 			}
-			string fullName = type.FullName;
+			string fullName = type.get_FullName();
 			if (fullName != null)
 			{
 				if (fullName == "System.Boolean")

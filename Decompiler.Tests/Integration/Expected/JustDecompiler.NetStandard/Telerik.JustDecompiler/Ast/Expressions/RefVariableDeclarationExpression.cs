@@ -36,7 +36,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			RefVariableDeclarationExpression refVariableDeclarationExpression = other as RefVariableDeclarationExpression;
-			return base.Variable.Resolve() == refVariableDeclarationExpression.Variable.Resolve();
+			return (object)base.Variable.Resolve() == (object)refVariableDeclarationExpression.Variable.Resolve();
 		}
 	}
 }

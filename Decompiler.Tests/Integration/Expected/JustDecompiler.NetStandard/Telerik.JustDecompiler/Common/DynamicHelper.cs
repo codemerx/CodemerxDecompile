@@ -188,23 +188,24 @@ namespace Telerik.JustDecompiler.Common
 		public static bool[] GetDynamicPositioningFlags(CustomAttribute dynamicAttribute)
 		{
 			dynamicAttribute.Resolve();
-			if (!dynamicAttribute.IsResolved)
+			if (!dynamicAttribute.get_IsResolved())
 			{
 				throw new Exception("Could not resolve DynamicAttribute");
 			}
-			if (dynamicAttribute.ConstructorArguments.Count == 0)
+			if (dynamicAttribute.get_ConstructorArguments().get_Count() == 0)
 			{
 				return new Boolean[] { true };
 			}
-			if (dynamicAttribute.ConstructorArguments[0].Type.FullName != "System.Boolean[]")
+			if (dynamicAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName() != "System.Boolean[]")
 			{
 				throw new Exception("Invalid argument type for DynamicAttribute");
 			}
-			CustomAttributeArgument[] value = (CustomAttributeArgument[])dynamicAttribute.ConstructorArguments[0].Value;
+			CustomAttributeArgument item = dynamicAttribute.get_ConstructorArguments().get_Item(0);
+			CustomAttributeArgument[] value = (CustomAttributeArgument[])item.get_Value();
 			bool[] flagArray = new Boolean[(int)value.Length];
 			for (int i = 0; i < (int)value.Length; i++)
 			{
-				flagArray[i] = (Boolean)value[i].Value;
+				flagArray[i] = (Boolean)value[i].get_Value();
 			}
 			return flagArray;
 		}

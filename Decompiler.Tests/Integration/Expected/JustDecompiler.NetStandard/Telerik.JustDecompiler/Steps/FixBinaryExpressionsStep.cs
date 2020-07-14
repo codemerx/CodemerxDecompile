@@ -41,7 +41,7 @@ namespace Telerik.JustDecompiler.Steps
 			BinaryExpression binaryExpression;
 			Expression expression1;
 			Expression unaryExpression;
-			bool flag = (branch.OpCode.Code == Code.Brtrue ? true : branch.OpCode.Code == Code.Brtrue_S);
+			bool flag = (branch.get_OpCode().get_Code() == 57 ? true : branch.get_OpCode().get_Code() == 44);
 			TypeReference expressionType = expression.ExpressionType;
 			BinaryOperator binaryOperator = BinaryOperator.ValueEquality;
 			Instruction[] instructionArray = new Instruction[] { branch };
@@ -49,7 +49,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				binaryOperator = BinaryOperator.ValueInequality;
 			}
-			if (expressionType.Name == "Boolean" || expressionType.Name.Contains("Boolean "))
+			if (expressionType.get_Name() == "Boolean" || expressionType.get_Name().Contains("Boolean "))
 			{
 				expression1 = (flag ? expression : Negator.Negate(expression, this.typeSystem));
 				if (!(expression is SafeCastExpression))
@@ -62,36 +62,36 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				return unaryExpression;
 			}
-			if (expressionType.Name == "Char")
+			if (expressionType.get_Name() == "Char")
 			{
 				binaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression('\0', null), this.typeSystem, instructionArray, false)
 				{
-					ExpressionType = this.typeSystem.Boolean
+					ExpressionType = this.typeSystem.get_Boolean()
 				};
 			}
-			if (expressionType.IsPrimitive)
+			if (expressionType.get_IsPrimitive())
 			{
 				binaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(0, null), this.typeSystem, instructionArray, false)
 				{
-					ExpressionType = this.typeSystem.Boolean
+					ExpressionType = this.typeSystem.get_Boolean()
 				};
 			}
 			else
 			{
 				TypeDefinition typeDefinition = expressionType.Resolve();
-				if (typeDefinition == null || !typeDefinition.IsEnum || expressionType.IsArray)
+				if (typeDefinition == null || !typeDefinition.get_IsEnum() || expressionType.get_IsArray())
 				{
 					binaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(null, null), this.typeSystem, instructionArray, false)
 					{
-						ExpressionType = this.typeSystem.Boolean
+						ExpressionType = this.typeSystem.get_Boolean()
 					};
 				}
 				else
 				{
 					FieldDefinition fieldDefinition = null;
-					foreach (FieldDefinition field in typeDefinition.Fields)
+					foreach (FieldDefinition field in typeDefinition.get_Fields())
 					{
-						if (field.Constant == null || field.Constant.Value == null || !field.Constant.Value.Equals(0))
+						if (field.get_Constant() == null || field.get_Constant().get_Value() == null || !field.get_Constant().get_Value().Equals(0))
 						{
 							continue;
 						}
@@ -101,10 +101,10 @@ namespace Telerik.JustDecompiler.Steps
 				Label0:
 					binaryExpression = (fieldDefinition != null ? new BinaryExpression(binaryOperator, expression, new EnumExpression(fieldDefinition, null), this.typeSystem, instructionArray, false)
 					{
-						ExpressionType = this.typeSystem.Boolean
+						ExpressionType = this.typeSystem.get_Boolean()
 					} : new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(0, null), this.typeSystem, instructionArray, false)
 					{
-						ExpressionType = this.typeSystem.Boolean
+						ExpressionType = this.typeSystem.get_Boolean()
 					});
 				}
 			}
@@ -118,10 +118,10 @@ namespace Telerik.JustDecompiler.Steps
 				return expression;
 			}
 			TypeReference elementType = this.GetElementType(expression.Left.ExpressionType);
-			if (elementType.FullName != this.typeSystem.Boolean.FullName)
+			if (elementType.get_FullName() != this.typeSystem.get_Boolean().get_FullName())
 			{
 				TypeDefinition typeDefinition = elementType.Resolve();
-				if (elementType != null && !elementType.IsPrimitive && typeDefinition != null && !typeDefinition.IsEnum)
+				if (elementType != null && !elementType.get_IsPrimitive() && typeDefinition != null && !typeDefinition.get_IsEnum())
 				{
 					expression.Right = this.GetLiteralExpression(null, null);
 				}
@@ -139,13 +139,13 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (type is IModifierType)
 			{
-				return (type as IModifierType).ElementType;
+				return (type as IModifierType).get_ElementType();
 			}
 			if (!(type is ByReferenceType))
 			{
 				return type;
 			}
-			return (type as ByReferenceType).ElementType;
+			return (type as ByReferenceType).get_ElementType();
 		}
 
 		private LiteralExpression GetLiteralExpression(object value, IEnumerable<Instruction> instructions)
@@ -187,11 +187,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool NeedsPointerCast(BinaryExpression expression)
 		{
-			if (!expression.Left.ExpressionType.IsPointer && !expression.Left.ExpressionType.IsByReference)
+			if (!expression.Left.ExpressionType.get_IsPointer() && !expression.Left.ExpressionType.get_IsByReference())
 			{
 				return false;
 			}
-			return expression.Left.ExpressionType.GetElementType().FullName != expression.Right.ExpressionType.GetElementType().FullName;
+			return expression.Left.ExpressionType.GetElementType().get_FullName() != expression.Right.ExpressionType.GetElementType().get_FullName();
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -200,9 +200,9 @@ namespace Telerik.JustDecompiler.Steps
 			foreach (int key in methodContext.Expressions.BlockExpressions.Keys)
 			{
 				IList<Expression> item = methodContext.Expressions.BlockExpressions[key];
-				OpCode opCode = methodContext.ControlFlowGraph.InstructionToBlockMapping[key].Last.OpCode;
-				Code code = opCode.Code;
-				bool flag = (code == Code.Brtrue || code == Code.Brtrue_S || code == Code.Brfalse ? true : code == Code.Brfalse_S);
+				OpCode opCode = methodContext.ControlFlowGraph.InstructionToBlockMapping[key].Last.get_OpCode();
+				Code code = opCode.get_Code();
+				bool flag = (code == 57 || code == 44 || code == 56 ? true : code == 43);
 				for (int i = 0; i < item.Count; i++)
 				{
 					item[i] = (Expression)this.Visit(item[i]);
@@ -238,19 +238,19 @@ namespace Telerik.JustDecompiler.Steps
 			expressionType = this.GetElementType(expressionType);
 			if (expressionType != null)
 			{
-				if (expressionType.FullName == this.typeSystem.Char.FullName)
+				if (expressionType.get_FullName() == this.typeSystem.get_Char().get_FullName())
 				{
 					if (expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
 					{
 						if (this.IsArithmeticOperator(expression.Operator))
 						{
-							expression.ExpressionType = this.typeSystem.Char;
+							expression.ExpressionType = this.typeSystem.get_Char();
 							return expression;
 						}
 						if (expression.Right.HasType)
 						{
 							TypeReference elementType = this.GetElementType(expression.Right.ExpressionType);
-							if (expressionType.FullName == elementType.FullName)
+							if (expressionType.get_FullName() == elementType.get_FullName())
 							{
 								return expression;
 							}
@@ -258,19 +258,19 @@ namespace Telerik.JustDecompiler.Steps
 						LiteralExpression right = expression.Right as LiteralExpression;
 						expression.Right = this.GetLiteralExpression((char)((Int32)right.Value), right.MappedInstructions);
 					}
-					if (this.GetElementType(expression.Right.ExpressionType).FullName != this.typeSystem.Char.FullName)
+					if (this.GetElementType(expression.Right.ExpressionType).get_FullName() != this.typeSystem.get_Char().get_FullName())
 					{
-						if (expression.Right.CodeNodeType != CodeNodeType.ExplicitCastExpression || !(expression.Right.ExpressionType.FullName == this.typeSystem.UInt16.FullName))
+						if (expression.Right.CodeNodeType != CodeNodeType.ExplicitCastExpression || !(expression.Right.ExpressionType.get_FullName() == this.typeSystem.get_UInt16().get_FullName()))
 						{
-							expression.Right = new ExplicitCastExpression(expression.Right, this.typeSystem.Char, null);
+							expression.Right = new ExplicitCastExpression(expression.Right, this.typeSystem.get_Char(), null);
 						}
 						else
 						{
-							((ExplicitCastExpression)expression.Right).TargetType = this.typeSystem.Char;
+							((ExplicitCastExpression)expression.Right).TargetType = this.typeSystem.get_Char();
 						}
 					}
 				}
-				if (expressionType.FullName == this.typeSystem.Boolean.FullName && expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
+				if (expressionType.get_FullName() == this.typeSystem.get_Boolean().get_FullName() && expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
 				{
 					if (expression.Operator == BinaryOperator.ValueEquality || expression.Operator == BinaryOperator.ValueInequality || this.IsBooleanAssignmentOperator(expression.Operator))
 					{
@@ -291,7 +291,7 @@ namespace Telerik.JustDecompiler.Steps
 			if (expression.Operator == BinaryOperator.ValueEquality || expression.Operator == BinaryOperator.ValueInequality)
 			{
 				TypeReference elementType1 = this.GetElementType(expression.Right.ExpressionType);
-				if (elementType1 != null && expressionType != null && elementType1.FullName != expressionType.FullName)
+				if (elementType1 != null && expressionType != null && elementType1.get_FullName() != expressionType.get_FullName())
 				{
 					return this.FixEqualityComparisonExpression(expression);
 				}
@@ -309,10 +309,10 @@ namespace Telerik.JustDecompiler.Steps
 						expression.Right.ExpressionType = expression.Left.ExpressionType;
 					}
 				}
-				else if (expression.Left.HasType && (expression.Left.ExpressionType.IsByReference || expression.Left.ExpressionType.IsPointer || expression.Left.ExpressionType.IsArray || !expression.Left.ExpressionType.IsPrimitive))
+				else if (expression.Left.HasType && (expression.Left.ExpressionType.get_IsByReference() || expression.Left.ExpressionType.get_IsPointer() || expression.Left.ExpressionType.get_IsArray() || !expression.Left.ExpressionType.get_IsPrimitive()))
 				{
 					TypeDefinition typeDefinition = expression.Left.ExpressionType.Resolve();
-					if (typeDefinition != null && !typeDefinition.IsEnum && expression.Right is LiteralExpression)
+					if (typeDefinition != null && !typeDefinition.get_IsEnum() && expression.Right is LiteralExpression)
 					{
 						LiteralExpression right1 = expression.Right as LiteralExpression;
 						if (right1.Value != null && right1.Value.Equals(0))
@@ -322,7 +322,7 @@ namespace Telerik.JustDecompiler.Steps
 					}
 				}
 			}
-			if (expression.Operator == BinaryOperator.GreaterThan && expression.MappedInstructions.Count<Instruction>() == 1 && expression.MappedInstructions.First<Instruction>().OpCode.Code == Code.Cgt_Un)
+			if (expression.Operator == BinaryOperator.GreaterThan && expression.MappedInstructions.Count<Instruction>() == 1 && expression.MappedInstructions.First<Instruction>().get_OpCode().get_Code() == 194)
 			{
 				LiteralExpression literalExpression1 = null;
 				if (expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
@@ -348,8 +348,8 @@ namespace Telerik.JustDecompiler.Steps
 				Expression expression1 = expression.Right;
 				if (this.CheckForOverloadedEqualityOperators(expression.Left, out typeReference) && this.CheckForOverloadedEqualityOperators(expression.Right, out typeReference1))
 				{
-					expression.Left = new ExplicitCastExpression(left, left.ExpressionType.Module.TypeSystem.Object, null, typeReference);
-					expression.Right = new ExplicitCastExpression(expression1, expression1.ExpressionType.Module.TypeSystem.Object, null, typeReference1);
+					expression.Left = new ExplicitCastExpression(left, left.ExpressionType.get_Module().get_TypeSystem().get_Object(), null, typeReference);
+					expression.Right = new ExplicitCastExpression(expression1, expression1.ExpressionType.get_Module().get_TypeSystem().get_Object(), null, typeReference1);
 				}
 			}
 			return expression;

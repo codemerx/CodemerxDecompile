@@ -136,7 +136,7 @@ namespace Telerik.JustDecompiler.Steps
 					return false;
 				}
 				Expression target = disposeMethodReference.Target;
-				if (target != null && target.CodeNodeType == CodeNodeType.ExplicitCastExpression && (target as ExplicitCastExpression).TargetType.FullName == "System.IDisposable")
+				if (target != null && target.CodeNodeType == CodeNodeType.ExplicitCastExpression && (target as ExplicitCastExpression).TargetType.get_FullName() == "System.IDisposable")
 				{
 					target = (target as ExplicitCastExpression).Expression;
 				}
@@ -212,12 +212,12 @@ namespace Telerik.JustDecompiler.Steps
 					return null;
 				}
 				MethodReferenceExpression methodExpression = expression.MethodExpression;
-				TypeReference declaringType = expression.MethodExpression.Method.DeclaringType;
+				TypeReference declaringType = expression.MethodExpression.Method.get_DeclaringType();
 				if (declaringType == null)
 				{
 					return null;
 				}
-				TypeDefinition typeDefinition = Utilities.GetCorlibTypeReference(typeof(IDisposable), declaringType.Module).Resolve();
+				TypeDefinition typeDefinition = Utilities.GetCorlibTypeReference(typeof(IDisposable), declaringType.get_Module()).Resolve();
 				if (typeDefinition == null)
 				{
 					return null;

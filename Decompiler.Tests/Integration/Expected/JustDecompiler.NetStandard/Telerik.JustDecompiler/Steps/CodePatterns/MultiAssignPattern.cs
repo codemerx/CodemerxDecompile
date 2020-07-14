@@ -17,7 +17,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private readonly MethodSpecificContext methodContext;
 
-		public MultiAssignPattern(CodePatternsContext patternsContext, MethodSpecificContext methodContext) : base(patternsContext, methodContext.Method.Module.TypeSystem)
+		public MultiAssignPattern(CodePatternsContext patternsContext, MethodSpecificContext methodContext) : base(patternsContext, methodContext.Method.get_Module().get_TypeSystem())
 		{
 			this.methodContext = methodContext;
 		}
@@ -81,7 +81,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 					break;
 				}
 				BinaryExpression binaryExpression = (item as ExpressionStatement).Expression as BinaryExpression;
-				if (binaryExpression == null || !binaryExpression.IsAssignmentExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (binaryExpression.Right as VariableReferenceExpression).Variable != variableReference)
+				if (binaryExpression == null || !binaryExpression.IsAssignmentExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(binaryExpression.Right as VariableReferenceExpression).Variable != (object)variableReference)
 				{
 					break;
 				}

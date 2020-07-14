@@ -58,7 +58,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			}
 			else
 			{
-				methodSignature = typeDefinition.Methods.FirstOrDefault<MethodDefinition>((MethodDefinition m) => m.Name == "Invoke");
+				methodSignature = typeDefinition.get_Methods().FirstOrDefault<MethodDefinition>((MethodDefinition m) => m.get_Name() == "Invoke");
 			}
 			return base.GetSortedReturnValueAttributes(methodSignature);
 		}

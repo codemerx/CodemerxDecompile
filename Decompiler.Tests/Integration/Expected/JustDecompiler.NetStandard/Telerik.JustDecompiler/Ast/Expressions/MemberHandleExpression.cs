@@ -54,7 +54,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.MemberReference.FullName == memberHandleExpression.MemberReference.FullName;
+			return this.MemberReference.get_FullName() == memberHandleExpression.MemberReference.get_FullName();
 		}
 	}
 }

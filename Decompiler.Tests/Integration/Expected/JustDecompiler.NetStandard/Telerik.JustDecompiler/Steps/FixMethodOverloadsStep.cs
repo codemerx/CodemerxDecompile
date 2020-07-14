@@ -21,9 +21,9 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool ArgumentsMatchParameters(Mono.Collections.Generic.Collection<ParameterDefinition> parameters, ExpressionCollection arguments)
 		{
-			for (int i = 0; i < parameters.Count; i++)
+			for (int i = 0; i < parameters.get_Count(); i++)
 			{
-				TypeDefinition typeDefinition = parameters[i].ParameterType.Resolve();
+				TypeDefinition typeDefinition = parameters.get_Item(i).get_ParameterType().Resolve();
 				Expression item = arguments[i];
 				if (!item.HasType)
 				{
@@ -34,7 +34,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return true;
 				}
-				if ((item.CodeNodeType != CodeNodeType.LiteralExpression || ((LiteralExpression)item).Value != null || typeDefinition.IsValueType) && typeDefinition.FullName != typeDefinition1.FullName && !this.IsTypeDescendantOf(typeDefinition1, typeDefinition))
+				if ((item.CodeNodeType != CodeNodeType.LiteralExpression || ((LiteralExpression)item).Value != null || typeDefinition.get_IsValueType()) && typeDefinition.get_FullName() != typeDefinition1.get_FullName() && !this.IsTypeDescendantOf(typeDefinition1, typeDefinition))
 				{
 					return false;
 				}
@@ -44,7 +44,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void FixArguments(MethodReference method, ExpressionCollection arguments)
 		{
-			TypeDefinition typeDefinition = method.DeclaringType.Resolve();
+			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
 			if (typeDefinition == null)
 			{
 				return;
@@ -54,8 +54,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				for (int i = 0; i < arguments.Count; i++)
 				{
-					TypeReference typeReference = method.Parameters[i].ResolveParameterType(method);
-					if (arguments[i].HasType && !(arguments[i].ExpressionType.FullName == typeReference.FullName) && this.ShouldAddCast(arguments[i], sameNameMethods, i, typeReference))
+					TypeReference typeReference = method.get_Parameters().get_Item(i).ResolveParameterType(method);
+					if (arguments[i].HasType && !(arguments[i].ExpressionType.get_FullName() == typeReference.get_FullName()) && this.ShouldAddCast(arguments[i], sameNameMethods, i, typeReference))
 					{
 						arguments[i] = new ExplicitCastExpression(arguments[i], typeReference, null);
 					}
@@ -71,9 +71,9 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return methodDefinitions;
 			}
-			foreach (MethodDefinition methodDefinition1 in declaringTypeDefinition.Methods)
+			foreach (MethodDefinition methodDefinition1 in declaringTypeDefinition.get_Methods())
 			{
-				if (methodDefinition1.Name != method.Name || methodDefinition1.HasParameters != method.HasParameters || methodDefinition1.Parameters.Count != method.Parameters.Count || methodDefinition1 == methodDefinition || methodDefinition1.HasGenericParameters != methodDefinition.HasGenericParameters || !this.ArgumentsMatchParameters(methodDefinition1.Parameters, arguments))
+				if (methodDefinition1.get_Name() != method.get_Name() || methodDefinition1.get_HasParameters() != method.get_HasParameters() || methodDefinition1.get_Parameters().get_Count() != method.get_Parameters().get_Count() || (object)methodDefinition1 == (object)methodDefinition || methodDefinition1.get_HasGenericParameters() != methodDefinition.get_HasGenericParameters() || !this.ArgumentsMatchParameters(methodDefinition1.get_Parameters(), arguments))
 				{
 					continue;
 				}
@@ -86,7 +86,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			bool flag;
 			TypeDefinition typeDefinition;
-			if (descendant.IsGenericParameter)
+			if (descendant.get_IsGenericParameter())
 			{
 				return true;
 			}
@@ -95,19 +95,19 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (descendant.IsArray == ancestor.IsArray)
+			if (descendant.get_IsArray() == ancestor.get_IsArray())
 			{
 				while (typeDefinition1 != null)
 				{
-					if (typeDefinition1.BaseType != null && typeDefinition1.BaseType.FullName == ancestor.FullName)
+					if (typeDefinition1.get_BaseType() != null && typeDefinition1.get_BaseType().get_FullName() == ancestor.get_FullName())
 					{
 						return true;
 					}
-					if (typeDefinition1.HasInterfaces)
+					if (typeDefinition1.get_HasInterfaces())
 					{
-						foreach (TypeReference @interface in typeDefinition1.Interfaces)
+						foreach (TypeReference @interface in typeDefinition1.get_Interfaces())
 						{
-							if (@interface.FullName != ancestor.FullName)
+							if (@interface.get_FullName() != ancestor.get_FullName())
 							{
 								continue;
 							}
@@ -115,13 +115,13 @@ namespace Telerik.JustDecompiler.Steps
 							return flag;
 						}
 					}
-					if (typeDefinition1.BaseType == null)
+					if (typeDefinition1.get_BaseType() == null)
 					{
 						typeDefinition = null;
 					}
 					else
 					{
-						typeDefinition = typeDefinition1.BaseType.Resolve();
+						typeDefinition = typeDefinition1.get_BaseType().Resolve();
 					}
 					typeDefinition1 = typeDefinition;
 				}
@@ -129,9 +129,9 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			else
 			{
-				foreach (TypeReference typeReference in typeDefinition1.Interfaces)
+				foreach (TypeReference typeReference in typeDefinition1.get_Interfaces())
 				{
-					if (typeReference.FullName != ancestor.FullName)
+					if (typeReference.get_FullName() != ancestor.get_FullName())
 					{
 						continue;
 					}
@@ -163,19 +163,19 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				while (enumerator.MoveNext())
 				{
-					TypeReference parameterType = enumerator.Current.Parameters[argumentIndex].ParameterType;
-					if (this.IsTypeDescendantOf(calledMethodParamType, parameterType) || calledMethodParamType.FullName == parameterType.FullName)
+					TypeReference parameterType = enumerator.Current.get_Parameters().get_Item(argumentIndex).get_ParameterType();
+					if (this.IsTypeDescendantOf(calledMethodParamType, parameterType) || calledMethodParamType.get_FullName() == parameterType.get_FullName())
 					{
 						continue;
 					}
-					if (this.IsTypeDescendantOf(expressionType, parameterType) || expressionType.FullName == parameterType.FullName)
+					if (this.IsTypeDescendantOf(expressionType, parameterType) || expressionType.get_FullName() == parameterType.get_FullName())
 					{
 						flag = true;
 						return flag;
 					}
 					else
 					{
-						if (argument.CodeNodeType != CodeNodeType.LiteralExpression || ((LiteralExpression)argument).Value != null || parameterType.IsValueType)
+						if (argument.CodeNodeType != CodeNodeType.LiteralExpression || ((LiteralExpression)argument).Value != null || parameterType.get_IsValueType())
 						{
 							continue;
 						}

@@ -46,19 +46,19 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			bool flag;
 			MethodDefinition stateMachineMethod = this.GetStateMachineMethod("SetStateMachine") ?? this.GetStateMachineMethod("System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine");
-			if (stateMachineMethod == null || stateMachineMethod.Body == null)
+			if (stateMachineMethod == null || stateMachineMethod.get_Body() == null)
 			{
 				return false;
 			}
-			if (stateMachineMethod.Body.Instructions.Count <= 1)
+			if (stateMachineMethod.get_Body().get_Instructions().get_Count() <= 1)
 			{
-				Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = this.stateMachineTypeDef.Fields.GetEnumerator();
+				Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = this.stateMachineTypeDef.get_Fields().GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
 					{
-						FieldDefinition current = enumerator.Current;
-						if (!(current.FieldType.Name == "AsyncVoidMethodBuilder") && !(current.FieldType.Name == "AsyncTaskMethodBuilder") && !(current.FieldType.Name == "AsyncTaskMethodBuilder`1"))
+						FieldDefinition current = enumerator.get_Current();
+						if (!(current.get_FieldType().get_Name() == "AsyncVoidMethodBuilder") && !(current.get_FieldType().get_Name() == "AsyncTaskMethodBuilder") && !(current.get_FieldType().get_Name() == "AsyncTaskMethodBuilder`1"))
 						{
 							continue;
 						}
@@ -70,22 +70,22 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					enumerator.Dispose();
 				}
 			}
 			else
 			{
-				Mono.Collections.Generic.Collection<Instruction>.Enumerator enumerator1 = stateMachineMethod.Body.Instructions.GetEnumerator();
+				Mono.Collections.Generic.Collection<Instruction>.Enumerator enumerator1 = stateMachineMethod.get_Body().get_Instructions().GetEnumerator();
 				try
 				{
 					while (enumerator1.MoveNext())
 					{
-						Instruction instruction = enumerator1.Current;
-						if (instruction.OpCode.Code != Code.Ldflda)
+						Instruction instruction = enumerator1.get_Current();
+						if (instruction.get_OpCode().get_Code() != 121)
 						{
 							continue;
 						}
-						this.builderField = ((FieldReference)instruction.Operand).Resolve();
+						this.builderField = ((FieldReference)instruction.get_Operand()).Resolve();
 						flag = true;
 						return flag;
 					}
@@ -93,7 +93,7 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				finally
 				{
-					((IDisposable)enumerator1).Dispose();
+					enumerator1.Dispose();
 				}
 			}
 			return flag;
@@ -112,11 +112,11 @@ namespace Telerik.JustDecompiler.Steps
 		private StatementCollection GetMoveNextStatements()
 		{
 			MethodDefinition stateMachineMethod = this.GetStateMachineMethod("MoveNext");
-			if (stateMachineMethod == null || stateMachineMethod.Body == null)
+			if (stateMachineMethod == null || stateMachineMethod.get_Body() == null)
 			{
 				return null;
 			}
-			BlockStatement blockStatement = stateMachineMethod.Body.DecompileAsyncStateMachine(this.context, out this.asyncData);
+			BlockStatement blockStatement = stateMachineMethod.get_Body().DecompileAsyncStateMachine(this.context, out this.asyncData);
 			if (blockStatement == null)
 			{
 				return null;
@@ -127,13 +127,13 @@ namespace Telerik.JustDecompiler.Steps
 		private MethodDefinition GetStateMachineMethod(string name)
 		{
 			MethodDefinition methodDefinition;
-			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = this.stateMachineTypeDef.Methods.GetEnumerator();
+			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = this.stateMachineTypeDef.get_Methods().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					MethodDefinition current = enumerator.Current;
-					if (current.Name != name)
+					MethodDefinition current = enumerator.get_Current();
+					if (current.get_Name() != name)
 					{
 						continue;
 					}
@@ -144,7 +144,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return methodDefinition;
 		}
@@ -160,13 +160,13 @@ namespace Telerik.JustDecompiler.Steps
 					BinaryExpression expression = expressionStatement.Expression as BinaryExpression;
 					if (expression.Right is ThisReferenceExpression && expression.Left is FieldReferenceExpression)
 					{
-						TypeReference declaringType = (expression.Left as FieldReferenceExpression).Field.DeclaringType;
+						TypeReference declaringType = (expression.Left as FieldReferenceExpression).Field.get_DeclaringType();
 						if (declaringType == null)
 						{
 							return false;
 						}
 						TypeDefinition typeDefinition = declaringType.Resolve();
-						if (typeDefinition == null || typeDefinition.DeclaringType != this.methodContext.Method.DeclaringType || !typeDefinition.IsAsyncStateMachine())
+						if (typeDefinition == null || (object)typeDefinition.get_DeclaringType() != (object)this.methodContext.Method.get_DeclaringType() || !typeDefinition.IsAsyncStateMachine())
 						{
 							return false;
 						}
@@ -229,7 +229,7 @@ namespace Telerik.JustDecompiler.Steps
 					if (expression.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 					{
 						FieldReference field = (expression.Left as FieldReferenceExpression).Field;
-						if (field.DeclaringType.Resolve() == this.stateMachineTypeDef)
+						if ((object)field.get_DeclaringType().Resolve() == (object)this.stateMachineTypeDef)
 						{
 							this.parameterMappings[field.Resolve()] = expression.Right;
 						}
@@ -256,12 +256,12 @@ namespace Telerik.JustDecompiler.Steps
 						continue;
 					}
 					FieldDefinition fieldDefinition = (expression.Left as FieldReferenceExpression).Field.Resolve();
-					if (fieldDefinition == null || fieldDefinition.DeclaringType == null)
+					if (fieldDefinition == null || fieldDefinition.get_DeclaringType() == null)
 					{
 						flag = false;
 						return flag;
 					}
-					else if (fieldDefinition.DeclaringType.Resolve() == this.stateMachineTypeDef)
+					else if ((object)fieldDefinition.get_DeclaringType().Resolve() == (object)this.stateMachineTypeDef)
 					{
 						this.asyncData.StateField = fieldDefinition;
 						flag = true;
@@ -323,7 +323,7 @@ namespace Telerik.JustDecompiler.Steps
 				if (node.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.asyncData.AwaiterVariables.Contains((node.Left as VariableReferenceExpression).Variable))
 				{
 					VariableReference variable = (node.Left as VariableReferenceExpression).Variable;
-					if (node.Right.CodeNodeType == CodeNodeType.MethodInvocationExpression && (node.Right as MethodInvocationExpression).MethodExpression.Method.Name == "GetAwaiter")
+					if (node.Right.CodeNodeType == CodeNodeType.MethodInvocationExpression && (node.Right as MethodInvocationExpression).MethodExpression.Method.get_Name() == "GetAwaiter")
 					{
 						Expression expression = null;
 						MethodInvocationExpression right = node.Right as MethodInvocationExpression;
@@ -346,7 +346,7 @@ namespace Telerik.JustDecompiler.Steps
 							return null;
 						}
 					}
-					else if ((node.Right.CodeNodeType == CodeNodeType.ObjectCreationExpression || node.Right.CodeNodeType == CodeNodeType.LiteralExpression && (node.Right as LiteralExpression).Value == null) && (this.matcherState & RebuildAsyncStatementsStep.MatcherState.FindInitObj) == RebuildAsyncStatementsStep.MatcherState.FindInitObj && this.currentAwaiterVariable == variable)
+					else if ((node.Right.CodeNodeType == CodeNodeType.ObjectCreationExpression || node.Right.CodeNodeType == CodeNodeType.LiteralExpression && (node.Right as LiteralExpression).Value == null) && (this.matcherState & RebuildAsyncStatementsStep.MatcherState.FindInitObj) == RebuildAsyncStatementsStep.MatcherState.FindInitObj && (object)this.currentAwaiterVariable == (object)variable)
 					{
 						this.matcherState ^= RebuildAsyncStatementsStep.MatcherState.FindInitObj;
 						return null;
@@ -354,7 +354,7 @@ namespace Telerik.JustDecompiler.Steps
 					this.matcherState = RebuildAsyncStatementsStep.MatcherState.Stopped;
 					return node;
 				}
-				if (node.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression && (node.Left as FieldReferenceExpression).Field.Resolve() == this.asyncData.StateField || node.Right.CodeNodeType == CodeNodeType.ThisReferenceExpression)
+				if (node.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(node.Left as FieldReferenceExpression).Field.Resolve() == (object)this.asyncData.StateField || node.Right.CodeNodeType == CodeNodeType.ThisReferenceExpression)
 				{
 					return null;
 				}
@@ -389,7 +389,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (node.Field.DeclaringType.Resolve() != this.stateMachineTypeDef)
+			if ((object)node.Field.get_DeclaringType().Resolve() != (object)this.stateMachineTypeDef)
 			{
 				return base.VisitFieldReferenceExpression(node);
 			}
@@ -398,7 +398,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return this.parameterMappings[fieldDefinition].CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 			}
-			VariableDefinition variableDefinition = new VariableDefinition(this.GetFriendlyName(fieldDefinition.Name), fieldDefinition.FieldType, this.methodContext.Method);
+			VariableDefinition variableDefinition = new VariableDefinition(this.GetFriendlyName(fieldDefinition.get_Name()), fieldDefinition.get_FieldType(), this.methodContext.Method);
 			this.methodContext.Variables.Add(variableDefinition);
 			this.methodContext.VariableAssignmentData.Add(variableDefinition, this.asyncData.FieldAssignmentData[fieldDefinition]);
 			this.methodContext.VariablesToRename.Add(variableDefinition);
@@ -416,9 +416,9 @@ namespace Telerik.JustDecompiler.Steps
 				if (methodExpression.Target.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.asyncData.AwaiterVariables.Contains((methodExpression.Target as VariableReferenceExpression).Variable))
 				{
 					VariableReference variable = (methodExpression.Target as VariableReferenceExpression).Variable;
-					if (this.currentAwaiterVariable == variable)
+					if ((object)this.currentAwaiterVariable == (object)variable)
 					{
-						if (methodExpression.Method.Name == "get_IsCompleted")
+						if (methodExpression.Method.get_Name() == "get_IsCompleted")
 						{
 							if (this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindIsCompletedInvoke)
 							{
@@ -426,16 +426,16 @@ namespace Telerik.JustDecompiler.Steps
 								return null;
 							}
 						}
-						else if (methodExpression.Method.Name == "GetResult" && (this.matcherState & RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke) == RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke)
+						else if (methodExpression.Method.get_Name() == "GetResult" && (this.matcherState & RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke) == RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke)
 						{
 							this.matcherState ^= RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke;
-							return new AwaitExpression((Expression)this.Visit(this.awaitedExpression), methodExpression.Method.ReturnType, node.UnderlyingSameMethodInstructions);
+							return new AwaitExpression((Expression)this.Visit(this.awaitedExpression), methodExpression.Method.get_ReturnType(), node.UnderlyingSameMethodInstructions);
 						}
 					}
 					this.matcherState = RebuildAsyncStatementsStep.MatcherState.Stopped;
 					return node;
 				}
-				if (methodExpression.Target.CodeNodeType == CodeNodeType.FieldReferenceExpression && (methodExpression.Target as FieldReferenceExpression).Field.Resolve() == this.builderField && methodExpression.Method.Name == "SetResult")
+				if (methodExpression.Target.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(methodExpression.Target as FieldReferenceExpression).Field.Resolve() == (object)this.builderField && methodExpression.Method.get_Name() == "SetResult")
 				{
 					if (node.Arguments.Count > 0)
 					{
@@ -459,7 +459,7 @@ namespace Telerik.JustDecompiler.Steps
 				return base.VisitPropertyReferenceExpression(node);
 			}
 			VariableReference variable = (methodExpression.Target as VariableReferenceExpression).Variable;
-			if (this.currentAwaiterVariable == variable && methodExpression.Method.Name == "get_IsCompleted" && this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindIsCompletedInvoke)
+			if ((object)this.currentAwaiterVariable == (object)variable && methodExpression.Method.get_Name() == "get_IsCompleted" && this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindIsCompletedInvoke)
 			{
 				this.matcherState = RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke | RebuildAsyncStatementsStep.MatcherState.FindInitObj;
 				return null;

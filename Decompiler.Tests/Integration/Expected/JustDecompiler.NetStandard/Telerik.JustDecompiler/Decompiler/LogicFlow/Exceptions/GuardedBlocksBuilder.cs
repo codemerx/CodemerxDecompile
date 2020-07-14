@@ -28,16 +28,16 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 		{
 			if (tryBlockExistingHandler is TryCatchFilterLogicalConstruct)
 			{
-				if (handler.HandlerType == ExceptionHandlerType.Fault || handler.HandlerType == ExceptionHandlerType.Finally)
+				if (handler.get_HandlerType() == 4 || handler.get_HandlerType() == 2)
 				{
 					throw new Exception("Illegal IL: Non-exclusive Fault/Finally handler found");
 				}
-				if (handler.HandlerType == ExceptionHandlerType.Filter)
+				if (handler.get_HandlerType() == 1)
 				{
 					(tryBlockExistingHandler as TryCatchFilterLogicalConstruct).AddHandler(this.CreateFilterHandler(handler));
 					return;
 				}
-				if (handler.HandlerType == ExceptionHandlerType.Catch)
+				if (handler.get_HandlerType() == null)
 				{
 					(tryBlockExistingHandler as TryCatchFilterLogicalConstruct).AddHandler(this.CreateCatchHandler(handler));
 					return;
@@ -52,8 +52,8 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 		private ExceptionHandlingBlockCatch CreateCatchHandler(ExceptionHandler handler)
 		{
 			ILogicalConstruct logicalConstruct;
-			BlockRange blockRangeFromInstructions = this.GetBlockRangeFromInstructions(handler.HandlerStart, handler.HandlerEnd);
-			return new ExceptionHandlingBlockCatch(this.GetLogicalConstructsInRange(blockRangeFromInstructions, out logicalConstruct), this.context.CFGBlockToLogicalConstructMap[blockRangeFromInstructions.Start][0], handler.CatchType);
+			BlockRange blockRangeFromInstructions = this.GetBlockRangeFromInstructions(handler.get_HandlerStart(), handler.get_HandlerEnd());
+			return new ExceptionHandlingBlockCatch(this.GetLogicalConstructsInRange(blockRangeFromInstructions, out logicalConstruct), this.context.CFGBlockToLogicalConstructMap[blockRangeFromInstructions.Start][0], handler.get_CatchType());
 		}
 
 		private BlockLogicalConstruct CreateExceptionhandlingBlock(BlockRange cfgBlocks)
@@ -66,14 +66,14 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 		private ExceptionHandlingBlockFilter CreateFilterHandler(ExceptionHandler handler)
 		{
 			ILogicalConstruct logicalConstruct;
-			BlockRange blockRangeFromInstructions = this.GetBlockRangeFromInstructions(handler.FilterStart, handler.FilterEnd);
+			BlockRange blockRangeFromInstructions = this.GetBlockRangeFromInstructions(handler.get_FilterStart(), handler.get_FilterEnd());
 			HashSet<ILogicalConstruct> logicalConstructsInRange = this.GetLogicalConstructsInRange(blockRangeFromInstructions, out logicalConstruct);
 			if (this.FindFollowNodes(logicalConstructsInRange) != null)
 			{
 				throw new Exception("The filter block must not have a follow node");
 			}
 			BlockLogicalConstruct blockLogicalConstruct = new BlockLogicalConstruct(this.context.CFGBlockToLogicalConstructMap[blockRangeFromInstructions.Start][0], logicalConstructsInRange);
-			BlockRange blockRange = this.GetBlockRangeFromInstructions(handler.HandlerStart, handler.HandlerEnd);
+			BlockRange blockRange = this.GetBlockRangeFromInstructions(handler.get_HandlerStart(), handler.get_HandlerEnd());
 			HashSet<ILogicalConstruct> logicalConstructs = this.GetLogicalConstructsInRange(blockRange, out logicalConstruct);
 			BlockLogicalConstruct blockLogicalConstruct1 = new BlockLogicalConstruct(this.context.CFGBlockToLogicalConstructMap[blockRange.Start][0], logicalConstructs);
 			return new ExceptionHandlingBlockFilter(blockLogicalConstruct, blockLogicalConstruct1);
@@ -117,44 +117,44 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 		{
 			foreach (ExceptionHandler rawExceptionHandler in this.context.CFG.RawExceptionHandlers)
 			{
-				BlockRange blockRangeFromInstructions = this.GetBlockRangeFromInstructions(rawExceptionHandler.TryStart, rawExceptionHandler.TryEnd);
+				BlockRange blockRangeFromInstructions = this.GetBlockRangeFromInstructions(rawExceptionHandler.get_TryStart(), rawExceptionHandler.get_TryEnd());
 				ExceptionHandlingLogicalConstruct exceptionHandlingLogicalConstruct = null;
 				if (!this.tryBlocksFound.TryGetValue(blockRangeFromInstructions, out exceptionHandlingLogicalConstruct))
 				{
 					BlockLogicalConstruct blockLogicalConstruct = this.CreateExceptionhandlingBlock(blockRangeFromInstructions);
 					ExceptionHandlingLogicalConstruct tryCatchFilterLogicalConstruct = null;
-					switch (rawExceptionHandler.HandlerType)
+					switch (rawExceptionHandler.get_HandlerType())
 					{
-						case ExceptionHandlerType.Catch:
+						case 0:
 						{
 							tryCatchFilterLogicalConstruct = new TryCatchFilterLogicalConstruct(blockLogicalConstruct, this.CreateCatchHandler(rawExceptionHandler));
-							goto case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally;
+							goto case 3;
 						}
-						case ExceptionHandlerType.Filter:
+						case 1:
 						{
 							tryCatchFilterLogicalConstruct = new TryCatchFilterLogicalConstruct(blockLogicalConstruct, this.CreateFilterHandler(rawExceptionHandler));
-							goto case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally;
+							goto case 3;
 						}
-						case ExceptionHandlerType.Finally:
+						case 2:
 						{
-							BlockRange blockRange = this.GetBlockRangeFromInstructions(rawExceptionHandler.HandlerStart, rawExceptionHandler.HandlerEnd);
+							BlockRange blockRange = this.GetBlockRangeFromInstructions(rawExceptionHandler.get_HandlerStart(), rawExceptionHandler.get_HandlerEnd());
 							tryCatchFilterLogicalConstruct = new TryFinallyLogicalConstruct(blockLogicalConstruct, this.CreateExceptionhandlingBlock(blockRange));
-							goto case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally;
+							goto case 3;
 						}
-						case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally:
+						case 3:
 						{
 							this.tryBlocksFound.Add(blockRangeFromInstructions, tryCatchFilterLogicalConstruct);
 							continue;
 						}
-						case ExceptionHandlerType.Fault:
+						case 4:
 						{
-							BlockRange blockRangeFromInstructions1 = this.GetBlockRangeFromInstructions(rawExceptionHandler.HandlerStart, rawExceptionHandler.HandlerEnd);
+							BlockRange blockRangeFromInstructions1 = this.GetBlockRangeFromInstructions(rawExceptionHandler.get_HandlerStart(), rawExceptionHandler.get_HandlerEnd());
 							tryCatchFilterLogicalConstruct = new TryFaultLogicalConstruct(blockLogicalConstruct, this.CreateExceptionhandlingBlock(blockRangeFromInstructions1));
-							goto case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally;
+							goto case 3;
 						}
 						default:
 						{
-							goto case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally;
+							goto case 3;
 						}
 					}
 				}
@@ -184,19 +184,19 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 
 		private BlockRange GetBlockRangeFromInstructions(Instruction start, Instruction end)
 		{
-			InstructionBlock item = this.context.CFG.InstructionToBlockMapping[start.Offset];
-			int num = (end != null ? end.Previous.Offset : this.context.CFG.MethodBody.CodeSize);
+			InstructionBlock item = this.context.CFG.InstructionToBlockMapping[start.get_Offset()];
+			int num = (end != null ? end.get_Previous().get_Offset() : this.context.CFG.MethodBody.get_CodeSize());
 			return new BlockRange(item, this.context.CFG.InstructionToBlockMapping[this.FindBlockStartOffset(num)]);
 		}
 
 		private InstructionBlock GetEntryBlockInRange(BlockRange blockRange)
 		{
-			int offset = blockRange.Start.First.Offset;
-			int num = blockRange.End.First.Offset;
+			int offset = blockRange.Start.First.get_Offset();
+			int num = blockRange.End.First.get_Offset();
 			for (int i = 0; i < (int)this.context.CFG.Blocks.Length; i++)
 			{
 				InstructionBlock blocks = this.context.CFG.Blocks[i];
-				if (blocks.First.Offset >= offset && blocks.First.Offset <= num)
+				if (blocks.First.get_Offset() >= offset && blocks.First.get_Offset() <= num)
 				{
 					return blocks;
 				}
@@ -209,12 +209,12 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 			ILogicalConstruct logicalConstruct;
 			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
 			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
-			int offset = blockRange.Start.First.Offset;
-			int num = blockRange.End.First.Offset;
+			int offset = blockRange.Start.First.get_Offset();
+			int num = blockRange.End.First.get_Offset();
 			for (int i = 0; i < (int)this.context.CFG.Blocks.Length; i++)
 			{
 				InstructionBlock blocks = this.context.CFG.Blocks[i];
-				if (blocks.First.Offset >= offset && blocks.First.Offset <= num)
+				if (blocks.First.get_Offset() >= offset && blocks.First.get_Offset() <= num)
 				{
 					CFGBlockLogicalConstruct[] item = this.context.CFGBlockToLogicalConstructMap[blocks];
 					for (int j = 0; j < (int)item.Length; j++)

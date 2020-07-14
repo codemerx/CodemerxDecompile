@@ -75,7 +75,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			AssemblySpecificContext assemblyContext = writerContextService.GetAssemblyContext(assembly, this.Language);
 			this.SetAssemblyContext(assemblyContext);
-			ModuleSpecificContext moduleContext = writerContextService.GetModuleContext(assembly.MainModule, this.Language);
+			ModuleSpecificContext moduleContext = writerContextService.GetModuleContext(assembly.get_MainModule(), this.Language);
 			this.SetModuleContext(moduleContext);
 			this.WriteAssemblyAttributesInternal(assembly, assemblyContext.AssemblyNamespaceUsings, moduleContext.ModuleNamespaceUsings, writeUsings, attributesToIgnore);
 		}
@@ -95,7 +95,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			AssemblySpecificContext assemblyContext = writerContextService.GetAssemblyContext(assembly, this.Language);
 			this.SetAssemblyContext(assemblyContext);
-			ModuleSpecificContext moduleContext = writerContextService.GetModuleContext(assembly.MainModule, this.Language);
+			ModuleSpecificContext moduleContext = writerContextService.GetModuleContext(assembly.get_MainModule(), this.Language);
 			this.SetModuleContext(moduleContext);
 			this.WriteAssemblyInfoInternal(assembly, assemblyContext.AssemblyNamespaceUsings, moduleContext.ModuleNamespaceUsings, writeUsings, assemblyAttributesToIgnore, moduleAttributesToIgnore);
 		}
@@ -109,7 +109,7 @@ namespace Telerik.JustDecompiler.Languages
 				this.Writer.WriteLine();
 			}
 			this.WriteAssemblyAttributesInternal(assembly, assemblyNamespaceUsings, mainModuleNamespaceUsings, false, assemblyAttributesToIgnore);
-			this.WriteModuleAttributesInternal(assembly.MainModule, mainModuleNamespaceUsings, false, moduleAttributesToIgnore);
+			this.WriteModuleAttributesInternal(assembly.get_MainModule(), mainModuleNamespaceUsings, false, moduleAttributesToIgnore);
 		}
 
 		public virtual void WriteModuleAttributes(ModuleDefinition module, IWriterContextService writerContextService, bool writeUsings = false, ICollection<string> attributesToIgnore = null)

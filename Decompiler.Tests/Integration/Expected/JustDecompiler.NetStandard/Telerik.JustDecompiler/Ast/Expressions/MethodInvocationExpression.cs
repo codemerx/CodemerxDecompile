@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.MethodExpression.Method.ReturnType.IsByReference;
+				return this.MethodExpression.Method.get_ReturnType().get_IsByReference();
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.ConstraintType != null;
+				return (object)this.ConstraintType != (object)null;
 			}
 		}
 
@@ -144,12 +144,12 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.ConstraintType == methodInvocationExpression.ConstraintType;
+			return (object)this.ConstraintType == (object)methodInvocationExpression.ConstraintType;
 		}
 
 		public Expression GetTarget()
 		{
-			if (this.MethodExpression.MethodDefinition == null || !this.MethodExpression.MethodDefinition.IsExtensionMethod)
+			if (this.MethodExpression.MethodDefinition == null || !this.MethodExpression.MethodDefinition.get_IsExtensionMethod())
 			{
 				return this.MethodExpression.Target;
 			}

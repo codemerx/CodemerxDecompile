@@ -26,11 +26,11 @@ namespace Mono.Cecil.Extensions
 
 		public bool Equals(ImplementedMember other)
 		{
-			if (this.DeclaringType != other.DeclaringType)
+			if ((object)this.DeclaringType != (object)other.DeclaringType)
 			{
 				return false;
 			}
-			return this.Member == other.Member;
+			return (object)this.Member == (object)other.Member;
 		}
 	}
 }

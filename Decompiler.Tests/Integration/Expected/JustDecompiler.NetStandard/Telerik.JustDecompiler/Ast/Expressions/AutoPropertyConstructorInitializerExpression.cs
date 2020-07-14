@@ -35,7 +35,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Property.PropertyType;
+				return this.Property.get_PropertyType();
 			}
 			set
 			{
@@ -47,7 +47,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Property.PropertyType != null;
+				return (object)this.Property.get_PropertyType() != (object)null;
 			}
 		}
 
@@ -117,7 +117,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Property.FullName == autoPropertyConstructorInitializerExpression.Property.FullName;
+			return this.Property.get_FullName() == autoPropertyConstructorInitializerExpression.Property.get_FullName();
 		}
 	}
 }

@@ -12,20 +12,20 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		private static int GetEnumBitSize(TypeDefinition enumDefinition)
 		{
-			TypeReference fieldType = enumDefinition.Fields[0].FieldType;
-			if (fieldType.FullName == "System.Int32" || fieldType.FullName == "System.UInt32")
+			TypeReference fieldType = enumDefinition.get_Fields().get_Item(0).get_FieldType();
+			if (fieldType.get_FullName() == "System.Int32" || fieldType.get_FullName() == "System.UInt32")
 			{
 				return 32;
 			}
-			if (fieldType.FullName == "System.Int64" || fieldType.FullName == "System.UInt64")
+			if (fieldType.get_FullName() == "System.Int64" || fieldType.get_FullName() == "System.UInt64")
 			{
 				return 64;
 			}
-			if (fieldType.FullName == "System.Int16" || fieldType.FullName == "System.UInt16")
+			if (fieldType.get_FullName() == "System.Int16" || fieldType.get_FullName() == "System.UInt16")
 			{
 				return 16;
 			}
-			if (!(fieldType.FullName == "System.Byte") && !(fieldType.FullName == "System.SByte"))
+			if (!(fieldType.get_FullName() == "System.Byte") && !(fieldType.get_FullName() == "System.SByte"))
 			{
 				return -1;
 			}
@@ -91,62 +91,62 @@ namespace Telerik.JustDecompiler.Steps
 					}
 				}
 			}
-			Collection<FieldDefinition> fields = enumDefinition.Fields;
+			Collection<FieldDefinition> fields = enumDefinition.get_Fields();
 			List<FieldDefinition> fieldDefinitions = new List<FieldDefinition>();
 			Collection<FieldDefinition>.Enumerator enumerator = fields.GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					FieldDefinition current = enumerator.Current;
-					if (current.Constant == null || current.Constant.Value == null)
+					FieldDefinition current = enumerator.get_Current();
+					if (current.get_Constant() == null || current.get_Constant().get_Value() == null)
 					{
 						continue;
 					}
 					ulong num = (ulong)0;
-					fullName = current.Constant.Value.GetType().FullName;
+					fullName = current.get_Constant().get_Value().GetType().FullName;
 					if (fullName != null)
 					{
 						switch (fullName)
 						{
 							case "System.Int32":
 							{
-								num = (ulong)((Int32)current.Constant.Value);
+								num = (ulong)((Int32)current.get_Constant().get_Value());
 								break;
 							}
 							case "System.UInt32":
 							{
-								num = (ulong)((UInt32)current.Constant.Value);
+								num = (ulong)((UInt32)current.get_Constant().get_Value());
 								break;
 							}
 							case "System.Byte":
 							{
-								num = (ulong)((Byte)current.Constant.Value);
+								num = (ulong)((Byte)current.get_Constant().get_Value());
 								break;
 							}
 							case "System.SByte":
 							{
-								num = (ulong)((byte)((SByte)current.Constant.Value));
+								num = (ulong)((byte)((SByte)current.get_Constant().get_Value()));
 								break;
 							}
 							case "System.Int16":
 							{
-								num = (ulong)((ushort)((Int16)current.Constant.Value));
+								num = (ulong)((ushort)((Int16)current.get_Constant().get_Value()));
 								break;
 							}
 							case "System.UInt16":
 							{
-								num = (ulong)((UInt16)current.Constant.Value);
+								num = (ulong)((UInt16)current.get_Constant().get_Value());
 								break;
 							}
 							case "System.Int64":
 							{
-								num = (ulong)current.Constant.Value;
+								num = (ulong)current.get_Constant().get_Value();
 								break;
 							}
 							case "System.UInt64":
 							{
-								num = (UInt64)current.Constant.Value;
+								num = (UInt64)current.get_Constant().get_Value();
 								break;
 							}
 						}
@@ -184,7 +184,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return enumExpression;
 		}

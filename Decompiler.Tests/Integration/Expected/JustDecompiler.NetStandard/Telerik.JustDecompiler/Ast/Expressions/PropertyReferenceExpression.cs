@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return base.MethodExpression.Method.DeclaringType;
+				return base.MethodExpression.Method.get_DeclaringType();
 			}
 		}
 
@@ -36,8 +36,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				{
 					return base.MethodExpression.ExpressionType;
 				}
-				int count = base.MethodExpression.Method.Parameters.Count - 1;
-				return base.MethodExpression.Method.Parameters[count].ResolveParameterType(base.MethodExpression.Method);
+				int count = base.MethodExpression.Method.get_Parameters().get_Count() - 1;
+				return base.MethodExpression.Method.get_Parameters().get_Item(count).ResolveParameterType(base.MethodExpression.Method);
 			}
 			set
 			{
@@ -61,7 +61,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				{
 					return false;
 				}
-				return base.MethodExpression.MethodDefinition.IsSetter;
+				return base.MethodExpression.MethodDefinition.get_IsSetter();
 			}
 		}
 
@@ -130,16 +130,16 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		private PropertyDefinition ResolveProperty()
 		{
-			TypeDefinition typeDefinition = base.MethodExpression.Method.DeclaringType.Resolve();
+			TypeDefinition typeDefinition = base.MethodExpression.Method.get_DeclaringType().Resolve();
 			MethodDefinition methodDefinition = base.MethodExpression.Method.Resolve();
 			PropertyDefinition propertyDefinition = null;
 			if (typeDefinition != null)
 			{
-				foreach (PropertyDefinition property in typeDefinition.Properties)
+				foreach (PropertyDefinition property in typeDefinition.get_Properties())
 				{
-					if (property.GetMethod != methodDefinition)
+					if ((object)property.get_GetMethod() != (object)methodDefinition)
 					{
-						if (property.SetMethod != methodDefinition)
+						if ((object)property.get_SetMethod() != (object)methodDefinition)
 						{
 							continue;
 						}

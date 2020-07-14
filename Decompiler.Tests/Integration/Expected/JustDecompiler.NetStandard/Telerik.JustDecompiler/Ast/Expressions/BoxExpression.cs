@@ -46,7 +46,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.theTypeSystem.Object;
+				return this.theTypeSystem.get_Object();
 			}
 			set
 			{
@@ -95,7 +95,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.BoxedAs.FullName == boxExpression.BoxedAs.FullName;
+			return this.BoxedAs.get_FullName() == boxExpression.BoxedAs.get_FullName();
 		}
 	}
 }

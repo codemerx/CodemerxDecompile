@@ -48,11 +48,11 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				{
 					return false;
 				}
-				Mono.Collections.Generic.Collection<TypeReference> interfaces = typeDefinition.Interfaces;
+				Mono.Collections.Generic.Collection<TypeReference> interfaces = typeDefinition.get_Interfaces();
 				Func<TypeReference, bool> func1 = func;
 				if (func1 == null)
 				{
-					Func<TypeReference, bool> fullName = (TypeReference x) => x.FullName == interfaceName;
+					Func<TypeReference, bool> fullName = (TypeReference x) => x.get_FullName() == interfaceName;
 					Func<TypeReference, bool> func2 = fullName;
 					func = fullName;
 					func1 = func2;
@@ -61,7 +61,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				{
 					return true;
 				}
-				type = typeDefinition.BaseType;
+				type = typeDefinition.get_BaseType();
 			}
 			return false;
 		}
@@ -81,7 +81,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			ArrayCreationExpression right = binaryExpression.Right as ArrayCreationExpression;
-			if (!binaryExpression.Right.HasType || !binaryExpression.Right.ExpressionType.IsArray)
+			if (!binaryExpression.Right.HasType || !binaryExpression.Right.ExpressionType.get_IsArray())
 			{
 				return false;
 			}

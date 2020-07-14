@@ -59,7 +59,7 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.Visit(body);
 			this.CleanupRedundantAssignments();
 			this.CleanupEmptyIfs(body);
@@ -71,9 +71,14 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 			if (node.Expression is BinaryExpression)
 			{
 				BinaryExpression expression = node.Expression as BinaryExpression;
-				if (expression.Operator == BinaryOperator.Assign && expression.Left is VariableReferenceExpression && expression.Right is VariableReferenceExpression && (expression.Left as VariableReferenceExpression).Variable == (expression.Right as VariableReferenceExpression).Variable)
+				if (expression.Operator == BinaryOperator.Assign && expression.Left is VariableReferenceExpression && expression.Right is VariableReferenceExpression)
 				{
-					this.statementsToRemove.Add(node);
+					VariableReference variable = (expression.Left as VariableReferenceExpression).Variable;
+					VariableReference variableReference = (expression.Right as VariableReferenceExpression).Variable;
+					if ((object)variable == (object)variableReference)
+					{
+						this.statementsToRemove.Add(node);
+					}
 				}
 			}
 		}

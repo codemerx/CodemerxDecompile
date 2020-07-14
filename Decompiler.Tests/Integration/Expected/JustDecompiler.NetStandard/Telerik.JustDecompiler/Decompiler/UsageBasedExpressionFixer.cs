@@ -22,10 +22,10 @@ namespace Telerik.JustDecompiler.Decompiler
 		public UsageBasedExpressionFixer(MethodSpecificContext methodContext)
 		{
 			this.methodContext = methodContext;
-			TypeReference returnType = methodContext.Method.ReturnType;
-			this.currentTypeSystem = methodContext.Method.Module.TypeSystem;
-			this.isBoolReturnType = returnType.FullName == this.currentTypeSystem.Boolean.FullName;
-			this.isCharReturnType = returnType.FullName == this.currentTypeSystem.Char.FullName;
+			TypeReference returnType = methodContext.Method.get_ReturnType();
+			this.currentTypeSystem = methodContext.Method.get_Module().get_TypeSystem();
+			this.isBoolReturnType = returnType.get_FullName() == this.currentTypeSystem.get_Boolean().get_FullName();
+			this.isCharReturnType = returnType.get_FullName() == this.currentTypeSystem.get_Char().get_FullName();
 		}
 
 		private void FixArguments(MethodReference methodRef, ExpressionCollection arguments)
@@ -36,7 +36,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 			for (int i = 0; i < arguments.Count; i++)
 			{
-				TypeReference typeReference = methodRef.Parameters[i].ResolveParameterType(methodRef);
+				TypeReference typeReference = methodRef.get_Parameters().get_Item(i).ResolveParameterType(methodRef);
 				LiteralExpression item = arguments[i] as LiteralExpression;
 				if (item != null)
 				{
@@ -73,20 +73,20 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private void HandleCastArgument(TypeReference parameterType, ExplicitCastExpression castArgument)
 		{
-			if (parameterType.FullName == this.currentTypeSystem.Char.FullName && castArgument.ExpressionType.FullName == this.currentTypeSystem.UInt16.FullName)
+			if (parameterType.get_FullName() == this.currentTypeSystem.get_Char().get_FullName() && castArgument.ExpressionType.get_FullName() == this.currentTypeSystem.get_UInt16().get_FullName())
 			{
-				castArgument.TargetType = this.currentTypeSystem.Char;
+				castArgument.TargetType = this.currentTypeSystem.get_Char();
 			}
 		}
 
 		private void HandleLiteralArgument(TypeReference parameterType, LiteralExpression literalArgument)
 		{
-			if (parameterType.FullName == this.currentTypeSystem.Boolean.FullName)
+			if (parameterType.get_FullName() == this.currentTypeSystem.get_Boolean().get_FullName())
 			{
 				this.FixBooleanLiteral(literalArgument);
 				return;
 			}
-			if (parameterType.FullName == this.currentTypeSystem.Char.FullName)
+			if (parameterType.get_FullName() == this.currentTypeSystem.get_Char().get_FullName())
 			{
 				this.FixCharLiteral(literalArgument);
 			}
@@ -102,7 +102,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		public override ICodeNode VisitBoxExpression(BoxExpression node)
 		{
 			base.VisitBoxExpression(node);
-			if (node.BoxedExpression.CodeNodeType == CodeNodeType.LiteralExpression && node.BoxedAs.FullName == this.currentTypeSystem.Boolean.FullName)
+			if (node.BoxedExpression.CodeNodeType == CodeNodeType.LiteralExpression && node.BoxedAs.get_FullName() == this.currentTypeSystem.get_Boolean().get_FullName())
 			{
 				this.FixBooleanLiteral(node.BoxedExpression as LiteralExpression);
 				return node.BoxedExpression.CloneAndAttachInstructions(node.MappedInstructions);
@@ -111,9 +111,9 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				ExplicitCastExpression boxedExpression = node.BoxedExpression as ExplicitCastExpression;
 				ExplicitCastExpression expression = boxedExpression.Expression as ExplicitCastExpression;
-				if (boxedExpression.TargetType.FullName == this.currentTypeSystem.Char.FullName && expression.TargetType.FullName == this.currentTypeSystem.UInt16.FullName)
+				if (boxedExpression.TargetType.get_FullName() == this.currentTypeSystem.get_Char().get_FullName() && expression.TargetType.get_FullName() == this.currentTypeSystem.get_UInt16().get_FullName())
 				{
-					expression.TargetType = this.currentTypeSystem.Char;
+					expression.TargetType = this.currentTypeSystem.get_Char();
 					node.BoxedExpression = expression;
 				}
 			}
@@ -122,12 +122,12 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public override ICodeNode VisitExplicitCastExpression(ExplicitCastExpression node)
 		{
-			if (node.Expression.CodeNodeType == CodeNodeType.LiteralExpression && node.TargetType.FullName == this.currentTypeSystem.Boolean.FullName)
+			if (node.Expression.CodeNodeType == CodeNodeType.LiteralExpression && node.TargetType.get_FullName() == this.currentTypeSystem.get_Boolean().get_FullName())
 			{
 				this.FixBooleanLiteral(node.Expression as LiteralExpression);
 				return node.Expression.CloneAndAttachInstructions(node.MappedInstructions);
 			}
-			if (node.Expression.CodeNodeType != CodeNodeType.LiteralExpression || !(node.TargetType.FullName == this.currentTypeSystem.Char.FullName))
+			if (node.Expression.CodeNodeType != CodeNodeType.LiteralExpression || !(node.TargetType.get_FullName() == this.currentTypeSystem.get_Char().get_FullName()))
 			{
 				return base.VisitExplicitCastExpression(node);
 			}
@@ -165,9 +165,9 @@ namespace Telerik.JustDecompiler.Decompiler
 				}
 			}
 			ExplicitCastExpression chr = node.Value as ExplicitCastExpression;
-			if (chr != null && chr.ExpressionType.FullName != this.methodContext.Method.ReturnType.FullName && this.isCharReturnType && chr.ExpressionType.FullName == this.currentTypeSystem.UInt16.FullName)
+			if (chr != null && chr.ExpressionType.get_FullName() != this.methodContext.Method.get_ReturnType().get_FullName() && this.isCharReturnType && chr.ExpressionType.get_FullName() == this.currentTypeSystem.get_UInt16().get_FullName())
 			{
-				chr.TargetType = this.currentTypeSystem.Char;
+				chr.TargetType = this.currentTypeSystem.get_Char();
 			}
 			return node;
 		}

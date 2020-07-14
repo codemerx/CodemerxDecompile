@@ -48,7 +48,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 		public void WriteAssemblyInfo(AssemblyDefinition assembly, IWriterContextService writerContextService, bool writeUsings = false, ICollection<string> assemblyAttributesToIgnore = null, ICollection<string> moduleAttributesToIgnore = null)
 		{
 			this.WriteAssemblyAttributes(assembly, writerContextService, writeUsings, assemblyAttributesToIgnore);
-			this.WriteModuleAttributes(assembly.MainModule, writerContextService, writeUsings, moduleAttributesToIgnore);
+			this.WriteModuleAttributes(assembly.get_MainModule(), writerContextService, writeUsings, moduleAttributesToIgnore);
 		}
 
 		public void WriteModuleAttributes(ModuleDefinition module, IWriterContextService writerContextService, bool writeUsings = false, ICollection<string> attributesToIgnore = null)

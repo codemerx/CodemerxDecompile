@@ -198,7 +198,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			{
 				throw new Exception("Invalid state");
 			}
-			if (node.Variable.Resolve() != this.variableDef)
+			if ((object)node.Variable.Resolve() != (object)this.variableDef)
 			{
 				return node;
 			}

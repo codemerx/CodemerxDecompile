@@ -29,26 +29,26 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		protected override void BuildUpHardNodesHierarchy(IEnumerable<ClassHierarchyNode> hardNodes)
 		{
-			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.Boolean);
-			ClassHierarchyNode classHierarchyNode = this.GetTypeNode(this.typeSystem.Byte);
+			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Boolean());
+			ClassHierarchyNode classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Byte());
 			this.AddEdge(classHierarchyNode, typeNode);
-			typeNode = this.GetTypeNode(this.typeSystem.Byte);
-			classHierarchyNode = this.GetTypeNode(this.typeSystem.Char);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Byte());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Char());
 			this.AddEdge(classHierarchyNode, typeNode);
-			typeNode = this.GetTypeNode(this.typeSystem.Byte);
-			classHierarchyNode = this.GetTypeNode(this.typeSystem.Int16);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Byte());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Int16());
 			this.AddEdge(classHierarchyNode, typeNode);
-			typeNode = this.GetTypeNode(this.typeSystem.Char);
-			classHierarchyNode = this.GetTypeNode(this.typeSystem.Int32);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Char());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Int32());
 			this.AddEdge(classHierarchyNode, typeNode);
-			typeNode = this.GetTypeNode(this.typeSystem.Int16);
-			classHierarchyNode = this.GetTypeNode(this.typeSystem.Int32);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Int16());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Int32());
 			this.AddEdge(classHierarchyNode, typeNode);
 		}
 
 		protected override ClassHierarchyNode GetTypeNode(TypeReference assignedType)
 		{
-			string fullName = assignedType.FullName;
+			string fullName = assignedType.get_FullName();
 			if (!this.typeNameToNode.ContainsKey(fullName))
 			{
 				ClassHierarchyNode classHierarchyNode = new ClassHierarchyNode(assignedType);
@@ -78,11 +78,11 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private bool IsArithmeticOperation(Code code)
 		{
-			if (code == Code.Add || code == Code.Sub || code == Code.Mul || code == Code.Div || code == Code.Rem || code == Code.Add_Ovf || code == Code.Add_Ovf_Un || code == Code.Sub_Ovf || code == Code.Sub_Ovf_Un || code == Code.Rem_Un || code == Code.Mul_Ovf || code == Code.Mul_Ovf_Un)
+			if (code == 87 || code == 88 || code == 89 || code == 90 || code == 92 || code == 180 || code == 181 || code == 184 || code == 185 || code == 93 || code == 182 || code == 183)
 			{
 				return true;
 			}
-			return code == Code.Div_Un;
+			return code == 91;
 		}
 
 		private bool IsStackVariable(VariableReference varRef)
@@ -148,15 +148,15 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				int value = (Int32)(item as LiteralExpression).Value;
 				if (value == 0 || value == 1)
 				{
-					expressionType = this.typeSystem.Boolean;
+					expressionType = this.typeSystem.get_Boolean();
 				}
 				else if (value <= 0xff && value >= 0)
 				{
-					expressionType = this.typeSystem.Byte;
+					expressionType = this.typeSystem.get_Byte();
 				}
 				else if (value < 0xffff && value >= 0)
 				{
-					expressionType = this.typeSystem.Char;
+					expressionType = this.typeSystem.get_Char();
 				}
 			}
 			ClassHierarchyNode typeNode = this.GetTypeNode(expressionType);
@@ -167,24 +167,24 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 		protected override void OnPhiVariableUsed(int instructionOffset, ClassHierarchyNode variableNode)
 		{
 			Instruction item = this.offsetToInstruction[instructionOffset];
-			if (item.OpCode.Code == Code.Dup || item.OpCode.Code == Code.Pop)
+			if (item.get_OpCode().get_Code() == 36 || item.get_OpCode().get_Code() == 37)
 			{
 				return;
 			}
 			ClassHierarchyNode useExpressionTypeNode = base.GetUseExpressionTypeNode(item, variableNode.Variable);
-			if (item.OpCode.Code == Code.Switch)
+			if (item.get_OpCode().get_Code() == 68)
 			{
 				variableNode.AddSupertype(useExpressionTypeNode);
 				this.resultingGraph.Add(useExpressionTypeNode);
 				return;
 			}
-			if (!(useExpressionTypeNode.NodeType.FullName == "System.Int32") || !this.OnlyPhiVariablesUsed(this.offsetToExpression[item.Offset]))
+			if (!(useExpressionTypeNode.NodeType.get_FullName() == "System.Int32") || !this.OnlyPhiVariablesUsed(this.offsetToExpression[item.get_Offset()]))
 			{
 				variableNode.AddSupertype(useExpressionTypeNode);
 				this.resultingGraph.Add(useExpressionTypeNode);
 				return;
 			}
-			List<ClassHierarchyNode> usedPhiVariableNodes = this.GetUsedPhiVariableNodes(item.Offset);
+			List<ClassHierarchyNode> usedPhiVariableNodes = this.GetUsedPhiVariableNodes(item.get_Offset());
 			for (int i = 0; i < usedPhiVariableNodes.Count; i++)
 			{
 				for (int j = i + 1; j < usedPhiVariableNodes.Count; j++)
@@ -193,12 +193,12 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 					usedPhiVariableNodes[j].AddSupertype(usedPhiVariableNodes[i]);
 				}
 			}
-			if (this.IsArithmeticOperation(item.OpCode.Code))
+			if (this.IsArithmeticOperation(item.get_OpCode().get_Code()))
 			{
 				for (int k = 0; k < usedPhiVariableNodes.Count; k++)
 				{
 					this.notPossibleBooleanNodes.Add(usedPhiVariableNodes[k]);
-					ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.Int32);
+					ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Int32());
 					if (!typeNode.CanAssignTo.Contains(usedPhiVariableNodes[k]))
 					{
 						typeNode.CanAssignTo.Add(usedPhiVariableNodes[k]);
@@ -210,7 +210,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private void RemoveBooleanAsASubtype(ClassHierarchyNode variableNode)
 		{
-			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.Boolean);
+			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Boolean());
 			if (variableNode.SubTypes.Contains(typeNode))
 			{
 				variableNode.SubTypes.Remove(typeNode);
@@ -228,7 +228,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		protected override bool ShouldConsiderVariable(VariableReference variableReference)
 		{
-			return variableReference.VariableType.FullName == "System.Int32";
+			return variableReference.get_VariableType().get_FullName() == "System.Int32";
 		}
 	}
 }

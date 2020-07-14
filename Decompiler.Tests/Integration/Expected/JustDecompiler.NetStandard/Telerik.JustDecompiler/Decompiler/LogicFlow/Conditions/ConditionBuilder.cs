@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 		{
 			this.typeSystem = typeSystem;
 			this.logicalBuilderContext = logicalBuilderContext;
-			this.booleanTypeReference = logicalBuilderContext.CFG.MethodBody.Method.Module.TypeSystem.Boolean;
+			this.booleanTypeReference = logicalBuilderContext.CFG.MethodBody.get_Method().get_Module().get_TypeSystem().get_Boolean();
 		}
 
 		private bool ArePredecessorsLegal(ILogicalConstruct node, HashSet<ILogicalConstruct> allowedPredecessors)
@@ -139,7 +139,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 			{
 				CFGBlockLogicalConstruct cFGBlockLogicalConstruct = value[(int)value.Length - 1];
 				InstructionBlock theBlock = cFGBlockLogicalConstruct.TheBlock;
-				if ((int)theBlock.Successors.Length != 2 || !(theBlock.Successors[0] != theBlock.Successors[1]) || theBlock.Last.OpCode.Code == Code.Switch)
+				if ((int)theBlock.Successors.Length != 2 || !(theBlock.Successors[0] != theBlock.Successors[1]) || theBlock.Last.get_OpCode().get_Code() == 68)
 				{
 					continue;
 				}

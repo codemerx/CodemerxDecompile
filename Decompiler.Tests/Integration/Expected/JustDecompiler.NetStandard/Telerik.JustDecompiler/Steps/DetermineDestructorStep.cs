@@ -16,7 +16,7 @@ namespace Telerik.JustDecompiler.Steps
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			MethodDefinition method = context.MethodContext.Method;
-			if (method.Name == "Finalize" && method.IsVirtual && body.Statements.Count == 1 && body.Statements[0] is TryStatement)
+			if (method.get_Name() == "Finalize" && method.get_IsVirtual() && body.Statements.Count == 1 && body.Statements[0] is TryStatement)
 			{
 				TryStatement item = body.Statements[0] as TryStatement;
 				if (item.Finally != null && item.Finally.Body.Statements.Count == 1 && item.Finally.Body.Statements[0] is ExpressionStatement)
@@ -25,7 +25,7 @@ namespace Telerik.JustDecompiler.Steps
 					if (expressionStatement.Expression is MethodInvocationExpression)
 					{
 						MethodDefinition methodDefinition = (expressionStatement.Expression as MethodInvocationExpression).MethodExpression.MethodDefinition;
-						if (methodDefinition != null && methodDefinition.Name == "Finalize" && methodDefinition.DeclaringType.FullName == method.DeclaringType.BaseType.FullName)
+						if (methodDefinition != null && methodDefinition.get_Name() == "Finalize" && methodDefinition.get_DeclaringType().get_FullName() == method.get_DeclaringType().get_BaseType().get_FullName())
 						{
 							context.MethodContext.IsDestructor = true;
 							context.MethodContext.DestructorStatements = new BlockStatement()

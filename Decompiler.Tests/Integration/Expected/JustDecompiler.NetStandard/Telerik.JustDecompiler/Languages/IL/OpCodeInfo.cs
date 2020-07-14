@@ -556,7 +556,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			{
 				CanThrow = false
 			}, new OpCodeInfo(OpCodes.Stelem_Any), new OpCodeInfo(OpCodes.Stelem_I1), new OpCodeInfo(OpCodes.Stelem_I2), new OpCodeInfo(OpCodes.Stelem_I4), new OpCodeInfo(OpCodes.Stelem_I8), new OpCodeInfo(OpCodes.Stelem_R4), new OpCodeInfo(OpCodes.Stelem_R8), new OpCodeInfo(OpCodes.Stelem_Ref), new OpCodeInfo(OpCodes.Stfld), new OpCodeInfo(OpCodes.Stobj), new OpCodeInfo(OpCodes.Stsfld), new OpCodeInfo(OpCodes.Throw), new OpCodeInfo(OpCodes.Unbox), new OpCodeInfo(OpCodes.Unbox_Any) };
-			OpCodeInfo.knownOpCodeDict = OpCodeInfo.knownOpCodes.ToDictionary<OpCodeInfo, Code>((OpCodeInfo info) => info.OpCode.Code);
+			OpCodeInfo.knownOpCodeDict = OpCodeInfo.knownOpCodes.ToDictionary<OpCodeInfo, Code>((OpCodeInfo info) => info.OpCode.get_Code());
 		}
 
 		private OpCodeInfo(Mono.Cecil.Cil.OpCode opcode)
@@ -567,7 +567,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public static OpCodeInfo Get(Mono.Cecil.Cil.OpCode opCode)
 		{
-			return OpCodeInfo.Get(opCode.Code);
+			return OpCodeInfo.Get(opCode.get_Code());
 		}
 
 		public static OpCodeInfo Get(Code code)
@@ -583,34 +583,34 @@ namespace Telerik.JustDecompiler.Languages.IL
 		public static bool IsUnconditionalBranch(Mono.Cecil.Cil.OpCode opcode)
 		{
 			FlowControl flowControl;
-			if (opcode.OpCodeType == OpCodeType.Prefix)
+			if (opcode.get_OpCodeType() == 4)
 			{
 				return false;
 			}
-			switch (opcode.FlowControl)
+			switch (opcode.get_FlowControl())
 			{
-				case FlowControl.Branch:
-				case FlowControl.Return:
-				case FlowControl.Throw:
+				case 0:
+				case 7:
+				case 8:
 				{
 					return true;
 				}
-				case FlowControl.Break:
-				case FlowControl.Meta:
-				case FlowControl.Phi:
+				case 1:
+				case 4:
+				case 6:
 				{
-					flowControl = opcode.FlowControl;
+					flowControl = opcode.get_FlowControl();
 					throw new NotSupportedException(flowControl.ToString());
 				}
-				case FlowControl.Call:
-				case FlowControl.Cond_Branch:
-				case FlowControl.Next:
+				case 2:
+				case 3:
+				case 5:
 				{
 					return false;
 				}
 				default:
 				{
-					flowControl = opcode.FlowControl;
+					flowControl = opcode.get_FlowControl();
 					throw new NotSupportedException(flowControl.ToString());
 				}
 			}

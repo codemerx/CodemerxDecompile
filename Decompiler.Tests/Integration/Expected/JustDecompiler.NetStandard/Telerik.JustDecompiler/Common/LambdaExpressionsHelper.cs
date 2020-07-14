@@ -15,7 +15,7 @@ namespace Telerik.JustDecompiler.Common
 			{
 				while (enumerator.MoveNext())
 				{
-					if (!enumerator.Current.ParameterType.ContainsAnonymousType())
+					if (!enumerator.get_Current().get_ParameterType().ContainsAnonymousType())
 					{
 						continue;
 					}
@@ -26,7 +26,7 @@ namespace Telerik.JustDecompiler.Common
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}

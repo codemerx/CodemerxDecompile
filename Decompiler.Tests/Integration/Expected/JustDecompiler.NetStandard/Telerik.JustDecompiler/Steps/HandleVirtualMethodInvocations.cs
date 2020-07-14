@@ -29,14 +29,14 @@ namespace Telerik.JustDecompiler.Steps
 			while (num < typeDefinitions.Count)
 			{
 				TypeDefinition typeDefinition = typeDefinitions[num];
-				if (typeDefinition == null || typeDefinition.FullName == definingTypeFullName)
+				if (typeDefinition == null || typeDefinition.get_FullName() == definingTypeFullName)
 				{
 					item = num;
 					break;
 				}
 				else
 				{
-					TypeReference baseType = typeDefinition.BaseType;
+					TypeReference baseType = typeDefinition.get_BaseType();
 					if (baseType != null)
 					{
 						TypeDefinition typeDefinition1 = baseType.Resolve();
@@ -46,7 +46,7 @@ namespace Telerik.JustDecompiler.Steps
 							nums.Add(num);
 						}
 					}
-					foreach (TypeReference @interface in typeDefinition.Interfaces)
+					foreach (TypeReference @interface in typeDefinition.get_Interfaces())
 					{
 						if (@interface == null)
 						{
@@ -84,15 +84,15 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				if (methodExpression.Target is ThisReferenceExpression)
 				{
-					TypeDefinition typeDefinition = this.method.DeclaringType.Resolve();
-					if (typeDefinition != null && typeDefinition != methodExpression.Method.DeclaringType.Resolve())
+					TypeDefinition typeDefinition = this.method.get_DeclaringType().Resolve();
+					if (typeDefinition != null && (object)typeDefinition != (object)methodExpression.Method.get_DeclaringType().Resolve())
 					{
-						TypeReference baseType = this.method.DeclaringType.BaseType;
-						if (baseType == null || baseType.FullName == typeof(Object).FullName)
+						TypeReference baseType = this.method.get_DeclaringType().get_BaseType();
+						if (baseType == null || baseType.get_FullName() == typeof(Object).FullName)
 						{
 							return;
 						}
-						methodExpression.Target = new BaseReferenceExpression(methodExpression.Method.DeclaringType, (methodExpression.Target as ThisReferenceExpression).MappedInstructions);
+						methodExpression.Target = new BaseReferenceExpression(methodExpression.Method.get_DeclaringType(), (methodExpression.Target as ThisReferenceExpression).MappedInstructions);
 					}
 				}
 				return;
@@ -102,7 +102,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			if (methodReferenceExpression.Target.ExpressionType.FullName == methodReferenceExpression.Method.DeclaringType.FullName)
+			if (methodReferenceExpression.Target.ExpressionType.get_FullName() == methodReferenceExpression.Method.get_DeclaringType().get_FullName())
 			{
 				return;
 			}
@@ -112,14 +112,14 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			foreach (TypeDefinition inheritanceChain in this.GetInheritanceChain(typeDefinition1, methodReferenceExpression.Method.DeclaringType.FullName))
+			foreach (TypeDefinition inheritanceChain in this.GetInheritanceChain(typeDefinition1, methodReferenceExpression.Method.get_DeclaringType().get_FullName()))
 			{
-				Collection<MethodDefinition> methods = inheritanceChain.Methods;
+				Collection<MethodDefinition> methods = inheritanceChain.get_Methods();
 				Func<MethodDefinition, bool> func1 = func;
 				if (func1 == null)
 				{
 					Func<MethodDefinition, bool> name = (MethodDefinition x) => {
-						if (x.Name != methodReferenceExpression.Method.Name)
+						if (x.get_Name() != methodReferenceExpression.Method.get_Name())
 						{
 							return false;
 						}

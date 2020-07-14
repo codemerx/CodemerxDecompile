@@ -23,7 +23,7 @@ namespace Telerik.JustDecompiler.Steps
 			List<Instruction> instructions1 = new List<Instruction>();
 			for (int i = 1; i < instructions.Count; i++)
 			{
-				if (instructions[i] == instructions[i - 1])
+				if ((object)instructions[i] == (object)instructions[i - 1])
 				{
 					instructions1.Add(instructions[i]);
 				}
@@ -48,7 +48,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				foreach (Instruction underlyingSameMethodInstruction in pdbCodeNode.UnderlyingSameMethodInstructions)
 				{
-					if (underlyingSameMethodInstruction.ContainingMethod == pdbCodeNode.UnderlyingInstructionsMember)
+					if ((object)underlyingSameMethodInstruction.get_ContainingMethod() == (object)pdbCodeNode.UnderlyingInstructionsMember)
 					{
 						continue;
 					}

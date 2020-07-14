@@ -43,7 +43,7 @@ namespace Telerik.JustDecompiler.Common
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (node.Variable == this.variable)
+			if ((object)node.Variable == (object)this.variable)
 			{
 				this.found = true;
 				return;

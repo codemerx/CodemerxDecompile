@@ -45,7 +45,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				{
 					return this.Type;
 				}
-				return this.Constructor.DeclaringType;
+				return this.Constructor.get_DeclaringType();
 			}
 			set
 			{
@@ -123,7 +123,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 					return false;
 				}
 			}
-			else if (anonymousObjectCreationExpression.Constructor == null || this.Constructor.FullName != anonymousObjectCreationExpression.Constructor.FullName)
+			else if (anonymousObjectCreationExpression.Constructor == null || this.Constructor.get_FullName() != anonymousObjectCreationExpression.Constructor.get_FullName())
 			{
 				return false;
 			}
@@ -134,7 +134,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 					return false;
 				}
 			}
-			else if (anonymousObjectCreationExpression.Type == null || this.Type.FullName != anonymousObjectCreationExpression.Type.FullName)
+			else if (anonymousObjectCreationExpression.Type == null || this.Type.get_FullName() != anonymousObjectCreationExpression.Type.get_FullName())
 			{
 				return false;
 			}

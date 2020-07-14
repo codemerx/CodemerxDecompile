@@ -26,7 +26,7 @@ namespace Telerik.JustDecompiler.Steps
 				if (right != null && (right.Operator == BinaryOperator.Add || right.Operator == BinaryOperator.Subtract))
 				{
 					VariableReferenceExpression left = right.Left as VariableReferenceExpression;
-					if (left != null && left.Variable == forVariable)
+					if (left != null && (object)left.Variable == (object)forVariable)
 					{
 						return true;
 					}

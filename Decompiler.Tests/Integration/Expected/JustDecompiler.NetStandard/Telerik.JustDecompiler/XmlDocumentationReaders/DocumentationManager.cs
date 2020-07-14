@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.XmlDocumentationReaders
 
 		private static void CacheModule(ModuleDefinition module)
 		{
-			DocumentationManager.cachedModuleLocation = module.FilePath;
+			DocumentationManager.cachedModuleLocation = module.get_FilePath();
 		}
 
 		public static void ClearCache()
@@ -91,14 +91,14 @@ namespace Telerik.JustDecompiler.XmlDocumentationReaders
 		{
 			if (!(member is TypeDefinition))
 			{
-				return member.DeclaringType.Module;
+				return member.get_DeclaringType().get_Module();
 			}
-			return (member as TypeDefinition).Module;
+			return (member as TypeDefinition).get_Module();
 		}
 
 		private static bool IsCachedModule(ModuleDefinition module)
 		{
-			return module.FilePath == DocumentationManager.cachedModuleLocation;
+			return module.get_FilePath() == DocumentationManager.cachedModuleLocation;
 		}
 
 		private static DocumentationCache ReadDocumentation(string documentationLocation)

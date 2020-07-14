@@ -15,15 +15,15 @@ namespace Mono.Cecil.Extensions
 			int count = 0;
 			if (self is TypeReference)
 			{
-				TypeReference declaringType = (self as TypeReference).DeclaringType;
+				TypeReference declaringType = (self as TypeReference).get_DeclaringType();
 				if (declaringType != null)
 				{
-					count = declaringType.GenericParameters.Count;
+					count = declaringType.get_GenericParameters().get_Count();
 				}
 			}
-			while (count < self.GenericParameters.Count)
+			while (count < self.get_GenericParameters().get_Count())
 			{
-				yield return self.GenericParameters[count];
+				yield return self.get_GenericParameters().get_Item(count);
 				count++;
 			}
 		}

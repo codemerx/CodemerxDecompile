@@ -56,19 +56,19 @@ namespace Telerik.JustDecompiler.Steps
 			ICollection<InstructionBlock> instructionBlocks;
 			foreach (ExceptionHandler rawExceptionHandler in this.theCFG.RawExceptionHandlers)
 			{
-				InstructionBlock item = this.theCFG.InstructionToBlockMapping[rawExceptionHandler.TryStart.Offset];
+				InstructionBlock item = this.theCFG.InstructionToBlockMapping[rawExceptionHandler.get_TryStart().get_Offset()];
 				if (!this.guardedBlockToExceptionHandler.TryGetValue(item, out instructionBlocks))
 				{
 					instructionBlocks = new List<InstructionBlock>();
 					this.guardedBlockToExceptionHandler[item] = instructionBlocks;
 				}
-				InstructionBlock item1 = this.theCFG.InstructionToBlockMapping[rawExceptionHandler.HandlerStart.Offset];
+				InstructionBlock item1 = this.theCFG.InstructionToBlockMapping[rawExceptionHandler.get_HandlerStart().get_Offset()];
 				instructionBlocks.Add(item1);
-				if (rawExceptionHandler.HandlerType != ExceptionHandlerType.Filter)
+				if (rawExceptionHandler.get_HandlerType() != 1)
 				{
 					continue;
 				}
-				InstructionBlock instructionBlocks1 = this.theCFG.InstructionToBlockMapping[rawExceptionHandler.FilterStart.Offset];
+				InstructionBlock instructionBlocks1 = this.theCFG.InstructionToBlockMapping[rawExceptionHandler.get_FilterStart().get_Offset()];
 				instructionBlocks.Add(instructionBlocks1);
 			}
 		}
@@ -122,10 +122,10 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				this.decompilationContext.MethodContext.IsMethodBodyChanged = true;
 			}
-			for (int j = 0; j < this.theCFG.RawExceptionHandlers.Count; j++)
+			for (int j = 0; j < this.theCFG.RawExceptionHandlers.get_Count(); j++)
 			{
-				ExceptionHandler item = this.theCFG.RawExceptionHandlers[j];
-				if (instructionBlocks.Contains(this.theCFG.InstructionToBlockMapping[item.TryStart.Offset]))
+				ExceptionHandler item = this.theCFG.RawExceptionHandlers.get_Item(j);
+				if (instructionBlocks.Contains(this.theCFG.InstructionToBlockMapping[item.get_TryStart().get_Offset()]))
 				{
 					int num = j;
 					j = num - 1;

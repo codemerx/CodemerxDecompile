@@ -30,11 +30,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Variable.VariableType;
+				return this.Variable.get_VariableType();
 			}
 			set
 			{
-				this.Variable.VariableType = value;
+				this.Variable.set_VariableType(value);
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			VariableDeclarationExpression variableDeclarationExpression = other as VariableDeclarationExpression;
-			return this.Variable.Resolve() == variableDeclarationExpression.Variable.Resolve();
+			return (object)this.Variable.Resolve() == (object)variableDeclarationExpression.Variable.Resolve();
 		}
 	}
 }

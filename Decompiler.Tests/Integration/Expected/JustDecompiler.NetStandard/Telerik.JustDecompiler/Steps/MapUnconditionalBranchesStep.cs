@@ -21,12 +21,12 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsUnconditionalBranch(Instruction instruction)
 		{
-			Code code = instruction.OpCode.Code;
-			if (code == Code.Br)
+			Code code = instruction.get_OpCode().get_Code();
+			if (code == 55)
 			{
 				return true;
 			}
-			return code == Code.Br_S;
+			return code == 42;
 		}
 
 		private void MapBranches(Expression expression)
@@ -37,11 +37,11 @@ namespace Telerik.JustDecompiler.Steps
 			for (int i = 0; i < count; i++)
 			{
 				Instruction item = instructions[i];
-				FlowControl flowControl = item.OpCode.FlowControl;
-				if (flowControl != FlowControl.Branch && flowControl != FlowControl.Cond_Branch && (int)flowControl - (int)FlowControl.Return > (int)FlowControl.Break)
+				FlowControl flowControl = item.get_OpCode().get_FlowControl();
+				if (flowControl != null && flowControl != 3 && flowControl - 7 > 1)
 				{
-					Instruction next = item.Next;
-					if (next != null && !this.mappedInstructions.Contains(next) && (i == instructions.Count - 1 || next != instructions[i + 1]) && this.IsUnconditionalBranch(next) && !this.methodContext.ControlFlowGraph.InstructionToBlockMapping.ContainsKey(next.Offset))
+					Instruction next = item.get_Next();
+					if (next != null && !this.mappedInstructions.Contains(next) && (i == instructions.Count - 1 || (object)next != (object)instructions[i + 1]) && this.IsUnconditionalBranch(next) && !this.methodContext.ControlFlowGraph.InstructionToBlockMapping.ContainsKey(next.get_Offset()))
 					{
 						instructions1.Add(next);
 					}

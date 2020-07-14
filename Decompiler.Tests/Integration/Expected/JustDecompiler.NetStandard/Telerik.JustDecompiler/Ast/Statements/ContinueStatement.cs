@@ -33,7 +33,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			if (jumps != null)
 			{
 				this.continueJumps.AddRange(jumps);
-				this.continueJumps.Sort((Instruction x, Instruction y) => x.Offset.CompareTo(y.Offset));
+				this.continueJumps.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
 		}
 

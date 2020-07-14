@@ -20,7 +20,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 					Instruction instruction = base.UnderlyingSameMethodInstructions.FirstOrDefault<Instruction>();
 					if (instruction != null)
 					{
-						containingMethod = instruction.ContainingMethod;
+						containingMethod = instruction.get_ContainingMethod();
 					}
 					else
 					{

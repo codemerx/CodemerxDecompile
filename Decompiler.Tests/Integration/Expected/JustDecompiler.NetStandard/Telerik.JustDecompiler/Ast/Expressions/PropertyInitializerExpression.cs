@@ -52,7 +52,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Property.Name;
+				return this.Property.get_Name();
 			}
 		}
 

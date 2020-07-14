@@ -152,7 +152,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			if (reference.TryGetDynamicAttribute(out customAttribute))
 			{
 				IEnumerator enumerator = DynamicHelper.GetDynamicPositioningFlags(customAttribute).GetEnumerator();
-				if (reference.ParameterType.IsByReference && (reference.ParameterType as ByReferenceType).ElementType == type && (!enumerator.MoveNext() || (Boolean)enumerator.Current))
+				if (reference.get_ParameterType().get_IsByReference() && (object)(reference.get_ParameterType() as ByReferenceType).get_ElementType() == (object)type && (!enumerator.MoveNext() || (Boolean)enumerator.Current))
 				{
 					throw new Exception("Invalid argument type for DynamicAttribute");
 				}
@@ -168,7 +168,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			{
 				str = Utilities.EscapeNameIfNeeded(str, base.Language);
 			}
-			base.WriteAndMapParameterToCode(() => this.Write(str), reference.Index);
+			base.WriteAndMapParameterToCode(() => this.Write(str), reference.get_Index());
 		}
 
 		protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference)
@@ -193,7 +193,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
 		protected override void DoWriteVariableTypeAndName(VariableDefinition variable)
 		{
-			this.WriteReferenceAndNamespaceIfInCollision(variable.VariableType);
+			this.WriteReferenceAndNamespaceIfInCollision(variable.get_VariableType());
 			this.WriteSpace();
 			this.WriteVariableName(variable);
 		}
@@ -226,12 +226,12 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 		private bool HasRefOrOutParameter(MethodReference method)
 		{
 			bool flag;
-			Mono.Collections.Generic.Collection<ParameterDefinition>.Enumerator enumerator = method.Parameters.GetEnumerator();
+			Mono.Collections.Generic.Collection<ParameterDefinition>.Enumerator enumerator = method.get_Parameters().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					if (!enumerator.Current.ParameterType.IsByReference)
+					if (!enumerator.get_Current().get_ParameterType().get_IsByReference())
 					{
 						continue;
 					}
@@ -242,7 +242,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -266,11 +266,11 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
 		protected override void PostWriteGenericParametersConstraints(IGenericDefinition genericDefinition)
 		{
-			if (genericDefinition.HasGenericParameters)
+			if (genericDefinition.get_HasGenericParameters())
 			{
-				foreach (GenericParameter genericParameter in genericDefinition.GenericParameters)
+				foreach (GenericParameter genericParameter in genericDefinition.get_GenericParameters())
 				{
-					if (!genericParameter.HasNotNullableValueTypeConstraint && !genericParameter.HasDefaultConstructorConstraint && !genericParameter.HasConstraints && !genericParameter.HasReferenceTypeConstraint)
+					if (!genericParameter.get_HasNotNullableValueTypeConstraint() && !genericParameter.get_HasDefaultConstructorConstraint() && !genericParameter.get_HasConstraints() && !genericParameter.get_HasReferenceTypeConstraint())
 					{
 						continue;
 					}
@@ -484,7 +484,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			{
 				return this.GetGenericNameFromMemberReference(type);
 			}
-			string name = type.Name;
+			string name = type.get_Name();
 			if (name != null)
 			{
 				if (name == "Decimal")
@@ -653,7 +653,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			{
 				throw new Exception(String.Format("Exception filters are not supported in {0}.", base.Language.Name));
 			}
-			if (node.Type.FullName != "System.Object")
+			if (node.Type.get_FullName() != "System.Object")
 			{
 				this.WriteSpace();
 				this.WriteSpecialBetweenParenthesis(() => {
@@ -820,7 +820,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			else if (node.UnresolvedReferenceForAmbiguousCastToObject != null)
 			{
 				Telerik.JustDecompiler.Common.Extensions.ResolveToOverloadedEqualityOperator(node.Expression.ExpressionType, out typeReference);
-				this.WriteNotResolvedReference("object", typeReference, String.Format("The cast to object might be unnecessary. Please, locate the assembly where \"{0}\" is defined.", typeReference.Name));
+				this.WriteNotResolvedReference("object", typeReference, String.Format("The cast to object might be unnecessary. Please, locate the assembly where \"{0}\" is defined.", typeReference.get_Name()));
 			}
 			else
 			{
@@ -945,7 +945,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 		{
 			this.WriteKeyword(base.KeyWordWriter.ByRef);
 			this.WriteSpace();
-			this.WriteReferenceAndNamespaceIfInCollision(node.Variable.VariableType.GetElementType());
+			this.WriteReferenceAndNamespaceIfInCollision(node.Variable.get_VariableType().GetElementType());
 			this.WriteSpace();
 			this.WriteVariableName(node.Variable);
 		}
@@ -1055,19 +1055,19 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 				return;
 			}
 			string variableName = base.GetVariableName(node.Variable);
-			if (node.Variable.VariableType.ContainsAnonymousType())
+			if (node.Variable.get_VariableType().ContainsAnonymousType())
 			{
 				this.WriteKeyword(base.KeyWordWriter.Dim);
 				this.WriteSpace();
 				base.WriteAndMapVariableToCode(() => this.Write(variableName), node.Variable);
 				return;
 			}
-			if (!node.Variable.Resolve().IsDynamic)
+			if (!node.Variable.Resolve().get_IsDynamic())
 			{
 				base.VisitVariableDeclarationExpression(node);
 				return;
 			}
-			this.WriteDynamicType(node.Variable.VariableType, node.Variable.DynamicPositioningFlags);
+			this.WriteDynamicType(node.Variable.get_VariableType(), node.Variable.get_DynamicPositioningFlags());
 			this.WriteSpace();
 			base.WriteAndMapVariableToCode(() => this.Write(variableName), node.Variable);
 		}
@@ -1079,7 +1079,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 				base.VisitVariableReferenceExpression(node);
 				return;
 			}
-			this.Write(node.Variable.Name);
+			this.Write(node.Variable.get_Name());
 		}
 
 		public override void VisitYieldBreakExpression(YieldBreakExpression node)
@@ -1180,7 +1180,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			bool flag = false;
 			try
 			{
-				string str = String.Concat("~", this.GetTypeName(method.DeclaringType));
+				string str = String.Concat("~", this.GetTypeName(method.get_DeclaringType()));
 				this.WriteReference(str, method);
 				this.WriteToken("(");
 				this.WriteToken(")");
@@ -1355,17 +1355,17 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 		protected override void WriteFieldTypeAndName(FieldDefinition field)
 		{
 			CustomAttribute customAttribute;
-			if (field.IsUnsafe)
+			if (field.get_IsUnsafe())
 			{
 				this.WriteKeyword(base.KeyWordWriter.Unsafe);
 				this.WriteSpace();
 			}
-			TypeReference fieldType = field.FieldType;
-			if (fieldType.IsRequiredModifier && (fieldType as RequiredModifierType).ModifierType.FullName == "System.Runtime.CompilerServices.IsVolatile")
+			TypeReference fieldType = field.get_FieldType();
+			if (fieldType.get_IsRequiredModifier() && (fieldType as RequiredModifierType).get_ModifierType().get_FullName() == "System.Runtime.CompilerServices.IsVolatile")
 			{
 				this.WriteKeyword(base.KeyWordWriter.Volatile);
 				this.WriteSpace();
-				fieldType = (fieldType as RequiredModifierType).ElementType;
+				fieldType = (fieldType as RequiredModifierType).get_ElementType();
 			}
 			string fieldName = this.GetFieldName(field);
 			if (!field.TryGetDynamicAttribute(out customAttribute))
@@ -1387,7 +1387,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
 		protected override void WriteGenericInstanceMethod(GenericInstanceMethod genericMethod)
 		{
-			MethodReference elementMethod = genericMethod.ElementMethod;
+			MethodReference elementMethod = genericMethod.get_ElementMethod();
 			string methodName = this.GetMethodName(elementMethod);
 			if (!this.HasRefOrOutParameter(elementMethod))
 			{
@@ -1395,7 +1395,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			}
 			else
 			{
-				MethodDefinition methodDefinition = genericMethod.ElementMethod.Resolve();
+				MethodDefinition methodDefinition = genericMethod.get_ElementMethod().Resolve();
 				if (methodDefinition != null)
 				{
 					this.WriteReference(methodName, methodDefinition);
@@ -1410,15 +1410,15 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 				return;
 			}
 			this.WriteToken(this.GenericLeftBracket);
-			Mono.Collections.Generic.Collection<TypeReference> genericArguments = genericMethod.GenericArguments;
-			for (int i = 0; i < genericArguments.Count; i++)
+			Mono.Collections.Generic.Collection<TypeReference> genericArguments = genericMethod.get_GenericArguments();
+			for (int i = 0; i < genericArguments.get_Count(); i++)
 			{
 				if (i > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				this.WriteReferenceAndNamespaceIfInCollision(genericArguments[i]);
+				this.WriteReferenceAndNamespaceIfInCollision(genericArguments.get_Item(i));
 			}
 			this.WriteToken(this.GenericRightBracket);
 		}
@@ -1436,7 +1436,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 		{
 			if (member is ParameterReference)
 			{
-				this.formatter.Write(((ParameterReference)member).Name);
+				this.formatter.Write(((ParameterReference)member).get_Name());
 				return;
 			}
 			if (member is TypeReference)
@@ -1457,7 +1457,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 				base.WriteMethodReference(name, reference);
 				return;
 			}
-			if ((reference.Name == ".ctor" || reference.Name == ".cctor") && name != "this" && name != "base")
+			if ((reference.get_Name() == ".ctor" || reference.get_Name() == ".cctor") && name != "this" && name != "base")
 			{
 				name = Utilities.EscapeTypeNameIfNeeded(name, base.Language);
 			}
@@ -1488,24 +1488,24 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 		protected override void WriteMethodReturnType(MethodDefinition method)
 		{
 			CustomAttribute customAttribute;
-			if (method.MethodReturnType.TryGetDynamicAttribute(out customAttribute))
+			if (method.get_MethodReturnType().TryGetDynamicAttribute(out customAttribute))
 			{
-				this.WriteDynamicType(method.ReturnType, customAttribute);
+				this.WriteDynamicType(method.get_ReturnType(), customAttribute);
 				return;
 			}
-			if (!method.ReturnType.IsByReference)
+			if (!method.get_ReturnType().get_IsByReference())
 			{
 				base.WriteMethodReturnType(method);
 				return;
 			}
 			this.WriteKeyword(base.KeyWordWriter.ByRef);
 			this.WriteSpace();
-			this.WriteReferenceAndNamespaceIfInCollision(method.ReturnType.GetElementType());
+			this.WriteReferenceAndNamespaceIfInCollision(method.get_ReturnType().GetElementType());
 		}
 
 		protected override bool WriteMethodVisibility(MethodDefinition method)
 		{
-			if (method.HasOverrides && method.IsPrivate)
+			if (method.get_HasOverrides() && method.get_IsPrivate())
 			{
 				return false;
 			}
@@ -1520,7 +1520,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			bool flag = false;
 			while (modifierType != null)
 			{
-				if (modifierType.ModifierType.FullName != "System.Runtime.CompilerServices.IsVolatile")
+				if (modifierType.get_ModifierType().get_FullName() != "System.Runtime.CompilerServices.IsVolatile")
 				{
 					if (flag)
 					{
@@ -1528,15 +1528,15 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 					}
 					stringBuilder.Append((modifierType is RequiredModifierType ? "modreq" : "modopt"));
 					stringBuilder.Append("(");
-					stringBuilder.Append(modifierType.ModifierType.FullName);
+					stringBuilder.Append(modifierType.get_ModifierType().get_FullName());
 					stringBuilder.Append(")");
 					flag = true;
-					elementType = modifierType.ElementType;
+					elementType = modifierType.get_ElementType();
 					modifierType = elementType as IModifierType;
 				}
 				else
 				{
-					elementType = modifierType.ElementType;
+					elementType = modifierType.get_ElementType();
 					modifierType = elementType as IModifierType;
 				}
 			}
@@ -1558,10 +1558,10 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			string @this = base.KeyWordWriter.This;
 			if (property.IsExplicitImplementation())
 			{
-				int num = property.Name.LastIndexOf(".");
-				@this = property.Name.Replace(property.Name.Substring(num + 1), base.KeyWordWriter.This);
+				int num = property.get_Name().LastIndexOf(".");
+				@this = property.get_Name().Replace(property.get_Name().Substring(num + 1), base.KeyWordWriter.This);
 			}
-			this.WriteTypeAndName(property.PropertyType, @this, property);
+			this.WriteTypeAndName(property.get_PropertyType(), @this, property);
 			this.Write(this.IndexLeftBracket);
 			base.WritePropertyParameters(property);
 			this.Write(this.IndexRightBracket);
@@ -1579,12 +1579,12 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			string propertyName = this.GetPropertyName(property);
 			if (property.TryGetDynamicAttribute(out customAttribute))
 			{
-				this.WriteDynamicType(property.PropertyType, customAttribute);
+				this.WriteDynamicType(property.get_PropertyType(), customAttribute);
 				this.WriteSpace();
 				this.WriteReference(propertyName, property);
 				return;
 			}
-			base.WriteTypeAndName(property.PropertyType, propertyName, property);
+			base.WriteTypeAndName(property.get_PropertyType(), propertyName, property);
 			if (base.HasArguments(property))
 			{
 				this.WriteToken("(");
@@ -1646,13 +1646,13 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 		protected override void WriteTypeInterfaces(TypeDefinition type, bool isPartial, bool baseTypeWritten)
 		{
 			List<TypeReference> typeReferences;
-			typeReferences = (this.TypeContext.CurrentType != type || !this.TypeContext.IsWinRTImplementation ? type.Interfaces.ToList<TypeReference>() : type.Interfaces.Where<TypeReference>((TypeReference @interface) => {
+			typeReferences = ((object)this.TypeContext.CurrentType != (object)type || !this.TypeContext.IsWinRTImplementation ? type.get_Interfaces().ToList<TypeReference>() : type.get_Interfaces().Where<TypeReference>((TypeReference @interface) => {
 				TypeDefinition typeDefinition = @interface.Resolve();
 				if (typeDefinition == null)
 				{
 					return true;
 				}
-				return !typeDefinition.IsWindowsRuntime;
+				return !typeDefinition.get_IsWindowsRuntime();
 			}).ToList<TypeReference>());
 			if (typeReferences.Count > 0)
 			{
@@ -1685,11 +1685,11 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
 		protected override void WriteTypeSpecification(TypeSpecification typeSpecification, int startingArgument = 0)
 		{
-			if (this.isDynamicEnumerator != null && !typeSpecification.IsGenericInstance)
+			if (this.isDynamicEnumerator != null && !typeSpecification.get_IsGenericInstance())
 			{
-				if (typeSpecification.IsArray)
+				if (typeSpecification.get_IsArray())
 				{
-					for (TypeReference i = typeSpecification; i.IsArray; i = (i as ArrayType).ElementType)
+					for (TypeReference i = typeSpecification; i.get_IsArray(); i = (i as ArrayType).get_ElementType())
 					{
 						if (!this.isDynamicEnumerator.MoveNext() || (Boolean)this.isDynamicEnumerator.Current)
 						{
@@ -1702,7 +1702,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 					throw new Exception("Invalid argument type for DynamicAttribute");
 				}
 			}
-			if (typeSpecification.IsRequiredModifier || typeSpecification.IsOptionalModifier)
+			if (typeSpecification.get_IsRequiredModifier() || typeSpecification.get_IsOptionalModifier())
 			{
 				this.WriteModifier(typeSpecification);
 				return;

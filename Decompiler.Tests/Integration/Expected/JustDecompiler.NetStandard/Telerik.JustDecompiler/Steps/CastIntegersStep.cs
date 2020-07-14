@@ -25,7 +25,7 @@ namespace Telerik.JustDecompiler.Steps
 			for (int i = 0; i < arguments.Count; i++)
 			{
 				Expression item = arguments[i];
-				TypeReference typeReference = method.Parameters[i].ResolveParameterType(method);
+				TypeReference typeReference = method.get_Parameters().get_Item(i).ResolveParameterType(method);
 				if (item.HasType && typeReference != null && !(item is LiteralExpression))
 				{
 					TypeReference expressionType = item.ExpressionType;
@@ -48,7 +48,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private int GetIntegerTypeBytes(TypeReference type)
 		{
-			string fullName = type.FullName;
+			string fullName = type.get_FullName();
 			if (fullName != null)
 			{
 				if (fullName == "System.SByte" || fullName == "System.Byte")
@@ -68,7 +68,7 @@ namespace Telerik.JustDecompiler.Steps
 					return 8;
 				}
 			}
-			throw new NotSupportedException(String.Format("Not supported type {0}.", type.FullName));
+			throw new NotSupportedException(String.Format("Not supported type {0}.", type.get_FullName()));
 		}
 
 		private bool IsIntegerType(TypeReference type)
@@ -82,28 +82,28 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsSignedIntegerType(TypeReference type)
 		{
-			string fullName = type.FullName;
-			if (fullName == this.typeSystem.SByte.FullName || fullName == this.typeSystem.Int16.FullName || fullName == this.typeSystem.Int32.FullName)
+			string fullName = type.get_FullName();
+			if (fullName == this.typeSystem.get_SByte().get_FullName() || fullName == this.typeSystem.get_Int16().get_FullName() || fullName == this.typeSystem.get_Int32().get_FullName())
 			{
 				return true;
 			}
-			return fullName == this.typeSystem.Int64.FullName;
+			return fullName == this.typeSystem.get_Int64().get_FullName();
 		}
 
 		private bool IsUnsignedIntegerType(TypeReference type)
 		{
-			string fullName = type.FullName;
-			if (fullName == this.typeSystem.Byte.FullName || fullName == this.typeSystem.UInt16.FullName || fullName == this.typeSystem.UInt32.FullName)
+			string fullName = type.get_FullName();
+			if (fullName == this.typeSystem.get_Byte().get_FullName() || fullName == this.typeSystem.get_UInt16().get_FullName() || fullName == this.typeSystem.get_UInt32().get_FullName())
 			{
 				return true;
 			}
-			return fullName == this.typeSystem.UInt64.FullName;
+			return fullName == this.typeSystem.get_UInt64().get_FullName();
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
-			this.decompiledMethodReturnType = context.MethodContext.Method.ReturnType;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
+			this.decompiledMethodReturnType = context.MethodContext.Method.get_ReturnType();
 			this.Visit(body);
 			if (context.MethodContext.CtorInvokeExpression != null)
 			{

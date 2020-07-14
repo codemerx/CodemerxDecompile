@@ -72,7 +72,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				{
 					this.UpdateType();
 				}
-				return this.type != null;
+				return (object)this.type != (object)null;
 			}
 		}
 
@@ -146,26 +146,26 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 						this.isObjectComparison = new bool?(false);
 					}
 					else if (!this.instructions.Any<Instruction>((Instruction i) => {
-						if (i.OpCode.Name != "call")
+						if (i.get_OpCode().get_Name() != "call")
 						{
 							return false;
 						}
-						if ((i.Operand as MethodReference).Name == "op_Equality")
+						if ((i.get_Operand() as MethodReference).get_Name() == "op_Equality")
 						{
 							return true;
 						}
-						return (i.Operand as MethodReference).Name == "op_Inequality";
+						return (i.get_Operand() as MethodReference).get_Name() == "op_Inequality";
 					}))
 					{
-						bool isValueType = !this.Left.ExpressionType.IsValueType;
-						bool flag = !this.Right.ExpressionType.IsValueType;
-						if (this.Left.ExpressionType.IsRequiredModifier || this.Left.ExpressionType.IsOptionalModifier)
+						bool isValueType = !this.Left.ExpressionType.get_IsValueType();
+						bool flag = !this.Right.ExpressionType.get_IsValueType();
+						if (this.Left.ExpressionType.get_IsRequiredModifier() || this.Left.ExpressionType.get_IsOptionalModifier())
 						{
-							isValueType = !this.Left.ExpressionType.Resolve().IsValueType;
+							isValueType = !this.Left.ExpressionType.Resolve().get_IsValueType();
 						}
-						if (this.Right.ExpressionType.IsRequiredModifier || this.Right.ExpressionType.IsOptionalModifier)
+						if (this.Right.ExpressionType.get_IsRequiredModifier() || this.Right.ExpressionType.get_IsOptionalModifier())
 						{
-							flag = !this.Right.ExpressionType.Resolve().IsValueType;
+							flag = !this.Right.ExpressionType.Resolve().get_IsValueType();
 						}
 						this.isObjectComparison = new bool?(isValueType & flag);
 					}
@@ -320,7 +320,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				while (enumerator.MoveNext())
 				{
-					if ((int)enumerator.Current.OpCode.Code - (int)Code.Add_Ovf > (int)Code.Ldarg_3)
+					if (enumerator.Current.get_OpCode().get_Code() - 180 > 5)
 					{
 						continue;
 					}
@@ -366,7 +366,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			int? nullable;
 			int? nullable1;
-			if (leftType == rightType)
+			if ((object)leftType == (object)rightType)
 			{
 				return rightType;
 			}
@@ -392,10 +392,10 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 			nullable = typeIndex;
 			nullable1 = typeIndex1;
-			if (!(nullable.GetValueOrDefault() == nullable1.GetValueOrDefault() & nullable.HasValue == nullable1.HasValue) || !(leftType.FullName == rightType.FullName))
+			if (!(nullable.GetValueOrDefault() == nullable1.GetValueOrDefault() & nullable.HasValue == nullable1.HasValue) || !(leftType.get_FullName() == rightType.get_FullName()))
 			{
-				string str = (typeIndex.HasValue ? "" : leftType.FullName);
-				string str1 = (typeIndex1.HasValue ? "" : rightType.FullName);
+				string str = (typeIndex.HasValue ? "" : leftType.get_FullName());
+				string str1 = (typeIndex1.HasValue ? "" : rightType.get_FullName());
 				throw new Exception(String.Concat(new String[] { "Operation on type(s) of unknown size: ", str, " ", str1, ". Result size is platform dependent and cannot be determined at decompile time." }));
 			}
 			return leftType;
@@ -415,7 +415,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return;
 			}
-			if (expressionTypeDefinition.FullName == typeDefinition.FullName)
+			if (expressionTypeDefinition.get_FullName() == typeDefinition.get_FullName())
 			{
 				this.ExpressionType = expressionTypeDefinition;
 				return;
@@ -424,13 +424,13 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return;
 			}
-			if (!(expressionTypeDefinition.IsEnum ^ typeDefinition.IsEnum))
+			if (!(expressionTypeDefinition.get_IsEnum() ^ typeDefinition.get_IsEnum()))
 			{
 				containingType = this.GetContainingType(expressionTypeDefinition, typeDefinition);
 				this.ExpressionType = containingType;
 				return;
 			}
-			if (expressionTypeDefinition.IsEnum)
+			if (expressionTypeDefinition.get_IsEnum())
 			{
 				this.ExpressionType = expressionTypeDefinition;
 				return;
@@ -446,33 +446,33 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return null;
 			}
-			typeDefinition = (!expressionType.IsPointer ? expressionType.Resolve() : this.typeSystem.IntPtr.Resolve());
+			typeDefinition = (!expressionType.get_IsPointer() ? expressionType.Resolve() : this.typeSystem.get_IntPtr().Resolve());
 			return typeDefinition;
 		}
 
 		private int? GetTypeIndex(TypeDefinition type)
 		{
-			if (type.FullName == "System.UIntPtr" || type.FullName == "System.IntPtr")
+			if (type.get_FullName() == "System.UIntPtr" || type.get_FullName() == "System.IntPtr")
 			{
-				if (type.Module.Architecture == TargetArchitecture.I386 || type.Module.Architecture == TargetArchitecture.ARMv7)
+				if (type.get_Module().get_Architecture() == null || type.get_Module().get_Architecture() == 4)
 				{
 					return new int?(5);
 				}
-				if (type.Module.Architecture == TargetArchitecture.IA64 || type.Module.Architecture == TargetArchitecture.AMD64)
+				if (type.get_Module().get_Architecture() == 2 || type.get_Module().get_Architecture() == 1)
 				{
 					return new int?(7);
 				}
-				if (type.Module.Architecture == TargetArchitecture.AnyCPU)
+				if (type.get_Module().get_Architecture() == 3)
 				{
 					return null;
 				}
 			}
-			if (type.IsEnum)
+			if (type.get_IsEnum())
 			{
 				FieldDefinition fieldDefinition = null;
-				foreach (FieldDefinition field in type.Fields)
+				foreach (FieldDefinition field in type.get_Fields())
 				{
-					if (field.Name != "value__")
+					if (field.get_Name() != "value__")
 					{
 						continue;
 					}
@@ -480,9 +480,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 					goto Label0;
 				}
 			Label0:
-				type = fieldDefinition.FieldType.Resolve();
+				type = fieldDefinition.get_FieldType().Resolve();
 			}
-			string fullName = type.FullName;
+			string fullName = type.get_FullName();
 			if (fullName != null)
 			{
 				if (fullName == "System.Boolean")
@@ -534,17 +534,17 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 					return new int?(11);
 				}
 			}
-			throw new NotSupportedException(String.Format("Not supported type {0}.", type.FullName));
+			throw new NotSupportedException(String.Format("Not supported type {0}.", type.get_FullName()));
 		}
 
 		private bool HandleDateTime(TypeReference firstType, TypeReference secondType)
 		{
-			if (firstType.FullName == "System.DateTime" && secondType.FullName == "System.TimeSpan")
+			if (firstType.get_FullName() == "System.DateTime" && secondType.get_FullName() == "System.TimeSpan")
 			{
 				this.ExpressionType = firstType;
 				return true;
 			}
-			if (!(secondType.FullName == "System.DateTime") || !(firstType.FullName == "System.TimeSpan"))
+			if (!(secondType.get_FullName() == "System.DateTime") || !(firstType.get_FullName() == "System.TimeSpan"))
 			{
 				return false;
 			}
@@ -558,11 +558,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return null;
 			}
-			if ((firstType.IsPointer || firstType.IsPinned || firstType.IsByReference) && this.IsIntegerType(secondType))
+			if ((firstType.get_IsPointer() || firstType.get_IsPinned() || firstType.get_IsByReference()) && this.IsIntegerType(secondType))
 			{
 				return firstType;
 			}
-			if (!secondType.IsPointer && !secondType.IsPinned && !secondType.IsByReference || !this.IsIntegerType(firstType))
+			if (!secondType.get_IsPointer() && !secondType.get_IsPinned() && !secondType.get_IsByReference() || !this.IsIntegerType(firstType))
 			{
 				return null;
 			}
@@ -609,7 +609,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		private bool IsIntegerType(TypeReference type)
 		{
-			if (!(type.FullName == "System.Int32") && !(type.FullName == "System.UInt32") && !(type.FullName == "System.Byte") && !(type.FullName == "System.SByte") && !(type.FullName == "System.Int16") && !(type.FullName == "System.UInt16") && !(type.FullName == "System.Int64") && !(type.FullName == "System.UInt64"))
+			if (!(type.get_FullName() == "System.Int32") && !(type.get_FullName() == "System.UInt32") && !(type.get_FullName() == "System.Byte") && !(type.get_FullName() == "System.SByte") && !(type.get_FullName() == "System.Int16") && !(type.get_FullName() == "System.UInt16") && !(type.get_FullName() == "System.Int64") && !(type.get_FullName() == "System.UInt64"))
 			{
 				return false;
 			}
@@ -618,11 +618,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		private static bool IsPointerType(TypeDefinition type)
 		{
-			if (type.FullName == "System.UIntPtr")
+			if (type.get_FullName() == "System.UIntPtr")
 			{
 				return true;
 			}
-			return type.FullName == "System.IntPtr";
+			return type.get_FullName() == "System.IntPtr";
 		}
 
 		private bool IsValidObjectComparisonNode(Telerik.JustDecompiler.Ast.CodeNodeType codeNodeType)
@@ -643,10 +643,10 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 			if (this.IsLogicalExpression || this.IsComparisonExpression)
 			{
-				this.type = this.typeSystem.Boolean;
+				this.type = this.typeSystem.get_Boolean();
 				return;
 			}
-			if (this.Left.HasType && this.Right.HasType && this.Left.ExpressionType.FullName == this.Right.ExpressionType.FullName)
+			if (this.Left.HasType && this.Right.HasType && this.Left.ExpressionType.get_FullName() == this.Right.ExpressionType.get_FullName())
 			{
 				this.type = this.Left.ExpressionType;
 				return;

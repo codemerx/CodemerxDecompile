@@ -11,43 +11,43 @@ namespace Mono.Cecil
 			bool hasOverrides = false;
 			if (genericDefinition is MethodDefinition)
 			{
-				hasOverrides = ((MethodDefinition)genericDefinition).HasOverrides;
+				hasOverrides = ((MethodDefinition)genericDefinition).get_HasOverrides();
 			}
-			string nonGenericName = GenericHelper.GetNonGenericName(genericDefinition.Name);
+			string nonGenericName = GenericHelper.GetNonGenericName(genericDefinition.get_Name());
 			if (!hasOverrides)
 			{
-				if ((!(genericDefinition is MethodDefinition) ? true : !((MethodDefinition)genericDefinition).IsConstructor))
+				if ((!(genericDefinition is MethodDefinition) ? true : !((MethodDefinition)genericDefinition).get_IsConstructor()))
 				{
 					nonGenericName = GenericHelper.ReplaceInvalidCharactersName(language, nonGenericName);
 				}
 			}
-			if (genericDefinition.HasGenericParameters)
+			if (genericDefinition.get_HasGenericParameters())
 			{
 				int count = 0;
 				if (genericDefinition is TypeDefinition)
 				{
-					TypeDefinition declaringType = (genericDefinition as TypeDefinition).DeclaringType;
-					if (declaringType != null && declaringType.HasGenericParameters)
+					TypeDefinition declaringType = (genericDefinition as TypeDefinition).get_DeclaringType();
+					if (declaringType != null && declaringType.get_HasGenericParameters())
 					{
-						count = declaringType.GenericParameters.Count;
+						count = declaringType.get_GenericParameters().get_Count();
 					}
 				}
-				if (count < genericDefinition.GenericParameters.Count)
+				if (count < genericDefinition.get_GenericParameters().get_Count())
 				{
 					nonGenericName = String.Concat(nonGenericName, leftBracket);
-					while (count < genericDefinition.GenericParameters.Count)
+					while (count < genericDefinition.get_GenericParameters().get_Count())
 					{
-						GenericParameter item = genericDefinition.GenericParameters[count];
-						if (item.IsCovariant)
+						GenericParameter item = genericDefinition.get_GenericParameters().get_Item(count);
+						if (item.get_IsCovariant())
 						{
 							nonGenericName = String.Concat(nonGenericName, "out ");
 						}
-						if (item.IsContravariant)
+						if (item.get_IsContravariant())
 						{
 							nonGenericName = String.Concat(nonGenericName, "in ");
 						}
-						nonGenericName = String.Concat(nonGenericName, GenericHelper.ReplaceInvalidCharactersName(language, item.Name));
-						if (count != genericDefinition.GenericParameters.Count - 1)
+						nonGenericName = String.Concat(nonGenericName, GenericHelper.ReplaceInvalidCharactersName(language, item.get_Name()));
+						if (count != genericDefinition.get_GenericParameters().get_Count() - 1)
 						{
 							nonGenericName = String.Concat(nonGenericName, ", ");
 						}
@@ -61,41 +61,41 @@ namespace Mono.Cecil
 
 		internal static string GetGenericName(TypeReference genericDefinition, string leftBracket, string rightBracket, ILanguage language)
 		{
-			string name = genericDefinition.Name;
-			if (genericDefinition.HasGenericParameters)
+			string name = genericDefinition.get_Name();
+			if (genericDefinition.get_HasGenericParameters())
 			{
-				name = GenericHelper.GetNonGenericName(genericDefinition.Name);
-				if (!genericDefinition.IsPointer && !genericDefinition.IsByReference && !genericDefinition.IsArray)
+				name = GenericHelper.GetNonGenericName(genericDefinition.get_Name());
+				if (!genericDefinition.get_IsPointer() && !genericDefinition.get_IsByReference() && !genericDefinition.get_IsArray())
 				{
 					name = GenericHelper.ReplaceInvalidCharactersName(language, name);
 				}
 				if (language != null && language.Name == "IL")
 				{
-					int count = genericDefinition.GenericParameters.Count;
+					int count = genericDefinition.get_GenericParameters().get_Count();
 					name = String.Concat(name, "`", count.ToString());
 					return name;
 				}
 				name = String.Concat(name, leftBracket);
-				for (int i = 0; i < genericDefinition.GenericParameters.Count; i++)
+				for (int i = 0; i < genericDefinition.get_GenericParameters().get_Count(); i++)
 				{
-					GenericParameter item = genericDefinition.GenericParameters[i];
-					if (item.IsCovariant)
+					GenericParameter item = genericDefinition.get_GenericParameters().get_Item(i);
+					if (item.get_IsCovariant())
 					{
 						name = String.Concat(name, "out ");
 					}
-					if (item.IsContravariant)
+					if (item.get_IsContravariant())
 					{
 						name = String.Concat(name, "in ");
 					}
-					name = String.Concat(name, GenericHelper.ReplaceInvalidCharactersName(language, item.Name));
-					if (i != genericDefinition.GenericParameters.Count - 1)
+					name = String.Concat(name, GenericHelper.ReplaceInvalidCharactersName(language, item.get_Name()));
+					if (i != genericDefinition.get_GenericParameters().get_Count() - 1)
 					{
 						name = String.Concat(name, ", ");
 					}
 				}
 				name = String.Concat(name, rightBracket);
 			}
-			else if (!genericDefinition.IsPointer && !genericDefinition.IsByReference && !genericDefinition.IsArray)
+			else if (!genericDefinition.get_IsPointer() && !genericDefinition.get_IsByReference() && !genericDefinition.get_IsArray())
 			{
 				name = GenericHelper.ReplaceInvalidCharactersName(language, name);
 			}

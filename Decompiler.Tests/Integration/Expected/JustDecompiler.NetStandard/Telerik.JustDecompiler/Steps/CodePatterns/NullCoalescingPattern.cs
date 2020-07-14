@@ -15,7 +15,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 	{
 		private readonly MethodSpecificContext methodContext;
 
-		public NullCoalescingPattern(CodePatternsContext patternsContext, MethodSpecificContext methodContext) : base(patternsContext, methodContext.Method.Module.TypeSystem)
+		public NullCoalescingPattern(CodePatternsContext patternsContext, MethodSpecificContext methodContext) : base(patternsContext, methodContext.Method.get_Module().get_TypeSystem())
 		{
 			this.methodContext = methodContext;
 		}
@@ -28,7 +28,7 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			BinaryExpression expression = (theThen.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
-			if (expression == null || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (expression.Right as VariableReferenceExpression).Variable != xVariableReference)
+			if (expression == null || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Right as VariableReferenceExpression).Variable != (object)xVariableReference)
 			{
 				return false;
 			}
@@ -85,17 +85,17 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				return false;
 			}
 			BinaryExpression condition = item.Condition as BinaryExpression;
-			if (condition == null || condition.Operator != BinaryOperator.ValueEquality || condition.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (condition.Left as VariableReferenceExpression).Variable != variableReference || condition.Right.CodeNodeType != CodeNodeType.LiteralExpression || (condition.Right as LiteralExpression).Value != null)
+			if (condition == null || condition.Operator != BinaryOperator.ValueEquality || condition.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(condition.Left as VariableReferenceExpression).Variable != (object)variableReference || condition.Right.CodeNodeType != CodeNodeType.LiteralExpression || (condition.Right as LiteralExpression).Value != null)
 			{
 				return false;
 			}
 			BinaryExpression binaryExpression = (item.Then.Statements[num] as ExpressionStatement).Expression as BinaryExpression;
-			if (binaryExpression == null || !base.IsAssignToVariableExpression(binaryExpression, out variableReference1) || variableReference1 != variableReference)
+			if (binaryExpression == null || !base.IsAssignToVariableExpression(binaryExpression, out variableReference1) || (object)variableReference1 != (object)variableReference)
 			{
 				return false;
 			}
 			Expression right1 = binaryExpression.Right;
-			if (!right.HasType || !right1.HasType || right.ExpressionType.FullName != right1.ExpressionType.FullName)
+			if (!right.HasType || !right1.HasType || right.ExpressionType.get_FullName() != right1.ExpressionType.get_FullName())
 			{
 				return false;
 			}

@@ -15,7 +15,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 			TypeReference elementType = firstType.GetElementType();
 			TypeReference typeReference = secondType.GetElementType();
-			if (elementType.HasGenericParameters && typeReference.HasGenericParameters && elementType.FullName == typeReference.FullName && elementType.GenericParameters.Count == typeReference.GenericParameters.Count)
+			if (elementType.get_HasGenericParameters() && typeReference.get_HasGenericParameters() && elementType.get_FullName() == typeReference.get_FullName() && elementType.get_GenericParameters().get_Count() == typeReference.get_GenericParameters().get_Count())
 			{
 				return true;
 			}

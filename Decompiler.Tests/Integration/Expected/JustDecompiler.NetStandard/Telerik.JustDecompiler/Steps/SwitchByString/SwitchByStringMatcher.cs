@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 			{
 				return false;
 			}
-			if ((expression.Right as ObjectCreationExpression).ExpressionType.FullName != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if ((expression.Right as ObjectCreationExpression).ExpressionType.get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
 			{
 				return false;
 			}
@@ -171,11 +171,11 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 				return false;
 			}
 			FieldReferenceExpression left = binaryExpression.Left as FieldReferenceExpression;
-			if (left.ExpressionType.FullName != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if (left.ExpressionType.get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
 			{
 				return false;
 			}
-			if (left.Field.DeclaringType.FullName.IndexOf("<PrivateImplementationDetails>") != 0 || left.Field.Name.IndexOf("$$method") != 0)
+			if (left.Field.get_DeclaringType().get_FullName().IndexOf("<PrivateImplementationDetails>") != 0 || left.Field.get_Name().IndexOf("$$method") != 0)
 			{
 				return false;
 			}
@@ -191,7 +191,7 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 				{
 					return false;
 				}
-				return theCondition.Right.ExpressionType.FullName == "System.Int32";
+				return theCondition.Right.ExpressionType.get_FullName() == "System.Int32";
 			}
 			if (theCondition.Operator != BinaryOperator.LogicalOr)
 			{
@@ -259,7 +259,7 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 				return false;
 			}
 			VariableReferenceExpression item = operand.Arguments[0] as VariableReferenceExpression;
-			if (item == null || item.ExpressionType.FullName != "System.String")
+			if (item == null || item.ExpressionType.get_FullName() != "System.String")
 			{
 				return false;
 			}
@@ -269,7 +269,7 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 				return false;
 			}
 			VariableReferenceExpression variableReferenceExpression = item1.Operand as VariableReferenceExpression;
-			if (variableReferenceExpression == null || variableReferenceExpression.ExpressionType.FullName != "System.Int32")
+			if (variableReferenceExpression == null || variableReferenceExpression.ExpressionType.get_FullName() != "System.Int32")
 			{
 				return false;
 			}
@@ -322,23 +322,23 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		private bool IsAddMethod(MethodReference method)
 		{
-			if (method.DeclaringType.FullName != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if (method.get_DeclaringType().get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
 			{
 				return false;
 			}
-			if (method.Name != "Add")
+			if (method.get_Name() != "Add")
 			{
 				return false;
 			}
-			if (method.Parameters.Count != 2)
+			if (method.get_Parameters().get_Count() != 2)
 			{
 				return false;
 			}
-			if (method.Parameters[0].ResolveParameterType(method).FullName != "System.String")
+			if (method.get_Parameters().get_Item(0).ResolveParameterType(method).get_FullName() != "System.String")
 			{
 				return false;
 			}
-			if (method.Parameters[1].ResolveParameterType(method).FullName != "System.Int32")
+			if (method.get_Parameters().get_Item(1).ResolveParameterType(method).get_FullName() != "System.Int32")
 			{
 				return false;
 			}
@@ -361,23 +361,23 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		private bool IsTryGetMethod(MethodReference method)
 		{
-			if (method.DeclaringType.FullName != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if (method.get_DeclaringType().get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
 			{
 				return false;
 			}
-			if (method.Name != "TryGetValue")
+			if (method.get_Name() != "TryGetValue")
 			{
 				return false;
 			}
-			if (method.Parameters.Count != 2)
+			if (method.get_Parameters().get_Count() != 2)
 			{
 				return false;
 			}
-			if (method.Parameters[0].ResolveParameterType(method).FullName != "System.String")
+			if (method.get_Parameters().get_Item(0).ResolveParameterType(method).get_FullName() != "System.String")
 			{
 				return false;
 			}
-			if (method.Parameters[1].ResolveParameterType(method).FullName != "System.Int32&")
+			if (method.get_Parameters().get_Item(1).ResolveParameterType(method).get_FullName() != "System.Int32&")
 			{
 				return false;
 			}

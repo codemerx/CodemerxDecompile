@@ -50,7 +50,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.TargetType != null;
+				return (object)this.TargetType != (object)null;
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			SafeCastExpression safeCastExpression = other as SafeCastExpression;
-			if (this.TargetType.FullName != safeCastExpression.TargetType.FullName)
+			if (this.TargetType.get_FullName() != safeCastExpression.TargetType.get_FullName())
 			{
 				return false;
 			}

@@ -22,11 +22,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckForAssignment(BinaryExpression node)
 		{
-			if (node.Left.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && (node.Left as ArgumentReferenceExpression).Parameter.ParameterType.IsByReference)
+			if (node.Left.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && (node.Left as ArgumentReferenceExpression).Parameter.get_ParameterType().get_IsByReference())
 			{
 				throw new Exception("Managed pointer usage not in SSA");
 			}
-			if (node.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || !(node.Left as VariableReferenceExpression).Variable.VariableType.IsByReference)
+			if (node.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || !(node.Left as VariableReferenceExpression).Variable.get_VariableType().get_IsByReference())
 			{
 				return false;
 			}
@@ -170,27 +170,26 @@ namespace Telerik.JustDecompiler.Steps
 
 			private ICodeNode VisitTargetExpression(Expression target)
 			{
-				if (target != null && target.CodeNodeType == CodeNodeType.UnaryExpression)
-				{
-					UnaryExpression unaryExpression = target as UnaryExpression;
-					if (unaryExpression.Operator == UnaryOperator.AddressReference)
-					{
-						if (unaryExpression.Operand.ExpressionType == null)
-						{
-							throw new Exception("Referenced element has no type.");
-						}
-						TypeReference expressionType = unaryExpression.Operand.ExpressionType.Resolve();
-						if (expressionType == null)
-						{
-							expressionType = unaryExpression.Operand.ExpressionType;
-						}
-						if (expressionType.IsValueType)
-						{
-							return this.Visit(unaryExpression.Operand);
-						}
-					}
-				}
-				return this.Visit(target);
+				// 
+				// Current member / type: Telerik.JustDecompiler.Ast.ICodeNode Telerik.JustDecompiler.Steps.ManagedPointersRemovalStep/ComplexDereferencer::VisitTargetExpression(Telerik.JustDecompiler.Ast.Expressions.Expression)
+				// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
+				// 
+				// Product version: 0.0.0.0
+				// Exception in: Telerik.JustDecompiler.Ast.ICodeNode VisitTargetExpression(Telerik.JustDecompiler.Ast.Expressions.Expression)
+				// 
+				// Object reference not set to an instance of an object.
+				//    at Telerik.JustDecompiler.Decompiler.TypeInference.TypeInferer.FindLowestCommonAncestor(ICollection`1 typeNodes) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\TypeInference\TypeInferer.cs:line 510
+				//    at Telerik.JustDecompiler.Decompiler.TypeInference.TypeInferer.MergeWithLowestCommonAncestor() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\TypeInference\TypeInferer.cs:line 445
+				//    at Telerik.JustDecompiler.Decompiler.TypeInference.TypeInferer.ProcessSingleConstraints() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\TypeInference\TypeInferer.cs:line 363
+				//    at Telerik.JustDecompiler.Decompiler.TypeInference.TypeInferer.InferTypes() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\TypeInference\TypeInferer.cs:line 307
+				//    at Telerik.JustDecompiler.Decompiler.ExpressionDecompilerStep.Process(DecompilationContext theContext, BlockStatement body) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\ExpressionDecompilerStep.cs:line 86
+				//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.RunInternal(MethodBody body, BlockStatement block, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 81
+				//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.Run(MethodBody body, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 70
+				//    at Telerik.JustDecompiler.Decompiler.Extensions.Decompile(MethodBody body, ILanguage language, DecompilationContext& context, TypeSpecificContext typeContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\Extensions.cs:line 61
+				//    at Telerik.JustDecompiler.Decompiler.WriterContextServices.BaseWriterContextService.DecompileMethod(ILanguage language, MethodDefinition method, TypeSpecificContext typeContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\WriterContextServices\BaseWriterContextService.cs:line 117
+				// 
+				// mailto: JustDecompilePublicFeedback@telerik.com
+
 			}
 
 			public override ICodeNode VisitUnaryExpression(UnaryExpression node)
@@ -202,9 +201,9 @@ namespace Telerik.JustDecompiler.Steps
 						return node.Operand;
 					}
 					ExplicitCastExpression operand = node.Operand as ExplicitCastExpression;
-					if (operand != null && operand.TargetType.IsByReference)
+					if (operand != null && operand.TargetType.get_IsByReference())
 					{
-						TypeReference elementType = (operand.TargetType as ByReferenceType).ElementType;
+						TypeReference elementType = (operand.TargetType as ByReferenceType).get_ElementType();
 						return new ExplicitCastExpression((Expression)this.Visit(operand.Expression), elementType, null);
 					}
 				}

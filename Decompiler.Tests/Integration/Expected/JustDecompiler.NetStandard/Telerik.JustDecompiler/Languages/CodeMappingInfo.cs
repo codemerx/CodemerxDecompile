@@ -123,18 +123,18 @@ namespace Telerik.JustDecompiler.Languages
 
 			public bool Equals(Instruction x, Instruction y)
 			{
-				if (x.Offset != y.Offset || !(x.ContainingMethod.FullName == y.ContainingMethod.FullName))
+				if (x.get_Offset() != y.get_Offset() || !(x.get_ContainingMethod().get_FullName() == y.get_ContainingMethod().get_FullName()))
 				{
 					return false;
 				}
-				return x.ContainingMethod.GenericParameters.Count == y.ContainingMethod.GenericParameters.Count;
+				return x.get_ContainingMethod().get_GenericParameters().get_Count() == y.get_ContainingMethod().get_GenericParameters().get_Count();
 			}
 
 			public int GetHashCode(Instruction obj)
 			{
-				string str = obj.Offset.ToString();
-				string fullName = obj.ContainingMethod.FullName;
-				int count = obj.ContainingMethod.GenericParameters.Count;
+				string str = obj.get_Offset().ToString();
+				string fullName = obj.get_ContainingMethod().get_FullName();
+				int count = obj.get_ContainingMethod().get_GenericParameters().get_Count();
 				return String.Concat(str, fullName, count.ToString()).GetHashCode();
 			}
 		}
@@ -147,8 +147,8 @@ namespace Telerik.JustDecompiler.Languages
 
 			public bool Equals(VariableDefinition x, VariableDefinition y)
 			{
-				bool index = x.Index != -1;
-				if (index != y.Index != -1)
+				bool index = x.get_Index() != -1;
+				if (index != y.get_Index() != -1)
 				{
 					return false;
 				}
@@ -156,22 +156,22 @@ namespace Telerik.JustDecompiler.Languages
 				{
 					return x.Equals(y);
 				}
-				if (x.Index != y.Index || !(x.ContainingMethod.FullName == y.ContainingMethod.FullName))
+				if (x.get_Index() != y.get_Index() || !(x.get_ContainingMethod().get_FullName() == y.get_ContainingMethod().get_FullName()))
 				{
 					return false;
 				}
-				return x.ContainingMethod.GenericParameters.Count == y.ContainingMethod.GenericParameters.Count;
+				return x.get_ContainingMethod().get_GenericParameters().get_Count() == y.get_ContainingMethod().get_GenericParameters().get_Count();
 			}
 
 			public int GetHashCode(VariableDefinition obj)
 			{
-				if (obj.Index == -1)
+				if (obj.get_Index() == -1)
 				{
 					return obj.GetHashCode();
 				}
-				string str = obj.Index.ToString();
-				string fullName = obj.ContainingMethod.FullName;
-				int count = obj.ContainingMethod.GenericParameters.Count;
+				string str = obj.get_Index().ToString();
+				string fullName = obj.get_ContainingMethod().get_FullName();
+				int count = obj.get_ContainingMethod().get_GenericParameters().get_Count();
 				return String.Concat(str, fullName, count.ToString()).GetHashCode();
 			}
 		}

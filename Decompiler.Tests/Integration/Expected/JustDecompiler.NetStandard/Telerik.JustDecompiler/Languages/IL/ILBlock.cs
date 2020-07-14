@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public readonly List<ILBlock> Children = new List<ILBlock>();
 
-		public ILBlock(MethodBody body) : this(ILBlockType.Root, 0, body.CodeSize, (Mono.Cecil.Cil.ExceptionHandler)null)
+		public ILBlock(MethodBody body) : this(ILBlockType.Root, 0, body.get_CodeSize(), (Mono.Cecil.Cil.ExceptionHandler)null)
 		{
 			this.AddExceptionHandlerBlocks(body);
 			this.AddBlocks(this.FindAllBranches(body));
@@ -48,26 +48,26 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			for (int i = allBranches.Count - 1; i >= 0; i--)
 			{
-				int offset = allBranches[i].FirstInstruction.Offset + allBranches[i].FirstInstruction.GetSize();
-				int num = allBranches[i].SecondInstruction.Offset;
+				int offset = allBranches[i].FirstInstruction.get_Offset() + allBranches[i].FirstInstruction.GetSize();
+				int num = allBranches[i].SecondInstruction.get_Offset();
 				if (num < offset)
 				{
 					Instruction secondInstruction = null;
-					Instruction previous = allBranches[i].SecondInstruction.Previous;
-					if (previous != null && !OpCodeInfo.IsUnconditionalBranch(previous.OpCode))
+					Instruction previous = allBranches[i].SecondInstruction.get_Previous();
+					if (previous != null && !OpCodeInfo.IsUnconditionalBranch(previous.get_OpCode()))
 					{
 						secondInstruction = allBranches[i].SecondInstruction;
 					}
 					bool flag = false;
 					foreach (ILBlock.InstructionPair allBranch in allBranches)
 					{
-						if (allBranch.FirstInstruction.Offset >= num && allBranch.FirstInstruction.Offset < offset || num > allBranch.SecondInstruction.Offset || allBranch.SecondInstruction.Offset >= offset)
+						if (allBranch.FirstInstruction.get_Offset() >= num && allBranch.FirstInstruction.get_Offset() < offset || num > allBranch.SecondInstruction.get_Offset() || allBranch.SecondInstruction.get_Offset() >= offset)
 						{
 							continue;
 						}
 						if (secondInstruction != null)
 						{
-							if (allBranch.SecondInstruction == secondInstruction)
+							if ((object)allBranch.SecondInstruction == (object)secondInstruction)
 							{
 								continue;
 							}
@@ -88,24 +88,24 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void AddExceptionHandlerBlocks(MethodBody body)
 		{
-			for (int i = 0; i < body.ExceptionHandlers.Count; i++)
+			for (int i = 0; i < body.get_ExceptionHandlers().get_Count(); i++)
 			{
-				Mono.Cecil.Cil.ExceptionHandler item = body.ExceptionHandlers[i];
-				if (!body.ExceptionHandlers.Take<Mono.Cecil.Cil.ExceptionHandler>(i).Any<Mono.Cecil.Cil.ExceptionHandler>((Mono.Cecil.Cil.ExceptionHandler oldEh) => {
-					if (oldEh.TryStart != item.TryStart)
+				Mono.Cecil.Cil.ExceptionHandler item = body.get_ExceptionHandlers().get_Item(i);
+				if (!body.get_ExceptionHandlers().Take<Mono.Cecil.Cil.ExceptionHandler>(i).Any<Mono.Cecil.Cil.ExceptionHandler>((Mono.Cecil.Cil.ExceptionHandler oldEh) => {
+					if ((object)oldEh.get_TryStart() != (object)item.get_TryStart())
 					{
 						return false;
 					}
-					return oldEh.TryEnd == item.TryEnd;
+					return (object)oldEh.get_TryEnd() == (object)item.get_TryEnd();
 				}))
 				{
-					this.AddNestedBlock(new ILBlock(ILBlockType.Try, item.TryStart.Offset, item.TryEnd.Offset, item));
+					this.AddNestedBlock(new ILBlock(ILBlockType.Try, item.get_TryStart().get_Offset(), item.get_TryEnd().get_Offset(), item));
 				}
-				if (item.HandlerType == ExceptionHandlerType.Filter)
+				if (item.get_HandlerType() == 1)
 				{
-					this.AddNestedBlock(new ILBlock(ILBlockType.Filter, item.FilterStart.Offset, item.HandlerStart.Offset, item));
+					this.AddNestedBlock(new ILBlock(ILBlockType.Filter, item.get_FilterStart().get_Offset(), item.get_HandlerStart().get_Offset(), item));
 				}
-				this.AddNestedBlock(new ILBlock(ILBlockType.Handler, item.HandlerStart.Offset, (item.HandlerEnd == null ? body.CodeSize : item.HandlerEnd.Offset), item));
+				this.AddNestedBlock(new ILBlock(ILBlockType.Handler, item.get_HandlerStart().get_Offset(), (item.get_HandlerEnd() == null ? body.get_CodeSize() : item.get_HandlerEnd().get_Offset()), item));
 			}
 		}
 
@@ -144,26 +144,26 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			List<ILBlock.InstructionPair> instructionPairs = new List<ILBlock.InstructionPair>();
 		Label0:
-			foreach (Instruction instruction in body.Instructions)
+			foreach (Instruction instruction in body.get_Instructions())
 			{
-				OperandType operandType = instruction.OpCode.OperandType;
-				if (operandType != OperandType.InlineBrTarget)
+				OperandType operandType = instruction.get_OpCode().get_OperandType();
+				if (operandType != null)
 				{
-					if (operandType == OperandType.InlineSwitch)
+					if (operandType == 10)
 					{
-						Instruction[] operand = (Instruction[])instruction.Operand;
+						Instruction[] operand = (Instruction[])instruction.get_Operand();
 						for (int i = 0; i < (int)operand.Length; i++)
 						{
 							instructionPairs.Add(new ILBlock.InstructionPair(instruction, operand[i]));
 						}
 						goto Label0;
 					}
-					else if (operandType != OperandType.ShortInlineBrTarget)
+					else if (operandType != 15)
 					{
 						continue;
 					}
 				}
-				instructionPairs.Add(new ILBlock.InstructionPair(instruction, (Instruction)instruction.Operand));
+				instructionPairs.Add(new ILBlock.InstructionPair(instruction, (Instruction)instruction.get_Operand()));
 			}
 			return instructionPairs;
 		}

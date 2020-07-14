@@ -426,7 +426,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 					continue;
 				}
 				CFGBlockLogicalConstruct cFGBlockLogicalConstruct = construct as CFGBlockLogicalConstruct;
-				if (cFGBlockLogicalConstruct == null || cFGBlockLogicalConstruct.TheBlock.Last.OpCode.Code != Code.Switch)
+				if (cFGBlockLogicalConstruct == null || cFGBlockLogicalConstruct.TheBlock.Last.get_OpCode().get_Code() != 68)
 				{
 					continue;
 				}

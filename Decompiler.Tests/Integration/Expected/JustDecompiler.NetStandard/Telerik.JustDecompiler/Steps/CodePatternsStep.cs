@@ -54,7 +54,7 @@ namespace Telerik.JustDecompiler.Steps
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.patternsContext = new CodePatternsContext(body);
 			body = (BlockStatement)this.Visit(body);
 			return body;

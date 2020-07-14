@@ -55,9 +55,13 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				variable = (expression as VariableDeclarationExpression).Variable;
 			}
-			if (variable != null && variable == this.yieldData.FieldsInfo.ReturnFlagVariable)
+			if (variable != null)
 			{
-				return true;
+				YieldFieldsInformation fieldsInfo = this.yieldData.FieldsInfo;
+				if ((object)variable == (object)fieldsInfo.ReturnFlagVariable)
+				{
+					return true;
+				}
 			}
 			return false;
 		}
@@ -66,9 +70,9 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			BlockStatement blockStatement;
 			MethodDefinition methodDefinition = null;
-			foreach (MethodDefinition method in this.yieldDeclaringType.Methods)
+			foreach (MethodDefinition method in this.yieldDeclaringType.get_Methods())
 			{
-				if (!method.Name.EndsWith(".GetEnumerator"))
+				if (!method.get_Name().EndsWith(".GetEnumerator"))
 				{
 					continue;
 				}
@@ -77,9 +81,9 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return null;
 				}
-				if (methodDefinition.Body != null)
+				if (methodDefinition.get_Body() != null)
 				{
-					blockStatement = methodDefinition.Body.Decompile(this.decompilationContext.Language, (TypeSpecificContext)null);
+					blockStatement = methodDefinition.get_Body().Decompile(this.decompilationContext.Language, (TypeSpecificContext)null);
 				}
 				else
 				{
@@ -91,9 +95,9 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			if (methodDefinition.Body != null)
+			if (methodDefinition.get_Body() != null)
 			{
-				blockStatement = methodDefinition.Body.Decompile(this.decompilationContext.Language, (TypeSpecificContext)null);
+				blockStatement = methodDefinition.get_Body().Decompile(this.decompilationContext.Language, (TypeSpecificContext)null);
 			}
 			else
 			{
@@ -150,12 +154,12 @@ namespace Telerik.JustDecompiler.Steps
 				value = binaryExpression.Right as ObjectCreationExpression;
 			}
 			MethodReference constructor = value.Constructor;
-			if (constructor == null || constructor.DeclaringType == null)
+			if (constructor == null || constructor.get_DeclaringType() == null)
 			{
 				return null;
 			}
-			TypeDefinition typeDefinition = constructor.DeclaringType.Resolve();
-			if (typeDefinition != null && typeDefinition.IsNestedPrivate && typeDefinition.HasCompilerGeneratedAttribute())
+			TypeDefinition typeDefinition = constructor.get_DeclaringType().Resolve();
+			if (typeDefinition != null && typeDefinition.get_IsNestedPrivate() && typeDefinition.HasCompilerGeneratedAttribute())
 			{
 				return typeDefinition;
 			}
@@ -166,29 +170,29 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			BlockStatement blockStatement;
 			MethodDefinition methodDefinition = null;
-			foreach (MethodDefinition method in this.yieldDeclaringType.Methods)
+			foreach (MethodDefinition method in this.yieldDeclaringType.get_Methods())
 			{
-				if (method.Name != "MoveNext")
+				if (method.get_Name() != "MoveNext")
 				{
 					continue;
 				}
 				methodDefinition = method;
-				if (methodDefinition == null || methodDefinition.Body == null)
+				if (methodDefinition == null || methodDefinition.get_Body() == null)
 				{
 					return null;
 				}
-				blockStatement = methodDefinition.Body.DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
+				blockStatement = methodDefinition.get_Body().DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
 				if (blockStatement == null)
 				{
 					return null;
 				}
 				return this.GetStatements(blockStatement);
 			}
-			if (methodDefinition == null || methodDefinition.Body == null)
+			if (methodDefinition == null || methodDefinition.get_Body() == null)
 			{
 				return null;
 			}
-			blockStatement = methodDefinition.Body.DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
+			blockStatement = methodDefinition.get_Body().DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
 			if (blockStatement == null)
 			{
 				return null;
@@ -306,7 +310,7 @@ namespace Telerik.JustDecompiler.Steps
 						if (expression.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 						{
 							FieldReference field = (expression.Left as FieldReferenceExpression).Field;
-							if (field.DeclaringType.Resolve() == this.yieldDeclaringType)
+							if ((object)field.get_DeclaringType().Resolve() == (object)this.yieldDeclaringType)
 							{
 								this.parameterMappings[field.Resolve()] = expression.Right;
 							}
@@ -350,7 +354,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (node.Field.DeclaringType.Resolve() != this.yieldDeclaringType)
+			if ((object)node.Field.get_DeclaringType().Resolve() != (object)this.yieldDeclaringType)
 			{
 				return base.VisitFieldReferenceExpression(node);
 			}
@@ -359,7 +363,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return this.parameterMappings[fieldDefinition].CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 			}
-			VariableDefinition variableDefinition = new VariableDefinition(this.GetFriendlyName(fieldDefinition.Name), fieldDefinition.FieldType, this.decompilationContext.MethodContext.Method);
+			VariableDefinition variableDefinition = new VariableDefinition(this.GetFriendlyName(fieldDefinition.get_Name()), fieldDefinition.get_FieldType(), this.decompilationContext.MethodContext.Method);
 			this.decompilationContext.MethodContext.Variables.Add(variableDefinition);
 			this.decompilationContext.MethodContext.VariableAssignmentData.Add(variableDefinition, this.yieldData.FieldAssignmentData[fieldDefinition]);
 			this.decompilationContext.MethodContext.VariablesToRename.Add(variableDefinition);
@@ -385,9 +389,9 @@ namespace Telerik.JustDecompiler.Steps
 				if (item.Expression.CodeNodeType == CodeNodeType.MethodInvocationExpression)
 				{
 					MethodReferenceExpression methodExpression = (item.Expression as MethodInvocationExpression).MethodExpression;
-					if (methodExpression != null && methodExpression.Method != null && methodExpression.Method.DeclaringType != null && methodExpression.Method.DeclaringType.Resolve() == this.yieldDeclaringType)
+					if (methodExpression != null && methodExpression.Method != null && methodExpression.Method.get_DeclaringType() != null && (object)methodExpression.Method.get_DeclaringType().Resolve() == (object)this.yieldDeclaringType)
 					{
-						node.Finally = new FinallyClause(methodExpression.Method.Resolve().Body.Decompile(this.decompilationContext.Language, (TypeSpecificContext)null), node.Finally.UnderlyingSameMethodInstructions);
+						node.Finally = new FinallyClause(methodExpression.Method.Resolve().get_Body().Decompile(this.decompilationContext.Language, (TypeSpecificContext)null), node.Finally.UnderlyingSameMethodInstructions);
 					}
 				}
 			}

@@ -25,7 +25,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		public StateMachineFinallyCheckRemoverBase(MethodSpecificContext methodContext)
 		{
-			this.methodVariables = methodContext.Body.Variables;
+			this.methodVariables = methodContext.Body.get_Variables();
 			this.theCFG = methodContext.ControlFlowGraph;
 		}
 
@@ -38,7 +38,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			InstructionBlock instructionBlocks;
 			foreach (ExceptionHandler rawExceptionHandler in this.theCFG.RawExceptionHandlers)
 			{
-				if (rawExceptionHandler.HandlerType != ExceptionHandlerType.Finally || !this.theCFG.InstructionToBlockMapping.TryGetValue(rawExceptionHandler.HandlerStart.Offset, out instructionBlocks) || !this.IsFinallyCheckBlock(instructionBlocks))
+				if (rawExceptionHandler.get_HandlerType() != 2 || !this.theCFG.InstructionToBlockMapping.TryGetValue(rawExceptionHandler.get_HandlerStart().get_Offset(), out instructionBlocks) || !this.IsFinallyCheckBlock(instructionBlocks))
 				{
 					continue;
 				}

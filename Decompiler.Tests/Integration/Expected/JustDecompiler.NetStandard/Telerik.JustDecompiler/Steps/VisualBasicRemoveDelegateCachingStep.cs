@@ -34,9 +34,9 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				throw new Exception("Caching field not found.");
 			}
-			VariableDefinition variableDefinition = new VariableDefinition(fieldDefinition.FieldType, this.context.MethodContext.Method);
+			VariableDefinition variableDefinition = new VariableDefinition(fieldDefinition.get_FieldType(), this.context.MethodContext.Method);
 			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(variableDefinition, null);
-			ExpressionStatement expressionStatement = new ExpressionStatement(new BinaryExpression(BinaryOperator.Assign, variableReferenceExpression, this.fieldToReplacingExpressionMap[fieldDefinition], this.context.MethodContext.Method.Module.TypeSystem, null, false));
+			ExpressionStatement expressionStatement = new ExpressionStatement(new BinaryExpression(BinaryOperator.Assign, variableReferenceExpression, this.fieldToReplacingExpressionMap[fieldDefinition], this.context.MethodContext.Method.get_Module().get_TypeSystem(), null, false));
 			this.initializationsToRemove.Add(variableDefinition, expressionStatement);
 			this.variableToReplacingExpressionMap.Add(variableDefinition, this.fieldToReplacingExpressionMap[fieldDefinition]);
 			this.fieldToReplacingExpressionMap[fieldDefinition] = variableReferenceExpression;

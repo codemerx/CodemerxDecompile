@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Steps
 			for (int i = 0; i < this.context.MethodContext.OutParametersToAssign.Count; i++)
 			{
 				ParameterDefinition item = this.context.MethodContext.OutParametersToAssign[i];
-				TypeReference typeReference = (item.ParameterType.IsByReference ? item.ParameterType.GetElementType() : item.ParameterType);
+				TypeReference typeReference = (item.get_ParameterType().get_IsByReference() ? item.get_ParameterType().GetElementType() : item.get_ParameterType());
 				UnaryExpression unaryExpression = new UnaryExpression(UnaryOperator.AddressDereference, new ArgumentReferenceExpression(item, null), null);
 				BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, unaryExpression, typeReference.GetDefaultValueExpression(this.typeSystem), typeReference, this.typeSystem, null, false);
 				block.AddStatementAt(i, new ExpressionStatement(binaryExpression));
@@ -34,7 +34,7 @@ namespace Telerik.JustDecompiler.Steps
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.InsertTopLevelParameterAssignments(body);
 			return body;
 		}

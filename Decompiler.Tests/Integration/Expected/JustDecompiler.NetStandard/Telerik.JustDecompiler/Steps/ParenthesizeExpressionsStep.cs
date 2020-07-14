@@ -76,7 +76,7 @@ namespace Telerik.JustDecompiler.Steps
 					{
 						flag1 = true;
 					}
-					else if (right.ExpressionType == right.ExpressionType.Module.TypeSystem.Single || right.ExpressionType == right.ExpressionType.Module.TypeSystem.Double)
+					else if ((object)right.ExpressionType == (object)right.ExpressionType.get_Module().get_TypeSystem().get_Single() || (object)right.ExpressionType == (object)right.ExpressionType.get_Module().get_TypeSystem().get_Double())
 					{
 						flag1 = true;
 					}

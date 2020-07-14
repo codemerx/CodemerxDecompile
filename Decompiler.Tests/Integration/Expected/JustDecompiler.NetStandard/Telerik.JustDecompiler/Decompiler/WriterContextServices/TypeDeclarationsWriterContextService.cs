@@ -24,9 +24,9 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private HashSet<EventDefinition> GetAutoImplementedEvents(TypeDefinition type, ILanguage language)
 		{
 			HashSet<EventDefinition> eventDefinitions = new HashSet<EventDefinition>();
-			if (type.HasEvents)
+			if (type.get_HasEvents())
 			{
-				foreach (EventDefinition @event in type.Events)
+				foreach (EventDefinition @event in type.get_Events())
 				{
 					if (!(new AutoImplementedEventMatcher(@event, language)).IsAutoImplemented())
 					{
@@ -46,7 +46,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			while (memberDefinitions.Count > 0)
 			{
 				IMemberDefinition memberDefinition = memberDefinitions.Dequeue();
-				if (memberDefinition is TypeDefinition && memberDefinition == member)
+				if (memberDefinition is TypeDefinition && (object)memberDefinition == (object)member)
 				{
 					foreach (IMemberDefinition typeMember in Utilities.GetTypeMembers(memberDefinition as TypeDefinition, language, true, null, null, null, propertyFields))
 					{
@@ -60,17 +60,17 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				if (memberDefinition is EventDefinition)
 				{
 					EventDefinition eventDefinition = memberDefinition as EventDefinition;
-					if (eventDefinition.AddMethod != null)
+					if (eventDefinition.get_AddMethod() != null)
 					{
-						strs.Add(Utilities.GetMemberUniqueName(eventDefinition.AddMethod), new BlockStatement());
+						strs.Add(Utilities.GetMemberUniqueName(eventDefinition.get_AddMethod()), new BlockStatement());
 					}
-					if (eventDefinition.RemoveMethod != null)
+					if (eventDefinition.get_RemoveMethod() != null)
 					{
-						strs.Add(Utilities.GetMemberUniqueName(eventDefinition.RemoveMethod), new BlockStatement());
+						strs.Add(Utilities.GetMemberUniqueName(eventDefinition.get_RemoveMethod()), new BlockStatement());
 					}
-					if (eventDefinition.InvokeMethod != null)
+					if (eventDefinition.get_InvokeMethod() != null)
 					{
-						strs.Add(Utilities.GetMemberUniqueName(eventDefinition.InvokeMethod), new BlockStatement());
+						strs.Add(Utilities.GetMemberUniqueName(eventDefinition.get_InvokeMethod()), new BlockStatement());
 					}
 				}
 				if (!(memberDefinition is PropertyDefinition))
@@ -78,15 +78,15 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					continue;
 				}
 				PropertyDefinition propertyDefinition = memberDefinition as PropertyDefinition;
-				if (propertyDefinition.GetMethod != null)
+				if (propertyDefinition.get_GetMethod() != null)
 				{
-					strs.Add(Utilities.GetMemberUniqueName(propertyDefinition.GetMethod), new BlockStatement());
+					strs.Add(Utilities.GetMemberUniqueName(propertyDefinition.get_GetMethod()), new BlockStatement());
 				}
-				if (propertyDefinition.SetMethod == null)
+				if (propertyDefinition.get_SetMethod() == null)
 				{
 					continue;
 				}
-				strs.Add(Utilities.GetMemberUniqueName(propertyDefinition.SetMethod), new BlockStatement());
+				strs.Add(Utilities.GetMemberUniqueName(propertyDefinition.get_SetMethod()), new BlockStatement());
 			}
 			return strs;
 		}
@@ -115,8 +115,8 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			};
 			TypeDefinition typeDefinition = Utilities.GetDeclaringTypeOrSelf(member);
 			Dictionary<string, string> strs = new Dictionary<string, string>();
-			MemberRenamingData memberRenamingData = this.GetMemberRenamingData(typeDefinition.Module, language);
-			ModuleSpecificContext moduleSpecificContext = new ModuleSpecificContext(typeDefinition.Module, new List<string>(), new Dictionary<string, List<string>>(), new Dictionary<string, HashSet<string>>(), strs, memberRenamingData.RenamedMembers, memberRenamingData.RenamedMembersMap);
+			MemberRenamingData memberRenamingData = this.GetMemberRenamingData(typeDefinition.get_Module(), language);
+			ModuleSpecificContext moduleSpecificContext = new ModuleSpecificContext(typeDefinition.get_Module(), new List<string>(), new Dictionary<string, List<string>>(), new Dictionary<string, HashSet<string>>(), strs, memberRenamingData.RenamedMembers, memberRenamingData.RenamedMembersMap);
 			return new WriterContext(new AssemblySpecificContext(), moduleSpecificContext, typeSpecificContext, new Dictionary<string, MethodSpecificContext>(), this.GetDecompiledStatements(member, language, keys));
 		}
 	}

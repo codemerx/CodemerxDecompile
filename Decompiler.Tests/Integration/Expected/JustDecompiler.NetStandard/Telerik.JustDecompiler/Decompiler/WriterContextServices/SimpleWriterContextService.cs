@@ -41,7 +41,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			while (memberDefinitions.Count > 0)
 			{
 				IMemberDefinition memberDefinition = memberDefinitions.Dequeue();
-				if (memberDefinition is TypeDefinition && memberDefinition == member)
+				if (memberDefinition is TypeDefinition && (object)memberDefinition == (object)member)
 				{
 					foreach (IMemberDefinition typeMember in Utilities.GetTypeMembers(memberDefinition as TypeDefinition, language, true, null, null, null, decompiledType.TypeContext.GetFieldToPropertyMap(language).Keys))
 					{
@@ -59,17 +59,17 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					{
 						decompiledType.TypeContext.AutoImplementedEvents.Add(eventDefinition);
 					}
-					if (eventDefinition.AddMethod != null)
+					if (eventDefinition.get_AddMethod() != null)
 					{
-						base.DecompileMember(eventDefinition.AddMethod, language, decompiledType);
+						base.DecompileMember(eventDefinition.get_AddMethod(), language, decompiledType);
 					}
-					if (eventDefinition.RemoveMethod != null)
+					if (eventDefinition.get_RemoveMethod() != null)
 					{
-						base.DecompileMember(eventDefinition.RemoveMethod, language, decompiledType);
+						base.DecompileMember(eventDefinition.get_RemoveMethod(), language, decompiledType);
 					}
-					if (eventDefinition.InvokeMethod != null)
+					if (eventDefinition.get_InvokeMethod() != null)
 					{
-						base.DecompileMember(eventDefinition.InvokeMethod, language, decompiledType);
+						base.DecompileMember(eventDefinition.get_InvokeMethod(), language, decompiledType);
 					}
 				}
 				if (memberDefinition is PropertyDefinition)
@@ -101,9 +101,9 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					continue;
 				}
 				FieldDefinition fieldDefinition = memberDefinition as FieldDefinition;
-				foreach (MethodDefinition method in memberDefinition.DeclaringType.Methods)
+				foreach (MethodDefinition method in memberDefinition.get_DeclaringType().get_Methods())
 				{
-					if (!method.IsConstructor || fieldDefinition.IsStatic != method.IsStatic)
+					if (!method.get_IsConstructor() || fieldDefinition.get_IsStatic() != method.get_IsStatic())
 					{
 						continue;
 					}
@@ -167,7 +167,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				Dictionary<string, DecompiledType> nestedDecompiledTypes = base.GetNestedDecompiledTypes(typeDefinition, language);
 				typeContext = this.GetTypeContext(typeDefinition, language, nestedDecompiledTypes);
 				base.AddTypeContextsToCache(nestedDecompiledTypes, typeDefinition, language);
-				if (!nestedDecompiledTypes.TryGetValue(typeDefinition.FullName, out decompiledType))
+				if (!nestedDecompiledTypes.TryGetValue(typeDefinition.get_FullName(), out decompiledType))
 				{
 					throw new Exception("Decompiled type not found in decompiled types cache.");
 				}
@@ -185,8 +185,8 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				strs1.Add(decompiledMember.Key, decompiledMember.Value.Statement);
 			}
 			TypeDefinition declaringTypeOrSelf = Utilities.GetDeclaringTypeOrSelf(member);
-			AssemblySpecificContext assemblyContext = this.GetAssemblyContext(declaringTypeOrSelf.Module.Assembly, language);
-			ModuleSpecificContext moduleContext = this.GetModuleContext(declaringTypeOrSelf.Module, language);
+			AssemblySpecificContext assemblyContext = this.GetAssemblyContext(declaringTypeOrSelf.get_Module().get_Assembly(), language);
+			ModuleSpecificContext moduleContext = this.GetModuleContext(declaringTypeOrSelf.get_Module(), language);
 			return new WriterContext(assemblyContext, moduleContext, typeSpecificContext, strs, strs1);
 		}
 	}

@@ -61,21 +61,21 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		{
 			Dictionary<string, List<string>> strs = new Dictionary<string, List<string>>(language.IdentifierComparer);
 			Dictionary<string, string> strs1 = new Dictionary<string, string>(language.IdentifierComparer);
-			this.UpdateCollisionTypesDataWithTypes(strs, strs1, module.Types);
+			this.UpdateCollisionTypesDataWithTypes(strs, strs1, module.get_Types());
 			Dictionary<AssemblyNameReference, List<TypeReference>> moduleDependsOnAnalysis = this.GetModuleDependsOnAnalysis(module);
-			SpecialTypeAssembly specialTypeAssembly = (module.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None);
+			SpecialTypeAssembly specialTypeAssembly = (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(module) ? 1 : 0);
 			foreach (AssemblyNameReference key in moduleDependsOnAnalysis.Keys)
 			{
-				AssemblyDefinition assemblyDefinition = module.AssemblyResolver.Resolve(key, "", module.GetModuleArchitecture(), specialTypeAssembly, true);
+				AssemblyDefinition assemblyDefinition = module.get_AssemblyResolver().Resolve(key, "", ModuleDefinitionExtensions.GetModuleArchitecture(module), specialTypeAssembly, true);
 				if (assemblyDefinition == null)
 				{
 					this.UpdateCollisionTypesDataWithTypes(strs, strs1, moduleDependsOnAnalysis[key]);
 				}
 				else
 				{
-					foreach (ModuleDefinition moduleDefinition in assemblyDefinition.Modules)
+					foreach (ModuleDefinition moduleDefinition in assemblyDefinition.get_Modules())
 					{
-						this.UpdateCollisionTypesDataWithTypes(strs, strs1, moduleDefinition.Types);
+						this.UpdateCollisionTypesDataWithTypes(strs, strs1, moduleDefinition.get_Types());
 					}
 				}
 			}
@@ -108,7 +108,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		private Dictionary<AssemblyNameReference, List<TypeReference>> GetModuleDependsOnAnalysis(ModuleDefinition module)
 		{
-			Collection<TypeDefinition> types = module.Types;
+			Collection<TypeDefinition> types = module.get_Types();
 			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
 			foreach (TypeReference type in types)
 			{
@@ -127,7 +127,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				typeReferences.Add(typeReference);
 			}
 			Dictionary<AssemblyNameReference, List<TypeReference>> assembliesDependingOnToUsedTypesMap = Utilities.GetAssembliesDependingOnToUsedTypesMap(module, Utilities.GetExpandedTypeDependanceList(typeReferences));
-			foreach (AssemblyNameReference assemblyReference in module.AssemblyReferences)
+			foreach (AssemblyNameReference assemblyReference in module.get_AssemblyReferences())
 			{
 				if (assembliesDependingOnToUsedTypesMap.ContainsKey(assemblyReference))
 				{
@@ -141,19 +141,19 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private Dictionary<string, HashSet<string>> GetModuleNamespaceHierarchy(ModuleDefinition module, ILanguage language)
 		{
 			Dictionary<string, HashSet<string>> strs = new Dictionary<string, HashSet<string>>(language.IdentifierComparer);
-			this.UpdateNamespaceHiearchyDataWithTypes(strs, module.Types);
+			this.UpdateNamespaceHiearchyDataWithTypes(strs, module.get_Types());
 			Dictionary<AssemblyNameReference, List<TypeReference>> moduleDependsOnAnalysis = this.GetModuleDependsOnAnalysis(module);
-			SpecialTypeAssembly specialTypeAssembly = (module.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None);
+			SpecialTypeAssembly specialTypeAssembly = (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(module) ? 1 : 0);
 			foreach (AssemblyNameReference key in moduleDependsOnAnalysis.Keys)
 			{
-				AssemblyDefinition assemblyDefinition = module.AssemblyResolver.Resolve(key, "", module.GetModuleArchitecture(), specialTypeAssembly, true);
+				AssemblyDefinition assemblyDefinition = module.get_AssemblyResolver().Resolve(key, "", ModuleDefinitionExtensions.GetModuleArchitecture(module), specialTypeAssembly, true);
 				if (assemblyDefinition == null)
 				{
 					this.UpdateNamespaceHiearchyDataWithTypes(strs, moduleDependsOnAnalysis[key]);
 				}
 				else
 				{
-					this.UpdateNamespaceHiearchyDataWithTypes(strs, assemblyDefinition.MainModule.Types);
+					this.UpdateNamespaceHiearchyDataWithTypes(strs, assemblyDefinition.get_MainModule().get_Types());
 				}
 			}
 			return strs;
@@ -168,7 +168,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			}
 			HashSet<string> strs1 = new HashSet<string>();
 		Label0:
-			foreach (TypeDefinition type in module.Types)
+			foreach (TypeDefinition type in module.get_Types())
 			{
 				string @namespace = type.GetNamespace();
 				if (@namespace != String.Empty)
@@ -225,7 +225,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			base.AddTypeContextsToCache(nestedDecompiledTypes, outerMostDeclaringType, language);
 			Dictionary<string, MethodSpecificContext> strs = new Dictionary<string, MethodSpecificContext>();
 			Dictionary<string, Statement> strs1 = new Dictionary<string, Statement>();
-			if (!nestedDecompiledTypes.TryGetValue(type.FullName, out decompiledType))
+			if (!nestedDecompiledTypes.TryGetValue(type.get_FullName(), out decompiledType))
 			{
 				throw new Exception("Decompiled type missing from DecompiledTypes cache.");
 			}
@@ -238,8 +238,8 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				strs.Add(value.MemberFullName, value.Context);
 				strs1.Add(value.MemberFullName, value.Statement);
 			}
-			AssemblySpecificContext assemblyContext = this.GetAssemblyContext(outerMostDeclaringType.Module.Assembly, language);
-			ModuleSpecificContext moduleContext = this.GetModuleContext(outerMostDeclaringType.Module, language);
+			AssemblySpecificContext assemblyContext = this.GetAssemblyContext(outerMostDeclaringType.get_Module().get_Assembly(), language);
+			ModuleSpecificContext moduleContext = this.GetModuleContext(outerMostDeclaringType.get_Module(), language);
 			return new WriterContext(assemblyContext, moduleContext, typeContext, strs, strs1);
 		}
 
@@ -249,10 +249,10 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			List<string> strs;
 			foreach (TypeReference type in types)
 			{
-				string name = type.Name;
+				string name = type.get_Name();
 				if (!typeNamesFirstOccurrence.ContainsKey(name))
 				{
-					typeNamesFirstOccurrence.Add(name, type.Namespace);
+					typeNamesFirstOccurrence.Add(name, type.get_Namespace());
 				}
 				else if (collisionTypesData.ContainsKey(name))
 				{
@@ -260,7 +260,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					{
 						throw new Exception("Collision type namespaces collection not found in collision types cache.");
 					}
-					strs.Add(type.Namespace);
+					strs.Add(type.get_Namespace());
 				}
 				else
 				{
@@ -268,11 +268,12 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					{
 						throw new Exception("Namespace not found in type first time occurence cache.");
 					}
-					collisionTypesData.Add(name, new List<string>()
+					List<string> strs1 = new List<string>()
 					{
 						str,
-						type.Namespace
-					});
+						type.get_Namespace()
+					};
+					collisionTypesData.Add(name, strs1);
 				}
 			}
 		}
@@ -282,7 +283,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			HashSet<string> strs;
 			foreach (TypeReference type in types)
 			{
-				string @namespace = type.Namespace;
+				string @namespace = type.get_Namespace();
 				if (!Utilities.HasNamespaceParentNamespace(@namespace))
 				{
 					continue;

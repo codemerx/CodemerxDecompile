@@ -29,7 +29,7 @@ namespace Telerik.JustDecompiler.Steps
 				if (expressionStatement.Expression is BinaryExpression)
 				{
 					BinaryExpression expression = expressionStatement.Expression as BinaryExpression;
-					if (expression.IsAssignmentExpression && expression.Left.ExpressionType.IsPinned && expression.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+					if (expression.IsAssignmentExpression && expression.Left.ExpressionType.get_IsPinned() && expression.Right.CodeNodeType != CodeNodeType.LiteralExpression)
 					{
 						variableReferences.Add((expression.Left as VariableReferenceExpression).Variable);
 						return new FixedStatement(expressionStatement.Expression, new BlockStatement());
@@ -80,7 +80,7 @@ namespace Telerik.JustDecompiler.Steps
 						if (node.Statements[j].CodeNodeType == CodeNodeType.ExpressionStatement)
 						{
 							expressionStatement = node.Statements[j] as ExpressionStatement;
-							if (variable1 != null && variable1 == variable && expressionStatement.Expression.CodeNodeType == CodeNodeType.BinaryExpression && (expressionStatement.Expression as BinaryExpression).IsAssignmentExpression && (expressionStatement.Expression as BinaryExpression).Right.CodeNodeType == CodeNodeType.LiteralExpression && ((expressionStatement.Expression as BinaryExpression).Right as LiteralExpression).Value == null)
+							if (variable1 != null && (object)variable1 == (object)variable && expressionStatement.Expression.CodeNodeType == CodeNodeType.BinaryExpression && (expressionStatement.Expression as BinaryExpression).IsAssignmentExpression && (expressionStatement.Expression as BinaryExpression).Right.CodeNodeType == CodeNodeType.LiteralExpression && ((expressionStatement.Expression as BinaryExpression).Right as LiteralExpression).Value == null)
 							{
 								node.Statements.RemoveAt(j);
 								j--;

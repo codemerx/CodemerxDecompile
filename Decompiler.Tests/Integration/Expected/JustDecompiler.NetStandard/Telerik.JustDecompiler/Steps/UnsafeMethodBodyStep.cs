@@ -22,7 +22,7 @@ namespace Telerik.JustDecompiler.Steps
 				while (enumerator.MoveNext())
 				{
 					Instruction current = enumerator.Current;
-					if (!(current.OpCode == OpCodes.Conv_U) && !(current.OpCode == OpCodes.Conv_I))
+					if (!(current.get_OpCode() == OpCodes.Conv_U) && !(current.get_OpCode() == OpCodes.Conv_I))
 					{
 						continue;
 					}
@@ -37,7 +37,7 @@ namespace Telerik.JustDecompiler.Steps
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			MethodDefinition method = context.MethodContext.Method;
-			if (!method.IsUnsafe && method.HasBody && this.IsUnsafe(method.Body.Instructions))
+			if (!method.get_IsUnsafe() && method.get_HasBody() && this.IsUnsafe(method.get_Body().get_Instructions()))
 			{
 				UnsafeBlockStatement unsafeBlockStatement = new UnsafeBlockStatement(body.Statements);
 				body.Statements = new StatementCollection();

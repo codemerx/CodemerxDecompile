@@ -81,7 +81,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			for (i = 0; i < (int)blocks.Length; i++)
 			{
 				InstructionBlock instructionBlocks = blocks[i];
-				int offset = instructionBlocks.First.Offset;
+				int offset = instructionBlocks.First.get_Offset();
 				this.logicalBuilderContext.CFGBlockToLogicalConstructMap.Add(instructionBlocks, new CFGBlockLogicalConstruct[] { new CFGBlockLogicalConstruct(instructionBlocks, this.methodContext.Expressions.BlockExpressions[offset]) });
 			}
 			blocks = this.logicalBuilderContext.CFG.Blocks;
@@ -103,13 +103,13 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.methodContext = context.MethodContext;
-			TypeSystem typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			TypeSystem typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.logicalBuilderContext = new LogicalFlowBuilderContext(context.MethodContext.ControlFlowGraph);
 			this.cfgBlockSplitter = new CFGBlockSplitter(this.logicalBuilderContext);
 			this.conditionBuilder = new ConditionBuilder(this.logicalBuilderContext, typeSystem);
 			this.loopBuilder = new LoopBuilder(this.logicalBuilderContext, typeSystem);
 			this.switchBuilder = new SwitchBuilder(this.logicalBuilderContext);
-			this.ifBuilder = new IfBuilder(this.logicalBuilderContext, this.methodContext.Method.Module.TypeSystem);
+			this.ifBuilder = new IfBuilder(this.logicalBuilderContext, this.methodContext.Method.get_Module().get_TypeSystem());
 			this.followNodeDeterminator = new FollowNodeDeterminator(typeSystem);
 			this.yieldGuardedBlocksBuilder = new YieldGuardedBlocksBuilder(this.logicalBuilderContext, context);
 			this.GetMaxIndexOfBlock();

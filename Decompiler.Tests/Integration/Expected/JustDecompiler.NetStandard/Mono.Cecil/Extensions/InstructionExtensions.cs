@@ -8,32 +8,32 @@ namespace Mono.Cecil.Extensions
 	{
 		internal static bool IsLoadRegister(this Instruction instruction, out int register)
 		{
-			Code code = instruction.OpCode.Code;
+			Code code = instruction.get_OpCode().get_Code();
 			switch (code)
 			{
-				case Code.Ldloc_0:
+				case 6:
 				{
 					register = 0;
 					return true;
 				}
-				case Code.Ldloc_1:
+				case 7:
 				{
 					register = 1;
 					return true;
 				}
-				case Code.Ldloc_2:
+				case 8:
 				{
 					register = 2;
 					return true;
 				}
-				case Code.Ldloc_3:
+				case 9:
 				{
 					register = 3;
 					return true;
 				}
 				default:
 				{
-					if ((int)code - (int)Code.Ldloc_S <= (int)Code.Break || (int)code - (int)Code.Ldloc <= (int)Code.Break)
+					if (code - 17 <= 1 || code - 202 <= 1)
 					{
 						break;
 					}
@@ -44,38 +44,38 @@ namespace Mono.Cecil.Extensions
 					}
 				}
 			}
-			register = ((VariableReference)instruction.Operand).Index;
+			register = ((VariableReference)instruction.get_Operand()).get_Index();
 			return true;
 		}
 
 		internal static bool IsStoreRegister(this Instruction instruction, out int register)
 		{
-			Code code = instruction.OpCode.Code;
+			Code code = instruction.get_OpCode().get_Code();
 			switch (code)
 			{
-				case Code.Stloc_0:
+				case 10:
 				{
 					register = 0;
 					return true;
 				}
-				case Code.Stloc_1:
+				case 11:
 				{
 					register = 1;
 					return true;
 				}
-				case Code.Stloc_2:
+				case 12:
 				{
 					register = 2;
 					return true;
 				}
-				case Code.Stloc_3:
+				case 13:
 				{
 					register = 3;
 					return true;
 				}
 				default:
 				{
-					if (code == Code.Stloc_S || code == Code.Stloc)
+					if (code == 19 || code == 204)
 					{
 						break;
 					}
@@ -86,7 +86,7 @@ namespace Mono.Cecil.Extensions
 					}
 				}
 			}
-			register = ((VariableReference)instruction.Operand).Index;
+			register = ((VariableReference)instruction.get_Operand()).get_Index();
 			return true;
 		}
 	}

@@ -99,7 +99,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			return new BinaryExpression(BinaryOperator.Assign, new PropertyInitializerExpression(propertyDefinition, propertyDefinition.PropertyType), (Expression)this.Visit(invocation.Arguments[1]), this.typeSystem, null, false);
+			return new BinaryExpression(BinaryOperator.Assign, new PropertyInitializerExpression(propertyDefinition, propertyDefinition.get_PropertyType()), (Expression)this.Visit(invocation.Arguments[1]), this.typeSystem, null, false);
 		}
 
 		private ICodeNode ConvertCall(MethodInvocationExpression node)
@@ -113,7 +113,7 @@ namespace Telerik.JustDecompiler.Steps
 			if (node.Arguments.Count == 3)
 			{
 				ArrayCreationExpression arrayCreationExpression = this.Visit(node.Arguments[2]) as ArrayCreationExpression;
-				if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count != methodReference.Parameters.Count)
+				if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count != methodReference.get_Parameters().get_Count())
 				{
 					return null;
 				}
@@ -213,16 +213,16 @@ namespace Telerik.JustDecompiler.Steps
 
 		private ICodeNode ConvertInvocation(MethodInvocationExpression invocation)
 		{
-			if (invocation.MethodExpression == null || invocation.MethodExpression.Method == null || invocation.MethodExpression.Method.HasThis || invocation.MethodExpression.Method.DeclaringType == null || invocation.MethodExpression.Method.DeclaringType.FullName != "System.Linq.Expressions.Expression")
+			if (invocation.MethodExpression == null || invocation.MethodExpression.Method == null || invocation.MethodExpression.Method.get_HasThis() || invocation.MethodExpression.Method.get_DeclaringType() == null || invocation.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Linq.Expressions.Expression")
 			{
 				return null;
 			}
-			if (this.conversionDepth == 0 && invocation.MethodExpression.Method.Name != "Lambda")
+			if (this.conversionDepth == 0 && invocation.MethodExpression.Method.get_Name() != "Lambda")
 			{
 				return null;
 			}
 			ICodeNode codeNode = null;
-			string name = invocation.MethodExpression.Method.Name;
+			string name = invocation.MethodExpression.Method.get_Name();
 			if (name != null)
 			{
 				switch (name)
@@ -519,7 +519,7 @@ namespace Telerik.JustDecompiler.Steps
 				if (!arrayCreationExpression.Initializer.Expressions.Any<Expression>((Expression element) => element.CodeNodeType != CodeNodeType.ArgumentReferenceExpression))
 				{
 					List<ArgumentReferenceExpression> list = arrayCreationExpression.Initializer.Expressions.Cast<ArgumentReferenceExpression>().ToList<ArgumentReferenceExpression>();
-					bool flag = list.Any<ArgumentReferenceExpression>((ArgumentReferenceExpression param) => param.Parameter.ParameterType.Resolve().IsAnonymous());
+					bool flag = list.Any<ArgumentReferenceExpression>((ArgumentReferenceExpression param) => param.Parameter.get_ParameterType().Resolve().IsAnonymous());
 					BlockStatement blockStatement = new BlockStatement();
 					blockStatement.AddStatement(new ExpressionStatement(new ShortFormReturnExpression((Expression)this.Visit(invocation.Arguments[0]), null)));
 					return new LambdaExpression(new ExpressionCollection(
@@ -551,7 +551,7 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			arrayCreationExpression.Initializer.InitializerType = InitializerType.CollectionInitializer;
 			arrayCreationExpression.Initializer.IsMultiLine = true;
-			return new BinaryExpression(BinaryOperator.Assign, new PropertyInitializerExpression(propertyDefinition, propertyDefinition.PropertyType), arrayCreationExpression.Initializer, this.typeSystem, null, false);
+			return new BinaryExpression(BinaryOperator.Assign, new PropertyInitializerExpression(propertyDefinition, propertyDefinition.get_PropertyType()), arrayCreationExpression.Initializer, this.typeSystem, null, false);
 		}
 
 		private ICodeNode ConvertListInit(MethodInvocationExpression invocation)
@@ -669,13 +669,13 @@ namespace Telerik.JustDecompiler.Steps
 				}
 				return new ObjectCreationExpression(null, (expression as TypeOfExpression).Type, null, null);
 			}
-			ObjectCreationExpression objectCreationExpression = new ObjectCreationExpression(methodReference, methodReference.DeclaringType, null, null);
+			ObjectCreationExpression objectCreationExpression = new ObjectCreationExpression(methodReference, methodReference.get_DeclaringType(), null, null);
 			if (invocation.Arguments.Count == 1)
 			{
 				return objectCreationExpression;
 			}
 			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
-			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count != methodReference.Parameters.Count)
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count != methodReference.get_Parameters().get_Count())
 			{
 				return null;
 			}
@@ -710,7 +710,7 @@ namespace Telerik.JustDecompiler.Steps
 				this.paramterNameIndex = num + 1;
 				str = String.Concat("expressionParameter", num.ToString());
 			}
-			return new ArgumentReferenceExpression(new ParameterDefinition(str, ParameterAttributes.None, type), null);
+			return new ArgumentReferenceExpression(new ParameterDefinition(str, 0, type), null);
 		}
 
 		private ICodeNode ConvertProperty(MethodInvocationExpression invocation)
@@ -805,13 +805,13 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			MethodDefinition methodDefinition = typeDefinition.Methods.FirstOrDefault<MethodDefinition>((MethodDefinition method) => method.Name == "Invoke");
+			MethodDefinition methodDefinition = typeDefinition.get_Methods().FirstOrDefault<MethodDefinition>((MethodDefinition method) => method.get_Name() == "Invoke");
 			if (methodDefinition == null)
 			{
 				return null;
 			}
-			MethodReference methodReference = new MethodReference(methodDefinition.Name, methodDefinition.ReturnType, expressionType);
-			methodReference.Parameters.AddRange(methodDefinition.Parameters);
+			MethodReference methodReference = new MethodReference(methodDefinition.get_Name(), methodDefinition.get_ReturnType(), expressionType);
+			methodReference.get_Parameters().AddRange(methodDefinition.get_Parameters());
 			return methodReference;
 		}
 
@@ -832,7 +832,7 @@ namespace Telerik.JustDecompiler.Steps
 				return body;
 			}
 			this.context = context;
-			this.typeSystem = context.TypeContext.CurrentType.Module.TypeSystem;
+			this.typeSystem = context.TypeContext.CurrentType.get_Module().get_TypeSystem();
 			this.failure = false;
 			BlockStatement blockStatement = (BlockStatement)this.Visit(body.Clone());
 			if (this.failure || this.usedVariables.Count == 0 || !this.TryRemoveUnusedVariableAssignments(blockStatement))
@@ -870,16 +870,16 @@ namespace Telerik.JustDecompiler.Steps
 		private PropertyDefinition ResolveProperty(MethodReference methodRef)
 		{
 			MethodDefinition methodDefinition = methodRef.Resolve();
-			if (methodDefinition == null || methodDefinition.DeclaringType == null)
+			if (methodDefinition == null || methodDefinition.get_DeclaringType() == null)
 			{
 				return null;
 			}
-			return methodDefinition.DeclaringType.Properties.FirstOrDefault<PropertyDefinition>((PropertyDefinition prop) => {
-				if (prop.GetMethod == methodDefinition)
+			return methodDefinition.get_DeclaringType().get_Properties().FirstOrDefault<PropertyDefinition>((PropertyDefinition prop) => {
+				if ((object)prop.get_GetMethod() == (object)methodDefinition)
 				{
 					return true;
 				}
-				return prop.SetMethod == methodDefinition;
+				return (object)prop.get_SetMethod() == (object)methodDefinition;
 			});
 		}
 
@@ -887,29 +887,29 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			fieldRef = null;
 			MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
-			if (methodInvocationExpression == null || methodInvocationExpression.Arguments.Count > 2 || methodInvocationExpression.Arguments.Count < 1 || methodInvocationExpression.Arguments[0].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.Arguments.Count == 2 && methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.MethodExpression.Method == null || methodInvocationExpression.MethodExpression.Method.Name != "GetFieldFromHandle" || methodInvocationExpression.MethodExpression.Method.DeclaringType == null || methodInvocationExpression.MethodExpression.Method.DeclaringType.FullName != "System.Reflection.FieldInfo")
+			if (methodInvocationExpression == null || methodInvocationExpression.Arguments.Count > 2 || methodInvocationExpression.Arguments.Count < 1 || methodInvocationExpression.Arguments[0].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.Arguments.Count == 2 && methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.MethodExpression.Method == null || methodInvocationExpression.MethodExpression.Method.get_Name() != "GetFieldFromHandle" || methodInvocationExpression.MethodExpression.Method.get_DeclaringType() == null || methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Reflection.FieldInfo")
 			{
 				return false;
 			}
 			fieldRef = (methodInvocationExpression.Arguments[0] as MemberHandleExpression).MemberReference as FieldReference;
-			return fieldRef != null;
+			return (object)fieldRef != (object)null;
 		}
 
 		private bool TryGetMethodReference(Expression expression, string castTargetTypeName, out MethodReference methodRef)
 		{
 			methodRef = null;
 			ExplicitCastExpression explicitCastExpression = expression as ExplicitCastExpression;
-			if (explicitCastExpression == null || explicitCastExpression.Expression.CodeNodeType != CodeNodeType.MethodInvocationExpression || explicitCastExpression.TargetType == null || explicitCastExpression.TargetType.FullName != castTargetTypeName)
+			if (explicitCastExpression == null || explicitCastExpression.Expression.CodeNodeType != CodeNodeType.MethodInvocationExpression || explicitCastExpression.TargetType == null || explicitCastExpression.TargetType.get_FullName() != castTargetTypeName)
 			{
 				return false;
 			}
 			MethodInvocationExpression methodInvocationExpression = explicitCastExpression.Expression as MethodInvocationExpression;
-			if (methodInvocationExpression == null || methodInvocationExpression.Arguments.Count > 2 || methodInvocationExpression.Arguments.Count < 1 || methodInvocationExpression.Arguments[0].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.Arguments.Count == 2 && methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.MethodExpression.Method == null || methodInvocationExpression.MethodExpression.Method.Name != "GetMethodFromHandle" || methodInvocationExpression.MethodExpression.Method.DeclaringType == null || methodInvocationExpression.MethodExpression.Method.DeclaringType.FullName != "System.Reflection.MethodBase")
+			if (methodInvocationExpression == null || methodInvocationExpression.Arguments.Count > 2 || methodInvocationExpression.Arguments.Count < 1 || methodInvocationExpression.Arguments[0].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.Arguments.Count == 2 && methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.MethodExpression.Method == null || methodInvocationExpression.MethodExpression.Method.get_Name() != "GetMethodFromHandle" || methodInvocationExpression.MethodExpression.Method.get_DeclaringType() == null || methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Reflection.MethodBase")
 			{
 				return false;
 			}
 			methodRef = (methodInvocationExpression.Arguments[0] as MemberHandleExpression).MemberReference as MethodReference;
-			return methodRef != null;
+			return (object)methodRef != (object)null;
 		}
 
 		private bool TryRemoveExpressionStatment(ExpressionStatement statement)
@@ -1136,7 +1136,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				if (node.MethodExpression != null && node.MethodExpression.Method != null && !node.MethodExpression.Method.HasThis && node.MethodExpression.Method.Name == "Lambda" && node.MethodExpression.Method.DeclaringType != null && node.MethodExpression.Method.DeclaringType.FullName == "System.Linq.Expressions.Expression")
+				if (node.MethodExpression != null && node.MethodExpression.Method != null && !node.MethodExpression.Method.get_HasThis() && node.MethodExpression.Method.get_Name() == "Lambda" && node.MethodExpression.Method.get_DeclaringType() != null && node.MethodExpression.Method.get_DeclaringType().get_FullName() == "System.Linq.Expressions.Expression")
 				{
 					this.containsExpressionTree = true;
 					return;
@@ -1184,7 +1184,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if (node.Variable == this.variable)
+				if ((object)node.Variable == (object)this.variable)
 				{
 					this.isUsed = true;
 				}

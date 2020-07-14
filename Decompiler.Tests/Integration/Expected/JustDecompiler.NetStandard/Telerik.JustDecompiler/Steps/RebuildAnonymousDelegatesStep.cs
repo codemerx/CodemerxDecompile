@@ -134,7 +134,7 @@ namespace Telerik.JustDecompiler.Steps
 					return false;
 				}
 				FieldReferenceExpression left = theAssignExpression.Left as FieldReferenceExpression;
-				if (left.Target == null || left.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (left.Target as VariableReferenceExpression).Variable != this.delegateVariableReference)
+				if (left.Target == null || left.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(left.Target as VariableReferenceExpression).Variable != (object)this.delegateVariableReference)
 				{
 					return false;
 				}
@@ -152,13 +152,13 @@ namespace Telerik.JustDecompiler.Steps
 
 			private bool CheckTypeForCompilerGeneratedAttribute(TypeDefinition typeDefinition)
 			{
-				while (typeDefinition.IsNested)
+				while (typeDefinition.get_IsNested())
 				{
 					if (typeDefinition.HasCompilerGeneratedAttribute())
 					{
 						return true;
 					}
-					typeDefinition = typeDefinition.DeclaringType;
+					typeDefinition = typeDefinition.get_DeclaringType();
 				}
 				return false;
 			}
@@ -187,7 +187,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			private void MapTheRestOfTheFieldsToVariables()
 			{
-				foreach (FieldDefinition field in this.delegateTypeDef.Fields)
+				foreach (FieldDefinition field in this.delegateTypeDef.get_Fields())
 				{
 					if (this.fieldDefToAssignedValueMap.ContainsKey(field))
 					{
@@ -196,7 +196,7 @@ namespace Telerik.JustDecompiler.Steps
 					MethodSpecificContext methodContext = this.context.MethodContext;
 					int lambdaVariablesCount = methodContext.LambdaVariablesCount;
 					methodContext.LambdaVariablesCount = lambdaVariablesCount + 1;
-					VariableDefinition variableDefinition = new VariableDefinition(String.Concat("lambdaVar", lambdaVariablesCount.ToString()), field.FieldType, this.context.MethodContext.Method);
+					VariableDefinition variableDefinition = new VariableDefinition(String.Concat("lambdaVar", lambdaVariablesCount.ToString()), field.get_FieldType(), this.context.MethodContext.Method);
 					this.context.MethodContext.Variables.Add(variableDefinition);
 					this.context.MethodContext.VariablesToRename.Add(variableDefinition);
 					this.fieldDefToAssignedValueMap[field] = new VariableReferenceExpression(variableDefinition, null);
@@ -324,17 +324,17 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return base.VisitObjectCreationExpression(node);
 				}
-				TypeDefinition typeDefinition = node.Constructor.DeclaringType.Resolve();
-				if (typeDefinition == null || typeDefinition.BaseType == null || typeDefinition.BaseType.FullName != "System.MulticastDelegate")
+				TypeDefinition typeDefinition = node.Constructor.get_DeclaringType().Resolve();
+				if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 				{
 					return base.VisitObjectCreationExpression(node);
 				}
 				MethodReference method = (node.Arguments[1] as MethodReferenceExpression).Method;
 				MethodDefinition methodDefinition = (node.Arguments[1] as MethodReferenceExpression).MethodDefinition;
-				MethodSpecificContext methodSpecificContext = new MethodSpecificContext(methodDefinition.Body);
+				MethodSpecificContext methodSpecificContext = new MethodSpecificContext(methodDefinition.get_Body());
 				DecompilationContext decompilationContext = new DecompilationContext(methodSpecificContext, this.context.TypeContext, this.context.ModuleContext, this.context.AssemblyContext, this.context.Language);
 				methodSpecificContext.FieldToExpression = this.fieldDefToAssignedValueMap;
-				BlockStatement blockStatement = methodDefinition.Body.DecompileLambda(this.context.Language, decompilationContext);
+				BlockStatement blockStatement = methodDefinition.get_Body().DecompileLambda(this.context.Language, decompilationContext);
 				if (blockStatement.Statements.Count == 1 && blockStatement.Statements[0].CodeNodeType == CodeNodeType.ExpressionStatement && (blockStatement.Statements[0] as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ReturnExpression)
 				{
 					ReturnExpression expression = (blockStatement.Statements[0] as ExpressionStatement).Expression as ReturnExpression;
@@ -348,17 +348,17 @@ namespace Telerik.JustDecompiler.Steps
 				this.context.MethodContext.GotoStatements.AddRange(decompilationContext.MethodContext.GotoStatements);
 				this.context.MethodContext.GotoLabels.AddRange<string, Statement>(decompilationContext.MethodContext.GotoLabels);
 				ExpressionCollection expressionCollection = new ExpressionCollection();
-				bool flag = LambdaExpressionsHelper.HasAnonymousParameter(methodDefinition.Parameters);
-				foreach (ParameterDefinition parameter in methodDefinition.Parameters)
+				bool flag = LambdaExpressionsHelper.HasAnonymousParameter(methodDefinition.get_Parameters());
+				foreach (ParameterDefinition parameter in methodDefinition.get_Parameters())
 				{
 					expressionCollection.Add(new LambdaParameterExpression(parameter, !flag, null));
 				}
 				this.delegatesFound.Add(blockStatement);
-				LambdaExpression lambdaExpression = new LambdaExpression(expressionCollection, blockStatement, methodDefinition.IsAsync(), methodDefinition.IsFunction(), method.Parameters, false, node.Arguments[1].MappedInstructions)
+				LambdaExpression lambdaExpression = new LambdaExpression(expressionCollection, blockStatement, methodDefinition.IsAsync(), methodDefinition.IsFunction(), method.get_Parameters(), false, node.Arguments[1].MappedInstructions)
 				{
 					ExpressionType = typeDefinition
 				};
-				return new DelegateCreationExpression(node.Constructor.DeclaringType, lambdaExpression, node.Arguments[0], node.MappedInstructions);
+				return new DelegateCreationExpression(node.Constructor.get_DeclaringType(), lambdaExpression, node.Arguments[0], node.MappedInstructions);
 			}
 
 			private enum State
@@ -389,7 +389,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			private void CheckFieldReference(FieldReferenceExpression node)
 			{
-				if (node != this.assignedReference && node.Target != null && node.Target.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.delegateVariableCopies.Contains((node.Target as VariableReferenceExpression).Variable) && node.Field.Resolve() == this.fieldDef)
+				if (node != this.assignedReference && node.Target != null && node.Target.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.delegateVariableCopies.Contains((node.Target as VariableReferenceExpression).Variable) && (object)node.Field.Resolve() == (object)this.fieldDef)
 				{
 					this.foundUsage = true;
 				}

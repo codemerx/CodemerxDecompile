@@ -19,12 +19,12 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CanInferTypeOfDelegateCreation(TypeReference type)
 		{
-			if (type.IsGenericInstance)
+			if (type.get_IsGenericInstance())
 			{
 				return true;
 			}
 			TypeDefinition typeDefinition = type.Resolve();
-			if (typeDefinition != null && !typeDefinition.IsAbstract)
+			if (typeDefinition != null && !typeDefinition.get_IsAbstract())
 			{
 				return true;
 			}
@@ -44,12 +44,12 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void TraverseMethodParameters(MethodReference method, ExpressionCollection arguments)
 		{
-			for (int i = 0; i < method.Parameters.Count; i++)
+			for (int i = 0; i < method.get_Parameters().get_Count(); i++)
 			{
 				if (arguments[i].CodeNodeType == CodeNodeType.DelegateCreationExpression)
 				{
 					DelegateCreationExpression item = (DelegateCreationExpression)arguments[i];
-					if (this.CanInferTypeOfDelegateCreation(method.Parameters[i].ParameterType))
+					if (this.CanInferTypeOfDelegateCreation(method.get_Parameters().get_Item(i).get_ParameterType()))
 					{
 						item.TypeIsImplicitlyInferable = true;
 					}
@@ -102,7 +102,7 @@ namespace Telerik.JustDecompiler.Steps
 			if (node.Value.CodeNodeType == CodeNodeType.DelegateCreationExpression)
 			{
 				DelegateCreationExpression value = (DelegateCreationExpression)node.Value;
-				if (this.CanInferTypeOfDelegateCreation(this.context.MethodContext.Method.ReturnType))
+				if (this.CanInferTypeOfDelegateCreation(this.context.MethodContext.Method.get_ReturnType()))
 				{
 					value.TypeIsImplicitlyInferable = true;
 				}

@@ -56,7 +56,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		private DecompilationContext GetNewContext(MethodBody body, ILanguage language)
 		{
 			MethodSpecificContext methodSpecificContext = new MethodSpecificContext(body);
-			TypeSpecificContext typeSpecificContext = new TypeSpecificContext(body.Method.DeclaringType);
+			TypeSpecificContext typeSpecificContext = new TypeSpecificContext(body.get_Method().get_DeclaringType());
 			return new DecompilationContext(methodSpecificContext, typeSpecificContext, language);
 		}
 
@@ -74,7 +74,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			try
 			{
-				if (body.Instructions.Count != 0 || body.Method.IsJustDecompileGenerated)
+				if (body.get_Instructions().get_Count() != 0 || body.get_Method().get_IsJustDecompileGenerated())
 				{
 					foreach (IDecompilationStep step in this.steps)
 					{
@@ -93,7 +93,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				if (this.Context.MethodContext.IsMethodBodyChanged)
 				{
-					body.Method.RefreshBody();
+					body.get_Method().RefreshBody();
 				}
 			}
 			return block;

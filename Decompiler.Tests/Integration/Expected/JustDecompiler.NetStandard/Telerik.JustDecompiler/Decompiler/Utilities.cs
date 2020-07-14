@@ -27,13 +27,13 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return false;
 			}
-			if (parameters.Count != arguments.Count)
+			if (parameters.get_Count() != arguments.Count)
 			{
 				return false;
 			}
-			for (int i = 0; i < parameters.Count; i++)
+			for (int i = 0; i < parameters.get_Count(); i++)
 			{
-				if (parameters[i].ParameterType.FullName != arguments[i].FullName)
+				if (parameters.get_Item(i).get_ParameterType().get_FullName() != arguments[i].FullName)
 				{
 					return false;
 				}
@@ -102,7 +102,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			MemberReference memberReference = null;
 			foreach (object fieldsAndProperty in fieldsAndProperties)
 			{
-				if ((fieldsAndProperty as MemberReference).Name != argument.Name)
+				if ((fieldsAndProperty as MemberReference).get_Name() != argument.get_Name())
 				{
 					continue;
 				}
@@ -122,16 +122,16 @@ namespace Telerik.JustDecompiler.Decompiler
 			foreach (TypeReference typeReference in typesDependingOn)
 			{
 				AssemblyNameReference name = null;
-				ModuleDefinition scope = typeReference.Scope as ModuleDefinition;
-				if (scope != null && scope.Kind != ModuleKind.NetModule)
+				ModuleDefinition scope = typeReference.get_Scope() as ModuleDefinition;
+				if (scope != null && scope.get_Kind() != 3)
 				{
-					name = scope.Assembly.Name;
+					name = scope.get_Assembly().get_Name();
 				}
-				else if (typeReference.Scope is AssemblyNameReference)
+				else if (typeReference.get_Scope() is AssemblyNameReference)
 				{
-					name = typeReference.Scope as AssemblyNameReference;
+					name = typeReference.get_Scope() as AssemblyNameReference;
 				}
-				if (name == null || module != module.Assembly.MainModule || name == module.Assembly.Name)
+				if (name == null || (object)module != (object)module.get_Assembly().get_MainModule() || name == module.get_Assembly().get_Name())
 				{
 					continue;
 				}
@@ -147,7 +147,8 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static AssemblyDefinition GetAssembly(string assemblyPath)
 		{
 			WeakAssemblyResolver weakAssemblyResolver = new WeakAssemblyResolver(GlobalAssemblyResolver.CurrentAssemblyPathCache);
-			return weakAssemblyResolver.LoadAssemblyDefinition(assemblyPath, new ReaderParameters(weakAssemblyResolver), true);
+			ReaderParameters readerParameter = new ReaderParameters(weakAssemblyResolver);
+			return ((BaseAssemblyResolver)weakAssemblyResolver).LoadAssemblyDefinition(assemblyPath, readerParameter, true);
 		}
 
 		public static ICollection<string> GetAssemblyAndModuleNamespaceUsings(AssemblySpecificContext assemblyContext, ModuleSpecificContext moduleContext)
@@ -171,18 +172,18 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static FieldDefinition GetCompileGeneratedBackingField(PropertyDefinition property)
 		{
 			FieldDefinition fieldDefinition;
-			TypeDefinition declaringType = property.DeclaringType;
-			if (!declaringType.HasFields)
+			TypeDefinition declaringType = property.get_DeclaringType();
+			if (!declaringType.get_HasFields())
 			{
 				return null;
 			}
-			Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = declaringType.Fields.GetEnumerator();
+			Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = declaringType.get_Fields().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					FieldDefinition current = enumerator.Current;
-					if (!current.Name.Equals(String.Concat("<", property.Name, ">k__BackingField"), StringComparison.Ordinal) || !current.HasCompilerGeneratedAttribute())
+					FieldDefinition current = enumerator.get_Current();
+					if (!current.get_Name().Equals(String.Concat("<", property.get_Name(), ">k__BackingField"), StringComparison.Ordinal) || !current.HasCompilerGeneratedAttribute())
 					{
 						continue;
 					}
@@ -193,7 +194,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return fieldDefinition;
 		}
@@ -208,7 +209,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			if (!(member is TypeDefinition))
 			{
-				return member.DeclaringType;
+				return member.get_DeclaringType();
 			}
 			return member as TypeDefinition;
 		}
@@ -225,16 +226,16 @@ namespace Telerik.JustDecompiler.Decompiler
 			if (typeDefinition == null)
 			{
 				MethodReference methodReference1 = new MethodReference(".ctor", Utilities.GetCorlibTypeReference(typeof(Void), currentModule), corlibTypeReference);
-				methodReference1.Parameters.AddRange(Utilities.GetMatchingArguments(mscorlibArgumentTypes, currentModule));
+				methodReference1.get_Parameters().AddRange(Utilities.GetMatchingArguments(mscorlibArgumentTypes, currentModule));
 				return methodReference1;
 			}
-			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.Methods.GetEnumerator();
+			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.get_Methods().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					MethodDefinition current = enumerator.Current;
-					if (!current.IsConstructor || !Utilities.ArgumentsMatch(current.Parameters, mscorlibArgumentTypes))
+					MethodDefinition current = enumerator.get_Current();
+					if (!current.get_IsConstructor() || !Utilities.ArgumentsMatch(current.get_Parameters(), mscorlibArgumentTypes))
 					{
 						continue;
 					}
@@ -245,7 +246,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return methodReference;
 		}
@@ -261,31 +262,31 @@ namespace Telerik.JustDecompiler.Decompiler
 			while (typeReferences1.Count > 0)
 			{
 				TypeReference typeReference = typeReferences1.Dequeue();
-				if (typeReference.Scope.Name == "mscorlib" || typeReferences.Contains(typeReference))
+				if (typeReference.get_Scope().get_Name() == "mscorlib" || typeReferences.Contains(typeReference))
 				{
 					continue;
 				}
 				typeReferences.Add(typeReference);
-				if (typeReference.DeclaringType != null)
+				if (typeReference.get_DeclaringType() != null)
 				{
-					typeReferences1.Enqueue(typeReference.DeclaringType);
+					typeReferences1.Enqueue(typeReference.get_DeclaringType());
 				}
 				TypeDefinition typeDefinition = typeReference.Resolve();
 				if (typeDefinition == null)
 				{
 					continue;
 				}
-				if (typeDefinition.BaseType != null && typeDefinition.BaseType.Scope.Name != "mscorlib" && !typeReferences.Contains(typeDefinition.BaseType))
+				if (typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_Scope().get_Name() != "mscorlib" && !typeReferences.Contains(typeDefinition.get_BaseType()))
 				{
-					typeReferences1.Enqueue(typeDefinition.BaseType);
+					typeReferences1.Enqueue(typeDefinition.get_BaseType());
 				}
-				if (!typeDefinition.HasInterfaces)
+				if (!typeDefinition.get_HasInterfaces())
 				{
 					continue;
 				}
-				foreach (TypeReference @interface in typeDefinition.Interfaces)
+				foreach (TypeReference @interface in typeDefinition.get_Interfaces())
 				{
-					if (@interface.Scope.Name == "mscorlib" || typeReferences.Contains(@interface))
+					if (@interface.get_Scope().get_Name() == "mscorlib" || typeReferences.Contains(@interface))
 					{
 						continue;
 					}
@@ -309,21 +310,21 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			if (!(member is MethodDefinition))
 			{
-				return member.FullName;
+				return member.get_FullName();
 			}
 			MethodDefinition methodDefinition = member as MethodDefinition;
-			string fullName = methodDefinition.FullName;
-			if (methodDefinition.HasGenericParameters)
+			string fullName = methodDefinition.get_FullName();
+			if (methodDefinition.get_HasGenericParameters())
 			{
-				foreach (GenericParameter genericParameter in methodDefinition.GenericParameters)
+				foreach (GenericParameter genericParameter in methodDefinition.get_GenericParameters())
 				{
-					fullName = String.Concat(fullName, genericParameter.Name);
-					if (!genericParameter.HasConstraints && !genericParameter.HasDefaultConstructorConstraint && !genericParameter.HasReferenceTypeConstraint && !genericParameter.HasNotNullableValueTypeConstraint)
+					fullName = String.Concat(fullName, genericParameter.get_Name());
+					if (!genericParameter.get_HasConstraints() && !genericParameter.get_HasDefaultConstructorConstraint() && !genericParameter.get_HasReferenceTypeConstraint() && !genericParameter.get_HasNotNullableValueTypeConstraint())
 					{
 						continue;
 					}
 					bool flag = false;
-					if (genericParameter.HasNotNullableValueTypeConstraint)
+					if (genericParameter.get_HasNotNullableValueTypeConstraint())
 					{
 						if (flag)
 						{
@@ -332,9 +333,9 @@ namespace Telerik.JustDecompiler.Decompiler
 						flag = true;
 						fullName = String.Concat(fullName, "struct");
 					}
-					foreach (TypeReference constraint in genericParameter.Constraints)
+					foreach (TypeReference constraint in genericParameter.get_Constraints())
 					{
-						if (genericParameter.HasNotNullableValueTypeConstraint && constraint.FullName == "System.ValueType")
+						if (genericParameter.get_HasNotNullableValueTypeConstraint() && constraint.get_FullName() == "System.ValueType")
 						{
 							continue;
 						}
@@ -342,10 +343,10 @@ namespace Telerik.JustDecompiler.Decompiler
 						{
 							fullName = String.Concat(fullName, ", ");
 						}
-						fullName = String.Concat(fullName, constraint.FullName);
+						fullName = String.Concat(fullName, constraint.get_FullName());
 						flag = true;
 					}
-					if (genericParameter.HasReferenceTypeConstraint)
+					if (genericParameter.get_HasReferenceTypeConstraint())
 					{
 						if (flag)
 						{
@@ -354,7 +355,7 @@ namespace Telerik.JustDecompiler.Decompiler
 						flag = true;
 						fullName = String.Concat(fullName, "class");
 					}
-					if (!genericParameter.HasDefaultConstructorConstraint || genericParameter.HasNotNullableValueTypeConstraint)
+					if (!genericParameter.get_HasDefaultConstructorConstraint() || genericParameter.get_HasNotNullableValueTypeConstraint())
 					{
 						continue;
 					}
@@ -374,11 +375,11 @@ namespace Telerik.JustDecompiler.Decompiler
 			HashSet<ModuleReference> moduleReferences = new HashSet<ModuleReference>();
 			foreach (TypeReference typeReference in typesDependingOn)
 			{
-				if (!(typeReference.Scope is ModuleReference) || typeReference.Scope is AssemblyNameReference || typeReference.Scope is ModuleDefinition)
+				if (!(typeReference.get_Scope() is ModuleReference) || typeReference.get_Scope() is AssemblyNameReference || typeReference.get_Scope() is ModuleDefinition)
 				{
 					continue;
 				}
-				ModuleReference scope = typeReference.Scope as ModuleReference;
+				ModuleReference scope = typeReference.get_Scope() as ModuleReference;
 				if (moduleReferences.Contains(scope))
 				{
 					continue;
@@ -420,10 +421,10 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static TypeDefinition GetOuterMostDeclaringType(IMemberDefinition member)
 		{
 			TypeDefinition declaringType;
-			declaringType = (!(member is TypeDefinition) ? member.DeclaringType : member as TypeDefinition);
-			while (declaringType.DeclaringType != null)
+			declaringType = (!(member is TypeDefinition) ? member.get_DeclaringType() : member as TypeDefinition);
+			while (declaringType.get_DeclaringType() != null)
 			{
-				declaringType = declaringType.DeclaringType;
+				declaringType = declaringType.get_DeclaringType();
 			}
 			return declaringType;
 		}
@@ -441,15 +442,15 @@ namespace Telerik.JustDecompiler.Decompiler
 		public static ICollection<TypeReference> GetTypeReferenceTypesDepedningOn(TypeReference reference)
 		{
 			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			for (TypeReference i = reference; i != null; i = i.DeclaringType)
+			for (TypeReference i = reference; i != null; i = i.get_DeclaringType())
 			{
 				if (!typeReferences.Contains(i))
 				{
 					typeReferences.Add(i);
 				}
-				if (i.IsGenericInstance)
+				if (i.get_IsGenericInstance())
 				{
-					foreach (TypeReference genericArgument in (i as GenericInstanceType).GenericArguments)
+					foreach (TypeReference genericArgument in (i as GenericInstanceType).get_GenericArguments())
 					{
 						typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(genericArgument));
 					}
@@ -465,11 +466,11 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static bool IsComputeStringHashMethod(MethodReference method)
 		{
-			if (method.FullName == "System.UInt32 <PrivateImplementationDetails>::ComputeStringHash(System.String)")
+			if (method.get_FullName() == "System.UInt32 <PrivateImplementationDetails>::ComputeStringHash(System.String)")
 			{
 				return true;
 			}
-			if (method.FullName == "System.UInt32 <PrivateImplementationDetails>::$$method0x6000001-ComputeStringHash(System.String)")
+			if (method.get_FullName() == "System.UInt32 <PrivateImplementationDetails>::$$method0x6000001-ComputeStringHash(System.String)")
 			{
 				return true;
 			}
@@ -480,7 +481,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			if (theDefinition is MethodDefinition)
 			{
-				return ((MethodDefinition)theDefinition).HasOverrides;
+				return ((MethodDefinition)theDefinition).get_HasOverrides();
 			}
 			if (theDefinition is PropertyDefinition)
 			{
@@ -520,12 +521,12 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static DecompiledMember TryGetDecompiledMember(MethodDefinition method, TypeSpecificContext typeContext, ILanguage language)
 		{
-			if (method.Body == null)
+			if (method.get_Body() == null)
 			{
 				return new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null);
 			}
 			DecompilationContext decompilationContext = null;
-			BlockStatement blockStatement = method.Body.Decompile(language, out decompilationContext, typeContext);
+			BlockStatement blockStatement = method.get_Body().Decompile(language, out decompilationContext, typeContext);
 			return new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, decompilationContext.MethodContext);
 		}
 
@@ -545,12 +546,12 @@ namespace Telerik.JustDecompiler.Decompiler
 				{
 					return false;
 				}
-				return x.FullName == y.FullName;
+				return x.get_FullName() == y.get_FullName();
 			}
 
 			public int GetHashCode(AssemblyNameReference obj)
 			{
-				return obj.FullName.GetHashCode();
+				return obj.get_FullName().GetHashCode();
 			}
 		}
 	}

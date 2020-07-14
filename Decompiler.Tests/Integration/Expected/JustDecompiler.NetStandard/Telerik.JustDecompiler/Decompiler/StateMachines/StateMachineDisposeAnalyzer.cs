@@ -59,7 +59,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				this.stateField = fieldDefinition;
 			}
-			else if (this.stateField != fieldDefinition)
+			else if ((object)this.stateField != (object)fieldDefinition)
 			{
 				return false;
 			}
@@ -74,15 +74,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			for (int i = 0; i < (int)blocks.Length; i++)
 			{
 				InstructionBlock instructionBlocks = blocks[i];
-				if ((this.IsBeqInstruction(instructionBlocks.Last) || this.IsBneUnInstruction(instructionBlocks.Last)) && StateMachineUtilities.TryGetOperandOfLdc(instructionBlocks.Last.Previous, out num))
+				if ((this.IsBeqInstruction(instructionBlocks.Last) || this.IsBneUnInstruction(instructionBlocks.Last)) && StateMachineUtilities.TryGetOperandOfLdc(instructionBlocks.Last.get_Previous(), out num))
 				{
 					Instruction instruction = null;
-					instruction = (!this.IsBeqInstruction(instructionBlocks.Last) ? instructionBlocks.Last.Next : instructionBlocks.Last.Operand as Instruction);
+					instruction = (!this.IsBeqInstruction(instructionBlocks.Last) ? instructionBlocks.Last.get_Next() : instructionBlocks.Last.get_Operand() as Instruction);
 					if (instruction == null)
 					{
 						throw new Exception("branchTargetInstruction cannot be null.");
 					}
-					if (this.TryGetExceptionHandler(StateMachineDisposeAnalyzer.SkipSingleNopInstructionBlock(this.theDisposeCFG.InstructionToBlockMapping[instruction.Offset]), out exceptionHandler))
+					if (this.TryGetExceptionHandler(StateMachineDisposeAnalyzer.SkipSingleNopInstructionBlock(this.theDisposeCFG.InstructionToBlockMapping[instruction.get_Offset()]), out exceptionHandler))
 					{
 						if (!this.handlerToStatesMap.ContainsKey(exceptionHandler))
 						{
@@ -98,15 +98,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		{
 			ExceptionHandler exceptionHandler;
 			int num = 0;
-			Instruction previous = switchBlockInfo.SwitchBlock.Last.Previous;
-			if (previous.OpCode.Code == Code.Sub)
+			Instruction previous = switchBlockInfo.SwitchBlock.Last.get_Previous();
+			if (previous.get_OpCode().get_Code() == 88)
 			{
-				previous = previous.Previous;
+				previous = previous.get_Previous();
 				if (!StateMachineUtilities.TryGetOperandOfLdc(previous, out num))
 				{
 					return false;
 				}
-				previous = previous.Previous;
+				previous = previous.get_Previous();
 			}
 			InstructionBlock[] orderedCasesArray = switchBlockInfo.OrderedCasesArray;
 			for (int i = 0; i < (int)orderedCasesArray.Length; i++)
@@ -125,10 +125,10 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private InstructionBlock GetActualCase(InstructionBlock theBlock)
 		{
-			while (theBlock.First == theBlock.Last && (theBlock.First.OpCode.Code == Code.Br || theBlock.First.OpCode.Code == Code.Br_S))
+			while ((object)theBlock.First == (object)theBlock.Last && (theBlock.First.get_OpCode().get_Code() == 55 || theBlock.First.get_OpCode().get_Code() == 42))
 			{
-				Instruction operand = theBlock.First.Operand as Instruction;
-				theBlock = this.theDisposeCFG.InstructionToBlockMapping[operand.Offset];
+				Instruction operand = theBlock.First.get_Operand() as Instruction;
+				theBlock = this.theDisposeCFG.InstructionToBlockMapping[operand.get_Offset()];
 			}
 			theBlock = StateMachineDisposeAnalyzer.SkipSingleNopInstructionBlock(theBlock);
 			return theBlock;
@@ -138,7 +138,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		{
 			string str = "System.Void System.IDisposable.Dispose()";
 			MethodDefinition methodDefinition = null;
-			foreach (MethodDefinition method in this.moveNextMethodDefinition.DeclaringType.Methods)
+			foreach (MethodDefinition method in this.moveNextMethodDefinition.get_DeclaringType().get_Methods())
 			{
 				if (method.GetFullMemberName(null) != str)
 				{
@@ -168,12 +168,12 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				return true;
 			}
 			Instruction item = this.theDisposeCFG.OffsetToInstruction[0];
-			if (item.OpCode.Code != Code.Ldarg_0)
+			if (item.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
 			item = this.theDisposeCFG.OffsetToInstruction[1];
-			if (item.OpCode.Code != Code.Ldfld || !(item.Operand is FieldReference) || !this.CheckAndSaveStateField(item.Operand as FieldReference))
+			if (item.get_OpCode().get_Code() != 120 || !(item.get_Operand() is FieldReference) || !this.CheckAndSaveStateField(item.get_Operand() as FieldReference))
 			{
 				return false;
 			}
@@ -211,72 +211,73 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		protected bool IsBeqInstruction(Instruction theInstruction)
 		{
-			if (theInstruction.OpCode.Code == Code.Beq)
+			if (theInstruction.get_OpCode().get_Code() == 58)
 			{
 				return true;
 			}
-			return theInstruction.OpCode.Code == Code.Beq_S;
+			return theInstruction.get_OpCode().get_Code() == 45;
 		}
 
 		protected bool IsBneUnInstruction(Instruction theInstruction)
 		{
-			if (theInstruction.OpCode.Code == Code.Bne_Un)
+			if (theInstruction.get_OpCode().get_Code() == 63)
 			{
 				return true;
 			}
-			return theInstruction.OpCode.Code == Code.Bne_Un_S;
+			return theInstruction.get_OpCode().get_Code() == 50;
 		}
 
 		private bool IsVersion2Disposer(InstructionBlock theBlock)
 		{
 			Instruction first = theBlock.First;
-			if (first.OpCode.Code != Code.Ldarg_0)
+			if (first.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldc_I4_1)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Stfld || !(first.Operand is FieldReference))
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 122 || !(first.get_Operand() is FieldReference))
 			{
 				return false;
 			}
-			this.disposingField = ((FieldReference)first.Operand).Resolve();
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldarg_0)
+			this.disposingField = ((FieldReference)first.get_Operand()).Resolve();
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Call || !(first.Operand is MethodReference) || (first.Operand as MethodReference).Resolve() != this.moveNextMethodDefinition)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 39 || !(first.get_Operand() is MethodReference) || (object)(first.get_Operand() as MethodReference).Resolve() != (object)this.moveNextMethodDefinition)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Pop)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 37)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldarg_0)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldc_I4_M1)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 21)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Stfld || !(first.Operand is FieldReference))
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 122 || !(first.get_Operand() is FieldReference))
 			{
 				return false;
 			}
-			this.stateField = ((FieldReference)first.Operand).Resolve();
-			return first.Next.OpCode.Code == Code.Ret;
+			this.stateField = ((FieldReference)first.get_Operand()).Resolve();
+			OpCode opCode = first.get_Next().get_OpCode();
+			return opCode.get_Code() == 41;
 		}
 
 		public YieldStateMachineVersion ProcessDisposeMethod()
@@ -298,7 +299,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		private static InstructionBlock SkipSingleNopInstructionBlock(InstructionBlock theBlock)
 		{
 			InstructionBlock successors = theBlock;
-			if (theBlock.First == theBlock.Last && theBlock.First.OpCode.Code == Code.Nop && (int)theBlock.Successors.Length == 1)
+			if ((object)theBlock.First == (object)theBlock.Last && theBlock.First.get_OpCode().get_Code() == null && (int)theBlock.Successors.Length == 1)
 			{
 				successors = theBlock.Successors[0];
 			}
@@ -311,7 +312,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			int num;
 			FieldReference fieldReference;
 			FieldReference fieldReference1;
-			if (handler.HandlerType != ExceptionHandlerType.Finally)
+			if (handler.get_HandlerType() != 2)
 			{
 				return false;
 			}
@@ -335,52 +336,52 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			nextState = -1;
 			enumeratorField = null;
 			disposableField = null;
-			Instruction handlerStart = handler.HandlerStart;
-			handlerStart = handlerStart.Next;
+			Instruction handlerStart = handler.get_HandlerStart();
+			handlerStart = handlerStart.get_Next();
 			if (handlerStart == null || !StateMachineUtilities.TryGetOperandOfLdc(handlerStart, out nextState))
 			{
 				return false;
 			}
-			handlerStart = handlerStart.Next;
-			if (handlerStart.OpCode.Code != Code.Stfld || ((FieldReference)handlerStart.Operand).Resolve() != this.stateField)
+			handlerStart = handlerStart.get_Next();
+			if (handlerStart.get_OpCode().get_Code() != 122 || (object)((FieldReference)handlerStart.get_Operand()).Resolve() != (object)this.stateField)
 			{
 				return false;
 			}
-			handlerStart = handlerStart.Next;
-			handlerStart = handlerStart.Next;
-			if (handlerStart.OpCode.Code != Code.Ldfld)
+			handlerStart = handlerStart.get_Next();
+			handlerStart = handlerStart.get_Next();
+			if (handlerStart.get_OpCode().get_Code() != 120)
 			{
-				handlerStart = handlerStart.Next;
-				if (handlerStart.OpCode.Code != Code.Ldfld)
+				handlerStart = handlerStart.get_Next();
+				if (handlerStart.get_OpCode().get_Code() != 120)
 				{
 					return false;
 				}
 			}
-			else if (handlerStart.Next.OpCode.Code != Code.Brfalse_S)
+			else if (handlerStart.get_Next().get_OpCode().get_Code() != 43)
 			{
 				return false;
 			}
-			enumeratorField = (FieldReference)handlerStart.Operand;
-			if (handlerStart.Next.OpCode.Code != Code.Brfalse_S)
+			enumeratorField = (FieldReference)handlerStart.get_Operand();
+			if (handlerStart.get_Next().get_OpCode().get_Code() != 43)
 			{
-				handlerStart = handlerStart.Next;
-				if (handlerStart.OpCode.Code != Code.Isinst || ((TypeReference)handlerStart.Operand).Name != "IDisposable")
+				handlerStart = handlerStart.get_Next();
+				if (handlerStart.get_OpCode().get_Code() != 116 || ((TypeReference)handlerStart.get_Operand()).get_Name() != "IDisposable")
 				{
 					return false;
 				}
-				handlerStart = handlerStart.Next;
-				if (handlerStart.OpCode.Code != Code.Stfld)
+				handlerStart = handlerStart.get_Next();
+				if (handlerStart.get_OpCode().get_Code() != 122)
 				{
 					return false;
 				}
-				disposableField = (FieldReference)handlerStart.Operand;
-				handlerStart = handlerStart.Next;
+				disposableField = (FieldReference)handlerStart.get_Operand();
+				handlerStart = handlerStart.get_Next();
 				if (handlerStart == null)
 				{
 					return false;
 				}
-				handlerStart = handlerStart.Next;
-				if (handlerStart == null || handlerStart.OpCode.Code != Code.Ldfld || handlerStart.Operand != disposableField)
+				handlerStart = handlerStart.get_Next();
+				if (handlerStart == null || handlerStart.get_OpCode().get_Code() != 120 || handlerStart.get_Operand() != disposableField)
 				{
 					return false;
 				}
@@ -390,23 +391,23 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				disposableField = enumeratorField;
 				enumeratorField = null;
 			}
-			handlerStart = handlerStart.Next;
-			if (handlerStart.OpCode.Code != Code.Brfalse_S || ((Instruction)handlerStart.Operand).OpCode.Code != Code.Endfinally)
+			handlerStart = handlerStart.get_Next();
+			if (handlerStart.get_OpCode().get_Code() != 43 || ((Instruction)handlerStart.get_Operand()).get_OpCode().get_Code() != 186)
 			{
 				return false;
 			}
-			handlerStart = handlerStart.Next;
-			handlerStart = handlerStart.Next;
-			if (handlerStart.OpCode.Code != Code.Ldfld || handlerStart.Operand != disposableField)
+			handlerStart = handlerStart.get_Next();
+			handlerStart = handlerStart.get_Next();
+			if (handlerStart.get_OpCode().get_Code() != 120 || handlerStart.get_Operand() != disposableField)
 			{
 				return false;
 			}
-			handlerStart = handlerStart.Next;
-			if (handlerStart.OpCode.Code != Code.Callvirt || ((MethodReference)handlerStart.Operand).Name != "Dispose")
+			handlerStart = handlerStart.get_Next();
+			if (handlerStart.get_OpCode().get_Code() != 110 || ((MethodReference)handlerStart.get_Operand()).get_Name() != "Dispose")
 			{
 				return false;
 			}
-			if (handlerStart.Next.OpCode.Code != Code.Endfinally)
+			if (handlerStart.get_Next().get_OpCode().get_Code() != 186)
 			{
 				return false;
 			}
@@ -421,8 +422,8 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				while (enumerator.MoveNext())
 				{
-					ExceptionHandler current = enumerator.Current;
-					if (current.TryStart != theBlock.First)
+					ExceptionHandler current = enumerator.get_Current();
+					if ((object)current.get_TryStart() != (object)theBlock.First)
 					{
 						continue;
 					}
@@ -435,22 +436,22 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
 
 		private bool TryGetFinallyMethodDefinition(ExceptionHandler theHandler, out MethodDefinition methodDef)
 		{
-			Instruction next = theHandler.HandlerStart.Next;
-			if (next.OpCode.Code == Code.Call)
+			Instruction next = theHandler.get_HandlerStart().get_Next();
+			if (next.get_OpCode().get_Code() == 39)
 			{
-				methodDef = ((MethodReference)next.Operand).Resolve();
-				while (next.Next.OpCode.Code == Code.Nop)
+				methodDef = ((MethodReference)next.get_Operand()).Resolve();
+				while (next.get_Next().get_OpCode().get_Code() == null)
 				{
-					next = next.Next;
+					next = next.get_Next();
 				}
-				if (next.Next.OpCode.Code == Code.Endfinally && next.Next.Next == theHandler.HandlerEnd)
+				if (next.get_Next().get_OpCode().get_Code() == 186 && (object)next.get_Next().get_Next() == (object)theHandler.get_HandlerEnd())
 				{
 					return true;
 				}

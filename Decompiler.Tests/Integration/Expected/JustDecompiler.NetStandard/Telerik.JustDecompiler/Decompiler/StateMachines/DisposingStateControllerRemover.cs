@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				this.returnFlagVariable = foundFlagVariable;
 			}
-			else if (this.returnFlagVariable != foundFlagVariable)
+			else if ((object)this.returnFlagVariable != (object)foundFlagVariable)
 			{
 				return false;
 			}
@@ -34,37 +34,37 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		private bool IsDisposingBlock(InstructionBlock theBlock)
 		{
 			Instruction first = theBlock.First;
-			if (first.OpCode.Code != Code.Ldarg_0 || first == theBlock.Last)
+			if (first.get_OpCode().get_Code() != 2 || (object)first == (object)theBlock.Last)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldfld || ((FieldReference)first.Operand).Resolve() != this.disposingField || first == theBlock.Last)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 120 || (object)((FieldReference)first.get_Operand()).Resolve() != (object)this.disposingField || (object)first == (object)theBlock.Last)
 			{
 				return false;
 			}
 			Instruction last = theBlock.Last;
-			if (last.OpCode.Code == Code.Brfalse || last.OpCode.Code == Code.Brfalse_S || last.OpCode.Code == Code.Brtrue)
+			if (last.get_OpCode().get_Code() == 56 || last.get_OpCode().get_Code() == 43 || last.get_OpCode().get_Code() == 57)
 			{
 				return true;
 			}
-			return last.OpCode.Code == Code.Brtrue_S;
+			return last.get_OpCode().get_Code() == 44;
 		}
 
 		private bool IsFalseReturnBlock(InstructionBlock theBlock)
 		{
 			VariableReference variableReference;
 			Instruction first = theBlock.First;
-			if (first.OpCode.Code != Code.Ldc_I4_0 || first == theBlock.Last)
+			if (first.get_OpCode().get_Code() != 22 || (object)first == (object)theBlock.Last)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (!base.TryGetVariableFromInstruction(first, out variableReference) || first == theBlock.Last || !this.CheckAndSaveReturnFlagVariable(variableReference))
+			first = first.get_Next();
+			if (!base.TryGetVariableFromInstruction(first, out variableReference) || (object)first == (object)theBlock.Last || !this.CheckAndSaveReturnFlagVariable(variableReference))
 			{
 				return false;
 			}
-			first = first.Next;
+			first = first.get_Next();
 			return StateMachineUtilities.IsUnconditionalBranch(first);
 		}
 

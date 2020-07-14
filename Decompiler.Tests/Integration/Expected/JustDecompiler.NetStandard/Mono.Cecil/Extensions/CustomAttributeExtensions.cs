@@ -9,27 +9,27 @@ namespace Mono.Cecil.Extensions
 	{
 		private static int CompareConstructorArguments(CustomAttribute first, CustomAttribute second)
 		{
-			if (first.HasConstructorArguments && !second.HasConstructorArguments)
+			if (first.get_HasConstructorArguments() && !second.get_HasConstructorArguments())
 			{
 				return 1;
 			}
-			if (!first.HasConstructorArguments && second.HasConstructorArguments)
+			if (!first.get_HasConstructorArguments() && second.get_HasConstructorArguments())
 			{
 				return -1;
 			}
-			int num = Math.Max(first.ConstructorArguments.Count, second.ConstructorArguments.Count);
+			int num = Math.Max(first.get_ConstructorArguments().get_Count(), second.get_ConstructorArguments().get_Count());
 			for (int i = 0; i < num; i++)
 			{
-				if (first.ConstructorArguments.Count <= i)
+				if (first.get_ConstructorArguments().get_Count() <= i)
 				{
 					return 1;
 				}
-				if (second.ConstructorArguments.Count <= i)
+				if (second.get_ConstructorArguments().get_Count() <= i)
 				{
 					return -1;
 				}
-				CustomAttributeArgument item = first.ConstructorArguments[i];
-				CustomAttributeArgument customAttributeArgument = second.ConstructorArguments[i];
+				CustomAttributeArgument item = first.get_ConstructorArguments().get_Item(i);
+				CustomAttributeArgument customAttributeArgument = second.get_ConstructorArguments().get_Item(i);
 				int num1 = CustomAttributeExtensions.CompareCustomAttributeArguments(item, customAttributeArgument);
 				if (num1 != 0)
 				{
@@ -41,33 +41,33 @@ namespace Mono.Cecil.Extensions
 
 		private static int CompareConstructorFields(CustomAttribute first, CustomAttribute second)
 		{
-			if (first.HasFields && !second.HasFields)
+			if (first.get_HasFields() && !second.get_HasFields())
 			{
 				return 1;
 			}
-			if (!first.HasFields && second.HasFields)
+			if (!first.get_HasFields() && second.get_HasFields())
 			{
 				return -1;
 			}
-			int num = Math.Max(first.Fields.Count, second.Fields.Count);
+			int num = Math.Max(first.get_Fields().get_Count(), second.get_Fields().get_Count());
 			for (int i = 0; i < num; i++)
 			{
-				if (first.Fields.Count <= i)
+				if (first.get_Fields().get_Count() <= i)
 				{
 					return 1;
 				}
-				if (second.Fields.Count <= i)
+				if (second.get_Fields().get_Count() <= i)
 				{
 					return -1;
 				}
-				CustomAttributeNamedArgument item = first.Fields[i];
-				CustomAttributeNamedArgument customAttributeNamedArgument = second.Fields[i];
-				int num1 = item.Name.CompareTo(customAttributeNamedArgument.Name);
+				CustomAttributeNamedArgument item = first.get_Fields().get_Item(i);
+				CustomAttributeNamedArgument customAttributeNamedArgument = second.get_Fields().get_Item(i);
+				int num1 = item.get_Name().CompareTo(customAttributeNamedArgument.get_Name());
 				if (num1 != 0)
 				{
 					return num1;
 				}
-				int num2 = CustomAttributeExtensions.CompareCustomAttributeArguments(item.Argument, customAttributeNamedArgument.Argument);
+				int num2 = CustomAttributeExtensions.CompareCustomAttributeArguments(item.get_Argument(), customAttributeNamedArgument.get_Argument());
 				if (num2 != 0)
 				{
 					return num2;
@@ -78,33 +78,33 @@ namespace Mono.Cecil.Extensions
 
 		private static int CompareConstructorProperties(CustomAttribute first, CustomAttribute second)
 		{
-			if (first.HasProperties && !second.HasProperties)
+			if (first.get_HasProperties() && !second.get_HasProperties())
 			{
 				return 1;
 			}
-			if (!first.HasProperties && second.HasProperties)
+			if (!first.get_HasProperties() && second.get_HasProperties())
 			{
 				return -1;
 			}
-			int num = Math.Max(first.Properties.Count, second.Properties.Count);
+			int num = Math.Max(first.get_Properties().get_Count(), second.get_Properties().get_Count());
 			for (int i = 0; i < num; i++)
 			{
-				if (first.Properties.Count <= i)
+				if (first.get_Properties().get_Count() <= i)
 				{
 					return 1;
 				}
-				if (second.Properties.Count <= i)
+				if (second.get_Properties().get_Count() <= i)
 				{
 					return -1;
 				}
-				CustomAttributeNamedArgument item = first.Properties[i];
-				CustomAttributeNamedArgument customAttributeNamedArgument = second.Properties[i];
-				int num1 = item.Name.CompareTo(customAttributeNamedArgument.Name);
+				CustomAttributeNamedArgument item = first.get_Properties().get_Item(i);
+				CustomAttributeNamedArgument customAttributeNamedArgument = second.get_Properties().get_Item(i);
+				int num1 = item.get_Name().CompareTo(customAttributeNamedArgument.get_Name());
 				if (num1 != 0)
 				{
 					return num1;
 				}
-				int num2 = CustomAttributeExtensions.CompareCustomAttributeArguments(item.Argument, customAttributeNamedArgument.Argument);
+				int num2 = CustomAttributeExtensions.CompareCustomAttributeArguments(item.get_Argument(), customAttributeNamedArgument.get_Argument());
 				if (num2 != 0)
 				{
 					return num2;
@@ -115,20 +115,20 @@ namespace Mono.Cecil.Extensions
 
 		private static int CompareCustomAttributeArguments(CustomAttributeArgument firstArgument, CustomAttributeArgument secondArgument)
 		{
-			return firstArgument.Value.ToString().CompareTo(secondArgument.Value.ToString());
+			return firstArgument.get_Value().ToString().CompareTo(secondArgument.get_Value().ToString());
 		}
 
 		public static int CompareToCustomAttribute(this CustomAttribute first, CustomAttribute second, bool fullNameCheck = false)
 		{
-			if (first.AttributeType.Name != second.AttributeType.Name)
+			if (first.get_AttributeType().get_Name() != second.get_AttributeType().get_Name())
 			{
 				if (fullNameCheck)
 				{
-					return first.AttributeType.FullName.CompareTo(second.AttributeType.FullName);
+					return first.get_AttributeType().get_FullName().CompareTo(second.get_AttributeType().get_FullName());
 				}
-				return first.AttributeType.Name.CompareTo(second.AttributeType.Name);
+				return first.get_AttributeType().get_Name().CompareTo(second.get_AttributeType().get_Name());
 			}
-			if (first == second)
+			if ((object)first == (object)second)
 			{
 				return 0;
 			}

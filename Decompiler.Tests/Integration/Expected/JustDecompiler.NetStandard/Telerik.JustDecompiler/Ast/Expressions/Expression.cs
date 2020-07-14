@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.ExpressionType != null;
+				return (object)this.ExpressionType != (object)null;
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			foreach (Instruction branchInstruction in branchInstructions)
 			{
-				if (branchInstruction.OpCode.Code == Code.Br || branchInstruction.OpCode.Code == Code.Br_S)
+				if (branchInstruction.get_OpCode().get_Code() == 55 || branchInstruction.get_OpCode().get_Code() == 42)
 				{
 					continue;
 				}
@@ -83,7 +83,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			foreach (Instruction dupInstruction in dupInstructions)
 			{
-				if (dupInstruction.OpCode.Code == Code.Dup)
+				if (dupInstruction.get_OpCode().get_Code() == 36)
 				{
 					continue;
 				}

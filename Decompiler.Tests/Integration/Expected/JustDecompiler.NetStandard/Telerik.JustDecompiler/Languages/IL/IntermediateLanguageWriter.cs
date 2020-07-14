@@ -30,25 +30,25 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void Disassemble(MethodBody body, MemberMapping methodMapping)
 		{
-			MethodDefinition method = body.Method;
-			if (method.DeclaringType.Module.Assembly.EntryPoint == method)
+			MethodDefinition method = body.get_Method();
+			if ((object)method.get_DeclaringType().get_Module().get_Assembly().get_EntryPoint() == (object)method)
 			{
 				this.WriteKeyword(".entrypoint");
 				this.WriteLine();
 			}
-			if (method.Body.HasVariables)
+			if (method.get_Body().get_HasVariables())
 			{
 				this.WriteMethodVariables(method);
 				this.WriteLine();
 			}
-			if (base.Settings.ShouldGenerateBlocks && body.Instructions.Count > 0)
+			if (base.Settings.ShouldGenerateBlocks && body.get_Instructions().get_Count() > 0)
 			{
-				Instruction item = body.Instructions[0];
-				HashSet<int> branchTargets = this.GetBranchTargets(body.Instructions);
-				this.WriteStructureBody(new ILBlock(body), branchTargets, ref item, methodMapping, method.Body.CodeSize);
+				Instruction item = body.get_Instructions().get_Item(0);
+				HashSet<int> branchTargets = this.GetBranchTargets(body.get_Instructions());
+				this.WriteStructureBody(new ILBlock(body), branchTargets, ref item, methodMapping, method.get_Body().get_CodeSize());
 				return;
 			}
-			foreach (Instruction instruction in method.Body.Instructions)
+			foreach (Instruction instruction in method.get_Body().get_Instructions())
 			{
 				this.WriteInstruction(instruction);
 				if (methodMapping != null)
@@ -57,18 +57,18 @@ namespace Telerik.JustDecompiler.Languages.IL
 					{
 						ILInstructionOffset = new ILRange()
 						{
-							From = instruction.Offset,
-							To = (instruction.Next == null ? method.Body.CodeSize : instruction.Next.Offset)
+							From = instruction.get_Offset(),
+							To = (instruction.get_Next() == null ? method.get_Body().get_CodeSize() : instruction.get_Next().get_Offset())
 						},
 						MemberMapping = methodMapping
 					});
 				}
 				this.WriteLine();
 			}
-			if (method.Body.HasExceptionHandlers)
+			if (method.get_Body().get_HasExceptionHandlers())
 			{
 				this.WriteLine();
-				foreach (ExceptionHandler exceptionHandler in method.Body.ExceptionHandlers)
+				foreach (ExceptionHandler exceptionHandler in method.get_Body().get_ExceptionHandlers())
 				{
 					this.WriteExceptionHandler(exceptionHandler);
 					this.WriteLine();
@@ -78,20 +78,20 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private string GetAssemblyQualifiedName(TypeReference type)
 		{
-			AssemblyNameReference scope = type.Scope as AssemblyNameReference;
+			AssemblyNameReference scope = type.get_Scope() as AssemblyNameReference;
 			if (scope == null)
 			{
-				ModuleDefinition moduleDefinition = type.Scope as ModuleDefinition;
+				ModuleDefinition moduleDefinition = type.get_Scope() as ModuleDefinition;
 				if (moduleDefinition != null)
 				{
-					scope = moduleDefinition.Assembly.Name;
+					scope = moduleDefinition.get_Assembly().get_Name();
 				}
 			}
 			if (scope == null)
 			{
-				return type.FullName;
+				return type.get_FullName();
 			}
-			return String.Concat(type.FullName, ", ", scope.FullName);
+			return String.Concat(type.get_FullName(), ", ", scope.get_FullName());
 		}
 
 		private HashSet<int> GetBranchTargets(IEnumerable<Instruction> instructions)
@@ -99,12 +99,12 @@ namespace Telerik.JustDecompiler.Languages.IL
 			HashSet<int> nums = new HashSet<int>();
 			foreach (Instruction instruction in instructions)
 			{
-				Instruction operand = instruction.Operand as Instruction;
+				Instruction operand = instruction.get_Operand() as Instruction;
 				if (operand != null)
 				{
-					nums.Add(operand.Offset);
+					nums.Add(operand.get_Offset());
 				}
-				Instruction[] instructionArray = instruction.Operand as Instruction[];
+				Instruction[] instructionArray = instruction.get_Operand() as Instruction[];
 				if (instructionArray == null)
 				{
 					continue;
@@ -112,7 +112,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 				Instruction[] instructionArray1 = instructionArray;
 				for (int i = 0; i < (int)instructionArray1.Length; i++)
 				{
-					nums.Add(instructionArray1[i].Offset);
+					nums.Add(instructionArray1[i].get_Offset());
 				}
 			}
 			return nums;
@@ -123,11 +123,11 @@ namespace Telerik.JustDecompiler.Languages.IL
 			string empty = String.Empty;
 			if (member is IMemberDefinition)
 			{
-				empty = (base.Settings.RenameInvalidMembers ? ((IMemberDefinition)member).GetFriendlyFullName(base.Language) : ((IMemberDefinition)member).FullName);
+				empty = (base.Settings.RenameInvalidMembers ? ((IMemberDefinition)member).GetFriendlyFullName(base.Language) : ((IMemberDefinition)member).get_FullName());
 			}
 			else if (member is ParameterReference)
 			{
-				empty = (base.Settings.RenameInvalidMembers ? base.Language.ReplaceInvalidCharactersInIdentifier(((ParameterReference)member).Name) : ((ParameterReference)member).Name);
+				empty = (base.Settings.RenameInvalidMembers ? base.Language.ReplaceInvalidCharactersInIdentifier(((ParameterReference)member).get_Name()) : ((ParameterReference)member).get_Name());
 			}
 			else if (!(member is MemberReference))
 			{
@@ -135,7 +135,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			}
 			else
 			{
-				empty = (base.Settings.RenameInvalidMembers ? ((MemberReference)member).GetFriendlyFullName(base.Language) : ((MemberReference)member).FullName);
+				empty = (base.Settings.RenameInvalidMembers ? ((MemberReference)member).GetFriendlyFullName(base.Language) : ((MemberReference)member).get_FullName());
 			}
 			return empty;
 		}
@@ -145,26 +145,26 @@ namespace Telerik.JustDecompiler.Languages.IL
 			string empty = String.Empty;
 			if (member is IMemberDefinition)
 			{
-				empty = ((IMemberDefinition)member).Name;
+				empty = ((IMemberDefinition)member).get_Name();
 			}
 			else if (!(member is ParameterReference))
 			{
-				empty = (!(member is MemberReference) ? member.ToString() : ((MemberReference)member).Name);
+				empty = (!(member is MemberReference) ? member.ToString() : ((MemberReference)member).get_Name());
 			}
 			else
 			{
-				empty = ((ParameterReference)member).Name;
+				empty = ((ParameterReference)member).get_Name();
 			}
 			return empty;
 		}
 
 		private bool HasParameterAttributes(ParameterDefinition p)
 		{
-			if (p.HasConstant)
+			if (p.get_HasConstant())
 			{
 				return true;
 			}
-			return p.HasCustomAttributes;
+			return p.get_HasCustomAttributes();
 		}
 
 		private string OffsetToString(int offset)
@@ -177,12 +177,12 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteEventDeclaration(@event);
 			int currentPosition = this.formatter.CurrentPosition;
 			this.WriteStartBlock();
-			this.WriteAttributes(@event.CustomAttributes);
-			this.WriteNestedMethod(".addon", @event.AddMethod);
+			this.WriteAttributes(@event.get_CustomAttributes());
+			this.WriteNestedMethod(".addon", @event.get_AddMethod());
 			this.WriteLine();
-			this.WriteNestedMethod(".removeon", @event.RemoveMethod);
-			this.WriteNestedMethod(".fire", @event.InvokeMethod);
-			foreach (MethodDefinition otherMethod in @event.OtherMethods)
+			this.WriteNestedMethod(".removeon", @event.get_RemoveMethod());
+			this.WriteNestedMethod(".fire", @event.get_InvokeMethod());
+			foreach (MethodDefinition otherMethod in @event.get_OtherMethods())
 			{
 				this.WriteNestedMethod(".other", otherMethod);
 			}
@@ -195,19 +195,19 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WritePropertyDeclaration(property);
 			int currentPosition = this.formatter.CurrentPosition;
 			this.WriteStartBlock();
-			this.WriteAttributes(property.CustomAttributes);
-			this.WriteNestedMethod(".get", property.GetMethod);
-			if (property.GetMethod != null)
+			this.WriteAttributes(property.get_CustomAttributes());
+			this.WriteNestedMethod(".get", property.get_GetMethod());
+			if (property.get_GetMethod() != null)
 			{
 				this.WriteLine();
 			}
-			this.WriteNestedMethod(".set", property.SetMethod);
-			if (property.SetMethod != null)
+			this.WriteNestedMethod(".set", property.get_SetMethod());
+			if (property.get_SetMethod() != null)
 			{
 				this.WriteLine();
 			}
 			bool flag = false;
-			foreach (MethodDefinition otherMethod in property.OtherMethods)
+			foreach (MethodDefinition otherMethod in property.get_OtherMethods())
 			{
 				if (flag)
 				{
@@ -233,28 +233,28 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteKeyWordPostSpace(".field");
 			this.flagsWriter.WriteFieldVisibility(field);
 			this.flagsWriter.WriteFieldFlags(field);
-			if (field.HasMarshalInfo)
+			if (field.get_HasMarshalInfo())
 			{
-				this.WriteMarshalInfo(field.MarshalInfo);
+				this.WriteMarshalInfo(field.get_MarshalInfo());
 			}
-			this.WriteTypeReference(field.FieldType, IntermediateLanguageWriter.ILNameSyntax.Signature);
+			this.WriteTypeReference(field.get_FieldType(), IntermediateLanguageWriter.ILNameSyntax.Signature);
 			this.WriteSpace();
 			int currentPosition = this.formatter.CurrentPosition;
-			this.WriteReference(ILHelpers.Escape(field.Name), field);
+			this.WriteReference(ILHelpers.Escape(field.get_Name()), field);
 			int num = this.formatter.CurrentPosition - 1;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[field] = new OffsetSpan(currentPosition, num);
-			if ((field.Attributes & FieldAttributes.HasFieldRVA) == FieldAttributes.HasFieldRVA)
+			if ((field.get_Attributes() & 0x100) == 0x100)
 			{
-				this.Write(String.Format(" at I_{0:x8}", field.RVA));
+				this.Write(String.Format(" at I_{0:x8}", field.get_RVA()));
 			}
-			if (field.HasConstant)
+			if (field.get_HasConstant())
 			{
 				this.WriteSpace();
 				this.WriteToken("=");
 				this.WriteSpace();
-				this.WriteConstant(field.Constant.Value);
+				this.WriteConstant(field.get_Constant().get_Value());
 			}
-			if (field.HasCustomAttributes && this.WriteAttributes(field.CustomAttributes))
+			if (field.get_HasCustomAttributes() && this.WriteAttributes(field.get_CustomAttributes()))
 			{
 				this.WriteLine();
 			}
@@ -274,29 +274,30 @@ namespace Telerik.JustDecompiler.Languages.IL
 		private void WriteArrayType(TypeReference type, IntermediateLanguageWriter.ILNameSyntax syntaxForElementTypes)
 		{
 			ArrayType arrayType = (ArrayType)type;
-			this.WriteTypeReference(arrayType.ElementType, syntaxForElementTypes);
+			this.WriteTypeReference(arrayType.get_ElementType(), syntaxForElementTypes);
 			this.WriteToken("[");
-			for (int i = 0; i < arrayType.Dimensions.Count; i++)
+			for (int i = 0; i < arrayType.get_Dimensions().get_Count(); i++)
 			{
 				if (i > 0)
 				{
 					this.WriteTokenPostSpace(",");
 				}
-				this.WriteToken(arrayType.Dimensions[i].ToString());
+				ArrayDimension item = arrayType.get_Dimensions().get_Item(i);
+				this.WriteToken(item.ToString());
 			}
 			this.WriteToken("]");
 		}
 
 		private bool WriteAttributes(Collection<CustomAttribute> attributes)
 		{
-			if (attributes.Count == 0)
+			if (attributes.get_Count() == 0)
 			{
 				return false;
 			}
 			foreach (CustomAttribute attribute in attributes)
 			{
 				this.WriteKeyWordPostSpace(".custom");
-				this.WriteMethodReference(attribute.Constructor, true);
+				this.WriteMethodReference(attribute.get_Constructor(), true);
 				byte[] blob = attribute.GetBlob();
 				if (blob != null)
 				{
@@ -427,10 +428,10 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			this.WriteKeyWordPostSpace(".event");
 			this.flagsWriter.WriteEventFlags(@event);
-			this.WriteTypeReference(@event.EventType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+			this.WriteTypeReference(@event.get_EventType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 			this.WriteSpace();
 			int currentPosition = this.formatter.CurrentPosition;
-			this.WriteReference(ILHelpers.Escape(@event.Name), @event);
+			this.WriteReference(ILHelpers.Escape(@event.get_Name()), @event);
 			int num = this.formatter.CurrentPosition - 1;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event] = new OffsetSpan(currentPosition, num);
 		}
@@ -438,37 +439,37 @@ namespace Telerik.JustDecompiler.Languages.IL
 		private void WriteExceptionHandler(ExceptionHandler exceptionHandler)
 		{
 			this.WriteKeyWordPostSpace("Try");
-			this.WriteOffsetReference(exceptionHandler.TryStart);
+			this.WriteOffsetReference(exceptionHandler.get_TryStart());
 			this.WriteToken("-");
-			this.WriteOffsetReference(exceptionHandler.TryEnd);
+			this.WriteOffsetReference(exceptionHandler.get_TryEnd());
 			this.WriteSpace();
-			this.WriteKeyword(exceptionHandler.HandlerType.ToString());
-			if (exceptionHandler.FilterStart != null)
+			this.WriteKeyword(exceptionHandler.get_HandlerType().ToString());
+			if (exceptionHandler.get_FilterStart() != null)
 			{
 				this.WriteSpace();
-				this.WriteOffsetReference(exceptionHandler.FilterStart);
+				this.WriteOffsetReference(exceptionHandler.get_FilterStart());
 				this.WriteSpace();
 				this.WriteKeyword("handler");
 				this.WriteSpace();
 			}
-			if (exceptionHandler.CatchType != null)
+			if (exceptionHandler.get_CatchType() != null)
 			{
 				this.WriteSpace();
-				this.WriteTypeReference(exceptionHandler.CatchType, IntermediateLanguageWriter.ILNameSyntax.Signature);
+				this.WriteTypeReference(exceptionHandler.get_CatchType(), IntermediateLanguageWriter.ILNameSyntax.Signature);
 			}
 			this.WriteSpace();
-			this.WriteOffsetReference(exceptionHandler.HandlerStart);
+			this.WriteOffsetReference(exceptionHandler.get_HandlerStart());
 			this.WriteSpace();
-			this.WriteOffsetReference(exceptionHandler.HandlerEnd);
+			this.WriteOffsetReference(exceptionHandler.get_HandlerEnd());
 		}
 
 		private void WriteFieldReference(FieldReference field)
 		{
-			this.WriteTypeReference(field.FieldType, IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters);
+			this.WriteTypeReference(field.get_FieldType(), IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters);
 			this.WriteSpace();
-			this.WriteTypeReference(field.DeclaringType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+			this.WriteTypeReference(field.get_DeclaringType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 			this.WriteToken("::");
-			this.WriteReference(ILHelpers.Escape(field.Name), field);
+			this.WriteReference(ILHelpers.Escape(field.get_Name()), field);
 		}
 
 		private void WriteFloatOperand(float val)
@@ -498,77 +499,79 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteGenericTypeParameter(GenericParameter gp)
 		{
-			if (gp.HasReferenceTypeConstraint)
+			if (gp.get_HasReferenceTypeConstraint())
 			{
 				this.WriteKeyWordPostSpace("class");
 			}
-			else if (gp.HasNotNullableValueTypeConstraint)
+			else if (gp.get_HasNotNullableValueTypeConstraint())
 			{
 				this.WriteKeyWordPostSpace("valuetype");
 			}
-			if (gp.HasDefaultConstructorConstraint)
+			if (gp.get_HasDefaultConstructorConstraint())
 			{
 				this.WriteKeyWordPostSpace(".ctor");
 			}
-			if (gp.HasConstraints)
+			if (gp.get_HasConstraints())
 			{
 				this.WriteToken("(");
-				for (int i = 0; i < gp.Constraints.Count; i++)
+				for (int i = 0; i < gp.get_Constraints().get_Count(); i++)
 				{
 					if (i > 0)
 					{
 						this.WriteTokenPostSpace(",");
 					}
-					this.WriteTypeReference(gp.Constraints[i], IntermediateLanguageWriter.ILNameSyntax.TypeName);
+					this.WriteTypeReference(gp.get_Constraints().get_Item(i), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				}
 				this.WriteTokenPostSpace(")");
 			}
-			if (gp.IsContravariant)
+			if (gp.get_IsContravariant())
 			{
 				this.WriteToken("-");
 			}
-			else if (gp.IsCovariant)
+			else if (gp.get_IsCovariant())
 			{
 				this.WriteToken("+");
 			}
-			this.WriteEscaped(gp.Name);
+			this.WriteEscaped(gp.get_Name());
 		}
 
 		private void WriteGenericTypeParameter(TypeReference type, IntermediateLanguageWriter.ILNameSyntax syntax)
 		{
 			this.WriteToken("!");
-			if (((GenericParameter)type).Owner.GenericParameterType == GenericParameterType.Method)
+			if (((GenericParameter)type).get_Owner().get_GenericParameterType() == 1)
 			{
 				this.WriteToken("!");
 			}
-			if (!String.IsNullOrEmpty(type.Name) && type.Name[0] != '!' && syntax != IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters)
+			if (!String.IsNullOrEmpty(type.get_Name()) && type.get_Name()[0] != '!' && syntax != IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters)
 			{
-				this.WriteReference(ILHelpers.Escape(type.Name), null);
+				this.WriteReference(ILHelpers.Escape(type.get_Name()), null);
 				return;
 			}
-			this.WriteReference(((GenericParameter)type).Position.ToString(), null);
+			int position = ((GenericParameter)type).get_Position();
+			this.WriteReference(position.ToString(), null);
 		}
 
 		private void WriteInstruction(Instruction instruction)
 		{
-			this.WriteDefinition(this.OffsetToString(instruction.Offset), instruction);
+			this.WriteDefinition(this.OffsetToString(instruction.get_Offset()), instruction);
 			this.WriteTokenPostSpace(":");
-			this.WriteReference(instruction.OpCode.Name, instruction.OpCode);
-			if (instruction.Operand != null)
+			OpCode opCode = instruction.get_OpCode();
+			this.WriteReference(opCode.get_Name(), instruction.get_OpCode());
+			if (instruction.get_Operand() != null)
 			{
 				this.WriteSpace();
-				if (instruction.OpCode == OpCodes.Ldtoken)
+				if (instruction.get_OpCode() == OpCodes.Ldtoken)
 				{
-					if (instruction.Operand is MethodReference)
+					if (instruction.get_Operand() is MethodReference)
 					{
 						this.WriteKeyWordPostSpace("method");
 					}
-					else if (instruction.Operand is FieldReference)
+					else if (instruction.get_Operand() is FieldReference)
 					{
 						this.WriteKeyWordPostSpace("field");
 					}
 				}
-				this.WriteOperand(instruction.Operand);
+				this.WriteOperand(instruction.get_Operand());
 			}
 		}
 
@@ -607,7 +610,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			this.WriteKeyword("marshal");
 			this.WriteToken("(");
-			this.WriteNativeType(marshalInfo.NativeType, marshalInfo);
+			this.WriteNativeType(marshalInfo.get_NativeType(), marshalInfo);
 			this.WriteToken("(");
 			this.WriteSpace();
 		}
@@ -625,7 +628,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			if (memberDefinition is TypeReference)
 			{
 				TypeReference typeReference = (TypeReference)memberDefinition;
-				this.formatter.Write((base.Settings.RenameInvalidMembers ? typeReference.GetFriendlyTypeName(base.Language, "<", ">") : typeReference.Name));
+				this.formatter.Write((base.Settings.RenameInvalidMembers ? typeReference.GetFriendlyTypeName(base.Language, "<", ">") : typeReference.get_Name()));
 				return;
 			}
 			string fullName = this.GetFullName(memberDefinition);
@@ -639,7 +642,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 				MethodDefinition methodDefinition = memberDefinition as MethodDefinition;
 				IFormatter formatter = this.formatter;
 				string str = fullName;
-				obj3 = (base.Settings.RenameInvalidMembers ? methodDefinition.ReturnType.GetFriendlyFullName(base.Language) : methodDefinition.ReturnType.FullName);
+				obj3 = (base.Settings.RenameInvalidMembers ? methodDefinition.get_ReturnType().GetFriendlyFullName(base.Language) : methodDefinition.get_ReturnType().get_FullName());
 				formatter.Write(String.Format("{0} : {1}", (object)str, obj3));
 				return;
 			}
@@ -648,7 +651,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 				PropertyDefinition propertyDefinition = memberDefinition as PropertyDefinition;
 				IFormatter formatter1 = this.formatter;
 				string str1 = fullName;
-				obj2 = (base.Settings.RenameInvalidMembers ? propertyDefinition.PropertyType.GetFriendlyFullName(base.Language) : propertyDefinition.PropertyType.FullName);
+				obj2 = (base.Settings.RenameInvalidMembers ? propertyDefinition.get_PropertyType().GetFriendlyFullName(base.Language) : propertyDefinition.get_PropertyType().get_FullName());
 				formatter1.Write(String.Format("{0} : {1}", (object)str1, obj2));
 				return;
 			}
@@ -657,7 +660,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 				FieldDefinition fieldDefinition = memberDefinition as FieldDefinition;
 				IFormatter formatter2 = this.formatter;
 				string str2 = fullName;
-				obj1 = (base.Settings.RenameInvalidMembers ? fieldDefinition.FieldType.GetFriendlyFullName(base.Language) : fieldDefinition.FieldType.FullName);
+				obj1 = (base.Settings.RenameInvalidMembers ? fieldDefinition.get_FieldType().GetFriendlyFullName(base.Language) : fieldDefinition.get_FieldType().get_FullName());
 				formatter2.Write(String.Format("{0} : {1}", (object)str2, obj1));
 				return;
 			}
@@ -666,18 +669,18 @@ namespace Telerik.JustDecompiler.Languages.IL
 				EventDefinition eventDefinition = memberDefinition as EventDefinition;
 				IFormatter formatter3 = this.formatter;
 				string str3 = fullName;
-				obj = (base.Settings.RenameInvalidMembers ? eventDefinition.EventType.GetFriendlyFullName(base.Language) : eventDefinition.EventType.FullName);
+				obj = (base.Settings.RenameInvalidMembers ? eventDefinition.get_EventType().GetFriendlyFullName(base.Language) : eventDefinition.get_EventType().get_FullName());
 				formatter3.Write(String.Format("{0} : {1}", (object)str3, obj));
 				return;
 			}
 			if (memberDefinition is ParameterReference)
 			{
-				this.formatter.Write(((ParameterReference)memberDefinition).Name);
+				this.formatter.Write(((ParameterReference)memberDefinition).get_Name());
 				return;
 			}
 			if (memberDefinition is MemberReference)
 			{
-				this.formatter.Write((base.Settings.RenameInvalidMembers ? ((MemberReference)memberDefinition).GetFriendlyFullName(base.Language) : ((MemberReference)memberDefinition).FullName));
+				this.formatter.Write((base.Settings.RenameInvalidMembers ? ((MemberReference)memberDefinition).GetFriendlyFullName(base.Language) : ((MemberReference)memberDefinition).get_FullName()));
 			}
 		}
 
@@ -689,7 +692,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			}
 			if (member is TypeReference)
 			{
-				this.formatter.Write(((TypeReference)member).Name);
+				this.formatter.Write(((TypeReference)member).get_Name());
 				return;
 			}
 			string[] strArray = this.GetName(member).Split(new String[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
@@ -699,7 +702,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			}
 			if (member is ParameterReference)
 			{
-				this.formatter.Write(((ParameterReference)member).Name);
+				this.formatter.Write(((ParameterReference)member).get_Name());
 				return;
 			}
 			if (member is MemberReference)
@@ -710,10 +713,10 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteMethodBody(MethodDefinition method)
 		{
-			this.WriteAttributes(method.CustomAttributes);
-			if (method.HasOverrides)
+			this.WriteAttributes(method.get_CustomAttributes());
+			if (method.get_HasOverrides())
 			{
-				foreach (MethodReference @override in method.Overrides)
+				foreach (MethodReference @override in method.get_Overrides())
 				{
 					this.WriteKeyWordPostSpace(".override");
 					this.WriteKeyWordPostSpace("method");
@@ -721,15 +724,15 @@ namespace Telerik.JustDecompiler.Languages.IL
 					this.WriteLine();
 				}
 			}
-			foreach (ParameterDefinition parameter in method.Parameters)
+			foreach (ParameterDefinition parameter in method.get_Parameters())
 			{
 				this.WriteParameterAttributes(parameter);
 			}
 			this.WriteSecurityDeclarations(method);
-			if (method.HasBody)
+			if (method.get_HasBody())
 			{
 				MemberMapping memberMapping = ILHelpers.CreateCodeMapping(method, this.CodeMappings);
-				this.Disassemble(method.Body, memberMapping);
+				this.Disassemble(method.get_Body(), memberMapping);
 			}
 		}
 
@@ -738,35 +741,35 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteKeyWordPostSpace(".method");
 			this.flagsWriter.WriteMethodVisibility(method);
 			this.flagsWriter.WriteMethodFlags(method);
-			if (method.IsCompilerControlled)
+			if (method.get_IsCompilerControlled())
 			{
 				this.WriteKeyWordPostSpace("privatescope");
 			}
-			if ((method.Attributes & MethodAttributes.PInvokeImpl) == MethodAttributes.PInvokeImpl)
+			if ((method.get_Attributes() & 0x2000) == 0x2000)
 			{
 				this.WriteKeyword("pinvokeimpl");
-				if (method.HasPInvokeInfo && method.PInvokeInfo != null)
+				if (method.get_HasPInvokeInfo() && method.get_PInvokeInfo() != null)
 				{
 					this.WritePInvokeAttributes(method);
 				}
 				this.WriteSpace();
 			}
 			this.Indent();
-			if (method.ExplicitThis)
+			if (method.get_ExplicitThis())
 			{
 				this.WriteKeyWordPostSpace("instance");
 				this.WriteKeyWordPostSpace("explicit");
 			}
-			else if (method.HasThis)
+			else if (method.get_HasThis())
 			{
 				this.WriteKeyWordPostSpace("instance");
 			}
 			this.flagsWriter.WriteMethodCallingConvention(method);
-			this.WriteTypeReference(method.ReturnType, IntermediateLanguageWriter.ILNameSyntax.Signature);
+			this.WriteTypeReference(method.get_ReturnType(), IntermediateLanguageWriter.ILNameSyntax.Signature);
 			this.WriteSpace();
-			if (method.MethodReturnType.HasMarshalInfo)
+			if (method.get_MethodReturnType().get_HasMarshalInfo())
 			{
-				this.WriteMarshalInfo(method.MethodReturnType.MarshalInfo);
+				this.WriteMarshalInfo(method.get_MethodReturnType().get_MarshalInfo());
 			}
 			int currentPosition = this.formatter.CurrentPosition;
 			this.WriteMethodName(method);
@@ -784,7 +787,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			// 
 			// Current member / type: System.Void Telerik.JustDecompiler.Languages.IL.IntermediateLanguageWriter::WriteMethodManagedType(Mono.Cecil.MethodDefinition)
-			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\JustDecompiler.NetStandard.dll
+			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
 			// 
 			// Product version: 0.0.0.0
 			// Exception in: System.Void WriteMethodManagedType(Mono.Cecil.MethodDefinition)
@@ -804,13 +807,13 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteMethodName(MethodDefinition method)
 		{
-			if (!method.IsCompilerControlled)
+			if (!method.get_IsCompilerControlled())
 			{
-				this.WriteReference(ILHelpers.Escape(method.Name), method);
+				this.WriteReference(ILHelpers.Escape(method.get_Name()), method);
 				return;
 			}
-			string name = method.Name;
-			int num = method.MetadataToken.ToInt32();
+			string name = method.get_Name();
+			int num = method.get_MetadataToken().ToInt32();
 			this.WriteReference(ILHelpers.Escape(String.Concat(name, "$PST", num.ToString("X8"))), method);
 		}
 
@@ -818,14 +821,14 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			string str;
 			MethodDefinition methodDefinition = method as MethodDefinition;
-			if (methodDefinition == null || !methodDefinition.IsCompilerControlled)
+			if (methodDefinition == null || !methodDefinition.get_IsCompilerControlled())
 			{
-				str = ILHelpers.Escape(method.Name);
+				str = ILHelpers.Escape(method.get_Name());
 			}
 			else
 			{
-				string name = method.Name;
-				int num = method.MetadataToken.ToInt32();
+				string name = method.get_Name();
+				int num = method.get_MetadataToken().ToInt32();
 				str = ILHelpers.Escape(String.Concat(name, "$PST", num.ToString("X8")));
 			}
 			if (!writeAsReference)
@@ -839,11 +842,11 @@ namespace Telerik.JustDecompiler.Languages.IL
 		private void WriteMethodParameters(MethodDefinition method)
 		{
 			this.WriteTokenPreSpace("(");
-			if (method.HasParameters)
+			if (method.get_HasParameters())
 			{
 				this.WriteLine();
 				this.Indent();
-				this.WriteParameters(method.Parameters);
+				this.WriteParameters(method.get_Parameters());
 				this.Outdent();
 			}
 			this.WriteTokenPostSpace(")");
@@ -851,20 +854,20 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		protected void WriteMethodReference(MethodReference method, bool writeAsReference)
 		{
-			if (method.ExplicitThis)
+			if (method.get_ExplicitThis())
 			{
 				this.WriteKeyWordPostSpace("instance");
 				this.WriteKeyWordPostSpace("explicit");
 			}
-			else if (method.HasThis)
+			else if (method.get_HasThis())
 			{
 				this.WriteKeyWordPostSpace("instance");
 			}
-			this.WriteTypeReference(method.FixedReturnType, IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters);
+			this.WriteTypeReference(method.get_FixedReturnType(), IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters);
 			this.WriteSpace();
-			if (method.DeclaringType != null)
+			if (method.get_DeclaringType() != null)
 			{
-				this.WriteTypeReference(method.DeclaringType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+				this.WriteTypeReference(method.get_DeclaringType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				this.WriteToken("::");
 			}
 			this.WriteMethodName(method, writeAsReference);
@@ -872,25 +875,25 @@ namespace Telerik.JustDecompiler.Languages.IL
 			if (genericInstanceMethod != null)
 			{
 				this.WriteToken("<");
-				for (int i = 0; i < genericInstanceMethod.GenericArguments.Count; i++)
+				for (int i = 0; i < genericInstanceMethod.get_GenericArguments().get_Count(); i++)
 				{
 					if (i > 0)
 					{
 						this.WriteTokenPostSpace(",");
 					}
-					this.WriteTypeReference(genericInstanceMethod.GenericArguments[i], IntermediateLanguageWriter.ILNameSyntax.Signature);
+					this.WriteTypeReference(genericInstanceMethod.get_GenericArguments().get_Item(i), IntermediateLanguageWriter.ILNameSyntax.Signature);
 				}
 				this.WriteToken(">");
 			}
 			this.WriteToken("(");
-			Collection<ParameterDefinition> parameters = method.Parameters;
-			for (int j = 0; j < parameters.Count; j++)
+			Collection<ParameterDefinition> parameters = method.get_Parameters();
+			for (int j = 0; j < parameters.get_Count(); j++)
 			{
 				if (j > 0)
 				{
 					this.WriteTokenPostSpace(", ");
 				}
-				this.WriteTypeReference(parameters[j].ParameterType, IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters);
+				this.WriteTypeReference(parameters.get_Item(j).get_ParameterType(), IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters);
 			}
 			this.WriteToken(")");
 		}
@@ -898,24 +901,24 @@ namespace Telerik.JustDecompiler.Languages.IL
 		private void WriteMethodVariables(MethodDefinition method)
 		{
 			this.WriteKeyWordPostSpace(".locals");
-			if (method.Body.InitLocals)
+			if (method.get_Body().get_InitLocals())
 			{
 				this.WriteKeyWordPostSpace("init");
 			}
 			this.WriteToken("(");
 			this.WriteLine();
 			this.Indent();
-			foreach (VariableDefinition variable in method.Body.Variables)
+			foreach (VariableDefinition variable in method.get_Body().get_Variables())
 			{
-				int index = variable.Index;
+				int index = variable.get_Index();
 				this.WriteDefinition(String.Concat("[", index.ToString(), "] "), variable);
-				this.WriteTypeReference(variable.VariableType, IntermediateLanguageWriter.ILNameSyntax.Signature);
-				if (!String.IsNullOrEmpty(variable.Name))
+				this.WriteTypeReference(variable.get_VariableType(), IntermediateLanguageWriter.ILNameSyntax.Signature);
+				if (!String.IsNullOrEmpty(variable.get_Name()))
 				{
 					this.WriteSpace();
-					this.Write(ILHelpers.Escape(variable.Name));
+					this.Write(ILHelpers.Escape(variable.get_Name()));
 				}
-				if (variable.Index + 1 < method.Body.Variables.Count)
+				if (variable.get_Index() + 1 < method.get_Body().get_Variables().get_Count())
 				{
 					this.WriteToken(",");
 				}
@@ -930,126 +933,126 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			switch (nativeType)
 			{
-				case NativeType.Boolean:
+				case 2:
 				{
 					this.WriteKeyword("bool");
 					return;
 				}
-				case NativeType.I1:
+				case 3:
 				{
 					this.WriteKeyword("int8");
 					return;
 				}
-				case NativeType.U1:
+				case 4:
 				{
 					this.WriteKeyword("unsigned int8");
 					return;
 				}
-				case NativeType.I2:
+				case 5:
 				{
 					this.WriteKeyword("int16");
 					return;
 				}
-				case NativeType.U2:
+				case 6:
 				{
 					this.WriteKeyword("unsigned int16");
 					return;
 				}
-				case NativeType.I4:
+				case 7:
 				{
 					this.WriteKeyword("int32");
 					return;
 				}
-				case NativeType.U4:
+				case 8:
 				{
 					this.WriteKeyword("unsigned int32");
 					return;
 				}
-				case NativeType.I8:
+				case 9:
 				{
 					this.WriteKeyword("int64");
 					return;
 				}
-				case NativeType.U8:
+				case 10:
 				{
 					this.WriteKeyword("unsigned int64");
 					return;
 				}
-				case NativeType.R4:
+				case 11:
 				{
 					this.WriteKeyword("float32");
 					return;
 				}
-				case NativeType.R8:
+				case 12:
 				{
 					this.WriteKeyword("float64");
 					return;
 				}
-				case NativeType.U1 | NativeType.I2 | NativeType.U4 | NativeType.I8 | NativeType.R8:
-				case NativeType.Boolean | NativeType.U1 | NativeType.U2 | NativeType.U4 | NativeType.U8 | NativeType.R8:
+				case 13:
+				case 14:
 				case 16:
 				case 17:
 				case 18:
 				case 24:
 				case 33:
-				case NativeType.Func:
-				case NativeType.Boolean | NativeType.I1 | NativeType.U1 | NativeType.I2 | NativeType.U2 | NativeType.I4 | NativeType.UInt | NativeType.Func | NativeType.ByValStr | NativeType.ANSIBStr | NativeType.TBStr | NativeType.VariantBool:
-				case NativeType.U4 | NativeType.I8 | NativeType.UInt | NativeType.ASAny:
+				case 38:
+				case 39:
+				case 41:
 				{
 					this.WriteKeyword(nativeType.ToString());
 					break;
 				}
-				case NativeType.Currency:
+				case 15:
 				{
 					this.WriteKeyword("currency");
 					return;
 				}
-				case NativeType.BStr:
+				case 19:
 				{
 					this.WriteKeyword("bstr");
 					return;
 				}
-				case NativeType.LPStr:
+				case 20:
 				{
 					this.WriteKeyword("lpstr");
 					return;
 				}
-				case NativeType.LPWStr:
+				case 21:
 				{
 					this.WriteKeyword("lpwstr");
 					return;
 				}
-				case NativeType.LPTStr:
+				case 22:
 				{
 					this.WriteKeyword("lptstr");
 					return;
 				}
-				case NativeType.FixedSysString:
+				case 23:
 				{
-					this.WriteKeyword(String.Format("fixed sysstring[{0}]", ((FixedSysStringMarshalInfo)marshalInfo).Size));
+					this.WriteKeyword(String.Format("fixed sysstring[{0}]", ((FixedSysStringMarshalInfo)marshalInfo).get_Size()));
 					return;
 				}
-				case NativeType.IUnknown:
+				case 25:
 				{
 					this.WriteKeyword("iunknown");
 					return;
 				}
-				case NativeType.IDispatch:
+				case 26:
 				{
 					this.WriteKeyword("idispatch");
 					return;
 				}
-				case NativeType.Struct:
+				case 27:
 				{
 					this.WriteKeyword("struct");
 					return;
 				}
-				case NativeType.IntF:
+				case 28:
 				{
 					this.WriteKeyword("interface");
 					return;
 				}
-				case NativeType.SafeArray:
+				case 29:
 				{
 					this.WriteKeyWordPostSpace("safearray");
 					SafeArrayMarshalInfo safeArrayMarshalInfo = marshalInfo as SafeArrayMarshalInfo;
@@ -1057,124 +1060,124 @@ namespace Telerik.JustDecompiler.Languages.IL
 					{
 						break;
 					}
-					switch (safeArrayMarshalInfo.ElementType)
+					switch (safeArrayMarshalInfo.get_ElementType())
 					{
-						case VariantType.None:
+						case 0:
 						{
 							break;
 						}
 						case 1:
-						case VariantType.I2 | VariantType.I4 | VariantType.R4 | VariantType.R8 | VariantType.CY | VariantType.Date | VariantType.BStr | VariantType.Dispatch | VariantType.Error | VariantType.Bool | VariantType.Variant | VariantType.Unknown | VariantType.Decimal:
-						case VariantType.R4 | VariantType.I1:
-						case VariantType.R4 | VariantType.R8 | VariantType.I1 | VariantType.UI1:
+						case 15:
+						case 20:
+						case 21:
 						{
-							this.WriteKeyword(safeArrayMarshalInfo.ElementType.ToString());
+							this.WriteKeyword(safeArrayMarshalInfo.get_ElementType().ToString());
 							return;
 						}
-						case VariantType.I2:
+						case 2:
 						{
 							this.WriteKeyword("int16");
 							return;
 						}
-						case VariantType.I4:
+						case 3:
 						{
 							this.WriteKeyword("int32");
 							return;
 						}
-						case VariantType.R4:
+						case 4:
 						{
 							this.WriteKeyword("float32");
 							return;
 						}
-						case VariantType.R8:
+						case 5:
 						{
 							this.WriteKeyword("float64");
 							return;
 						}
-						case VariantType.CY:
+						case 6:
 						{
 							this.WriteKeyword("currency");
 							return;
 						}
-						case VariantType.Date:
+						case 7:
 						{
 							this.WriteKeyword("date");
 							return;
 						}
-						case VariantType.BStr:
+						case 8:
 						{
 							this.WriteKeyword("bstr");
 							return;
 						}
-						case VariantType.Dispatch:
+						case 9:
 						{
 							this.WriteKeyword("idispatch");
 							return;
 						}
-						case VariantType.Error:
+						case 10:
 						{
 							this.WriteKeyword("error");
 							return;
 						}
-						case VariantType.Bool:
+						case 11:
 						{
 							this.WriteKeyword("bool");
 							return;
 						}
-						case VariantType.Variant:
+						case 12:
 						{
 							this.WriteKeyword("variant");
 							return;
 						}
-						case VariantType.Unknown:
+						case 13:
 						{
 							this.WriteKeyword("iunknown");
 							return;
 						}
-						case VariantType.Decimal:
+						case 14:
 						{
 							this.WriteKeyword("decimal");
 							return;
 						}
-						case VariantType.I1:
+						case 16:
 						{
 							this.WriteKeyword("int8");
 							return;
 						}
-						case VariantType.UI1:
+						case 17:
 						{
 							this.WriteKeyword("unsigned int8");
 							return;
 						}
-						case VariantType.UI2:
+						case 18:
 						{
 							this.WriteKeyword("unsigned int16");
 							return;
 						}
-						case VariantType.UI4:
+						case 19:
 						{
 							this.WriteKeyword("unsigned int32");
 							return;
 						}
-						case VariantType.Int:
+						case 22:
 						{
 							this.WriteKeyword("int");
 							return;
 						}
-						case VariantType.UInt:
+						case 23:
 						{
 							this.WriteKeyword("unsigned int");
 							return;
 						}
 						default:
 						{
-							this.WriteKeyword(safeArrayMarshalInfo.ElementType.ToString());
+							this.WriteKeyword(safeArrayMarshalInfo.get_ElementType().ToString());
 							return;
 						}
 					}
 					break;
 				}
-				case NativeType.FixedArray:
+				case 30:
 				{
 					this.WriteKeyword("fixed array");
 					FixedArrayMarshalInfo fixedArrayMarshalInfo = marshalInfo as FixedArrayMarshalInfo;
@@ -1183,120 +1186,120 @@ namespace Telerik.JustDecompiler.Languages.IL
 						break;
 					}
 					this.WriteToken("[");
-					this.WriteLiteral(fixedArrayMarshalInfo.Size.ToString());
+					this.WriteLiteral(fixedArrayMarshalInfo.get_Size().ToString());
 					this.WriteToken("]");
-					if (fixedArrayMarshalInfo.ElementType == NativeType.None)
+					if (fixedArrayMarshalInfo.get_ElementType() == 102)
 					{
 						break;
 					}
 					this.WriteSpace();
-					this.WriteNativeType(fixedArrayMarshalInfo.ElementType, null);
+					this.WriteNativeType(fixedArrayMarshalInfo.get_ElementType(), null);
 					return;
 				}
-				case NativeType.Int:
+				case 31:
 				{
 					this.WriteKeyword("int");
 					return;
 				}
-				case NativeType.UInt:
+				case 32:
 				{
 					this.WriteKeyword("unsigned int");
 					return;
 				}
-				case NativeType.ByValStr:
+				case 34:
 				{
 					this.WriteKeyword("byvalstr");
 					return;
 				}
-				case NativeType.ANSIBStr:
+				case 35:
 				{
 					this.WriteKeyword("ansi bstr");
 					return;
 				}
-				case NativeType.TBStr:
+				case 36:
 				{
 					this.WriteKeyword("tbstr");
 					return;
 				}
-				case NativeType.VariantBool:
+				case 37:
 				{
 					this.WriteKeyword("variant bool");
 					return;
 				}
-				case NativeType.ASAny:
+				case 40:
 				{
 					this.WriteKeyword("as any");
 					return;
 				}
-				case NativeType.Array:
+				case 42:
 				{
 					ArrayMarshalInfo arrayMarshalInfo = (ArrayMarshalInfo)marshalInfo;
 					if (arrayMarshalInfo == null)
 					{
-						goto case NativeType.U4 | NativeType.I8 | NativeType.UInt | NativeType.ASAny;
+						goto case 41;
 					}
-					if (arrayMarshalInfo.ElementType != NativeType.Max)
+					if (arrayMarshalInfo.get_ElementType() != 80)
 					{
-						this.WriteNativeType(arrayMarshalInfo.ElementType, null);
+						this.WriteNativeType(arrayMarshalInfo.get_ElementType(), null);
 					}
 					this.WriteToken("[");
-					if (arrayMarshalInfo.SizeParameterMultiplier != 0)
+					if (arrayMarshalInfo.get_SizeParameterMultiplier() != 0)
 					{
-						if (arrayMarshalInfo.Size >= 0)
+						if (arrayMarshalInfo.get_Size() >= 0)
 						{
-							this.WriteLiteral(arrayMarshalInfo.Size.ToString());
+							this.WriteLiteral(arrayMarshalInfo.get_Size().ToString());
 						}
 						this.WriteSpace();
 						this.WriteToken("+");
 						this.WriteSpace();
-						this.WriteLiteral(arrayMarshalInfo.SizeParameterIndex.ToString());
+						this.WriteLiteral(arrayMarshalInfo.get_SizeParameterIndex().ToString());
 					}
 					else
 					{
-						this.WriteLiteral(arrayMarshalInfo.Size.ToString());
+						this.WriteLiteral(arrayMarshalInfo.get_Size().ToString());
 					}
 					this.WriteToken("]");
 					return;
 				}
-				case NativeType.LPStruct:
+				case 43:
 				{
 					this.WriteKeyword("lpstruct");
 					return;
 				}
-				case NativeType.CustomMarshaler:
+				case 44:
 				{
 					CustomMarshalInfo customMarshalInfo = marshalInfo as CustomMarshalInfo;
 					if (customMarshalInfo == null)
 					{
-						goto case NativeType.U4 | NativeType.I8 | NativeType.UInt | NativeType.ASAny;
+						goto case 41;
 					}
 					this.WriteKeyword("custom");
 					this.WriteToken("(");
-					this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(customMarshalInfo.ManagedType.FullName));
+					this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(customMarshalInfo.get_ManagedType().get_FullName()));
 					this.WriteTokenPostSpace(",");
-					this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(customMarshalInfo.Cookie));
-					if (customMarshalInfo.Guid != Guid.Empty || !String.IsNullOrEmpty(customMarshalInfo.UnmanagedType))
+					this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(customMarshalInfo.get_Cookie()));
+					if (customMarshalInfo.get_Guid() != Guid.Empty || !String.IsNullOrEmpty(customMarshalInfo.get_UnmanagedType()))
 					{
 						this.WriteTokenPostSpace(",");
-						this.WriteLiteralInQuotes(customMarshalInfo.Guid.ToString());
+						this.WriteLiteralInQuotes(customMarshalInfo.get_Guid().ToString());
 						this.WriteTokenPostSpace(",");
-						this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(customMarshalInfo.UnmanagedType));
+						this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(customMarshalInfo.get_UnmanagedType()));
 					}
 					this.WriteToken(")");
 					return;
 				}
-				case NativeType.Error:
+				case 45:
 				{
 					this.WriteKeyword("error");
 					return;
 				}
 				default:
 				{
-					if (nativeType == NativeType.None)
+					if (nativeType == 102)
 					{
 						break;
 					}
-					goto case NativeType.U4 | NativeType.I8 | NativeType.UInt | NativeType.ASAny;
+					goto case 41;
 				}
 			}
 		}
@@ -1319,7 +1322,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteOffsetReference(Instruction instruction)
 		{
-			this.Write(this.OffsetToString(instruction.Offset));
+			this.Write(this.OffsetToString(instruction.get_Offset()));
 		}
 
 		private void WriteOpeningBrace()
@@ -1361,29 +1364,29 @@ namespace Telerik.JustDecompiler.Languages.IL
 			VariableReference variableReference = operand as VariableReference;
 			if (variableReference != null)
 			{
-				if (!String.IsNullOrEmpty(variableReference.Name))
+				if (!String.IsNullOrEmpty(variableReference.get_Name()))
 				{
-					this.WriteReference(ILHelpers.Escape(variableReference.Name), variableReference);
+					this.WriteReference(ILHelpers.Escape(variableReference.get_Name()), variableReference);
 					return;
 				}
-				index = variableReference.Index;
+				index = variableReference.get_Index();
 				this.WriteReference(index.ToString(), variableReference);
 				return;
 			}
 			ParameterReference parameterReference = operand as ParameterReference;
 			if (parameterReference != null)
 			{
-				if (this.method != null && this.method.Body != null && parameterReference == this.method.Body.ThisParameter)
+				if (this.method != null && this.method.get_Body() != null && parameterReference == this.method.get_Body().get_ThisParameter())
 				{
 					this.WriteReference(0.ToString(), parameterReference);
 					return;
 				}
-				if (!String.IsNullOrEmpty(parameterReference.Name))
+				if (!String.IsNullOrEmpty(parameterReference.get_Name()))
 				{
-					this.WriteReference(ILHelpers.Escape(parameterReference.Name), parameterReference);
+					this.WriteReference(ILHelpers.Escape(parameterReference.get_Name()), parameterReference);
 					return;
 				}
-				index = parameterReference.Index;
+				index = parameterReference.get_Index();
 				this.WriteReference(index.ToString(), parameterReference);
 				return;
 			}
@@ -1442,43 +1445,43 @@ namespace Telerik.JustDecompiler.Languages.IL
 				return;
 			}
 			this.WriteKeyWordPostSpace(".param");
-			this.WriteToken(String.Format("[{0}]", p.Index + 1));
-			if (p.HasConstant)
+			this.WriteToken(String.Format("[{0}]", p.get_Index() + 1));
+			if (p.get_HasConstant())
 			{
 				this.WriteSpace();
 				this.WriteToken("=");
 				this.WriteSpace();
-				this.WriteConstant(p.Constant.Value);
+				this.WriteConstant(p.get_Constant().get_Value());
 			}
 			this.WriteLine();
-			this.WriteAttributes(p.CustomAttributes);
+			this.WriteAttributes(p.get_CustomAttributes());
 		}
 
 		private void WriteParameters(Collection<ParameterDefinition> parameters)
 		{
-			for (int i = 0; i < parameters.Count; i++)
+			for (int i = 0; i < parameters.get_Count(); i++)
 			{
-				ParameterDefinition item = parameters[i];
-				if (item.IsIn)
+				ParameterDefinition item = parameters.get_Item(i);
+				if (item.get_IsIn())
 				{
 					this.WriteKeyWordPostSpace("[in]");
 				}
-				if (item.IsOut)
+				if (item.get_IsOut())
 				{
 					this.WriteKeyWordPostSpace("[out]");
 				}
-				if (item.IsOptional)
+				if (item.get_IsOptional())
 				{
 					this.WriteKeyWordPostSpace("[opt]");
 				}
-				this.WriteTypeReference(item.ParameterType, IntermediateLanguageWriter.ILNameSyntax.Signature);
+				this.WriteTypeReference(item.get_ParameterType(), IntermediateLanguageWriter.ILNameSyntax.Signature);
 				this.WriteSpace();
-				if (item.HasMarshalInfo)
+				if (item.get_HasMarshalInfo())
 				{
-					this.WriteMarshalInfo(item.MarshalInfo);
+					this.WriteMarshalInfo(item.get_MarshalInfo());
 				}
-				this.WriteEscaped(item.Name);
-				if (i < parameters.Count - 1)
+				this.WriteEscaped(item.get_Name());
+				if (i < parameters.get_Count() - 1)
 				{
 					this.WriteToken(",");
 				}
@@ -1488,54 +1491,54 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WritePInvokeAttributes(MethodDefinition method)
 		{
-			PInvokeInfo pInvokeInfo = method.PInvokeInfo;
+			PInvokeInfo pInvokeInfo = method.get_PInvokeInfo();
 			this.WriteToken("(");
-			this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(pInvokeInfo.Module.Name));
+			this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(pInvokeInfo.get_Module().get_Name()));
 			this.WriteToken(")");
-			if (!String.IsNullOrEmpty(pInvokeInfo.EntryPoint) && pInvokeInfo.EntryPoint != method.Name)
+			if (!String.IsNullOrEmpty(pInvokeInfo.get_EntryPoint()) && pInvokeInfo.get_EntryPoint() != method.get_Name())
 			{
 				this.WriteSpace();
 				this.WriteKeyword("as");
 				this.WriteSpace();
-				this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(pInvokeInfo.EntryPoint));
+				this.WriteLiteralInQuotes(BaseLanguageWriter.ConvertString(pInvokeInfo.get_EntryPoint()));
 			}
-			if (pInvokeInfo.IsNoMangle)
+			if (pInvokeInfo.get_IsNoMangle())
 			{
 				this.WriteKeyWordPreSpace("nomangle");
 			}
-			if (pInvokeInfo.IsCharSetAnsi)
+			if (pInvokeInfo.get_IsCharSetAnsi())
 			{
 				this.WriteKeyWordPreSpace("ansi");
 			}
-			else if (pInvokeInfo.IsCharSetAuto)
+			else if (pInvokeInfo.get_IsCharSetAuto())
 			{
 				this.WriteKeyWordPreSpace("autochar");
 			}
-			else if (pInvokeInfo.IsCharSetUnicode)
+			else if (pInvokeInfo.get_IsCharSetUnicode())
 			{
 				this.WriteKeyWordPreSpace("unicode");
 			}
-			if (pInvokeInfo.SupportsLastError)
+			if (pInvokeInfo.get_SupportsLastError())
 			{
 				this.WriteKeyWordPreSpace("lasterr");
 			}
-			if (pInvokeInfo.IsCallConvCdecl)
+			if (pInvokeInfo.get_IsCallConvCdecl())
 			{
 				this.WriteKeyWordPreSpace("cdecl");
 			}
-			else if (pInvokeInfo.IsCallConvFastcall)
+			else if (pInvokeInfo.get_IsCallConvFastcall())
 			{
 				this.WriteKeyWordPreSpace("fastcall");
 			}
-			else if (pInvokeInfo.IsCallConvStdCall)
+			else if (pInvokeInfo.get_IsCallConvStdCall())
 			{
 				this.WriteKeyWordPreSpace("stdcall");
 			}
-			else if (pInvokeInfo.IsCallConvThiscall)
+			else if (pInvokeInfo.get_IsCallConvThiscall())
 			{
 				this.WriteKeyWordPreSpace("thiscall");
 			}
-			else if (pInvokeInfo.IsCallConvWinapi)
+			else if (pInvokeInfo.get_IsCallConvWinapi())
 			{
 				this.WriteKeyWordPreSpace("winapi");
 			}
@@ -1546,22 +1549,22 @@ namespace Telerik.JustDecompiler.Languages.IL
 		{
 			this.WriteKeyWordPostSpace(".property");
 			this.flagsWriter.WritePropertyFlags(property);
-			if (property.HasThis)
+			if (property.get_HasThis())
 			{
 				this.WriteKeyWordPostSpace("instance");
 			}
-			this.WriteTypeReference(property.PropertyType, IntermediateLanguageWriter.ILNameSyntax.Signature);
+			this.WriteTypeReference(property.get_PropertyType(), IntermediateLanguageWriter.ILNameSyntax.Signature);
 			this.WriteSpace();
 			int currentPosition = this.formatter.CurrentPosition;
-			this.WriteReference(ILHelpers.Escape(property.Name), property);
+			this.WriteReference(ILHelpers.Escape(property.get_Name()), property);
 			int num = this.formatter.CurrentPosition - 1;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property] = new OffsetSpan(currentPosition, num);
 			this.WriteToken("(");
-			if (property.HasParameters)
+			if (property.get_HasParameters())
 			{
 				this.WriteLine();
 				this.Indent();
-				this.WriteParameters(property.Parameters);
+				this.WriteParameters(property.get_Parameters());
 				this.Outdent();
 			}
 			this.WriteToken(")");
@@ -1569,12 +1572,12 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteSecurityDeclarationArgument(CustomAttributeNamedArgument na)
 		{
-			CustomAttributeArgument argument = na.Argument;
-			TypeReference type = argument.Type;
-			if (type.MetadataType == MetadataType.Class || type.MetadataType == MetadataType.ValueType)
+			CustomAttributeArgument argument = na.get_Argument();
+			TypeReference type = argument.get_Type();
+			if (type.get_MetadataType() == 18 || type.get_MetadataType() == 17)
 			{
 				this.WriteKeyWordPostSpace("enum");
-				if (type.Scope == type.Module)
+				if (type.get_Scope() == type.get_Module())
 				{
 					this.WriteTypeReference(type, IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				}
@@ -1589,109 +1592,109 @@ namespace Telerik.JustDecompiler.Languages.IL
 				this.WriteTypeReference(type, IntermediateLanguageWriter.ILNameSyntax.Signature);
 			}
 			this.WriteSpace();
-			this.WriteReference(ILHelpers.Escape(na.Name), type);
+			this.WriteReference(ILHelpers.Escape(na.get_Name()), type);
 			this.WriteSpace();
 			this.WriteToken("=");
 			this.WriteSpace();
-			if (!(na.Argument.Value is String))
+			if (!(na.get_Argument().get_Value() is String))
 			{
-				argument = na.Argument;
-				this.WriteConstant(argument.Value);
+				argument = na.get_Argument();
+				this.WriteConstant(argument.get_Value());
 				return;
 			}
-			argument = na.Argument;
-			this.Write(String.Format("string('{0}')", BaseLanguageWriter.ConvertString((String)argument.Value).Replace("'", "'")));
+			argument = na.get_Argument();
+			this.Write(String.Format("string('{0}')", BaseLanguageWriter.ConvertString((String)argument.get_Value()).Replace("'", "'")));
 		}
 
 		private void WriteSecurityDeclarations(ISecurityDeclarationProvider secDeclProvider)
 		{
-			if (!secDeclProvider.HasSecurityDeclarations)
+			if (!secDeclProvider.get_HasSecurityDeclarations())
 			{
 				return;
 			}
-			foreach (SecurityDeclaration securityDeclaration in secDeclProvider.SecurityDeclarations)
+			foreach (SecurityDeclaration securityDeclaration in secDeclProvider.get_SecurityDeclarations())
 			{
 				this.WriteKeyWordPostSpace(".permissionset");
-				switch (securityDeclaration.Action)
+				switch (securityDeclaration.get_Action())
 				{
-					case SecurityAction.Request:
+					case 1:
 					{
 						this.WriteKeyword("request");
 						break;
 					}
-					case SecurityAction.Demand:
+					case 2:
 					{
 						this.WriteKeyword("demand");
 						break;
 					}
-					case SecurityAction.Assert:
+					case 3:
 					{
 						this.WriteKeyword("assert");
 						break;
 					}
-					case SecurityAction.Deny:
+					case 4:
 					{
 						this.WriteKeyword("deny");
 						break;
 					}
-					case SecurityAction.PermitOnly:
+					case 5:
 					{
 						this.WriteKeyword("permitonly");
 						break;
 					}
-					case SecurityAction.LinkDemand:
+					case 6:
 					{
 						this.WriteKeyword("linkcheck");
 						break;
 					}
-					case SecurityAction.InheritDemand:
+					case 7:
 					{
 						this.WriteKeyword("inheritcheck");
 						break;
 					}
-					case SecurityAction.RequestMinimum:
+					case 8:
 					{
 						this.WriteKeyword("reqmin");
 						break;
 					}
-					case SecurityAction.RequestOptional:
+					case 9:
 					{
 						this.WriteKeyword("reqopt");
 						break;
 					}
-					case SecurityAction.RequestRefuse:
+					case 10:
 					{
 						this.WriteKeyword("reqrefuse");
 						break;
 					}
-					case SecurityAction.PreJitGrant:
+					case 11:
 					{
 						this.WriteKeyword("prejitgrant");
 						break;
 					}
-					case SecurityAction.PreJitDeny:
+					case 12:
 					{
 						this.WriteKeyword("prejitdeny");
 						break;
 					}
-					case SecurityAction.NonCasDemand:
+					case 13:
 					{
 						this.WriteKeyword("noncasdemand");
 						break;
 					}
-					case SecurityAction.NonCasLinkDemand:
+					case 14:
 					{
 						this.WriteKeyword("noncaslinkdemand");
 						break;
 					}
-					case SecurityAction.NonCasInheritance:
+					case 15:
 					{
 						this.WriteKeyword("noncasinheritance");
 						break;
 					}
 					default:
 					{
-						this.WriteKeyword(securityDeclaration.Action.ToString());
+						this.WriteKeyword(securityDeclaration.get_Action().ToString());
 						break;
 					}
 				}
@@ -1699,31 +1702,31 @@ namespace Telerik.JustDecompiler.Languages.IL
 				this.WriteTokenPreSpace("{");
 				this.WriteLine();
 				this.Indent();
-				for (int i = 0; i < securityDeclaration.SecurityAttributes.Count; i++)
+				for (int i = 0; i < securityDeclaration.get_SecurityAttributes().get_Count(); i++)
 				{
-					SecurityAttribute item = securityDeclaration.SecurityAttributes[i];
-					if (item.AttributeType.Scope != item.AttributeType.Module)
+					SecurityAttribute item = securityDeclaration.get_SecurityAttributes().get_Item(i);
+					if (item.get_AttributeType().get_Scope() != item.get_AttributeType().get_Module())
 					{
-						this.WriteTypeReference(item.AttributeType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+						this.WriteTypeReference(item.get_AttributeType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 					}
 					else
 					{
 						this.WriteKeyWordPostSpace("class");
-						this.WriteEscaped(this.GetAssemblyQualifiedName(item.AttributeType));
+						this.WriteEscaped(this.GetAssemblyQualifiedName(item.get_AttributeType()));
 					}
 					this.WriteTokenPreSpace("=");
 					this.WriteTokenPreSpace("{");
-					if (item.HasFields || item.HasProperties)
+					if (item.get_HasFields() || item.get_HasProperties())
 					{
 						this.WriteLine();
 						this.Indent();
-						foreach (CustomAttributeNamedArgument field in item.Fields)
+						foreach (CustomAttributeNamedArgument field in item.get_Fields())
 						{
 							this.WriteKeyWordPostSpace("field");
 							this.WriteSecurityDeclarationArgument(field);
 							this.WriteLine();
 						}
-						foreach (CustomAttributeNamedArgument property in item.Properties)
+						foreach (CustomAttributeNamedArgument property in item.get_Properties())
 						{
 							this.WriteKeyWordPostSpace("property");
 							this.WriteSecurityDeclarationArgument(property);
@@ -1732,7 +1735,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 						this.Outdent();
 					}
 					this.WriteToken("}");
-					if (i + 1 < securityDeclaration.SecurityAttributes.Count)
+					if (i + 1 < securityDeclaration.get_SecurityAttributes().get_Count())
 					{
 						this.WriteToken(",");
 					}
@@ -1753,12 +1756,13 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteStructureBody(ILBlock s, HashSet<int> branchTargets, ref Instruction inst, MemberMapping currentMethodMapping, int codeSize)
 		{
+			bool flowControl;
 			bool flag = true;
 			bool flag1 = false;
 			int num = 0;
-			while (inst != null && inst.Offset < s.EndOffset)
+			while (inst != null && inst.get_Offset() < s.EndOffset)
 			{
-				int offset = inst.Offset;
+				int offset = inst.get_Offset();
 				if (num >= s.Children.Count || s.Children[num].StartOffset > offset || offset >= s.Children[num].EndOffset)
 				{
 					if (!flag && (flag1 || branchTargets.Contains(offset)))
@@ -1772,15 +1776,24 @@ namespace Telerik.JustDecompiler.Languages.IL
 						{
 							ILInstructionOffset = new ILRange()
 							{
-								From = inst.Offset,
-								To = (inst.Next == null ? codeSize : inst.Next.Offset)
+								From = inst.get_Offset(),
+								To = (inst.get_Next() == null ? codeSize : inst.get_Next().get_Offset())
 							},
 							MemberMapping = currentMethodMapping
 						});
 					}
 					this.WriteLine();
-					flag1 = (inst.OpCode.FlowControl == FlowControl.Branch || inst.OpCode.FlowControl == FlowControl.Cond_Branch || inst.OpCode.FlowControl == FlowControl.Return ? true : inst.OpCode.FlowControl == FlowControl.Throw);
-					inst = inst.Next;
+					if (inst.get_OpCode().get_FlowControl() == null || inst.get_OpCode().get_FlowControl() == 3 || inst.get_OpCode().get_FlowControl() == 7)
+					{
+						flowControl = true;
+					}
+					else
+					{
+						OpCode opCode = inst.get_OpCode();
+						flowControl = opCode.get_FlowControl() == 8;
+					}
+					flag1 = flowControl;
+					inst = inst.get_Next();
 				}
 				else
 				{
@@ -1847,31 +1860,31 @@ namespace Telerik.JustDecompiler.Languages.IL
 				}
 				case ILBlockType.Handler:
 				{
-					switch (s.ExceptionHandler.HandlerType)
+					switch (s.ExceptionHandler.get_HandlerType())
 					{
-						case ExceptionHandlerType.Catch:
-						case ExceptionHandlerType.Filter:
+						case 0:
+						case 1:
 						{
 							this.WriteKeyword("catch");
-							if (s.ExceptionHandler.CatchType != null)
+							if (s.ExceptionHandler.get_CatchType() != null)
 							{
 								this.WriteSpace();
-								this.WriteTypeReference(s.ExceptionHandler.CatchType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+								this.WriteTypeReference(s.ExceptionHandler.get_CatchType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 							}
 							this.WriteLine();
 							break;
 						}
-						case ExceptionHandlerType.Finally:
+						case 2:
 						{
 							this.WriteKeyword("finally");
 							this.WriteLine();
 							break;
 						}
-						case ExceptionHandlerType.Filter | ExceptionHandlerType.Finally:
+						case 3:
 						{
 							throw new NotSupportedException();
 						}
-						case ExceptionHandlerType.Fault:
+						case 4:
 						{
 							this.WriteKeyword("fault");
 							this.WriteLine();
@@ -1927,7 +1940,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 					this.WriteReference(str, type);
 					return;
 				}
-				this.WriteReference(ILHelpers.Escape(type.Name), type);
+				this.WriteReference(ILHelpers.Escape(type.get_Name()), type);
 				return;
 			}
 			if ((syntax == IntermediateLanguageWriter.ILNameSyntax.Signature || syntax == IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters) && str != null)
@@ -1937,22 +1950,22 @@ namespace Telerik.JustDecompiler.Languages.IL
 			}
 			if (syntax == IntermediateLanguageWriter.ILNameSyntax.Signature || syntax == IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters)
 			{
-				this.WriteKeyWordPostSpace((type.IsValueType ? "valuetype" : "class"));
+				this.WriteKeyWordPostSpace((type.get_IsValueType() ? "valuetype" : "class"));
 			}
-			if (type.DeclaringType != null)
+			if (type.get_DeclaringType() != null)
 			{
-				this.WriteTypeReference(type.DeclaringType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+				this.WriteTypeReference(type.get_DeclaringType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				this.WriteKeyword("/");
-				this.WriteReference(ILHelpers.Escape(type.Name), type);
+				this.WriteReference(ILHelpers.Escape(type.get_Name()), type);
 				return;
 			}
-			if (!type.IsDefinition && type.Scope != null && !(type is TypeSpecification))
+			if (!type.get_IsDefinition() && type.get_Scope() != null && !(type is TypeSpecification))
 			{
 				this.WriteToken("[");
-				this.WriteEscaped(type.Scope.Name);
+				this.WriteEscaped(type.get_Scope().get_Name());
 				this.WriteToken("]");
 			}
-			this.WriteReference(ILHelpers.Escape(type.FullName), type);
+			this.WriteReference(ILHelpers.Escape(type.get_FullName()), type);
 		}
 
 		protected override string WriteTypeDeclaration(TypeDefinition type, bool isPartial = false)
@@ -1961,12 +1974,12 @@ namespace Telerik.JustDecompiler.Languages.IL
 			{
 				this.CodeMappings = new Telerik.JustDecompiler.Languages.IL.CodeMappings()
 				{
-					FullName = type.FullName,
+					FullName = type.get_FullName(),
 					Mapping = new List<MemberMapping>()
 				};
 			}
 			this.WriteKeyWordPostSpace(".class");
-			if ((type.Attributes & TypeAttributes.ClassSemanticMask) == TypeAttributes.ClassSemanticMask)
+			if ((type.get_Attributes() & 32) == 32)
 			{
 				this.WriteKeyWordPostSpace("interface");
 			}
@@ -1975,23 +1988,23 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.flagsWriter.WriteTypeStringFormat(type);
 			this.flagsWriter.WriteTypeAttributes(type);
 			int currentPosition = this.formatter.CurrentPosition;
-			this.WriteReference(ILHelpers.Escape((type.DeclaringType != null ? type.Name : type.FullName)), type);
+			this.WriteReference(ILHelpers.Escape((type.get_DeclaringType() != null ? type.get_Name() : type.get_FullName())), type);
 			int num = this.formatter.CurrentPosition - 1;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[type] = new OffsetSpan(currentPosition, num);
 			this.WriteTypeParameters(type);
 			this.WriteLine();
-			if (type.BaseType != null)
+			if (type.get_BaseType() != null)
 			{
 				this.Indent();
 				this.WriteKeyWordPostSpace("extends");
-				this.WriteTypeReference(type.BaseType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+				this.WriteTypeReference(type.get_BaseType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				this.WriteLine();
 				this.Outdent();
 			}
-			if (type.HasInterfaces)
+			if (type.get_HasInterfaces())
 			{
 				this.Indent();
-				for (int i = 0; i < type.Interfaces.Count; i++)
+				for (int i = 0; i < type.get_Interfaces().get_Count(); i++)
 				{
 					if (i > 0)
 					{
@@ -2006,7 +2019,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 					{
 						this.WriteKeyWordPostSpace("implements");
 					}
-					this.WriteTypeReference(type.Interfaces[i], IntermediateLanguageWriter.ILNameSyntax.TypeName);
+					this.WriteTypeReference(type.get_Interfaces().get_Item(i), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				}
 				this.WriteLine();
 				this.Outdent();
@@ -2016,13 +2029,13 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		protected override void WriteTypeOpeningBlock(TypeDefinition type)
 		{
-			this.WriteAttributes(type.CustomAttributes);
+			this.WriteAttributes(type.get_CustomAttributes());
 			this.WriteSecurityDeclarations(type);
-			if (type.HasLayoutInfo)
+			if (type.get_HasLayoutInfo())
 			{
-				this.Write(String.Format(".pack {0}", type.PackingSize));
+				this.Write(String.Format(".pack {0}", type.get_PackingSize()));
 				this.WriteLine();
-				this.Write(String.Format(".size {0}", type.ClassSize));
+				this.Write(String.Format(".size {0}", type.get_ClassSize()));
 				this.WriteLine();
 				this.WriteLine();
 			}
@@ -2030,18 +2043,18 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private void WriteTypeParameters(IGenericParameterProvider p)
 		{
-			if (!p.HasGenericParameters)
+			if (!p.get_HasGenericParameters())
 			{
 				return;
 			}
 			this.WriteToken("<");
-			for (int i = 0; i < p.GenericParameters.Count; i++)
+			for (int i = 0; i < p.get_GenericParameters().get_Count(); i++)
 			{
 				if (i > 0)
 				{
 					this.WriteTokenPostSpace(",");
 				}
-				this.WriteGenericTypeParameter(p.GenericParameters[i]);
+				this.WriteGenericTypeParameter(p.get_GenericParameters().get_Item(i));
 			}
 			this.WriteToken(">");
 		}
@@ -2051,7 +2064,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			IntermediateLanguageWriter.ILNameSyntax lNameSyntax = (syntax == IntermediateLanguageWriter.ILNameSyntax.SignatureNoNamedTypeParameters ? syntax : IntermediateLanguageWriter.ILNameSyntax.Signature);
 			if (type is PinnedType)
 			{
-				this.WriteTypeReference(((PinnedType)type).ElementType, lNameSyntax);
+				this.WriteTypeReference(((PinnedType)type).get_ElementType(), lNameSyntax);
 				this.WriteKeyWordPreSpace("pinned");
 				return;
 			}
@@ -2067,13 +2080,13 @@ namespace Telerik.JustDecompiler.Languages.IL
 			}
 			if (type is ByReferenceType)
 			{
-				this.WriteTypeReference(((ByReferenceType)type).ElementType, lNameSyntax);
+				this.WriteTypeReference(((ByReferenceType)type).get_ElementType(), lNameSyntax);
 				this.WriteToken("&");
 				return;
 			}
 			if (type is PointerType)
 			{
-				this.WriteTypeReference(((PointerType)type).ElementType, lNameSyntax);
+				this.WriteTypeReference(((PointerType)type).get_ElementType(), lNameSyntax);
 				this.WriteToken("*");
 				return;
 			}
@@ -2081,10 +2094,10 @@ namespace Telerik.JustDecompiler.Languages.IL
 			{
 				if (type is OptionalModifierType)
 				{
-					this.WriteTypeReference(((OptionalModifierType)type).ElementType, syntax);
+					this.WriteTypeReference(((OptionalModifierType)type).get_ElementType(), syntax);
 					this.WriteKeyWordPreSpace("modopt");
 					this.WriteToken("(");
-					this.WriteTypeReference(((OptionalModifierType)type).ModifierType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+					this.WriteTypeReference(((OptionalModifierType)type).get_ModifierType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 					this.WriteTokenPostSpace(")");
 					return;
 				}
@@ -2093,22 +2106,22 @@ namespace Telerik.JustDecompiler.Languages.IL
 					this.WriteType(type, syntax);
 					return;
 				}
-				this.WriteTypeReference(((RequiredModifierType)type).ElementType, syntax);
+				this.WriteTypeReference(((RequiredModifierType)type).get_ElementType(), syntax);
 				this.WriteKeyWordPreSpace("modreq");
 				this.WriteToken("(");
-				this.WriteTypeReference(((RequiredModifierType)type).ModifierType, IntermediateLanguageWriter.ILNameSyntax.TypeName);
+				this.WriteTypeReference(((RequiredModifierType)type).get_ModifierType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 				this.WriteTokenPostSpace(")");
 				return;
 			}
 			this.WriteTypeReference(type.GetElementType(), lNameSyntax);
 			this.WriteToken("<");
-			Collection<TypeReference> genericArguments = ((GenericInstanceType)type).GenericArguments;
-			for (int i = 0; i < genericArguments.Count; i++)
+			Collection<TypeReference> genericArguments = ((GenericInstanceType)type).get_GenericArguments();
+			for (int i = 0; i < genericArguments.get_Count(); i++)
 			{
-				TypeReference item = genericArguments[i];
-				if (((GenericInstanceType)type).PostionToArgument.ContainsKey(i))
+				TypeReference item = genericArguments.get_Item(i);
+				if (((GenericInstanceType)type).get_PostionToArgument().ContainsKey(i))
 				{
-					item = ((GenericInstanceType)type).PostionToArgument[i];
+					item = ((GenericInstanceType)type).get_PostionToArgument()[i];
 				}
 				if (i > 0)
 				{

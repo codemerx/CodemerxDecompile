@@ -17,21 +17,21 @@ namespace Telerik.JustDecompiler.Ast
 		{
 			if (first is VariableReferenceExpression && second is VariableReferenceExpression)
 			{
-				return ((VariableReferenceExpression)first).Variable == ((VariableReferenceExpression)second).Variable;
+				return (object)((VariableReferenceExpression)first).Variable == (object)((VariableReferenceExpression)second).Variable;
 			}
 			if (first is ArgumentReferenceExpression && second is ArgumentReferenceExpression)
 			{
-				return ((ArgumentReferenceExpression)first).Parameter == ((ArgumentReferenceExpression)second).Parameter;
+				return (object)((ArgumentReferenceExpression)first).Parameter == (object)((ArgumentReferenceExpression)second).Parameter;
 			}
 			if (first is FieldReferenceExpression && second is FieldReferenceExpression)
 			{
-				return ((FieldReferenceExpression)first).Field == ((FieldReferenceExpression)second).Field;
+				return (object)((FieldReferenceExpression)first).Field == (object)((FieldReferenceExpression)second).Field;
 			}
 			if (!(first is PropertyReferenceExpression) || !(second is PropertyReferenceExpression))
 			{
 				return false;
 			}
-			return ((PropertyReferenceExpression)first).Property == ((PropertyReferenceExpression)second).Property;
+			return (object)((PropertyReferenceExpression)first).Property == (object)((PropertyReferenceExpression)second).Property;
 		}
 
 		public static TypeReference GetTargetTypeReference(this Expression target)
@@ -61,7 +61,7 @@ namespace Telerik.JustDecompiler.Ast
 				return false;
 			}
 			MethodReference method = methodExpression.Method;
-			if (method.CallingConvention == MethodCallingConvention.StdCall || method.DeclaringType.FullName != "System.Type" || method.Name != "GetTypeFromHandle")
+			if (method.get_CallingConvention() == 2 || method.get_DeclaringType().get_FullName() != "System.Type" || method.get_Name() != "GetTypeFromHandle")
 			{
 				return false;
 			}
@@ -75,14 +75,14 @@ namespace Telerik.JustDecompiler.Ast
 				return false;
 			}
 			typeReference = item.MemberReference as TypeReference;
-			return typeReference != null;
+			return (object)typeReference != (object)null;
 		}
 
 		public static string ToCodeString(this Expression expression)
 		{
 			StringWriter stringWriter = new StringWriter();
 			IntermediateDecompilationCSharpLanguageWriter intermediateDecompilationCSharpLanguageWriter = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(stringWriter));
-			((ILanguageTestCaseWriter)intermediateDecompilationCSharpLanguageWriter).SetContext(expression.UnderlyingSameMethodInstructions.First<Instruction>().ContainingMethod);
+			((ILanguageTestCaseWriter)intermediateDecompilationCSharpLanguageWriter).SetContext(expression.UnderlyingSameMethodInstructions.First<Instruction>().get_ContainingMethod());
 			((ILanguageTestCaseWriter)intermediateDecompilationCSharpLanguageWriter).Write(expression);
 			return stringWriter.ToString();
 		}

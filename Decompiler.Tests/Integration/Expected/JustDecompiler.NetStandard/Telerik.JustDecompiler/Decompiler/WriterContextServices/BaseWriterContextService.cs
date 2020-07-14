@@ -103,11 +103,11 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		{
 			foreach (ImplementedMember explicitlyImplementedMember in explicitlyImplementedMembers)
 			{
-				if (collection.Contains(explicitlyImplementedMember.DeclaringType, explicitlyImplementedMember.Member.FullName))
+				if (collection.Contains(explicitlyImplementedMember.DeclaringType, explicitlyImplementedMember.Member.get_FullName()))
 				{
 					continue;
 				}
-				collection.Add(explicitlyImplementedMember.DeclaringType, explicitlyImplementedMember.Member.FullName);
+				collection.Add(explicitlyImplementedMember.DeclaringType, explicitlyImplementedMember.Member.get_FullName());
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				{
 					continue;
 				}
-				typeSpecificContext = (decompiledType.Value.Type != outerMostDeclaringType ? decompiledType.Value.TypeContext : this.CreateTypeContext(decompiledType.Value.Type, language, decompiledTypes, decompiledType.Value));
+				typeSpecificContext = ((object)decompiledType.Value.Type != (object)outerMostDeclaringType ? decompiledType.Value.TypeContext : this.CreateTypeContext(decompiledType.Value.Type, language, decompiledTypes, decompiledType.Value));
 				this.cacheService.AddTypeContextToCache(decompiledType.Value.Type, language, this.renameInvalidMembers, typeSpecificContext);
 			}
 		}
@@ -137,7 +137,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private TypeSpecificContext CreateTypeContext(TypeDefinition type, ILanguage language, Dictionary<string, DecompiledType> decompiledTypes, DecompiledType decompiledCurrentType)
 		{
 			ICollection<TypeReference> typesDependingOn = this.GetTypesDependingOn(decompiledTypes, language);
-			ICollection<string> usedNamespaces = this.GetUsedNamespaces(typesDependingOn, type.Namespace);
+			ICollection<string> usedNamespaces = this.GetUsedNamespaces(typesDependingOn, type.get_Namespace());
 			ICollection<string> typeVisibleMembersNames = this.GetTypeVisibleMembersNames(type, language, decompiledTypes);
 			ExplicitlyImplementedMembersCollection explicitlyImplementedInterfaceMethods = this.GetExplicitlyImplementedInterfaceMethods(type, language);
 			return new TypeSpecificContext(type, decompiledCurrentType.TypeContext.MethodDefinitionToNameMap, decompiledCurrentType.TypeContext.BackingFieldToNameMap, usedNamespaces, typeVisibleMembersNames, decompiledCurrentType.TypeContext.AssignmentData, this.GetAutoImplementedProperties(decompiledTypes), this.GetAutoImplementedEvents(decompiledTypes), explicitlyImplementedInterfaceMethods, this.ExceptionsWhileDecompiling, decompiledCurrentType.TypeContext.GeneratedFilterMethods, decompiledCurrentType.TypeContext.GeneratedMethodDefinitionToNameMap);
@@ -152,7 +152,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				BaseWriterContextService.AddAssignmentDataToDecompiledType(decompiledMemberFromCache, decompiledType);
 				return;
 			}
-			if (method.Body == null)
+			if (method.get_Body() == null)
 			{
 				CachedDecompiledMember cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null));
 				this.cacheService.AddDecompiledMemberToCache(method, language, this.renameInvalidMembers, cachedDecompiledMember);
@@ -160,16 +160,16 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			}
 			CachedDecompiledMember cachedDecompiledMember1 = this.DecompileMethod(language, method, decompiledType.TypeContext.ShallowPartialClone());
 			List<CachedDecompiledMember> cachedDecompiledMembers = new List<CachedDecompiledMember>();
-			TypeDefinition declaringType = method.DeclaringType;
-			if (!method.IsStatic)
+			TypeDefinition declaringType = method.get_DeclaringType();
+			if (!method.get_IsStatic())
 			{
-				foreach (MethodDefinition methodDefinition in declaringType.Methods)
+				foreach (MethodDefinition methodDefinition in declaringType.get_Methods())
 				{
-					if (!methodDefinition.IsConstructor || methodDefinition.FullName == cachedDecompiledMember1.Member.MemberFullName || methodDefinition.IsStatic)
+					if (!methodDefinition.get_IsConstructor() || methodDefinition.get_FullName() == cachedDecompiledMember1.Member.MemberFullName || methodDefinition.get_IsStatic())
 					{
 						continue;
 					}
-					if (methodDefinition.Body != null)
+					if (methodDefinition.get_Body() != null)
 					{
 						cachedDecompiledMembers.Add(this.DecompileMethod(language, methodDefinition, decompiledType.TypeContext.ShallowPartialClone()));
 					}
@@ -189,7 +189,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					}
 					if (cachedDecompiledMember3.Member.Context == null)
 					{
-						MethodDefinition methodDefinition1 = decompiledType.Type.Methods.First<MethodDefinition>((MethodDefinition x) => x.FullName == cachedDecompiledMember3.Member.MemberFullName);
+						MethodDefinition methodDefinition1 = decompiledType.Type.get_Methods().First<MethodDefinition>((MethodDefinition x) => x.get_FullName() == cachedDecompiledMember3.Member.MemberFullName);
 						if (!this.cacheService.IsDecompiledMemberInCache(methodDefinition1, language, this.renameInvalidMembers))
 						{
 							this.cacheService.AddDecompiledMemberToCache(methodDefinition1, language, this.renameInvalidMembers, cachedDecompiledMember3);
@@ -206,7 +206,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		protected void DecompileMember(MethodDefinition method, ILanguage language, DecompiledType decompiledType)
 		{
-			if (method.IsConstructor && !method.IsStatic && method.HasBody)
+			if (method.get_IsConstructor() && !method.get_IsStatic() && method.get_HasBody())
 			{
 				this.DecompileConstructorChain(method, language, decompiledType);
 				return;
@@ -220,7 +220,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			try
 			{
 				DecompilationContext decompilationContext = null;
-				Statement statement = method.Body.Decompile(language, out decompilationContext, typeContext);
+				Statement statement = method.get_Body().Decompile(language, out decompilationContext, typeContext);
 				cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), statement, decompilationContext.MethodContext), decompilationContext.TypeContext);
 			}
 			catch (Exception exception1)
@@ -229,7 +229,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				this.ExceptionsWhileDecompiling.Add(method);
 				BlockStatement blockStatement = new BlockStatement();
 				blockStatement.AddStatement(new ExceptionStatement(exception, method));
-				cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, new MethodSpecificContext(method.Body)));
+				cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, new MethodSpecificContext(method.get_Body())));
 				base.OnExceptionThrown(exception);
 			}
 			return cachedDecompiledMember;
@@ -264,7 +264,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		protected CachedDecompiledMember GetDecompiledMember(MethodDefinition method, ILanguage language, DecompiledType decompiledType)
 		{
-			if (method.Body == null)
+			if (method.get_Body() == null)
 			{
 				return new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null));
 			}
@@ -280,19 +280,19 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private ICollection<TypeReference> GetEventTypesDependingOn(EventDefinition @event, ILanguage language)
 		{
 			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(@event.EventType));
+			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(@event.get_EventType()));
 			typeReferences.UnionWith(AttributesUtilities.GetEventAttributesUsedTypes(@event, language));
-			if (@event.AddMethod != null)
+			if (@event.get_AddMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.AddMethod, language, false));
+				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.get_AddMethod(), language, false));
 			}
-			if (@event.RemoveMethod != null)
+			if (@event.get_RemoveMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.RemoveMethod, language, false));
+				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.get_RemoveMethod(), language, false));
 			}
-			if (@event.InvokeMethod != null)
+			if (@event.get_InvokeMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.InvokeMethod, language, false));
+				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.get_InvokeMethod(), language, false));
 			}
 			return typeReferences;
 		}
@@ -322,7 +322,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private ICollection<TypeReference> GetFieldTypesDependingOn(FieldDefinition field)
 		{
 			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(field.FieldType));
+			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(field.get_FieldType()));
 			typeReferences.UnionWith(AttributesUtilities.GetFieldAttributesUsedTypes(field));
 			return typeReferences;
 		}
@@ -335,17 +335,17 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private ICollection<TypeReference> GetMethodTypesDependingOn(MethodDefinition method, ILanguage language, bool considerAttributes = true)
 		{
 			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			if (method.ReturnType != null)
+			if (method.get_ReturnType() != null)
 			{
-				typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(method.ReturnType));
+				typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(method.get_ReturnType()));
 			}
 			if (considerAttributes)
 			{
 				typeReferences.UnionWith(AttributesUtilities.GetMethodAttributesUsedTypes(method, language));
 			}
-			foreach (ParameterDefinition parameter in method.Parameters)
+			foreach (ParameterDefinition parameter in method.get_Parameters())
 			{
-				typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(parameter.ParameterType));
+				typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(parameter.get_ParameterType()));
 			}
 			return typeReferences;
 		}
@@ -371,7 +371,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				IMemberDefinition memberDefinition = memberDefinitions.Dequeue();
 				if (!(memberDefinition is TypeDefinition))
 				{
-					if (!strs.TryGetValue(memberDefinition.DeclaringType.FullName, out decompiledType))
+					if (!strs.TryGetValue(memberDefinition.get_DeclaringType().get_FullName(), out decompiledType))
 					{
 						throw new Exception("Type missing from nested types decompilation cache.");
 					}
@@ -386,17 +386,17 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 						{
 							decompiledType.TypeContext.AutoImplementedEvents.Add(eventDefinition);
 						}
-						if (eventDefinition.AddMethod != null)
+						if (eventDefinition.get_AddMethod() != null)
 						{
-							this.DecompileMember(eventDefinition.AddMethod, language, decompiledType);
+							this.DecompileMember(eventDefinition.get_AddMethod(), language, decompiledType);
 						}
-						if (eventDefinition.RemoveMethod != null)
+						if (eventDefinition.get_RemoveMethod() != null)
 						{
-							this.DecompileMember(eventDefinition.RemoveMethod, language, decompiledType);
+							this.DecompileMember(eventDefinition.get_RemoveMethod(), language, decompiledType);
 						}
-						if (eventDefinition.InvokeMethod != null)
+						if (eventDefinition.get_InvokeMethod() != null)
 						{
-							this.DecompileMember(eventDefinition.InvokeMethod, language, decompiledType);
+							this.DecompileMember(eventDefinition.get_InvokeMethod(), language, decompiledType);
 						}
 					}
 					if (!(memberDefinition is PropertyDefinition))
@@ -428,7 +428,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				else
 				{
 					TypeDefinition typeDefinition = memberDefinition as TypeDefinition;
-					strs.Add(typeDefinition.FullName, new DecompiledType(typeDefinition));
+					strs.Add(typeDefinition.get_FullName(), new DecompiledType(typeDefinition));
 					foreach (IMemberDefinition typeMembersToDecompile in Utilities.GetTypeMembersToDecompile(typeDefinition))
 					{
 						memberDefinitions.Enqueue(typeMembersToDecompile);
@@ -445,15 +445,15 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private ICollection<TypeReference> GetPropertyTypesDependingOn(PropertyDefinition property, ILanguage language)
 		{
 			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(property.PropertyType));
+			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(property.get_PropertyType()));
 			typeReferences.UnionWith(AttributesUtilities.GetPropertyAttributesUsedTypes(property, language));
-			if (property.GetMethod != null)
+			if (property.get_GetMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(property.GetMethod, language, false));
+				typeReferences.UnionWith(this.GetMethodTypesDependingOn(property.get_GetMethod(), language, false));
 			}
-			if (property.SetMethod != null)
+			if (property.get_SetMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(property.SetMethod, language, false));
+				typeReferences.UnionWith(this.GetMethodTypesDependingOn(property.get_SetMethod(), language, false));
 			}
 			return typeReferences;
 		}
@@ -462,7 +462,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		{
 			DecompiledType decompiledType;
 			TypeSpecificContext typeContextFromCache;
-			if (!decompiledTypes.TryGetValue(type.FullName, out decompiledType))
+			if (!decompiledTypes.TryGetValue(type.get_FullName(), out decompiledType))
 			{
 				throw new Exception("Decompiled type not found in decompiled types cache.");
 			}
@@ -494,38 +494,38 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 						continue;
 					}
 					typeReferences.UnionWith(decompiledMember.Value.Context.AnalysisResults.TypesDependingOn);
-					if (decompiledMember.Value.Context.Method == null || decompiledMember.Value.Context.Method.Body == null || !decompiledMember.Value.Context.Method.Body.HasVariables)
+					if (decompiledMember.Value.Context.Method == null || decompiledMember.Value.Context.Method.get_Body() == null || !decompiledMember.Value.Context.Method.get_Body().get_HasVariables())
 					{
 						continue;
 					}
-					foreach (VariableDefinition variable in decompiledMember.Value.Context.Method.Body.Variables)
+					foreach (VariableDefinition variable in decompiledMember.Value.Context.Method.get_Body().get_Variables())
 					{
-						if (typeReferences.Contains(variable.VariableType))
+						if (typeReferences.Contains(variable.get_VariableType()))
 						{
 							continue;
 						}
-						typeReferences.Add(variable.VariableType);
+						typeReferences.Add(variable.get_VariableType());
 					}
 				}
-				if (value.Type.BaseType != null)
+				if (value.Type.get_BaseType() != null)
 				{
-					typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(value.Type.BaseType));
+					typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(value.Type.get_BaseType()));
 				}
-				if (value.Type.HasGenericParameters)
+				if (value.Type.get_HasGenericParameters())
 				{
-					foreach (GenericParameter genericParameter in value.Type.GenericParameters)
+					foreach (GenericParameter genericParameter in value.Type.get_GenericParameters())
 					{
-						if (!genericParameter.HasConstraints)
+						if (!genericParameter.get_HasConstraints())
 						{
 							continue;
 						}
-						foreach (TypeReference constraint in genericParameter.Constraints)
+						foreach (TypeReference constraint in genericParameter.get_Constraints())
 						{
 							typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(constraint));
 						}
 					}
 				}
-				foreach (TypeReference @interface in value.Type.Interfaces)
+				foreach (TypeReference @interface in value.Type.get_Interfaces())
 				{
 					typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(@interface));
 				}
@@ -564,20 +564,20 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			while (typeDefinitions.Count > 0)
 			{
 				TypeDefinition typeDefinition = typeDefinitions.Dequeue();
-				if (typeDefinition.BaseType != null)
+				if (typeDefinition.get_BaseType() != null)
 				{
-					TypeDefinition typeDefinition1 = typeDefinition.BaseType.Resolve();
-					if (typeDefinition1 != null && (typeDefinition1.IsPublic || typeDefinition1.Module.Assembly == type.Module.Assembly))
+					TypeDefinition typeDefinition1 = typeDefinition.get_BaseType().Resolve();
+					if (typeDefinition1 != null && (typeDefinition1.get_IsPublic() || (object)typeDefinition1.get_Module().get_Assembly() == (object)type.get_Module().get_Assembly()))
 					{
 						typeDefinitions.Enqueue(typeDefinition1);
 					}
 				}
-				if (typeDefinition.HasInterfaces)
+				if (typeDefinition.get_HasInterfaces())
 				{
-					foreach (TypeReference @interface in typeDefinition.Interfaces)
+					foreach (TypeReference @interface in typeDefinition.get_Interfaces())
 					{
 						TypeDefinition typeDefinition2 = @interface.Resolve();
-						if (typeDefinition2 == null || !typeDefinition2.IsPublic && typeDefinition2.Module.Assembly != type.Module.Assembly)
+						if (typeDefinition2 == null || !typeDefinition2.get_IsPublic() && (object)typeDefinition2.get_Module().get_Assembly() != (object)type.get_Module().get_Assembly())
 						{
 							continue;
 						}
@@ -585,7 +585,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					}
 				}
 				List<FieldDefinition> fieldDefinitions = null;
-				if (decompiledTypes.TryGetValue(typeDefinition.FullName, out decompiledType))
+				if (decompiledTypes.TryGetValue(typeDefinition.get_FullName(), out decompiledType))
 				{
 					fieldDefinitions = new List<FieldDefinition>(decompiledType.TypeContext.GetFieldToPropertyMap(language).Keys);
 				}
@@ -598,32 +598,32 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					if (typeMember is PropertyDefinition)
 					{
 						PropertyDefinition propertyDefinition = typeMember as PropertyDefinition;
-						if (propertyDefinition.GetMethod != null && (!propertyDefinition.GetMethod.IsPrivate || propertyDefinition.DeclaringType == type) && !strs.Contains(propertyDefinition.Name))
+						if (propertyDefinition.get_GetMethod() != null && (!propertyDefinition.get_GetMethod().get_IsPrivate() || (object)propertyDefinition.get_DeclaringType() == (object)type) && !strs.Contains(propertyDefinition.get_Name()))
 						{
-							strs.Add(propertyDefinition.Name);
+							strs.Add(propertyDefinition.get_Name());
 						}
-						if (propertyDefinition.SetMethod != null && (!propertyDefinition.SetMethod.IsPrivate || propertyDefinition.DeclaringType == type) && !strs.Contains(propertyDefinition.Name))
+						if (propertyDefinition.get_SetMethod() != null && (!propertyDefinition.get_SetMethod().get_IsPrivate() || (object)propertyDefinition.get_DeclaringType() == (object)type) && !strs.Contains(propertyDefinition.get_Name()))
 						{
-							strs.Add(propertyDefinition.Name);
+							strs.Add(propertyDefinition.get_Name());
 						}
 					}
 					if (typeMember is FieldDefinition)
 					{
 						FieldDefinition fieldDefinition = typeMember as FieldDefinition;
-						if ((!fieldDefinition.IsPrivate || fieldDefinition.DeclaringType == type) && !strs.Contains(fieldDefinition.Name))
+						if ((!fieldDefinition.get_IsPrivate() || (object)fieldDefinition.get_DeclaringType() == (object)type) && !strs.Contains(fieldDefinition.get_Name()))
 						{
-							strs.Add(fieldDefinition.Name);
+							strs.Add(fieldDefinition.get_Name());
 						}
 					}
-					if (typeMember is EventDefinition && !strs.Contains(typeMember.Name))
+					if (typeMember is EventDefinition && !strs.Contains(typeMember.get_Name()))
 					{
-						strs.Add(typeMember.Name);
+						strs.Add(typeMember.get_Name());
 					}
-					if (!(typeMember is TypeDefinition) || strs.Contains(typeMember.Name))
+					if (!(typeMember is TypeDefinition) || strs.Contains(typeMember.get_Name()))
 					{
 						continue;
 					}
-					strs.Add(typeMember.Name);
+					strs.Add(typeMember.get_Name());
 				}
 			}
 			return strs;
@@ -634,11 +634,11 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			ICollection<string> strs = new HashSet<string>();
 			foreach (TypeReference declaringType in typesDependingOn)
 			{
-				while (declaringType.IsNested)
+				while (declaringType.get_IsNested())
 				{
-					declaringType = declaringType.DeclaringType;
+					declaringType = declaringType.get_DeclaringType();
 				}
-				string @namespace = declaringType.Namespace;
+				string @namespace = declaringType.get_Namespace();
 				if (!(@namespace != String.Empty) || !(@namespace != currentNamespace) || strs.Contains(@namespace))
 				{
 					continue;
@@ -718,7 +718,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		private void RemoveBaseCtorInvocationStatements(CachedDecompiledMember decompiledMember, DecompiledType decompiledType)
 		{
 			MethodSpecificContext context = decompiledMember.Member.Context;
-			if (context == null || !context.Method.IsConstructor || context.Method.IsStatic || context.CtorInvokeExpression == null)
+			if (context == null || !context.Method.get_IsConstructor() || context.Method.get_IsStatic() || context.CtorInvokeExpression == null)
 			{
 				return;
 			}

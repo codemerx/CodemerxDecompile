@@ -52,19 +52,19 @@ namespace Telerik.JustDecompiler.Steps
 			AssignmentType assignmentType;
 			bool flag;
 			int indexOfCtorCall = 0;
-			if (this.context.MethodContext.Method.IsConstructor)
+			if (this.context.MethodContext.Method.get_IsConstructor())
 			{
 				indexOfCtorCall = this.GetIndexOfCtorCall(block) + 1;
 			}
 			int num = 0;
-			while (num < this.methodVariables.Count)
+			while (num < this.methodVariables.get_Count())
 			{
-				bool flag1 = this.context.MethodContext.VariableAssignmentData.TryGetValue(this.methodVariables[num], out assignmentType);
+				bool flag1 = this.context.MethodContext.VariableAssignmentData.TryGetValue(this.methodVariables.get_Item(num), out assignmentType);
 				if (flag1 && assignmentType == AssignmentType.NotUsed)
 				{
 					indexOfCtorCall--;
 				}
-				else if (!this.variableReferences.TryGetValue(this.methodVariables[num], out flag) || flag && (!flag1 || assignmentType != AssignmentType.NotAssigned))
+				else if (!this.variableReferences.TryGetValue(this.methodVariables.get_Item(num), out flag) || flag && (!flag1 || assignmentType != AssignmentType.NotAssigned))
 				{
 					this.InsertVariableDeclaration(block, indexOfCtorCall, num);
 				}
@@ -79,25 +79,25 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void InsertVariableDeclaration(BlockStatement block, int insertIndex, int variableIndex)
 		{
-			block.AddStatementAt(insertIndex, new ExpressionStatement(new VariableDeclarationExpression(this.methodVariables[variableIndex], null)));
+			block.AddStatementAt(insertIndex, new ExpressionStatement(new VariableDeclarationExpression(this.methodVariables.get_Item(variableIndex), null)));
 		}
 
 		private void InsertVariableDeclarationAndAssignment(BlockStatement block, int insertIndex, int variableIndex)
 		{
-			Expression defaultValueExpression = this.methodVariables[variableIndex].VariableType.GetDefaultValueExpression(this.typeSystem);
+			Expression defaultValueExpression = this.methodVariables.get_Item(variableIndex).get_VariableType().GetDefaultValueExpression(this.typeSystem);
 			if (defaultValueExpression == null)
 			{
 				this.InsertVariableDeclaration(block, insertIndex, variableIndex);
 				return;
 			}
-			BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, new VariableDeclarationExpression(this.methodVariables[variableIndex], null), defaultValueExpression, this.typeSystem, null, false);
+			BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, new VariableDeclarationExpression(this.methodVariables.get_Item(variableIndex), null), defaultValueExpression, this.typeSystem, null, false);
 			block.AddStatementAt(insertIndex, new ExpressionStatement(binaryExpression));
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
 			this.context = context;
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.methodVariables = new Mono.Collections.Generic.Collection<VariableDefinition>();
 			foreach (VariableDefinition variable in context.MethodContext.Variables)
 			{
@@ -169,7 +169,7 @@ namespace Telerik.JustDecompiler.Steps
 			for (int i = 0; i < node.Arguments.Count; i++)
 			{
 				UnaryExpression item = node.Arguments[i] as UnaryExpression;
-				if (item == null || item.Operator != UnaryOperator.AddressReference || item.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || !methodDefinition.Parameters[i].IsOutParameter())
+				if (item == null || item.Operator != UnaryOperator.AddressReference || item.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || !methodDefinition.get_Parameters().get_Item(i).IsOutParameter())
 				{
 					this.Visit(node.Arguments[i]);
 				}

@@ -107,19 +107,19 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		private int CountConstraints(GenericParameter parameter)
 		{
 			int count = 0;
-			if (parameter.HasConstraints)
+			if (parameter.get_HasConstraints())
 			{
-				count += parameter.Constraints.Count;
+				count += parameter.get_Constraints().get_Count();
 			}
-			if (parameter.HasDefaultConstructorConstraint)
-			{
-				count++;
-			}
-			if (parameter.HasReferenceTypeConstraint)
+			if (parameter.get_HasDefaultConstructorConstraint())
 			{
 				count++;
 			}
-			if (parameter.HasNotNullableValueTypeConstraint)
+			if (parameter.get_HasReferenceTypeConstraint())
+			{
+				count++;
+			}
+			if (parameter.get_HasNotNullableValueTypeConstraint())
 			{
 				count++;
 			}
@@ -154,7 +154,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			}
 			if (!this.isWritingComment)
 			{
-				base.WriteAndMapParameterToCode(() => this.Write(str), reference.Index);
+				base.WriteAndMapParameterToCode(() => this.Write(str), reference.get_Index());
 			}
 			else
 			{
@@ -198,12 +198,12 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				this.Write(base.GetVariableName(variable));
 			}
 			this.WriteAsBetweenSpaces();
-			this.WriteReferenceAndNamespaceIfInCollision(variable.VariableType);
+			this.WriteReferenceAndNamespaceIfInCollision(variable.get_VariableType());
 		}
 
 		private string GetCastMethod(TypeReference type)
 		{
-			string name = type.Name;
+			string name = type.get_Name();
 			if (name != null)
 			{
 				if (name == "Decimal")
@@ -287,7 +287,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		private object GetDecrementedValue(LiteralExpression expression)
 		{
-			string name = expression.ExpressionType.Name;
+			string name = expression.ExpressionType.get_Name();
 			if (name != null)
 			{
 				if (name == "Byte")
@@ -345,11 +345,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			{
 				if (codeNodeType == CodeNodeType.FieldReferenceExpression)
 				{
-					return ((FieldReferenceExpression)expression).Field.FieldType;
+					return ((FieldReferenceExpression)expression).Field.get_FieldType();
 				}
 				if (codeNodeType == CodeNodeType.PropertyReferenceExpression)
 				{
-					return ((PropertyReferenceExpression)expression).Property.PropertyType;
+					return ((PropertyReferenceExpression)expression).Property.get_PropertyType();
 				}
 			}
 			else if (codeNodeType == CodeNodeType.MethodInvocationExpression)
@@ -357,12 +357,12 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				MethodReferenceExpression methodExpression = ((MethodInvocationExpression)expression).MethodExpression;
 				if (methodExpression.CodeNodeType == CodeNodeType.MethodReferenceExpression)
 				{
-					return methodExpression.Method.ReturnType;
+					return methodExpression.Method.get_ReturnType();
 				}
 			}
 			else if (codeNodeType == CodeNodeType.VariableReferenceExpression)
 			{
-				return ((VariableReferenceExpression)expression).Variable.VariableType;
+				return ((VariableReferenceExpression)expression).Variable.get_VariableType();
 			}
 			return null;
 		}
@@ -436,7 +436,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				UnaryExpression unaryExpression = (UnaryExpression)incrementExpression;
 				if (unaryExpression.Operator == UnaryOperator.PostDecrement || unaryExpression.Operator == UnaryOperator.PreDecrement)
 				{
-					return new LiteralExpression((object)-1, base.MethodContext.Method.Module.TypeSystem, null);
+					return new LiteralExpression((object)-1, base.MethodContext.Method.get_Module().get_TypeSystem(), null);
 				}
 			}
 			if (incrementExpression.CodeNodeType == CodeNodeType.BinaryExpression && (incrementExpression as BinaryExpression).Operator == BinaryOperator.SubtractAssign)
@@ -478,13 +478,13 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		private Mono.Collections.Generic.Collection<TypeReference> GetGenericExtensionMethodArguments(GenericInstanceMethod genericMethod)
 		{
-			TypeReference parameterType = genericMethod.ElementMethod.Parameters[0].ParameterType;
-			if (!parameterType.IsGenericInstance && !parameterType.IsGenericParameter)
+			TypeReference parameterType = genericMethod.get_ElementMethod().get_Parameters().get_Item(0).get_ParameterType();
+			if (!parameterType.get_IsGenericInstance() && !parameterType.get_IsGenericParameter())
 			{
-				return genericMethod.GenericArguments;
+				return genericMethod.get_GenericArguments();
 			}
 			HashSet<GenericParameter> genericParameters = new HashSet<GenericParameter>();
-			if (!parameterType.IsGenericInstance)
+			if (!parameterType.get_IsGenericInstance())
 			{
 				genericParameters.Add(parameterType as GenericParameter);
 			}
@@ -494,11 +494,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				genericInstanceTypes.Enqueue(parameterType as GenericInstanceType);
 				while (genericInstanceTypes.Count > 0)
 				{
-					foreach (TypeReference genericArgument in genericInstanceTypes.Dequeue().GenericArguments)
+					foreach (TypeReference genericArgument in genericInstanceTypes.Dequeue().get_GenericArguments())
 					{
-						if (!genericArgument.IsGenericInstance)
+						if (!genericArgument.get_IsGenericInstance())
 						{
-							if (!genericArgument.IsGenericParameter)
+							if (!genericArgument.get_IsGenericParameter())
 							{
 								continue;
 							}
@@ -511,15 +511,15 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 					}
 				}
 			}
-			Mono.Collections.Generic.Collection<TypeReference> typeReferences = new Mono.Collections.Generic.Collection<TypeReference>();
-			for (int i = 0; i < genericMethod.ElementMethod.GenericParameters.Count; i++)
+			Mono.Collections.Generic.Collection<TypeReference> collection = new Mono.Collections.Generic.Collection<TypeReference>();
+			for (int i = 0; i < genericMethod.get_ElementMethod().get_GenericParameters().get_Count(); i++)
 			{
-				if (!genericParameters.Contains(genericMethod.ElementMethod.GenericParameters[i]))
+				if (!genericParameters.Contains(genericMethod.get_ElementMethod().get_GenericParameters().get_Item(i)))
 				{
-					typeReferences.Add(genericMethod.GenericArguments[i]);
+					collection.Add(genericMethod.get_GenericArguments().get_Item(i));
 				}
 			}
-			return typeReferences;
+			return collection;
 		}
 
 		private string GetGenericNameFromMemberReference(TypeReference type)
@@ -542,7 +542,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			ICollection<ImplementedMember> implementedMembers1 = new List<ImplementedMember>();
 			foreach (ImplementedMember implementedMember in implementedMembers)
 			{
-				if (this.TypeContext.ExplicitlyImplementedMembers.Contains(implementedMember.DeclaringType, implementedMember.Member.FullName))
+				if (this.TypeContext.ExplicitlyImplementedMembers.Contains(implementedMember.DeclaringType, implementedMember.Member.get_FullName()))
 				{
 					continue;
 				}
@@ -598,7 +598,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			{
 				return false;
 			}
-			if (typeDefinition.BaseType != null && typeDefinition.BaseType.Name == "MulticastDelegate")
+			if (typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_Name() == "MulticastDelegate")
 			{
 				return true;
 			}
@@ -626,11 +626,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void PostWriteGenericParametersConstraints(IGenericDefinition generic)
 		{
-			if (!generic.HasGenericParameters)
+			if (!generic.get_HasGenericParameters())
 			{
 				return;
 			}
-			foreach (GenericParameter genericParameter in generic.GenericParameters)
+			foreach (GenericParameter genericParameter in generic.get_GenericParameters())
 			{
 				if (!base.IsTypeParameterRedeclaration(genericParameter) || !base.ShouldWriteConstraintsAsComment(genericParameter))
 				{
@@ -639,7 +639,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				this.WriteLine();
 				this.StartWritingComment();
 				this.WriteToken("Of ");
-				this.WriteReference(genericParameter.Name, null);
+				this.WriteReference(genericParameter.get_Name(), null);
 				this.WriteGenericParameterConstraints(genericParameter);
 				this.EndWritingComment();
 			}
@@ -647,7 +647,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void PostWriteMethodReturnType(MethodDefinition method)
 		{
-			if (method.ReturnType != null && method.ReturnType.FullName != "System.Void")
+			if (method.get_ReturnType() != null && method.get_ReturnType().get_FullName() != "System.Void")
 			{
 				this.WriteAsBetweenSpaces();
 				base.AttributeWriter.WriteMemberReturnValueAttributes(method);
@@ -855,7 +855,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		{
 			if (base.IsReferenceFromMscorlib(type))
 			{
-				string name = type.Name;
+				string name = type.get_Name();
 				if (name != null)
 				{
 					if (name == "Decimal")
@@ -933,7 +933,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override bool TypeSupportsExplicitStaticMembers(TypeDefinition type)
 		{
-			return !type.IsStaticClass;
+			return !type.get_IsStaticClass();
 		}
 
 		private void VisitAddressOfExpression(UnaryExpression node)
@@ -997,7 +997,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		public override void VisitArrayVariableDeclarationExpression(ArrayVariableDeclarationExpression node)
 		{
-			if ((node.Variable.Variable.VariableType.IsOptionalModifier || node.Variable.Variable.VariableType.IsRequiredModifier) && !this.isWritingComment)
+			if ((node.Variable.Variable.get_VariableType().get_IsOptionalModifier() || node.Variable.Variable.get_VariableType().get_IsRequiredModifier()) && !this.isWritingComment)
 			{
 				this.StartWritingComment();
 				this.VisitVariableDeclarationExpression(node.Variable);
@@ -1081,7 +1081,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		public override void VisitCatchClause(CatchClause node)
 		{
 			this.WriteKeyword(base.KeyWordWriter.Catch);
-			if (node.Type.FullName != "System.Object")
+			if (node.Type.get_FullName() != "System.Object")
 			{
 				this.WriteSpace();
 				if (node.Variable == null)
@@ -1191,7 +1191,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				if (node.UnresolvedReferenceForAmbiguousCastToObject != null)
 				{
 					Telerik.JustDecompiler.Common.Extensions.ResolveToOverloadedEqualityOperator(node.Expression.ExpressionType, out typeReference);
-					this.WriteNotResolvedReference(castMethod, typeReference, String.Format("The cast to object might be unnecessary. Please, locate the assembly where \"{0}\" is defined.", typeReference.Name));
+					this.WriteNotResolvedReference(castMethod, typeReference, String.Format("The cast to object might be unnecessary. Please, locate the assembly where \"{0}\" is defined.", typeReference.get_Name()));
 				}
 				else
 				{
@@ -1382,7 +1382,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
 			GenericInstanceMethod method = node.MethodExpression.Method as GenericInstanceMethod;
-			if (node.MethodExpression.Method.HasThis || node.Arguments.Count == 0 || method == null || node.MethodExpression.MethodDefinition == null || !node.MethodExpression.MethodDefinition.IsExtensionMethod)
+			if (node.MethodExpression.Method.get_HasThis() || node.Arguments.Count == 0 || method == null || node.MethodExpression.MethodDefinition == null || !node.MethodExpression.MethodDefinition.get_IsExtensionMethod())
 			{
 				base.VisitMethodInvocationExpression(node);
 				return;
@@ -1428,7 +1428,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		{
 			this.WriteKeyword(base.KeyWordWriter.Fire);
 			this.WriteSpace();
-			this.WriteReference(node.Event.Name, node.Event);
+			this.WriteReference(node.Event.get_Name(), node.Event);
 			base.EnterMethodInvocation(node.InvokeMethodReference);
 			this.Write("(");
 			base.VisitMethodParameters(node.Arguments);
@@ -1537,7 +1537,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			if ((node.Variable.VariableType.IsOptionalModifier || node.Variable.VariableType.IsRequiredModifier) && !this.isWritingComment)
+			if ((node.Variable.get_VariableType().get_IsOptionalModifier() || node.Variable.get_VariableType().get_IsRequiredModifier()) && !this.isWritingComment)
 			{
 				this.StartWritingComment();
 				this.VisitVariableDeclarationExpression(node);
@@ -1546,7 +1546,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			}
 			this.WriteDim();
 			VariableDefinition variable = node.Variable;
-			if (!variable.VariableType.ContainsAnonymousType())
+			if (!variable.get_VariableType().ContainsAnonymousType())
 			{
 				base.VisitVariableDeclarationExpression(node);
 				return;
@@ -1618,7 +1618,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		protected override void WriteArrayDimensions(ExpressionCollection dimensions, TypeReference arrayType, bool isInitializerPresent)
 		{
 			ExpressionCollection binaryExpression = dimensions.Clone();
-			TypeSystem typeSystem = this.ModuleContext.Module.TypeSystem;
+			TypeSystem typeSystem = this.ModuleContext.Module.get_TypeSystem();
 			for (int i = 0; i < binaryExpression.Count; i++)
 			{
 				if (!(binaryExpression[i] is LiteralExpression))
@@ -1643,7 +1643,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void WriteBaseConstructorInvokation(MethodInvocationExpression baseConstructorInvokation)
 		{
-			if (!base.MethodContext.Method.IsStatic)
+			if (!base.MethodContext.Method.get_IsStatic())
 			{
 				this.WriteLine();
 				this.Indent();
@@ -1717,7 +1717,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void WriteEmptyMethodEndOfStatement(MethodDefinition method)
 		{
-			if (!method.IsAbstract)
+			if (!method.get_IsAbstract())
 			{
 				this.WriteLine();
 				this.WriteSpecialEndBlock(base.GetMethodKeyWord(method));
@@ -1845,10 +1845,10 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void WriteEventAddOnParameters(EventDefinition @event)
 		{
-			if (@event.AddMethod.Parameters.Any<ParameterDefinition>())
+			if (@event.get_AddMethod().get_Parameters().Any<ParameterDefinition>())
 			{
 				this.Write("(");
-				this.WriteParameters(@event.AddMethod);
+				this.WriteParameters(@event.get_AddMethod());
 				this.Write(")");
 			}
 		}
@@ -1873,10 +1873,10 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void WriteEventRemoveOnParameters(EventDefinition @event)
 		{
-			if (@event.RemoveMethod.Parameters.Any<ParameterDefinition>())
+			if (@event.get_RemoveMethod().get_Parameters().Any<ParameterDefinition>())
 			{
 				this.Write("(");
-				this.WriteParameters(@event.RemoveMethod);
+				this.WriteParameters(@event.get_RemoveMethod());
 				this.Write(")");
 			}
 		}
@@ -1889,12 +1889,12 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				return;
 			}
 			string eventName = this.GetEventName(@event);
-			this.WriteTypeAndName(@event.EventType, eventName, @event);
+			this.WriteTypeAndName(@event.get_EventType(), eventName, @event);
 		}
 
 		protected override void WriteFieldDeclaration(FieldDefinition field)
 		{
-			if (field.FieldType.IsOptionalModifier || field.FieldType.IsRequiredModifier)
+			if (field.get_FieldType().get_IsOptionalModifier() || field.get_FieldType().get_IsRequiredModifier())
 			{
 				this.StartWritingComment();
 				base.WriteFieldDeclaration(field);
@@ -1932,11 +1932,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			{
 				list = implementedMembers.Where<ImplementedMember>((ImplementedMember member) => {
 					TypeDefinition typeDefinition = member.DeclaringType.Resolve();
-					if (typeDefinition == null || !typeDefinition.IsInterface)
+					if (typeDefinition == null || !typeDefinition.get_IsInterface())
 					{
 						return true;
 					}
-					return !typeDefinition.IsWindowsRuntime;
+					return !typeDefinition.get_IsWindowsRuntime();
 				}).ToList<ImplementedMember>();
 				if (list.Count == 0)
 				{
@@ -1994,7 +1994,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		protected override void WriteInterfacesInheritColon(TypeDefinition type)
 		{
 			this.WriteLine();
-			if (!type.IsInterface)
+			if (!type.get_IsInterface())
 			{
 				this.WriteKeyword(base.KeyWordWriter.Implements);
 			}
@@ -2009,7 +2009,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		{
 			if (member is ParameterReference)
 			{
-				this.formatter.Write(((ParameterReference)member).Name);
+				this.formatter.Write(((ParameterReference)member).get_Name());
 				return;
 			}
 			if (member is TypeReference)
@@ -2026,14 +2026,14 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		protected override void WriteMethodDeclaration(MethodDefinition method, bool writeDocumentation)
 		{
 			bool flag = false;
-			if (method.ReturnType.IsOptionalModifier || method.ReturnType.IsRequiredModifier)
+			if (method.get_ReturnType().get_IsOptionalModifier() || method.get_ReturnType().get_IsRequiredModifier())
 			{
 				flag = true;
 			}
-			for (int i = 0; i < method.Parameters.Count && !flag; i++)
+			for (int i = 0; i < method.get_Parameters().get_Count() && !flag; i++)
 			{
-				ParameterDefinition item = method.Parameters[i];
-				if (item.ParameterType.IsOptionalModifier || item.ParameterType.IsRequiredModifier)
+				ParameterDefinition item = method.get_Parameters().get_Item(i);
+				if (item.get_ParameterType().get_IsOptionalModifier() || item.get_ParameterType().get_IsRequiredModifier())
 				{
 					flag = true;
 				}
@@ -2113,19 +2113,19 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 				this.WriteToken(")");
 			}
 			this.WriteAsBetweenSpaces();
-			base.AttributeWriter.WriteMemberReturnValueAttributes(property.GetMethod);
-			this.WriteReferenceAndNamespaceIfInCollision(property.PropertyType);
+			base.AttributeWriter.WriteMemberReturnValueAttributes(property.get_GetMethod());
+			this.WriteReferenceAndNamespaceIfInCollision(property.get_PropertyType());
 		}
 
 		protected override void WriteReadOnlyWriteOnlyProperty(PropertyDefinition property)
 		{
-			if (property.GetMethod == null)
+			if (property.get_GetMethod() == null)
 			{
 				this.WriteKeyword(base.KeyWordWriter.WriteOnly);
 				this.WriteSpace();
 				return;
 			}
-			if (property.SetMethod != null)
+			if (property.get_SetMethod() != null)
 			{
 				return;
 			}
@@ -2160,7 +2160,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override string WriteTypeDeclaration(TypeDefinition type, bool isPartial = false)
 		{
-			if (type.IsNested && type.IsStaticClass)
+			if (type.get_IsNested() && type.get_IsStaticClass())
 			{
 				throw new Exception("VB.NET does not support nested modules. Please, try using other language.");
 			}
@@ -2170,13 +2170,13 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 		protected override void WriteTypeInterfaces(TypeDefinition type, bool isPartial, bool baseTypeWritten)
 		{
 			List<TypeReference> typeReferences;
-			typeReferences = (this.TypeContext.CurrentType != type || !this.TypeContext.IsWinRTImplementation ? type.Interfaces.ToList<TypeReference>() : type.Interfaces.Where<TypeReference>((TypeReference @interface) => {
+			typeReferences = ((object)this.TypeContext.CurrentType != (object)type || !this.TypeContext.IsWinRTImplementation ? type.get_Interfaces().ToList<TypeReference>() : type.get_Interfaces().Where<TypeReference>((TypeReference @interface) => {
 				TypeDefinition typeDefinition = @interface.Resolve();
 				if (typeDefinition == null)
 				{
 					return true;
 				}
-				return !typeDefinition.IsWindowsRuntime;
+				return !typeDefinition.get_IsWindowsRuntime();
 			}).ToList<TypeReference>());
 			if (typeReferences.Count > 0)
 			{
@@ -2204,12 +2204,12 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		protected override void WriteTypeSpecification(TypeSpecification typeSpecification, int startingArgument = 0)
 		{
-			if (!typeSpecification.IsOptionalModifier && !typeSpecification.IsRequiredModifier || this.isWritingComment)
+			if (!typeSpecification.get_IsOptionalModifier() && !typeSpecification.get_IsRequiredModifier() || this.isWritingComment)
 			{
 				base.WriteTypeSpecification(typeSpecification, startingArgument);
 				return;
 			}
-			this.WriteReferenceAndNamespaceIfInCollision(typeSpecification.ElementType);
+			this.WriteReferenceAndNamespaceIfInCollision(typeSpecification.get_ElementType());
 		}
 
 		protected override void WriteTypeStaticKeywordAndSpace()

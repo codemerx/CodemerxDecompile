@@ -45,32 +45,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				if (this.Target is ArgumentReferenceExpression)
 				{
 					TypeReference typeReference = (this.Target as ArgumentReferenceExpression).ExpressionType;
-					if (typeReference.IsByReference)
+					if (typeReference.get_IsByReference())
 					{
-						expressionType = (typeReference as ByReferenceType).ElementType;
+						expressionType = (typeReference as ByReferenceType).get_ElementType();
 					}
 				}
-				if (expressionType.IsOptionalModifier)
+				if (expressionType.get_IsOptionalModifier())
 				{
-					expressionType = (expressionType as OptionalModifierType).ElementType;
+					expressionType = (expressionType as OptionalModifierType).get_ElementType();
 				}
-				if (expressionType.IsRequiredModifier)
+				if (expressionType.get_IsRequiredModifier())
 				{
-					expressionType = (expressionType as RequiredModifierType).ElementType;
+					expressionType = (expressionType as RequiredModifierType).get_ElementType();
 				}
-				if (expressionType.IsArray)
+				if (expressionType.get_IsArray())
 				{
-					return (expressionType as ArrayType).ElementType;
+					return (expressionType as ArrayType).get_ElementType();
 				}
-				if (expressionType.FullName == "System.Array")
+				if (expressionType.get_FullName() == "System.Array")
 				{
-					return expressionType.Module.TypeSystem.Object;
+					return expressionType.get_Module().get_TypeSystem().get_Object();
 				}
-				if (expressionType.FullName != "System.String")
+				if (expressionType.get_FullName() != "System.String")
 				{
 					throw new ArgumentOutOfRangeException("Target of array indexer expression is not an array.");
 				}
-				return expressionType.Module.TypeSystem.Char;
+				return expressionType.get_Module().get_TypeSystem().get_Char();
 			}
 			set
 			{

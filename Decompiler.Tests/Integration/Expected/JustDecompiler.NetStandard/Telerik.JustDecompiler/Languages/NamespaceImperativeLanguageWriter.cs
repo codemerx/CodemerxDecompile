@@ -33,11 +33,11 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool CheckForSpecialName(TypeReference reference)
 		{
-			if (reference.HasGenericParameters)
+			if (reference.get_HasGenericParameters())
 			{
 				return false;
 			}
-			return reference.Name != this.ToTypeString(reference);
+			return reference.get_Name() != this.ToTypeString(reference);
 		}
 
 		protected abstract void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference);
@@ -50,7 +50,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		private string GetCurrentNamespace(TypeDefinition type)
 		{
-			return Utilities.GetOuterMostDeclaringType(type).Namespace;
+			return Utilities.GetOuterMostDeclaringType(type).get_Namespace();
 		}
 
 		public void WriteAssemblyAndModuleUsings()
@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Languages
 		protected override void WriteBodyInternal(IMemberDefinition member)
 		{
 			this.membersStack.Push(member);
-			this.currentNamespace = member.DeclaringType.Namespace;
+			this.currentNamespace = member.get_DeclaringType().get_Namespace();
 			base.WriteBodyInternal(member);
 			this.membersStack.Pop();
 		}
@@ -134,11 +134,11 @@ namespace Telerik.JustDecompiler.Languages
 			string empty = String.Empty;
 			if (forceWriteNamespace)
 			{
-				empty = reference.Namespace;
+				empty = reference.get_Namespace();
 			}
-			else if (reference.Namespace != this.currentNamespace)
+			else if (reference.get_Namespace() != this.currentNamespace)
 			{
-				empty = reference.Namespace;
+				empty = reference.get_Namespace();
 			}
 			if (this.ModuleContext.RenamedNamespacesMap.ContainsKey(empty))
 			{
@@ -183,11 +183,11 @@ namespace Telerik.JustDecompiler.Languages
 		public void WritePartialTypeAndNamespacesInternal(TypeDefinition type, Dictionary<string, ICollection<string>> fieldsToSkip = null)
 		{
 			this.writeNamespacesandUsings = true;
-			this.currentNamespace = type.Namespace;
+			this.currentNamespace = type.get_Namespace();
 			ICollection<string> item = null;
-			if (fieldsToSkip.ContainsKey(type.FullName))
+			if (fieldsToSkip.ContainsKey(type.get_FullName()))
 			{
-				item = fieldsToSkip[type.FullName];
+				item = fieldsToSkip[type.get_FullName()];
 			}
 			if (this.TypeContext.UsedNamespaces.Count<string>() > 0)
 			{
@@ -275,7 +275,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected override void WriteTypeInANewWriterIfNeeded(TypeDefinition type)
 		{
-			if (base.CurrentType == type)
+			if ((object)base.CurrentType == (object)type)
 			{
 				base.WriteType(type);
 				return;
@@ -289,7 +289,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected sealed override void WriteTypeNamespaceEnd(TypeDefinition type)
 		{
-			if (this.writeNamespacesandUsings && type.Namespace != String.Empty)
+			if (this.writeNamespacesandUsings && type.get_Namespace() != String.Empty)
 			{
 				this.WriteLine();
 				this.Outdent();
@@ -301,7 +301,7 @@ namespace Telerik.JustDecompiler.Languages
 		protected sealed override void WriteTypeNamespaceStart(TypeDefinition type)
 		{
 			this.currentNamespace = type.GetNamespace();
-			if (this.writeNamespacesandUsings && type.Namespace != String.Empty)
+			if (this.writeNamespacesandUsings && type.get_Namespace() != String.Empty)
 			{
 				this.WriteNamespaceDeclaration(this.currentNamespace);
 				this.Indent();

@@ -65,7 +65,7 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 			for (int i = 0; i < node.Arguments.Count; i++)
 			{
 				UnaryExpression item = node.Arguments[i] as UnaryExpression;
-				if (methodDefinition.Parameters[i].IsOutParameter() && (item != null && item.Operator == UnaryOperator.AddressReference && this.CheckExpression(item.Operand) || this.CheckExpression(node.Arguments[i])))
+				if (methodDefinition.get_Parameters().get_Item(i).IsOutParameter() && (item != null && item.Operator == UnaryOperator.AddressReference && this.CheckExpression(item.Operand) || this.CheckExpression(node.Arguments[i])))
 				{
 					this.searchResult = UsageFinderSearchResult.Assigned;
 					return;

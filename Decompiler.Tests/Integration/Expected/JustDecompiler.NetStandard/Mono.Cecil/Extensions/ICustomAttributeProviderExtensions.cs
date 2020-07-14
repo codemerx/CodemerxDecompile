@@ -16,22 +16,22 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (!attributeProvider.HasCustomAttributes)
+			if (!attributeProvider.get_HasCustomAttributes())
 			{
 				return false;
 			}
-			Collection<CustomAttribute>.Enumerator enumerator = attributeProvider.CustomAttributes.GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = attributeProvider.get_CustomAttributes().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					CustomAttribute current = enumerator.Current;
+					CustomAttribute current = enumerator.get_Current();
 					using (IEnumerator<string> enumerator1 = attributeTypes.GetEnumerator())
 					{
 						while (enumerator1.MoveNext())
 						{
 							string str = enumerator1.Current;
-							if (current.AttributeType.FullName != str)
+							if (current.get_AttributeType().get_FullName() != str)
 							{
 								continue;
 							}
@@ -44,7 +44,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}

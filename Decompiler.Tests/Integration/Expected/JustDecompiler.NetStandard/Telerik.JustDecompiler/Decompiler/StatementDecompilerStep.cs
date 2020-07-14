@@ -591,12 +591,12 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private bool IsUnconditionalJump(Instruction instruction)
 		{
-			Code code = instruction.OpCode.Code;
-			if (code == Code.Br)
+			Code code = instruction.get_OpCode().get_Code();
+			if (code == 55)
 			{
 				return true;
 			}
-			return code == Code.Br_S;
+			return code == 42;
 		}
 
 		private void MarkGoTosIfNotLoopEdge(ILogicalConstruct start, ILogicalConstruct end)
@@ -649,7 +649,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			this.contextGotoLabels = context.MethodContext.GotoLabels;
 			this.contextGotoStatements = context.MethodContext.GotoStatements;
 			this.theCFG = context.MethodContext.ControlFlowGraph;
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.logicalTree = context.MethodContext.LogicalConstructsTree;
 			this.expressions = context.MethodContext.Expressions;
 			body = (BlockStatement)this.ProcessLogicalConstruct(this.logicalTree, false)[0];
@@ -676,7 +676,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			// 
 			// Current member / type: System.Void Telerik.JustDecompiler.Decompiler.StatementDecompilerStep::ProcessCfgBlockLogicalConstruct(Telerik.JustDecompiler.Decompiler.LogicFlow.CFGBlockLogicalConstruct,System.Collections.Generic.List`1<Telerik.JustDecompiler.Ast.Statements.Statement>,System.Boolean,System.Boolean)
-			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\JustDecompiler.NetStandard.dll
+			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
 			// 
 			// Product version: 0.0.0.0
 			// Exception in: System.Void ProcessCfgBlockLogicalConstruct(Telerik.JustDecompiler.Decompiler.LogicFlow.CFGBlockLogicalConstruct,System.Collections.Generic.List<Telerik.JustDecompiler.Ast.Statements.Statement>,System.Boolean,System.Boolean)
@@ -792,7 +792,7 @@ namespace Telerik.JustDecompiler.Decompiler
 				{
 					ExceptionHandlingBlockCatch exceptionHandlingBlockCatch = filteringExceptionHandler as ExceptionHandlingBlockCatch;
 					BlockStatement item2 = (BlockStatement)this.ProcessLogicalConstruct(exceptionHandlingBlockCatch, gotoReachableConstruct)[0];
-					if (this.context.MethodContext.StackData.ExceptionHandlerStartToExceptionVariableMap.TryGetValue(exceptionHandlingBlockCatch.FirstBlock.TheBlock.First.Offset, out variableDefinition))
+					if (this.context.MethodContext.StackData.ExceptionHandlerStartToExceptionVariableMap.TryGetValue(exceptionHandlingBlockCatch.FirstBlock.TheBlock.First.get_Offset(), out variableDefinition))
 					{
 						variableDeclarationExpression = new VariableDeclarationExpression(variableDefinition, null);
 					}
@@ -984,7 +984,7 @@ namespace Telerik.JustDecompiler.Decompiler
 				}
 				LiteralExpression literalExpression = new LiteralExpression((object)key[key.Count - 1], this.typeSystem, null)
 				{
-					ExpressionType = this.context.MethodContext.Method.Module.TypeSystem.Int32
+					ExpressionType = this.context.MethodContext.Method.get_Module().get_TypeSystem().get_Int32()
 				};
 				if (conditionCases == null)
 				{

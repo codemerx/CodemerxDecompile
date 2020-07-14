@@ -19,13 +19,13 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			CodeNodeType codeNodeType = initializer.CodeNodeType;
 			if (codeNodeType == CodeNodeType.PropertyInitializerExpression)
 			{
-				return (initializer as PropertyInitializerExpression).Property.Name;
+				return (initializer as PropertyInitializerExpression).Property.get_Name();
 			}
 			if (codeNodeType != CodeNodeType.FieldInitializerExpression)
 			{
 				throw new ArgumentException("Expected field or property");
 			}
-			return (initializer as FieldInitializerExpression).Field.Name;
+			return (initializer as FieldInitializerExpression).Field.get_Name();
 		}
 
 		private bool IsObjectPropertyOrFieldAssignment(BinaryExpression assignment, Expression assignee)
@@ -91,20 +91,20 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 				if (binaryExpression.Left.CodeNodeType == CodeNodeType.PropertyReferenceExpression)
 				{
 					PropertyDefinition property = (binaryExpression.Left as PropertyReferenceExpression).Property;
-					if (!this.Visit(property.Name, strs))
+					if (!this.Visit(property.get_Name(), strs))
 					{
 						break;
 					}
-					propertyInitializerExpression = new PropertyInitializerExpression(property, property.PropertyType, binaryExpression.Left.UnderlyingSameMethodInstructions);
+					propertyInitializerExpression = new PropertyInitializerExpression(property, property.get_PropertyType(), binaryExpression.Left.UnderlyingSameMethodInstructions);
 				}
 				else if (binaryExpression.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 				{
 					FieldDefinition fieldDefinition = (binaryExpression.Left as FieldReferenceExpression).Field.Resolve();
-					if (!this.Visit(fieldDefinition.Name, strs))
+					if (!this.Visit(fieldDefinition.get_Name(), strs))
 					{
 						break;
 					}
-					propertyInitializerExpression = new FieldInitializerExpression(fieldDefinition, fieldDefinition.FieldType, binaryExpression.Left.UnderlyingSameMethodInstructions);
+					propertyInitializerExpression = new FieldInitializerExpression(fieldDefinition, fieldDefinition.get_FieldType(), binaryExpression.Left.UnderlyingSameMethodInstructions);
 				}
 				BinaryExpression binaryExpression1 = new BinaryExpression(BinaryOperator.Assign, propertyInitializerExpression, binaryExpression.Right.Clone(), this.typeSystem, null, false);
 				expressionCollection.Add(binaryExpression1);

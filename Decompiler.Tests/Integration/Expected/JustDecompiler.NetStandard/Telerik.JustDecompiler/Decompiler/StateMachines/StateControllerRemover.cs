@@ -66,7 +66,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				this.stateField = fieldDefinition;
 			}
-			else if (this.stateField != fieldDefinition)
+			else if ((object)this.stateField != (object)fieldDefinition)
 			{
 				return false;
 			}
@@ -75,9 +75,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		protected bool ContainsStateFieldLoad(InstructionBlock theBlock)
 		{
-			for (Instruction i = theBlock.First; i != theBlock.Last; i = i.Next)
+			for (Instruction i = theBlock.First; (object)i != (object)theBlock.Last; i = i.get_Next())
 			{
-				if (i.OpCode.Code == Code.Ldfld && ((FieldReference)i.Operand).Resolve() == this.stateField)
+				if (i.get_OpCode().get_Code() == 120 && (object)((FieldReference)i.get_Operand()).Resolve() == (object)this.stateField)
 				{
 					return true;
 				}
@@ -88,9 +88,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		private bool ContainsStateVariableSet(InstructionBlock theBlock)
 		{
 			VariableReference variableReference;
-			for (Instruction i = theBlock.First; i != theBlock.Last; i = i.Next)
+			for (Instruction i = theBlock.First; (object)i != (object)theBlock.Last; i = i.get_Next())
 			{
-				if (this.IsStloc(i) && this.TryGetVariableFromInstruction(i, out variableReference) && variableReference == this.stateVariable)
+				if (this.IsStloc(i) && this.TryGetVariableFromInstruction(i, out variableReference) && (object)variableReference == (object)this.stateVariable)
 				{
 					return true;
 				}
@@ -132,15 +132,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		protected bool GetStateFieldAndVariable()
 		{
-			for (Instruction i = this.theCFG.Blocks[this.firstControllerBlock].First; i != this.theCFG.Blocks[this.firstControllerBlock].Last; i = i.Next)
+			for (Instruction i = this.theCFG.Blocks[this.firstControllerBlock].First; (object)i != (object)this.theCFG.Blocks[this.firstControllerBlock].Last; i = i.get_Next())
 			{
-				if (i.OpCode.Code == Code.Ldfld)
+				if (i.get_OpCode().get_Code() == 120)
 				{
-					if (!this.CheckAndSaveStateField((FieldReference)i.Operand))
+					if (!this.CheckAndSaveStateField((FieldReference)i.get_Operand()))
 					{
 						return false;
 					}
-					this.TryGetVariableFromInstruction(i.Next, out this.stateVariable);
+					this.TryGetVariableFromInstruction(i.get_Next(), out this.stateVariable);
 					return true;
 				}
 			}
@@ -156,29 +156,29 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		protected bool IsBeqInstruction(Instruction theInstruction)
 		{
-			if (theInstruction.OpCode.Code == Code.Beq)
+			if (theInstruction.get_OpCode().get_Code() == 58)
 			{
 				return true;
 			}
-			return theInstruction.OpCode.Code == Code.Beq_S;
+			return theInstruction.get_OpCode().get_Code() == 45;
 		}
 
 		private bool IsBneInstruction(Instruction theInstruction)
 		{
-			if (theInstruction.OpCode.Code == Code.Bne_Un)
+			if (theInstruction.get_OpCode().get_Code() == 63)
 			{
 				return true;
 			}
-			return theInstruction.OpCode.Code == Code.Bne_Un_S;
+			return theInstruction.get_OpCode().get_Code() == 50;
 		}
 
 		private bool IsBrFalseInstruction(Instruction theInstruction)
 		{
-			if (theInstruction.OpCode.Code == Code.Brfalse)
+			if (theInstruction.get_OpCode().get_Code() == 56)
 			{
 				return true;
 			}
-			return theInstruction.OpCode.Code == Code.Brfalse_S;
+			return theInstruction.get_OpCode().get_Code() == 43;
 		}
 
 		private bool IsControllerCondition(Instruction instruction)
@@ -187,43 +187,43 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				return true;
 			}
-			return instruction.OpCode.Code == Code.Switch;
+			return instruction.get_OpCode().get_Code() == 68;
 		}
 
 		private bool IsDebugControllerBlock(InstructionBlock theBlock, out int stateNumber)
 		{
-			if (theBlock.First == theBlock.Last)
+			if ((object)theBlock.First == (object)theBlock.Last)
 			{
 				stateNumber = -1;
 				return false;
 			}
-			Instruction next = theBlock.First.Next;
-			if (next == theBlock.Last || next.OpCode.Code != Code.Ldfld || ((FieldReference)next.Operand).Resolve() != this.stateField)
+			Instruction next = theBlock.First.get_Next();
+			if ((object)next == (object)theBlock.Last || next.get_OpCode().get_Code() != 120 || (object)((FieldReference)next.get_Operand()).Resolve() != (object)this.stateField)
 			{
 				stateNumber = -1;
 				return false;
 			}
-			next = next.Next;
-			if (next == theBlock.Last || !StateMachineUtilities.TryGetOperandOfLdc(next, out stateNumber))
+			next = next.get_Next();
+			if ((object)next == (object)theBlock.Last || !StateMachineUtilities.TryGetOperandOfLdc(next, out stateNumber))
 			{
 				stateNumber = -1;
 				return false;
 			}
-			next = next.Next;
-			if (next == theBlock.Last || next.OpCode.Code != Code.Ceq)
+			next = next.get_Next();
+			if ((object)next == (object)theBlock.Last || next.get_OpCode().get_Code() != 192)
 			{
 				return false;
 			}
-			next = next.Next;
-			if (next == theBlock.Last || next.OpCode.Code != Code.Ldc_I4_0)
+			next = next.get_Next();
+			if ((object)next == (object)theBlock.Last || next.get_OpCode().get_Code() != 22)
 			{
 				return false;
 			}
-			if (theBlock.Last.OpCode.Code == Code.Brtrue)
+			if (theBlock.Last.get_OpCode().get_Code() == 57)
 			{
 				return true;
 			}
-			return theBlock.Last.OpCode.Code == Code.Brtrue_S;
+			return theBlock.Last.get_OpCode().get_Code() == 44;
 		}
 
 		private bool IsStateMachineControllerBlock(ref InstructionBlock theBlock, out StateControllerRemover.StateMachineControllerType controllerType, out int stateNumber)
@@ -234,9 +234,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			if (this.theCFG.SwitchBlocksInformation.ContainsKey(theBlock))
 			{
 				controllerType = StateControllerRemover.StateMachineControllerType.Switch;
-				if (last.Previous.OpCode.Code == Code.Sub || last.Previous.OpCode.Code == Code.Sub_Ovf)
+				if (last.get_Previous().get_OpCode().get_Code() == 88 || last.get_Previous().get_OpCode().get_Code() == 184)
 				{
-					last = last.Previous.Previous;
+					last = last.get_Previous().get_Previous();
 					if (!StateMachineUtilities.TryGetOperandOfLdc(last, out stateNumber))
 					{
 						return false;
@@ -250,7 +250,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			else if (this.IsBeqInstruction(theBlock.Last))
 			{
 				controllerType = StateControllerRemover.StateMachineControllerType.Condition;
-				last = theBlock.Last.Previous;
+				last = theBlock.Last.get_Previous();
 				if (!StateMachineUtilities.TryGetOperandOfLdc(last, out stateNumber))
 				{
 					return false;
@@ -270,7 +270,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 					return false;
 				}
 				controllerType = StateControllerRemover.StateMachineControllerType.NegativeCondition;
-				last = theBlock.Last.Previous;
+				last = theBlock.Last.get_Previous();
 				if (!StateMachineUtilities.TryGetOperandOfLdc(last, out stateNumber))
 				{
 					return false;
@@ -282,7 +282,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				last = theBlock.Last;
 				stateNumber = 0;
 			}
-			if (this.ContainsStateFieldLoad(theBlock) || this.TryGetVariableFromInstruction(last.Previous, out variableReference) && variableReference == this.stateVariable && !this.ContainsStateVariableSet(theBlock))
+			if (this.ContainsStateFieldLoad(theBlock) || this.TryGetVariableFromInstruction(last.get_Previous(), out variableReference) && (object)variableReference == (object)this.stateVariable && !this.ContainsStateVariableSet(theBlock))
 			{
 				return true;
 			}
@@ -292,11 +292,11 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private bool IsStloc(Instruction instruction)
 		{
-			if (instruction.OpCode.Code == Code.Stloc || instruction.OpCode.Code == Code.Stloc_0 || instruction.OpCode.Code == Code.Stloc_1 || instruction.OpCode.Code == Code.Stloc_2 || instruction.OpCode.Code == Code.Stloc_3)
+			if (instruction.get_OpCode().get_Code() == 204 || instruction.get_OpCode().get_Code() == 10 || instruction.get_OpCode().get_Code() == 11 || instruction.get_OpCode().get_Code() == 12 || instruction.get_OpCode().get_Code() == 13)
 			{
 				return true;
 			}
-			return instruction.OpCode.Code == Code.Stloc_S;
+			return instruction.get_OpCode().get_Code() == 19;
 		}
 
 		protected virtual bool IsUnconditionalBranchBlock(InstructionBlock theBlock)
@@ -517,7 +517,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		protected bool TryGetVariableFromInstruction(Instruction instruction, out VariableReference varReference)
 		{
-			return StateMachineUtilities.TryGetVariableFromInstruction(instruction, this.methodContext.Body.Variables, out varReference);
+			return StateMachineUtilities.TryGetVariableFromInstruction(instruction, this.methodContext.Body.get_Variables(), out varReference);
 		}
 
 		protected enum ControllerTraversalSearchResult

@@ -70,7 +70,7 @@ namespace Telerik.JustDecompiler.Steps
 			BinaryExpression binaryExpression = new BinaryExpression(@operator, (Expression)this.codeTransformer.Visit(left), (Expression)this.codeTransformer.Visit(right), expressionType, this.typeSystem, instructions, true);
 			if (binaryExpression.IsComparisonExpression || binaryExpression.IsLogicalExpression)
 			{
-				binaryExpression.ExpressionType = left.ExpressionType.Module.TypeSystem.Boolean;
+				binaryExpression.ExpressionType = left.ExpressionType.get_Module().get_TypeSystem().get_Boolean();
 			}
 			return binaryExpression;
 		}
@@ -89,7 +89,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			if (typeDefinition.BaseType != null && typeDefinition.BaseType.Name == "MulticastDelegate")
+			if (typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_Name() == "MulticastDelegate")
 			{
 				Expression right = node.Right;
 				MethodInvocationExpression expression = right as MethodInvocationExpression;
@@ -109,9 +109,9 @@ namespace Telerik.JustDecompiler.Steps
 					{
 						return null;
 					}
-					if (expression.MethodExpression.Method.Name != "Combine")
+					if (expression.MethodExpression.Method.get_Name() != "Combine")
 					{
-						if (expression.MethodExpression.Method.Name != "Remove")
+						if (expression.MethodExpression.Method.get_Name() != "Remove")
 						{
 							return null;
 						}
@@ -134,36 +134,36 @@ namespace Telerik.JustDecompiler.Steps
 			BinaryOperator binaryOperator;
 			UnaryOperator unaryOperator;
 			MethodReferenceExpression methodExpression = node.MethodExpression;
-			if (methodExpression == null || methodExpression.Method.CallingConvention == MethodCallingConvention.StdCall)
+			if (methodExpression == null || methodExpression.Method.get_CallingConvention() == 2)
 			{
 				return null;
 			}
 			MethodReference method = methodExpression.Method;
-			if (OperatorStep.binaryOperators.TryGetValue(method.Name, out binaryOperator))
+			if (OperatorStep.binaryOperators.TryGetValue(method.get_Name(), out binaryOperator))
 			{
-				return this.BuildBinaryExpression(binaryOperator, node.Arguments[0], node.Arguments[1], method.FixedReturnType, node.InvocationInstructions);
+				return this.BuildBinaryExpression(binaryOperator, node.Arguments[0], node.Arguments[1], method.get_FixedReturnType(), node.InvocationInstructions);
 			}
-			if (OperatorStep.unaryOperators.TryGetValue(method.Name, out unaryOperator))
+			if (OperatorStep.unaryOperators.TryGetValue(method.get_Name(), out unaryOperator))
 			{
 				return this.BuildUnaryExpression(unaryOperator, node.Arguments[0], node.InvocationInstructions);
 			}
-			if (method.Name == "op_True")
+			if (method.get_Name() == "op_True")
 			{
 				return (Expression)this.codeTransformer.Visit(node.Arguments[0]);
 			}
-			if (method.Name == "op_False")
+			if (method.get_Name() == "op_False")
 			{
 				return new ConditionExpression((Expression)this.codeTransformer.Visit(node.Arguments[0]), new LiteralExpression(false, this.typeSystem, null), new LiteralExpression(true, this.typeSystem, null), node.InvocationInstructions);
 			}
-			if (method.Name == "op_Explicit")
+			if (method.get_Name() == "op_Explicit")
 			{
 				return new ExplicitCastExpression((Expression)this.codeTransformer.Visit(node.Arguments[0]), node.ExpressionType, node.InvocationInstructions);
 			}
-			if (method.Name == "op_Implicit")
+			if (method.get_Name() == "op_Implicit")
 			{
 				return new ImplicitCastExpression((Expression)this.codeTransformer.Visit(node.Arguments[0]), node.ExpressionType, node.InvocationInstructions);
 			}
-			if (!(method.Name == "get_Chars") || !(node.MethodExpression.Target.ExpressionType.FullName == "System.String"))
+			if (!(method.get_Name() == "get_Chars") || !(node.MethodExpression.Target.ExpressionType.get_FullName() == "System.String"))
 			{
 				return null;
 			}

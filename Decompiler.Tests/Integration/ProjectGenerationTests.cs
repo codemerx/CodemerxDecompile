@@ -6,11 +6,13 @@ namespace Decompiler.Tests.Integration
 {
     public class ProjectGenerationTests
     {
+
         [Fact]
         public void CmdShel_ShouldGenerateCorrectOutput()
         {
             // Arrange
-            string[] testArgs = { @"/target:Actual/JustDecompiler.NetStandard.dll", @"/out", @"result" };
+            string outpuFolder = @"result";
+            string[] testArgs = { @"/target:Integration/Actual/JustDecompiler.NetStandard.dll", @"/out", outpuFolder };
             GeneratorProjectInfo generatorProjectInfo = CommandLineManager.Parse(testArgs);
 
             CmdShell shell = new CmdShell();
@@ -19,7 +21,7 @@ namespace Decompiler.Tests.Integration
             shell.Run(generatorProjectInfo);
 
             // Assert
-            TestHelper.AssertFoldersDiffRecursively(@"Integration/Expected/JustDecompiler.NetStandard", "result");
+            TestHelper.AssertFoldersDiffRecursively(@"../../../Integration/Expected/JustDecompiler.NetStandard", outpuFolder);
         }
     }
 }

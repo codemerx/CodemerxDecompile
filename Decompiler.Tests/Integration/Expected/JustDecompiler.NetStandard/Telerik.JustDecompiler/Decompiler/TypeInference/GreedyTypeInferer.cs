@@ -32,7 +32,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private bool FixVariableType(VariableReference variable, TypeReference type)
 		{
-			variable.VariableType = type;
+			variable.set_VariableType(type);
 			if (type == null)
 			{
 				return false;
@@ -46,7 +46,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			List<VariableReference> variableReferences = new List<VariableReference>();
 			foreach (VariableDefinition key in this.context.MethodContext.StackData.VariableToDefineUseInfo.Keys)
 			{
-				if (key.VariableType != null)
+				if (key.get_VariableType() != null)
 				{
 					this.resolvedVariables.Add(key);
 				}

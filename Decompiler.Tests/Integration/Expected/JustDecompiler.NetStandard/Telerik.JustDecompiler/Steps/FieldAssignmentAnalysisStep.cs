@@ -19,7 +19,7 @@ namespace Telerik.JustDecompiler.Steps
 		protected override void AnalyzeAssignments()
 		{
 			Dictionary<FieldDefinition, AssignmentType> fieldAssignmentData = this.dataSelector(this.context).FieldAssignmentData;
-			foreach (FieldDefinition field in this.context.TypeContext.CurrentType.Fields)
+			foreach (FieldDefinition field in this.context.TypeContext.CurrentType.get_Fields())
 			{
 				fieldAssignmentData.Add(field, base.AnalyzeAssignmentType(new FieldUsageFinder(field)));
 			}

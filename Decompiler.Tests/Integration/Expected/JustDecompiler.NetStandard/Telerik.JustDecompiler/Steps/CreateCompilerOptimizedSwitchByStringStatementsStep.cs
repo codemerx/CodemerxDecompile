@@ -157,11 +157,11 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			LiteralExpression right = operand.Right as LiteralExpression;
-			if (condition.CodeNodeType == CodeNodeType.UnaryExpression && right.ExpressionType.FullName != "System.String")
+			if (condition.CodeNodeType == CodeNodeType.UnaryExpression && right.ExpressionType.get_FullName() != "System.String")
 			{
 				return false;
 			}
-			if (condition.CodeNodeType == CodeNodeType.BinaryExpression && (right.ExpressionType.FullName != "System.Object" || right.Value != null))
+			if (condition.CodeNodeType == CodeNodeType.BinaryExpression && (right.ExpressionType.get_FullName() != "System.Object" || right.Value != null))
 			{
 				return false;
 			}
@@ -171,7 +171,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				data.SwitchExpressionLoadInstructions.Add(operand.Left.UnderlyingSameMethodInstructions.First<Instruction>().Offset);
+				data.SwitchExpressionLoadInstructions.Add(operand.Left.UnderlyingSameMethodInstructions.First<Instruction>().get_Offset());
 			}
 			else
 			{

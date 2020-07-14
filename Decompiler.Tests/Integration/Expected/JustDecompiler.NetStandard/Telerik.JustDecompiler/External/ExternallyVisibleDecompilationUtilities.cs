@@ -48,13 +48,13 @@ namespace Telerik.JustDecompiler.External
 		private static ModuleDefinition GetAssemblyModule(AssemblyDefinition assembly, string moduleFilePath)
 		{
 			ModuleDefinition moduleDefinition;
-			Collection<ModuleDefinition>.Enumerator enumerator = assembly.Modules.GetEnumerator();
+			Collection<ModuleDefinition>.Enumerator enumerator = assembly.get_Modules().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					ModuleDefinition current = enumerator.Current;
-					if (!String.Equals(current.FilePath, moduleFilePath, StringComparison.OrdinalIgnoreCase))
+					ModuleDefinition current = enumerator.get_Current();
+					if (!String.Equals(current.get_FilePath(), moduleFilePath, StringComparison.OrdinalIgnoreCase))
 					{
 						continue;
 					}
@@ -65,17 +65,17 @@ namespace Telerik.JustDecompiler.External
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return moduleDefinition;
 		}
 
 		public static MemberIdentifier GetIdentifier(string assemblyFilePath, IMemberDefinition member)
 		{
-			TypeDefinition typeDefinition = member as TypeDefinition ?? member.DeclaringType;
+			TypeDefinition typeDefinition = member as TypeDefinition ?? member.get_DeclaringType();
 			AssemblyIdentifier assemblyIdentifier = new AssemblyIdentifier(assemblyFilePath);
-			string filePath = typeDefinition.Module.FilePath;
-			MetadataToken metadataToken = member.MetadataToken;
+			string filePath = typeDefinition.get_Module().get_FilePath();
+			MetadataToken metadataToken = member.get_MetadataToken();
 			return new MemberIdentifier(assemblyIdentifier, new UniqueMemberIdentifier(filePath, metadataToken.ToInt32()));
 		}
 
@@ -87,7 +87,7 @@ namespace Telerik.JustDecompiler.External
 		public static AssemblyDefinition ResolveAssembly(AssemblyIdentifier assembly)
 		{
 			IAssemblyResolver instance = GlobalAssemblyResolver.Instance;
-			return instance.LoadAssemblyDefinition(assembly.AssemblyPath, new ReaderParameters(instance, ReadingMode.Deferred), true);
+			return instance.LoadAssemblyDefinition(assembly.AssemblyPath, new ReaderParameters(instance, 2), true);
 		}
 
 		public static IMemberDefinition ResolveMemberByToken(AssemblyDefinition assembly, IUniqueMemberIdentifier uniqueMemberIdentifier)

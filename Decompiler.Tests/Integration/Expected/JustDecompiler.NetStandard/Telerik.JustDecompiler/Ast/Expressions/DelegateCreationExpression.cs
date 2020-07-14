@@ -134,7 +134,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Type.FullName == delegateCreationExpression.Type.FullName;
+			return this.Type.get_FullName() == delegateCreationExpression.Type.get_FullName();
 		}
 	}
 }

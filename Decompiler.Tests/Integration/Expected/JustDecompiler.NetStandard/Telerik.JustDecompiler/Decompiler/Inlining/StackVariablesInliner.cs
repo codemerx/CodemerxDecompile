@@ -17,7 +17,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		private readonly HashSet<VariableDefinition> inlinedOnSecondPass = new HashSet<VariableDefinition>();
 
-		public StackVariablesInliner(MethodSpecificContext methodContext, Dictionary<int, Expression> offsetToExpression, IVariablesToNotInlineFinder finder) : base(methodContext, new SimpleVariableInliner(methodContext.Method.Module.TypeSystem), finder)
+		public StackVariablesInliner(MethodSpecificContext methodContext, Dictionary<int, Expression> offsetToExpression, IVariablesToNotInlineFinder finder) : base(methodContext, new SimpleVariableInliner(methodContext.Method.get_Module().get_TypeSystem()), finder)
 		{
 			this.offsetToExpression = offsetToExpression;
 		}

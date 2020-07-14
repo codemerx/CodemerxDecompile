@@ -266,7 +266,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			PartialCFGBlockLogicalConstruct partialCFGBlockLogicalConstruct = node as PartialCFGBlockLogicalConstruct;
 			if (partialCFGBlockLogicalConstruct == null)
 			{
-				offset = node.TheBlock.First.Offset;
+				offset = node.TheBlock.First.get_Offset();
 				return String.Format("IL_{0}", offset.ToString("x4"));
 			}
 			int num = Array.IndexOf<CFGBlockLogicalConstruct>(context.CFGBlockToLogicalConstructMap[partialCFGBlockLogicalConstruct.TheBlock], partialCFGBlockLogicalConstruct);
@@ -274,7 +274,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			{
 				throw new Exception("Invalid partial block data.");
 			}
-			offset = partialCFGBlockLogicalConstruct.TheBlock.First.Offset;
+			offset = partialCFGBlockLogicalConstruct.TheBlock.First.get_Offset();
 			return String.Format("IL_{0}_{1}", (object)offset.ToString("x4"), num);
 		}
 

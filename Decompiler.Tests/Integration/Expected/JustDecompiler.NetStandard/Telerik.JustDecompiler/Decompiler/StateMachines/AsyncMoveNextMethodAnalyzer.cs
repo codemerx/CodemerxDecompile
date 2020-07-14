@@ -61,58 +61,58 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		private bool GetDoFinallyVariable()
 		{
 			Instruction first = this.theCFG.Blocks[0].First;
-			if (first.OpCode.Code != Code.Ldc_I4_1)
+			if (first.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			return StateMachineUtilities.TryGetVariableFromInstruction(first.Next, this.methodVariables, out this.doFinallyVariable);
+			return StateMachineUtilities.TryGetVariableFromInstruction(first.get_Next(), this.methodVariables, out this.doFinallyVariable);
 		}
 
 		private void GetStateVariable()
 		{
 			VariableReference variableReference;
 			Instruction first = this.theCFG.Blocks[0].First;
-			if (first.OpCode.Code != Code.Ldarg_0)
+			if (first.get_OpCode().get_Code() != 2)
 			{
 				return;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Ldfld)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 120)
 			{
 				return;
 			}
-			FieldReference operand = first.Operand as FieldReference;
-			if (operand == null || operand.Resolve() != this.stateField)
+			FieldReference operand = first.get_Operand() as FieldReference;
+			if (operand == null || (object)operand.Resolve() != (object)this.stateField)
 			{
 				return;
 			}
-			first = first.Next;
+			first = first.get_Next();
 			StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out this.stateVariable);
-			if (first == this.theCFG.Blocks[0].Last)
+			if ((object)first == (object)this.theCFG.Blocks[0].Last)
 			{
 				return;
 			}
-			first = first.Next;
+			first = first.get_Next();
 			bool flag = true;
 			while (flag)
 			{
-				if (first.OpCode.Code == Code.Ldarg_0)
+				if (first.get_OpCode().get_Code() == 2)
 				{
-					first = first.Next;
-					if (first.OpCode.Code == Code.Ldfld)
+					first = first.get_Next();
+					if (first.get_OpCode().get_Code() == 120)
 					{
-						FieldReference fieldReference = first.Operand as FieldReference;
+						FieldReference fieldReference = first.get_Operand() as FieldReference;
 						if (fieldReference != null)
 						{
-							first = first.Next;
+							first = first.get_Next();
 							if (StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out variableReference))
 							{
 								this.variableToFieldMap.Add(variableReference, fieldReference);
-								if (first == this.theCFG.Blocks[0].Last)
+								if ((object)first == (object)this.theCFG.Blocks[0].Last)
 								{
 									break;
 								}
-								first = first.Next;
+								first = first.get_Next();
 								continue;
 							}
 						}

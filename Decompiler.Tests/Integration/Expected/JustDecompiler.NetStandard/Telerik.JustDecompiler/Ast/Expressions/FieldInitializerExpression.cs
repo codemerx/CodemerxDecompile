@@ -58,7 +58,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.Name;
+				return this.Field.get_Name();
 			}
 		}
 

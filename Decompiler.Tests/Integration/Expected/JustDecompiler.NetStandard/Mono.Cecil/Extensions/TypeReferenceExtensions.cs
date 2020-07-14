@@ -23,16 +23,16 @@ namespace Mono.Cecil.Extensions
 			}
 			else if (self is TypeSpecification)
 			{
-				return (self as TypeSpecification).ElementType.ContainsAnonymousType();
+				return (self as TypeSpecification).get_ElementType().ContainsAnonymousType();
 			}
 			return false;
 		}
 
 		public static Expression GetDefaultValueExpression(this TypeReference typeReference, TypeSystem typeSystem)
 		{
-			if (typeReference.IsPrimitive)
+			if (typeReference.get_IsPrimitive())
 			{
-				string fullName = typeReference.FullName;
+				string fullName = typeReference.get_FullName();
 				if (fullName != null)
 				{
 					if (fullName == "System.Boolean")
@@ -50,24 +50,24 @@ namespace Mono.Cecil.Extensions
 				}
 				return new LiteralExpression(Activator.CreateInstance(Type.GetType(fullName)), typeSystem, null);
 			}
-			if (typeReference.IsGenericParameter)
+			if (typeReference.get_IsGenericParameter())
 			{
 				return new DefaultObjectExpression(typeReference, null);
 			}
-			if (typeReference.IsArray)
+			if (typeReference.get_IsArray())
 			{
 				return new LiteralExpression(null, typeSystem, null);
 			}
-			if (!typeReference.IsValueType)
+			if (!typeReference.get_IsValueType())
 			{
-				if (!typeReference.IsRequiredModifier)
+				if (!typeReference.get_IsRequiredModifier())
 				{
 					return new LiteralExpression(null, typeSystem, null);
 				}
-				return (typeReference as RequiredModifierType).ElementType.GetDefaultValueExpression(typeSystem);
+				return (typeReference as RequiredModifierType).get_ElementType().GetDefaultValueExpression(typeSystem);
 			}
 			TypeDefinition typeDefinition = typeReference.Resolve();
-			if (typeDefinition != null && typeDefinition.IsEnum)
+			if (typeDefinition != null && typeDefinition.get_IsEnum())
 			{
 				return new LiteralExpression((object)0, typeSystem, null);
 			}
@@ -81,7 +81,7 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("self");
 			}
-			if (self.IsGenericInstance)
+			if (self.get_IsGenericInstance())
 			{
 				return null;
 			}
@@ -90,13 +90,13 @@ namespace Mono.Cecil.Extensions
 			{
 				return null;
 			}
-			Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.Methods.GetEnumerator();
+			Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.get_Methods().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					MethodDefinition current = enumerator.Current;
-					if (!current.IsConstructor || current.HasParameters)
+					MethodDefinition current = enumerator.get_Current();
+					if (!current.get_IsConstructor() || current.get_HasParameters())
 					{
 						continue;
 					}
@@ -107,18 +107,18 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return methodReference;
 		}
 
 		public static string GetNamespace(this TypeReference self)
 		{
-			if (!self.IsNested)
+			if (!self.get_IsNested())
 			{
-				return self.Namespace;
+				return self.get_Namespace();
 			}
-			return self.DeclaringType.GetNamespace();
+			return self.get_DeclaringType().GetNamespace();
 		}
 
 		public static bool IsIntegerType(this TypeReference self)
@@ -127,8 +127,8 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			string fullName = self.FullName;
-			if (!(fullName == self.Module.TypeSystem.Byte.FullName) && !(fullName == self.Module.TypeSystem.SByte.FullName) && !(fullName == self.Module.TypeSystem.Int16.FullName) && !(fullName == self.Module.TypeSystem.UInt16.FullName) && !(fullName == self.Module.TypeSystem.Int32.FullName) && !(fullName == self.Module.TypeSystem.UInt32.FullName) && !(fullName == self.Module.TypeSystem.Int64.FullName) && !(fullName == self.Module.TypeSystem.UInt64.FullName))
+			string fullName = self.get_FullName();
+			if (!(fullName == self.get_Module().get_TypeSystem().get_Byte().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_SByte().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_Int16().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_UInt16().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_Int32().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_UInt32().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_Int64().get_FullName()) && !(fullName == self.get_Module().get_TypeSystem().get_UInt64().get_FullName()))
 			{
 				return false;
 			}

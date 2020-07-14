@@ -17,13 +17,13 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("MethodDefinition");
 			}
-			if (!method.HasBody)
+			if (!method.get_HasBody())
 			{
 				return Enumerable.Empty<Instruction>();
 			}
 			try
 			{
-				instructions = method.Body.Instructions;
+				instructions = method.get_Body().get_Instructions();
 			}
 			catch
 			{
@@ -42,23 +42,23 @@ namespace Mono.Cecil.Extensions
 			{
 				return method;
 			}
-			if (method.IsPrivate)
+			if (method.get_IsPrivate())
 			{
 				return other;
 			}
-			if (method.IsFamily || method.IsAssembly)
+			if (method.get_IsFamily() || method.get_IsAssembly())
 			{
-				if (!other.IsPublic && !other.IsFamilyOrAssembly)
+				if (!other.get_IsPublic() && !other.get_IsFamilyOrAssembly())
 				{
 					return method;
 				}
 				return other;
 			}
-			if (!method.IsFamilyOrAssembly)
+			if (!method.get_IsFamilyOrAssembly())
 			{
 				return method;
 			}
-			if (other.IsPublic)
+			if (other.get_IsPublic())
 			{
 				return other;
 			}
@@ -70,12 +70,12 @@ namespace Mono.Cecil.Extensions
 			bool flag;
 			bool flag1 = false;
 			bool flag2 = false;
-			Collection<CustomAttribute>.Enumerator enumerator = self.CustomAttributes.GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					CustomAttribute current = enumerator.Current;
+					CustomAttribute current = enumerator.get_Current();
 					if (!(flag1 & flag2))
 					{
 						if (!flag1 && MethodDefinitionExtensions.IsAsyncStateMachineAttribute(current))
@@ -98,7 +98,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -107,19 +107,19 @@ namespace Mono.Cecil.Extensions
 		{
 			bool flag;
 			TypeDefinition typeDefinition;
-			Collection<VariableDefinition>.Enumerator enumerator = self.Body.Variables.GetEnumerator();
+			Collection<VariableDefinition>.Enumerator enumerator = self.get_Body().get_Variables().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					VariableDefinition current = enumerator.Current;
-					if (current.VariableType == null)
+					VariableDefinition current = enumerator.get_Current();
+					if (current.get_VariableType() == null)
 					{
 						typeDefinition = null;
 					}
 					else
 					{
-						typeDefinition = current.VariableType.Resolve();
+						typeDefinition = current.get_VariableType().Resolve();
 					}
 					TypeDefinition typeDefinition1 = typeDefinition;
 					if (typeDefinition1 == null || !typeDefinition1.IsAsyncStateMachine())
@@ -133,7 +133,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -156,12 +156,12 @@ namespace Mono.Cecil.Extensions
 		{
 			bool flag;
 			asyncStateMachineType = null;
-			Collection<CustomAttribute>.Enumerator enumerator = self.CustomAttributes.GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
 				{
-					if (!MethodDefinitionExtensions.IsAsyncAttribute(enumerator.Current, self, self.DeclaringType, out asyncStateMachineType))
+					if (!MethodDefinitionExtensions.IsAsyncAttribute(enumerator.get_Current(), self, self.get_DeclaringType(), out asyncStateMachineType))
 					{
 						continue;
 					}
@@ -172,7 +172,7 @@ namespace Mono.Cecil.Extensions
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				enumerator.Dispose();
 			}
 			return flag;
 		}
@@ -180,22 +180,23 @@ namespace Mono.Cecil.Extensions
 		private static bool IsAsyncAttribute(CustomAttribute customAttribute, MethodDefinition method, TypeDefinition declaringType, out TypeDefinition stateMachineType)
 		{
 			stateMachineType = null;
-			if (customAttribute.AttributeType.FullName != "System.Runtime.CompilerServices.AsyncStateMachineAttribute")
+			if (customAttribute.get_AttributeType().get_FullName() != "System.Runtime.CompilerServices.AsyncStateMachineAttribute")
 			{
 				return false;
 			}
 			customAttribute.Resolve();
-			if (customAttribute.ConstructorArguments.Count != 1 || customAttribute.ConstructorArguments[0].Type.FullName != "System.Type")
+			if (customAttribute.get_ConstructorArguments().get_Count() != 1 || customAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName() != "System.Type")
 			{
 				return false;
 			}
-			TypeReference value = customAttribute.ConstructorArguments[0].Value as TypeReference;
+			CustomAttributeArgument item = customAttribute.get_ConstructorArguments().get_Item(0);
+			TypeReference value = item.get_Value() as TypeReference;
 			if (value == null)
 			{
 				return false;
 			}
 			TypeDefinition typeDefinition = value.Resolve();
-			if (typeDefinition == null || typeDefinition.DeclaringType != declaringType || !typeDefinition.IsAsyncStateMachine())
+			if (typeDefinition == null || (object)typeDefinition.get_DeclaringType() != (object)declaringType || !typeDefinition.IsAsyncStateMachine())
 			{
 				return false;
 			}
@@ -205,25 +206,25 @@ namespace Mono.Cecil.Extensions
 
 		private static bool IsAsyncStateMachineAttribute(CustomAttribute customAttribute)
 		{
-			return customAttribute.AttributeType.FullName == "System.Runtime.CompilerServices.AsyncStateMachineAttribute";
+			return customAttribute.get_AttributeType().get_FullName() == "System.Runtime.CompilerServices.AsyncStateMachineAttribute";
 		}
 
 		private static bool IsDebuggerStepThroughAttribute(CustomAttribute customAttribute)
 		{
-			return customAttribute.AttributeType.FullName == "System.Diagnostics.DebuggerStepThroughAttribute";
+			return customAttribute.get_AttributeType().get_FullName() == "System.Diagnostics.DebuggerStepThroughAttribute";
 		}
 
 		public static bool IsExtern(this MethodDefinition method)
 		{
-			if (method.IsInternalCall)
+			if (method.get_IsInternalCall())
 			{
 				return true;
 			}
-			if (method.IsPInvokeImpl)
+			if (method.get_IsPInvokeImpl())
 			{
 				return true;
 			}
-			if (method.IsRuntime)
+			if (method.get_IsRuntime())
 			{
 				return true;
 			}
@@ -232,27 +233,27 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsFunction(this MethodDefinition self)
 		{
-			if (self.FixedReturnType == null)
+			if (self.get_FixedReturnType() == null)
 			{
 				return false;
 			}
-			return self.FixedReturnType.FullName != "System.Void";
+			return self.get_FixedReturnType().get_FullName() != "System.Void";
 		}
 
 		public static bool IsQueryableMethod(this MethodDefinition self)
 		{
-			if (self == null || !self.IsStatic)
+			if (self == null || !self.get_IsStatic())
 			{
 				return false;
 			}
-			return self.DeclaringType.FullName == "System.Linq.Queryable";
+			return self.get_DeclaringType().get_FullName() == "System.Linq.Queryable";
 		}
 
 		public static bool IsQueryMethod(this MethodDefinition self)
 		{
 			// 
 			// Current member / type: System.Boolean Mono.Cecil.Extensions.MethodDefinitionExtensions::IsQueryMethod(Mono.Cecil.MethodDefinition)
-			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\JustDecompiler.NetStandard.dll
+			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
 			// 
 			// Product version: 0.0.0.0
 			// Exception in: System.Boolean IsQueryMethod(Mono.Cecil.MethodDefinition)

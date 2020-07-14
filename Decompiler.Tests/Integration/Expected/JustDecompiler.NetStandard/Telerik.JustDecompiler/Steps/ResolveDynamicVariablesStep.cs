@@ -38,7 +38,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckArrayIndexerExpression(ArrayIndexerExpression expression, VariableReference arrayVariable, int index)
 		{
-			if (expression.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (expression.Target as VariableReferenceExpression).Variable != arrayVariable || expression.Indices.Count != 1 || expression.Indices[0].CodeNodeType != CodeNodeType.LiteralExpression)
+			if (expression.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Target as VariableReferenceExpression).Variable != (object)arrayVariable || expression.Indices.Count != 1 || expression.Indices[0].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				return false;
 			}
@@ -47,11 +47,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckFieldDefinition(FieldDefinition callSiteFieldDefinition)
 		{
-			if (callSiteFieldDefinition == null || !callSiteFieldDefinition.IsStatic || callSiteFieldDefinition.DeclaringType == null || !callSiteFieldDefinition.DeclaringType.HasCompilerGeneratedAttribute())
+			if (callSiteFieldDefinition == null || !callSiteFieldDefinition.get_IsStatic() || callSiteFieldDefinition.get_DeclaringType() == null || !callSiteFieldDefinition.get_DeclaringType().HasCompilerGeneratedAttribute())
 			{
 				return false;
 			}
-			return callSiteFieldDefinition.DeclaringType.DeclaringType == this.methodContext.Method.DeclaringType;
+			return (object)callSiteFieldDefinition.get_DeclaringType().get_DeclaringType() == (object)this.methodContext.Method.get_DeclaringType();
 		}
 
 		private int CheckNewArrayInitializationAndSize(Statement statement, VariableReference arrayVariable)
@@ -61,7 +61,7 @@ namespace Telerik.JustDecompiler.Steps
 				throw new Exception("Invalid statement.");
 			}
 			BinaryExpression expression = (statement as ExpressionStatement).Expression as BinaryExpression;
-			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (expression.Left as VariableReferenceExpression).Variable != arrayVariable)
+			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Left as VariableReferenceExpression).Variable != (object)arrayVariable)
 			{
 				throw new Exception("Invalid statement.");
 			}
@@ -98,17 +98,17 @@ namespace Telerik.JustDecompiler.Steps
 
 		private MethodInvocationExpression GetBinderMethodInvocation(ExpressionStatement callSiteCreationStatement, FieldDefinition callSiteField)
 		{
-			if (callSiteCreationStatement == null || callSiteCreationStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || (callSiteCreationStatement.Expression as BinaryExpression).Operator != BinaryOperator.Assign || (callSiteCreationStatement.Expression as BinaryExpression).Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || ((callSiteCreationStatement.Expression as BinaryExpression).Left as FieldReferenceExpression).Field.Resolve() != callSiteField)
+			if (callSiteCreationStatement == null || callSiteCreationStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || (callSiteCreationStatement.Expression as BinaryExpression).Operator != BinaryOperator.Assign || (callSiteCreationStatement.Expression as BinaryExpression).Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)((callSiteCreationStatement.Expression as BinaryExpression).Left as FieldReferenceExpression).Field.Resolve() != (object)callSiteField)
 			{
 				throw new Exception("Last statement is not CallSite field assignment.");
 			}
 			MethodInvocationExpression right = (callSiteCreationStatement.Expression as BinaryExpression).Right as MethodInvocationExpression;
-			if (right.MethodExpression.Method.DeclaringType.GetElementType().GetFriendlyFullName(null) != "System.Runtime.CompilerServices.CallSite<!0>" || right.MethodExpression.Target != null || right.MethodExpression.Method.Name != "Create" || right.Arguments[0].CodeNodeType != CodeNodeType.MethodInvocationExpression)
+			if (right.MethodExpression.Method.get_DeclaringType().GetElementType().GetFriendlyFullName(null) != "System.Runtime.CompilerServices.CallSite<!0>" || right.MethodExpression.Target != null || right.MethodExpression.Method.get_Name() != "Create" || right.Arguments[0].CodeNodeType != CodeNodeType.MethodInvocationExpression)
 			{
 				throw new Exception("Invalid CallSite field assignment.");
 			}
 			MethodInvocationExpression item = right.Arguments[0] as MethodInvocationExpression;
-			if (item.MethodExpression.Target != null || item.MethodExpression.Method.DeclaringType.GetFriendlyFullName(null) != "Microsoft.CSharp.RuntimeBinder.Binder")
+			if (item.MethodExpression.Target != null || item.MethodExpression.Method.get_DeclaringType().GetFriendlyFullName(null) != "Microsoft.CSharp.RuntimeBinder.Binder")
 			{
 				throw new Exception("Invalid CallSite creation argument.");
 			}
@@ -128,7 +128,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void GetDynamicArgument(MethodInvocationExpression expression, int index, CallSiteInfo callSiteInfo)
 		{
-			if (expression.MethodExpression.Method.Name != "Create" || expression.MethodExpression.Target != null || expression.MethodExpression.Method.DeclaringType.GetFriendlyFullName(null) != "Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo" || expression.Arguments.Count != 2 || expression.Arguments[0].CodeNodeType != CodeNodeType.LiteralExpression)
+			if (expression.MethodExpression.Method.get_Name() != "Create" || expression.MethodExpression.Target != null || expression.MethodExpression.Method.get_DeclaringType().GetFriendlyFullName(null) != "Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo" || expression.Arguments.Count != 2 || expression.Arguments[0].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				throw new Exception("Invalid statement.");
 			}
@@ -203,7 +203,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			this.methodContext = context.MethodContext;
 			this.Visit(body);
-			body = CallSiteInvocationReplacer.ReplaceInvocations(body, this.fieldToCallSiteInfoMap, this.variableToCallSiteInfoMap, this.statementsToRemove, this.methodContext.Method.Module.TypeSystem);
+			body = CallSiteInvocationReplacer.ReplaceInvocations(body, this.fieldToCallSiteInfoMap, this.variableToCallSiteInfoMap, this.statementsToRemove, this.methodContext.Method.get_Module().get_TypeSystem());
 			this.RemoveStatements();
 			return body;
 		}
@@ -241,7 +241,7 @@ namespace Telerik.JustDecompiler.Steps
 		private void ProcessCallSiteCaching(IfStatement theIf, FieldDefinition callSiteField)
 		{
 			MethodInvocationExpression binderMethodInvocation = this.GetBinderMethodInvocation(theIf.Then.Statements.Last<Statement>() as ExpressionStatement, callSiteField);
-			CallSiteInfo callSiteInfo = new CallSiteInfo(callSiteField, binderMethodInvocation.MethodExpression.Method.Name);
+			CallSiteInfo callSiteInfo = new CallSiteInfo(callSiteField, binderMethodInvocation.MethodExpression.Method.get_Name());
 			int num = 0;
 			if (callSiteInfo.BinderType == CallSiteBinderType.GetMember || callSiteInfo.BinderType == CallSiteBinderType.InvokeMember || callSiteInfo.BinderType == CallSiteBinderType.SetMember || callSiteInfo.BinderType == CallSiteBinderType.IsEvent)
 			{
@@ -296,7 +296,7 @@ namespace Telerik.JustDecompiler.Steps
 				return;
 			}
 			FieldReferenceExpression right = expression.Right as FieldReferenceExpression;
-			if (right.Target == null || right.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || right.Field.Name != "Target")
+			if (right.Target == null || right.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || right.Field.get_Name() != "Target")
 			{
 				return;
 			}
@@ -318,7 +318,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					FieldReferenceExpression left = condition.Left as FieldReferenceExpression;
 					FieldDefinition fieldDefinition = left.Field.Resolve();
-					if (left.Field.FieldType.GetElementType().GetFriendlyFullName(null) == "System.Runtime.CompilerServices.CallSite<!0>" && this.CheckFieldDefinition(fieldDefinition))
+					if (left.Field.get_FieldType().GetElementType().GetFriendlyFullName(null) == "System.Runtime.CompilerServices.CallSite<!0>" && this.CheckFieldDefinition(fieldDefinition))
 					{
 						this.ProcessCallSiteCaching(node, fieldDefinition);
 						this.statementsToRemove.Add(node);

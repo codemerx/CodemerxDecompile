@@ -201,7 +201,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		public virtual string GetExplicitName(IMemberDefinition member)
 		{
-			return member.Name;
+			return member.get_Name();
 		}
 
 		public abstract ILanguageWriter GetWriter(IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings);

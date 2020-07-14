@@ -621,14 +621,14 @@ namespace Telerik.JustDecompiler.Languages
 				if (explicitMember is MethodDefinition)
 				{
 					return (
-						from t in explicitMember.DeclaringType.Methods
+						from t in explicitMember.get_DeclaringType().get_Methods()
 						where this.GetMemberNonExplicitName(t) == nonExplicitName
 						select t).Count<MethodDefinition>() > 1;
 				}
 				if (explicitMember is PropertyDefinition)
 				{
 					return (
-						from t in explicitMember.DeclaringType.Properties
+						from t in explicitMember.get_DeclaringType().get_Properties()
 						where this.GetMemberNonExplicitName(t) == nonExplicitName
 						select t).Count<PropertyDefinition>() > 1;
 				}
@@ -637,7 +637,7 @@ namespace Telerik.JustDecompiler.Languages
 					return false;
 				}
 				return (
-					from t in explicitMember.DeclaringType.Events
+					from t in explicitMember.get_DeclaringType().get_Events()
 					where this.GetMemberNonExplicitName(t) == nonExplicitName
 					select t).Count<EventDefinition>() > 1;
 			}
@@ -664,7 +664,7 @@ namespace Telerik.JustDecompiler.Languages
 
 			private string GetMemberNonExplicitName(IMemberDefinition member)
 			{
-				string name = member.Name;
+				string name = member.get_Name();
 				int num = name.LastIndexOf('.');
 				if (num != -1)
 				{

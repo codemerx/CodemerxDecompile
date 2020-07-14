@@ -67,21 +67,21 @@ namespace Telerik.JustDecompiler.Steps
 			TypeReference expressionType = this.theSwitch.Condition.ExpressionType;
 			int num = Convert.ToInt32(literalCondition.Value) + this.conditionOffset;
 			literalCondition.Value = num;
-			TypeSystem typeSystem = this.context.MethodContext.Method.Module.TypeSystem;
-			if (expressionType.Name == "System.Nullable`1" && expressionType.HasGenericParameters)
+			TypeSystem typeSystem = this.context.MethodContext.Method.get_Module().get_TypeSystem();
+			if (expressionType.get_Name() == "System.Nullable`1" && expressionType.get_HasGenericParameters())
 			{
-				expressionType = expressionType.GenericParameters[0];
+				expressionType = expressionType.get_GenericParameters().get_Item(0);
 			}
-			if (expressionType.FullName == typeSystem.Char.FullName)
+			if (expressionType.get_FullName() == typeSystem.get_Char().get_FullName())
 			{
 				return new LiteralExpression((object)Convert.ToChar(num), typeSystem, null);
 			}
-			if (expressionType.FullName == typeSystem.Boolean.FullName)
+			if (expressionType.get_FullName() == typeSystem.get_Boolean().get_FullName())
 			{
 				return new LiteralExpression((object)Convert.ToBoolean(num), typeSystem, null);
 			}
 			TypeDefinition typeDefinition = expressionType.Resolve();
-			if (typeDefinition == null || !typeDefinition.IsEnum)
+			if (typeDefinition == null || !typeDefinition.get_IsEnum())
 			{
 				return literalCondition;
 			}

@@ -253,7 +253,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 							return;
 						}
 					}
-					else if (handlerInfo.HandlerType == YieldExceptionHandlerType.Method && item.CodeNodeType == CodeNodeType.MethodInvocationExpression && (item as MethodInvocationExpression).MethodExpression.MethodDefinition == handlerInfo.FinallyMethodDefinition)
+					else if (handlerInfo.HandlerType == YieldExceptionHandlerType.Method && item.CodeNodeType == CodeNodeType.MethodInvocationExpression && (object)(item as MethodInvocationExpression).MethodExpression.MethodDefinition == (object)handlerInfo.FinallyMethodDefinition)
 					{
 						if (value.LogicalConstructExpressions.Count == 1)
 						{
@@ -465,7 +465,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			if (startBlock.LogicalConstructExpressions.Count == 2 && yieldExceptionHandler.HandlerType == YieldExceptionHandlerType.ConditionalDispose)
 			{
 				BinaryExpression item1 = startBlock.LogicalConstructExpressions[1] as BinaryExpression;
-				if (item1 == null || !item1.IsAssignmentExpression || item1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (item1.Left as FieldReferenceExpression).Field != yieldExceptionHandler.DisposableField || item1.Right.CodeNodeType != CodeNodeType.SafeCastExpression || (item1.Right as SafeCastExpression).Expression.CodeNodeType != CodeNodeType.FieldReferenceExpression || ((item1.Right as SafeCastExpression).Expression as FieldReferenceExpression).Field != yieldExceptionHandler.EnumeratorField)
+				if (item1 == null || !item1.IsAssignmentExpression || item1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item1.Left as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || item1.Right.CodeNodeType != CodeNodeType.SafeCastExpression || (item1.Right as SafeCastExpression).Expression.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)((item1.Right as SafeCastExpression).Expression as FieldReferenceExpression).Field != (object)yieldExceptionHandler.EnumeratorField)
 				{
 					return false;
 				}
@@ -485,7 +485,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 				return false;
 			}
 			BinaryExpression binaryExpression1 = current.LogicalConstructExpressions[0] as BinaryExpression;
-			if (binaryExpression1 == null || binaryExpression1.Operator != BinaryOperator.ValueEquality || binaryExpression1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (binaryExpression1.Left as FieldReferenceExpression).Field != yieldExceptionHandler.DisposableField || binaryExpression1.Right.CodeNodeType != CodeNodeType.LiteralExpression || (binaryExpression1.Right as LiteralExpression).Value != null)
+			if (binaryExpression1 == null || binaryExpression1.Operator != BinaryOperator.ValueEquality || binaryExpression1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(binaryExpression1.Left as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || binaryExpression1.Right.CodeNodeType != CodeNodeType.LiteralExpression || (binaryExpression1.Right as LiteralExpression).Value != null)
 			{
 				return false;
 			}
@@ -503,7 +503,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 					return false;
 				}
 				item = cFGBlockLogicalConstruct.LogicalConstructExpressions[0] as MethodInvocationExpression;
-				if (item == null || !item.VirtualCall || item.MethodExpression.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || (item.MethodExpression.Target as FieldReferenceExpression).Field != yieldExceptionHandler.DisposableField || item.MethodExpression.Method.Name != "Dispose")
+				if (item == null || !item.VirtualCall || item.MethodExpression.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item.MethodExpression.Target as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || item.MethodExpression.Method.get_Name() != "Dispose")
 				{
 					return false;
 				}
@@ -520,7 +520,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 				return false;
 			}
 			item = cFGBlockLogicalConstruct.LogicalConstructExpressions[0] as MethodInvocationExpression;
-			if (item == null || !item.VirtualCall || item.MethodExpression.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || (item.MethodExpression.Target as FieldReferenceExpression).Field != yieldExceptionHandler.DisposableField || item.MethodExpression.Method.Name != "Dispose")
+			if (item == null || !item.VirtualCall || item.MethodExpression.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item.MethodExpression.Target as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || item.MethodExpression.Method.get_Name() != "Dispose")
 			{
 				return false;
 			}

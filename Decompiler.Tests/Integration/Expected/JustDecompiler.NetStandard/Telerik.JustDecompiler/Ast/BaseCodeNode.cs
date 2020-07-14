@@ -65,7 +65,7 @@ namespace Telerik.JustDecompiler.Ast
 			{
 				foreach (Instruction instruction in enumerable)
 				{
-					nums.Add(instruction.Offset);
+					nums.Add(instruction.get_Offset());
 				}
 			}
 			return nums;
@@ -78,7 +78,7 @@ namespace Telerik.JustDecompiler.Ast
 			{
 				instructions.AddRange(enumerable);
 			}
-			instructions.Sort((Instruction x, Instruction y) => x.Offset.CompareTo(y.Offset));
+			instructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			return instructions;
 		}
 	}

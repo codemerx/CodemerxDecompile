@@ -77,7 +77,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			if (this.Value == null)
 			{
-				this.ExpressionType = this.typeSystem.Object;
+				this.ExpressionType = this.typeSystem.get_Object();
 				return;
 			}
 			string name = this.Value.GetType().Name;
@@ -85,72 +85,72 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				if (name == "String")
 				{
-					this.ExpressionType = this.typeSystem.String;
+					this.ExpressionType = this.typeSystem.get_String();
 					return;
 				}
 				if (name == "Boolean")
 				{
-					this.ExpressionType = this.typeSystem.Boolean;
+					this.ExpressionType = this.typeSystem.get_Boolean();
 					return;
 				}
 				if (name == "Byte")
 				{
-					this.ExpressionType = this.typeSystem.Byte;
+					this.ExpressionType = this.typeSystem.get_Byte();
 					return;
 				}
 				if (name == "SByte")
 				{
-					this.ExpressionType = this.typeSystem.SByte;
+					this.ExpressionType = this.typeSystem.get_SByte();
 					return;
 				}
 				if (name == "Char")
 				{
-					this.ExpressionType = this.typeSystem.Char;
+					this.ExpressionType = this.typeSystem.get_Char();
 					return;
 				}
 				if (name == "UInt16")
 				{
-					this.ExpressionType = this.typeSystem.UInt16;
+					this.ExpressionType = this.typeSystem.get_UInt16();
 					return;
 				}
 				if (name == "Int16")
 				{
-					this.ExpressionType = this.typeSystem.Int16;
+					this.ExpressionType = this.typeSystem.get_Int16();
 					return;
 				}
 				if (name == "Int32")
 				{
-					this.ExpressionType = this.typeSystem.Int32;
+					this.ExpressionType = this.typeSystem.get_Int32();
 					return;
 				}
 				if (name == "UInt32")
 				{
-					this.ExpressionType = this.typeSystem.UInt32;
+					this.ExpressionType = this.typeSystem.get_UInt32();
 					return;
 				}
 				if (name == "Int64")
 				{
-					this.ExpressionType = this.typeSystem.Int64;
+					this.ExpressionType = this.typeSystem.get_Int64();
 					return;
 				}
 				if (name == "UInt64")
 				{
-					this.ExpressionType = this.typeSystem.UInt64;
+					this.ExpressionType = this.typeSystem.get_UInt64();
 					return;
 				}
 				if (name == "Single")
 				{
-					this.ExpressionType = this.typeSystem.Single;
+					this.ExpressionType = this.typeSystem.get_Single();
 					return;
 				}
 				if (name == "Double")
 				{
-					this.ExpressionType = this.typeSystem.Double;
+					this.ExpressionType = this.typeSystem.get_Double();
 					return;
 				}
 				if (name == "IntPtr")
 				{
-					this.ExpressionType = this.typeSystem.IntPtr;
+					this.ExpressionType = this.typeSystem.get_IntPtr();
 					return;
 				}
 			}

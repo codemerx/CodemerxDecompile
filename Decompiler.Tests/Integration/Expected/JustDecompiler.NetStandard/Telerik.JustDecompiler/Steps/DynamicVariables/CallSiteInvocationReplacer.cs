@@ -32,7 +32,7 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 			this.fieldToCallSiteInfoMap = fieldToCallSiteInfoMap;
 			this.variableToCallSiteInfoMap = variableToCallSiteInfoMap;
 			this.typeSystem = typeSystem;
-			this.objectTypeRef = typeSystem.Object;
+			this.objectTypeRef = typeSystem.get_Object();
 		}
 
 		private bool CanReplaceIf(BlockStatement statementBlock)
@@ -303,7 +303,7 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 
 		private Expression RemoveUnneededCast(Expression expression)
 		{
-			while (expression.CodeNodeType == CodeNodeType.ExplicitCastExpression && (expression as ExplicitCastExpression).TargetType.Name[0] == '!')
+			while (expression.CodeNodeType == CodeNodeType.ExplicitCastExpression && (expression as ExplicitCastExpression).TargetType.get_Name()[0] == '!')
 			{
 				expression = (expression as ExplicitCastExpression).Expression;
 			}
@@ -378,9 +378,9 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 			CallSiteInfo callSiteInfo1;
 			Expression expression = (Expression)base.VisitMethodInvocationExpression(node);
 			MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
-			if (methodInvocationExpression != null && methodInvocationExpression.MethodExpression.Target != null && methodInvocationExpression.MethodExpression.Method.Name == "Invoke")
+			if (methodInvocationExpression != null && methodInvocationExpression.MethodExpression.Target != null && methodInvocationExpression.MethodExpression.Method.get_Name() == "Invoke")
 			{
-				if (methodInvocationExpression.MethodExpression.Target.CodeNodeType == CodeNodeType.FieldReferenceExpression && (methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Field.Name == "Target" && (methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Target != null && (methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Target.CodeNodeType == CodeNodeType.FieldReferenceExpression)
+				if (methodInvocationExpression.MethodExpression.Target.CodeNodeType == CodeNodeType.FieldReferenceExpression && (methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Field.get_Name() == "Target" && (methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Target != null && (methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Target.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 				{
 					FieldDefinition fieldDefinition = ((methodInvocationExpression.MethodExpression.Target as FieldReferenceExpression).Target as FieldReferenceExpression).Field.Resolve();
 					if (fieldDefinition != null && this.fieldToCallSiteInfoMap.TryGetValue(fieldDefinition, out callSiteInfo))

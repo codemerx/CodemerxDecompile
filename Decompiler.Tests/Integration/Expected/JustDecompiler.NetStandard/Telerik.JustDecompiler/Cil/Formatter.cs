@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Cil
 
 		public static string FormatTypeReference(TypeReference type)
 		{
-			return Formatter.FormatTypeReference(type.FullName);
+			return Formatter.FormatTypeReference(type.get_FullName());
 		}
 
 		public static string FormatTypeReference(string typeName)
@@ -75,13 +75,13 @@ namespace Telerik.JustDecompiler.Cil
 
 		public static void WriteInstruction(TextWriter writer, Instruction instruction)
 		{
-			writer.Write(Formatter.FormatLabel(instruction.Offset));
+			writer.Write(Formatter.FormatLabel(instruction.get_Offset()));
 			writer.Write(": ");
-			writer.Write(instruction.OpCode.Name);
-			if (instruction.Operand != null)
+			writer.Write(instruction.get_OpCode().get_Name());
+			if (instruction.get_Operand() != null)
 			{
 				writer.Write(' ');
-				Formatter.WriteOperand(writer, instruction.Operand);
+				Formatter.WriteOperand(writer, instruction.get_Operand());
 			}
 		}
 
@@ -94,30 +94,30 @@ namespace Telerik.JustDecompiler.Cil
 				{
 					writer.Write(", ");
 				}
-				writer.Write(Formatter.FormatLabel(instructions[i].Offset));
+				writer.Write(Formatter.FormatLabel(instructions[i].get_Offset()));
 			}
 			writer.Write(")");
 		}
 
 		private static void WriteMethodReference(TextWriter writer, MethodReference method)
 		{
-			writer.Write(Formatter.FormatTypeReference(method.FixedReturnType));
-			if (method.DeclaringType != null)
+			writer.Write(Formatter.FormatTypeReference(method.get_FixedReturnType()));
+			if (method.get_DeclaringType() != null)
 			{
 				writer.Write(' ');
-				writer.Write(Formatter.FormatTypeReference(method.DeclaringType));
+				writer.Write(Formatter.FormatTypeReference(method.get_DeclaringType()));
 			}
 			writer.Write("::");
-			writer.Write(method.Name);
+			writer.Write(method.get_Name());
 			writer.Write("(");
-			Collection<ParameterDefinition> parameters = method.Parameters;
-			for (int i = 0; i < parameters.Count; i++)
+			Collection<ParameterDefinition> parameters = method.get_Parameters();
+			for (int i = 0; i < parameters.get_Count(); i++)
 			{
 				if (i > 0)
 				{
 					writer.Write(", ");
 				}
-				writer.Write(Formatter.FormatTypeReference(parameters[i].ParameterType));
+				writer.Write(Formatter.FormatTypeReference(parameters.get_Item(i).get_ParameterType()));
 			}
 			writer.Write(")");
 		}
@@ -131,7 +131,7 @@ namespace Telerik.JustDecompiler.Cil
 			Instruction instruction = operand as Instruction;
 			if (instruction != null)
 			{
-				writer.Write(Formatter.FormatLabel(instruction.Offset));
+				writer.Write(Formatter.FormatLabel(instruction.get_Offset()));
 				return;
 			}
 			Instruction[] instructionArray = operand as Instruction[];
@@ -143,7 +143,7 @@ namespace Telerik.JustDecompiler.Cil
 			VariableReference variableReference = operand as VariableReference;
 			if (variableReference != null)
 			{
-				writer.Write(variableReference.Index.ToString());
+				writer.Write(variableReference.get_Index().ToString());
 				return;
 			}
 			MethodReference methodReference = operand as MethodReference;

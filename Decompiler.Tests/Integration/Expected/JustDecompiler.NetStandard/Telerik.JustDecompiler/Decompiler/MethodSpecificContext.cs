@@ -64,11 +64,11 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			get
 			{
-				if (!this.enableEventAnalysis || this.Method.IsAddOn)
+				if (!this.enableEventAnalysis || this.Method.get_IsAddOn())
 				{
 					return false;
 				}
-				return !this.Method.IsRemoveOn;
+				return !this.Method.get_IsRemoveOn();
 			}
 			set
 			{
@@ -146,7 +146,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			get
 			{
-				return this.Body.Method;
+				return this.Body.get_Method();
 			}
 		}
 
@@ -231,8 +231,8 @@ namespace Telerik.JustDecompiler.Decompiler
 		public MethodSpecificContext(MethodBody body)
 		{
 			this.Body = body;
-			this.Variables = new Collection<VariableDefinition>(body.Variables);
-			this.ControlFlowGraph = Telerik.JustDecompiler.Cil.ControlFlowGraph.Create(body.Method);
+			this.Variables = new Collection<VariableDefinition>(body.get_Variables());
+			this.ControlFlowGraph = Telerik.JustDecompiler.Cil.ControlFlowGraph.Create(body.get_Method());
 			this.GotoLabels = new Dictionary<string, Statement>();
 			this.GotoStatements = new List<GotoStatement>();
 			this.IsMethodBodyChanged = false;
@@ -299,9 +299,9 @@ namespace Telerik.JustDecompiler.Decompiler
 		internal void AddInnerMethodParametersToContext(MethodSpecificContext innerMethodContext)
 		{
 			this.ParameterDefinitionToNameMap.AddRange<ParameterDefinition, string>(innerMethodContext.ParameterDefinitionToNameMap);
-			foreach (ParameterDefinition parameter in innerMethodContext.Method.Parameters)
+			foreach (ParameterDefinition parameter in innerMethodContext.Method.get_Parameters())
 			{
-				this.ParameterDefinitionToNameMap[parameter] = parameter.Name;
+				this.ParameterDefinitionToNameMap[parameter] = parameter.get_Name();
 			}
 		}
 
@@ -310,7 +310,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			HashSet<VariableDefinition> variableDefinitions = new HashSet<VariableDefinition>();
 			foreach (VariableDefinition variable in this.Variables)
 			{
-				if (variable.VariableNameChanged)
+				if (variable.get_VariableNameChanged())
 				{
 					continue;
 				}

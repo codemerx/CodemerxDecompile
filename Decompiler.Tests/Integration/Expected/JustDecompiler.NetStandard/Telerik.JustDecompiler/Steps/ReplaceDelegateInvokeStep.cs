@@ -20,12 +20,12 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (methodReference.Name != "Invoke")
+			if (methodReference.get_Name() != "Invoke")
 			{
 				return false;
 			}
-			TypeDefinition typeDefinition = methodReference.DeclaringType.Resolve();
-			if (typeDefinition != null && typeDefinition.BaseType != null && typeDefinition.BaseType.FullName == "System.MulticastDelegate")
+			TypeDefinition typeDefinition = methodReference.get_DeclaringType().Resolve();
+			if (typeDefinition != null && typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_FullName() == "System.MulticastDelegate")
 			{
 				return true;
 			}

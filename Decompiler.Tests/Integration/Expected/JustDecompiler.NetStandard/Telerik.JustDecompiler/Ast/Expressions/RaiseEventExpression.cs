@@ -67,7 +67,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			RaiseEventExpression raiseEventExpression = other as RaiseEventExpression;
-			if (!(this.Event.FullName == raiseEventExpression.Event.FullName) || !(this.InvokeMethodReference.FullName == raiseEventExpression.InvokeMethodReference.FullName))
+			if (!(this.Event.get_FullName() == raiseEventExpression.Event.get_FullName()) || !(this.InvokeMethodReference.get_FullName() == raiseEventExpression.InvokeMethodReference.get_FullName()))
 			{
 				return false;
 			}

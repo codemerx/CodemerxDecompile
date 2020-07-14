@@ -64,7 +64,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			if (this.TargetType.FullName != (other as CastExpressionBase).TargetType.FullName)
+			if (this.TargetType.get_FullName() != (other as CastExpressionBase).TargetType.get_FullName())
 			{
 				return false;
 			}

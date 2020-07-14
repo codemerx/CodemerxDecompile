@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		private DecompiledType GetDecompiledType(IMemberDefinition member, ILanguage language)
 		{
-			DecompiledType decompiledType = new DecompiledType((member is TypeDefinition ? member as TypeDefinition : member.DeclaringType));
+			DecompiledType decompiledType = new DecompiledType((member is TypeDefinition ? member as TypeDefinition : member.get_DeclaringType()));
 			if (!(member is MethodDefinition))
 			{
 				if (!(member is PropertyDefinition))
@@ -29,22 +29,22 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 					throw new NotSupportedException("FrameworkFolderWriterContext service supports only methods and properties.");
 				}
 				PropertyDefinition propertyDefinition = member as PropertyDefinition;
-				if (propertyDefinition.GetMethod != null)
+				if (propertyDefinition.get_GetMethod() != null)
 				{
-					DecompiledMember decompiledMember = Utilities.TryGetDecompiledMember(propertyDefinition.GetMethod, decompiledType.TypeContext, language);
-					decompiledType.DecompiledMembers.Add(propertyDefinition.GetMethod.FullName, decompiledMember);
+					DecompiledMember decompiledMember = Utilities.TryGetDecompiledMember(propertyDefinition.get_GetMethod(), decompiledType.TypeContext, language);
+					decompiledType.DecompiledMembers.Add(propertyDefinition.get_GetMethod().get_FullName(), decompiledMember);
 				}
-				if (propertyDefinition.SetMethod != null)
+				if (propertyDefinition.get_SetMethod() != null)
 				{
-					DecompiledMember decompiledMember1 = Utilities.TryGetDecompiledMember(propertyDefinition.SetMethod, decompiledType.TypeContext, language);
-					decompiledType.DecompiledMembers.Add(propertyDefinition.SetMethod.FullName, decompiledMember1);
+					DecompiledMember decompiledMember1 = Utilities.TryGetDecompiledMember(propertyDefinition.get_SetMethod(), decompiledType.TypeContext, language);
+					decompiledType.DecompiledMembers.Add(propertyDefinition.get_SetMethod().get_FullName(), decompiledMember1);
 				}
 			}
 			else
 			{
 				MethodDefinition methodDefinition = member as MethodDefinition;
 				DecompiledMember decompiledMember2 = Utilities.TryGetDecompiledMember(methodDefinition, decompiledType.TypeContext, language);
-				decompiledType.DecompiledMembers.Add(methodDefinition.FullName, decompiledMember2);
+				decompiledType.DecompiledMembers.Add(methodDefinition.get_FullName(), decompiledMember2);
 			}
 			base.AddGeneratedFilterMethodsToDecompiledType(decompiledType, decompiledType.TypeContext, language);
 			return decompiledType;

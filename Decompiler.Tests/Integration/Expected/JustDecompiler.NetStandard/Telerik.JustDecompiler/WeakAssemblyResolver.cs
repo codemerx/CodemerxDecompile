@@ -35,11 +35,11 @@ namespace Telerik.JustDecompiler
 		{
 			public WeakAssemblyCache(AssemblyPathResolverCache cache)
 			{
-				this.assemblyFaildedResolver = cache.AssemblyFaildedResolverCache.Clone();
-				this.assemblyNameDefinition = new Dictionary<string, AssemblyName>(cache.AssemblyNameDefinition);
-				this.assemblyParts = new Dictionary<string, TargetPlatform>(cache.AssemblyParts);
-				this.assemblyPathArchitecture = new Dictionary<string, TargetArchitecture>(cache.AssemblyPathArchitecture);
-				this.assemblyPathName = new List<KeyValuePair<AssemblyStrongNameExtended, string>>(cache.AssemblyPathName);
+				this.assemblyFaildedResolver = cache.get_AssemblyFaildedResolverCache().Clone();
+				this.assemblyNameDefinition = new Dictionary<string, AssemblyName>(cache.get_AssemblyNameDefinition());
+				this.assemblyParts = new Dictionary<string, TargetPlatform>(cache.get_AssemblyParts());
+				this.assemblyPathArchitecture = new Dictionary<string, TargetArchitecture>(cache.get_AssemblyPathArchitecture());
+				this.assemblyPathName = new List<KeyValuePair<AssemblyStrongNameExtended, string>>(cache.get_AssemblyPathName());
 			}
 		}
 	}

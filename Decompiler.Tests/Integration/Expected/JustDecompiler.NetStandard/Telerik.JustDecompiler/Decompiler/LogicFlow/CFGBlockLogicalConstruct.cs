@@ -89,7 +89,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.AppendLine(base.GetType().Name);
 			stringBuilder.AppendLine("{");
-			for (i = this.TheBlock.First; i != this.TheBlock.Last; i = i.Next)
+			for (i = this.TheBlock.First; (object)i != (object)this.TheBlock.Last; i = i.get_Next())
 			{
 				stringBuilder.AppendLine(String.Format("\t{0}", i.ToString()));
 			}

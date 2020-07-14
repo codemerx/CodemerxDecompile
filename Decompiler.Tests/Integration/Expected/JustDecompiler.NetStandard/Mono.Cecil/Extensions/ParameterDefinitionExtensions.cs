@@ -8,15 +8,15 @@ namespace Mono.Cecil.Extensions
 	{
 		public static bool IsOutParameter(this ParameterDefinition self)
 		{
-			if (!self.IsOut)
+			if (!self.get_IsOut())
 			{
 				return false;
 			}
-			if (self.IsIn)
+			if (self.get_IsIn())
 			{
 				return false;
 			}
-			if (self.ParameterType != null && self.ParameterType.IsByReference)
+			if (self.get_ParameterType() != null && self.get_ParameterType().get_IsByReference())
 			{
 				return true;
 			}

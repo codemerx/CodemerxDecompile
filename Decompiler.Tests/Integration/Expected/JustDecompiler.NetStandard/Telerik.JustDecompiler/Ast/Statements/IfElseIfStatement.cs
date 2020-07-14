@@ -20,7 +20,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			{
 				// 
 				// Current member / type: System.Collections.Generic.IEnumerable`1<Telerik.JustDecompiler.Ast.ICodeNode> Telerik.JustDecompiler.Ast.Statements.IfElseIfStatement::get_Children()
-				// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\JustDecompiler.NetStandard.dll
+				// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
 				// 
 				// Product version: 0.0.0.0
 				// Exception in: System.Collections.Generic.IEnumerable<Telerik.JustDecompiler.Ast.ICodeNode> get_Children()

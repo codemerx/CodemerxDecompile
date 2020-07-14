@@ -141,7 +141,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				if (((VariableReferenceExpression)arrayIndexerExpression.Indices[0]).Variable != variableReference)
+				if ((object)((VariableReferenceExpression)arrayIndexerExpression.Indices[0]).Variable != (object)variableReference)
 				{
 					return false;
 				}
@@ -211,7 +211,7 @@ namespace Telerik.JustDecompiler.Steps
 			private TypeReference GetArrayElementType(Expression arrayExpression)
 			{
 				TypeReference targetTypeReference = arrayExpression.GetTargetTypeReference();
-				if (!targetTypeReference.IsArray)
+				if (!targetTypeReference.get_IsArray())
 				{
 					return null;
 				}
@@ -225,7 +225,7 @@ namespace Telerik.JustDecompiler.Steps
 					return null;
 				}
 				ExplicitCastExpression explicitCastExpression = (ExplicitCastExpression)expression;
-				if (explicitCastExpression.TargetType.FullName != "System.Int32")
+				if (explicitCastExpression.TargetType.get_FullName() != "System.Int32")
 				{
 					return null;
 				}
@@ -234,7 +234,7 @@ namespace Telerik.JustDecompiler.Steps
 					return null;
 				}
 				PropertyReferenceExpression propertyReferenceExpression = (PropertyReferenceExpression)explicitCastExpression.Expression;
-				if (propertyReferenceExpression.Property.FullName != "Int32.System Length()")
+				if (propertyReferenceExpression.Property.get_FullName() != "Int32.System Length()")
 				{
 					return null;
 				}
@@ -267,7 +267,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				return targetTypeReference.IsArray;
+				return targetTypeReference.get_IsArray();
 			}
 
 			private bool IsIncrementExpression(Statement statement, VariableReference variableReference)
@@ -286,7 +286,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				if ((expression.Left as VariableReferenceExpression).Variable != variableReference)
+				if ((object)(expression.Left as VariableReferenceExpression).Variable != (object)variableReference)
 				{
 					return false;
 				}
@@ -307,7 +307,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				if ((right.Left as VariableReferenceExpression).Variable != variableReference)
+				if ((object)(right.Left as VariableReferenceExpression).Variable != (object)variableReference)
 				{
 					return false;
 				}
@@ -343,7 +343,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				if (((VariableReferenceExpression)condition.Left).Variable != variableReference)
+				if ((object)((VariableReferenceExpression)condition.Left).Variable != (object)variableReference)
 				{
 					return false;
 				}

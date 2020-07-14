@@ -79,7 +79,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				this.currentItemField = fieldDefinition;
 			}
-			else if (this.currentItemField != fieldDefinition)
+			else if ((object)this.currentItemField != (object)fieldDefinition)
 			{
 				return false;
 			}
@@ -92,7 +92,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				this.returnFlagVariable = foundReturnFlagVariable;
 			}
-			else if (this.returnFlagVariable != foundReturnFlagVariable)
+			else if ((object)this.returnFlagVariable != (object)foundReturnFlagVariable)
 			{
 				return false;
 			}
@@ -111,35 +111,35 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		private bool IsFinallyMethodInvocationBlock(InstructionBlock block)
 		{
 			Instruction first = block.First;
-			if (first.OpCode.Code != Code.Ldarg_0)
+			if (first.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.Next;
-			if (first.OpCode.Code != Code.Call)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 39)
 			{
 				return false;
 			}
 			Instruction instruction = first;
-			first = first.Next;
-			if (first.OpCode.Code == Code.Nop)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() == null)
 			{
-				first = first.Next;
+				first = first.get_Next();
 			}
 			if (!StateMachineUtilities.IsUnconditionalBranch(first))
 			{
 				return false;
 			}
-			if (block.Last != first)
+			if ((object)block.Last != (object)first)
 			{
 				return false;
 			}
-			MethodReference operand = instruction.Operand as MethodReference;
+			MethodReference operand = instruction.get_Operand() as MethodReference;
 			if (operand == null)
 			{
 				return false;
 			}
-			if (!operand.Name.StartsWith("<>m__Finally"))
+			if (!operand.get_Name().StartsWith("<>m__Finally"))
 			{
 				return false;
 			}
@@ -156,7 +156,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				while (enumerator.MoveNext())
 				{
 					InstructionBlock current = enumerator.Current;
-					if (current.Last != current.First)
+					if ((object)current.Last != (object)current.First)
 					{
 						if (this.TryAddToYieldReturningBlocks(current))
 						{
@@ -194,13 +194,13 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				while (enumerator.MoveNext())
 				{
 					InstructionBlock current = enumerator.Current;
-					if (current.Last != current.First)
+					if ((object)current.Last != (object)current.First)
 					{
 						VariableReference variableReference = null;
 						Instruction last = current.Last;
 						if (StateMachineUtilities.IsUnconditionalBranch(last))
 						{
-							last = last.Previous;
+							last = last.get_Previous();
 						}
 						if (this.IsFinallyMethodInvocationBlock(current))
 						{
@@ -211,7 +211,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 							flag = false;
 							return flag;
 						}
-						else if (!this.TryGetVariableFromInstruction(last, out variableReference) || !this.CheckAndSaveReturnFlagVariable(variableReference) || !StateMachineUtilities.TryGetOperandOfLdc(last.Previous, out num))
+						else if (!this.TryGetVariableFromInstruction(last, out variableReference) || !this.CheckAndSaveReturnFlagVariable(variableReference) || !StateMachineUtilities.TryGetOperandOfLdc(last.get_Previous(), out num))
 						{
 							flag = false;
 							return flag;
@@ -266,7 +266,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			for (int i = 0; i < (int)blocks.Length; i++)
 			{
 				InstructionBlock instructionBlocks = blocks[i];
-				if (instructionBlocks.Successors.Length == 0 && instructionBlocks.Last.OpCode.Code == Code.Ret && !this.TryProcessEndBlock(instructionBlocks))
+				if (instructionBlocks.Successors.Length == 0 && instructionBlocks.Last.get_OpCode().get_Code() == 41 && !this.TryProcessEndBlock(instructionBlocks))
 				{
 					return false;
 				}
@@ -289,17 +289,17 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult TryGetNextStateNumber(InstructionBlock theBlock, out int newStateNumber)
 		{
-			for (Instruction i = theBlock.Last; i != theBlock.First; i = i.Previous)
+			for (Instruction i = theBlock.Last; (object)i != (object)theBlock.First; i = i.get_Previous())
 			{
-				if (i.OpCode.Code == Code.Stfld && this.stateField == ((FieldReference)i.Operand).Resolve())
+				if (i.get_OpCode().get_Code() == 122 && (object)this.stateField == (object)((FieldReference)i.get_Operand()).Resolve())
 				{
-					i = i.Previous;
+					i = i.get_Previous();
 					if (!StateMachineUtilities.TryGetOperandOfLdc(i, out newStateNumber))
 					{
 						return YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.PatternFailed;
 					}
-					i = i.Previous.Previous;
-					if (i.OpCode.Code == Code.Stfld && this.CheckAndSaveCurrentItemField((FieldReference)i.Operand))
+					i = i.get_Previous().get_Previous();
+					if (i.get_OpCode().get_Code() == 122 && this.CheckAndSaveCurrentItemField((FieldReference)i.get_Operand()))
 					{
 						return YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.StateNumberFound;
 					}
@@ -320,7 +320,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			int num;
 			int num1;
 			VariableReference variableReference = null;
-			Instruction previous = theBlock.Last.Previous;
+			Instruction previous = theBlock.Last.get_Previous();
 			if (!StateMachineUtilities.TryGetOperandOfLdc(previous, out num))
 			{
 				if (!this.TryGetVariableFromInstruction(previous, out variableReference) || !this.CheckAndSaveReturnFlagVariable(variableReference))

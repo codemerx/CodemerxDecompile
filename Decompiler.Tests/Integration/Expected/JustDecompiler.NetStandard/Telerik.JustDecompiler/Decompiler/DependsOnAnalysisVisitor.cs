@@ -69,13 +69,13 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Field.DeclaringType));
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Field.get_DeclaringType()));
 			base.VisitFieldReferenceExpression(node);
 		}
 
 		public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Method.DeclaringType));
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Method.get_DeclaringType()));
 			this.Visit(node.Target);
 		}
 
@@ -87,7 +87,7 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Property.DeclaringType));
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Property.get_DeclaringType()));
 			base.VisitPropertyReferenceExpression(node);
 		}
 
@@ -110,7 +110,7 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Variable.VariableType));
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Variable.get_VariableType()));
 			base.VisitVariableDeclarationExpression(node);
 		}
 	}

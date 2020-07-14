@@ -75,7 +75,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				return false;
 			}
 			DynamicConstructorInvocationExpression dynamicConstructorInvocationExpression = other as DynamicConstructorInvocationExpression;
-			if (this.ConstructorType.FullName != dynamicConstructorInvocationExpression.ConstructorType.FullName)
+			if (this.ConstructorType.get_FullName() != dynamicConstructorInvocationExpression.ConstructorType.get_FullName())
 			{
 				return false;
 			}

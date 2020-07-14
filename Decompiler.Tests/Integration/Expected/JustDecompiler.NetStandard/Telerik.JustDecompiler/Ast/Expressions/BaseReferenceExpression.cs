@@ -73,7 +73,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.TargetType.FullName == (other as BaseReferenceExpression).TargetType.FullName;
+			return this.TargetType.get_FullName() == (other as BaseReferenceExpression).TargetType.get_FullName();
 		}
 	}
 }

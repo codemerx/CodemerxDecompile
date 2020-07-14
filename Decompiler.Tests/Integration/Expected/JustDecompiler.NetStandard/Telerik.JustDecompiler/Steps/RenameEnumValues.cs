@@ -24,16 +24,16 @@ namespace Telerik.JustDecompiler.Steps
 		private bool NeedsCast(TypeReference from, TypeReference to)
 		{
 			TypeDefinition typeDefinition = to.Resolve();
-			if (typeDefinition == null || from == null || !typeDefinition.IsEnum || to.IsArray)
+			if (typeDefinition == null || from == null || !typeDefinition.get_IsEnum() || to.get_IsArray())
 			{
 				return false;
 			}
-			return from.FullName != to.FullName;
+			return from.get_FullName() != to.get_FullName();
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.context = context;
 			return (BlockStatement)this.VisitBlockStatement(block);
 		}
@@ -57,7 +57,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			if (!typeDefinition.IsEnum || node.Left.ExpressionType.IsArray)
+			if (!typeDefinition.get_IsEnum() || node.Left.ExpressionType.get_IsArray())
 			{
 				if (!node.Right.HasType)
 				{
@@ -68,7 +68,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return node;
 				}
-				if (typeDefinition1.IsEnum && !node.Right.ExpressionType.IsArray)
+				if (typeDefinition1.get_IsEnum() && !node.Right.ExpressionType.get_IsArray())
 				{
 					if (node.Left is LiteralExpression)
 					{
@@ -95,7 +95,7 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			node = (BoxExpression)base.VisitBoxExpression(node);
 			TypeDefinition typeDefinition = node.BoxedAs.Resolve();
-			if (typeDefinition != null && typeDefinition.IsEnum && !node.BoxedAs.IsArray && node.BoxedExpression is LiteralExpression)
+			if (typeDefinition != null && typeDefinition.get_IsEnum() && !node.BoxedAs.get_IsArray() && node.BoxedExpression is LiteralExpression)
 			{
 				node.BoxedExpression = EnumHelper.GetEnumExpression(typeDefinition, node.BoxedExpression as LiteralExpression, this.typeSystem);
 			}
@@ -109,7 +109,7 @@ namespace Telerik.JustDecompiler.Steps
 				return base.VisitExplicitCastExpression(node);
 			}
 			TypeDefinition typeDefinition = node.ExpressionType.Resolve();
-			if (typeDefinition == null || !typeDefinition.IsEnum || node.ExpressionType.IsArray)
+			if (typeDefinition == null || !typeDefinition.get_IsEnum() || node.ExpressionType.get_IsArray())
 			{
 				return node;
 			}
@@ -118,10 +118,10 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void VisitInvocationArguments(ExpressionCollection arguments, MethodReference method)
 		{
-			Mono.Collections.Generic.Collection<ParameterDefinition> parameters = method.Parameters;
+			Mono.Collections.Generic.Collection<ParameterDefinition> parameters = method.get_Parameters();
 			for (int i = 0; i < arguments.Count; i++)
 			{
-				TypeReference typeReference = parameters[i].ResolveParameterType(method);
+				TypeReference typeReference = parameters.get_Item(i).ResolveParameterType(method);
 				if (this.NeedsCast(arguments[i].ExpressionType, typeReference))
 				{
 					if (arguments[i].CodeNodeType != CodeNodeType.LiteralExpression)
@@ -143,7 +143,7 @@ namespace Telerik.JustDecompiler.Steps
 			if (node.IsConstrained && node.MethodExpression.Target.CodeNodeType == CodeNodeType.LiteralExpression)
 			{
 				TypeDefinition typeDefinition = node.ConstraintType.Resolve();
-				if (typeDefinition.IsEnum)
+				if (typeDefinition.get_IsEnum())
 				{
 					node.MethodExpression.Target = EnumHelper.GetEnumExpression(typeDefinition, node.MethodExpression.Target as LiteralExpression, this.typeSystem);
 				}
@@ -174,7 +174,7 @@ namespace Telerik.JustDecompiler.Steps
 		public override ICodeNode VisitReturnExpression(ReturnExpression node)
 		{
 			node = (ReturnExpression)base.VisitReturnExpression(node);
-			TypeDefinition typeDefinition = this.context.MethodContext.Method.ReturnType.Resolve();
+			TypeDefinition typeDefinition = this.context.MethodContext.Method.get_ReturnType().Resolve();
 			if (typeDefinition == null)
 			{
 				return node;
@@ -183,7 +183,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			if (typeDefinition.IsEnum && !this.context.MethodContext.Method.ReturnType.IsArray && (node.Value.ExpressionType == null || node.Value.ExpressionType.FullName != typeDefinition.FullName))
+			if (typeDefinition.get_IsEnum() && !this.context.MethodContext.Method.get_ReturnType().get_IsArray() && (node.Value.ExpressionType == null || node.Value.ExpressionType.get_FullName() != typeDefinition.get_FullName()))
 			{
 				if (node.Value is LiteralExpression)
 				{

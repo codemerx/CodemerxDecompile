@@ -70,7 +70,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.MethodContext.Method.Module.TypeSystem;
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			return (BlockStatement)this.Visit(body);
 		}
 
@@ -109,7 +109,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (node.ExpressionType.FullName != "System.Boolean")
+			if (node.ExpressionType.get_FullName() != "System.Boolean")
 			{
 				return false;
 			}
@@ -147,7 +147,7 @@ namespace Telerik.JustDecompiler.Steps
 				node.Right = expression1;
 				return true;
 			}
-			if (right.Left.ExpressionType.FullName != "System.Boolean")
+			if (right.Left.ExpressionType.get_FullName() != "System.Boolean")
 			{
 				return false;
 			}
@@ -162,7 +162,7 @@ namespace Telerik.JustDecompiler.Steps
 			Expression expression2;
 			Expression expression3;
 			bool flag = false;
-			if (binaryExpression.Left.ExpressionType.FullName != "System.Boolean" || binaryExpression.Right.ExpressionType.FullName != "System.Boolean")
+			if (binaryExpression.Left.ExpressionType.get_FullName() != "System.Boolean" || binaryExpression.Right.ExpressionType.get_FullName() != "System.Boolean")
 			{
 				return false;
 			}
@@ -215,7 +215,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				bool flag1 = false;
 				bool flag2 = false;
-				if (then.ExpressionType.FullName == "System.Int32" && @else.ExpressionType.FullName == "System.Int32")
+				if (then.ExpressionType.get_FullName() == "System.Int32" && @else.ExpressionType.get_FullName() == "System.Int32")
 				{
 					int num = (Int32)then.Value;
 					int value1 = (Int32)@else.Value;
@@ -228,7 +228,7 @@ namespace Telerik.JustDecompiler.Steps
 						}
 					}
 				}
-				else if (then.ExpressionType.FullName == "System.Boolean" && @else.ExpressionType.FullName == "System.Boolean")
+				else if (then.ExpressionType.get_FullName() == "System.Boolean" && @else.ExpressionType.get_FullName() == "System.Boolean")
 				{
 					bool value2 = (Boolean)then.Value;
 					bool value3 = (Boolean)@else.Value;
@@ -260,7 +260,7 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					ExplicitCastExpression explicitCastExpression = ternary.Then as ExplicitCastExpression;
 					ExplicitCastExpression else1 = ternary.Else as ExplicitCastExpression;
-					if (explicitCastExpression == null || else1 == null || !(explicitCastExpression.TargetType.FullName == "System.Int32") || !(explicitCastExpression.Expression.ExpressionType.FullName == "System.Boolean") || !(else1.TargetType.FullName == "System.Int32") || !(else1.Expression.ExpressionType.FullName == "System.Boolean"))
+					if (explicitCastExpression == null || else1 == null || !(explicitCastExpression.TargetType.get_FullName() == "System.Int32") || !(explicitCastExpression.Expression.ExpressionType.get_FullName() == "System.Boolean") || !(else1.TargetType.get_FullName() == "System.Int32") || !(else1.Expression.ExpressionType.get_FullName() == "System.Boolean"))
 					{
 						return false;
 					}
@@ -277,9 +277,9 @@ namespace Telerik.JustDecompiler.Steps
 				literalExpression = then;
 				flag = true;
 			}
-			if (literalExpression.ExpressionType.FullName != "System.Int32")
+			if (literalExpression.ExpressionType.get_FullName() != "System.Int32")
 			{
-				if (literalExpression.ExpressionType.FullName != "System.Boolean")
+				if (literalExpression.ExpressionType.get_FullName() != "System.Boolean")
 				{
 					return false;
 				}
@@ -297,7 +297,7 @@ namespace Telerik.JustDecompiler.Steps
 			ExplicitCastExpression explicitCastExpression1 = expression as ExplicitCastExpression;
 			Expression expression2 = null;
 			bool flag3 = false;
-			if (conditionExpression == null && (explicitCastExpression1 == null || explicitCastExpression1.TargetType.FullName != "System.Int32" || explicitCastExpression1.Expression.ExpressionType.FullName != "System.Boolean") && !this.IsBinaryExpression(expression, out expression2, out flag3) && expression.ExpressionType.FullName != "System.Boolean")
+			if (conditionExpression == null && (explicitCastExpression1 == null || explicitCastExpression1.TargetType.get_FullName() != "System.Int32" || explicitCastExpression1.Expression.ExpressionType.get_FullName() != "System.Boolean") && !this.IsBinaryExpression(expression, out expression2, out flag3) && expression.ExpressionType.get_FullName() != "System.Boolean")
 			{
 				return false;
 			}

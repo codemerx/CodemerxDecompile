@@ -35,7 +35,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.FieldType;
+				return this.Field.get_FieldType();
 			}
 			set
 			{
@@ -135,7 +135,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			return this.Field.FullName == fieldReferenceExpression.Field.FullName;
+			return this.Field.get_FullName() == fieldReferenceExpression.Field.get_FullName();
 		}
 	}
 }

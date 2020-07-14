@@ -122,26 +122,26 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				this.expressionType = null;
 				return;
 			}
-			while (expressionType.IsOptionalModifier || expressionType.IsRequiredModifier)
+			while (expressionType.get_IsOptionalModifier() || expressionType.get_IsRequiredModifier())
 			{
-				expressionType = (expressionType as TypeSpecification).ElementType;
+				expressionType = (expressionType as TypeSpecification).get_ElementType();
 			}
-			if (expressionType.IsPointer)
+			if (expressionType.get_IsPointer())
 			{
-				this.expressionType = (expressionType as PointerType).ElementType;
+				this.expressionType = (expressionType as PointerType).get_ElementType();
 				return;
 			}
-			if (expressionType.IsByReference)
+			if (expressionType.get_IsByReference())
 			{
-				this.expressionType = (expressionType as ByReferenceType).ElementType;
+				this.expressionType = (expressionType as ByReferenceType).get_ElementType();
 				return;
 			}
-			if (!expressionType.IsPinned)
+			if (!expressionType.get_IsPinned())
 			{
 				this.expressionType = expressionType;
 				return;
 			}
-			this.expressionType = ((expressionType as PinnedType).ElementType as ByReferenceType).ElementType;
+			this.expressionType = ((expressionType as PinnedType).get_ElementType() as ByReferenceType).get_ElementType();
 		}
 
 		public override bool Equals(Expression other)

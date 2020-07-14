@@ -21,26 +21,26 @@ namespace Mono.Cecil.Extensions
 			FieldDefinition fieldDefinition;
 			TypeReference baseType;
 			TypeDefinition typeDefinition;
-			fieldDefinition = (!fieldReference.IsDefinition ? fieldReference.Resolve() : (FieldDefinition)fieldReference);
+			fieldDefinition = (!fieldReference.get_IsDefinition() ? fieldReference.Resolve() : (FieldDefinition)fieldReference);
 			if (fieldDefinition == null)
 			{
 				return false;
 			}
 			bool flag = fieldDefinition.IsCompilerGenerated(true);
-			typeDefinition = (!fieldDefinition.FieldType.IsDefinition ? fieldDefinition.FieldType.Resolve() : (TypeDefinition)fieldDefinition.FieldType);
+			typeDefinition = (!fieldDefinition.get_FieldType().get_IsDefinition() ? fieldDefinition.get_FieldType().Resolve() : (TypeDefinition)fieldDefinition.get_FieldType());
 			if (typeDefinition == null)
 			{
 				baseType = null;
 			}
 			else
 			{
-				baseType = typeDefinition.BaseType;
+				baseType = typeDefinition.get_BaseType();
 			}
 			if (!flag || baseType == null)
 			{
 				return false;
 			}
-			return baseType.FullName == typeof(MulticastDelegate).FullName;
+			return baseType.get_FullName() == typeof(MulticastDelegate).FullName;
 		}
 	}
 }

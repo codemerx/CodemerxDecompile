@@ -5,47 +5,52 @@ namespace Decompiler.Tests
 {
     internal static class TestHelper
     {
-        internal static void AssertFoldersDiffRecursively(string originFolderPath, string resultFolderPath)
+        internal static void AssertFoldersDiffRecursively(string expectedFolderPath, string actualFolderPath)
         {
-            if (!Directory.Exists(resultFolderPath))
+            if (!Directory.Exists(actualFolderPath))
             {
-                Fail($"Folder {resultFolderPath} not found");
+                Fail($"Folder {actualFolderPath} not found");
             }
 
-            string[] originFiles = Directory.GetFiles(originFolderPath);
-            string[] resultFiles = Directory.GetFiles(resultFolderPath);
-            Assert.Equal(originFiles.Length, resultFiles.Length);
+            string[] expectedFileNames = Directory.GetFiles(expectedFolderPath);
+            string[] actualFileNames = Directory.GetFiles(actualFolderPath);
+            Assert.Equal(expectedFileNames.Length, actualFileNames.Length);
 
-            for (int i = 0; i < originFiles.Length; i++)
+            for (int i = 0; i < expectedFileNames.Length; i++)
             {
-                string originFileName = originFiles[i];
-                if (originFileName.EndsWith(".dll"))
+                string expectedFileName = expectedFileNames[i];
+                if (expectedFileName.EndsWith(".dll"))
                 {
                     continue;
                 }
 
-                string originFileContent = File.ReadAllText(originFileName);
+                string expectedFileContent = File.ReadAllText(expectedFileName);
 
-                string resultFileName = resultFiles[i];
-                string resultFileContent = File.ReadAllText(resultFileName);
+                string actualFileName = actualFileNames[i];
+                string actualFileContent = File.ReadAllText(actualFileName);
 
-                //Assert.Equal(originFileName, resultFileName);
+                Assert.Equal(GetFileName(expectedFileName, expectedFolderPath), GetFileName(actualFileName, actualFolderPath));
 
-                Assert.Equal(originFileContent, resultFileContent);
+                Assert.Equal(expectedFileContent, actualFileContent);
             }
 
-            string[] originSubFolders = Directory.GetDirectories(originFolderPath);
-            string[] resultSubFolders = Directory.GetDirectories(resultFolderPath);
-            Assert.Equal(originSubFolders.Length, resultSubFolders.Length);
+            string[] expectdeSubFolderNames = Directory.GetDirectories(expectedFolderPath);
+            string[] actualSubFolderNames = Directory.GetDirectories(actualFolderPath);
+            Assert.Equal(expectdeSubFolderNames.Length, actualSubFolderNames.Length);
 
-            for (int i = 0; i < originSubFolders.Length; i++)
+            for (int i = 0; i < expectdeSubFolderNames.Length; i++)
             {
-                string originSubFolderFullName = originSubFolders[i];
-                string resultSubFolderFullName = resultSubFolders[i];
-                //Assert.Equal(originSubFolderFullName, resultSubFolderFullName);
+                string expectedSubFolderFullName = expectdeSubFolderNames[i];
+                string actualSubFolderFullName = actualSubFolderNames[i];
+                Assert.Equal(GetFileName(expectedSubFolderFullName, expectedFolderPath), GetFileName(actualSubFolderFullName, actualFolderPath));
 
-                AssertFoldersDiffRecursively(originSubFolderFullName, resultSubFolderFullName);
+                AssertFoldersDiffRecursively(expectedSubFolderFullName, actualSubFolderFullName);
             }
+        }
+
+        private static string GetFileName(string fullPath, string rootFolder)
+        {
+            return fullPath.Substring(rootFolder.Length);
         }
 
         private static void Fail(string message)

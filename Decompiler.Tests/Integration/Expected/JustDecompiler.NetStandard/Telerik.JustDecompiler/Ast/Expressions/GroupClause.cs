@@ -14,9 +14,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				GroupClause groupClause = null;
-				yield return groupClause.Expression;
-				yield return groupClause.GroupKey;
+				stackVariable1 = new GroupClause.u003cget_Childrenu003ed__15(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.GroupClause;
+				return 76;
 			}
 		}
 
@@ -40,30 +40,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public GroupClause(Telerik.JustDecompiler.Ast.Expressions.Expression expression, Telerik.JustDecompiler.Ast.Expressions.Expression key, IEnumerable<Instruction> instructions) : base(instructions)
+		public GroupClause(Telerik.JustDecompiler.Ast.Expressions.Expression expression, Telerik.JustDecompiler.Ast.Expressions.Expression key, IEnumerable<Instruction> instructions)
 		{
-			this.Expression = expression;
-			this.GroupKey = key;
+			base(instructions);
+			this.set_Expression(expression);
+			this.set_GroupKey(key);
+			return;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new GroupClause(this.Expression.Clone(), this.GroupKey.Clone(), this.instructions);
+			return new GroupClause(this.get_Expression().Clone(), this.get_GroupKey().Clone(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new GroupClause(this.Expression.CloneExpressionOnly(), this.GroupKey.CloneExpressionOnly(), null);
+			return new GroupClause(this.get_Expression().CloneExpressionOnly(), this.get_GroupKey().CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			GroupClause groupClause = other as GroupClause;
-			if (groupClause == null || !this.Expression.Equals(groupClause.Expression))
+			V_0 = other as GroupClause;
+			if (V_0 == null || !this.get_Expression().Equals(V_0.get_Expression()))
 			{
 				return false;
 			}
-			return this.GroupKey.Equals(groupClause.GroupKey);
+			return this.get_GroupKey().Equals(V_0.get_GroupKey());
 		}
 	}
 }

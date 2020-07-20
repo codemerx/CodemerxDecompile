@@ -4,11 +4,7 @@ using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using Telerik.JustDecompiler.Ast;
-using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.Caching;
@@ -16,7 +12,6 @@ using Telerik.JustDecompiler.Decompiler.MemberRenamingServices;
 using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.External.Interfaces;
 using Telerik.JustDecompiler.Languages;
-using Telerik.JustDecompiler.Languages.IL;
 
 namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 {
@@ -30,178 +25,259 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		{
 			get
 			{
-				return JustDecompileGenerated_get_ExceptionsWhileDecompiling();
+				return get_ExceptionsWhileDecompiling();
 			}
 			set
 			{
-				JustDecompileGenerated_set_ExceptionsWhileDecompiling(value);
+				set_ExceptionsWhileDecompiling(value);
 			}
 		}
 
-		private ICollection<MethodDefinition> JustDecompileGenerated_ExceptionsWhileDecompiling_k__BackingField;
+		// <ExceptionsWhileDecompiling>k__BackingField
+		private ICollection<MethodDefinition> u003cExceptionsWhileDecompilingu003ek__BackingField;
 
-		public ICollection<MethodDefinition> JustDecompileGenerated_get_ExceptionsWhileDecompiling()
+		public ICollection<MethodDefinition> get_ExceptionsWhileDecompiling()
 		{
-			return this.JustDecompileGenerated_ExceptionsWhileDecompiling_k__BackingField;
+			return this.u003cExceptionsWhileDecompilingu003ek__BackingField;
 		}
 
-		private void JustDecompileGenerated_set_ExceptionsWhileDecompiling(ICollection<MethodDefinition> value)
+		private void set_ExceptionsWhileDecompiling(ICollection<MethodDefinition> value)
 		{
-			this.JustDecompileGenerated_ExceptionsWhileDecompiling_k__BackingField = value;
+			this.u003cExceptionsWhileDecompilingu003ek__BackingField = value;
+			return;
 		}
 
 		public BaseWriterContextService(IDecompilationCacheService cacheService, bool renameInvalidMembers)
 		{
+			base();
 			this.cacheService = cacheService;
 			this.renameInvalidMembers = renameInvalidMembers;
-			this.ExceptionsWhileDecompiling = new List<MethodDefinition>();
+			this.set_ExceptionsWhileDecompiling(new List<MethodDefinition>());
+			return;
 		}
 
 		private static void AddAssignmentDataToDecompiledType(CachedDecompiledMember decompiledMember, DecompiledType decompiledType)
 		{
-			if (!decompiledType.TypeContext.FieldInitializationFailed)
+			if (!decompiledType.get_TypeContext().get_FieldInitializationFailed())
 			{
-				foreach (KeyValuePair<string, InitializationAssignment> fieldAssignmentDatum in decompiledMember.FieldAssignmentData)
+				V_0 = decompiledMember.get_FieldAssignmentData().GetEnumerator();
+				try
 				{
-					if (decompiledType.TypeContext.AssignmentData.ContainsKey(fieldAssignmentDatum.Key))
+					while (V_0.MoveNext())
 					{
-						if (decompiledType.TypeContext.AssignmentData[fieldAssignmentDatum.Key].AssignmentExpression.Equals(fieldAssignmentDatum.Value.AssignmentExpression))
+						V_1 = V_0.get_Current();
+						if (decompiledType.get_TypeContext().get_AssignmentData().ContainsKey(V_1.get_Key()))
 						{
-							continue;
+							if (decompiledType.get_TypeContext().get_AssignmentData().get_Item(V_1.get_Key()).get_AssignmentExpression().Equals(V_1.get_Value().get_AssignmentExpression()))
+							{
+								continue;
+							}
+							decompiledType.get_TypeContext().set_FieldInitializationFailed(true);
+							decompiledType.get_TypeContext().set_AssignmentData(new Dictionary<string, InitializationAssignment>());
+							goto Label0;
 						}
-						decompiledType.TypeContext.FieldInitializationFailed = true;
-						decompiledType.TypeContext.AssignmentData = new Dictionary<string, InitializationAssignment>();
-						return;
-					}
-					else
-					{
-						decompiledType.TypeContext.AssignmentData.Add(fieldAssignmentDatum.Key, fieldAssignmentDatum.Value);
+						else
+						{
+							decompiledType.get_TypeContext().get_AssignmentData().Add(V_1.get_Key(), V_1.get_Value());
+						}
 					}
 				}
+				finally
+				{
+					((IDisposable)V_0).Dispose();
+				}
 			}
+		Label0:
+			return;
 		}
 
 		protected CachedDecompiledMember AddDecompiledMemberToCache(IMemberDefinition member, DecompiledMember decompiledMember, TypeSpecificContext typeContext, ILanguage language)
 		{
-			CachedDecompiledMember cachedDecompiledMember = new CachedDecompiledMember(decompiledMember, typeContext);
+			V_0 = new CachedDecompiledMember(decompiledMember, typeContext);
 			if (!this.cacheService.IsDecompiledMemberInCache(member, language, this.renameInvalidMembers))
 			{
-				this.cacheService.AddDecompiledMemberToCache(member, language, this.renameInvalidMembers, cachedDecompiledMember);
+				this.cacheService.AddDecompiledMemberToCache(member, language, this.renameInvalidMembers, V_0);
 			}
-			return cachedDecompiledMember;
+			return V_0;
 		}
 
 		protected void AddDecompiledMemberToDecompiledType(CachedDecompiledMember decompiledMember, DecompiledType decompiledType)
 		{
-			if (!decompiledType.DecompiledMembers.ContainsKey(decompiledMember.Member.MemberFullName))
+			if (!decompiledType.get_DecompiledMembers().ContainsKey(decompiledMember.get_Member().get_MemberFullName()))
 			{
-				decompiledType.DecompiledMembers.Add(decompiledMember.Member.MemberFullName, decompiledMember.Member);
+				decompiledType.get_DecompiledMembers().Add(decompiledMember.get_Member().get_MemberFullName(), decompiledMember.get_Member());
 			}
+			return;
 		}
 
 		private void AddExplicitlyImplementedMembers(ICollection<ImplementedMember> explicitlyImplementedMembers, ExplicitlyImplementedMembersCollection collection)
 		{
-			foreach (ImplementedMember explicitlyImplementedMember in explicitlyImplementedMembers)
+			V_0 = explicitlyImplementedMembers.GetEnumerator();
+			try
 			{
-				if (collection.Contains(explicitlyImplementedMember.DeclaringType, explicitlyImplementedMember.Member.get_FullName()))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (collection.Contains(V_1.get_DeclaringType(), V_1.get_Member().get_FullName()))
+					{
+						continue;
+					}
+					collection.Add(V_1.get_DeclaringType(), V_1.get_Member().get_FullName());
 				}
-				collection.Add(explicitlyImplementedMember.DeclaringType, explicitlyImplementedMember.Member.get_FullName());
 			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return;
 		}
 
 		protected void AddGeneratedFilterMethodsToDecompiledType(DecompiledType decompiledType, TypeSpecificContext context, ILanguage language)
 		{
-			foreach (GeneratedMethod generatedFilterMethod in context.GeneratedFilterMethods)
+			V_0 = context.get_GeneratedFilterMethods().GetEnumerator();
+			try
 			{
-				CachedDecompiledMember cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(generatedFilterMethod.Method), generatedFilterMethod.Body, generatedFilterMethod.Context));
-				this.AddDecompiledMemberToDecompiledType(cachedDecompiledMember, decompiledType);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					V_2 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(V_1.get_Method()), V_1.get_Body(), V_1.get_Context()));
+					this.AddDecompiledMemberToDecompiledType(V_2, decompiledType);
+				}
 			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return;
 		}
 
 		protected void AddTypeContextsToCache(Dictionary<string, DecompiledType> decompiledTypes, TypeDefinition outerMostDeclaringType, ILanguage language)
 		{
-			TypeSpecificContext typeSpecificContext;
-			foreach (KeyValuePair<string, DecompiledType> decompiledType in decompiledTypes)
+			V_0 = decompiledTypes.GetEnumerator();
+			try
 			{
-				if (this.cacheService.IsTypeContextInCache(decompiledType.Value.Type, language, this.renameInvalidMembers))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (this.cacheService.IsTypeContextInCache(V_1.get_Value().get_Type(), language, this.renameInvalidMembers))
+					{
+						continue;
+					}
+					if ((object)V_1.get_Value().get_Type() != (object)outerMostDeclaringType)
+					{
+						V_2 = V_1.get_Value().get_TypeContext();
+					}
+					else
+					{
+						V_2 = this.CreateTypeContext(V_1.get_Value().get_Type(), language, decompiledTypes, V_1.get_Value());
+					}
+					this.cacheService.AddTypeContextToCache(V_1.get_Value().get_Type(), language, this.renameInvalidMembers, V_2);
 				}
-				typeSpecificContext = ((object)decompiledType.Value.Type != (object)outerMostDeclaringType ? decompiledType.Value.TypeContext : this.CreateTypeContext(decompiledType.Value.Type, language, decompiledTypes, decompiledType.Value));
-				this.cacheService.AddTypeContextToCache(decompiledType.Value.Type, language, this.renameInvalidMembers, typeSpecificContext);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private TypeSpecificContext CreateTypeContext(TypeDefinition type, ILanguage language, Dictionary<string, DecompiledType> decompiledTypes, DecompiledType decompiledCurrentType)
 		{
-			ICollection<TypeReference> typesDependingOn = this.GetTypesDependingOn(decompiledTypes, language);
-			ICollection<string> usedNamespaces = this.GetUsedNamespaces(typesDependingOn, type.get_Namespace());
-			ICollection<string> typeVisibleMembersNames = this.GetTypeVisibleMembersNames(type, language, decompiledTypes);
-			ExplicitlyImplementedMembersCollection explicitlyImplementedInterfaceMethods = this.GetExplicitlyImplementedInterfaceMethods(type, language);
-			return new TypeSpecificContext(type, decompiledCurrentType.TypeContext.MethodDefinitionToNameMap, decompiledCurrentType.TypeContext.BackingFieldToNameMap, usedNamespaces, typeVisibleMembersNames, decompiledCurrentType.TypeContext.AssignmentData, this.GetAutoImplementedProperties(decompiledTypes), this.GetAutoImplementedEvents(decompiledTypes), explicitlyImplementedInterfaceMethods, this.ExceptionsWhileDecompiling, decompiledCurrentType.TypeContext.GeneratedFilterMethods, decompiledCurrentType.TypeContext.GeneratedMethodDefinitionToNameMap);
+			V_0 = this.GetTypesDependingOn(decompiledTypes, language);
+			V_1 = this.GetUsedNamespaces(V_0, type.get_Namespace());
+			V_2 = this.GetTypeVisibleMembersNames(type, language, decompiledTypes);
+			V_3 = this.GetExplicitlyImplementedInterfaceMethods(type, language);
+			return new TypeSpecificContext(type, decompiledCurrentType.get_TypeContext().get_MethodDefinitionToNameMap(), decompiledCurrentType.get_TypeContext().get_BackingFieldToNameMap(), V_1, V_2, decompiledCurrentType.get_TypeContext().get_AssignmentData(), this.GetAutoImplementedProperties(decompiledTypes), this.GetAutoImplementedEvents(decompiledTypes), V_3, this.get_ExceptionsWhileDecompiling(), decompiledCurrentType.get_TypeContext().get_GeneratedFilterMethods(), decompiledCurrentType.get_TypeContext().get_GeneratedMethodDefinitionToNameMap());
 		}
 
 		protected void DecompileConstructorChain(MethodDefinition method, ILanguage language, DecompiledType decompiledType)
 		{
 			if (this.cacheService.IsDecompiledMemberInCache(method, language, this.renameInvalidMembers))
 			{
-				CachedDecompiledMember decompiledMemberFromCache = this.cacheService.GetDecompiledMemberFromCache(method, language, this.renameInvalidMembers);
-				this.AddDecompiledMemberToDecompiledType(decompiledMemberFromCache, decompiledType);
-				BaseWriterContextService.AddAssignmentDataToDecompiledType(decompiledMemberFromCache, decompiledType);
+				V_3 = this.cacheService.GetDecompiledMemberFromCache(method, language, this.renameInvalidMembers);
+				this.AddDecompiledMemberToDecompiledType(V_3, decompiledType);
+				BaseWriterContextService.AddAssignmentDataToDecompiledType(V_3, decompiledType);
 				return;
 			}
 			if (method.get_Body() == null)
 			{
-				CachedDecompiledMember cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null));
-				this.cacheService.AddDecompiledMemberToCache(method, language, this.renameInvalidMembers, cachedDecompiledMember);
+				V_4 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null));
+				this.cacheService.AddDecompiledMemberToCache(method, language, this.renameInvalidMembers, V_4);
 				return;
 			}
-			CachedDecompiledMember cachedDecompiledMember1 = this.DecompileMethod(language, method, decompiledType.TypeContext.ShallowPartialClone());
-			List<CachedDecompiledMember> cachedDecompiledMembers = new List<CachedDecompiledMember>();
-			TypeDefinition declaringType = method.get_DeclaringType();
+			V_0 = this.DecompileMethod(language, method, decompiledType.get_TypeContext().ShallowPartialClone());
+			V_1 = new List<CachedDecompiledMember>();
+			V_2 = method.get_DeclaringType();
 			if (!method.get_IsStatic())
 			{
-				foreach (MethodDefinition methodDefinition in declaringType.get_Methods())
+				V_5 = V_2.get_Methods().GetEnumerator();
+				try
 				{
-					if (!methodDefinition.get_IsConstructor() || methodDefinition.get_FullName() == cachedDecompiledMember1.Member.MemberFullName || methodDefinition.get_IsStatic())
+					while (V_5.MoveNext())
 					{
-						continue;
-					}
-					if (methodDefinition.get_Body() != null)
-					{
-						cachedDecompiledMembers.Add(this.DecompileMethod(language, methodDefinition, decompiledType.TypeContext.ShallowPartialClone()));
-					}
-					else
-					{
-						CachedDecompiledMember cachedDecompiledMember2 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(methodDefinition), null, null));
-						cachedDecompiledMembers.Add(cachedDecompiledMember2);
-					}
-				}
-				cachedDecompiledMembers.Add(cachedDecompiledMember1);
-				this.MergeConstructorsTypeContexts(cachedDecompiledMembers, decompiledType);
-				foreach (CachedDecompiledMember cachedDecompiledMember3 in cachedDecompiledMembers)
-				{
-					if (!(language is IntermediateLanguage))
-					{
-						this.RemoveBaseCtorInvocationStatements(cachedDecompiledMember3, decompiledType);
-					}
-					if (cachedDecompiledMember3.Member.Context == null)
-					{
-						MethodDefinition methodDefinition1 = decompiledType.Type.get_Methods().First<MethodDefinition>((MethodDefinition x) => x.get_FullName() == cachedDecompiledMember3.Member.MemberFullName);
-						if (!this.cacheService.IsDecompiledMemberInCache(methodDefinition1, language, this.renameInvalidMembers))
+						V_6 = V_5.get_Current();
+						if (!V_6.get_IsConstructor() || String.op_Equality(V_6.get_FullName(), V_0.get_Member().get_MemberFullName()) || V_6.get_IsStatic())
 						{
-							this.cacheService.AddDecompiledMemberToCache(methodDefinition1, language, this.renameInvalidMembers, cachedDecompiledMember3);
+							continue;
+						}
+						if (V_6.get_Body() != null)
+						{
+							V_1.Add(this.DecompileMethod(language, V_6, decompiledType.get_TypeContext().ShallowPartialClone()));
+						}
+						else
+						{
+							V_7 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(V_6), null, null));
+							V_1.Add(V_7);
 						}
 					}
-					else if (!this.cacheService.IsDecompiledMemberInCache(cachedDecompiledMember3.Member.Context.Method, language, this.renameInvalidMembers))
+				}
+				finally
+				{
+					V_5.Dispose();
+				}
+				V_1.Add(V_0);
+				this.MergeConstructorsTypeContexts(V_1, decompiledType);
+				V_8 = V_1.GetEnumerator();
+				try
+				{
+					while (V_8.MoveNext())
 					{
-						this.cacheService.AddDecompiledMemberToCache(cachedDecompiledMember3.Member.Context.Method, language, this.renameInvalidMembers, cachedDecompiledMember3);
+						V_9 = new BaseWriterContextService.u003cu003ec__DisplayClass15_0();
+						V_9.constructor = V_8.get_Current();
+						if (language as IntermediateLanguage == null)
+						{
+							this.RemoveBaseCtorInvocationStatements(V_9.constructor, decompiledType);
+						}
+						if (V_9.constructor.get_Member().get_Context() != null)
+						{
+							if (!this.cacheService.IsDecompiledMemberInCache(V_9.constructor.get_Member().get_Context().get_Method(), language, this.renameInvalidMembers))
+							{
+								this.cacheService.AddDecompiledMemberToCache(V_9.constructor.get_Member().get_Context().get_Method(), language, this.renameInvalidMembers, V_9.constructor);
+							}
+						}
+						else
+						{
+							V_10 = decompiledType.get_Type().get_Methods().First<MethodDefinition>(new Func<MethodDefinition, bool>(V_9.u003cDecompileConstructorChainu003eb__0));
+							if (!this.cacheService.IsDecompiledMemberInCache(V_10, language, this.renameInvalidMembers))
+							{
+								this.cacheService.AddDecompiledMemberToCache(V_10, language, this.renameInvalidMembers, V_9.constructor);
+							}
+						}
+						this.AddDecompiledMemberToDecompiledType(V_9.constructor, decompiledType);
 					}
-					this.AddDecompiledMemberToDecompiledType(cachedDecompiledMember3, decompiledType);
+				}
+				finally
+				{
+					((IDisposable)V_8).Dispose();
 				}
 			}
+			return;
 		}
 
 		protected void DecompileMember(MethodDefinition method, ILanguage language, DecompiledType decompiledType)
@@ -212,27 +288,27 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 				return;
 			}
 			this.AddDecompiledMemberToDecompiledType(this.GetDecompiledMember(method, language, decompiledType), decompiledType);
+			return;
 		}
 
 		private CachedDecompiledMember DecompileMethod(ILanguage language, MethodDefinition method, TypeSpecificContext typeContext)
 		{
-			CachedDecompiledMember cachedDecompiledMember;
 			try
 			{
-				DecompilationContext decompilationContext = null;
-				Statement statement = method.get_Body().Decompile(language, out decompilationContext, typeContext);
-				cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), statement, decompilationContext.MethodContext), decompilationContext.TypeContext);
+				V_2 = null;
+				V_1 = method.get_Body().Decompile(language, out V_2, typeContext);
+				V_0 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), V_1, V_2.get_MethodContext()), V_2.get_TypeContext());
 			}
-			catch (Exception exception1)
+			catch (Exception exception_0)
 			{
-				Exception exception = exception1;
-				this.ExceptionsWhileDecompiling.Add(method);
-				BlockStatement blockStatement = new BlockStatement();
-				blockStatement.AddStatement(new ExceptionStatement(exception, method));
-				cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, new MethodSpecificContext(method.get_Body())));
-				base.OnExceptionThrown(exception);
+				V_3 = exception_0;
+				this.get_ExceptionsWhileDecompiling().Add(method);
+				V_4 = new BlockStatement();
+				V_4.AddStatement(new ExceptionStatement(V_3, method));
+				V_0 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), V_4, new MethodSpecificContext(method.get_Body())));
+				this.OnExceptionThrown(V_3);
 			}
-			return cachedDecompiledMember;
+			return V_0;
 		}
 
 		public abstract AssemblySpecificContext GetAssemblyContext(AssemblyDefinition assembly, ILanguage language);
@@ -244,22 +320,40 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		protected HashSet<EventDefinition> GetAutoImplementedEvents(Dictionary<string, DecompiledType> decompiledTypes)
 		{
-			HashSet<EventDefinition> eventDefinitions = new HashSet<EventDefinition>();
-			foreach (DecompiledType value in decompiledTypes.Values)
+			V_0 = new HashSet<EventDefinition>();
+			V_1 = decompiledTypes.get_Values().GetEnumerator();
+			try
 			{
-				eventDefinitions.UnionWith(value.TypeContext.AutoImplementedEvents);
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.UnionWith(V_2.get_TypeContext().get_AutoImplementedEvents());
+				}
 			}
-			return eventDefinitions;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		protected HashSet<PropertyDefinition> GetAutoImplementedProperties(Dictionary<string, DecompiledType> decompiledTypes)
 		{
-			HashSet<PropertyDefinition> propertyDefinitions = new HashSet<PropertyDefinition>();
-			foreach (DecompiledType value in decompiledTypes.Values)
+			V_0 = new HashSet<PropertyDefinition>();
+			V_1 = decompiledTypes.get_Values().GetEnumerator();
+			try
 			{
-				propertyDefinitions.UnionWith(value.TypeContext.AutoImplementedProperties);
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.UnionWith(V_2.get_TypeContext().get_AutoImplementedProperties());
+				}
 			}
-			return propertyDefinitions;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		protected CachedDecompiledMember GetDecompiledMember(MethodDefinition method, ILanguage language, DecompiledType decompiledType)
@@ -272,59 +366,71 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			{
 				return this.cacheService.GetDecompiledMemberFromCache(method, language, this.renameInvalidMembers);
 			}
-			CachedDecompiledMember cachedDecompiledMember = this.DecompileMethod(language, method, decompiledType.TypeContext);
-			this.cacheService.AddDecompiledMemberToCache(method, language, this.renameInvalidMembers, cachedDecompiledMember);
-			return cachedDecompiledMember;
+			V_0 = this.DecompileMethod(language, method, decompiledType.get_TypeContext());
+			this.cacheService.AddDecompiledMemberToCache(method, language, this.renameInvalidMembers, V_0);
+			return V_0;
 		}
 
-		private ICollection<TypeReference> GetEventTypesDependingOn(EventDefinition @event, ILanguage language)
+		private ICollection<TypeReference> GetEventTypesDependingOn(EventDefinition event, ILanguage language)
 		{
-			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(@event.get_EventType()));
-			typeReferences.UnionWith(AttributesUtilities.GetEventAttributesUsedTypes(@event, language));
-			if (@event.get_AddMethod() != null)
+			V_0 = new HashSet<TypeReference>();
+			V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(event.get_EventType()));
+			V_0.UnionWith(AttributesUtilities.GetEventAttributesUsedTypes(event, language));
+			if (event.get_AddMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.get_AddMethod(), language, false));
+				V_0.UnionWith(this.GetMethodTypesDependingOn(event.get_AddMethod(), language, false));
 			}
-			if (@event.get_RemoveMethod() != null)
+			if (event.get_RemoveMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.get_RemoveMethod(), language, false));
+				V_0.UnionWith(this.GetMethodTypesDependingOn(event.get_RemoveMethod(), language, false));
 			}
-			if (@event.get_InvokeMethod() != null)
+			if (event.get_InvokeMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(@event.get_InvokeMethod(), language, false));
+				V_0.UnionWith(this.GetMethodTypesDependingOn(event.get_InvokeMethod(), language, false));
 			}
-			return typeReferences;
+			return V_0;
 		}
 
 		protected ExplicitlyImplementedMembersCollection GetExplicitlyImplementedInterfaceMethods(TypeDefinition type, ILanguage language)
 		{
-			ExplicitlyImplementedMembersCollection explicitlyImplementedMembersCollection = new ExplicitlyImplementedMembersCollection();
-			foreach (IMemberDefinition membersUnordered in TypeDefinitionExtensions.GetMembersUnordered(type, true))
+			V_0 = new ExplicitlyImplementedMembersCollection();
+			V_1 = TypeDefinitionExtensions.GetMembersUnordered(type, true).GetEnumerator();
+			try
 			{
-				if (membersUnordered is MethodDefinition)
+				while (V_1.MoveNext())
 				{
-					this.AddExplicitlyImplementedMembers((membersUnordered as MethodDefinition).GetExplicitlyImplementedMethods(), explicitlyImplementedMembersCollection);
+					V_2 = V_1.get_Current();
+					if (V_2 as MethodDefinition != null)
+					{
+						this.AddExplicitlyImplementedMembers((V_2 as MethodDefinition).GetExplicitlyImplementedMethods(), V_0);
+					}
+					if (V_2 as PropertyDefinition != null)
+					{
+						this.AddExplicitlyImplementedMembers((V_2 as PropertyDefinition).GetExplicitlyImplementedProperties(), V_0);
+					}
+					if (V_2 as EventDefinition == null)
+					{
+						continue;
+					}
+					this.AddExplicitlyImplementedMembers((V_2 as EventDefinition).GetExplicitlyImplementedEvents(), V_0);
 				}
-				if (membersUnordered is PropertyDefinition)
-				{
-					this.AddExplicitlyImplementedMembers((membersUnordered as PropertyDefinition).GetExplicitlyImplementedProperties(), explicitlyImplementedMembersCollection);
-				}
-				if (!(membersUnordered is EventDefinition))
-				{
-					continue;
-				}
-				this.AddExplicitlyImplementedMembers((membersUnordered as EventDefinition).GetExplicitlyImplementedEvents(), explicitlyImplementedMembersCollection);
 			}
-			return explicitlyImplementedMembersCollection;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		private ICollection<TypeReference> GetFieldTypesDependingOn(FieldDefinition field)
 		{
-			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(field.get_FieldType()));
-			typeReferences.UnionWith(AttributesUtilities.GetFieldAttributesUsedTypes(field));
-			return typeReferences;
+			stackVariable0 = new HashSet<TypeReference>();
+			stackVariable0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(field.get_FieldType()));
+			stackVariable0.UnionWith(AttributesUtilities.GetFieldAttributesUsedTypes(field));
+			return stackVariable0;
 		}
 
 		protected virtual MemberRenamingData GetMemberRenamingData(ModuleDefinition module, ILanguage language)
@@ -334,20 +440,29 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		private ICollection<TypeReference> GetMethodTypesDependingOn(MethodDefinition method, ILanguage language, bool considerAttributes = true)
 		{
-			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
+			V_0 = new HashSet<TypeReference>();
 			if (method.get_ReturnType() != null)
 			{
-				typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(method.get_ReturnType()));
+				V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(method.get_ReturnType()));
 			}
 			if (considerAttributes)
 			{
-				typeReferences.UnionWith(AttributesUtilities.GetMethodAttributesUsedTypes(method, language));
+				V_0.UnionWith(AttributesUtilities.GetMethodAttributesUsedTypes(method, language));
 			}
-			foreach (ParameterDefinition parameter in method.get_Parameters())
+			V_1 = method.get_Parameters().GetEnumerator();
+			try
 			{
-				typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(parameter.get_ParameterType()));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(V_2.get_ParameterType()));
+				}
 			}
-			return typeReferences;
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0;
 		}
 
 		public abstract ModuleSpecificContext GetModuleContext(ModuleDefinition module, ILanguage language);
@@ -359,411 +474,549 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		protected Dictionary<string, DecompiledType> GetNestedDecompiledTypes(TypeDefinition type, ILanguage language)
 		{
-			DecompiledType decompiledType;
-			CachedDecompiledMember cachedDecompiledMember;
-			CachedDecompiledMember cachedDecompiledMember1;
-			bool flag;
-			Dictionary<string, DecompiledType> strs = new Dictionary<string, DecompiledType>();
-			Queue<IMemberDefinition> memberDefinitions = new Queue<IMemberDefinition>();
-			memberDefinitions.Enqueue(type);
-			while (memberDefinitions.Count > 0)
+			V_0 = new Dictionary<string, DecompiledType>();
+			V_1 = new Queue<IMemberDefinition>();
+			V_1.Enqueue(type);
+			while (V_1.get_Count() > 0)
 			{
-				IMemberDefinition memberDefinition = memberDefinitions.Dequeue();
-				if (!(memberDefinition is TypeDefinition))
+				V_2 = V_1.Dequeue();
+				if (V_2 as TypeDefinition == null)
 				{
-					if (!strs.TryGetValue(memberDefinition.get_DeclaringType().get_FullName(), out decompiledType))
+					if (!V_0.TryGetValue(V_2.get_DeclaringType().get_FullName(), out V_7))
 					{
 						throw new Exception("Type missing from nested types decompilation cache.");
 					}
-					if (memberDefinition is MethodDefinition)
+					if (V_2 as MethodDefinition != null)
 					{
-						this.DecompileMember(memberDefinition as MethodDefinition, language, decompiledType);
+						this.DecompileMember(V_2 as MethodDefinition, language, V_7);
 					}
-					if (memberDefinition is EventDefinition)
+					if (V_2 as EventDefinition != null)
 					{
-						EventDefinition eventDefinition = memberDefinition as EventDefinition;
-						if ((new AutoImplementedEventMatcher(eventDefinition, language)).IsAutoImplemented())
+						V_9 = V_2 as EventDefinition;
+						if ((new AutoImplementedEventMatcher(V_9, language)).IsAutoImplemented())
 						{
-							decompiledType.TypeContext.AutoImplementedEvents.Add(eventDefinition);
+							dummyVar0 = V_7.get_TypeContext().get_AutoImplementedEvents().Add(V_9);
 						}
-						if (eventDefinition.get_AddMethod() != null)
+						if (V_9.get_AddMethod() != null)
 						{
-							this.DecompileMember(eventDefinition.get_AddMethod(), language, decompiledType);
+							this.DecompileMember(V_9.get_AddMethod(), language, V_7);
 						}
-						if (eventDefinition.get_RemoveMethod() != null)
+						if (V_9.get_RemoveMethod() != null)
 						{
-							this.DecompileMember(eventDefinition.get_RemoveMethod(), language, decompiledType);
+							this.DecompileMember(V_9.get_RemoveMethod(), language, V_7);
 						}
-						if (eventDefinition.get_InvokeMethod() != null)
+						if (V_9.get_InvokeMethod() != null)
 						{
-							this.DecompileMember(eventDefinition.get_InvokeMethod(), language, decompiledType);
+							this.DecompileMember(V_9.get_InvokeMethod(), language, V_7);
 						}
 					}
-					if (!(memberDefinition is PropertyDefinition))
+					if (V_2 as PropertyDefinition == null)
 					{
 						continue;
 					}
-					PropertyDefinition propertyDefinition = memberDefinition as PropertyDefinition;
-					PropertyDecompiler propertyDecompiler = new PropertyDecompiler(propertyDefinition, language, this.renameInvalidMembers, this.cacheService, decompiledType.TypeContext);
-					propertyDecompiler.ExceptionThrown += new EventHandler<Exception>(this.OnExceptionThrown);
-					propertyDecompiler.Decompile(out cachedDecompiledMember, out cachedDecompiledMember1, out flag);
-					propertyDecompiler.ExceptionThrown -= new EventHandler<Exception>(this.OnExceptionThrown);
-					if (flag)
+					V_10 = V_2 as PropertyDefinition;
+					stackVariable34 = new PropertyDecompiler(V_10, language, this.renameInvalidMembers, this.cacheService, V_7.get_TypeContext());
+					stackVariable34.add_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
+					stackVariable34.Decompile(out V_11, out V_12, out V_13);
+					stackVariable34.remove_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
+					if (V_13)
 					{
-						decompiledType.TypeContext.AutoImplementedProperties.Add(propertyDefinition);
+						dummyVar1 = V_7.get_TypeContext().get_AutoImplementedProperties().Add(V_10);
 					}
-					if (cachedDecompiledMember != null)
+					if (V_11 != null)
 					{
-						this.AddDecompiledMemberToDecompiledType(cachedDecompiledMember, decompiledType);
+						this.AddDecompiledMemberToDecompiledType(V_11, V_7);
 					}
-					if (cachedDecompiledMember1 != null)
+					if (V_12 != null)
 					{
-						this.AddDecompiledMemberToDecompiledType(cachedDecompiledMember1, decompiledType);
+						this.AddDecompiledMemberToDecompiledType(V_12, V_7);
 					}
-					foreach (MethodDefinition exceptionsWhileDecompiling in propertyDecompiler.ExceptionsWhileDecompiling)
+					V_14 = stackVariable34.get_ExceptionsWhileDecompiling().GetEnumerator();
+					try
 					{
-						this.ExceptionsWhileDecompiling.Add(exceptionsWhileDecompiling);
+						while (V_14.MoveNext())
+						{
+							V_15 = V_14.get_Current();
+							this.get_ExceptionsWhileDecompiling().Add(V_15);
+						}
+					}
+					finally
+					{
+						if (V_14 != null)
+						{
+							V_14.Dispose();
+						}
 					}
 				}
 				else
 				{
-					TypeDefinition typeDefinition = memberDefinition as TypeDefinition;
-					strs.Add(typeDefinition.get_FullName(), new DecompiledType(typeDefinition));
-					foreach (IMemberDefinition typeMembersToDecompile in Utilities.GetTypeMembersToDecompile(typeDefinition))
+					V_3 = V_2 as TypeDefinition;
+					V_0.Add(V_3.get_FullName(), new DecompiledType(V_3));
+					V_4 = Utilities.GetTypeMembersToDecompile(V_3).GetEnumerator();
+					try
 					{
-						memberDefinitions.Enqueue(typeMembersToDecompile);
+						while (V_4.MoveNext())
+						{
+							V_5 = V_4.get_Current();
+							V_1.Enqueue(V_5);
+						}
+					}
+					finally
+					{
+						((IDisposable)V_4).Dispose();
 					}
 				}
 			}
-			foreach (DecompiledType value in strs.Values)
+			V_16 = V_0.get_Values().GetEnumerator();
+			try
 			{
-				this.AddGeneratedFilterMethodsToDecompiledType(value, value.TypeContext, language);
+				while (V_16.MoveNext())
+				{
+					V_17 = V_16.get_Current();
+					this.AddGeneratedFilterMethodsToDecompiledType(V_17, V_17.get_TypeContext(), language);
+				}
 			}
-			return strs;
+			finally
+			{
+				((IDisposable)V_16).Dispose();
+			}
+			return V_0;
 		}
 
 		private ICollection<TypeReference> GetPropertyTypesDependingOn(PropertyDefinition property, ILanguage language)
 		{
-			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(property.get_PropertyType()));
-			typeReferences.UnionWith(AttributesUtilities.GetPropertyAttributesUsedTypes(property, language));
+			V_0 = new HashSet<TypeReference>();
+			V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(property.get_PropertyType()));
+			V_0.UnionWith(AttributesUtilities.GetPropertyAttributesUsedTypes(property, language));
 			if (property.get_GetMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(property.get_GetMethod(), language, false));
+				V_0.UnionWith(this.GetMethodTypesDependingOn(property.get_GetMethod(), language, false));
 			}
 			if (property.get_SetMethod() != null)
 			{
-				typeReferences.UnionWith(this.GetMethodTypesDependingOn(property.get_SetMethod(), language, false));
+				V_0.UnionWith(this.GetMethodTypesDependingOn(property.get_SetMethod(), language, false));
 			}
-			return typeReferences;
+			return V_0;
 		}
 
 		protected virtual TypeSpecificContext GetTypeContext(TypeDefinition type, ILanguage language, Dictionary<string, DecompiledType> decompiledTypes)
 		{
-			DecompiledType decompiledType;
-			TypeSpecificContext typeContextFromCache;
-			if (!decompiledTypes.TryGetValue(type.get_FullName(), out decompiledType))
+			if (!decompiledTypes.TryGetValue(type.get_FullName(), out V_0))
 			{
 				throw new Exception("Decompiled type not found in decompiled types cache.");
 			}
 			if (!this.cacheService.IsTypeContextInCache(type, language, this.renameInvalidMembers))
 			{
-				typeContextFromCache = this.CreateTypeContext(type, language, decompiledTypes, decompiledType);
-				this.cacheService.AddTypeContextToCache(type, language, this.renameInvalidMembers, typeContextFromCache);
+				V_1 = this.CreateTypeContext(type, language, decompiledTypes, V_0);
+				this.cacheService.AddTypeContextToCache(type, language, this.renameInvalidMembers, V_1);
 			}
 			else
 			{
-				if (decompiledType.TypeContext.GeneratedFilterMethods.Count > 0)
+				if (V_0.get_TypeContext().get_GeneratedFilterMethods().get_Count() > 0)
 				{
-					this.cacheService.ReplaceCachedTypeContext(type, language, this.renameInvalidMembers, decompiledType.TypeContext);
+					this.cacheService.ReplaceCachedTypeContext(type, language, this.renameInvalidMembers, V_0.get_TypeContext());
 				}
-				typeContextFromCache = this.cacheService.GetTypeContextFromCache(type, language, this.renameInvalidMembers);
+				V_1 = this.cacheService.GetTypeContextFromCache(type, language, this.renameInvalidMembers);
 			}
-			return typeContextFromCache;
+			return V_1;
 		}
 
 		private ICollection<TypeReference> GetTypesDependingOn(Dictionary<string, DecompiledType> decompiledTypes, ILanguage language)
 		{
-			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			foreach (DecompiledType value in decompiledTypes.Values)
+			V_0 = new HashSet<TypeReference>();
+			V_1 = decompiledTypes.get_Values().GetEnumerator();
+			try
 			{
-				foreach (KeyValuePair<string, DecompiledMember> decompiledMember in value.DecompiledMembers)
+				while (V_1.MoveNext())
 				{
-					if (decompiledMember.Value.Context == null)
+					V_2 = V_1.get_Current();
+					V_3 = V_2.get_DecompiledMembers().GetEnumerator();
+					try
 					{
-						continue;
-					}
-					typeReferences.UnionWith(decompiledMember.Value.Context.AnalysisResults.TypesDependingOn);
-					if (decompiledMember.Value.Context.Method == null || decompiledMember.Value.Context.Method.get_Body() == null || !decompiledMember.Value.Context.Method.get_Body().get_HasVariables())
-					{
-						continue;
-					}
-					foreach (VariableDefinition variable in decompiledMember.Value.Context.Method.get_Body().get_Variables())
-					{
-						if (typeReferences.Contains(variable.get_VariableType()))
+						while (V_3.MoveNext())
 						{
-							continue;
+							V_4 = V_3.get_Current();
+							if (V_4.get_Value().get_Context() == null)
+							{
+								continue;
+							}
+							V_0.UnionWith(V_4.get_Value().get_Context().get_AnalysisResults().get_TypesDependingOn());
+							if (V_4.get_Value().get_Context().get_Method() == null || V_4.get_Value().get_Context().get_Method().get_Body() == null || !V_4.get_Value().get_Context().get_Method().get_Body().get_HasVariables())
+							{
+								continue;
+							}
+							V_5 = V_4.get_Value().get_Context().get_Method().get_Body().get_Variables().GetEnumerator();
+							try
+							{
+								while (V_5.MoveNext())
+								{
+									V_6 = V_5.get_Current();
+									if (V_0.Contains(V_6.get_VariableType()))
+									{
+										continue;
+									}
+									dummyVar0 = V_0.Add(V_6.get_VariableType());
+								}
+							}
+							finally
+							{
+								V_5.Dispose();
+							}
 						}
-						typeReferences.Add(variable.get_VariableType());
 					}
-				}
-				if (value.Type.get_BaseType() != null)
-				{
-					typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(value.Type.get_BaseType()));
-				}
-				if (value.Type.get_HasGenericParameters())
-				{
-					foreach (GenericParameter genericParameter in value.Type.get_GenericParameters())
+					finally
 					{
-						if (!genericParameter.get_HasConstraints())
+						((IDisposable)V_3).Dispose();
+					}
+					if (V_2.get_Type().get_BaseType() != null)
+					{
+						V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(V_2.get_Type().get_BaseType()));
+					}
+					if (V_2.get_Type().get_HasGenericParameters())
+					{
+						V_7 = V_2.get_Type().get_GenericParameters().GetEnumerator();
+						try
 						{
-							continue;
+							while (V_7.MoveNext())
+							{
+								V_8 = V_7.get_Current();
+								if (!V_8.get_HasConstraints())
+								{
+									continue;
+								}
+								V_9 = V_8.get_Constraints().GetEnumerator();
+								try
+								{
+									while (V_9.MoveNext())
+									{
+										V_10 = V_9.get_Current();
+										V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(V_10));
+									}
+								}
+								finally
+								{
+									V_9.Dispose();
+								}
+							}
 						}
-						foreach (TypeReference constraint in genericParameter.get_Constraints())
+						finally
 						{
-							typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(constraint));
+							V_7.Dispose();
 						}
 					}
-				}
-				foreach (TypeReference @interface in value.Type.get_Interfaces())
-				{
-					typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(@interface));
-				}
-				typeReferences.UnionWith(AttributesUtilities.GetTypeAttributesUsedTypes(value.Type));
-				foreach (IMemberDefinition typeMember in Utilities.GetTypeMembers(value.Type, language, true, null, null, null, value.TypeContext.GetFieldToPropertyMap(language).Keys))
-				{
-					if (typeMember is MethodDefinition)
+					V_9 = V_2.get_Type().get_Interfaces().GetEnumerator();
+					try
 					{
-						typeReferences.UnionWith(this.GetMethodTypesDependingOn(typeMember as MethodDefinition, language, true));
+						while (V_9.MoveNext())
+						{
+							V_11 = V_9.get_Current();
+							V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(V_11));
+						}
 					}
-					if (typeMember is PropertyDefinition)
+					finally
 					{
-						typeReferences.UnionWith(this.GetPropertyTypesDependingOn(typeMember as PropertyDefinition, language));
+						V_9.Dispose();
 					}
-					if (typeMember is EventDefinition)
+					V_0.UnionWith(AttributesUtilities.GetTypeAttributesUsedTypes(V_2.get_Type()));
+					V_12 = Utilities.GetTypeMembers(V_2.get_Type(), language, true, null, null, null, V_2.get_TypeContext().GetFieldToPropertyMap(language).get_Keys()).GetEnumerator();
+					try
 					{
-						typeReferences.UnionWith(this.GetEventTypesDependingOn(typeMember as EventDefinition, language));
+						while (V_12.MoveNext())
+						{
+							V_13 = V_12.get_Current();
+							if (V_13 as MethodDefinition != null)
+							{
+								V_0.UnionWith(this.GetMethodTypesDependingOn(V_13 as MethodDefinition, language, true));
+							}
+							if (V_13 as PropertyDefinition != null)
+							{
+								V_0.UnionWith(this.GetPropertyTypesDependingOn(V_13 as PropertyDefinition, language));
+							}
+							if (V_13 as EventDefinition != null)
+							{
+								V_0.UnionWith(this.GetEventTypesDependingOn(V_13 as EventDefinition, language));
+							}
+							if (V_13 as FieldDefinition == null)
+							{
+								continue;
+							}
+							V_0.UnionWith(this.GetFieldTypesDependingOn(V_13 as FieldDefinition));
+						}
 					}
-					if (!(typeMember is FieldDefinition))
+					finally
 					{
-						continue;
+						((IDisposable)V_12).Dispose();
 					}
-					typeReferences.UnionWith(this.GetFieldTypesDependingOn(typeMember as FieldDefinition));
 				}
 			}
-			return typeReferences;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		private ICollection<string> GetTypeVisibleMembersNames(TypeDefinition type, ILanguage language, Dictionary<string, DecompiledType> decompiledTypes)
 		{
-			DecompiledType decompiledType;
-			TypeSpecificContext typeSpecificContext;
-			HashSet<string> strs = new HashSet<string>(language.IdentifierComparer);
-			Queue<TypeDefinition> typeDefinitions = new Queue<TypeDefinition>();
-			typeDefinitions.Enqueue(type);
-			while (typeDefinitions.Count > 0)
+			V_0 = new HashSet<string>(language.get_IdentifierComparer());
+			V_1 = new Queue<TypeDefinition>();
+			V_1.Enqueue(type);
+			while (V_1.get_Count() > 0)
 			{
-				TypeDefinition typeDefinition = typeDefinitions.Dequeue();
-				if (typeDefinition.get_BaseType() != null)
+				V_2 = V_1.Dequeue();
+				if (V_2.get_BaseType() != null)
 				{
-					TypeDefinition typeDefinition1 = typeDefinition.get_BaseType().Resolve();
-					if (typeDefinition1 != null && (typeDefinition1.get_IsPublic() || (object)typeDefinition1.get_Module().get_Assembly() == (object)type.get_Module().get_Assembly()))
+					V_6 = V_2.get_BaseType().Resolve();
+					if (V_6 != null && V_6.get_IsPublic() || (object)V_6.get_Module().get_Assembly() == (object)type.get_Module().get_Assembly())
 					{
-						typeDefinitions.Enqueue(typeDefinition1);
+						V_1.Enqueue(V_6);
 					}
 				}
-				if (typeDefinition.get_HasInterfaces())
+				if (V_2.get_HasInterfaces())
 				{
-					foreach (TypeReference @interface in typeDefinition.get_Interfaces())
+					V_7 = V_2.get_Interfaces().GetEnumerator();
+					try
 					{
-						TypeDefinition typeDefinition2 = @interface.Resolve();
-						if (typeDefinition2 == null || !typeDefinition2.get_IsPublic() && (object)typeDefinition2.get_Module().get_Assembly() != (object)type.get_Module().get_Assembly())
+						while (V_7.MoveNext())
+						{
+							V_8 = V_7.get_Current().Resolve();
+							if (V_8 == null || !V_8.get_IsPublic() && (object)V_8.get_Module().get_Assembly() != (object)type.get_Module().get_Assembly())
+							{
+								continue;
+							}
+							V_1.Enqueue(V_8);
+						}
+					}
+					finally
+					{
+						V_7.Dispose();
+					}
+				}
+				V_5 = null;
+				if (!decompiledTypes.TryGetValue(V_2.get_FullName(), out V_3))
+				{
+					if (this.TryGetTypeContextFromCache(V_2, language, out V_4))
+					{
+						V_5 = new List<FieldDefinition>(V_4.GetFieldToPropertyMap(language).get_Keys());
+					}
+				}
+				else
+				{
+					V_5 = new List<FieldDefinition>(V_3.get_TypeContext().GetFieldToPropertyMap(language).get_Keys());
+				}
+				V_9 = Utilities.GetTypeMembers(V_2, language, true, null, null, null, V_5).GetEnumerator();
+				try
+				{
+					while (V_9.MoveNext())
+					{
+						V_10 = V_9.get_Current();
+						if (V_10 as PropertyDefinition != null)
+						{
+							V_11 = V_10 as PropertyDefinition;
+							if (V_11.get_GetMethod() != null && !V_11.get_GetMethod().get_IsPrivate() || (object)V_11.get_DeclaringType() == (object)type && !V_0.Contains(V_11.get_Name()))
+							{
+								dummyVar0 = V_0.Add(V_11.get_Name());
+							}
+							if (V_11.get_SetMethod() != null && !V_11.get_SetMethod().get_IsPrivate() || (object)V_11.get_DeclaringType() == (object)type && !V_0.Contains(V_11.get_Name()))
+							{
+								dummyVar1 = V_0.Add(V_11.get_Name());
+							}
+						}
+						if (V_10 as FieldDefinition != null)
+						{
+							V_12 = V_10 as FieldDefinition;
+							if (!V_12.get_IsPrivate() || (object)V_12.get_DeclaringType() == (object)type && !V_0.Contains(V_12.get_Name()))
+							{
+								dummyVar2 = V_0.Add(V_12.get_Name());
+							}
+						}
+						if (V_10 as EventDefinition != null && !V_0.Contains(V_10.get_Name()))
+						{
+							dummyVar3 = V_0.Add(V_10.get_Name());
+						}
+						if (V_10 as TypeDefinition == null || V_0.Contains(V_10.get_Name()))
 						{
 							continue;
 						}
-						typeDefinitions.Enqueue(typeDefinition2);
+						dummyVar4 = V_0.Add(V_10.get_Name());
 					}
 				}
-				List<FieldDefinition> fieldDefinitions = null;
-				if (decompiledTypes.TryGetValue(typeDefinition.get_FullName(), out decompiledType))
+				finally
 				{
-					fieldDefinitions = new List<FieldDefinition>(decompiledType.TypeContext.GetFieldToPropertyMap(language).Keys);
-				}
-				else if (this.TryGetTypeContextFromCache(typeDefinition, language, out typeSpecificContext))
-				{
-					fieldDefinitions = new List<FieldDefinition>(typeSpecificContext.GetFieldToPropertyMap(language).Keys);
-				}
-				foreach (IMemberDefinition typeMember in Utilities.GetTypeMembers(typeDefinition, language, true, null, null, null, fieldDefinitions))
-				{
-					if (typeMember is PropertyDefinition)
-					{
-						PropertyDefinition propertyDefinition = typeMember as PropertyDefinition;
-						if (propertyDefinition.get_GetMethod() != null && (!propertyDefinition.get_GetMethod().get_IsPrivate() || (object)propertyDefinition.get_DeclaringType() == (object)type) && !strs.Contains(propertyDefinition.get_Name()))
-						{
-							strs.Add(propertyDefinition.get_Name());
-						}
-						if (propertyDefinition.get_SetMethod() != null && (!propertyDefinition.get_SetMethod().get_IsPrivate() || (object)propertyDefinition.get_DeclaringType() == (object)type) && !strs.Contains(propertyDefinition.get_Name()))
-						{
-							strs.Add(propertyDefinition.get_Name());
-						}
-					}
-					if (typeMember is FieldDefinition)
-					{
-						FieldDefinition fieldDefinition = typeMember as FieldDefinition;
-						if ((!fieldDefinition.get_IsPrivate() || (object)fieldDefinition.get_DeclaringType() == (object)type) && !strs.Contains(fieldDefinition.get_Name()))
-						{
-							strs.Add(fieldDefinition.get_Name());
-						}
-					}
-					if (typeMember is EventDefinition && !strs.Contains(typeMember.get_Name()))
-					{
-						strs.Add(typeMember.get_Name());
-					}
-					if (!(typeMember is TypeDefinition) || strs.Contains(typeMember.get_Name()))
-					{
-						continue;
-					}
-					strs.Add(typeMember.get_Name());
+					((IDisposable)V_9).Dispose();
 				}
 			}
-			return strs;
+			return V_0;
 		}
 
 		protected ICollection<string> GetUsedNamespaces(ICollection<TypeReference> typesDependingOn, string currentNamespace = "")
 		{
-			ICollection<string> strs = new HashSet<string>();
-			foreach (TypeReference declaringType in typesDependingOn)
+			V_0 = new HashSet<string>();
+			V_1 = typesDependingOn.GetEnumerator();
+			try
 			{
-				while (declaringType.get_IsNested())
+				while (V_1.MoveNext())
 				{
-					declaringType = declaringType.get_DeclaringType();
+					V_2 = V_1.get_Current();
+					while (V_2.get_IsNested())
+					{
+						V_2 = V_2.get_DeclaringType();
+					}
+					V_3 = V_2.get_Namespace();
+					if (!String.op_Inequality(V_3, String.Empty) || !String.op_Inequality(V_3, currentNamespace) || V_0.Contains(V_3))
+					{
+						continue;
+					}
+					V_0.Add(V_3);
 				}
-				string @namespace = declaringType.get_Namespace();
-				if (!(@namespace != String.Empty) || !(@namespace != currentNamespace) || strs.Contains(@namespace))
-				{
-					continue;
-				}
-				strs.Add(@namespace);
 			}
-			return strs;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		public abstract WriterContext GetWriterContext(IMemberDefinition member, ILanguage language);
 
 		private void MergeConstructorsTypeContexts(List<CachedDecompiledMember> allConstructors, DecompiledType decompiledType)
 		{
-			if (allConstructors == null || allConstructors.Count == 0)
+			if (allConstructors == null || allConstructors.get_Count() == 0)
 			{
 				return;
 			}
-			for (int i = 0; i < allConstructors.Count; i++)
+			V_2 = 0;
+			while (V_2 < allConstructors.get_Count())
 			{
-				if (allConstructors[i].Member.Context != null && allConstructors[i].Member.Context.IsBaseConstructorInvokingConstructor)
+				if (allConstructors.get_Item(V_2).get_Member().get_Context() != null && allConstructors.get_Item(V_2).get_Member().get_Context().get_IsBaseConstructorInvokingConstructor())
 				{
-					decompiledType.TypeContext.BaseCtorInvocators.Add(allConstructors[i].Member.Context.Method);
+					decompiledType.get_TypeContext().get_BaseCtorInvocators().Add(allConstructors.get_Item(V_2).get_Member().get_Context().get_Method());
 				}
+				V_2 = V_2 + 1;
 			}
-			int num = 0;
-			Dictionary<string, InitializationAssignment> strs = new Dictionary<string, InitializationAssignment>();
+			V_0 = 0;
+			V_1 = new Dictionary<string, InitializationAssignment>();
 			while (true)
 			{
-				if (num >= allConstructors.Count)
+				if (V_0 < allConstructors.get_Count())
 				{
-					break;
-				}
-				else if (allConstructors[num].Member.Context == null || !allConstructors[num].Member.Context.IsBaseConstructorInvokingConstructor)
-				{
-					num++;
+					if (allConstructors.get_Item(V_0).get_Member().get_Context() == null || !allConstructors.get_Item(V_0).get_Member().get_Context().get_IsBaseConstructorInvokingConstructor())
+					{
+						V_0 = V_0 + 1;
+					}
+					else
+					{
+						V_1 = new Dictionary<string, InitializationAssignment>(allConstructors.get_Item(V_0).get_FieldAssignmentData());
+						break;
+					}
 				}
 				else
 				{
-					strs = new Dictionary<string, InitializationAssignment>(allConstructors[num].FieldAssignmentData);
 					break;
 				}
 			}
 			while (true)
 			{
-				if (num < allConstructors.Count)
+				if (V_0 < allConstructors.get_Count())
 				{
-					CachedDecompiledMember item = allConstructors[num];
-					if (item.Member.Context != null && item.Member.Context.IsBaseConstructorInvokingConstructor)
+					V_3 = allConstructors.get_Item(V_0);
+					if (V_3.get_Member().get_Context() != null && V_3.get_Member().get_Context().get_IsBaseConstructorInvokingConstructor())
 					{
-						if (item.FieldAssignmentData.Count != strs.Count)
+						if (V_3.get_FieldAssignmentData().get_Count() != V_1.get_Count())
 						{
-							decompiledType.TypeContext.FieldInitializationFailed = true;
-							decompiledType.TypeContext.AssignmentData = new Dictionary<string, InitializationAssignment>();
+							decompiledType.get_TypeContext().set_FieldInitializationFailed(true);
+							decompiledType.get_TypeContext().set_AssignmentData(new Dictionary<string, InitializationAssignment>());
 							return;
 						}
-						foreach (KeyValuePair<string, InitializationAssignment> fieldAssignmentDatum in item.FieldAssignmentData)
+						V_4 = V_3.get_FieldAssignmentData().GetEnumerator();
+						try
 						{
-							if (strs.ContainsKey(fieldAssignmentDatum.Key) && strs[fieldAssignmentDatum.Key].AssignmentExpression.Equals(fieldAssignmentDatum.Value.AssignmentExpression))
+							while (V_4.MoveNext())
 							{
-								continue;
+								V_5 = V_4.get_Current();
+								if (V_1.ContainsKey(V_5.get_Key()) && V_1.get_Item(V_5.get_Key()).get_AssignmentExpression().Equals(V_5.get_Value().get_AssignmentExpression()))
+								{
+									continue;
+								}
+								decompiledType.get_TypeContext().set_FieldInitializationFailed(true);
+								decompiledType.get_TypeContext().set_AssignmentData(new Dictionary<string, InitializationAssignment>());
+								goto Label0;
 							}
-							decompiledType.TypeContext.FieldInitializationFailed = true;
-							decompiledType.TypeContext.AssignmentData = new Dictionary<string, InitializationAssignment>();
-							return;
+						}
+						finally
+						{
+							((IDisposable)V_4).Dispose();
 						}
 					}
-					num++;
+					V_0 = V_0 + 1;
 				}
 				else
 				{
-					decompiledType.TypeContext.AssignmentData = strs;
+					decompiledType.get_TypeContext().set_AssignmentData(V_1);
 					break;
 				}
 			}
+		Label0:
+			return;
 		}
 
 		private void RemoveBaseCtorInvocationStatements(CachedDecompiledMember decompiledMember, DecompiledType decompiledType)
 		{
-			MethodSpecificContext context = decompiledMember.Member.Context;
-			if (context == null || !context.Method.get_IsConstructor() || context.Method.get_IsStatic() || context.CtorInvokeExpression == null)
+			V_0 = decompiledMember.get_Member().get_Context();
+			if (V_0 == null || !V_0.get_Method().get_IsConstructor() || V_0.get_Method().get_IsStatic() || V_0.get_CtorInvokeExpression() == null)
 			{
 				return;
 			}
-			BlockStatement statement = decompiledMember.Member.Statement as BlockStatement;
-			if (statement == null)
+			V_1 = decompiledMember.get_Member().get_Statement() as BlockStatement;
+			if (V_1 == null)
 			{
 				return;
 			}
-			if (statement.Statements.Count == 1 && statement.Statements[0] is UnsafeBlockStatement)
+			if (V_1.get_Statements().get_Count() == 1 && V_1.get_Statements().get_Item(0) as UnsafeBlockStatement != null)
 			{
-				statement = statement.Statements[0] as UnsafeBlockStatement;
+				V_1 = V_1.get_Statements().get_Item(0) as UnsafeBlockStatement;
 			}
-			TypeSpecificContext typeContext = decompiledType.TypeContext;
-			if (typeContext.FieldInitializationFailed && typeContext.BaseCtorInvocators.Contains(context.Method))
+			V_2 = decompiledType.get_TypeContext();
+			if (V_2.get_FieldInitializationFailed() && V_2.get_BaseCtorInvocators().Contains(V_0.get_Method()))
 			{
-				context.CtorInvokeExpression = null;
+				V_0.set_CtorInvokeExpression(null);
 				return;
 			}
-			for (int i = 0; i < statement.Statements.Count; i++)
+			V_3 = 0;
+			while (V_3 < V_1.get_Statements().get_Count())
 			{
-				if (statement.Statements[i].CodeNodeType == CodeNodeType.ExpressionStatement && ((statement.Statements[i] as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ThisCtorExpression || (statement.Statements[i] as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.BaseCtorExpression))
+				if (V_1.get_Statements().get_Item(V_3).get_CodeNodeType() == 5 && (V_1.get_Statements().get_Item(V_3) as ExpressionStatement).get_Expression().get_CodeNodeType() == 53 || (V_1.get_Statements().get_Item(V_3) as ExpressionStatement).get_Expression().get_CodeNodeType() == 52)
 				{
-					this.RemoveFirstStatements(statement.Statements, i + 1);
+					this.RemoveFirstStatements(V_1.get_Statements(), V_3 + 1);
 					return;
 				}
+				V_3 = V_3 + 1;
 			}
 			throw new Exception("Constructor invocation not found.");
 		}
 
 		private void RemoveFirstStatements(StatementCollection statements, int count)
 		{
-			for (int i = 0; i + count < statements.Count; i++)
+			V_0 = 0;
+			while (V_0 + count < statements.get_Count())
 			{
-				statements[i] = statements[i + count];
+				statements.set_Item(V_0, statements.get_Item(V_0 + count));
+				V_0 = V_0 + 1;
 			}
 			while (true)
 			{
-				int num = count;
-				count = num - 1;
-				if (num <= 0)
+				stackVariable16 = count;
+				count = stackVariable16 - 1;
+				if (stackVariable16 <= 0)
 				{
 					break;
 				}
-				statements.RemoveAt(statements.Count - 1);
+				statements.RemoveAt(statements.get_Count() - 1);
 			}
+			return;
 		}
 
 		private bool TryGetTypeContextFromCache(TypeDefinition type, ILanguage language, out TypeSpecificContext typeContext)

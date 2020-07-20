@@ -2,7 +2,6 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -15,195 +14,254 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 	{
 		private readonly Dictionary<int, Expression> offsetToExpression;
 
-		private readonly HashSet<VariableDefinition> inlinedOnSecondPass = new HashSet<VariableDefinition>();
+		private readonly HashSet<VariableDefinition> inlinedOnSecondPass;
 
-		public StackVariablesInliner(MethodSpecificContext methodContext, Dictionary<int, Expression> offsetToExpression, IVariablesToNotInlineFinder finder) : base(methodContext, new SimpleVariableInliner(methodContext.Method.get_Module().get_TypeSystem()), finder)
+		public StackVariablesInliner(MethodSpecificContext methodContext, Dictionary<int, Expression> offsetToExpression, IVariablesToNotInlineFinder finder)
 		{
+			this.inlinedOnSecondPass = new HashSet<VariableDefinition>();
+			base(methodContext, new SimpleVariableInliner(methodContext.get_Method().get_Module().get_TypeSystem()), finder);
 			this.offsetToExpression = offsetToExpression;
+			return;
 		}
 
 		protected override void FindSingleDefineSingleUseVariables()
 		{
-			foreach (KeyValuePair<VariableDefinition, StackVariableDefineUseInfo> variableToDefineUseInfo in this.methodContext.StackData.VariableToDefineUseInfo)
+			V_0 = this.methodContext.get_StackData().get_VariableToDefineUseInfo().GetEnumerator();
+			try
 			{
-				if (variableToDefineUseInfo.Value.DefinedAt.Count != 1 || variableToDefineUseInfo.Value.UsedAt.Count != 1 || this.variablesToNotInline.Contains(variableToDefineUseInfo.Key))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (V_1.get_Value().get_DefinedAt().get_Count() != 1 || V_1.get_Value().get_UsedAt().get_Count() != 1 || this.variablesToNotInline.Contains(V_1.get_Key()))
+					{
+						continue;
+					}
+					dummyVar0 = this.variablesToInline.Add(V_1.get_Key());
 				}
-				this.variablesToInline.Add(variableToDefineUseInfo.Key);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private void FixBlockExpressions(Dictionary<Expression, Expression> oldToNewValueMap)
 		{
-			Expression expression;
-			IList<Expression> value;
-			int i;
-			foreach (KeyValuePair<int, IList<Expression>> blockExpression in this.methodContext.Expressions.BlockExpressions)
+			V_1 = this.methodContext.get_Expressions().get_BlockExpressions().GetEnumerator();
+			try
 			{
-				value = blockExpression.Value;
-				for (i = 0; i < value.Count; i++)
+				while (V_1.MoveNext())
 				{
-					Expression item = value[i];
-					if (item.CodeNodeType == CodeNodeType.BinaryExpression)
+					V_2 = V_1.get_Current();
+					V_3 = V_2.get_Value();
+					V_4 = 0;
+					while (V_4 < V_3.get_Count())
 					{
-						BinaryExpression binaryExpression = item as BinaryExpression;
-						if (binaryExpression.IsAssignmentExpression && binaryExpression.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.inlinedOnSecondPass.Contains((binaryExpression.Left as VariableReferenceExpression).Variable.Resolve()))
+						V_5 = V_3.get_Item(V_4);
+						if (V_5.get_CodeNodeType() == 24)
 						{
-							goto Label1;
+							V_6 = V_5 as BinaryExpression;
+							if (V_6.get_IsAssignmentExpression() && V_6.get_Left().get_CodeNodeType() == 26 && this.inlinedOnSecondPass.Contains((V_6.get_Left() as VariableReferenceExpression).get_Variable().Resolve()))
+							{
+								goto Label1;
+							}
+							if (oldToNewValueMap.TryGetValue(V_6.get_Right(), out V_0))
+							{
+								V_6.set_Right(V_0);
+							}
 						}
-						if (oldToNewValueMap.TryGetValue(binaryExpression.Right, out expression))
+						if (oldToNewValueMap.TryGetValue(V_3.get_Item(V_4), out V_0))
 						{
-							binaryExpression.Right = expression;
+							V_3.set_Item(V_4, V_0);
 						}
+					Label0:
+						V_4 = V_4 + 1;
 					}
-					if (oldToNewValueMap.TryGetValue(value[i], out expression))
-					{
-						value[i] = expression;
-					}
-				Label0:
 				}
+			}
+			finally
+			{
+				((IDisposable)V_1).Dispose();
 			}
 			return;
 		Label1:
-			int num = i;
-			i = num - 1;
-			value.RemoveAt(num);
+			stackVariable57 = V_4;
+			V_4 = stackVariable57 - 1;
+			V_3.RemoveAt(stackVariable57);
 			goto Label0;
 		}
 
 		private void FixContextAfterInlining(VariableDefinition varDef)
 		{
-			this.methodContext.StackData.VariableToDefineUseInfo.Remove(varDef);
+			dummyVar0 = this.methodContext.get_StackData().get_VariableToDefineUseInfo().Remove(varDef);
+			return;
 		}
 
 		private void InlineAssignmentInNextExpression()
 		{
-			ICodeNode codeNode;
-			foreach (KeyValuePair<int, IList<Expression>> blockExpression in this.methodContext.Expressions.BlockExpressions)
+			V_0 = this.methodContext.get_Expressions().get_BlockExpressions().GetEnumerator();
+			try
 			{
-				IList<Expression> value = blockExpression.Value;
-				bool[] flagArray = new Boolean[value.Count];
-				int count = value.Count - 2;
-				int num = count + 1;
-				while (count >= 0)
+				while (V_0.MoveNext())
 				{
-					BinaryExpression item = value[count] as BinaryExpression;
-					if (item == null || !item.IsAssignmentExpression || item.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+					V_1 = V_0.get_Current();
+					V_2 = V_1.get_Value();
+					V_3 = new Boolean[V_2.get_Count()];
+					V_4 = V_2.get_Count() - 2;
+					V_5 = V_4 + 1;
+					while (V_4 >= 0)
 					{
-						num = count;
-					}
-					else
-					{
-						VariableDefinition variableDefinition = (item.Left as VariableReferenceExpression).Variable.Resolve();
-						if (this.variablesToInline.Contains(variableDefinition))
+						V_6 = V_2.get_Item(V_4) as BinaryExpression;
+						if (V_6 == null || !V_6.get_IsAssignmentExpression() || V_6.get_Left().get_CodeNodeType() != 26)
 						{
-							Expression right = item.Right;
-							if (!this.inliner.TryInlineVariable(variableDefinition, right, value[num], true, out codeNode))
-							{
-								num = count;
-							}
-							else
-							{
-								this.FixContextAfterInlining(variableDefinition);
-								this.variablesToInline.Remove(variableDefinition);
-								value[num] = (Expression)codeNode;
-								flagArray[count] = true;
-							}
+							V_5 = V_4;
 						}
 						else
 						{
-							num = count;
+							V_7 = (V_6.get_Left() as VariableReferenceExpression).get_Variable().Resolve();
+							if (this.variablesToInline.Contains(V_7))
+							{
+								V_8 = V_6.get_Right();
+								if (!this.inliner.TryInlineVariable(V_7, V_8, V_2.get_Item(V_5), true, out V_9))
+								{
+									V_5 = V_4;
+								}
+								else
+								{
+									this.FixContextAfterInlining(V_7);
+									dummyVar0 = this.variablesToInline.Remove(V_7);
+									V_2.set_Item(V_5, (Expression)V_9);
+									V_3[V_4] = true;
+								}
+							}
+							else
+							{
+								V_5 = V_4;
+							}
 						}
+						V_4 = V_4 - 1;
 					}
-					count--;
+					this.FastRemoveExpressions(V_2, V_3);
 				}
-				base.FastRemoveExpressions(value, flagArray);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private void InlineAssignmentInSameBlock()
 		{
-			ICodeNode codeNode;
-			foreach (KeyValuePair<int, IList<Expression>> blockExpression in this.methodContext.Expressions.BlockExpressions)
+			V_0 = this.methodContext.get_Expressions().get_BlockExpressions().GetEnumerator();
+			try
 			{
-				IList<Expression> value = blockExpression.Value;
-				for (int i = 0; i < value.Count - 1; i++)
+				while (V_0.MoveNext())
 				{
-					BinaryExpression item = value[i] as BinaryExpression;
-					if (item != null && item.IsAssignmentExpression && item.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
+					V_1 = V_0.get_Current();
+					V_2 = V_1.get_Value();
+					V_3 = 0;
+					while (V_3 < V_2.get_Count() - 1)
 					{
-						VariableDefinition variableDefinition = (item.Left as VariableReferenceExpression).Variable.Resolve();
-						if (this.variablesToInline.Contains(variableDefinition))
+						V_4 = V_2.get_Item(V_3) as BinaryExpression;
+						if (V_4 != null && V_4.get_IsAssignmentExpression() && V_4.get_Left().get_CodeNodeType() == 26)
 						{
-							Expression right = item.Right;
-							SideEffectsFinder sideEffectsFinder = new SideEffectsFinder();
-							bool flag = sideEffectsFinder.HasSideEffectsRecursive(right);
-							StackVariablesInliner.VariablesArgumentsAndFieldsFinder variablesArgumentsAndFieldsFinder = new StackVariablesInliner.VariablesArgumentsAndFieldsFinder();
-							variablesArgumentsAndFieldsFinder.Visit(right);
-							StackVariablesInliner.VariableReferenceFinder variableReferenceFinder = new StackVariablesInliner.VariableReferenceFinder(variablesArgumentsAndFieldsFinder.Variables, variablesArgumentsAndFieldsFinder.Parameters);
-							int num = i + 1;
-							while (num < value.Count)
+							V_5 = (V_4.get_Left() as VariableReferenceExpression).get_Variable().Resolve();
+							if (this.variablesToInline.Contains(V_5))
 							{
-								if (!this.inliner.TryInlineVariable(variableDefinition, right, value[num], true, out codeNode))
+								V_6 = V_4.get_Right();
+								V_7 = new SideEffectsFinder();
+								V_8 = V_7.HasSideEffectsRecursive(V_6);
+								V_9 = new StackVariablesInliner.VariablesArgumentsAndFieldsFinder();
+								V_9.Visit(V_6);
+								V_10 = new StackVariablesInliner.VariableReferenceFinder(V_9.get_Variables(), V_9.get_Parameters());
+								V_11 = V_3 + 1;
+								while (V_11 < V_2.get_Count())
 								{
-									if (flag && sideEffectsFinder.HasSideEffectsRecursive(value[num]) || variableReferenceFinder.ContainsReference(value[num]))
+									if (!this.inliner.TryInlineVariable(V_5, V_6, V_2.get_Item(V_11), true, out V_12))
 									{
-										break;
-									}
-									if (value[num].CodeNodeType == CodeNodeType.BinaryExpression && (value[num] as BinaryExpression).IsAssignmentExpression)
-									{
-										Expression left = (value[num] as BinaryExpression).Left;
-										if (left.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && variablesArgumentsAndFieldsFinder.Parameters.Contains((left as ArgumentReferenceExpression).Parameter.Resolve()) || left.CodeNodeType == CodeNodeType.VariableReferenceExpression && variablesArgumentsAndFieldsFinder.Variables.Contains((left as VariableReferenceExpression).Variable.Resolve()) || left.CodeNodeType == CodeNodeType.FieldReferenceExpression && variablesArgumentsAndFieldsFinder.Fields.Contains((left as FieldReferenceExpression).Field.Resolve()))
+										if (V_8 && V_7.HasSideEffectsRecursive(V_2.get_Item(V_11)) || V_10.ContainsReference(V_2.get_Item(V_11)))
 										{
 											break;
 										}
+										if (V_2.get_Item(V_11).get_CodeNodeType() == 24 && (V_2.get_Item(V_11) as BinaryExpression).get_IsAssignmentExpression())
+										{
+											V_13 = (V_2.get_Item(V_11) as BinaryExpression).get_Left();
+											if (V_13.get_CodeNodeType() == 25 && V_9.get_Parameters().Contains((V_13 as ArgumentReferenceExpression).get_Parameter().Resolve()) || V_13.get_CodeNodeType() == 26 && V_9.get_Variables().Contains((V_13 as VariableReferenceExpression).get_Variable().Resolve()) || V_13.get_CodeNodeType() == 30 && V_9.get_Fields().Contains((V_13 as FieldReferenceExpression).get_Field().Resolve()))
+											{
+												break;
+											}
+										}
+										V_11 = V_11 + 1;
 									}
-									num++;
-								}
-								else
-								{
-									this.FixContextAfterInlining(variableDefinition);
-									this.variablesToInline.Remove(variableDefinition);
-									value[num] = (Expression)codeNode;
-									value.RemoveAt(i);
-									i = i - (i > 0 ? 2 : 1);
-									break;
+									else
+									{
+										this.FixContextAfterInlining(V_5);
+										dummyVar0 = this.variablesToInline.Remove(V_5);
+										V_2.set_Item(V_11, (Expression)V_12);
+										V_2.RemoveAt(V_3);
+										stackVariable141 = V_3;
+										if (V_3 > 0)
+										{
+											stackVariable144 = 2;
+										}
+										else
+										{
+											stackVariable144 = 1;
+										}
+										V_3 = stackVariable141 - stackVariable144;
+										break;
+									}
 								}
 							}
 						}
+						V_3 = V_3 + 1;
 					}
 				}
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private void InlineConstantVariables()
 		{
-			Expression expression;
-			ICodeNode codeNode;
-			Dictionary<Expression, Expression> expressions = new Dictionary<Expression, Expression>();
-			foreach (VariableDefinition variableDefinition in this.variablesToInline)
+			V_0 = new Dictionary<Expression, Expression>();
+			V_1 = this.variablesToInline.GetEnumerator();
+			try
 			{
-				StackVariableDefineUseInfo item = this.methodContext.StackData.VariableToDefineUseInfo[variableDefinition];
-				int num = item.UsedAt.First<int>();
-				if (!this.offsetToExpression.TryGetValue(num, out expression))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					V_3 = this.methodContext.get_StackData().get_VariableToDefineUseInfo().get_Item(V_2);
+					V_4 = V_3.get_UsedAt().First<int>();
+					if (!this.offsetToExpression.TryGetValue(V_4, out V_5))
+					{
+						continue;
+					}
+					V_6 = this.offsetToExpression.get_Item(V_3.get_DefinedAt().First<int>());
+					if (!StackVariablesInliner.ConstantDeterminator.IsConstantExpression(V_6) || !this.inliner.TryInlineVariable(V_2, V_6, V_5, true, out V_7))
+					{
+						continue;
+					}
+					dummyVar0 = this.inlinedOnSecondPass.Add(V_2);
+					this.FixContextAfterInlining(V_2);
+					if (V_5 == V_7)
+					{
+						continue;
+					}
+					V_0.Add(V_5, (Expression)V_7);
 				}
-				Expression item1 = this.offsetToExpression[item.DefinedAt.First<int>()];
-				if (!StackVariablesInliner.ConstantDeterminator.IsConstantExpression(item1) || !this.inliner.TryInlineVariable(variableDefinition, item1, expression, true, out codeNode))
-				{
-					continue;
-				}
-				this.inlinedOnSecondPass.Add(variableDefinition);
-				this.FixContextAfterInlining(variableDefinition);
-				if (expression == codeNode)
-				{
-					continue;
-				}
-				expressions.Add(expression, (Expression)codeNode);
 			}
-			this.FixBlockExpressions(expressions);
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			this.FixBlockExpressions(V_0);
+			return;
 		}
 
 		protected override void InlineInBlocks()
@@ -211,6 +269,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			this.InlineAssignmentInNextExpression();
 			this.InlineAssignmentInSameBlock();
 			this.InlineConstantVariables();
+			return;
 		}
 
 		private class ConstantDeterminator : BaseCodeVisitor
@@ -219,16 +278,16 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 			private ConstantDeterminator()
 			{
+				base();
+				return;
 			}
 
 			public static bool IsConstantExpression(Expression expression)
 			{
-				StackVariablesInliner.ConstantDeterminator constantDeterminator = new StackVariablesInliner.ConstantDeterminator()
-				{
-					isConstant = true
-				};
-				constantDeterminator.Visit(expression);
-				return constantDeterminator.isConstant;
+				stackVariable0 = new StackVariablesInliner.ConstantDeterminator();
+				stackVariable0.isConstant = true;
+				stackVariable0.Visit(expression);
+				return stackVariable0.isConstant;
 			}
 
 			public override void Visit(ICodeNode node)
@@ -237,95 +296,103 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 				{
 					return;
 				}
-				CodeNodeType codeNodeType = node.CodeNodeType;
-				switch (codeNodeType)
+				V_1 = node.get_CodeNodeType();
+				switch (V_1 - 20)
 				{
-					case CodeNodeType.MethodReferenceExpression:
-					case CodeNodeType.LiteralExpression:
-					case CodeNodeType.BaseReferenceExpression:
+					case 0:
+					case 2:
+					case 9:
 					{
+					Label2:
 						return;
 					}
-					case CodeNodeType.DelegateCreationExpression:
-					case CodeNodeType.VariableReferenceExpression:
-					case CodeNodeType.VariableDeclarationExpression:
-					case CodeNodeType.FieldReferenceExpression:
-					case CodeNodeType.ExplicitCastExpression:
-					case CodeNodeType.ImplicitCastExpression:
-					case CodeNodeType.CanCastExpression:
+					case 1:
+					case 6:
+					case 7:
+					case 10:
+					case 11:
+					case 12:
+					case 14:
 					{
+					Label3:
 						this.isConstant = false;
 						return;
 					}
-					case CodeNodeType.UnaryExpression:
+					case 3:
 					{
-						switch ((node as UnaryExpression).Operator)
+						switch ((node as UnaryExpression).get_Operator())
 						{
-							case UnaryOperator.Negate:
-							case UnaryOperator.LogicalNot:
-							case UnaryOperator.BitwiseNot:
-							case UnaryOperator.AddressDereference:
-							case UnaryOperator.UnaryPlus:
-							case UnaryOperator.None:
+							case 0:
+							case 1:
+							case 2:
+							case 8:
+							case 10:
+							case 11:
 							{
-								base.Visit(node);
-								return;
+								goto Label0;
 							}
-							case UnaryOperator.PostDecrement:
-							case UnaryOperator.PostIncrement:
-							case UnaryOperator.PreDecrement:
-							case UnaryOperator.PreIncrement:
+							case 3:
+							case 4:
+							case 5:
+							case 6:
 							{
+							Label1:
 								this.isConstant = false;
 								return;
 							}
-							case UnaryOperator.AddressReference:
-							case UnaryOperator.AddressOf:
+							case 7:
+							case 9:
 							{
 								return;
 							}
 							default:
 							{
-								this.isConstant = false;
-								return;
+								goto Label1;
 							}
 						}
 						break;
 					}
-					case CodeNodeType.BinaryExpression:
+					case 4:
 					{
-						BinaryExpression binaryExpression = node as BinaryExpression;
-						this.isConstant = (binaryExpression.IsChecked || binaryExpression.Operator == BinaryOperator.Divide ? false : binaryExpression.Operator != BinaryOperator.Modulo);
+						V_0 = node as BinaryExpression;
+						if (V_0.get_IsChecked() || V_0.get_Operator() == 7)
+						{
+							stackVariable22 = false;
+						}
+						else
+						{
+							stackVariable22 = V_0.get_Operator() != 24;
+						}
+						this.isConstant = stackVariable22;
 						if (this.isConstant)
 						{
-							base.Visit(node);
-							return;
+							goto Label0;
 						}
 						return;
 					}
-					case CodeNodeType.ArgumentReferenceExpression:
+					case 5:
 					{
 						this.isConstant = false;
 						return;
 					}
-					case CodeNodeType.ThisReferenceExpression:
+					case 8:
 					{
 						return;
 					}
-					case CodeNodeType.SafeCastExpression:
-					case CodeNodeType.TypeOfExpression:
+					case 13:
+					case 15:
 					{
-						base.Visit(node);
+					Label0:
+						this.Visit(node);
 						return;
 					}
 					default:
 					{
-						if (codeNodeType == CodeNodeType.TypeReferenceExpression)
+						if (V_1 == 43)
 						{
-							return;
+							goto Label2;
 						}
-						this.isConstant = false;
-						return;
+						goto Label3;
 					}
 				}
 			}
@@ -341,8 +408,10 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 			public VariableReferenceFinder(HashSet<VariableDefinition> variables, HashSet<ParameterDefinition> parameters)
 			{
+				base();
 				this.variables = variables;
 				this.parameters = parameters;
+				return;
 			}
 
 			public bool ContainsReference(Expression expression)
@@ -358,17 +427,19 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 				{
 					return;
 				}
-				base.Visit(node);
+				this.Visit(node);
+				return;
 			}
 
 			public override void VisitUnaryExpression(UnaryExpression node)
 			{
-				if (node.Operator != UnaryOperator.AddressOf && node.Operator != UnaryOperator.AddressReference || (node.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || !this.variables.Contains((node.Operand as VariableReferenceExpression).Variable.Resolve())) && (node.Operand.CodeNodeType != CodeNodeType.ArgumentReferenceExpression || !this.parameters.Contains((node.Operand as ArgumentReferenceExpression).Parameter.Resolve())))
+				if (node.get_Operator() != 9 && node.get_Operator() != 7 || node.get_Operand().get_CodeNodeType() != 26 || !this.variables.Contains((node.get_Operand() as VariableReferenceExpression).get_Variable().Resolve()) && node.get_Operand().get_CodeNodeType() != 25 || !this.parameters.Contains((node.get_Operand() as ArgumentReferenceExpression).get_Parameter().Resolve()))
 				{
-					base.VisitUnaryExpression(node);
+					this.VisitUnaryExpression(node);
 					return;
 				}
 				this.containsReference = true;
+				return;
 			}
 		}
 
@@ -394,24 +465,29 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 			public VariablesArgumentsAndFieldsFinder()
 			{
-				this.Variables = new HashSet<VariableDefinition>();
-				this.Parameters = new HashSet<ParameterDefinition>();
-				this.Fields = new HashSet<FieldDefinition>();
+				base();
+				this.set_Variables(new HashSet<VariableDefinition>());
+				this.set_Parameters(new HashSet<ParameterDefinition>());
+				this.set_Fields(new HashSet<FieldDefinition>());
+				return;
 			}
 
 			public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 			{
-				this.Parameters.Add(node.Parameter.Resolve());
+				dummyVar0 = this.get_Parameters().Add(node.get_Parameter().Resolve());
+				return;
 			}
 
 			public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 			{
-				this.Fields.Add(node.Field.Resolve());
+				dummyVar0 = this.get_Fields().Add(node.get_Field().Resolve());
+				return;
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				this.Variables.Add(node.Variable.Resolve());
+				dummyVar0 = this.get_Variables().Add(node.get_Variable().Resolve());
+				return;
 			}
 		}
 	}

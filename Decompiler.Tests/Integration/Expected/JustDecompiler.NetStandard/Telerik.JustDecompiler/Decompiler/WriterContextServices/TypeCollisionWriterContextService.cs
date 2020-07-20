@@ -1,11 +1,9 @@
 using Mono.Cecil;
 using Mono.Cecil.AssemblyResolver;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.MemberRenamingServices;
@@ -23,21 +21,26 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 		{
 			TypeCollisionWriterContextService.assemblyContextsLocker = new Object();
 			TypeCollisionWriterContextService.moduleContextsLocker = new Object();
+			return;
 		}
 
-		public TypeCollisionWriterContextService(IDecompilationCacheService cacheService, bool renameInvalidMembers) : base(cacheService, renameInvalidMembers)
+		public TypeCollisionWriterContextService(IDecompilationCacheService cacheService, bool renameInvalidMembers)
 		{
+			base(cacheService, renameInvalidMembers);
+			return;
 		}
 
 		private string EscapeNamespace(string[] namespaceParts, ILanguage langugage)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append(langugage.ReplaceInvalidCharactersInIdentifier(namespaceParts[0]));
-			for (int i = 1; i < (int)namespaceParts.Length; i++)
+			V_0 = new StringBuilder();
+			dummyVar0 = V_0.Append(langugage.ReplaceInvalidCharactersInIdentifier(namespaceParts[0]));
+			V_1 = 1;
+			while (V_1 < (int)namespaceParts.Length)
 			{
-				stringBuilder.AppendFormat(".{0}", langugage.ReplaceInvalidCharactersInIdentifier(namespaceParts[i]));
+				dummyVar1 = V_0.AppendFormat(".{0}", langugage.ReplaceInvalidCharactersInIdentifier(namespaceParts[V_1]));
+				V_1 = V_1 + 1;
 			}
-			return stringBuilder.ToString();
+			return V_0.ToString();
 		}
 
 		public override AssemblySpecificContext GetAssemblyContext(AssemblyDefinition assembly, ILanguage language)
@@ -46,160 +49,262 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 			{
 				return this.cacheService.GetAssemblyContextFromCache(assembly, language, this.renameInvalidMembers);
 			}
-			AssemblySpecificContext assemblySpecificContext = new AssemblySpecificContext(base.GetAssemblyNamespaceUsings(assembly));
-			lock (TypeCollisionWriterContextService.assemblyContextsLocker)
+			V_0 = new AssemblySpecificContext(this.GetAssemblyNamespaceUsings(assembly));
+			V_1 = TypeCollisionWriterContextService.assemblyContextsLocker;
+			V_2 = false;
+			try
 			{
+				Monitor.Enter(V_1, ref V_2);
 				if (!this.cacheService.IsAssemblyContextInCache(assembly, language, this.renameInvalidMembers))
 				{
-					this.cacheService.AddAssemblyContextToCache(assembly, language, this.renameInvalidMembers, assemblySpecificContext);
+					this.cacheService.AddAssemblyContextToCache(assembly, language, this.renameInvalidMembers, V_0);
 				}
 			}
-			return assemblySpecificContext;
+			finally
+			{
+				if (V_2)
+				{
+					Monitor.Exit(V_1);
+				}
+			}
+			return V_0;
 		}
 
 		private Dictionary<string, List<string>> GetModuleCollisionTypesData(ModuleDefinition module, ILanguage language)
 		{
-			Dictionary<string, List<string>> strs = new Dictionary<string, List<string>>(language.IdentifierComparer);
-			Dictionary<string, string> strs1 = new Dictionary<string, string>(language.IdentifierComparer);
-			this.UpdateCollisionTypesDataWithTypes(strs, strs1, module.get_Types());
-			Dictionary<AssemblyNameReference, List<TypeReference>> moduleDependsOnAnalysis = this.GetModuleDependsOnAnalysis(module);
-			SpecialTypeAssembly specialTypeAssembly = (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(module) ? 1 : 0);
-			foreach (AssemblyNameReference key in moduleDependsOnAnalysis.Keys)
+			V_0 = new Dictionary<string, List<string>>(language.get_IdentifierComparer());
+			V_1 = new Dictionary<string, string>(language.get_IdentifierComparer());
+			this.UpdateCollisionTypesDataWithTypes(V_0, V_1, module.get_Types());
+			V_2 = this.GetModuleDependsOnAnalysis(module);
+			if (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(module))
 			{
-				AssemblyDefinition assemblyDefinition = module.get_AssemblyResolver().Resolve(key, "", ModuleDefinitionExtensions.GetModuleArchitecture(module), specialTypeAssembly, true);
-				if (assemblyDefinition == null)
+				stackVariable16 = 1;
+			}
+			else
+			{
+				stackVariable16 = 0;
+			}
+			V_3 = stackVariable16;
+			V_4 = V_2.get_Keys().GetEnumerator();
+			try
+			{
+				while (V_4.MoveNext())
 				{
-					this.UpdateCollisionTypesDataWithTypes(strs, strs1, moduleDependsOnAnalysis[key]);
-				}
-				else
-				{
-					foreach (ModuleDefinition moduleDefinition in assemblyDefinition.get_Modules())
+					V_5 = V_4.get_Current();
+					V_6 = module.get_AssemblyResolver().Resolve(V_5, "", ModuleDefinitionExtensions.GetModuleArchitecture(module), V_3, true);
+					if (V_6 == null)
 					{
-						this.UpdateCollisionTypesDataWithTypes(strs, strs1, moduleDefinition.get_Types());
+						this.UpdateCollisionTypesDataWithTypes(V_0, V_1, V_2.get_Item(V_5));
+					}
+					else
+					{
+						V_7 = V_6.get_Modules().GetEnumerator();
+						try
+						{
+							while (V_7.MoveNext())
+							{
+								V_8 = V_7.get_Current();
+								this.UpdateCollisionTypesDataWithTypes(V_0, V_1, V_8.get_Types());
+							}
+						}
+						finally
+						{
+							V_7.Dispose();
+						}
 					}
 				}
 			}
-			return strs;
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+			return V_0;
 		}
 
 		public override ModuleSpecificContext GetModuleContext(ModuleDefinition module, ILanguage language)
 		{
-			ModuleSpecificContext moduleContextFromCache;
-			lock (TypeCollisionWriterContextService.moduleContextsLocker)
+			V_0 = TypeCollisionWriterContextService.moduleContextsLocker;
+			V_1 = false;
+			try
 			{
+				Monitor.Enter(V_0, ref V_1);
 				if (!this.cacheService.IsModuleContextInCache(module, language, this.renameInvalidMembers))
 				{
-					ICollection<string> moduleNamespaceUsings = base.GetModuleNamespaceUsings(module);
-					Dictionary<string, List<string>> moduleCollisionTypesData = this.GetModuleCollisionTypesData(module, language);
-					Dictionary<string, HashSet<string>> moduleNamespaceHierarchy = this.GetModuleNamespaceHierarchy(module, language);
-					Dictionary<string, string> renamedNamespacesMap = this.GetRenamedNamespacesMap(module, language);
-					MemberRenamingData memberRenamingData = this.GetMemberRenamingData(module, language);
-					ModuleSpecificContext moduleSpecificContext = new ModuleSpecificContext(module, moduleNamespaceUsings, moduleCollisionTypesData, moduleNamespaceHierarchy, renamedNamespacesMap, memberRenamingData.RenamedMembers, memberRenamingData.RenamedMembersMap);
-					this.cacheService.AddModuleContextToCache(module, language, this.renameInvalidMembers, moduleSpecificContext);
-					moduleContextFromCache = moduleSpecificContext;
+					V_2 = this.GetModuleNamespaceUsings(module);
+					V_3 = this.GetModuleCollisionTypesData(module, language);
+					V_4 = this.GetModuleNamespaceHierarchy(module, language);
+					V_5 = this.GetRenamedNamespacesMap(module, language);
+					V_6 = this.GetMemberRenamingData(module, language);
+					V_7 = new ModuleSpecificContext(module, V_2, V_3, V_4, V_5, V_6.get_RenamedMembers(), V_6.get_RenamedMembersMap());
+					this.cacheService.AddModuleContextToCache(module, language, this.renameInvalidMembers, V_7);
+					V_8 = V_7;
 				}
 				else
 				{
-					moduleContextFromCache = this.cacheService.GetModuleContextFromCache(module, language, this.renameInvalidMembers);
+					V_8 = this.cacheService.GetModuleContextFromCache(module, language, this.renameInvalidMembers);
 				}
 			}
-			return moduleContextFromCache;
+			finally
+			{
+				if (V_1)
+				{
+					Monitor.Exit(V_0);
+				}
+			}
+			return V_8;
 		}
 
 		private Dictionary<AssemblyNameReference, List<TypeReference>> GetModuleDependsOnAnalysis(ModuleDefinition module)
 		{
-			Collection<TypeDefinition> types = module.get_Types();
-			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
-			foreach (TypeReference type in types)
+			stackVariable1 = module.get_Types();
+			V_0 = new HashSet<TypeReference>();
+			V_3 = stackVariable1.GetEnumerator();
+			try
 			{
-				if (typeReferences.Contains(type))
+				while (V_3.MoveNext())
 				{
-					continue;
+					V_4 = V_3.get_Current();
+					if (V_0.Contains(V_4))
+					{
+						continue;
+					}
+					dummyVar0 = V_0.Add(V_4);
 				}
-				typeReferences.Add(type);
 			}
-			foreach (TypeReference typeReference in module.GetTypeReferences())
+			finally
 			{
-				if (typeReferences.Contains(typeReference))
-				{
-					continue;
-				}
-				typeReferences.Add(typeReference);
+				V_3.Dispose();
 			}
-			Dictionary<AssemblyNameReference, List<TypeReference>> assembliesDependingOnToUsedTypesMap = Utilities.GetAssembliesDependingOnToUsedTypesMap(module, Utilities.GetExpandedTypeDependanceList(typeReferences));
-			foreach (AssemblyNameReference assemblyReference in module.get_AssemblyReferences())
+			V_5 = module.GetTypeReferences().GetEnumerator();
+			try
 			{
-				if (assembliesDependingOnToUsedTypesMap.ContainsKey(assemblyReference))
+				while (V_5.MoveNext())
 				{
-					continue;
+					V_6 = V_5.get_Current();
+					if (V_0.Contains(V_6))
+					{
+						continue;
+					}
+					dummyVar1 = V_0.Add(V_6);
 				}
-				assembliesDependingOnToUsedTypesMap.Add(assemblyReference, new List<TypeReference>());
 			}
-			return assembliesDependingOnToUsedTypesMap;
+			finally
+			{
+				if (V_5 != null)
+				{
+					V_5.Dispose();
+				}
+			}
+			V_2 = Utilities.GetAssembliesDependingOnToUsedTypesMap(module, Utilities.GetExpandedTypeDependanceList(V_0));
+			V_7 = module.get_AssemblyReferences().GetEnumerator();
+			try
+			{
+				while (V_7.MoveNext())
+				{
+					V_8 = V_7.get_Current();
+					if (V_2.ContainsKey(V_8))
+					{
+						continue;
+					}
+					V_2.Add(V_8, new List<TypeReference>());
+				}
+			}
+			finally
+			{
+				V_7.Dispose();
+			}
+			return V_2;
 		}
 
 		private Dictionary<string, HashSet<string>> GetModuleNamespaceHierarchy(ModuleDefinition module, ILanguage language)
 		{
-			Dictionary<string, HashSet<string>> strs = new Dictionary<string, HashSet<string>>(language.IdentifierComparer);
-			this.UpdateNamespaceHiearchyDataWithTypes(strs, module.get_Types());
-			Dictionary<AssemblyNameReference, List<TypeReference>> moduleDependsOnAnalysis = this.GetModuleDependsOnAnalysis(module);
-			SpecialTypeAssembly specialTypeAssembly = (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(module) ? 1 : 0);
-			foreach (AssemblyNameReference key in moduleDependsOnAnalysis.Keys)
+			V_0 = new Dictionary<string, HashSet<string>>(language.get_IdentifierComparer());
+			this.UpdateNamespaceHiearchyDataWithTypes(V_0, module.get_Types());
+			V_1 = this.GetModuleDependsOnAnalysis(module);
+			if (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(module))
 			{
-				AssemblyDefinition assemblyDefinition = module.get_AssemblyResolver().Resolve(key, "", ModuleDefinitionExtensions.GetModuleArchitecture(module), specialTypeAssembly, true);
-				if (assemblyDefinition == null)
+				stackVariable12 = 1;
+			}
+			else
+			{
+				stackVariable12 = 0;
+			}
+			V_2 = stackVariable12;
+			V_3 = V_1.get_Keys().GetEnumerator();
+			try
+			{
+				while (V_3.MoveNext())
 				{
-					this.UpdateNamespaceHiearchyDataWithTypes(strs, moduleDependsOnAnalysis[key]);
-				}
-				else
-				{
-					this.UpdateNamespaceHiearchyDataWithTypes(strs, assemblyDefinition.get_MainModule().get_Types());
+					V_4 = V_3.get_Current();
+					V_5 = module.get_AssemblyResolver().Resolve(V_4, "", ModuleDefinitionExtensions.GetModuleArchitecture(module), V_2, true);
+					if (V_5 == null)
+					{
+						this.UpdateNamespaceHiearchyDataWithTypes(V_0, V_1.get_Item(V_4));
+					}
+					else
+					{
+						this.UpdateNamespaceHiearchyDataWithTypes(V_0, V_5.get_MainModule().get_Types());
+					}
 				}
 			}
-			return strs;
+			finally
+			{
+				((IDisposable)V_3).Dispose();
+			}
+			return V_0;
 		}
 
 		private Dictionary<string, string> GetRenamedNamespacesMap(ModuleDefinition module, ILanguage langugage)
 		{
-			Dictionary<string, string> strs = new Dictionary<string, string>();
+			V_0 = new Dictionary<string, string>();
 			if (!this.renameInvalidMembers)
 			{
-				return strs;
+				return V_0;
 			}
-			HashSet<string> strs1 = new HashSet<string>();
-		Label0:
-			foreach (TypeDefinition type in module.get_Types())
+			V_1 = new HashSet<string>();
+			V_2 = module.get_Types().GetEnumerator();
+			try
 			{
-				string @namespace = type.GetNamespace();
-				if (@namespace != String.Empty)
+			Label0:
+				while (V_2.MoveNext())
 				{
-					if (strs1.Contains(@namespace))
+					V_3 = V_2.get_Current().GetNamespace();
+					if (!String.op_Equality(V_3, String.Empty))
 					{
-						continue;
+						if (V_1.Contains(V_3))
+						{
+							continue;
+						}
+						dummyVar1 = V_1.Add(V_3);
+						stackVariable23 = new Char[1];
+						stackVariable23[0] = '.';
+						V_4 = V_3.Split(stackVariable23);
+						V_5 = V_4;
+						V_6 = 0;
+						while (V_6 < (int)V_5.Length)
+						{
+							if (langugage.IsValidIdentifier(V_5[V_6]))
+							{
+								V_6 = V_6 + 1;
+							}
+							else
+							{
+								V_0.Add(V_3, this.EscapeNamespace(V_4, langugage));
+								goto Label0;
+							}
+						}
 					}
-					strs1.Add(@namespace);
-					string[] strArray = @namespace.Split(new Char[] { '.' });
-					string[] strArray1 = strArray;
-					int num = 0;
-					while (num < (int)strArray1.Length)
+					else
 					{
-						if (langugage.IsValidIdentifier(strArray1[num]))
-						{
-							num++;
-						}
-						else
-						{
-							strs.Add(@namespace, this.EscapeNamespace(strArray, langugage));
-							goto Label0;
-						}
+						dummyVar0 = V_1.Add(V_3);
 					}
-				}
-				else
-				{
-					strs1.Add(@namespace);
 				}
 			}
-			return strs;
+			finally
+			{
+				V_2.Dispose();
+			}
+			return V_0;
 		}
 
 		public override WriterContext GetWriterContext(IMemberDefinition member, ILanguage language)
@@ -209,102 +314,132 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		private WriterContext GetWriterContextForType(TypeDefinition type, ILanguage language)
 		{
-			Dictionary<string, DecompiledType> nestedDecompiledTypes;
-			DecompiledType decompiledType;
-			TypeDefinition outerMostDeclaringType = Utilities.GetOuterMostDeclaringType(type);
-			if (!this.cacheService.AreNestedDecompiledTypesInCache(outerMostDeclaringType, language, this.renameInvalidMembers))
+			V_0 = Utilities.GetOuterMostDeclaringType(type);
+			if (!this.cacheService.AreNestedDecompiledTypesInCache(V_0, language, this.renameInvalidMembers))
 			{
-				nestedDecompiledTypes = base.GetNestedDecompiledTypes(outerMostDeclaringType, language);
-				this.cacheService.AddNestedDecompiledTypesToCache(outerMostDeclaringType, language, this.renameInvalidMembers, nestedDecompiledTypes);
+				V_1 = this.GetNestedDecompiledTypes(V_0, language);
+				this.cacheService.AddNestedDecompiledTypesToCache(V_0, language, this.renameInvalidMembers, V_1);
 			}
 			else
 			{
-				nestedDecompiledTypes = this.cacheService.GetNestedDecompiledTypesFromCache(outerMostDeclaringType, language, this.renameInvalidMembers);
+				V_1 = this.cacheService.GetNestedDecompiledTypesFromCache(V_0, language, this.renameInvalidMembers);
 			}
-			TypeSpecificContext typeContext = this.GetTypeContext(outerMostDeclaringType, language, nestedDecompiledTypes);
-			base.AddTypeContextsToCache(nestedDecompiledTypes, outerMostDeclaringType, language);
-			Dictionary<string, MethodSpecificContext> strs = new Dictionary<string, MethodSpecificContext>();
-			Dictionary<string, Statement> strs1 = new Dictionary<string, Statement>();
-			if (!nestedDecompiledTypes.TryGetValue(type.get_FullName(), out decompiledType))
+			V_2 = this.GetTypeContext(V_0, language, V_1);
+			this.AddTypeContextsToCache(V_1, V_0, language);
+			V_3 = new Dictionary<string, MethodSpecificContext>();
+			V_4 = new Dictionary<string, Statement>();
+			if (!V_1.TryGetValue(type.get_FullName(), out V_5))
 			{
 				throw new Exception("Decompiled type missing from DecompiledTypes cache.");
 			}
-			if (typeContext.GeneratedFilterMethods.Count > 0)
+			if (V_2.get_GeneratedFilterMethods().get_Count() > 0)
 			{
-				base.AddGeneratedFilterMethodsToDecompiledType(decompiledType, typeContext, language);
+				this.AddGeneratedFilterMethodsToDecompiledType(V_5, V_2, language);
 			}
-			foreach (DecompiledMember value in decompiledType.DecompiledMembers.Values)
+			V_7 = V_5.get_DecompiledMembers().get_Values().GetEnumerator();
+			try
 			{
-				strs.Add(value.MemberFullName, value.Context);
-				strs1.Add(value.MemberFullName, value.Statement);
+				while (V_7.MoveNext())
+				{
+					V_8 = V_7.get_Current();
+					V_3.Add(V_8.get_MemberFullName(), V_8.get_Context());
+					V_4.Add(V_8.get_MemberFullName(), V_8.get_Statement());
+				}
 			}
-			AssemblySpecificContext assemblyContext = this.GetAssemblyContext(outerMostDeclaringType.get_Module().get_Assembly(), language);
-			ModuleSpecificContext moduleContext = this.GetModuleContext(outerMostDeclaringType.get_Module(), language);
-			return new WriterContext(assemblyContext, moduleContext, typeContext, strs, strs1);
+			finally
+			{
+				((IDisposable)V_7).Dispose();
+			}
+			stackVariable63 = this.GetAssemblyContext(V_0.get_Module().get_Assembly(), language);
+			V_6 = this.GetModuleContext(V_0.get_Module(), language);
+			return new WriterContext(stackVariable63, V_6, V_2, V_3, V_4);
 		}
 
 		private void UpdateCollisionTypesDataWithTypes(Dictionary<string, List<string>> collisionTypesData, Dictionary<string, string> typeNamesFirstOccurrence, IEnumerable<TypeReference> types)
 		{
-			string str;
-			List<string> strs;
-			foreach (TypeReference type in types)
+			V_0 = types.GetEnumerator();
+			try
 			{
-				string name = type.get_Name();
-				if (!typeNamesFirstOccurrence.ContainsKey(name))
+				while (V_0.MoveNext())
 				{
-					typeNamesFirstOccurrence.Add(name, type.get_Namespace());
-				}
-				else if (collisionTypesData.ContainsKey(name))
-				{
-					if (!collisionTypesData.TryGetValue(name, out strs))
+					V_1 = V_0.get_Current();
+					V_2 = V_1.get_Name();
+					if (!typeNamesFirstOccurrence.ContainsKey(V_2))
 					{
-						throw new Exception("Collision type namespaces collection not found in collision types cache.");
+						typeNamesFirstOccurrence.Add(V_2, V_1.get_Namespace());
 					}
-					strs.Add(type.get_Namespace());
-				}
-				else
-				{
-					if (!typeNamesFirstOccurrence.TryGetValue(name, out str))
+					else
 					{
-						throw new Exception("Namespace not found in type first time occurence cache.");
+						if (collisionTypesData.ContainsKey(V_2))
+						{
+							if (!collisionTypesData.TryGetValue(V_2, out V_5))
+							{
+								throw new Exception("Collision type namespaces collection not found in collision types cache.");
+							}
+							V_5.Add(V_1.get_Namespace());
+						}
+						else
+						{
+							if (!typeNamesFirstOccurrence.TryGetValue(V_2, out V_3))
+							{
+								throw new Exception("Namespace not found in type first time occurence cache.");
+							}
+							V_4 = new List<string>();
+							V_4.Add(V_3);
+							V_4.Add(V_1.get_Namespace());
+							collisionTypesData.Add(V_2, V_4);
+						}
 					}
-					List<string> strs1 = new List<string>()
-					{
-						str,
-						type.get_Namespace()
-					};
-					collisionTypesData.Add(name, strs1);
 				}
 			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return;
 		}
 
 		private void UpdateNamespaceHiearchyDataWithTypes(Dictionary<string, HashSet<string>> namespaceHierarchy, IEnumerable<TypeReference> types)
 		{
-			HashSet<string> strs;
-			foreach (TypeReference type in types)
+			V_0 = types.GetEnumerator();
+			try
 			{
-				string @namespace = type.get_Namespace();
-				if (!Utilities.HasNamespaceParentNamespace(@namespace))
+				while (V_0.MoveNext())
 				{
-					continue;
-				}
-				string namesapceParentNamesapce = Utilities.GetNamesapceParentNamesapce(@namespace);
-				string namespaceChildNamesapce = Utilities.GetNamespaceChildNamesapce(@namespace);
-				if (!namespaceHierarchy.TryGetValue(namesapceParentNamesapce, out strs))
-				{
-					strs = new HashSet<string>();
-					strs.Add(namespaceChildNamesapce);
-					namespaceHierarchy.Add(namesapceParentNamesapce, strs);
-				}
-				else
-				{
-					if (strs.Contains(namespaceChildNamesapce))
+					V_1 = V_0.get_Current().get_Namespace();
+					if (!Utilities.HasNamespaceParentNamespace(V_1))
 					{
 						continue;
 					}
-					strs.Add(namespaceChildNamesapce);
+					V_2 = Utilities.GetNamesapceParentNamesapce(V_1);
+					V_3 = Utilities.GetNamespaceChildNamesapce(V_1);
+					if (!namespaceHierarchy.TryGetValue(V_2, out V_4))
+					{
+						V_4 = new HashSet<string>();
+						dummyVar1 = V_4.Add(V_3);
+						namespaceHierarchy.Add(V_2, V_4);
+					}
+					else
+					{
+						if (V_4.Contains(V_3))
+						{
+							continue;
+						}
+						dummyVar0 = V_4.Add(V_3);
+					}
 				}
 			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return;
 		}
 	}
 }

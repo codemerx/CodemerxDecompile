@@ -13,16 +13,28 @@ namespace Telerik.JustDecompiler.Steps
 
 		public FieldAssignmentAnalysisStep(Func<DecompilationContext, IStateMachineData> dataSelector)
 		{
+			base();
 			this.dataSelector = dataSelector;
+			return;
 		}
 
 		protected override void AnalyzeAssignments()
 		{
-			Dictionary<FieldDefinition, AssignmentType> fieldAssignmentData = this.dataSelector(this.context).FieldAssignmentData;
-			foreach (FieldDefinition field in this.context.TypeContext.CurrentType.get_Fields())
+			V_0 = this.dataSelector.Invoke(this.context).get_FieldAssignmentData();
+			V_1 = this.context.get_TypeContext().get_CurrentType().get_Fields().GetEnumerator();
+			try
 			{
-				fieldAssignmentData.Add(field, base.AnalyzeAssignmentType(new FieldUsageFinder(field)));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.Add(V_2, this.AnalyzeAssignmentType(new FieldUsageFinder(V_2)));
+				}
 			}
+			finally
+			{
+				V_1.Dispose();
+			}
+			return;
 		}
 	}
 }

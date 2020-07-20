@@ -9,11 +9,11 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 {
 	internal class YieldStateMachineControlFlowRebuilder
 	{
-		private readonly HashSet<InstructionBlock> yieldBreaks = new HashSet<InstructionBlock>();
+		private readonly HashSet<InstructionBlock> yieldBreaks;
 
-		private readonly HashSet<InstructionBlock> yieldReturns = new HashSet<InstructionBlock>();
+		private readonly HashSet<InstructionBlock> yieldReturns;
 
-		private readonly HashSet<InstructionBlock> toBeRemoved = new HashSet<InstructionBlock>();
+		private readonly HashSet<InstructionBlock> toBeRemoved;
 
 		private readonly SwitchData switchData;
 
@@ -67,79 +67,90 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		public YieldStateMachineControlFlowRebuilder(MethodSpecificContext moveNextMethodContext, SwitchData controllerSwitchData, FieldDefinition stateField)
 		{
+			this.yieldBreaks = new HashSet<InstructionBlock>();
+			this.yieldReturns = new HashSet<InstructionBlock>();
+			this.toBeRemoved = new HashSet<InstructionBlock>();
+			base();
 			this.moveNextMethodContext = moveNextMethodContext;
 			this.switchData = controllerSwitchData;
 			this.stateField = stateField;
+			return;
 		}
 
 		private bool CheckAndSaveCurrentItemField(FieldReference foundCurrentItemFieldRef)
 		{
-			FieldDefinition fieldDefinition = foundCurrentItemFieldRef.Resolve();
-			if (this.currentItemField == null)
+			V_0 = foundCurrentItemFieldRef.Resolve();
+			if (this.currentItemField != null)
 			{
-				this.currentItemField = fieldDefinition;
+				if ((object)this.currentItemField != (object)V_0)
+				{
+					return false;
+				}
 			}
-			else if ((object)this.currentItemField != (object)fieldDefinition)
+			else
 			{
-				return false;
+				this.currentItemField = V_0;
 			}
 			return true;
 		}
 
 		private bool CheckAndSaveReturnFlagVariable(VariableReference foundReturnFlagVariable)
 		{
-			if (this.returnFlagVariable == null)
+			if (this.returnFlagVariable != null)
+			{
+				if ((object)this.returnFlagVariable != (object)foundReturnFlagVariable)
+				{
+					return false;
+				}
+			}
+			else
 			{
 				this.returnFlagVariable = foundReturnFlagVariable;
-			}
-			else if ((object)this.returnFlagVariable != (object)foundReturnFlagVariable)
-			{
-				return false;
 			}
 			return true;
 		}
 
 		private InstructionBlock GetStateFistBlock(int state)
 		{
-			if (state < 0 || state >= (int)this.switchData.OrderedCasesArray.Length)
+			if (state < 0 || state >= (int)this.switchData.get_OrderedCasesArray().Length)
 			{
-				return this.switchData.DefaultCase;
+				return this.switchData.get_DefaultCase();
 			}
-			return this.switchData.OrderedCasesArray[state];
+			return this.switchData.get_OrderedCasesArray()[state];
 		}
 
 		private bool IsFinallyMethodInvocationBlock(InstructionBlock block)
 		{
-			Instruction first = block.First;
-			if (first.get_OpCode().get_Code() != 2)
+			V_0 = block.get_First();
+			if (V_0.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 39)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 39)
 			{
 				return false;
 			}
-			Instruction instruction = first;
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() == null)
+			V_1 = V_0;
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() == null)
 			{
-				first = first.get_Next();
+				V_0 = V_0.get_Next();
 			}
-			if (!StateMachineUtilities.IsUnconditionalBranch(first))
-			{
-				return false;
-			}
-			if ((object)block.Last != (object)first)
+			if (!StateMachineUtilities.IsUnconditionalBranch(V_0))
 			{
 				return false;
 			}
-			MethodReference operand = instruction.get_Operand() as MethodReference;
-			if (operand == null)
+			if ((object)block.get_Last() != (object)V_0)
 			{
 				return false;
 			}
-			if (!operand.get_Name().StartsWith("<>m__Finally"))
+			V_2 = V_1.get_Operand() as MethodReference;
+			if (V_2 == null)
+			{
+				return false;
+			}
+			if (!V_2.get_Name().StartsWith("<>m__Finally"))
 			{
 				return false;
 			}
@@ -148,208 +159,225 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private bool MarkPredecessorsAsYieldReturns(InstructionBlock theBlock)
 		{
-			bool flag;
-			this.toBeRemoved.Add(theBlock);
-			HashSet<InstructionBlock>.Enumerator enumerator = (new HashSet<InstructionBlock>(theBlock.Predecessors)).GetEnumerator();
+			dummyVar0 = this.toBeRemoved.Add(theBlock);
+			V_0 = (new HashSet<InstructionBlock>(theBlock.get_Predecessors())).GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					InstructionBlock current = enumerator.Current;
-					if ((object)current.Last != (object)current.First)
+					V_1 = V_0.get_Current();
+					if ((object)V_1.get_Last() != (object)V_1.get_First())
 					{
-						if (this.TryAddToYieldReturningBlocks(current))
+						if (this.TryAddToYieldReturningBlocks(V_1))
 						{
 							continue;
 						}
-						flag = false;
-						return flag;
+						V_2 = false;
+						goto Label1;
 					}
 					else
 					{
-						if (StateMachineUtilities.IsUnconditionalBranch(current.Last) && this.MarkPredecessorsAsYieldReturns(current))
+						if (StateMachineUtilities.IsUnconditionalBranch(V_1.get_Last()) && this.MarkPredecessorsAsYieldReturns(V_1))
 						{
 							continue;
 						}
-						flag = false;
-						return flag;
+						V_2 = false;
+						goto Label1;
 					}
 				}
-				return true;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_0).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return true;
 		}
 
 		private bool MarkTrueReturningPredecessorsAsYieldReturn(InstructionBlock theBlock)
 		{
-			int num;
-			bool flag;
-			HashSet<InstructionBlock>.Enumerator enumerator = (new HashSet<InstructionBlock>(theBlock.Predecessors)).GetEnumerator();
+			V_0 = (new HashSet<InstructionBlock>(theBlock.get_Predecessors())).GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					InstructionBlock current = enumerator.Current;
-					if ((object)current.Last != (object)current.First)
+					V_1 = V_0.get_Current();
+					if ((object)V_1.get_Last() != (object)V_1.get_First())
 					{
-						VariableReference variableReference = null;
-						Instruction last = current.Last;
-						if (StateMachineUtilities.IsUnconditionalBranch(last))
+						V_2 = null;
+						V_3 = V_1.get_Last();
+						if (StateMachineUtilities.IsUnconditionalBranch(V_3))
 						{
-							last = last.get_Previous();
+							V_3 = V_3.get_Previous();
 						}
-						if (this.IsFinallyMethodInvocationBlock(current))
+						if (!this.IsFinallyMethodInvocationBlock(V_1))
 						{
-							if (this.MarkTrueReturningPredecessorsAsYieldReturn(current))
+							if (!this.TryGetVariableFromInstruction(V_3, out V_2) || !this.CheckAndSaveReturnFlagVariable(V_2) || !StateMachineUtilities.TryGetOperandOfLdc(V_3.get_Previous(), out V_4))
 							{
-								continue;
+								V_5 = false;
+								goto Label1;
 							}
-							flag = false;
-							return flag;
-						}
-						else if (!this.TryGetVariableFromInstruction(last, out variableReference) || !this.CheckAndSaveReturnFlagVariable(variableReference) || !StateMachineUtilities.TryGetOperandOfLdc(last.get_Previous(), out num))
-						{
-							flag = false;
-							return flag;
-						}
-						else if (num != 1)
-						{
-							if (num == 0)
+							else
 							{
-								continue;
+								if (V_4 != 1)
+								{
+									if (V_4 == 0)
+									{
+										continue;
+									}
+									V_5 = false;
+									goto Label1;
+								}
+								else
+								{
+									if (this.TryAddToYieldReturningBlocks(V_1))
+									{
+										continue;
+									}
+									V_5 = false;
+									goto Label1;
+								}
 							}
-							flag = false;
-							return flag;
 						}
 						else
 						{
-							if (this.TryAddToYieldReturningBlocks(current))
+							if (this.MarkTrueReturningPredecessorsAsYieldReturn(V_1))
 							{
 								continue;
 							}
-							flag = false;
-							return flag;
+							V_5 = false;
+							goto Label1;
 						}
-					}
-					else if (!StateMachineUtilities.IsUnconditionalBranch(current.Last))
-					{
-						flag = false;
-						return flag;
 					}
 					else
 					{
-						this.toBeRemoved.Add(current);
-						if (this.MarkTrueReturningPredecessorsAsYieldReturn(current))
+						if (!StateMachineUtilities.IsUnconditionalBranch(V_1.get_Last()))
 						{
-							continue;
+							V_5 = false;
+							goto Label1;
 						}
-						flag = false;
-						return flag;
+						else
+						{
+							dummyVar0 = this.toBeRemoved.Add(V_1);
+							if (this.MarkTrueReturningPredecessorsAsYieldReturn(V_1))
+							{
+								continue;
+							}
+							V_5 = false;
+							goto Label1;
+						}
 					}
 				}
-				return true;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_0).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_5;
+		Label0:
+			return true;
 		}
 
 		public bool ProcessEndBlocks()
 		{
-			InstructionBlock[] blocks = this.moveNextMethodContext.ControlFlowGraph.Blocks;
-			for (int i = 0; i < (int)blocks.Length; i++)
+			V_0 = this.moveNextMethodContext.get_ControlFlowGraph().get_Blocks();
+			V_1 = 0;
+			while (V_1 < (int)V_0.Length)
 			{
-				InstructionBlock instructionBlocks = blocks[i];
-				if (instructionBlocks.Successors.Length == 0 && instructionBlocks.Last.get_OpCode().get_Code() == 41 && !this.TryProcessEndBlock(instructionBlocks))
+				V_2 = V_0[V_1];
+				if (V_2.get_Successors().Length == 0 && V_2.get_Last().get_OpCode().get_Code() == 41 && !this.TryProcessEndBlock(V_2))
 				{
 					return false;
 				}
+				V_1 = V_1 + 1;
 			}
 			return true;
 		}
 
 		private bool TryAddToYieldReturningBlocks(InstructionBlock theBlock)
 		{
-			int num;
-			if (this.TryGetNextStateNumber(theBlock, out num) != YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.StateNumberFound)
+			if (this.TryGetNextStateNumber(theBlock, out V_0) != 1)
 			{
 				return false;
 			}
-			this.yieldReturns.Add(theBlock);
-			InstructionBlock stateFistBlock = this.GetStateFistBlock(num);
-			theBlock.Successors = new InstructionBlock[] { stateFistBlock };
+			dummyVar0 = this.yieldReturns.Add(theBlock);
+			V_1 = this.GetStateFistBlock(V_0);
+			stackVariable15 = new InstructionBlock[1];
+			stackVariable15[0] = V_1;
+			theBlock.set_Successors(stackVariable15);
 			return true;
 		}
 
 		private YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult TryGetNextStateNumber(InstructionBlock theBlock, out int newStateNumber)
 		{
-			for (Instruction i = theBlock.Last; (object)i != (object)theBlock.First; i = i.get_Previous())
+			V_0 = theBlock.get_Last();
+			while ((object)V_0 != (object)theBlock.get_First())
 			{
-				if (i.get_OpCode().get_Code() == 122 && (object)this.stateField == (object)((FieldReference)i.get_Operand()).Resolve())
+				if (V_0.get_OpCode().get_Code() == 122 && (object)this.stateField == (object)((FieldReference)V_0.get_Operand()).Resolve())
 				{
-					i = i.get_Previous();
-					if (!StateMachineUtilities.TryGetOperandOfLdc(i, out newStateNumber))
+					V_0 = V_0.get_Previous();
+					if (!StateMachineUtilities.TryGetOperandOfLdc(V_0, out newStateNumber))
 					{
-						return YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.PatternFailed;
+						return 0;
 					}
-					i = i.get_Previous().get_Previous();
-					if (i.get_OpCode().get_Code() == 122 && this.CheckAndSaveCurrentItemField((FieldReference)i.get_Operand()))
+					V_0 = V_0.get_Previous().get_Previous();
+					if (V_0.get_OpCode().get_Code() == 122 && this.CheckAndSaveCurrentItemField((FieldReference)V_0.get_Operand()))
 					{
-						return YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.StateNumberFound;
+						return 1;
 					}
-					return YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.PatternFailed;
+					return 0;
 				}
+				V_0 = V_0.get_Previous();
 			}
 			newStateNumber = 0;
-			return YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.StateWasNotSet;
+			return 2;
 		}
 
 		private bool TryGetVariableFromInstruction(Instruction instruction, out VariableReference varReference)
 		{
-			return StateMachineUtilities.TryGetVariableFromInstruction(instruction, this.moveNextMethodContext.Variables, out varReference);
+			return StateMachineUtilities.TryGetVariableFromInstruction(instruction, this.moveNextMethodContext.get_Variables(), out varReference);
 		}
 
 		private bool TryProcessEndBlock(InstructionBlock theBlock)
 		{
-			int num;
-			int num1;
-			VariableReference variableReference = null;
-			Instruction previous = theBlock.Last.get_Previous();
-			if (!StateMachineUtilities.TryGetOperandOfLdc(previous, out num))
+			V_0 = null;
+			V_1 = theBlock.get_Last().get_Previous();
+			if (!StateMachineUtilities.TryGetOperandOfLdc(V_1, out V_2))
 			{
-				if (!this.TryGetVariableFromInstruction(previous, out variableReference) || !this.CheckAndSaveReturnFlagVariable(variableReference))
+				if (!this.TryGetVariableFromInstruction(V_1, out V_0) || !this.CheckAndSaveReturnFlagVariable(V_0))
 				{
 					return false;
 				}
-				this.yieldBreaks.Add(theBlock);
+				dummyVar2 = this.yieldBreaks.Add(theBlock);
 				return this.MarkTrueReturningPredecessorsAsYieldReturn(theBlock);
 			}
-			if (num != 0)
+			if (V_2 != 0)
 			{
-				if (num != 1)
+				if (V_2 != 1)
 				{
 					return false;
 				}
-				switch (this.TryGetNextStateNumber(theBlock, out num1))
+				switch (this.TryGetNextStateNumber(theBlock, out V_3))
 				{
-					case YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.PatternFailed:
+					case 0:
 					{
 						return false;
 					}
-					case YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.StateNumberFound:
+					case 1:
 					{
-						this.yieldReturns.Add(theBlock);
-						InstructionBlock stateFistBlock = this.GetStateFistBlock(num1);
-						theBlock.Successors = new InstructionBlock[] { stateFistBlock };
+						dummyVar1 = this.yieldReturns.Add(theBlock);
+						V_4 = this.GetStateFistBlock(V_3);
+						stackVariable41 = new InstructionBlock[1];
+						stackVariable41[0] = V_4;
+						theBlock.set_Successors(stackVariable41);
 						break;
 					}
-					case YieldStateMachineControlFlowRebuilder.NextStateNumberSearchResult.StateWasNotSet:
+					case 2:
 					{
 						return this.MarkPredecessorsAsYieldReturns(theBlock);
 					}
@@ -357,7 +385,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			}
 			else
 			{
-				this.yieldBreaks.Add(theBlock);
+				dummyVar0 = this.yieldBreaks.Add(theBlock);
 			}
 			return true;
 		}

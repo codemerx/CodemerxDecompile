@@ -15,15 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				ThisCtorExpression thisCtorExpression = null;
-				if (thisCtorExpression.InstanceReference != null)
-				{
-					yield return thisCtorExpression.InstanceReference;
-				}
-				foreach (ICodeNode codeNode in thisCtorExpression.u003cu003en__0())
-				{
-					yield return codeNode;
-				}
+				stackVariable1 = new ThisCtorExpression.u003cget_Childrenu003ed__7(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -31,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ThisCtorExpression;
+				return 53;
 			}
 		}
 
@@ -61,57 +55,53 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ThisCtorExpression(MethodReferenceExpression methodReferenceExpression, IEnumerable<Instruction> instructions) : base(methodReferenceExpression, instructions)
+		public ThisCtorExpression(MethodReferenceExpression methodReferenceExpression, IEnumerable<Instruction> instructions)
 		{
+			base(methodReferenceExpression, instructions);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			Expression expression;
-			ThisCtorExpression thisCtorExpression = new ThisCtorExpression(base.MethodExpression.Clone() as MethodReferenceExpression, this.instructions)
+			stackVariable6 = new ThisCtorExpression(this.get_MethodExpression().Clone() as MethodReferenceExpression, this.instructions);
+			stackVariable6.set_Arguments(this.get_Arguments().Clone());
+			stackVariable6.set_VirtualCall(this.get_VirtualCall());
+			if (this.get_InstanceReference() != null)
 			{
-				Arguments = base.Arguments.Clone(),
-				VirtualCall = base.VirtualCall
-			};
-			if (this.InstanceReference != null)
-			{
-				expression = this.InstanceReference.Clone();
+				stackVariable16 = this.get_InstanceReference().Clone();
 			}
 			else
 			{
-				expression = null;
+				stackVariable16 = null;
 			}
-			thisCtorExpression.InstanceReference = expression;
-			return thisCtorExpression;
+			stackVariable6.set_InstanceReference(stackVariable16);
+			return stackVariable6;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			Expression expression;
-			ThisCtorExpression thisCtorExpression = new ThisCtorExpression(base.MethodExpression.CloneExpressionOnly() as MethodReferenceExpression, this.instructions)
+			stackVariable6 = new ThisCtorExpression(this.get_MethodExpression().CloneExpressionOnly() as MethodReferenceExpression, this.instructions);
+			stackVariable6.set_Arguments(this.get_Arguments().CloneExpressionsOnly());
+			stackVariable6.set_VirtualCall(this.get_VirtualCall());
+			if (this.get_InstanceReference() != null)
 			{
-				Arguments = base.Arguments.CloneExpressionsOnly(),
-				VirtualCall = base.VirtualCall
-			};
-			if (this.InstanceReference != null)
-			{
-				expression = this.InstanceReference.CloneExpressionOnly();
+				stackVariable16 = this.get_InstanceReference().CloneExpressionOnly();
 			}
 			else
 			{
-				expression = null;
+				stackVariable16 = null;
 			}
-			thisCtorExpression.InstanceReference = expression;
-			return thisCtorExpression;
+			stackVariable6.set_InstanceReference(stackVariable16);
+			return stackVariable6;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is ThisCtorExpression))
+			if (other as ThisCtorExpression == null)
 			{
 				return false;
 			}
-			return base.Equals(other);
+			return this.Equals(other);
 		}
 	}
 }

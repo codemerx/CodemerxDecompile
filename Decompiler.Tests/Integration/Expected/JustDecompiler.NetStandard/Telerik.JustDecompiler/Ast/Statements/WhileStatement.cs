@@ -23,8 +23,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.Parent = this;
+					this.body.set_Parent(this);
 				}
+				return;
 			}
 		}
 
@@ -32,12 +33,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				WhileStatement whileStatement = null;
-				yield return whileStatement.Condition;
-				if (whileStatement.body != null)
-				{
-					yield return whileStatement.body;
-				}
+				stackVariable1 = new WhileStatement.u003cget_Childrenu003ed__3(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -45,45 +43,45 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.WhileStatement;
+				return 7;
 			}
 		}
 
-		public WhileStatement(Expression condition, BlockStatement body) : base(condition)
+		public WhileStatement(Expression condition, BlockStatement body)
 		{
-			this.Body = body;
+			base(condition);
+			this.set_Body(body);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				blockStatement = this.body.Clone() as BlockStatement;
+				stackVariable5 = this.body.Clone() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			WhileStatement whileStatement = new WhileStatement(base.Condition.Clone(), blockStatement);
-			base.CopyParentAndLabel(whileStatement);
-			return whileStatement;
+			V_1 = new WhileStatement(this.get_Condition().Clone(), stackVariable5);
+			this.CopyParentAndLabel(V_1);
+			return V_1;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				blockStatement = this.body.CloneStatementOnly() as BlockStatement;
+				stackVariable5 = this.body.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			WhileStatement whileStatement = new WhileStatement(base.Condition.CloneExpressionOnly(), blockStatement);
-			base.CopyParentAndLabel(whileStatement);
-			return whileStatement;
+			V_1 = new WhileStatement(this.get_Condition().CloneExpressionOnly(), stackVariable5);
+			this.CopyParentAndLabel(V_1);
+			return V_1;
 		}
 	}
 }

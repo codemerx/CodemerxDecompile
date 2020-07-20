@@ -1,9 +1,7 @@
 using Mono.Cecil;
-using Mono.Cecil.Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
 namespace Telerik.JustDecompiler.Steps
@@ -12,20 +10,20 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		private static int GetEnumBitSize(TypeDefinition enumDefinition)
 		{
-			TypeReference fieldType = enumDefinition.get_Fields().get_Item(0).get_FieldType();
-			if (fieldType.get_FullName() == "System.Int32" || fieldType.get_FullName() == "System.UInt32")
+			V_0 = enumDefinition.get_Fields().get_Item(0).get_FieldType();
+			if (String.op_Equality(V_0.get_FullName(), "System.Int32") || String.op_Equality(V_0.get_FullName(), "System.UInt32"))
 			{
 				return 32;
 			}
-			if (fieldType.get_FullName() == "System.Int64" || fieldType.get_FullName() == "System.UInt64")
+			if (String.op_Equality(V_0.get_FullName(), "System.Int64") || String.op_Equality(V_0.get_FullName(), "System.UInt64"))
 			{
 				return 64;
 			}
-			if (fieldType.get_FullName() == "System.Int16" || fieldType.get_FullName() == "System.UInt16")
+			if (String.op_Equality(V_0.get_FullName(), "System.Int16") || String.op_Equality(V_0.get_FullName(), "System.UInt16"))
 			{
 				return 16;
 			}
-			if (!(fieldType.get_FullName() == "System.Byte") && !(fieldType.get_FullName() == "System.SByte"))
+			if (!String.op_Equality(V_0.get_FullName(), "System.Byte") && !String.op_Equality(V_0.get_FullName(), "System.SByte"))
 			{
 				return -1;
 			}
@@ -34,159 +32,179 @@ namespace Telerik.JustDecompiler.Steps
 
 		public static Expression GetEnumExpression(TypeDefinition enumDefinition, LiteralExpression targetedValue, TypeSystem typeSystem)
 		{
-			Expression enumExpression;
-			int enumBitSize = EnumHelper.GetEnumBitSize(enumDefinition);
-			ulong value = (ulong)0;
-			string fullName = targetedValue.Value.GetType().FullName;
-			if (fullName != null)
+			V_0 = EnumHelper.GetEnumBitSize(enumDefinition);
+			V_1 = (long)0;
+			V_4 = targetedValue.get_Value().GetType().get_FullName();
+			if (V_4 != null)
 			{
-				switch (fullName)
+				if (String.op_Equality(V_4, "System.Int32"))
 				{
-					case "System.Int32":
+					if (V_0 != 32)
 					{
-						if (enumBitSize != 32)
-						{
-							value = (ulong)((Int32)targetedValue.Value);
-						}
-						else
-						{
-							value = (ulong)((Int32)targetedValue.Value);
-						}
-						break;
-					}
-					case "System.Int64":
-					{
-						value = (ulong)targetedValue.Value;
-						break;
-					}
-					case "System.UInt32":
-					{
-						value = (ulong)((UInt32)targetedValue.Value);
-						break;
-					}
-					case "System.UInt64":
-					{
-						value = (UInt64)targetedValue.Value;
-						break;
-					}
-					case "System.Byte":
-					{
-						value = (ulong)((Byte)targetedValue.Value);
-						break;
-					}
-					case "System.SByte":
-					{
-						value = (ulong)((SByte)targetedValue.Value);
-						break;
-					}
-					case "System.Int16":
-					{
-						value = (ulong)((Int16)targetedValue.Value);
-						break;
-					}
-					case "System.UInt16":
-					{
-						value = (ulong)((UInt16)targetedValue.Value);
-						break;
-					}
-				}
-			}
-			Collection<FieldDefinition> fields = enumDefinition.get_Fields();
-			List<FieldDefinition> fieldDefinitions = new List<FieldDefinition>();
-			Collection<FieldDefinition>.Enumerator enumerator = fields.GetEnumerator();
-			try
-			{
-				while (enumerator.MoveNext())
-				{
-					FieldDefinition current = enumerator.get_Current();
-					if (current.get_Constant() == null || current.get_Constant().get_Value() == null)
-					{
-						continue;
-					}
-					ulong num = (ulong)0;
-					fullName = current.get_Constant().get_Value().GetType().FullName;
-					if (fullName != null)
-					{
-						switch (fullName)
-						{
-							case "System.Int32":
-							{
-								num = (ulong)((Int32)current.get_Constant().get_Value());
-								break;
-							}
-							case "System.UInt32":
-							{
-								num = (ulong)((UInt32)current.get_Constant().get_Value());
-								break;
-							}
-							case "System.Byte":
-							{
-								num = (ulong)((Byte)current.get_Constant().get_Value());
-								break;
-							}
-							case "System.SByte":
-							{
-								num = (ulong)((byte)((SByte)current.get_Constant().get_Value()));
-								break;
-							}
-							case "System.Int16":
-							{
-								num = (ulong)((ushort)((Int16)current.get_Constant().get_Value()));
-								break;
-							}
-							case "System.UInt16":
-							{
-								num = (ulong)((UInt16)current.get_Constant().get_Value());
-								break;
-							}
-							case "System.Int64":
-							{
-								num = (ulong)current.get_Constant().get_Value();
-								break;
-							}
-							case "System.UInt64":
-							{
-								num = (UInt64)current.get_Constant().get_Value();
-								break;
-							}
-						}
-					}
-					if (num != value)
-					{
-						if (num == 0 || (num | value) != value)
-						{
-							continue;
-						}
-						fieldDefinitions.Add(current);
+						V_1 = (long)((Int32)targetedValue.get_Value());
 					}
 					else
 					{
-						enumExpression = new EnumExpression(current, targetedValue.UnderlyingSameMethodInstructions);
-						return enumExpression;
+						V_1 = (ulong)((Int32)targetedValue.get_Value());
 					}
 				}
-				if (fieldDefinitions.Count < 2)
+				else
 				{
-					return targetedValue;
-				}
-				Expression binaryExpression = new BinaryExpression(BinaryOperator.BitwiseOr, new EnumExpression(fieldDefinitions[0], null), new EnumExpression(fieldDefinitions[1], null), typeSystem, null, false)
-				{
-					ExpressionType = enumDefinition
-				};
-				for (int i = 2; i < fieldDefinitions.Count; i++)
-				{
-					binaryExpression = new BinaryExpression(BinaryOperator.BitwiseOr, binaryExpression, new EnumExpression(fieldDefinitions[i], null), typeSystem, null, false)
+					if (String.op_Equality(V_4, "System.Int64"))
 					{
-						ExpressionType = enumDefinition
-					};
+						V_1 = (Int64)targetedValue.get_Value();
+					}
+					else
+					{
+						if (String.op_Equality(V_4, "System.UInt32"))
+						{
+							V_1 = (ulong)((UInt32)targetedValue.get_Value());
+						}
+						else
+						{
+							if (String.op_Equality(V_4, "System.UInt64"))
+							{
+								V_1 = (UInt64)targetedValue.get_Value();
+							}
+							else
+							{
+								if (String.op_Equality(V_4, "System.Byte"))
+								{
+									V_1 = (ulong)((Byte)targetedValue.get_Value());
+								}
+								else
+								{
+									if (String.op_Equality(V_4, "System.SByte"))
+									{
+										V_1 = (long)((SByte)targetedValue.get_Value());
+									}
+									else
+									{
+										if (String.op_Equality(V_4, "System.Int16"))
+										{
+											V_1 = (long)((Int16)targetedValue.get_Value());
+										}
+										else
+										{
+											if (String.op_Equality(V_4, "System.UInt16"))
+											{
+												V_1 = (ulong)((UInt16)targetedValue.get_Value());
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
-				return binaryExpression.CloneAndAttachInstructions(targetedValue.UnderlyingSameMethodInstructions);
+			}
+			stackVariable10 = enumDefinition.get_Fields();
+			V_2 = new List<FieldDefinition>();
+			V_6 = stackVariable10.GetEnumerator();
+			try
+			{
+				while (V_6.MoveNext())
+				{
+					V_7 = V_6.get_Current();
+					if (V_7.get_Constant() == null || V_7.get_Constant().get_Value() == null)
+					{
+						continue;
+					}
+					V_8 = (long)0;
+					V_4 = V_7.get_Constant().get_Value().GetType().get_FullName();
+					if (V_4 != null)
+					{
+						if (String.op_Equality(V_4, "System.Int32"))
+						{
+							V_8 = (ulong)((Int32)V_7.get_Constant().get_Value());
+						}
+						else
+						{
+							if (String.op_Equality(V_4, "System.UInt32"))
+							{
+								V_8 = (ulong)((UInt32)V_7.get_Constant().get_Value());
+							}
+							else
+							{
+								if (String.op_Equality(V_4, "System.Byte"))
+								{
+									V_8 = (ulong)((Byte)V_7.get_Constant().get_Value());
+								}
+								else
+								{
+									if (String.op_Equality(V_4, "System.SByte"))
+									{
+										V_8 = (ulong)((byte)((SByte)V_7.get_Constant().get_Value()));
+									}
+									else
+									{
+										if (String.op_Equality(V_4, "System.Int16"))
+										{
+											V_8 = (ulong)((ushort)((Int16)V_7.get_Constant().get_Value()));
+										}
+										else
+										{
+											if (String.op_Equality(V_4, "System.UInt16"))
+											{
+												V_8 = (ulong)((UInt16)V_7.get_Constant().get_Value());
+											}
+											else
+											{
+												if (String.op_Equality(V_4, "System.Int64"))
+												{
+													V_8 = (Int64)V_7.get_Constant().get_Value();
+												}
+												else
+												{
+													if (String.op_Equality(V_4, "System.UInt64"))
+													{
+														V_8 = (UInt64)V_7.get_Constant().get_Value();
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					if (V_8 != V_1)
+					{
+						if (V_8 == 0 || V_8 | V_1 != V_1)
+						{
+							continue;
+						}
+						V_2.Add(V_7);
+					}
+					else
+					{
+						V_9 = new EnumExpression(V_7, targetedValue.get_UnderlyingSameMethodInstructions());
+						goto Label1;
+					}
+				}
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_6.Dispose();
 			}
-			return enumExpression;
+		Label1:
+			return V_9;
+		Label0:
+			if (V_2.get_Count() < 2)
+			{
+				return targetedValue;
+			}
+			V_3 = new BinaryExpression(21, new EnumExpression(V_2.get_Item(0), null), new EnumExpression(V_2.get_Item(1), null), typeSystem, null, false);
+			V_3.set_ExpressionType(enumDefinition);
+			V_10 = 2;
+			while (V_10 < V_2.get_Count())
+			{
+				V_3 = new BinaryExpression(21, V_3, new EnumExpression(V_2.get_Item(V_10), null), typeSystem, null, false);
+				V_3.set_ExpressionType(enumDefinition);
+				V_10 = V_10 + 1;
+			}
+			return V_3.CloneAndAttachInstructions(targetedValue.get_UnderlyingSameMethodInstructions());
 		}
 	}
 }

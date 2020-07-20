@@ -19,7 +19,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Arguments;
+				return this.get_Arguments();
 			}
 		}
 
@@ -27,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.RaiseEventExpression;
+				return 92;
 			}
 		}
 
@@ -43,35 +43,37 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public RaiseEventExpression(EventReference @event, MethodReference invokeMethodReference, ExpressionCollection arguments, IEnumerable<Instruction> instructions) : base(instructions)
+		public RaiseEventExpression(EventReference event, MethodReference invokeMethodReference, ExpressionCollection arguments, IEnumerable<Instruction> instructions)
 		{
-			this.Event = @event;
-			this.InvokeMethodReference = invokeMethodReference;
-			this.Arguments = arguments;
+			base(instructions);
+			this.set_Event(event);
+			this.set_InvokeMethodReference(invokeMethodReference);
+			this.set_Arguments(arguments);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new RaiseEventExpression(this.Event, this.InvokeMethodReference, this.Arguments.Clone(), this.instructions);
+			return new RaiseEventExpression(this.get_Event(), this.get_InvokeMethodReference(), this.get_Arguments().Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new RaiseEventExpression(this.Event, this.InvokeMethodReference, this.Arguments.CloneExpressionsOnly(), null);
+			return new RaiseEventExpression(this.get_Event(), this.get_InvokeMethodReference(), this.get_Arguments().CloneExpressionsOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other.CodeNodeType != Telerik.JustDecompiler.Ast.CodeNodeType.RaiseEventExpression)
+			if (other.get_CodeNodeType() != 92)
 			{
 				return false;
 			}
-			RaiseEventExpression raiseEventExpression = other as RaiseEventExpression;
-			if (!(this.Event.get_FullName() == raiseEventExpression.Event.get_FullName()) || !(this.InvokeMethodReference.get_FullName() == raiseEventExpression.InvokeMethodReference.get_FullName()))
+			V_0 = other as RaiseEventExpression;
+			if (!String.op_Equality(this.get_Event().get_FullName(), V_0.get_Event().get_FullName()) || !String.op_Equality(this.get_InvokeMethodReference().get_FullName(), V_0.get_InvokeMethodReference().get_FullName()))
 			{
 				return false;
 			}
-			return this.Arguments.Equals(raiseEventExpression.Arguments);
+			return this.get_Arguments().Equals(V_0.get_Arguments());
 		}
 	}
 }

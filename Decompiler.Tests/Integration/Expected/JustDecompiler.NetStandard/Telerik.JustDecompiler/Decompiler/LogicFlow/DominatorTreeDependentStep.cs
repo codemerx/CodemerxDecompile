@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DTree;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow
@@ -10,18 +9,19 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		protected DominatorTreeDependentStep(LogicalFlowBuilderContext context)
 		{
+			base();
 			this.logicalContext = context;
+			return;
 		}
 
 		protected DominatorTree GetDominatorTreeFromContext(ILogicalConstruct construct)
 		{
-			DominatorTree dominatorTree;
-			if (!this.logicalContext.LogicalConstructToDominatorTreeMap.TryGetValue(construct, out dominatorTree))
+			if (!this.logicalContext.get_LogicalConstructToDominatorTreeMap().TryGetValue(construct, out V_0))
 			{
-				dominatorTree = FastDominatorTreeBuilder.BuildTree(construct);
-				this.logicalContext.LogicalConstructToDominatorTreeMap.Add(construct, dominatorTree);
+				V_0 = FastDominatorTreeBuilder.BuildTree(construct);
+				this.logicalContext.get_LogicalConstructToDominatorTreeMap().Add(construct, V_0);
 			}
-			return dominatorTree;
+			return V_0;
 		}
 	}
 }

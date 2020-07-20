@@ -9,23 +9,27 @@ namespace Telerik.JustDecompiler.Decompiler
 {
 	public class BlockDecompilationPipeline : DecompilationPipeline
 	{
-		public BlockDecompilationPipeline(params IDecompilationStep[] steps) : base(steps)
+		public BlockDecompilationPipeline(params IDecompilationStep[] steps)
 		{
+			base(steps);
+			return;
 		}
 
-		public BlockDecompilationPipeline(IEnumerable<IDecompilationStep> steps, DecompilationContext context) : base(steps)
+		public BlockDecompilationPipeline(IEnumerable<IDecompilationStep> steps, DecompilationContext context)
 		{
+			base(steps);
 			if (context == null)
 			{
 				throw new ArgumentNullException("context");
 			}
-			base.Context = context;
+			this.set_Context(context);
+			return;
 		}
 
 		public DecompilationContext Run(MethodBody body, BlockStatement block, ILanguage language = null)
 		{
-			base.Body = base.RunInternal(body, block, language);
-			return base.Context;
+			this.set_Body(this.RunInternal(body, block, language));
+			return this.get_Context();
 		}
 	}
 }

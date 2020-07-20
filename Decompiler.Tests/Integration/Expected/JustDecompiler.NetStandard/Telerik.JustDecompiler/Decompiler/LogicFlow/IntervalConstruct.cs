@@ -47,7 +47,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				return this.Entry.Index;
+				return this.get_Entry().get_Index();
 			}
 		}
 
@@ -81,16 +81,19 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		public IntervalConstruct(ISingleEntrySubGraph entry)
 		{
-			this.Entry = entry;
+			base();
+			this.set_Entry(entry);
 			this.predecesors = new HashSet<ISingleEntrySubGraph>();
 			this.successors = new HashSet<ISingleEntrySubGraph>();
 			this.children = new HashSet<ISingleEntrySubGraph>();
-			this.children.Add(entry);
+			dummyVar0 = this.children.Add(entry);
+			return;
 		}
 
 		public int CompareTo(ISingleEntrySubGraph other)
 		{
-			return this.Index.CompareTo(other.Index);
+			V_0 = this.get_Index();
+			return V_0.CompareTo(other.get_Index());
 		}
 
 		public bool ContainsBlock(InstructionBlock block)

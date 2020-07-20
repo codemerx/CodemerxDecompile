@@ -1,10 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -17,20 +14,22 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildEventsStep(TypeSystem typeSystem)
 		{
+			base();
 			this.typeSystem = typeSystem;
+			return;
 		}
 
 		private Expression GetEventAssignExpression(EventReferenceExpression target, Expression argument, string eventMethodPrefix, IEnumerable<Instruction> instructions)
 		{
-			if (eventMethodPrefix == "add_")
+			if (String.op_Equality(eventMethodPrefix, "add_"))
 			{
-				return new BinaryExpression(BinaryOperator.AddAssign, target, argument, this.typeSystem, instructions, false);
+				return new BinaryExpression(2, target, argument, this.typeSystem, instructions, false);
 			}
-			if (eventMethodPrefix != "remove_")
+			if (!String.op_Equality(eventMethodPrefix, "remove_"))
 			{
 				return null;
 			}
-			return new BinaryExpression(BinaryOperator.SubtractAssign, target, argument, this.typeSystem, instructions, false);
+			return new BinaryExpression(4, target, argument, this.typeSystem, instructions, false);
 		}
 
 		private string GetEventMethodPrefix(string eventMethodName)
@@ -48,53 +47,54 @@ namespace Telerik.JustDecompiler.Steps
 
 		public ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			if (node.MethodExpression == null)
+			if (node.get_MethodExpression() == null)
 			{
 				return null;
 			}
-			MethodReferenceExpression methodExpression = node.MethodExpression;
-			MethodReference method = methodExpression.Method;
-			if (method.get_Name() == null)
+			V_0 = node.get_MethodExpression();
+			V_1 = V_0.get_Method();
+			if (V_1.get_Name() == null)
 			{
 				return null;
 			}
-			string eventMethodPrefix = this.GetEventMethodPrefix(method.get_Name());
-			if (String.IsNullOrEmpty(eventMethodPrefix))
+			V_2 = this.GetEventMethodPrefix(V_1.get_Name());
+			if (String.IsNullOrEmpty(V_2))
 			{
 				return null;
 			}
-			if (method.get_Parameters().get_Count() != 1)
+			if (V_1.get_Parameters().get_Count() != 1)
 			{
 				return null;
 			}
-			TypeReference declaringType = method.get_DeclaringType();
-			EventDefinition eventDefinition = null;
+			V_3 = V_1.get_DeclaringType();
+			V_4 = null;
 			do
 			{
-				if (declaringType == null)
+				V_6 = new RebuildEventsStep.u003cu003ec__DisplayClass2_0();
+				if (V_3 == null)
 				{
 					break;
 				}
-				TypeDefinition typeDefinition = declaringType.Resolve();
-				if (typeDefinition == null)
+				V_7 = V_3.Resolve();
+				if (V_7 == null)
 				{
 					break;
 				}
-				string str = method.get_Name().Substring(eventMethodPrefix.Length);
-				eventDefinition = typeDefinition.get_Events().FirstOrDefault<EventDefinition>((EventDefinition e) => e.get_Name() == str);
-				if (eventDefinition != null)
+				V_6.eventName = V_1.get_Name().Substring(V_2.get_Length());
+				V_4 = V_7.get_Events().FirstOrDefault<EventDefinition>(new Func<EventDefinition, bool>(V_6.u003cVisitMethodInvocationExpressionu003eb__0));
+				if (V_4 != null)
 				{
 					continue;
 				}
-				declaringType = typeDefinition.get_BaseType();
+				V_3 = V_7.get_BaseType();
 			}
-			while (declaringType != null && eventDefinition == null);
-			if (eventDefinition == null)
+			while (V_3 != null && V_4 == null);
+			if (V_4 == null)
 			{
 				return null;
 			}
-			EventReferenceExpression eventReferenceExpression = new EventReferenceExpression(methodExpression.Target, eventDefinition, null);
-			return this.GetEventAssignExpression(eventReferenceExpression, node.Arguments[0], eventMethodPrefix, node.InvocationInstructions);
+			V_5 = new EventReferenceExpression(V_0.get_Target(), V_4, null);
+			return this.GetEventAssignExpression(V_5, node.get_Arguments().get_Item(0), V_2, node.get_InvocationInstructions());
 		}
 	}
 }

@@ -5,13 +5,13 @@ namespace Telerik.JustDecompiler.Pattern
 {
 	public static class Extensions
 	{
-		public static bool TryMatch(this ICodePattern self, MatchContext context, object @object)
+		public static bool TryMatch(this ICodePattern self, MatchContext context, object object)
 		{
 			if (self == null)
 			{
 				return true;
 			}
-			return self.Match(context, @object);
+			return self.Match(context, object);
 		}
 	}
 }

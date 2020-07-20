@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Cil;
-using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DFST
 {
@@ -42,7 +41,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DFST
 		{
 			get
 			{
-				return this.ReversePostOrder[0];
+				return this.get_ReversePostOrder().get_Item(0);
 			}
 		}
 
@@ -54,29 +53,32 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DFST
 
 		public DFSTree(Dictionary<ISingleEntrySubGraph, DFSTNode> constructToNodeMap)
 		{
-			this.ReversePostOrder = new List<DFSTNode>();
-			this.TreeEdges = new HashSet<DFSTEdge>();
-			this.ForwardEdges = new HashSet<DFSTEdge>();
-			this.BackEdges = new HashSet<DFSTEdge>();
-			this.CrossEdges = new HashSet<DFSTEdge>();
-			this.ConstructToNodeMap = constructToNodeMap;
+			base();
+			this.set_ReversePostOrder(new List<DFSTNode>());
+			this.set_TreeEdges(new HashSet<DFSTEdge>());
+			this.set_ForwardEdges(new HashSet<DFSTEdge>());
+			this.set_BackEdges(new HashSet<DFSTEdge>());
+			this.set_CrossEdges(new HashSet<DFSTEdge>());
+			this.set_ConstructToNodeMap(constructToNodeMap);
+			return;
 		}
 
 		public List<DFSTNode> GetPath(DFSTNode ancestorNode, DFSTNode descenderNode)
 		{
-			DFSTNode i;
-			List<DFSTNode> dFSTNodes = new List<DFSTNode>();
-			for (i = descenderNode; i != null && i != ancestorNode; i = (DFSTNode)i.Predecessor)
+			V_0 = new List<DFSTNode>();
+			V_1 = descenderNode;
+			while (V_1 != null && V_1 != ancestorNode)
 			{
-				dFSTNodes.Add(i);
+				V_0.Add(V_1);
+				V_1 = (DFSTNode)V_1.get_Predecessor();
 			}
-			if (i == null)
+			if (V_1 == null)
 			{
 				throw new Exception("No path between the two nodes.");
 			}
-			dFSTNodes.Add(i);
-			dFSTNodes.Reverse();
-			return dFSTNodes;
+			V_0.Add(V_1);
+			V_0.Reverse();
+			return V_0;
 		}
 	}
 }

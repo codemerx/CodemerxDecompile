@@ -1,10 +1,8 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -15,13 +13,13 @@ namespace Telerik.JustDecompiler.Steps
 {
 	public class DeclareTopLevelVariables : BaseCodeVisitor, IDecompilationStep
 	{
-		private readonly Stack<CodeNodeType> codeNodeTypes = new Stack<CodeNodeType>();
+		private readonly Stack<CodeNodeType> codeNodeTypes;
 
-		private readonly Dictionary<VariableReference, bool> variableReferences = new Dictionary<VariableReference, bool>();
+		private readonly Dictionary<VariableReference, bool> variableReferences;
 
 		private TypeSystem typeSystem;
 
-		private Mono.Collections.Generic.Collection<VariableDefinition> methodVariables;
+		private Collection<VariableDefinition> methodVariables;
 
 		private int inLambdaCount;
 
@@ -29,168 +27,211 @@ namespace Telerik.JustDecompiler.Steps
 
 		public DeclareTopLevelVariables()
 		{
+			this.codeNodeTypes = new Stack<CodeNodeType>();
+			this.variableReferences = new Dictionary<VariableReference, bool>();
+			base();
+			return;
 		}
 
 		private int GetIndexOfCtorCall(BlockStatement block)
 		{
-			for (int i = 0; i < block.Statements.Count; i++)
+			V_0 = 0;
+			while (V_0 < block.get_Statements().get_Count())
 			{
-				if (block.Statements[i].CodeNodeType == CodeNodeType.ExpressionStatement)
+				if (block.get_Statements().get_Item(V_0).get_CodeNodeType() == 5)
 				{
-					Expression expression = (block.Statements[i] as ExpressionStatement).Expression;
-					if (expression.CodeNodeType == CodeNodeType.BaseCtorExpression || expression.CodeNodeType == CodeNodeType.ThisCtorExpression)
+					V_1 = (block.get_Statements().get_Item(V_0) as ExpressionStatement).get_Expression();
+					if (V_1.get_CodeNodeType() == 52 || V_1.get_CodeNodeType() == 53)
 					{
-						return i;
+						return V_0;
 					}
 				}
+				V_0 = V_0 + 1;
 			}
 			return -1;
 		}
 
 		private void InsertTopLevelDeclarations(BlockStatement block)
 		{
-			AssignmentType assignmentType;
-			bool flag;
-			int indexOfCtorCall = 0;
-			if (this.context.MethodContext.Method.get_IsConstructor())
+			V_0 = 0;
+			if (this.context.get_MethodContext().get_Method().get_IsConstructor())
 			{
-				indexOfCtorCall = this.GetIndexOfCtorCall(block) + 1;
+				V_0 = this.GetIndexOfCtorCall(block) + 1;
 			}
-			int num = 0;
-			while (num < this.methodVariables.get_Count())
+			V_1 = 0;
+			while (V_1 < this.methodVariables.get_Count())
 			{
-				bool flag1 = this.context.MethodContext.VariableAssignmentData.TryGetValue(this.methodVariables.get_Item(num), out assignmentType);
-				if (flag1 && assignmentType == AssignmentType.NotUsed)
+				V_3 = this.context.get_MethodContext().get_VariableAssignmentData().TryGetValue(this.methodVariables.get_Item(V_1), out V_2);
+				if (!V_3 || V_2 != AssignmentType.NotUsed)
 				{
-					indexOfCtorCall--;
-				}
-				else if (!this.variableReferences.TryGetValue(this.methodVariables.get_Item(num), out flag) || flag && (!flag1 || assignmentType != AssignmentType.NotAssigned))
-				{
-					this.InsertVariableDeclaration(block, indexOfCtorCall, num);
+					if (!this.variableReferences.TryGetValue(this.methodVariables.get_Item(V_1), out V_4) || V_4 && !V_3 || V_2 != 1)
+					{
+						this.InsertVariableDeclaration(block, V_0, V_1);
+					}
+					else
+					{
+						this.InsertVariableDeclarationAndAssignment(block, V_0, V_1);
+					}
 				}
 				else
 				{
-					this.InsertVariableDeclarationAndAssignment(block, indexOfCtorCall, num);
+					V_0 = V_0 - 1;
 				}
-				num++;
-				indexOfCtorCall++;
+				V_1 = V_1 + 1;
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private void InsertVariableDeclaration(BlockStatement block, int insertIndex, int variableIndex)
 		{
 			block.AddStatementAt(insertIndex, new ExpressionStatement(new VariableDeclarationExpression(this.methodVariables.get_Item(variableIndex), null)));
+			return;
 		}
 
 		private void InsertVariableDeclarationAndAssignment(BlockStatement block, int insertIndex, int variableIndex)
 		{
-			Expression defaultValueExpression = this.methodVariables.get_Item(variableIndex).get_VariableType().GetDefaultValueExpression(this.typeSystem);
-			if (defaultValueExpression == null)
+			V_0 = this.methodVariables.get_Item(variableIndex).get_VariableType().GetDefaultValueExpression(this.typeSystem);
+			if (V_0 == null)
 			{
 				this.InsertVariableDeclaration(block, insertIndex, variableIndex);
 				return;
 			}
-			BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, new VariableDeclarationExpression(this.methodVariables.get_Item(variableIndex), null), defaultValueExpression, this.typeSystem, null, false);
-			block.AddStatementAt(insertIndex, new ExpressionStatement(binaryExpression));
+			V_1 = new BinaryExpression(26, new VariableDeclarationExpression(this.methodVariables.get_Item(variableIndex), null), V_0, this.typeSystem, null, false);
+			block.AddStatementAt(insertIndex, new ExpressionStatement(V_1));
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
 			this.context = context;
-			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
-			this.methodVariables = new Mono.Collections.Generic.Collection<VariableDefinition>();
-			foreach (VariableDefinition variable in context.MethodContext.Variables)
+			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.methodVariables = new Collection<VariableDefinition>();
+			V_0 = context.get_MethodContext().get_Variables().GetEnumerator();
+			try
 			{
-				if (context.MethodContext.VariablesToNotDeclare.Contains(variable))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (context.get_MethodContext().get_VariablesToNotDeclare().Contains(V_1))
+					{
+						continue;
+					}
+					this.methodVariables.Add(V_1);
 				}
-				this.methodVariables.Add(variable);
 			}
-			this.codeNodeTypes.Push(CodeNodeType.BlockStatement);
+			finally
+			{
+				V_0.Dispose();
+			}
+			this.codeNodeTypes.Push(0);
 			this.Visit(block);
-			this.codeNodeTypes.Pop();
+			dummyVar0 = this.codeNodeTypes.Pop();
 			this.InsertTopLevelDeclarations(block);
 			return block;
 		}
 
 		private void VisitAssignExpression(BinaryExpression node)
 		{
-			bool flag;
-			flag = (node.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression ? true : node.Left.CodeNodeType == CodeNodeType.VariableDeclarationExpression);
-			if (flag)
+			if (node.get_Left().get_CodeNodeType() == 26)
 			{
-				this.codeNodeTypes.Push(CodeNodeType.BinaryExpression);
+				stackVariable4 = true;
 			}
-			this.Visit(node.Left);
-			if (flag)
+			else
 			{
-				this.codeNodeTypes.Pop();
+				stackVariable4 = node.get_Left().get_CodeNodeType() == 27;
 			}
-			this.Visit(node.Right);
+			if (stackVariable4)
+			{
+				this.codeNodeTypes.Push(24);
+			}
+			this.Visit(node.get_Left());
+			if (stackVariable4)
+			{
+				dummyVar0 = this.codeNodeTypes.Pop();
+			}
+			this.Visit(node.get_Right());
+			return;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.IsAssignmentExpression)
+			if (node.get_IsAssignmentExpression())
 			{
 				this.VisitAssignExpression(node);
 				return;
 			}
-			base.VisitBinaryExpression(node);
+			this.VisitBinaryExpression(node);
+			return;
 		}
 
 		public override void VisitDelegateCreationExpression(DelegateCreationExpression node)
 		{
-			if (node.MethodExpression.CodeNodeType != CodeNodeType.LambdaExpression)
+			if (node.get_MethodExpression().get_CodeNodeType() != 50)
 			{
-				base.VisitDelegateCreationExpression(node);
+				this.VisitDelegateCreationExpression(node);
 				return;
 			}
-			this.VisitLambdaExpression((LambdaExpression)node.MethodExpression);
+			this.VisitLambdaExpression((LambdaExpression)node.get_MethodExpression());
+			return;
 		}
 
 		public override void VisitLambdaExpression(LambdaExpression node)
 		{
-			this.inLambdaCount++;
-			base.VisitLambdaExpression(node);
-			this.inLambdaCount--;
+			this.inLambdaCount = this.inLambdaCount + 1;
+			this.VisitLambdaExpression(node);
+			this.inLambdaCount = this.inLambdaCount - 1;
+			return;
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			MethodDefinition methodDefinition = node.MethodExpression.MethodDefinition;
-			if (methodDefinition == null)
+			V_0 = node.get_MethodExpression().get_MethodDefinition();
+			if (V_0 == null)
 			{
-				base.VisitMethodInvocationExpression(node);
+				this.VisitMethodInvocationExpression(node);
 				return;
 			}
-			this.Visit(node.MethodExpression);
-			for (int i = 0; i < node.Arguments.Count; i++)
+			this.Visit(node.get_MethodExpression());
+			V_1 = 0;
+			while (V_1 < node.get_Arguments().get_Count())
 			{
-				UnaryExpression item = node.Arguments[i] as UnaryExpression;
-				if (item == null || item.Operator != UnaryOperator.AddressReference || item.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || !methodDefinition.get_Parameters().get_Item(i).IsOutParameter())
+				V_2 = node.get_Arguments().get_Item(V_1) as UnaryExpression;
+				if (V_2 == null || V_2.get_Operator() != 7 || V_2.get_Operand().get_CodeNodeType() != 26 || !V_0.get_Parameters().get_Item(V_1).IsOutParameter())
 				{
-					this.Visit(node.Arguments[i]);
+					this.Visit(node.get_Arguments().get_Item(V_1));
 				}
 				else
 				{
-					VariableReference variable = (item.Operand as VariableReferenceExpression).Variable;
-					if (!this.variableReferences.ContainsKey(variable))
+					V_3 = (V_2.get_Operand() as VariableReferenceExpression).get_Variable();
+					if (!this.variableReferences.ContainsKey(V_3))
 					{
-						this.variableReferences.Add(variable, true);
+						this.variableReferences.Add(V_3, true);
 					}
 				}
+				V_1 = V_1 + 1;
 			}
+			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (!this.variableReferences.ContainsKey(node.Variable))
+			if (!this.variableReferences.ContainsKey(node.get_Variable()))
 			{
-				this.variableReferences.Add(node.Variable, (this.codeNodeTypes.Peek() != CodeNodeType.BinaryExpression ? false : this.inLambdaCount == 0));
+				stackVariable8 = this.variableReferences;
+				stackVariable10 = node.get_Variable();
+				if (this.codeNodeTypes.Peek() != 24)
+				{
+					stackVariable15 = false;
+				}
+				else
+				{
+					stackVariable15 = this.inLambdaCount == 0;
+				}
+				stackVariable8.Add(stackVariable10, stackVariable15);
 			}
-			base.VisitVariableReferenceExpression(node);
+			this.VisitVariableReferenceExpression(node);
+			return;
 		}
 	}
 }

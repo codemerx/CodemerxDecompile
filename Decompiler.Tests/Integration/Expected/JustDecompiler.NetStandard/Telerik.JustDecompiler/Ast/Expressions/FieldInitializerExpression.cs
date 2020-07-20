@@ -17,6 +17,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new FieldInitializerExpression.u003cget_Childrenu003ed__20(-2);
 			}
 		}
 
@@ -24,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.FieldInitializerExpression;
+				return 86;
 			}
 		}
 
@@ -58,28 +59,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.get_Name();
+				return this.get_Field().get_Name();
 			}
 		}
 
-		public FieldInitializerExpression(FieldDefinition fieldDefinition, TypeReference type) : this(fieldDefinition, type, null)
+		public FieldInitializerExpression(FieldDefinition fieldDefinition, TypeReference type)
 		{
+			this(fieldDefinition, type, null);
+			return;
 		}
 
-		public FieldInitializerExpression(FieldDefinition fieldDefinition, TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public FieldInitializerExpression(FieldDefinition fieldDefinition, TypeReference type, IEnumerable<Instruction> instructions)
 		{
-			this.Field = fieldDefinition;
+			base(instructions);
+			this.set_Field(fieldDefinition);
 			this.expressionType = type;
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new FieldInitializerExpression(this.Field, this.expressionType, this.instructions);
+			return new FieldInitializerExpression(this.get_Field(), this.expressionType, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new FieldInitializerExpression(this.Field, this.expressionType, null);
+			return new FieldInitializerExpression(this.get_Field(), this.expressionType, null);
 		}
 
 		public override bool Equals(Expression other)

@@ -14,9 +14,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				LetClause letClause = null;
-				yield return letClause.Identifier;
-				yield return letClause.Expression;
+				stackVariable1 = new LetClause.u003cget_Childrenu003ed__15(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.LetClause;
+				return 79;
 			}
 		}
 
@@ -40,30 +40,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public LetClause(VariableReferenceExpression identifier, Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions) : base(instructions)
+		public LetClause(VariableReferenceExpression identifier, Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions)
 		{
-			this.Identifier = identifier;
-			this.Expression = expression;
+			base(instructions);
+			this.set_Identifier(identifier);
+			this.set_Expression(expression);
+			return;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new LetClause((VariableReferenceExpression)this.Identifier.Clone(), this.Expression.Clone(), this.instructions);
+			return new LetClause((VariableReferenceExpression)this.get_Identifier().Clone(), this.get_Expression().Clone(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new LetClause((VariableReferenceExpression)this.Identifier.CloneExpressionOnly(), this.Expression.CloneExpressionOnly(), null);
+			return new LetClause((VariableReferenceExpression)this.get_Identifier().CloneExpressionOnly(), this.get_Expression().CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			LetClause letClause = other as LetClause;
-			if (letClause == null || !this.Identifier.Equals(letClause.Identifier))
+			V_0 = other as LetClause;
+			if (V_0 == null || !this.get_Identifier().Equals(V_0.get_Identifier()))
 			{
 				return false;
 			}
-			return this.Expression.Equals(letClause.Expression);
+			return this.get_Expression().Equals(V_0.get_Expression());
 		}
 	}
 }

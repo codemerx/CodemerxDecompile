@@ -10,6 +10,8 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public SideEffectsFinder()
 		{
+			base();
+			return;
 		}
 
 		public static bool HasSideEffects(ICodeNode node)
@@ -18,80 +20,80 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			{
 				return false;
 			}
-			CodeNodeType codeNodeType = node.CodeNodeType;
-			if (codeNodeType > CodeNodeType.DelegateCreationExpression)
+			V_1 = node.get_CodeNodeType();
+			if (V_1 > 21)
 			{
-				if (codeNodeType == CodeNodeType.BinaryExpression)
+				if (V_1 == 24)
 				{
-					BinaryExpression binaryExpression = node as BinaryExpression;
-					if (binaryExpression.IsChecked || binaryExpression.Operator == BinaryOperator.Divide)
+					V_0 = node as BinaryExpression;
+					if (V_0.get_IsChecked() || V_0.get_Operator() == 7)
 					{
 						return true;
 					}
-					return binaryExpression.Operator == BinaryOperator.Modulo;
+					return V_0.get_Operator() == 24;
 				}
-				switch (codeNodeType)
+				switch (V_1 - 30)
 				{
-					case CodeNodeType.FieldReferenceExpression:
+					case 0:
 					{
-						return !(node as FieldReferenceExpression).IsSimpleStore;
+						return !(node as FieldReferenceExpression).get_IsSimpleStore();
 					}
-					case CodeNodeType.ExplicitCastExpression:
+					case 1:
 					{
-						return !(node as ExplicitCastExpression).IsExplicitInterfaceCast;
+						return !(node as ExplicitCastExpression).get_IsExplicitInterfaceCast();
 					}
-					case CodeNodeType.ImplicitCastExpression:
-					case CodeNodeType.SafeCastExpression:
-					case CodeNodeType.CanCastExpression:
-					case CodeNodeType.ConditionExpression:
-					case CodeNodeType.FixedStatement:
-					case CodeNodeType.DefaultObjectExpression:
-					case CodeNodeType.TypeReferenceExpression:
-					case CodeNodeType.UsingStatement:
-					case CodeNodeType.SizeOfExpression:
-					case CodeNodeType.MakeRefExpression:
-					case CodeNodeType.EnumExpression:
-					case CodeNodeType.YieldReturnExpression:
-					case CodeNodeType.YieldBreakExpression:
-					case CodeNodeType.LockStatement:
-					case CodeNodeType.ReturnExpression:
-					case CodeNodeType.EmptyStatement:
-					case CodeNodeType.AnonymousPropertyInitializerExpression:
-					case CodeNodeType.LambdaParameterExpression:
+					case 2:
+					case 3:
+					case 4:
+					case 6:
+					case 7:
+					case 11:
+					case 13:
+					case 14:
+					case 16:
+					case 17:
+					case 19:
+					case 24:
+					case 25:
+					case 26:
+					case 27:
+					case 28:
+					case 33:
+					case 34:
 					{
-						return false;
+						goto Label0;
 					}
-					case CodeNodeType.TypeOfExpression:
-					case CodeNodeType.ArrayCreationExpression:
-					case CodeNodeType.ObjectCreationExpression:
-					case CodeNodeType.StackAllocExpression:
-					case CodeNodeType.EventReferenceExpression:
-					case CodeNodeType.LambdaExpression:
-					case CodeNodeType.DelegateInvokeExpression:
-					case CodeNodeType.BaseCtorExpression:
-					case CodeNodeType.ThisCtorExpression:
-					case CodeNodeType.DynamicMemberReferenceExpression:
-					case CodeNodeType.DynamicConstructorInvocationExpression:
-					case CodeNodeType.DynamicIndexerExpression:
-					case CodeNodeType.BoxExpression:
-					case CodeNodeType.AwaitExpression:
-					case CodeNodeType.ArrayLengthExpression:
+					case 5:
+					case 8:
+					case 10:
+					case 15:
+					case 18:
+					case 20:
+					case 21:
+					case 22:
+					case 23:
+					case 29:
+					case 30:
+					case 31:
+					case 32:
+					case 35:
+					case 36:
 					{
 						break;
 					}
-					case CodeNodeType.ArrayIndexerExpression:
+					case 9:
 					{
-						return !(node as ArrayIndexerExpression).IsSimpleStore;
+						return !(node as ArrayIndexerExpression).get_IsSimpleStore();
 					}
-					case CodeNodeType.PropertyReferenceExpression:
+					case 12:
 					{
-						return !(node as PropertyReferenceExpression).IsSetter;
+						return !(node as PropertyReferenceExpression).get_IsSetter();
 					}
 					default:
 					{
-						if (codeNodeType != CodeNodeType.AnonymousObjectCreationExpression)
+						if (V_1 != 72)
 						{
-							return false;
+							goto Label0;
 						}
 						else
 						{
@@ -102,13 +104,16 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			}
 			else
 			{
-				if (codeNodeType == CodeNodeType.MethodInvocationExpression || codeNodeType == CodeNodeType.DelegateCreationExpression)
+				if (V_1 == 19 || V_1 == 21)
 				{
-					return true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
+		Label1:
 			return true;
+		Label0:
+			return false;
 		}
 
 		public bool HasSideEffectsRecursive(ICodeNode node)
@@ -123,8 +128,9 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			this.hasSideEffects = SideEffectsFinder.HasSideEffects(node);
 			if (!this.hasSideEffects)
 			{
-				base.Visit(node);
+				this.Visit(node);
 			}
+			return;
 		}
 	}
 }

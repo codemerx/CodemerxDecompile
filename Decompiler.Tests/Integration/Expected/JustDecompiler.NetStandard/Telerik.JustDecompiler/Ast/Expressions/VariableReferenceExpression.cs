@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new VariableReferenceExpression.u003cget_Childrenu003ed__6(-2);
 			}
 		}
 
@@ -22,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.VariableReferenceExpression;
+				return 26;
 			}
 		}
 
@@ -30,11 +31,12 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Variable.get_VariableType();
+				return this.get_Variable().get_VariableType();
 			}
 			set
 			{
-				this.Variable.set_VariableType(value);
+				this.get_Variable().set_VariableType(value);
+				return;
 			}
 		}
 
@@ -42,7 +44,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Variable.get_VariableType().get_IsByReference();
+				return this.get_Variable().get_VariableType().get_IsByReference();
 			}
 		}
 
@@ -52,29 +54,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public VariableReferenceExpression(VariableReference variable, IEnumerable<Instruction> instructions) : base(instructions)
+		public VariableReferenceExpression(VariableReference variable, IEnumerable<Instruction> instructions)
 		{
-			this.Variable = variable;
+			base(instructions);
+			this.set_Variable(variable);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new VariableReferenceExpression(this.Variable, this.instructions);
+			return new VariableReferenceExpression(this.get_Variable(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new VariableReferenceExpression(this.Variable, null);
+			return new VariableReferenceExpression(this.get_Variable(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is VariableReferenceExpression))
+			if (other as VariableReferenceExpression == null)
 			{
 				return false;
 			}
-			VariableReferenceExpression variableReferenceExpression = other as VariableReferenceExpression;
-			return (object)this.Variable.Resolve() == (object)variableReferenceExpression.Variable.Resolve();
+			V_0 = other as VariableReferenceExpression;
+			return (object)this.get_Variable().Resolve() == (object)V_0.get_Variable().Resolve();
 		}
 	}
 }

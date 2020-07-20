@@ -1,9 +1,6 @@
-using Mono.Cecil;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
-using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 
@@ -15,52 +12,54 @@ namespace Telerik.JustDecompiler.Steps
 
 		public CreateIfElseIfStatementsStep()
 		{
+			base();
+			return;
 		}
 
 		private IfElseIfStatement BuildIfElseIfStatement(IfStatement theIf)
 		{
-			Statement item = theIf.Else.Statements[0];
-			if (item.CodeNodeType != CodeNodeType.IfStatement)
+			V_0 = theIf.get_Else().get_Statements().get_Item(0);
+			if (V_0.get_CodeNodeType() != 3)
 			{
-				IfElseIfStatement ifElseIfStatement = (IfElseIfStatement)item;
-				List<KeyValuePair<Expression, BlockStatement>> conditionBlocks = ifElseIfStatement.ConditionBlocks;
-				KeyValuePair<Expression, BlockStatement> keyValuePair = new KeyValuePair<Expression, BlockStatement>(theIf.Condition, theIf.Then);
-				conditionBlocks.Insert(0, keyValuePair);
-				theIf.Then.Parent = ifElseIfStatement;
-				return ifElseIfStatement;
+				V_4 = (IfElseIfStatement)V_0;
+				stackVariable11 = V_4.get_ConditionBlocks();
+				V_5 = new KeyValuePair<Expression, BlockStatement>(theIf.get_Condition(), theIf.get_Then());
+				stackVariable11.Insert(0, V_5);
+				theIf.get_Then().set_Parent(V_4);
+				return V_4;
 			}
-			IfStatement ifStatement = (IfStatement)item;
-			List<KeyValuePair<Expression, BlockStatement>> keyValuePairs = new List<KeyValuePair<Expression, BlockStatement>>();
-			KeyValuePair<Expression, BlockStatement> keyValuePair1 = new KeyValuePair<Expression, BlockStatement>(theIf.Condition, theIf.Then);
-			KeyValuePair<Expression, BlockStatement> keyValuePair2 = new KeyValuePair<Expression, BlockStatement>(ifStatement.Condition, ifStatement.Then);
-			keyValuePairs.Add(keyValuePair1);
-			keyValuePairs.Add(keyValuePair2);
-			return new IfElseIfStatement(keyValuePairs, ifStatement.Else);
+			V_1 = (IfStatement)V_0;
+			stackVariable25 = new List<KeyValuePair<Expression, BlockStatement>>();
+			V_2 = new KeyValuePair<Expression, BlockStatement>(theIf.get_Condition(), theIf.get_Then());
+			V_3 = new KeyValuePair<Expression, BlockStatement>(V_1.get_Condition(), V_1.get_Then());
+			stackVariable25.Add(V_2);
+			stackVariable25.Add(V_3);
+			return new IfElseIfStatement(stackVariable25, V_1.get_Else());
 		}
 
 		private IfElseIfStatement HandleDirectIfStatement(IfStatement theIf)
 		{
-			if (theIf.Then.Statements.Count != 1)
+			if (theIf.get_Then().get_Statements().get_Count() != 1)
 			{
 				return this.BuildIfElseIfStatement(theIf);
 			}
-			Statement item = theIf.Then.Statements[0];
-			if (item.CodeNodeType != CodeNodeType.IfElseIfStatement && item.CodeNodeType != CodeNodeType.IfStatement)
+			V_0 = theIf.get_Then().get_Statements().get_Item(0);
+			if (V_0.get_CodeNodeType() != 4 && V_0.get_CodeNodeType() != 3)
 			{
 				return this.BuildIfElseIfStatement(theIf);
 			}
-			Statement statement = theIf.Else.Statements[0];
-			if (statement.CodeNodeType == CodeNodeType.IfStatement)
+			V_1 = theIf.get_Else().get_Statements().get_Item(0);
+			if (V_1.get_CodeNodeType() == 3)
 			{
 				this.InvertIfStatement(theIf);
 				return this.BuildIfElseIfStatement(theIf);
 			}
-			if (item.CodeNodeType == CodeNodeType.IfStatement)
+			if (V_0.get_CodeNodeType() == 3)
 			{
 				return this.BuildIfElseIfStatement(theIf);
 			}
-			IfElseIfStatement ifElseIfStatement = (IfElseIfStatement)statement;
-			if (((IfElseIfStatement)item).ConditionBlocks.Count >= ifElseIfStatement.ConditionBlocks.Count)
+			V_2 = (IfElseIfStatement)V_1;
+			if (((IfElseIfStatement)V_0).get_ConditionBlocks().get_Count() >= V_2.get_ConditionBlocks().get_Count())
 			{
 				this.InvertIfStatement(theIf);
 			}
@@ -69,10 +68,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void InvertIfStatement(IfStatement theIf)
 		{
-			theIf.Condition = Negator.Negate(theIf.Condition, this.context.MethodContext.Method.get_Module().get_TypeSystem());
-			BlockStatement @else = theIf.Else;
-			theIf.Else = theIf.Then;
-			theIf.Then = @else;
+			theIf.set_Condition(Negator.Negate(theIf.get_Condition(), this.context.get_MethodContext().get_Method().get_Module().get_TypeSystem()));
+			V_0 = theIf.get_Else();
+			theIf.set_Else(theIf.get_Then());
+			theIf.set_Then(V_0);
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -83,35 +83,35 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitIfStatement(IfStatement node)
 		{
-			ICodeNode codeNode = base.VisitIfStatement(node);
-			if (codeNode.CodeNodeType != CodeNodeType.IfStatement)
+			V_0 = this.VisitIfStatement(node);
+			if (V_0.get_CodeNodeType() != 3)
 			{
-				return codeNode;
+				return V_0;
 			}
-			IfStatement ifStatement = (IfStatement)codeNode;
-			if (ifStatement.Else == null)
+			V_1 = (IfStatement)V_0;
+			if (V_1.get_Else() == null)
 			{
-				return ifStatement;
+				return V_1;
 			}
-			if (ifStatement.Else.Statements.Count == 1)
+			if (V_1.get_Else().get_Statements().get_Count() == 1)
 			{
-				Statement item = ifStatement.Else.Statements[0];
-				if (item.CodeNodeType == CodeNodeType.IfStatement || item.CodeNodeType == CodeNodeType.IfElseIfStatement)
+				V_3 = V_1.get_Else().get_Statements().get_Item(0);
+				if (V_3.get_CodeNodeType() == 3 || V_3.get_CodeNodeType() == 4)
 				{
-					return this.HandleDirectIfStatement(ifStatement);
+					return this.HandleDirectIfStatement(V_1);
 				}
 			}
-			if (ifStatement.Then.Statements.Count != 1)
+			if (V_1.get_Then().get_Statements().get_Count() != 1)
 			{
-				return ifStatement;
+				return V_1;
 			}
-			Statement statement = ifStatement.Then.Statements[0];
-			if (statement.CodeNodeType != CodeNodeType.IfStatement && statement.CodeNodeType != CodeNodeType.IfElseIfStatement)
+			V_2 = V_1.get_Then().get_Statements().get_Item(0);
+			if (V_2.get_CodeNodeType() != 3 && V_2.get_CodeNodeType() != 4)
 			{
-				return ifStatement;
+				return V_1;
 			}
-			this.InvertIfStatement(ifStatement);
-			return this.BuildIfElseIfStatement(ifStatement);
+			this.InvertIfStatement(V_1);
+			return this.BuildIfElseIfStatement(V_1);
 		}
 	}
 }

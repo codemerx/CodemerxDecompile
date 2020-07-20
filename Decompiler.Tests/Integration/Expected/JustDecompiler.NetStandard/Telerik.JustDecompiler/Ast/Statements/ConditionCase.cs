@@ -14,12 +14,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				ConditionCase conditionCase = null;
-				yield return conditionCase.Condition;
-				if (conditionCase.Body != null)
-				{
-					yield return conditionCase.Body;
-				}
+				stackVariable1 = new ConditionCase.u003cget_Childrenu003ed__3(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -27,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ConditionCase;
+				return 13;
 			}
 		}
 
@@ -39,43 +36,45 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public ConditionCase()
 		{
+			base();
+			return;
 		}
 
-		public ConditionCase(Expression condition, BlockStatement body) : base(body)
+		public ConditionCase(Expression condition, BlockStatement body)
 		{
-			this.Condition = condition;
+			base(body);
+			this.set_Condition(condition);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			BlockStatement blockStatement;
-			if (base.Body != null)
+			if (this.get_Body() != null)
 			{
-				blockStatement = base.Body.Clone() as BlockStatement;
+				stackVariable5 = this.get_Body().Clone() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			ConditionCase conditionCase = new ConditionCase(this.Condition.Clone(), blockStatement);
-			base.CopyParentAndLabel(conditionCase);
-			return conditionCase;
+			V_1 = new ConditionCase(this.get_Condition().Clone(), stackVariable5);
+			this.CopyParentAndLabel(V_1);
+			return V_1;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			BlockStatement blockStatement;
-			if (base.Body != null)
+			if (this.get_Body() != null)
 			{
-				blockStatement = base.Body.CloneStatementOnly() as BlockStatement;
+				stackVariable5 = this.get_Body().CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			ConditionCase conditionCase = new ConditionCase(this.Condition.CloneExpressionOnly(), blockStatement);
-			base.CopyParentAndLabel(conditionCase);
-			return conditionCase;
+			V_1 = new ConditionCase(this.get_Condition().CloneExpressionOnly(), stackVariable5);
+			this.CopyParentAndLabel(V_1);
+			return V_1;
 		}
 	}
 }

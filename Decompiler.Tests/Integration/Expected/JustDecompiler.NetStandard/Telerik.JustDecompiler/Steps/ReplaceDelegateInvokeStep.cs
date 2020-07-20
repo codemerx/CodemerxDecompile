@@ -11,7 +11,9 @@ namespace Telerik.JustDecompiler.Steps
 
 		public ReplaceDelegateInvokeStep(BaseCodeTransformer codeTransformer)
 		{
+			base();
 			this.codeTransformer = codeTransformer;
+			return;
 		}
 
 		private bool IsDelegateInvokeMethod(MethodReference methodReference)
@@ -20,12 +22,12 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (methodReference.get_Name() != "Invoke")
+			if (String.op_Inequality(methodReference.get_Name(), "Invoke"))
 			{
 				return false;
 			}
-			TypeDefinition typeDefinition = methodReference.get_DeclaringType().Resolve();
-			if (typeDefinition != null && typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_FullName() == "System.MulticastDelegate")
+			V_0 = methodReference.get_DeclaringType().Resolve();
+			if (V_0 != null && V_0.get_BaseType() != null && String.op_Equality(V_0.get_BaseType().get_FullName(), "System.MulticastDelegate"))
 			{
 				return true;
 			}
@@ -34,14 +36,14 @@ namespace Telerik.JustDecompiler.Steps
 
 		public ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			if (node.MethodExpression.CodeNodeType == CodeNodeType.MethodReferenceExpression)
+			if (node.get_MethodExpression().get_CodeNodeType() == 20)
 			{
-				MethodReferenceExpression methodExpression = node.MethodExpression;
-				MethodReference method = methodExpression.Method;
-				if (this.IsDelegateInvokeMethod(method))
+				V_0 = node.get_MethodExpression();
+				V_1 = V_0.get_Method();
+				if (this.IsDelegateInvokeMethod(V_1))
 				{
-					ExpressionCollection expressionCollection = (ExpressionCollection)this.codeTransformer.Visit(node.Arguments);
-					return new DelegateInvokeExpression(methodExpression.Target, expressionCollection, method, node.InvocationInstructions);
+					V_2 = (ExpressionCollection)this.codeTransformer.Visit(node.get_Arguments());
+					return new DelegateInvokeExpression(V_0.get_Target(), V_2, V_1, node.get_InvocationInstructions());
 				}
 			}
 			return null;

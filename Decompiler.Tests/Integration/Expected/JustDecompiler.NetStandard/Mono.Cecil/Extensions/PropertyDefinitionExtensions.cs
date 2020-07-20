@@ -10,191 +10,265 @@ namespace Mono.Cecil.Extensions
 	{
 		public static TypeReference FixedPropertyType(this PropertyReference self)
 		{
-			TypeReference propertyType = self.get_PropertyType();
-			if (propertyType is GenericParameter)
+			V_0 = self.get_PropertyType();
+			if (V_0 as GenericParameter != null)
 			{
-				GenericParameter genericParameter = propertyType as GenericParameter;
-				if (genericParameter.get_Owner() is GenericInstanceType)
+				V_1 = V_0 as GenericParameter;
+				if (V_1.get_Owner() as GenericInstanceType != null)
 				{
-					GenericInstanceType owner = genericParameter.get_Owner() as GenericInstanceType;
-					if (owner.get_PostionToArgument().ContainsKey(genericParameter.get_Position()))
+					V_2 = V_1.get_Owner() as GenericInstanceType;
+					if (V_2.get_PostionToArgument().ContainsKey(V_1.get_Position()))
 					{
-						propertyType = owner.get_PostionToArgument()[genericParameter.get_Position()];
+						V_0 = V_2.get_PostionToArgument().get_Item(V_1.get_Position());
 					}
 				}
 			}
-			return propertyType;
+			return V_0;
 		}
 
 		public static ICollection<ImplementedMember> GetExplicitlyImplementedProperties(this PropertyDefinition self)
 		{
-			List<ImplementedMember> implementedMembers = new List<ImplementedMember>();
+			V_0 = new List<ImplementedMember>();
 			if (!self.IsExplicitImplementation())
 			{
-				return implementedMembers;
+				return V_0;
 			}
 			if (self.get_GetMethod() != null)
 			{
-				foreach (ImplementedMember explicitlyImplementedMethod in self.get_GetMethod().GetExplicitlyImplementedMethods())
+				V_1 = self.get_GetMethod().GetExplicitlyImplementedMethods().GetEnumerator();
+				try
 				{
-					PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(explicitlyImplementedMethod.Member as MethodReference);
-					if (methodDeclaringProperty == null)
+					while (V_1.MoveNext())
 					{
-						continue;
+						V_2 = V_1.get_Current();
+						V_3 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_2.get_Member() as MethodReference);
+						if (V_3 == null)
+						{
+							continue;
+						}
+						V_0.Add(new ImplementedMember(V_2.get_DeclaringType(), V_3));
 					}
-					implementedMembers.Add(new ImplementedMember(explicitlyImplementedMethod.DeclaringType, methodDeclaringProperty));
 				}
-				return implementedMembers;
+				finally
+				{
+					if (V_1 != null)
+					{
+						V_1.Dispose();
+					}
+				}
+				return V_0;
 			}
 			if (self.get_SetMethod() == null)
 			{
-				return implementedMembers;
+				return V_0;
 			}
-			foreach (ImplementedMember implementedMember in self.get_SetMethod().GetExplicitlyImplementedMethods())
+			V_1 = self.get_SetMethod().GetExplicitlyImplementedMethods().GetEnumerator();
+			try
 			{
-				PropertyDefinition propertyDefinition = PropertyDefinitionExtensions.GetMethodDeclaringProperty(implementedMember.Member as MethodReference);
-				if (propertyDefinition == null)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_4 = V_1.get_Current();
+					V_5 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_4.get_Member() as MethodReference);
+					if (V_5 == null)
+					{
+						continue;
+					}
+					V_0.Add(new ImplementedMember(V_4.get_DeclaringType(), V_5));
 				}
-				implementedMembers.Add(new ImplementedMember(implementedMember.DeclaringType, propertyDefinition));
 			}
-			return implementedMembers;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		public static ICollection<ImplementedMember> GetImplementedProperties(this PropertyReference self)
 		{
-			List<ImplementedMember> implementedMembers = new List<ImplementedMember>();
-			PropertyDefinition propertyDefinition = self.Resolve();
-			if (propertyDefinition == null)
+			V_0 = new List<ImplementedMember>();
+			V_1 = self.Resolve();
+			if (V_1 == null)
 			{
-				return implementedMembers;
+				return V_0;
 			}
-			if (propertyDefinition.get_GetMethod() != null)
+			if (V_1.get_GetMethod() != null)
 			{
-				foreach (ImplementedMember implementedMethod in propertyDefinition.get_GetMethod().GetImplementedMethods())
+				V_2 = V_1.get_GetMethod().GetImplementedMethods().GetEnumerator();
+				try
 				{
-					PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(implementedMethod.Member as MethodReference);
-					if (methodDeclaringProperty == null)
+					while (V_2.MoveNext())
+					{
+						V_3 = V_2.get_Current();
+						V_4 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_3.get_Member() as MethodReference);
+						if (V_4 == null)
+						{
+							continue;
+						}
+						V_0.Add(new ImplementedMember(V_3.get_DeclaringType(), V_4));
+					}
+				}
+				finally
+				{
+					if (V_2 != null)
+					{
+						V_2.Dispose();
+					}
+				}
+				return V_0;
+			}
+			if (V_1.get_SetMethod() == null)
+			{
+				return V_0;
+			}
+			V_2 = V_1.get_SetMethod().GetImplementedMethods().GetEnumerator();
+			try
+			{
+				while (V_2.MoveNext())
+				{
+					V_5 = V_2.get_Current();
+					V_6 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_5.get_Member() as MethodReference);
+					if (V_6 == null)
 					{
 						continue;
 					}
-					implementedMembers.Add(new ImplementedMember(implementedMethod.DeclaringType, methodDeclaringProperty));
+					V_0.Add(new ImplementedMember(V_5.get_DeclaringType(), V_6));
 				}
-				return implementedMembers;
 			}
-			if (propertyDefinition.get_SetMethod() == null)
+			finally
 			{
-				return implementedMembers;
-			}
-			foreach (ImplementedMember implementedMember in propertyDefinition.get_SetMethod().GetImplementedMethods())
-			{
-				PropertyDefinition methodDeclaringProperty1 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(implementedMember.Member as MethodReference);
-				if (methodDeclaringProperty1 == null)
+				if (V_2 != null)
 				{
-					continue;
+					V_2.Dispose();
 				}
-				implementedMembers.Add(new ImplementedMember(implementedMember.DeclaringType, methodDeclaringProperty1));
 			}
-			return implementedMembers;
+			return V_0;
 		}
 
 		private static PropertyDefinition GetMethodDeclaringProperty(MethodReference method)
 		{
-			PropertyDefinition propertyDefinition;
 			if (method == null)
 			{
 				return null;
 			}
-			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
-			if (typeDefinition != null)
+			V_0 = method.get_DeclaringType().Resolve();
+			if (V_0 != null)
 			{
-				Collection<PropertyDefinition>.Enumerator enumerator = typeDefinition.get_Properties().GetEnumerator();
+				V_1 = V_0.get_Properties().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						PropertyDefinition current = enumerator.get_Current();
-						if ((current.get_GetMethod() == null || !current.get_GetMethod().HasSameSignatureWith(method)) && (current.get_SetMethod() == null || !current.get_SetMethod().HasSameSignatureWith(method)))
+						V_2 = V_1.get_Current();
+						if (V_2.get_GetMethod() == null || !V_2.get_GetMethod().HasSameSignatureWith(method) && V_2.get_SetMethod() == null || !V_2.get_SetMethod().HasSameSignatureWith(method))
 						{
 							continue;
 						}
-						propertyDefinition = current;
-						return propertyDefinition;
+						V_3 = V_2;
+						goto Label1;
 					}
-					return null;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return propertyDefinition;
+			Label1:
+				return V_3;
 			}
+		Label0:
 			return null;
 		}
 
 		public static ICollection<PropertyDefinition> GetOverridenAndImplementedProperties(this PropertyDefinition property)
 		{
-			List<PropertyDefinition> propertyDefinitions = new List<PropertyDefinition>()
+			V_0 = new List<PropertyDefinition>();
+			V_0.Add(property);
+			if (property.get_GetMethod() == null)
 			{
-				property
-			};
-			if (property.get_GetMethod() != null)
-			{
-				foreach (MethodDefinition overridenAndImplementedMethod in property.get_GetMethod().GetOverridenAndImplementedMethods())
+				if (property.get_SetMethod() != null)
 				{
-					PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(overridenAndImplementedMethod);
-					if (methodDeclaringProperty == null)
+					V_1 = property.get_SetMethod().GetOverridenAndImplementedMethods().GetEnumerator();
+					try
 					{
-						continue;
+						while (V_1.MoveNext())
+						{
+							V_3 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_1.get_Current());
+							if (V_3 == null)
+							{
+								continue;
+							}
+							V_0.Add(V_3);
+						}
 					}
-					propertyDefinitions.Add(methodDeclaringProperty);
+					finally
+					{
+						if (V_1 != null)
+						{
+							V_1.Dispose();
+						}
+					}
 				}
 			}
-			else if (property.get_SetMethod() != null)
+			else
 			{
-				foreach (MethodDefinition methodDefinition in property.get_SetMethod().GetOverridenAndImplementedMethods())
+				V_1 = property.get_GetMethod().GetOverridenAndImplementedMethods().GetEnumerator();
+				try
 				{
-					PropertyDefinition propertyDefinition = PropertyDefinitionExtensions.GetMethodDeclaringProperty(methodDefinition);
-					if (propertyDefinition == null)
+					while (V_1.MoveNext())
 					{
-						continue;
+						V_2 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_1.get_Current());
+						if (V_2 == null)
+						{
+							continue;
+						}
+						V_0.Add(V_2);
 					}
-					propertyDefinitions.Add(propertyDefinition);
+				}
+				finally
+				{
+					if (V_1 != null)
+					{
+						V_1.Dispose();
+					}
 				}
 			}
-			return propertyDefinitions;
+			return V_0;
 		}
 
 		private static bool HasAttribute(TypeDefinition declaringType, string attributeType, out CustomAttribute attribute)
 		{
-			bool flag;
-			Collection<CustomAttribute>.Enumerator enumerator = declaringType.get_CustomAttributes().GetEnumerator();
+			V_0 = declaringType.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					CustomAttribute current = enumerator.get_Current();
-					if (current.get_AttributeType().get_FullName() != attributeType)
+					V_1 = V_0.get_Current();
+					if (!String.op_Equality(V_1.get_AttributeType().get_FullName(), attributeType))
 					{
 						continue;
 					}
-					attribute = current;
+					attribute = V_1;
 					if (!attribute.get_IsResolved())
 					{
 						attribute.Resolve();
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				attribute = null;
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			attribute = null;
+			return false;
 		}
 
 		public static bool IsAbstract(this PropertyDefinition self)
@@ -212,25 +286,25 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsExplicitImplementation(this PropertyReference self)
 		{
-			PropertyDefinition propertyDefinition = self.Resolve();
-			if (propertyDefinition == null)
+			V_0 = self.Resolve();
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasOverrides() && propertyDefinition.get_GetMethod().get_IsPrivate())
+			if (V_0.get_GetMethod() != null && V_0.get_GetMethod().get_HasOverrides() && V_0.get_GetMethod().get_IsPrivate())
 			{
 				return true;
 			}
-			if (propertyDefinition.get_SetMethod() != null && propertyDefinition.get_SetMethod().get_HasOverrides() && propertyDefinition.get_SetMethod().get_IsPrivate())
+			if (V_0.get_SetMethod() != null && V_0.get_SetMethod().get_HasOverrides() && V_0.get_SetMethod().get_IsPrivate())
 			{
 				return true;
 			}
 			return false;
 		}
 
-		public static bool IsExplicitImplementationOf(this PropertyDefinition self, TypeDefinition @interface)
+		public static bool IsExplicitImplementationOf(this PropertyDefinition self, TypeDefinition interface)
 		{
-			if (self.get_GetMethod() != null && self.get_GetMethod().IsExplicitImplementationOf(@interface))
+			if (self.get_GetMethod() != null && self.get_GetMethod().IsExplicitImplementationOf(interface))
 			{
 				return true;
 			}
@@ -238,7 +312,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			return self.get_SetMethod().IsExplicitImplementationOf(@interface);
+			return self.get_SetMethod().IsExplicitImplementationOf(interface);
 		}
 
 		public static bool IsFinal(this PropertyDefinition self)
@@ -256,24 +330,20 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsIndexer(this PropertyReference self)
 		{
-			CustomAttribute customAttribute;
-			Collection<MethodReference>.Enumerator enumerator;
-			bool flag;
-			TypeDefinition typeDefinition;
 			if (self.get_DeclaringType() != null)
 			{
-				typeDefinition = self.get_DeclaringType().Resolve();
+				stackVariable4 = self.get_DeclaringType().Resolve();
 			}
 			else
 			{
-				typeDefinition = null;
+				stackVariable4 = null;
 			}
-			TypeDefinition typeDefinition1 = typeDefinition;
-			if (typeDefinition1 != null && typeDefinition1.get_HasCustomAttributes() && PropertyDefinitionExtensions.HasAttribute(typeDefinition1, "System.Reflection.DefaultMemberAttribute", out customAttribute))
+			V_0 = stackVariable4;
+			if (V_0 != null && V_0.get_HasCustomAttributes() && PropertyDefinitionExtensions.HasAttribute(V_0, "System.Reflection.DefaultMemberAttribute", out V_1))
 			{
-				CustomAttributeArgument item = customAttribute.get_ConstructorArguments().get_Item(0);
-				string str = item.get_Value().ToString();
-				if (self.get_Name() == str)
+				V_3 = V_1.get_ConstructorArguments().get_Item(0);
+				V_2 = V_3.get_Value().ToString();
+				if (String.op_Equality(self.get_Name(), V_2))
 				{
 					return true;
 				}
@@ -281,52 +351,62 @@ namespace Mono.Cecil.Extensions
 				{
 					return false;
 				}
-				return self.get_Name().EndsWith(String.Concat(".", str));
+				return self.get_Name().EndsWith(String.Concat(".", V_2));
 			}
-			PropertyDefinition propertyDefinition = self.Resolve();
-			if (propertyDefinition != null)
+			V_4 = self.Resolve();
+			if (V_4 != null)
 			{
-				if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasOverrides())
+				if (V_4.get_GetMethod() != null && V_4.get_GetMethod().get_HasOverrides())
 				{
-					foreach (MethodReference @override in propertyDefinition.get_GetMethod().get_Overrides())
-					{
-						PropertyDefinition methodDeclaringProperty = PropertyDefinitionExtensions.GetMethodDeclaringProperty(@override);
-						if (methodDeclaringProperty == null || !methodDeclaringProperty.IsIndexer())
-						{
-							continue;
-						}
-						flag = true;
-						return flag;
-					}
-				}
-				if (propertyDefinition.get_SetMethod() != null && propertyDefinition.get_SetMethod().get_HasOverrides())
-				{
-					enumerator = propertyDefinition.get_SetMethod().get_Overrides().GetEnumerator();
+					V_5 = V_4.get_GetMethod().get_Overrides().GetEnumerator();
 					try
 					{
-						while (enumerator.MoveNext())
+						while (V_5.MoveNext())
 						{
-							PropertyDefinition methodDeclaringProperty1 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(enumerator.get_Current());
-							if (methodDeclaringProperty1 == null || !methodDeclaringProperty1.IsIndexer())
+							V_6 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_5.get_Current());
+							if (V_6 == null || !V_6.IsIndexer())
 							{
 								continue;
 							}
-							flag = true;
-							return flag;
+							V_7 = true;
+							goto Label0;
 						}
-						return false;
 					}
 					finally
 					{
-						enumerator.Dispose();
+						V_5.Dispose();
+					}
+				}
+				if (V_4.get_SetMethod() != null && V_4.get_SetMethod().get_HasOverrides())
+				{
+					V_5 = V_4.get_SetMethod().get_Overrides().GetEnumerator();
+					try
+					{
+						while (V_5.MoveNext())
+						{
+							V_8 = PropertyDefinitionExtensions.GetMethodDeclaringProperty(V_5.get_Current());
+							if (V_8 == null || !V_8.IsIndexer())
+							{
+								continue;
+							}
+							V_7 = true;
+							goto Label0;
+						}
+						goto Label1;
+					}
+					finally
+					{
+						V_5.Dispose();
 					}
 				}
 				else
 				{
-					return false;
+					goto Label1;
 				}
-				return flag;
+			Label0:
+				return V_7;
 			}
+		Label1:
 			return false;
 		}
 

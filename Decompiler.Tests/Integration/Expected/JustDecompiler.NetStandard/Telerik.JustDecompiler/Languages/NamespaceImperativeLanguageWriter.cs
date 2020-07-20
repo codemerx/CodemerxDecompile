@@ -1,10 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.External.Interfaces;
 
@@ -22,13 +19,15 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.AssemblyContext.AssemblyNamespaceUsings.Union<string>(this.ModuleContext.ModuleNamespaceUsings);
+				return this.get_AssemblyContext().get_AssemblyNamespaceUsings().Union<string>(this.get_ModuleContext().get_ModuleNamespaceUsings());
 			}
 		}
 
-		public NamespaceImperativeLanguageWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings) : base(language, formatter, exceptionFormatter, settings)
+		public NamespaceImperativeLanguageWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
 		{
+			base(language, formatter, exceptionFormatter, settings);
 			this.writeNamespacesandUsings = false;
+			return;
 		}
 
 		private bool CheckForSpecialName(TypeReference reference)
@@ -37,7 +36,7 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return false;
 			}
-			return reference.get_Name() != this.ToTypeString(reference);
+			return String.op_Inequality(reference.get_Name(), this.ToTypeString(reference));
 		}
 
 		protected abstract void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference);
@@ -55,127 +54,138 @@ namespace Telerik.JustDecompiler.Languages
 
 		public void WriteAssemblyAndModuleUsings()
 		{
-			this.WriteUsings(Utilities.GetAssemblyAndModuleNamespaceUsings(this.AssemblyContext, this.ModuleContext));
+			this.WriteUsings(Utilities.GetAssemblyAndModuleNamespaceUsings(this.get_AssemblyContext(), this.get_ModuleContext()));
+			return;
 		}
 
 		public void WriteAssemblyUsings()
 		{
-			this.WriteUsings(this.AssemblyContext.AssemblyNamespaceUsings);
+			this.WriteUsings(this.get_AssemblyContext().get_AssemblyNamespaceUsings());
+			return;
 		}
 
 		public override void WriteBody(IMemberDefinition member, IWriterContextService writerContextService)
 		{
 			this.writerContextService = writerContextService;
-			this.writerContext = writerContextService.GetWriterContext(member, base.Language);
+			this.writerContext = writerContextService.GetWriterContext(member, this.get_Language());
 			this.currentWritingInfo = new WritingInfo(member);
-			base.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
-			this.writingInfos = new List<WritingInfo>()
-			{
-				this.currentWritingInfo
-			};
+			this.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
+			this.writingInfos = new List<WritingInfo>();
+			this.writingInfos.Add(this.currentWritingInfo);
 			this.WriteBodyInternal(member);
+			return;
 		}
 
 		protected override void WriteBodyInternal(IMemberDefinition member)
 		{
 			this.membersStack.Push(member);
 			this.currentNamespace = member.get_DeclaringType().get_Namespace();
-			base.WriteBodyInternal(member);
-			this.membersStack.Pop();
+			this.WriteBodyInternal(member);
+			dummyVar0 = this.membersStack.Pop();
+			return;
 		}
 
 		internal void WriteEnumValueField(FieldDefinition field)
 		{
 			this.WriteReference(this.GetFieldName(field), field);
+			return;
 		}
 
 		protected virtual void WriteMethodReference(string name, MethodReference reference)
 		{
-			base.WriteReference(name, reference);
+			this.WriteReference(name, reference);
+			return;
 		}
 
 		public void WriteModuleUsings()
 		{
-			this.WriteUsings(this.ModuleContext.ModuleNamespaceUsings);
+			this.WriteUsings(this.get_ModuleContext().get_ModuleNamespaceUsings());
+			return;
 		}
 
 		protected override void WriteNamespace(object reference, bool forceWriteNamespace = false)
 		{
-			if (!(reference is TypeReference))
+			if (reference as TypeReference == null)
 			{
-				base.WriteNamespace(reference, forceWriteNamespace);
+				this.WriteNamespace(reference, forceWriteNamespace);
 				return;
 			}
 			this.WriteNamespaceIfNeeded(reference as TypeReference, forceWriteNamespace);
+			return;
 		}
 
-		private void WriteNamespaceDeclaration(string @namespace)
+		private void WriteNamespaceDeclaration(string namespace)
 		{
-			if (this.ModuleContext.RenamedNamespacesMap.ContainsKey(@namespace))
+			if (this.get_ModuleContext().get_RenamedNamespacesMap().ContainsKey(namespace))
 			{
-				this.WriteComment(@namespace);
+				this.WriteComment(namespace);
 				this.WriteLine();
-				@namespace = this.ModuleContext.RenamedNamespacesMap[@namespace];
+				namespace = this.get_ModuleContext().get_RenamedNamespacesMap().get_Item(namespace);
 			}
-			this.WriteKeyword(base.KeyWordWriter.Namespace);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Namespace());
 			this.WriteSpace();
-			this.Write(Utilities.EscapeNamespaceIfNeeded(@namespace, base.Language));
+			this.Write(Utilities.EscapeNamespaceIfNeeded(namespace, this.get_Language()));
 			this.formatter.WriteNamespaceStartBlock();
 			this.WriteBeginBlock(false);
 			this.WriteLine();
+			return;
 		}
 
 		private void WriteNamespaceIfNeeded(TypeReference reference, bool forceWriteNamespace = false)
 		{
-			if (!forceWriteNamespace && (!base.Settings.WriteFullyQualifiedNames || this.CheckForSpecialName(reference)))
+			if (!forceWriteNamespace && !this.get_Settings().get_WriteFullyQualifiedNames() || this.CheckForSpecialName(reference))
 			{
 				return;
 			}
-			string empty = String.Empty;
-			if (forceWriteNamespace)
+			V_0 = String.Empty;
+			if (!forceWriteNamespace)
 			{
-				empty = reference.get_Namespace();
+				if (String.op_Inequality(reference.get_Namespace(), this.currentNamespace))
+				{
+					V_0 = reference.get_Namespace();
+				}
 			}
-			else if (reference.get_Namespace() != this.currentNamespace)
+			else
 			{
-				empty = reference.get_Namespace();
+				V_0 = reference.get_Namespace();
 			}
-			if (this.ModuleContext.RenamedNamespacesMap.ContainsKey(empty))
+			if (this.get_ModuleContext().get_RenamedNamespacesMap().ContainsKey(V_0))
 			{
-				empty = this.ModuleContext.RenamedNamespacesMap[empty];
+				V_0 = this.get_ModuleContext().get_RenamedNamespacesMap().get_Item(V_0);
 			}
-			if (empty != String.Empty)
+			if (String.op_Inequality(V_0, String.Empty))
 			{
-				empty = String.Concat(empty, ".");
+				V_0 = String.Concat(V_0, ".");
 			}
-			this.Write(Utilities.EscapeNamespaceIfNeeded(empty, base.Language));
+			this.Write(Utilities.EscapeNamespaceIfNeeded(V_0, this.get_Language()));
+			return;
 		}
 
 		public override void WriteNamespaceIfTypeInCollision(TypeReference reference)
 		{
-			if (base.Settings.WriteFullyQualifiedNames)
+			if (this.get_Settings().get_WriteFullyQualifiedNames())
 			{
 				return;
 			}
-			base.WriteNamespaceIfTypeInCollision(reference);
+			this.WriteNamespaceIfTypeInCollision(reference);
+			return;
 		}
 
 		protected sealed override void WriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference)
 		{
 			this.DoWriteParameterTypeAndName(type, name, reference);
+			return;
 		}
 
 		public List<WritingInfo> WritePartialTypeAndNamespaces(TypeDefinition type, IWriterContextService writerContextService, Dictionary<string, ICollection<string>> fieldsToSkip = null)
 		{
 			this.writerContextService = writerContextService;
-			this.writerContext = writerContextService.GetWriterContext(type, base.Language);
-			base.CurrentType = type;
+			this.writerContext = writerContextService.GetWriterContext(type, this.get_Language());
+			this.set_CurrentType(type);
 			this.currentWritingInfo = new WritingInfo(type);
-			base.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
-			this.writingInfos = new List<WritingInfo>()
-			{
-				this.currentWritingInfo
-			};
+			this.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
+			this.writingInfos = new List<WritingInfo>();
+			this.writingInfos.Add(this.currentWritingInfo);
 			this.WritePartialTypeAndNamespacesInternal(type, fieldsToSkip);
 			return this.writingInfos;
 		}
@@ -184,76 +194,79 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.writeNamespacesandUsings = true;
 			this.currentNamespace = type.get_Namespace();
-			ICollection<string> item = null;
+			V_0 = null;
 			if (fieldsToSkip.ContainsKey(type.get_FullName()))
 			{
-				item = fieldsToSkip[type.get_FullName()];
+				V_0 = fieldsToSkip.get_Item(type.get_FullName());
 			}
-			if (this.TypeContext.UsedNamespaces.Count<string>() > 0)
+			if (this.get_TypeContext().get_UsedNamespaces().Count<string>() > 0)
 			{
-				this.WriteUsings(this.TypeContext.UsedNamespaces);
+				this.WriteUsings(this.get_TypeContext().get_UsedNamespaces());
 				this.WriteLine();
 				this.WriteLine();
 			}
 			this.WriteTypeNamespaceStart(type);
-			base.WritePartialType(type, item);
+			this.WritePartialType(type, V_0);
 			this.WriteTypeNamespaceEnd(type);
+			return;
 		}
 
 		internal override void WriteReference(string name, object reference)
 		{
-			if (reference is TypeReference)
+			if (reference as TypeReference != null)
 			{
 				this.WriteNamespaceIfNeeded(reference as TypeReference, false);
 				this.WriteTypeReference(name, reference as TypeReference);
 				return;
 			}
-			if (!(reference is MethodReference))
+			if (reference as MethodReference == null)
 			{
-				base.WriteReference(name, reference);
+				this.WriteReference(name, reference);
 				return;
 			}
 			this.WriteMethodReference(name, reference as MethodReference);
+			return;
 		}
 
 		public void WriteSecurityDeclarationNamespaceIfNeeded()
 		{
-			if (base.Settings.WriteFullyQualifiedNames)
+			if (this.get_Settings().get_WriteFullyQualifiedNames())
 			{
 				this.Write("System.Security.Permissions");
 				this.WriteToken(".");
 			}
+			return;
 		}
 
 		public List<WritingInfo> WriteType(TypeDefinition type, IWriterContextService writerContextService)
 		{
 			this.writeNamespacesandUsings = false;
 			this.currentNamespace = this.GetCurrentNamespace(type);
-			return base.Write(type, writerContextService);
+			return this.Write(type, writerContextService);
 		}
 
 		protected sealed override void WriteTypeAndName(TypeReference typeReference, string name, object reference)
 		{
 			this.DoWriteTypeAndName(typeReference, name, reference);
+			return;
 		}
 
 		protected sealed override void WriteTypeAndName(TypeReference typeReference, string name)
 		{
 			this.DoWriteTypeAndName(typeReference, name);
+			return;
 		}
 
 		public List<WritingInfo> WriteTypeAndNamespaces(TypeDefinition type, IWriterContextService writerContextService)
 		{
 			this.writerContextService = writerContextService;
-			this.writerContext = writerContextService.GetWriterContext(type, base.Language);
-			base.CurrentType = type;
+			this.writerContext = writerContextService.GetWriterContext(type, this.get_Language());
+			this.set_CurrentType(type);
 			this.currentNamespace = this.GetCurrentNamespace(type);
 			this.currentWritingInfo = new WritingInfo(type);
-			base.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
-			this.writingInfos = new List<WritingInfo>()
-			{
-				this.currentWritingInfo
-			};
+			this.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
+			this.writingInfos = new List<WritingInfo>();
+			this.writingInfos.Add(this.currentWritingInfo);
 			this.WriteTypeAndNamespacesInternal(type);
 			return this.writingInfos;
 		}
@@ -262,91 +275,100 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.writeNamespacesandUsings = true;
 			this.currentNamespace = this.GetCurrentNamespace(type);
-			if (this.TypeContext.UsedNamespaces.Count<string>() > 0)
+			if (this.get_TypeContext().get_UsedNamespaces().Count<string>() > 0)
 			{
-				this.WriteUsings(this.TypeContext.UsedNamespaces);
+				this.WriteUsings(this.get_TypeContext().get_UsedNamespaces());
 				this.WriteLine();
 				this.WriteLine();
 			}
 			this.WriteTypeNamespaceStart(type);
 			this.WriteInternal(type);
 			this.WriteTypeNamespaceEnd(type);
+			return;
 		}
 
 		protected override void WriteTypeInANewWriterIfNeeded(TypeDefinition type)
 		{
-			if ((object)base.CurrentType == (object)type)
+			if ((object)this.get_CurrentType() == (object)type)
 			{
-				base.WriteType(type);
+				this.WriteType(type);
 				return;
 			}
-			ILanguageWriter writer = base.Language.GetWriter(this.formatter, this.exceptionFormatter, base.Settings);
-			writer.ExceptionThrown += new EventHandler<Exception>(this.OnExceptionThrown);
-			List<WritingInfo> writingInfos = (writer as NamespaceImperativeLanguageWriter).WriteType(type, this.writerContextService);
-			writer.ExceptionThrown -= new EventHandler<Exception>(this.OnExceptionThrown);
-			this.writingInfos.AddRange(writingInfos);
+			stackVariable13 = this.get_Language().GetWriter(this.formatter, this.exceptionFormatter, this.get_Settings());
+			stackVariable13.add_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
+			V_0 = (stackVariable13 as NamespaceImperativeLanguageWriter).WriteType(type, this.writerContextService);
+			stackVariable13.remove_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
+			this.writingInfos.AddRange(V_0);
+			return;
 		}
 
 		protected sealed override void WriteTypeNamespaceEnd(TypeDefinition type)
 		{
-			if (this.writeNamespacesandUsings && type.get_Namespace() != String.Empty)
+			if (this.writeNamespacesandUsings && String.op_Inequality(type.get_Namespace(), String.Empty))
 			{
 				this.WriteLine();
 				this.Outdent();
-				this.WriteEndBlock(base.KeyWordWriter.Namespace);
+				this.WriteEndBlock(this.get_KeyWordWriter().get_Namespace());
 				this.formatter.WriteNamespaceEndBlock();
 			}
+			return;
 		}
 
 		protected sealed override void WriteTypeNamespaceStart(TypeDefinition type)
 		{
 			this.currentNamespace = type.GetNamespace();
-			if (this.writeNamespacesandUsings && type.get_Namespace() != String.Empty)
+			if (this.writeNamespacesandUsings && String.op_Inequality(type.get_Namespace(), String.Empty))
 			{
 				this.WriteNamespaceDeclaration(this.currentNamespace);
 				this.Indent();
 			}
+			return;
 		}
 
 		protected virtual void WriteTypeReference(string name, TypeReference reference)
 		{
-			base.WriteReference(name, reference);
+			this.WriteReference(name, reference);
+			return;
 		}
 
 		public void WriteUsings(ICollection<string> usedNamespaces)
 		{
-			string[] array = usedNamespaces.ToArray<string>();
-			Array.Sort<string>(array);
-			bool flag = true;
-			string[] strArray = array;
-			for (int i = 0; i < (int)strArray.Length; i++)
+			stackVariable1 = usedNamespaces.ToArray<string>();
+			Array.Sort<string>(stackVariable1);
+			V_0 = true;
+			V_1 = stackVariable1;
+			V_2 = 0;
+			while (V_2 < (int)V_1.Length)
 			{
-				string str = strArray[i];
-				if (!flag)
+				V_3 = V_1[V_2];
+				if (!V_0)
 				{
 					this.WriteLine();
 				}
-				this.WriteKeyword(base.KeyWordWriter.NamespaceUsing);
+				this.WriteKeyword(this.get_KeyWordWriter().get_NamespaceUsing());
 				this.WriteSpace();
-				if (flag)
+				if (V_0)
 				{
 					this.formatter.WriteStartUsagesBlock();
-					flag = false;
+					V_0 = false;
 				}
-				string item = str;
-				if (this.ModuleContext.RenamedNamespacesMap.ContainsKey(str))
+				V_4 = V_3;
+				if (this.get_ModuleContext().get_RenamedNamespacesMap().ContainsKey(V_3))
 				{
-					item = this.ModuleContext.RenamedNamespacesMap[str];
+					V_4 = this.get_ModuleContext().get_RenamedNamespacesMap().get_Item(V_3);
 				}
-				this.Write(Utilities.EscapeNamespaceIfNeeded(item, base.Language));
+				this.Write(Utilities.EscapeNamespaceIfNeeded(V_4, this.get_Language()));
 				this.WriteEndOfStatement();
+				V_2 = V_2 + 1;
 			}
 			this.formatter.WriteEndUsagesBlock();
+			return;
 		}
 
 		protected sealed override void WriteVariableTypeAndName(VariableDefinition variable)
 		{
 			this.DoWriteVariableTypeAndName(variable);
+			return;
 		}
 	}
 }

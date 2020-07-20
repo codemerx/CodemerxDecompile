@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
@@ -17,49 +16,67 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 			}
 		}
 
-		public TryCatchFilterLogicalConstruct(BlockLogicalConstruct @try, IFilteringExceptionHandler handler)
+		public TryCatchFilterLogicalConstruct(BlockLogicalConstruct try, IFilteringExceptionHandler handler)
 		{
-			base.InitiExceptionHandlingLogicalConstruct(@try);
+			base();
+			this.InitiExceptionHandlingLogicalConstruct(try);
 			this.handlers = new List<IFilteringExceptionHandler>();
 			this.AddHandler(handler);
+			return;
 		}
 
 		public void AddHandler(IFilteringExceptionHandler handler)
 		{
-			FilteringExceptionHandlerType handlerType = handler.HandlerType;
-			if (handlerType != FilteringExceptionHandlerType.Catch)
+			V_0 = handler.get_HandlerType();
+			if (V_0 == FilteringExceptionHandlerType.Catch)
 			{
-				if (handlerType == FilteringExceptionHandlerType.Filter)
+				if (((ExceptionHandlingBlockCatch)handler).get_Parent() != this.get_Parent())
 				{
-					if (((ExceptionHandlingBlockFilter)handler).Parent != base.Parent)
+					throw new Exception("Catch handler belongs to different logical construct than the try block");
+				}
+			}
+			else
+			{
+				if (V_0 == 1)
+				{
+					if (((ExceptionHandlingBlockFilter)handler).get_Parent() != this.get_Parent())
 					{
 						throw new Exception("Filter handler belongs to different logical construct than the try block");
 					}
 				}
 			}
-			else if (((ExceptionHandlingBlockCatch)handler).Parent != base.Parent)
-			{
-				throw new Exception("Catch handler belongs to different logical construct than the try block");
-			}
-			base.RedirectChildrenToNewParent((IEnumerable<ILogicalConstruct>)(new IFilteringExceptionHandler[] { handler }));
+			stackVariable10 = new IFilteringExceptionHandler[1];
+			stackVariable10[0] = handler;
+			this.RedirectChildrenToNewParent((IEnumerable<ILogicalConstruct>)stackVariable10);
 			this.handlers.Add(handler);
 			this.FixSuccessors(handler);
+			return;
 		}
 
 		private void FixSuccessors(IFilteringExceptionHandler handler)
 		{
-			if (handler.CFGSuccessors.Contains(base.Try.FirstBlock))
+			if (handler.get_CFGSuccessors().Contains(this.get_Try().get_FirstBlock()))
 			{
-				base.AddToSuccessors(base.Try.FirstBlock);
+				this.AddToSuccessors(this.get_Try().get_FirstBlock());
 			}
-			foreach (CFGBlockLogicalConstruct cFGBlock in handler.CFGBlocks)
+			V_0 = handler.get_CFGBlocks().GetEnumerator();
+			try
 			{
-				if (!cFGBlock.CFGSuccessors.Contains(base.Try.FirstBlock))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (!V_1.get_CFGSuccessors().Contains(this.get_Try().get_FirstBlock()))
+					{
+						continue;
+					}
+					this.AddToPredecessors(V_1);
 				}
-				base.AddToPredecessors(cFGBlock);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 	}
 }

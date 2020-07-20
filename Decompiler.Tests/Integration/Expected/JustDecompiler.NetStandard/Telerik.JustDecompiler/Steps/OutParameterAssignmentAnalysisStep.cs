@@ -1,45 +1,65 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.AssignmentAnalysis;
 
 namespace Telerik.JustDecompiler.Steps
 {
 	internal class OutParameterAssignmentAnalysisStep : BaseAssignmentAnalysisStep
 	{
-		private readonly List<ParameterDefinition> outParameters = new List<ParameterDefinition>();
+		private readonly List<ParameterDefinition> outParameters;
 
 		public OutParameterAssignmentAnalysisStep()
 		{
+			this.outParameters = new List<ParameterDefinition>();
+			base();
+			return;
 		}
 
 		protected override void AnalyzeAssignments()
 		{
-			foreach (ParameterDefinition outParameter in this.outParameters)
+			V_0 = this.outParameters.GetEnumerator();
+			try
 			{
-				AssignmentType assignmentType = base.AnalyzeAssignmentType(new OutParameterUsageFinder(outParameter));
-				if (assignmentType != AssignmentType.NotAssigned && assignmentType != AssignmentType.NotUsed)
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					V_3 = this.AnalyzeAssignmentType(new OutParameterUsageFinder(V_1));
+					if (V_3 != 1 && V_3 != AssignmentType.NotUsed)
+					{
+						continue;
+					}
+					this.context.get_MethodContext().get_OutParametersToAssign().Add(V_1);
 				}
-				this.context.MethodContext.OutParametersToAssign.Add(outParameter);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		protected override bool ShouldExecuteStep()
 		{
-			foreach (ParameterDefinition parameter in this.context.MethodContext.Method.get_Parameters())
+			V_0 = this.context.get_MethodContext().get_Method().get_Parameters().GetEnumerator();
+			try
 			{
-				if (!parameter.IsOutParameter())
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (!V_1.IsOutParameter())
+					{
+						continue;
+					}
+					this.outParameters.Add(V_1);
 				}
-				this.outParameters.Add(parameter);
 			}
-			return this.outParameters.Count > 0;
+			finally
+			{
+				V_0.Dispose();
+			}
+			return this.outParameters.get_Count() > 0;
 		}
 	}
 }

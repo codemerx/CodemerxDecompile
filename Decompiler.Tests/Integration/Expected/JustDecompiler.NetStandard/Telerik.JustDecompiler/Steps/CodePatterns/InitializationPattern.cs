@@ -1,9 +1,6 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
@@ -16,28 +13,30 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private readonly MethodDefinition method;
 
-		public InitializationPattern(CodePatternsContext patternsContext, DecompilationContext context) : base(patternsContext, context.MethodContext.Method.get_Module().get_TypeSystem())
+		public InitializationPattern(CodePatternsContext patternsContext, DecompilationContext context)
 		{
-			this.typeContext = context.TypeContext;
-			this.method = context.MethodContext.Method;
+			base(patternsContext, context.get_MethodContext().get_Method().get_Module().get_TypeSystem());
+			this.typeContext = context.get_TypeContext();
+			this.method = context.get_MethodContext().get_Method();
+			return;
 		}
 
 		private bool IsAutoPropertyAssignment(ExpressionStatement propertyAssignmentStatement, out Expression assignedValue, out string propertyFullName)
 		{
 			propertyFullName = null;
 			assignedValue = null;
-			BinaryExpression expression = propertyAssignmentStatement.Expression as BinaryExpression;
-			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.AutoPropertyConstructorInitializerExpression)
+			V_0 = propertyAssignmentStatement.get_Expression() as BinaryExpression;
+			if (V_0 == null || !V_0.get_IsAssignmentExpression() || V_0.get_Left().get_CodeNodeType() != 91)
 			{
 				return false;
 			}
-			PropertyDefinition property = (expression.Left as AutoPropertyConstructorInitializerExpression).Property;
-			if (property == null)
+			V_1 = (V_0.get_Left() as AutoPropertyConstructorInitializerExpression).get_Property();
+			if (V_1 == null)
 			{
 				return false;
 			}
-			assignedValue = expression.Right;
-			propertyFullName = property.get_FullName();
+			assignedValue = V_0.get_Right();
+			propertyFullName = V_1.get_FullName();
 			return true;
 		}
 
@@ -45,24 +44,24 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 		{
 			fieldFullName = null;
 			assignedValue = null;
-			BinaryExpression expression = fieldAssignmentStatement.Expression as BinaryExpression;
-			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression)
+			V_0 = fieldAssignmentStatement.get_Expression() as BinaryExpression;
+			if (V_0 == null || !V_0.get_IsAssignmentExpression() || V_0.get_Left().get_CodeNodeType() != 30)
 			{
 				return false;
 			}
-			FieldReference field = (expression.Left as FieldReferenceExpression).Field;
-			if (field == null)
+			V_1 = (V_0.get_Left() as FieldReferenceExpression).get_Field();
+			if (V_1 == null)
 			{
 				return false;
 			}
-			assignedValue = expression.Right;
-			fieldFullName = field.get_FullName();
+			assignedValue = V_0.get_Right();
+			fieldFullName = V_1.get_FullName();
 			return true;
 		}
 
 		private bool MapAssignmentIntoContext(string memberFullName, Expression assignedValue)
 		{
-			this.typeContext.AssignmentData.Add(memberFullName, new InitializationAssignment(this.method, assignedValue));
+			this.typeContext.get_AssignmentData().Add(memberFullName, new InitializationAssignment(this.method, assignedValue));
 			return true;
 		}
 
@@ -81,54 +80,49 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private bool TryMatchArrayAssignmentInternal(StatementCollection statements)
 		{
-			VariableReference variableReference;
-			Expression expression;
-			string str;
-			if (statements.Count < 2)
+			if (statements.get_Count() < 2)
 			{
 				return false;
 			}
-			ExpressionStatement item = statements[0] as ExpressionStatement;
-			if (item == null)
+			V_0 = statements.get_Item(0) as ExpressionStatement;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression = item.Expression as BinaryExpression;
-			if (binaryExpression == null || !base.IsAssignToVariableExpression(binaryExpression, out variableReference))
+			V_1 = V_0.get_Expression() as BinaryExpression;
+			if (V_1 == null || !this.IsAssignToVariableExpression(V_1, out V_2))
 			{
 				return false;
 			}
-			Expression right = binaryExpression.Right;
-			ExpressionStatement expressionStatement = statements[1] as ExpressionStatement;
-			if (expressionStatement == null)
+			V_3 = V_1.get_Right();
+			V_4 = statements.get_Item(1) as ExpressionStatement;
+			if (V_4 == null)
 			{
 				return false;
 			}
-			if (!this.IsFieldAssignment(expressionStatement, out expression, out str) && !this.IsAutoPropertyAssignment(expressionStatement, out expression, out str))
+			if (!this.IsFieldAssignment(V_4, out V_5, out V_6) && !this.IsAutoPropertyAssignment(V_4, out V_5, out V_6))
 			{
 				return false;
 			}
-			if (expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression as VariableReferenceExpression).Variable != (object)variableReference)
+			if (V_5.get_CodeNodeType() != 26 || (object)(V_5 as VariableReferenceExpression).get_Variable() != (object)V_2)
 			{
 				return false;
 			}
-			return this.MapAssignmentIntoContext(str, right);
+			return this.MapAssignmentIntoContext(V_6, V_3);
 		}
 
 		private bool TryMatchDirectAssignmentInternal(StatementCollection statements)
 		{
-			string str;
-			Expression expression;
-			ExpressionStatement item = statements[0] as ExpressionStatement;
-			if (item == null || !String.IsNullOrEmpty(statements[0].Label))
+			V_0 = statements.get_Item(0) as ExpressionStatement;
+			if (V_0 == null || !String.IsNullOrEmpty(statements.get_Item(0).get_Label()))
 			{
 				return false;
 			}
-			if (!this.IsFieldAssignment(item, out expression, out str) && !this.IsAutoPropertyAssignment(item, out expression, out str))
+			if (!this.IsFieldAssignment(V_0, out V_2, out V_1) && !this.IsAutoPropertyAssignment(V_0, out V_2, out V_1))
 			{
 				return false;
 			}
-			return this.MapAssignmentIntoContext(str, expression);
+			return this.MapAssignmentIntoContext(V_1, V_2);
 		}
 	}
 }

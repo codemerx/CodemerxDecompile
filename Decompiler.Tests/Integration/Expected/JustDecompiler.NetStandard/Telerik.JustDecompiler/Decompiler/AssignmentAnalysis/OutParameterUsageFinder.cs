@@ -1,6 +1,5 @@
 using Mono.Cecil;
 using System;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
 namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
@@ -11,7 +10,9 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		public OutParameterUsageFinder(ParameterDefinition parameter)
 		{
+			base();
 			this.parameter = parameter;
+			return;
 		}
 
 		private bool CheckArgumentReference(ArgumentReferenceExpression node)
@@ -20,37 +21,39 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 			{
 				return false;
 			}
-			return (object)node.Parameter.Resolve() == (object)this.parameter;
+			return (object)node.get_Parameter().Resolve() == (object)this.parameter;
 		}
 
 		public override bool CheckExpression(Expression node)
 		{
-			if (node.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && this.CheckArgumentReference(node as ArgumentReferenceExpression))
+			if (node.get_CodeNodeType() == 25 && this.CheckArgumentReference(node as ArgumentReferenceExpression))
 			{
 				return true;
 			}
-			if (node.CodeNodeType != CodeNodeType.UnaryExpression || (node as UnaryExpression).Operator != UnaryOperator.AddressDereference)
+			if (node.get_CodeNodeType() != 23 || (node as UnaryExpression).get_Operator() != 8)
 			{
 				return false;
 			}
-			return this.CheckArgumentReference((node as UnaryExpression).Operand as ArgumentReferenceExpression);
+			return this.CheckArgumentReference((node as UnaryExpression).get_Operand() as ArgumentReferenceExpression);
 		}
 
 		public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 		{
-			if ((object)node.Parameter.Resolve() == (object)this.parameter)
+			if ((object)node.get_Parameter().Resolve() == (object)this.parameter)
 			{
-				this.searchResult = UsageFinderSearchResult.Used;
+				this.searchResult = 2;
 			}
+			return;
 		}
 
 		public override void VisitReturnExpression(ReturnExpression node)
 		{
-			this.Visit(node.Value);
+			this.Visit(node.get_Value());
 			if (this.searchResult == UsageFinderSearchResult.NotFound)
 			{
-				this.searchResult = UsageFinderSearchResult.Used;
+				this.searchResult = 2;
 			}
+			return;
 		}
 	}
 }

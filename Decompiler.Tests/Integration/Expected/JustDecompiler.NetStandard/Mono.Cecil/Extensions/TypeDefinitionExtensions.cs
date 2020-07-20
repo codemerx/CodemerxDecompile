@@ -4,9 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Languages;
 
 namespace Mono.Cecil.Extensions
@@ -15,409 +13,283 @@ namespace Mono.Cecil.Extensions
 	{
 		public static IEnumerable<MethodDefinition> GetAllMethodsUnordered(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers, IEnumerable<string> attributesToSkip = null)
 		{
-			foreach (MethodDefinition method in typeDefinition.get_Methods())
-			{
-				if (!showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute() || method.HasCustomAttribute(attributesToSkip))
-				{
-					continue;
-				}
-				yield return method;
-			}
+			stackVariable1 = new TypeDefinitionExtensions.u003cGetAllMethodsUnorderedu003ed__2(-2);
+			stackVariable1.u003cu003e3__typeDefinition = typeDefinition;
+			stackVariable1.u003cu003e3__showCompilerGeneratedMembers = showCompilerGeneratedMembers;
+			stackVariable1.u003cu003e3__attributesToSkip = attributesToSkip;
+			return stackVariable1;
 		}
 
 		public static List<TypeDefinition> GetBaseTypes(this TypeDefinition targetType)
 		{
-			List<TypeDefinition> typeDefinitions = new List<TypeDefinition>();
+			V_0 = new List<TypeDefinition>();
 			if (targetType == null)
 			{
-				return typeDefinitions;
+				return V_0;
 			}
-			typeDefinitions.Add(targetType);
-			for (int i = 0; i < typeDefinitions.Count; i++)
+			V_0.Add(targetType);
+			V_1 = 0;
+			while (V_1 < V_0.get_Count())
 			{
-				TypeDefinition item = typeDefinitions[i];
-				TypeReference baseType = item.get_BaseType();
-				if (baseType != null)
+				stackVariable10 = V_0.get_Item(V_1);
+				V_2 = stackVariable10.get_BaseType();
+				if (V_2 != null)
 				{
-					TypeDefinition typeDefinition = baseType.Resolve();
-					if (typeDefinition != null)
+					V_3 = V_2.Resolve();
+					if (V_3 != null)
 					{
-						typeDefinitions.Add(typeDefinition);
+						V_0.Add(V_3);
 					}
 				}
-				foreach (TypeReference @interface in item.get_Interfaces())
+				V_4 = stackVariable10.get_Interfaces().GetEnumerator();
+				try
 				{
-					if (@interface == null)
+					while (V_4.MoveNext())
 					{
-						continue;
+						V_5 = V_4.get_Current();
+						if (V_5 == null)
+						{
+							continue;
+						}
+						V_6 = V_5.Resolve();
+						if (V_6 == null)
+						{
+							continue;
+						}
+						V_0.Add(V_6);
 					}
-					TypeDefinition typeDefinition1 = @interface.Resolve();
-					if (typeDefinition1 == null)
-					{
-						continue;
-					}
-					typeDefinitions.Add(typeDefinition1);
 				}
+				finally
+				{
+					V_4.Dispose();
+				}
+				V_1 = V_1 + 1;
 			}
-			return typeDefinitions;
+			return V_0;
 		}
 
 		public static Dictionary<FieldDefinition, EventDefinition> GetFieldToEventMap(this TypeDefinition typeDefinition, ILanguage language)
 		{
-			FieldDefinition fieldDefinition;
-			Dictionary<FieldDefinition, EventDefinition> fieldDefinitions = new Dictionary<FieldDefinition, EventDefinition>();
-			foreach (EventDefinition @event in typeDefinition.get_Events())
+			V_0 = new Dictionary<FieldDefinition, EventDefinition>();
+			V_1 = typeDefinition.get_Events().GetEnumerator();
+			try
 			{
-				if (!(new AutoImplementedEventMatcher(@event, language)).IsAutoImplemented(out fieldDefinition))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (!(new AutoImplementedEventMatcher(V_2, language)).IsAutoImplemented(out V_3))
+					{
+						continue;
+					}
+					V_0.set_Item(V_3, V_2);
 				}
-				fieldDefinitions[fieldDefinition] = @event;
 			}
-			return fieldDefinitions;
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0;
 		}
 
 		public static Dictionary<FieldDefinition, PropertyDefinition> GetFieldToPropertyMap(this TypeDefinition typeDefinition, ILanguage language)
 		{
-			FieldDefinition fieldDefinition;
-			Dictionary<FieldDefinition, PropertyDefinition> fieldDefinitions = new Dictionary<FieldDefinition, PropertyDefinition>();
-			foreach (PropertyDefinition property in typeDefinition.get_Properties())
+			V_0 = new Dictionary<FieldDefinition, PropertyDefinition>();
+			V_1 = typeDefinition.get_Properties().GetEnumerator();
+			try
 			{
-				if (!(new PropertyDecompiler(property, language, null)).IsAutoImplemented(out fieldDefinition))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (!(new PropertyDecompiler(V_2, language, null)).IsAutoImplemented(out V_3))
+					{
+						continue;
+					}
+					V_0.set_Item(V_3, V_2);
 				}
-				fieldDefinitions[fieldDefinition] = property;
 			}
-			return fieldDefinitions;
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0;
 		}
 
 		public static IMemberDefinition GetMember(this TypeDefinition self, string fullName)
 		{
-			IMemberDefinition memberDefinition = (
-				from m in self.get_Methods()
-				where m.get_FullName() == fullName
-				select m).FirstOrDefault<MethodDefinition>();
-			if (memberDefinition == null && self.get_HasProperties())
+			V_0 = new TypeDefinitionExtensions.u003cu003ec__DisplayClass13_0();
+			V_0.fullName = fullName;
+			V_1 = self.get_Methods().Where<MethodDefinition>(new Func<MethodDefinition, bool>(V_0.u003cGetMemberu003eb__0)).FirstOrDefault<MethodDefinition>();
+			if (V_1 == null && self.get_HasProperties())
 			{
-				memberDefinition = (
-					from p in self.get_Properties()
-					where p.get_FullName() == fullName
-					select p).FirstOrDefault<PropertyDefinition>();
+				V_1 = self.get_Properties().Where<PropertyDefinition>(new Func<PropertyDefinition, bool>(V_0.u003cGetMemberu003eb__1)).FirstOrDefault<PropertyDefinition>();
 			}
-			if (memberDefinition == null && self.get_HasEvents())
+			if (V_1 == null && self.get_HasEvents())
 			{
-				memberDefinition = (
-					from e in self.get_Events()
-					where e.get_FullName() == fullName
-					select e).FirstOrDefault<EventDefinition>();
+				V_1 = self.get_Events().Where<EventDefinition>(new Func<EventDefinition, bool>(V_0.u003cGetMemberu003eb__2)).FirstOrDefault<EventDefinition>();
 			}
-			if (memberDefinition == null && self.get_HasFields())
+			if (V_1 == null && self.get_HasFields())
 			{
-				memberDefinition = (
-					from f in self.get_Fields()
-					where f.get_FullName() == fullName
-					select f).FirstOrDefault<FieldDefinition>();
+				V_1 = self.get_Fields().Where<FieldDefinition>(new Func<FieldDefinition, bool>(V_0.u003cGetMemberu003eb__3)).FirstOrDefault<FieldDefinition>();
 			}
-			return memberDefinition;
+			return V_1;
 		}
 
 		public static IEnumerable<IMemberDefinition> GetMembersSorted(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers, ILanguage language, IEnumerable<string> attributesToSkip = null, ICollection<string> fieldsToSkip = null, HashSet<FieldReference> eventFields = null, IEnumerable<MethodDefinition> generatedFilterMethods = null, IEnumerable<FieldReference> propertyFields = null)
 		{
-			HashSet<FieldReference> fieldReferences = new HashSet<FieldReference>();
-			fieldReferences = (eventFields != null ? new HashSet<FieldReference>(eventFields) : new HashSet<FieldReference>(typeDefinition.GetFieldToEventMap(language).Keys));
-			if (propertyFields != null)
-			{
-				fieldReferences.UnionWith(propertyFields);
-			}
-			else
-			{
-				fieldReferences.UnionWith(typeDefinition.GetFieldToPropertyMap(language).Keys);
-			}
-			if (typeDefinition.get_HasFields())
-			{
-				foreach (FieldDefinition field in typeDefinition.get_Fields())
-				{
-					if (!showCompilerGeneratedMembers && field.IsCompilerGenerated(true) || field.HasCustomAttribute(attributesToSkip) || fieldReferences.Contains(field) || fieldsToSkip != null && fieldsToSkip.Contains(field.get_Name()))
-					{
-						continue;
-					}
-					yield return field;
-				}
-			}
-			if (typeDefinition.get_HasProperties())
-			{
-				Collection<PropertyDefinition> properties = typeDefinition.get_Properties();
-				foreach (PropertyDefinition propertyDefinition in 
-					from p in properties
-					orderby p.get_Name()
-					select p)
-				{
-					if (propertyDefinition.HasCustomAttribute(attributesToSkip))
-					{
-						continue;
-					}
-					yield return propertyDefinition;
-				}
-			}
-			if (typeDefinition.get_HasMethods())
-			{
-				IEnumerable<MethodDefinition> methods = typeDefinition.get_Methods();
-				if (generatedFilterMethods != null)
-				{
-					methods = methods.Concat<MethodDefinition>(generatedFilterMethods);
-				}
-				IEnumerable<MethodDefinition> methodDefinitions = methods;
-				foreach (MethodDefinition methodDefinition in 
-					from m in methodDefinitions
-					orderby m.get_Name()
-					select m)
-				{
-					if (methodDefinition.get_IsGetter() || methodDefinition.get_IsSetter() || methodDefinition.get_IsAddOn() || methodDefinition.get_IsRemoveOn() || !showCompilerGeneratedMembers && methodDefinition.HasCompilerGeneratedAttribute() || methodDefinition.HasCustomAttribute(attributesToSkip))
-					{
-						continue;
-					}
-					yield return methodDefinition;
-				}
-			}
-			if (typeDefinition.get_HasEvents())
-			{
-				Collection<EventDefinition> events = typeDefinition.get_Events();
-				foreach (EventDefinition eventDefinition in 
-					from e in events
-					orderby e.get_Name()
-					select e)
-				{
-					if (eventDefinition.HasCustomAttribute(attributesToSkip))
-					{
-						continue;
-					}
-					yield return eventDefinition;
-				}
-			}
-			if (typeDefinition.get_HasNestedTypes())
-			{
-				Collection<TypeDefinition> nestedTypes = typeDefinition.get_NestedTypes();
-				foreach (TypeDefinition typeDefinition1 in 
-					from t in nestedTypes
-					orderby t.get_Name()
-					select t)
-				{
-					if (!showCompilerGeneratedMembers && typeDefinition1.HasCompilerGeneratedAttribute() || typeDefinition1.HasCustomAttribute(attributesToSkip))
-					{
-						continue;
-					}
-					yield return typeDefinition1;
-				}
-			}
+			stackVariable1 = new TypeDefinitionExtensions.u003cGetMembersSortedu003ed__7(-2);
+			stackVariable1.u003cu003e3__typeDefinition = typeDefinition;
+			stackVariable1.u003cu003e3__showCompilerGeneratedMembers = showCompilerGeneratedMembers;
+			stackVariable1.u003cu003e3__language = language;
+			stackVariable1.u003cu003e3__attributesToSkip = attributesToSkip;
+			stackVariable1.u003cu003e3__fieldsToSkip = fieldsToSkip;
+			stackVariable1.u003cu003e3__eventFields = eventFields;
+			stackVariable1.u003cu003e3__generatedFilterMethods = generatedFilterMethods;
+			stackVariable1.u003cu003e3__propertyFields = propertyFields;
+			return stackVariable1;
 		}
 
 		public static IEnumerable<IMemberDefinition> GetMembersToDecompile(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers = true)
 		{
-			foreach (PropertyDefinition property in typeDefinition.get_Properties())
-			{
-				yield return property;
-			}
-			if (typeDefinition.get_HasMethods())
-			{
-				foreach (MethodDefinition method in typeDefinition.get_Methods())
-				{
-					if (method.get_IsGetter() || method.get_IsSetter() || method.get_IsAddOn() || method.get_IsRemoveOn() || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
-					{
-						continue;
-					}
-					yield return method;
-				}
-			}
-			if (typeDefinition.get_HasEvents())
-			{
-				foreach (EventDefinition @event in typeDefinition.get_Events())
-				{
-					yield return @event;
-				}
-			}
-			if (typeDefinition.get_HasNestedTypes())
-			{
-				Collection<TypeDefinition> nestedTypes = typeDefinition.get_NestedTypes();
-				foreach (TypeDefinition typeDefinition1 in 
-					from t in nestedTypes
-					orderby t.get_Name()
-					select t)
-				{
-					if (!showCompilerGeneratedMembers && typeDefinition1.HasCompilerGeneratedAttribute())
-					{
-						continue;
-					}
-					yield return typeDefinition1;
-				}
-			}
+			stackVariable1 = new TypeDefinitionExtensions.u003cGetMembersToDecompileu003ed__3(-2);
+			stackVariable1.u003cu003e3__typeDefinition = typeDefinition;
+			stackVariable1.u003cu003e3__showCompilerGeneratedMembers = showCompilerGeneratedMembers;
+			return stackVariable1;
 		}
 
 		public static IEnumerable<IMemberDefinition> GetMembersUnordered(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers)
 		{
-			if (typeDefinition.get_HasFields())
-			{
-				foreach (FieldDefinition field in typeDefinition.get_Fields())
-				{
-					if (!showCompilerGeneratedMembers && field.IsCompilerGenerated(true))
-					{
-						continue;
-					}
-					yield return field;
-				}
-			}
-			if (typeDefinition.get_HasProperties())
-			{
-				foreach (PropertyDefinition property in typeDefinition.get_Properties())
-				{
-					yield return property;
-				}
-			}
-			if (typeDefinition.get_HasMethods())
-			{
-				foreach (MethodDefinition method in typeDefinition.get_Methods())
-				{
-					if (method.get_IsGetter() || method.get_IsSetter() || method.get_IsSpecialName() && (method.get_Name().StartsWith("remove_") || method.get_Name().StartsWith("add_")) || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
-					{
-						continue;
-					}
-					yield return method;
-				}
-			}
-			if (typeDefinition.get_HasEvents())
-			{
-				foreach (EventDefinition @event in typeDefinition.get_Events())
-				{
-					yield return @event;
-				}
-			}
+			stackVariable1 = new TypeDefinitionExtensions.u003cGetMembersUnorderedu003ed__0(-2);
+			stackVariable1.u003cu003e3__typeDefinition = typeDefinition;
+			stackVariable1.u003cu003e3__showCompilerGeneratedMembers = showCompilerGeneratedMembers;
+			return stackVariable1;
 		}
 
 		public static IEnumerable<IMemberDefinition> GetMethodsEventsPropertiesUnordered(TypeDefinition typeDefinition, bool showCompilerGeneratedMembers)
 		{
-			if (typeDefinition.get_HasProperties())
-			{
-				foreach (PropertyDefinition property in typeDefinition.get_Properties())
-				{
-					yield return property;
-				}
-			}
-			if (typeDefinition.get_HasMethods())
-			{
-				foreach (MethodDefinition method in typeDefinition.get_Methods())
-				{
-					if (method.get_IsGetter() || method.get_IsSetter() || method.get_IsAddOn() || method.get_IsRemoveOn() || !showCompilerGeneratedMembers && method.HasCompilerGeneratedAttribute())
-					{
-						continue;
-					}
-					yield return method;
-				}
-			}
-			if (typeDefinition.get_HasEvents())
-			{
-				foreach (EventDefinition @event in typeDefinition.get_Events())
-				{
-					yield return @event;
-				}
-			}
+			stackVariable1 = new TypeDefinitionExtensions.u003cGetMethodsEventsPropertiesUnorderedu003ed__1(-2);
+			stackVariable1.u003cu003e3__typeDefinition = typeDefinition;
+			stackVariable1.u003cu003e3__showCompilerGeneratedMembers = showCompilerGeneratedMembers;
+			return stackVariable1;
 		}
 
 		public static Dictionary<MethodDefinition, PropertyDefinition> GetMethodToPropertyMap(this TypeDefinition typeDefinition)
 		{
-			Dictionary<MethodDefinition, PropertyDefinition> methodDefinitions = new Dictionary<MethodDefinition, PropertyDefinition>();
-			foreach (PropertyDefinition property in typeDefinition.get_Properties())
+			V_0 = new Dictionary<MethodDefinition, PropertyDefinition>();
+			V_1 = typeDefinition.get_Properties().GetEnumerator();
+			try
 			{
-				if (property.get_GetMethod() != null)
+				while (V_1.MoveNext())
 				{
-					methodDefinitions.Add(property.get_GetMethod(), property);
+					V_2 = V_1.get_Current();
+					if (V_2.get_GetMethod() != null)
+					{
+						V_0.Add(V_2.get_GetMethod(), V_2);
+					}
+					if (V_2.get_SetMethod() == null)
+					{
+						continue;
+					}
+					V_0.Add(V_2.get_SetMethod(), V_2);
 				}
-				if (property.get_SetMethod() == null)
-				{
-					continue;
-				}
-				methodDefinitions.Add(property.get_SetMethod(), property);
 			}
-			return methodDefinitions;
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0;
 		}
 
 		internal static bool IsAnonymous(this TypeDefinition self)
 		{
-			bool flag;
-			if (self == null || self.get_Namespace() != String.Empty || !self.get_IsSealed() || !self.get_IsNotPublic() || self.get_BaseType().get_FullName() != "System.Object" || !self.get_HasGenericParameters() || !self.HasCompilerGeneratedAttribute())
+			if (self == null || String.op_Inequality(self.get_Namespace(), String.Empty) || !self.get_IsSealed() || !self.get_IsNotPublic() || String.op_Inequality(self.get_BaseType().get_FullName(), "System.Object") || !self.get_HasGenericParameters() || !self.HasCompilerGeneratedAttribute())
 			{
 				return false;
 			}
-			int num = 0;
+			V_0 = 0;
 			if (self.get_Interfaces().get_Count() > 1)
 			{
 				return false;
 			}
 			if (self.get_Interfaces().get_Count() == 1)
 			{
-				if (self.get_Interfaces().get_Item(0).get_Name() != "IEquatable`1")
+				if (!String.op_Equality(self.get_Interfaces().get_Item(0).get_Name(), "IEquatable`1"))
 				{
 					return false;
 				}
-				num = 1;
+				V_0 = 1;
 			}
-			int count = self.get_Properties().get_Count();
-			if (count != self.get_GenericParameters().get_Count() || count != self.get_Fields().get_Count())
+			V_1 = self.get_Properties().get_Count();
+			if (V_1 != self.get_GenericParameters().get_Count() || V_1 != self.get_Fields().get_Count())
 			{
 				return false;
 			}
-			int num1 = 0;
-			Collection<PropertyDefinition>.Enumerator enumerator = self.get_Properties().GetEnumerator();
+			V_2 = 0;
+			V_4 = self.get_Properties().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_4.MoveNext())
 				{
-					PropertyDefinition current = enumerator.get_Current();
-					if (current.get_GetMethod() != null)
+					V_5 = V_4.get_Current();
+					if (V_5.get_GetMethod() != null)
 					{
-						num1 = num1 + (current.get_SetMethod() != null ? 2 : 1);
+						stackVariable50 = V_2;
+						if (V_5.get_SetMethod() != null)
+						{
+							stackVariable53 = 2;
+						}
+						else
+						{
+							stackVariable53 = 1;
+						}
+						V_2 = stackVariable50 + stackVariable53;
 					}
 					else
 					{
-						flag = false;
-						return flag;
+						V_6 = false;
+						goto Label1;
 					}
 				}
-				int count1 = self.get_Methods().get_Count();
-				if (num1 + num >= count1)
-				{
-					return false;
-				}
-				return count1 <= num1 + num + 4;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_4.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_6;
+		Label0:
+			V_3 = self.get_Methods().get_Count();
+			if (V_2 + V_0 >= V_3)
+			{
+				return false;
+			}
+			return V_3 <= V_2 + V_0 + 4;
 		}
 
 		public static bool IsAsyncStateMachine(this TypeDefinition self)
 		{
-			bool flag;
-			Collection<TypeReference>.Enumerator enumerator = self.get_Interfaces().GetEnumerator();
+			V_0 = self.get_Interfaces().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					if (enumerator.get_Current().get_FullName() != "System.Runtime.CompilerServices.IAsyncStateMachine")
+					if (!String.op_Equality(V_0.get_Current().get_FullName(), "System.Runtime.CompilerServices.IAsyncStateMachine"))
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_1 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_1;
+		Label0:
+			return false;
 		}
 
 		public static bool IsCompilerGenerated(this TypeDefinition source)
@@ -435,12 +307,16 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			return memberDefinition.get_BaseType().get_FullName() == typeof(MulticastDelegate).FullName;
-		}
+			return String.op_Equality(memberDefinition.get_BaseType().get_FullName(), Type.GetTypeFromHandle(// 
+			// Current member / type: System.Boolean Mono.Cecil.Extensions.TypeDefinitionExtensions::IsDelegate(Mono.Cecil.TypeDefinition)
+			// Exception in: System.Boolean IsDelegate(Mono.Cecil.TypeDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		internal static bool IsNestedIn(this TypeDefinition self, TypeDefinition typeDef)
 		{
-			TypeDefinition typeDefinition = null;
 			if (self == null)
 			{
 				throw new ArgumentNullException("self");
@@ -449,17 +325,19 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("typeDef");
 			}
-			for (TypeDefinition i = self; i.get_IsNested(); i = typeDefinition)
+			V_0 = self;
+			while (V_0.get_IsNested())
 			{
-				typeDefinition = i.get_DeclaringType().Resolve();
-				if (typeDefinition == null)
+				V_1 = V_0.get_DeclaringType().Resolve();
+				if (V_1 == null)
 				{
 					return false;
 				}
-				if ((object)typeDefinition == (object)typeDef)
+				if ((object)V_1 == (object)typeDef)
 				{
 					return true;
 				}
+				V_0 = V_1;
 			}
 			return false;
 		}

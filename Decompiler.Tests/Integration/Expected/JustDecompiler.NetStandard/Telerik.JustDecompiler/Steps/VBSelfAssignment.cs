@@ -8,19 +8,20 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public VBSelfAssignment()
 		{
+			base();
+			return;
 		}
 
 		protected override Dictionary<BinaryOperator, BinaryOperator> InitializeNormalToAssignOperatorMap()
 		{
-			return new Dictionary<BinaryOperator, BinaryOperator>()
-			{
-				{ BinaryOperator.Add, BinaryOperator.AddAssign },
-				{ BinaryOperator.Subtract, BinaryOperator.SubtractAssign },
-				{ BinaryOperator.Multiply, BinaryOperator.MultiplyAssign },
-				{ BinaryOperator.Divide, BinaryOperator.DivideAssign },
-				{ BinaryOperator.LeftShift, BinaryOperator.LeftShiftAssign },
-				{ BinaryOperator.RightShift, BinaryOperator.RightShiftAssign }
-			};
+			stackVariable0 = new Dictionary<BinaryOperator, BinaryOperator>();
+			stackVariable0.Add(1, 2);
+			stackVariable0.Add(3, 4);
+			stackVariable0.Add(5, 6);
+			stackVariable0.Add(7, 8);
+			stackVariable0.Add(17, 18);
+			stackVariable0.Add(19, 20);
+			return stackVariable0;
 		}
 	}
 }

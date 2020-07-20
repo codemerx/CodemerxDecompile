@@ -10,35 +10,45 @@ namespace Mono.Cecil.Extensions
 	{
 		public static bool HasAnonymousArgument(this IGenericInstance self)
 		{
-			bool flag;
-			foreach (TypeReference genericArgument in self.get_GenericArguments())
-			{
-				if (!genericArgument.ContainsAnonymousType())
-				{
-					continue;
-				}
-				flag = true;
-				return flag;
-			}
-			Dictionary<int, TypeReference>.ValueCollection.Enumerator enumerator = self.get_PostionToArgument().Values.GetEnumerator();
+			V_0 = self.get_GenericArguments().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					if (!enumerator.Current.ContainsAnonymousType())
+					if (!V_0.get_Current().ContainsAnonymousType())
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_1 = true;
+					goto Label0;
 				}
-				return false;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+			V_2 = self.get_PostionToArgument().get_Values().GetEnumerator();
+			try
+			{
+				while (V_2.MoveNext())
+				{
+					if (!V_2.get_Current().ContainsAnonymousType())
+					{
+						continue;
+					}
+					V_1 = true;
+					goto Label0;
+				}
+				goto Label1;
+			}
+			finally
+			{
+				((IDisposable)V_2).Dispose();
+			}
+		Label0:
+			return V_1;
+		Label1:
+			return false;
 		}
 	}
 }

@@ -7,12 +7,16 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 	{
 		protected BlockLogicalConstruct()
 		{
+			base();
+			return;
 		}
 
 		public BlockLogicalConstruct(ILogicalConstruct Entry, IEnumerable<ILogicalConstruct> body)
 		{
-			this.Entry = Entry;
-			base.RedirectChildrenToNewParent(body);
+			base();
+			this.set_Entry(Entry);
+			this.RedirectChildrenToNewParent(body);
+			return;
 		}
 	}
 }

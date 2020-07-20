@@ -24,7 +24,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public Statement()
 		{
-			this.Label = String.Empty;
+			base();
+			this.set_Label(String.Empty);
+			return;
 		}
 
 		public abstract Statement Clone();
@@ -33,12 +35,14 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		protected void CopyParentAndLabel(Statement target)
 		{
-			target.Label = this.Label;
-			target.Parent = this.Parent;
+			target.set_Label(this.get_Label());
+			target.set_Parent(this.get_Parent());
+			return;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
+			return new Statement.u003cGetOwnInstructionsu003ed__1(-2);
 		}
 	}
 }

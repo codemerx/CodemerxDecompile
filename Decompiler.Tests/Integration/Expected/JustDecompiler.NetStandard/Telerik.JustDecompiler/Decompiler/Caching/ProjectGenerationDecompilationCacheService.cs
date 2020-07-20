@@ -15,11 +15,11 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private static Dictionary<ModuleDefinition, string> moduleContextsKeysMap;
 
-		private Dictionary<string, TypeSpecificContext> typeContextsCache = new Dictionary<string, TypeSpecificContext>();
+		private Dictionary<string, TypeSpecificContext> typeContextsCache;
 
-		private Dictionary<string, CachedDecompiledMember> decompiledMembersCache = new Dictionary<string, CachedDecompiledMember>();
+		private Dictionary<string, CachedDecompiledMember> decompiledMembersCache;
 
-		private Dictionary<string, Dictionary<string, DecompiledType>> nestedDecompiledTypesCache = new Dictionary<string, Dictionary<string, DecompiledType>>();
+		private Dictionary<string, Dictionary<string, DecompiledType>> nestedDecompiledTypesCache;
 
 		private readonly static object locker;
 
@@ -29,54 +29,65 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 			ProjectGenerationDecompilationCacheService.moduleContextsCache = new Dictionary<string, ModuleSpecificContext>();
 			ProjectGenerationDecompilationCacheService.moduleContextsKeysMap = new Dictionary<ModuleDefinition, string>();
 			ProjectGenerationDecompilationCacheService.locker = new Object();
+			return;
 		}
 
 		public ProjectGenerationDecompilationCacheService()
 		{
+			this.typeContextsCache = new Dictionary<string, TypeSpecificContext>();
+			this.decompiledMembersCache = new Dictionary<string, CachedDecompiledMember>();
+			this.nestedDecompiledTypesCache = new Dictionary<string, Dictionary<string, DecompiledType>>();
+			base();
+			return;
 		}
 
 		public void AddAssemblyContextToCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers, AssemblySpecificContext assemblyContext)
 		{
-			string moduleKey = this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers);
-			if (ProjectGenerationDecompilationCacheService.assemblyContextsCache.ContainsKey(moduleKey))
+			V_0 = this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers);
+			if (ProjectGenerationDecompilationCacheService.assemblyContextsCache.ContainsKey(V_0))
 			{
 				throw new Exception("Key already in AssemblyContextsCache");
 			}
-			ProjectGenerationDecompilationCacheService.assemblyContextsCache.Add(moduleKey, assemblyContext);
+			ProjectGenerationDecompilationCacheService.assemblyContextsCache.Add(V_0, assemblyContext);
+			return;
 		}
 
 		public void AddDecompiledMemberToCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers, CachedDecompiledMember decompiledMember)
 		{
+			return;
 		}
 
 		public void AddModuleContextToCache(ModuleDefinition module, ILanguage language, bool renameInvalidMembers, ModuleSpecificContext moduleContext)
 		{
-			string moduleKey = this.GetModuleKey(module, language, renameInvalidMembers);
-			if (ProjectGenerationDecompilationCacheService.moduleContextsCache.ContainsKey(moduleKey))
+			V_0 = this.GetModuleKey(module, language, renameInvalidMembers);
+			if (ProjectGenerationDecompilationCacheService.moduleContextsCache.ContainsKey(V_0))
 			{
 				throw new Exception("Key already in ModuleContextsCache");
 			}
-			ProjectGenerationDecompilationCacheService.moduleContextsCache.Add(moduleKey, moduleContext);
+			ProjectGenerationDecompilationCacheService.moduleContextsCache.Add(V_0, moduleContext);
+			return;
 		}
 
 		public void AddNestedDecompiledTypesToCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers, Dictionary<string, DecompiledType> decompiledTypes)
 		{
-			string typeKey = this.GetTypeKey(type, language, renameInvalidMembers);
-			if (this.nestedDecompiledTypesCache.ContainsKey(typeKey))
+			V_0 = this.GetTypeKey(type, language, renameInvalidMembers);
+			if (this.nestedDecompiledTypesCache.ContainsKey(V_0))
 			{
 				throw new Exception("Key already in NestedDecompiledTypesCache");
 			}
-			this.nestedDecompiledTypesCache.Add(typeKey, decompiledTypes);
+			this.nestedDecompiledTypesCache.Add(V_0, decompiledTypes);
+			return;
 		}
 
 		public void AddTypeContextToCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers, TypeSpecificContext typeContext)
 		{
-			string typeKey = this.GetTypeKey(type, language, renameInvalidMembers);
-			if (this.typeContextsCache.ContainsKey(typeKey))
+			V_0 = this.GetTypeKey(type, language, renameInvalidMembers);
+			if (this.typeContextsCache.ContainsKey(V_0))
 			{
 				throw new Exception("Key already in TypeContextsCache");
 			}
-			this.typeContextsCache.Add(typeKey, typeContext);
+			this.typeContextsCache.Add(V_0, typeContext);
+			return;
 		}
 
 		public bool AreNestedDecompiledTypesInCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
@@ -89,16 +100,16 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 			ProjectGenerationDecompilationCacheService.assemblyContextsCache.Clear();
 			ProjectGenerationDecompilationCacheService.moduleContextsCache.Clear();
 			ProjectGenerationDecompilationCacheService.moduleContextsKeysMap.Clear();
+			return;
 		}
 
 		public AssemblySpecificContext GetAssemblyContextFromCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers)
 		{
-			AssemblySpecificContext assemblySpecificContext;
-			if (!ProjectGenerationDecompilationCacheService.assemblyContextsCache.TryGetValue(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers), out assemblySpecificContext))
+			if (!ProjectGenerationDecompilationCacheService.assemblyContextsCache.TryGetValue(this.GetModuleKey(assembly.get_MainModule(), language, renameInvalidMembers), out V_0))
 			{
 				throw new Exception("Key not found in AssemblyContextsCache");
 			}
-			return assemblySpecificContext;
+			return V_0;
 		}
 
 		public CachedDecompiledMember GetDecompiledMemberFromCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers)
@@ -108,69 +119,85 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		public ModuleSpecificContext GetModuleContextFromCache(ModuleDefinition module, ILanguage language, bool renameInvalidMembers)
 		{
-			ModuleSpecificContext moduleSpecificContext;
-			if (!ProjectGenerationDecompilationCacheService.moduleContextsCache.TryGetValue(this.GetModuleKey(module, language, renameInvalidMembers), out moduleSpecificContext))
+			if (!ProjectGenerationDecompilationCacheService.moduleContextsCache.TryGetValue(this.GetModuleKey(module, language, renameInvalidMembers), out V_0))
 			{
 				throw new Exception("Key not found in ModuleContextsCache");
 			}
-			return moduleSpecificContext;
+			return V_0;
 		}
 
 		private string GetModuleKey(ModuleDefinition module, ILanguage language, bool renameInvalidMembers)
 		{
-			string str;
 			if (!ProjectGenerationDecompilationCacheService.moduleContextsKeysMap.ContainsKey(module))
 			{
-				lock (ProjectGenerationDecompilationCacheService.locker)
+				V_0 = ProjectGenerationDecompilationCacheService.locker;
+				V_1 = false;
+				try
 				{
+					Monitor.Enter(V_0, ref V_1);
 					if (ProjectGenerationDecompilationCacheService.moduleContextsKeysMap.ContainsKey(module))
 					{
-						return ProjectGenerationDecompilationCacheService.moduleContextsKeysMap[module];
+						goto Label0;
 					}
 					else
 					{
-						FileInfo fileInfo = new FileInfo(module.get_FilePath());
-						String[] filePath = new String[] { module.get_FilePath(), " : ", null, null, null, null, null, null, null };
-						filePath[2] = fileInfo.LastWriteTime.ToString();
-						filePath[3] = " : ";
-						filePath[4] = module.get_Name().ToString();
-						filePath[5] = " ";
-						filePath[6] = language.Name;
-						filePath[7] = " ";
-						filePath[8] = renameInvalidMembers.ToString();
-						string str1 = String.Concat(filePath);
-						ProjectGenerationDecompilationCacheService.moduleContextsKeysMap.Add(module, str1);
-						str = str1;
+						V_2 = new FileInfo(module.get_FilePath());
+						stackVariable17 = new String[9];
+						stackVariable17[0] = module.get_FilePath();
+						stackVariable17[1] = " : ";
+						V_4 = V_2.get_LastWriteTime();
+						stackVariable17[2] = V_4.ToString();
+						stackVariable17[3] = " : ";
+						stackVariable17[4] = module.get_Name().ToString();
+						stackVariable17[5] = " ";
+						stackVariable17[6] = language.get_Name();
+						stackVariable17[7] = " ";
+						stackVariable17[8] = renameInvalidMembers.ToString();
+						V_3 = String.Concat(stackVariable17);
+						ProjectGenerationDecompilationCacheService.moduleContextsKeysMap.Add(module, V_3);
+						V_5 = V_3;
 					}
 				}
-				return str;
+				finally
+				{
+					if (V_1)
+					{
+						Monitor.Exit(V_0);
+					}
+				}
+				return V_5;
 			}
-			return ProjectGenerationDecompilationCacheService.moduleContextsKeysMap[module];
+		Label0:
+			return ProjectGenerationDecompilationCacheService.moduleContextsKeysMap.get_Item(module);
 		}
 
 		public Dictionary<string, DecompiledType> GetNestedDecompiledTypesFromCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
 		{
-			Dictionary<string, DecompiledType> strs;
-			if (!this.nestedDecompiledTypesCache.TryGetValue(this.GetTypeKey(type, language, renameInvalidMembers), out strs))
+			if (!this.nestedDecompiledTypesCache.TryGetValue(this.GetTypeKey(type, language, renameInvalidMembers), out V_0))
 			{
 				throw new Exception("Key not found in NestedDecompiledTypesCache");
 			}
-			return strs;
+			return V_0;
 		}
 
 		public TypeSpecificContext GetTypeContextFromCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
 		{
-			TypeSpecificContext typeSpecificContext;
-			if (!this.typeContextsCache.TryGetValue(this.GetTypeKey(type, language, renameInvalidMembers), out typeSpecificContext))
+			if (!this.typeContextsCache.TryGetValue(this.GetTypeKey(type, language, renameInvalidMembers), out V_0))
 			{
 				throw new Exception("Key not found in TypeContextsCache");
 			}
-			return typeSpecificContext;
+			return V_0;
 		}
 
 		private string GetTypeKey(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
 		{
-			return String.Concat(new String[] { this.GetModuleKey(type.get_Module(), language, renameInvalidMembers), " : ", language.Name, " : ", type.get_FullName() });
+			stackVariable1 = new String[5];
+			stackVariable1[0] = this.GetModuleKey(type.get_Module(), language, renameInvalidMembers);
+			stackVariable1[1] = " : ";
+			stackVariable1[2] = language.get_Name();
+			stackVariable1[3] = " : ";
+			stackVariable1[4] = type.get_FullName();
+			return String.Concat(stackVariable1);
 		}
 
 		public bool IsAssemblyContextInCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers)
@@ -195,7 +222,8 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private void RemoveTypeContextFromCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
 		{
-			this.typeContextsCache.Remove(this.GetTypeKey(type, language, renameInvalidMembers));
+			dummyVar0 = this.typeContextsCache.Remove(this.GetTypeKey(type, language, renameInvalidMembers));
+			return;
 		}
 
 		public void ReplaceCachedTypeContext(TypeDefinition type, ILanguage language, bool renameInvalidMembers, TypeSpecificContext newContext)
@@ -206,6 +234,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 			}
 			this.RemoveTypeContextFromCache(type, language, renameInvalidMembers);
 			this.AddTypeContextToCache(type, language, renameInvalidMembers, newContext);
+			return;
 		}
 	}
 }

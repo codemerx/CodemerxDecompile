@@ -23,8 +23,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.Parent = this;
+					this.body.set_Parent(this);
 				}
+				return;
 			}
 		}
 
@@ -32,15 +33,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				FixedStatement fixedStatement = null;
-				if (fixedStatement.body != null)
-				{
-					yield return fixedStatement.body;
-				}
-				if (fixedStatement.Expression != null)
-				{
-					yield return fixedStatement.Expression;
-				}
+				stackVariable1 = new FixedStatement.u003cget_Childrenu003ed__3(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -48,7 +43,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.FixedStatement;
+				return 37;
 			}
 		}
 
@@ -60,40 +55,40 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public FixedStatement(Telerik.JustDecompiler.Ast.Expressions.Expression expression, BlockStatement body)
 		{
-			this.Expression = expression;
-			this.Body = body;
+			base();
+			this.set_Expression(expression);
+			this.set_Body(body);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				blockStatement = this.body.Clone() as BlockStatement;
+				stackVariable5 = this.body.Clone() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			FixedStatement fixedStatement = new FixedStatement(this.Expression.Clone(), blockStatement);
-			base.CopyParentAndLabel(fixedStatement);
-			return fixedStatement;
+			V_1 = new FixedStatement(this.get_Expression().Clone(), stackVariable5);
+			this.CopyParentAndLabel(V_1);
+			return V_1;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				blockStatement = this.body.CloneStatementOnly() as BlockStatement;
+				stackVariable5 = this.body.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			FixedStatement fixedStatement = new FixedStatement(this.Expression.CloneExpressionOnly(), blockStatement);
-			base.CopyParentAndLabel(fixedStatement);
-			return fixedStatement;
+			V_1 = new FixedStatement(this.get_Expression().CloneExpressionOnly(), stackVariable5);
+			this.CopyParentAndLabel(V_1);
+			return V_1;
 		}
 	}
 }

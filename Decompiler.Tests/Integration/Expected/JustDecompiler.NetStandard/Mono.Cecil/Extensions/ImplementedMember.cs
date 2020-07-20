@@ -20,17 +20,19 @@ namespace Mono.Cecil.Extensions
 
 		public ImplementedMember(TypeReference declaringType, MemberReference member)
 		{
-			this.DeclaringType = declaringType;
-			this.Member = member;
+			base();
+			this.set_DeclaringType(declaringType);
+			this.set_Member(member);
+			return;
 		}
 
 		public bool Equals(ImplementedMember other)
 		{
-			if ((object)this.DeclaringType != (object)other.DeclaringType)
+			if ((object)this.get_DeclaringType() != (object)other.get_DeclaringType())
 			{
 				return false;
 			}
-			return (object)this.Member == (object)other.Member;
+			return (object)this.get_Member() == (object)other.get_Member();
 		}
 	}
 }

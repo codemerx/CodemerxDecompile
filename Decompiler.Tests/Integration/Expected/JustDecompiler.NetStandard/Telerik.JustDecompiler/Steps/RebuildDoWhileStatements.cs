@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -11,6 +10,8 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public RebuildDoWhileStatements()
 		{
+			base();
+			return;
 		}
 
 		private BinaryExpression GetForAssignExpression(Expression expression)
@@ -19,42 +20,42 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			if (expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expression as BinaryExpression).IsAssignmentExpression)
+			if (expression.get_CodeNodeType() != 24 || !(expression as BinaryExpression).get_IsAssignmentExpression())
 			{
 				return null;
 			}
-			BinaryExpression binaryExpression = (BinaryExpression)expression;
-			if (binaryExpression.Left.CodeNodeType != CodeNodeType.VariableDeclarationExpression && binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression && binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression)
+			V_0 = (BinaryExpression)expression;
+			if (V_0.get_Left().get_CodeNodeType() != 27 && V_0.get_Left().get_CodeNodeType() != 26 && V_0.get_Left().get_CodeNodeType() != 30)
 			{
 				return null;
 			}
-			if (binaryExpression.IsAssignmentExpression)
+			if (V_0.get_IsAssignmentExpression())
 			{
-				return binaryExpression;
+				return V_0;
 			}
 			return null;
 		}
 
 		private BinaryExpression GetForBinaryExpression(Expression condition)
 		{
-			if (condition.CodeNodeType != CodeNodeType.BinaryExpression)
+			if (condition.get_CodeNodeType() != 24)
 			{
 				return null;
 			}
-			BinaryExpression binaryExpression = (BinaryExpression)condition;
-			if (binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression && binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression)
+			V_0 = (BinaryExpression)condition;
+			if (V_0.get_Left().get_CodeNodeType() != 26 && V_0.get_Left().get_CodeNodeType() != 30)
 			{
 				return null;
 			}
-			if (!this.IsForComparisonOperator(binaryExpression.Operator))
+			if (!this.IsForComparisonOperator(V_0.get_Operator()))
 			{
 				return null;
 			}
-			if (binaryExpression.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+			if (V_0.get_Right().get_CodeNodeType() != 22)
 			{
 				return null;
 			}
-			return binaryExpression;
+			return V_0;
 		}
 
 		private Expression GetForIncrementExpression(Expression expression)
@@ -63,25 +64,25 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			if (expression.CodeNodeType == CodeNodeType.UnaryExpression)
+			if (expression.get_CodeNodeType() == 23)
 			{
-				UnaryExpression unaryExpression = (UnaryExpression)expression;
-				if (unaryExpression.Operator != UnaryOperator.PostDecrement && unaryExpression.Operator != UnaryOperator.PreDecrement && unaryExpression.Operator != UnaryOperator.PostIncrement && unaryExpression.Operator != UnaryOperator.PreIncrement)
+				V_0 = (UnaryExpression)expression;
+				if (V_0.get_Operator() != 3 && V_0.get_Operator() != 5 && V_0.get_Operator() != 4 && V_0.get_Operator() != 6)
 				{
 					return null;
 				}
-				return unaryExpression;
+				return V_0;
 			}
-			if (expression.CodeNodeType == CodeNodeType.BinaryExpression && (expression as BinaryExpression).Operator == BinaryOperator.AddAssign || expression.CodeNodeType == CodeNodeType.BinaryExpression && (expression as BinaryExpression).Operator == BinaryOperator.SubtractAssign)
+			if (expression.get_CodeNodeType() == 24 && (expression as BinaryExpression).get_Operator() == 2 || expression.get_CodeNodeType() == 24 && (expression as BinaryExpression).get_Operator() == 4)
 			{
 				return expression;
 			}
-			if (expression.CodeNodeType == CodeNodeType.BinaryExpression && (expression as BinaryExpression).IsAssignmentExpression)
+			if (expression.get_CodeNodeType() == 24 && (expression as BinaryExpression).get_IsAssignmentExpression())
 			{
-				BinaryExpression binaryExpression = (BinaryExpression)expression;
-				if (this.IsSelfAssignExpression(binaryExpression))
+				V_1 = (BinaryExpression)expression;
+				if (this.IsSelfAssignExpression(V_1))
 				{
-					return binaryExpression;
+					return V_1;
 				}
 			}
 			return null;
@@ -89,7 +90,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsForComparisonOperator(BinaryOperator op)
 		{
-			if ((int)op - (int)BinaryOperator.LessThan <= (int)BinaryOperator.Subtract)
+			if (op - 13 <= 3)
 			{
 				return true;
 			}
@@ -98,36 +99,36 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsSelfAssignExpression(BinaryExpression assingExpression)
 		{
-			if (!assingExpression.IsAssignmentExpression)
+			if (!assingExpression.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			BinaryExpression right = assingExpression.Right as BinaryExpression;
-			if (right == null)
+			V_0 = assingExpression.get_Right() as BinaryExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (right.Left.CodeNodeType != assingExpression.Left.CodeNodeType)
+			if (V_0.get_Left().get_CodeNodeType() != assingExpression.get_Left().get_CodeNodeType())
 			{
 				return false;
 			}
-			if (right.Operator != BinaryOperator.Add && right.Operator != BinaryOperator.Subtract)
+			if (V_0.get_Operator() != 1 && V_0.get_Operator() != 3)
 			{
 				return false;
 			}
-			if (right.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+			if (V_0.get_Right().get_CodeNodeType() != 22)
 			{
 				return false;
 			}
-			if (right.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
+			if (V_0.get_Left().get_CodeNodeType() == 30)
 			{
-				return (object)((FieldReferenceExpression)right.Left).Field == (object)((FieldReferenceExpression)assingExpression.Left).Field;
+				return (object)((FieldReferenceExpression)V_0.get_Left()).get_Field() == (object)((FieldReferenceExpression)assingExpression.get_Left()).get_Field();
 			}
-			if (right.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+			if (V_0.get_Left().get_CodeNodeType() != 26)
 			{
 				return true;
 			}
-			return (object)((VariableReferenceExpression)right.Left).Variable == (object)((VariableReferenceExpression)assingExpression.Left).Variable;
+			return (object)((VariableReferenceExpression)V_0.get_Left()).get_Variable() == (object)((VariableReferenceExpression)assingExpression.get_Left()).get_Variable();
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -138,24 +139,27 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
-			for (int i = 0; i < node.Statements.Count - 1; i++)
+			V_0 = 0;
+			while (V_0 < node.get_Statements().get_Count() - 1)
 			{
-				if (node.Statements[i] is ForStatement)
+				if (node.get_Statements().get_Item(V_0) as ForStatement != null)
 				{
-					ForStatement item = node.Statements[i] as ForStatement;
-					BinaryExpression forAssignExpression = this.GetForAssignExpression(item.Initializer);
-					BinaryExpression forBinaryExpression = this.GetForBinaryExpression(item.Condition);
-					Expression forIncrementExpression = this.GetForIncrementExpression(item.Increment);
-					if (forAssignExpression == null || forBinaryExpression == null || forIncrementExpression == null)
+					V_1 = node.get_Statements().get_Item(V_0) as ForStatement;
+					stackVariable23 = this.GetForAssignExpression(V_1.get_Initializer());
+					V_2 = this.GetForBinaryExpression(V_1.get_Condition());
+					V_3 = this.GetForIncrementExpression(V_1.get_Increment());
+					if (stackVariable23 == null || V_2 == null || V_3 == null)
 					{
-						DoWhileStatement doWhileStatement = new DoWhileStatement(item.Condition, item.Body);
-						doWhileStatement.Body.AddStatement(new ExpressionStatement(item.Increment));
-						node.Statements[i] = new ExpressionStatement(item.Initializer);
-						node.Statements.Insert(i + 1, doWhileStatement);
+						V_4 = new DoWhileStatement(V_1.get_Condition(), V_1.get_Body());
+						V_4.get_Body().AddStatement(new ExpressionStatement(V_1.get_Increment()));
+						node.get_Statements().set_Item(V_0, new ExpressionStatement(V_1.get_Initializer()));
+						node.get_Statements().Insert(V_0 + 1, V_4);
 					}
 				}
+				V_0 = V_0 + 1;
 			}
-			base.VisitBlockStatement(node);
+			this.VisitBlockStatement(node);
+			return;
 		}
 	}
 }

@@ -1,109 +1,139 @@
-using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using System;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
-using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Decompiler.Inlining
 {
 	internal class MethodVariablesInliner : BaseVariablesInliner
 	{
-		public MethodVariablesInliner(MethodSpecificContext methodContext, IVariablesToNotInlineFinder finder) : base(methodContext, new RestrictedVariableInliner(methodContext.Method.get_Module().get_TypeSystem()), finder)
+		public MethodVariablesInliner(MethodSpecificContext methodContext, IVariablesToNotInlineFinder finder)
 		{
+			base(methodContext, new RestrictedVariableInliner(methodContext.get_Method().get_Module().get_TypeSystem()), finder);
+			return;
 		}
 
 		protected override void FindSingleDefineSingleUseVariables()
 		{
-			MethodVariablesInliner.SingleDefineSingleUseFinder singleDefineSingleUseFinder = new MethodVariablesInliner.SingleDefineSingleUseFinder(this.variablesToNotInline);
-			foreach (IList<Expression> value in this.methodContext.Expressions.BlockExpressions.Values)
+			V_0 = new MethodVariablesInliner.SingleDefineSingleUseFinder(this.variablesToNotInline);
+			V_1 = this.methodContext.get_Expressions().get_BlockExpressions().get_Values().GetEnumerator();
+			try
 			{
-				singleDefineSingleUseFinder.VisitExpressionsInBlock(value);
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.VisitExpressionsInBlock(V_2);
+				}
 			}
-			this.variablesToInline.UnionWith(singleDefineSingleUseFinder.SingleDefineSingleUsageVariables);
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			this.variablesToInline.UnionWith(V_0.get_SingleDefineSingleUsageVariables());
+			return;
 		}
 
 		protected override void InlineInBlocks()
 		{
-			ICodeNode codeNode;
-			foreach (KeyValuePair<int, IList<Expression>> blockExpression in this.methodContext.Expressions.BlockExpressions)
+			V_0 = this.methodContext.get_Expressions().get_BlockExpressions().GetEnumerator();
+			try
 			{
-				IList<Expression> value = blockExpression.Value;
-				bool[] flagArray = new Boolean[value.Count];
-				bool length = (int)this.methodContext.ControlFlowGraph.InstructionToBlockMapping[blockExpression.Key].Successors.Length > 1;
-				int count = value.Count - 2;
-				int num = count + 1;
-				while (count >= 0)
+				while (V_0.MoveNext())
 				{
-					BinaryExpression item = value[count] as BinaryExpression;
-					if (item == null || !item.IsAssignmentExpression || item.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+					V_1 = V_0.get_Current();
+					V_2 = V_1.get_Value();
+					V_3 = new Boolean[V_2.get_Count()];
+					V_4 = (int)this.methodContext.get_ControlFlowGraph().get_InstructionToBlockMapping().get_Item(V_1.get_Key()).get_Successors().Length > 1;
+					V_5 = V_2.get_Count() - 2;
+					V_6 = V_5 + 1;
+					while (V_5 >= 0)
 					{
-						num = count;
-					}
-					else
-					{
-						VariableDefinition variableDefinition = (item.Left as VariableReferenceExpression).Variable.Resolve();
-						if (this.variablesToInline.Contains(variableDefinition))
+						V_7 = V_2.get_Item(V_5) as BinaryExpression;
+						if (V_7 == null || !V_7.get_IsAssignmentExpression() || V_7.get_Left().get_CodeNodeType() != 26)
 						{
-							Expression right = item.Right;
-							if (this.IsEnumeratorGetCurrent(right) || this.IsQueryInvocation(right) || variableDefinition.get_VariableType() != null && variableDefinition.get_VariableType().get_IsPinned())
-							{
-								num = count;
-							}
-							else
-							{
-								List<Instruction> instructions = new List<Instruction>(item.MappedInstructions);
-								instructions.AddRange(item.Left.UnderlyingSameMethodInstructions);
-								if (!this.inliner.TryInlineVariable(variableDefinition, right.CloneAndAttachInstructions(instructions), value[num], (!length ? false : num + 1 == value.Count), out codeNode))
-								{
-									num = count;
-								}
-								else
-								{
-									value[num] = (Expression)codeNode;
-									flagArray[count] = true;
-								}
-							}
+							V_6 = V_5;
 						}
 						else
 						{
-							num = count;
+							V_8 = (V_7.get_Left() as VariableReferenceExpression).get_Variable().Resolve();
+							if (this.variablesToInline.Contains(V_8))
+							{
+								V_9 = V_7.get_Right();
+								if (this.IsEnumeratorGetCurrent(V_9) || this.IsQueryInvocation(V_9) || V_8.get_VariableType() != null && V_8.get_VariableType().get_IsPinned())
+								{
+									V_6 = V_5;
+								}
+								else
+								{
+									V_10 = new List<Instruction>(V_7.get_MappedInstructions());
+									V_10.AddRange(V_7.get_Left().get_UnderlyingSameMethodInstructions());
+									stackVariable78 = this.inliner;
+									stackVariable79 = V_8;
+									stackVariable82 = V_9.CloneAndAttachInstructions(V_10);
+									stackVariable85 = V_2.get_Item(V_6);
+									if (!V_4)
+									{
+										stackVariable87 = false;
+									}
+									else
+									{
+										stackVariable87 = V_6 + 1 == V_2.get_Count();
+									}
+									if (!stackVariable78.TryInlineVariable(stackVariable79, stackVariable82, stackVariable85, stackVariable87, out V_11))
+									{
+										V_6 = V_5;
+									}
+									else
+									{
+										V_2.set_Item(V_6, (Expression)V_11);
+										V_3[V_5] = true;
+									}
+								}
+							}
+							else
+							{
+								V_6 = V_5;
+							}
 						}
+						V_5 = V_5 - 1;
 					}
-					count--;
+					this.FastRemoveExpressions(V_2, V_3);
 				}
-				base.FastRemoveExpressions(value, flagArray);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private bool IsEnumeratorGetCurrent(Expression expression)
 		{
-			if (expression.CodeNodeType == CodeNodeType.ExplicitCastExpression)
+			if (expression.get_CodeNodeType() == 31)
 			{
-				expression = (expression as ExplicitCastExpression).Expression;
+				expression = (expression as ExplicitCastExpression).get_Expression();
 			}
-			if (expression.CodeNodeType != CodeNodeType.MethodInvocationExpression)
+			if (expression.get_CodeNodeType() != 19)
 			{
 				return false;
 			}
-			return (expression as MethodInvocationExpression).MethodExpression.Method.get_Name() == "get_Current";
+			return String.op_Equality((expression as MethodInvocationExpression).get_MethodExpression().get_Method().get_Name(), "get_Current");
 		}
 
 		private bool IsQueryInvocation(Expression expression)
 		{
-			MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
-			if (methodInvocationExpression == null || methodInvocationExpression.MethodExpression == null)
+			V_0 = expression as MethodInvocationExpression;
+			if (V_0 == null || V_0.get_MethodExpression() == null)
 			{
 				return false;
 			}
-			if (methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Linq.Enumerable")
+			if (!String.op_Equality(V_0.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Linq.Enumerable"))
 			{
 				return false;
 			}
-			return methodInvocationExpression.MethodExpression.MethodDefinition.IsQueryMethod();
+			return V_0.get_MethodExpression().get_MethodDefinition().IsQueryMethod();
 		}
 
 		private class SingleDefineSingleUseFinder : BaseCodeVisitor
@@ -124,74 +154,96 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 			public SingleDefineSingleUseFinder(HashSet<VariableDefinition> variablesToNotInline)
 			{
+				this.singleDefinitionVariables = new HashSet<VariableDefinition>();
+				this.singleUsageVariables = new HashSet<VariableDefinition>();
+				this.bannedVariables = new HashSet<VariableDefinition>();
+				base();
 				this.bannedVariables.UnionWith(variablesToNotInline);
+				return;
 			}
 
 			private void AddDefinition(VariableDefinition variable)
 			{
 				if (!this.bannedVariables.Contains(variable))
 				{
-					this.singleDefinitionVariables.Add(variable);
+					dummyVar0 = this.singleDefinitionVariables.Add(variable);
 				}
+				return;
 			}
 
 			public override void VisitBinaryExpression(BinaryExpression node)
 			{
-				if (!node.IsAssignmentExpression || node.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+				if (!node.get_IsAssignmentExpression() || node.get_Left().get_CodeNodeType() != 26)
 				{
-					base.VisitBinaryExpression(node);
+					this.VisitBinaryExpression(node);
 					return;
 				}
-				this.Visit(node.Right);
-				this.AddDefinition((node.Left as VariableReferenceExpression).Variable.Resolve());
+				this.Visit(node.get_Right());
+				this.AddDefinition((node.get_Left() as VariableReferenceExpression).get_Variable().Resolve());
+				return;
 			}
 
 			public void VisitExpressionsInBlock(IList<Expression> expressions)
 			{
 				this.singleDefinitionVariables.Clear();
-				foreach (Expression expression in expressions)
+				V_0 = expressions.GetEnumerator();
+				try
 				{
-					this.Visit(expression);
+					while (V_0.MoveNext())
+					{
+						V_1 = V_0.get_Current();
+						this.Visit(V_1);
+					}
 				}
+				finally
+				{
+					if (V_0 != null)
+					{
+						V_0.Dispose();
+					}
+				}
+				return;
 			}
 
 			public override void VisitUnaryExpression(UnaryExpression node)
 			{
-				if ((node.Operator == UnaryOperator.AddressOf || node.Operator == UnaryOperator.AddressReference) && node.Operand.CodeNodeType == CodeNodeType.VariableReferenceExpression)
+				if (node.get_Operator() == 9 || node.get_Operator() == 7 && node.get_Operand().get_CodeNodeType() == 26)
 				{
-					VariableDefinition variableDefinition = (node.Operand as VariableReferenceExpression).Variable.Resolve();
-					if (this.bannedVariables.Add(variableDefinition))
+					V_0 = (node.get_Operand() as VariableReferenceExpression).get_Variable().Resolve();
+					if (this.bannedVariables.Add(V_0))
 					{
-						this.singleDefinitionVariables.Remove(variableDefinition);
-						this.singleUsageVariables.Remove(variableDefinition);
+						dummyVar0 = this.singleDefinitionVariables.Remove(V_0);
+						dummyVar1 = this.singleUsageVariables.Remove(V_0);
 					}
 					return;
 				}
-				if (node.Operator == UnaryOperator.AddressDereference && node.Operand.CodeNodeType == CodeNodeType.UnaryExpression)
+				if (node.get_Operator() == 8 && node.get_Operand().get_CodeNodeType() == 23)
 				{
-					UnaryExpression operand = node.Operand as UnaryExpression;
-					if (operand.Operator == UnaryOperator.AddressOf || operand.Operator == UnaryOperator.AddressReference)
+					V_1 = node.get_Operand() as UnaryExpression;
+					if (V_1.get_Operator() == 9 || V_1.get_Operator() == 7)
 					{
-						base.Visit(operand.Operand);
+						this.Visit(V_1.get_Operand());
 						return;
 					}
 				}
-				base.VisitUnaryExpression(node);
+				this.VisitUnaryExpression(node);
+				return;
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				VariableDefinition variableDefinition = node.Variable.Resolve();
-				if (!this.bannedVariables.Contains(variableDefinition))
+				V_0 = node.get_Variable().Resolve();
+				if (!this.bannedVariables.Contains(V_0))
 				{
-					if (this.singleDefinitionVariables.Remove(variableDefinition))
+					if (this.singleDefinitionVariables.Remove(V_0))
 					{
-						this.singleUsageVariables.Add(variableDefinition);
+						dummyVar0 = this.singleUsageVariables.Add(V_0);
 						return;
 					}
-					this.singleUsageVariables.Remove(variableDefinition);
-					this.bannedVariables.Add(variableDefinition);
+					dummyVar1 = this.singleUsageVariables.Remove(V_0);
+					dummyVar2 = this.bannedVariables.Add(V_0);
 				}
+				return;
 			}
 		}
 	}

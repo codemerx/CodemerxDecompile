@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Cil;
-using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler.AssignmentAnalysis;
 using Telerik.JustDecompiler.Decompiler.DefineUseAnalysis;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
@@ -64,15 +63,16 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			get
 			{
-				if (!this.enableEventAnalysis || this.Method.get_IsAddOn())
+				if (!this.enableEventAnalysis || this.get_Method().get_IsAddOn())
 				{
 					return false;
 				}
-				return !this.Method.get_IsRemoveOn();
+				return !this.get_Method().get_IsRemoveOn();
 			}
 			set
 			{
 				this.enableEventAnalysis = value;
+				return;
 			}
 		}
 
@@ -146,7 +146,7 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			get
 			{
-				return this.Body.get_Method();
+				return this.get_Body().get_Method();
 			}
 		}
 
@@ -230,108 +230,135 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public MethodSpecificContext(MethodBody body)
 		{
-			this.Body = body;
-			this.Variables = new Collection<VariableDefinition>(body.get_Variables());
-			this.ControlFlowGraph = Telerik.JustDecompiler.Cil.ControlFlowGraph.Create(body.get_Method());
-			this.GotoLabels = new Dictionary<string, Statement>();
-			this.GotoStatements = new List<GotoStatement>();
-			this.IsMethodBodyChanged = false;
-			this.VariableDefinitionToNameMap = new Dictionary<VariableDefinition, string>();
-			this.VariableNamesCollection = new HashSet<string>();
-			this.ParameterDefinitionToNameMap = new Dictionary<ParameterDefinition, string>();
-			this.VariablesToRename = this.GetMethodVariablesToRename();
-			this.LambdaVariablesCount = 0;
-			this.AnalysisResults = new DecompilationAnalysisResults();
-			this.VariableAssignmentData = new Dictionary<VariableDefinition, AssignmentType>();
-			this.OutParametersToAssign = new List<ParameterDefinition>();
-			this.IsBaseConstructorInvokingConstructor = false;
+			base();
+			this.set_Body(body);
+			this.set_Variables(new Collection<VariableDefinition>(body.get_Variables()));
+			this.set_ControlFlowGraph(Telerik.JustDecompiler.Cil.ControlFlowGraph.Create(body.get_Method()));
+			this.set_GotoLabels(new Dictionary<string, Statement>());
+			this.set_GotoStatements(new List<GotoStatement>());
+			this.set_IsMethodBodyChanged(false);
+			this.set_VariableDefinitionToNameMap(new Dictionary<VariableDefinition, string>());
+			this.set_VariableNamesCollection(new HashSet<string>());
+			this.set_ParameterDefinitionToNameMap(new Dictionary<ParameterDefinition, string>());
+			this.set_VariablesToRename(this.GetMethodVariablesToRename());
+			this.set_LambdaVariablesCount(0);
+			this.set_AnalysisResults(new DecompilationAnalysisResults());
+			this.set_VariableAssignmentData(new Dictionary<VariableDefinition, AssignmentType>());
+			this.set_OutParametersToAssign(new List<ParameterDefinition>());
+			this.set_IsBaseConstructorInvokingConstructor(false);
 			this.enableEventAnalysis = true;
-			this.IsDestructor = false;
-			this.UndeclaredLinqVariables = new HashSet<VariableDefinition>();
-			this.ClosureVariableToFieldValue = new Dictionary<VariableReference, Dictionary<FieldDefinition, Expression>>();
-			this.VariablesToNotDeclare = new HashSet<VariableDefinition>();
-			this.SwitchByStringData = new CompilerOptimizedSwitchByStringData();
+			this.set_IsDestructor(false);
+			this.set_UndeclaredLinqVariables(new HashSet<VariableDefinition>());
+			this.set_ClosureVariableToFieldValue(new Dictionary<VariableReference, Dictionary<FieldDefinition, Expression>>());
+			this.set_VariablesToNotDeclare(new HashSet<VariableDefinition>());
+			this.set_SwitchByStringData(new CompilerOptimizedSwitchByStringData());
+			return;
 		}
 
-		public MethodSpecificContext(MethodBody body, Dictionary<VariableDefinition, string> variableDefinitionToNameMap, Dictionary<ParameterDefinition, string> parameterDefinitionTonameMap, MethodInvocationExpression ctorInvokeExpression) : this(body)
+		public MethodSpecificContext(MethodBody body, Dictionary<VariableDefinition, string> variableDefinitionToNameMap, Dictionary<ParameterDefinition, string> parameterDefinitionTonameMap, MethodInvocationExpression ctorInvokeExpression)
 		{
-			this.VariableDefinitionToNameMap = variableDefinitionToNameMap;
-			this.ParameterDefinitionToNameMap = parameterDefinitionTonameMap;
-			this.CtorInvokeExpression = ctorInvokeExpression;
+			this(body);
+			this.set_VariableDefinitionToNameMap(variableDefinitionToNameMap);
+			this.set_ParameterDefinitionToNameMap(parameterDefinitionTonameMap);
+			this.set_CtorInvokeExpression(ctorInvokeExpression);
+			return;
 		}
 
 		internal MethodSpecificContext(DecompilationAnalysisResults analysisResults, Telerik.JustDecompiler.Decompiler.YieldData yieldData, Telerik.JustDecompiler.Decompiler.AsyncData asyncData, bool isMethodBodyChanged, Dictionary<string, Statement> gotoLabels, List<GotoStatement> gotoStatements, StackUsageData stackData, bool isBaseConstructorInvokingConstructor, bool enableEventAnalysis, MethodBody body, Collection<VariableDefinition> variables, Telerik.JustDecompiler.Cil.ControlFlowGraph controlFlowGraph, ExpressionDecompilerData expressions, BlockLogicalConstruct logicalConstructsTree, LogicalFlowBuilderContext logicalConstructsContext, MethodInvocationExpression ctorInvokeExpression, Dictionary<Statement, ILogicalConstruct> statementToLogicalConstruct, Dictionary<ILogicalConstruct, List<Statement>> logicalConstructToStatements, Dictionary<VariableDefinition, string> variableDefinitionToNameMap, HashSet<string> variableNamesCollection, Dictionary<ParameterDefinition, string> parameterDefinitionToNameMap, HashSet<VariableDefinition> variablesToRename, Dictionary<FieldDefinition, Expression> fieldToExpression, int lambdaVariablesCount, Dictionary<VariableDefinition, AssignmentType> variableAssignmentData, List<ParameterDefinition> outParametersToAssign, bool isDestructor, BlockStatement destructorStatements, HashSet<VariableDefinition> undeclaredLinqVariables, Dictionary<VariableReference, Dictionary<FieldDefinition, Expression>> closureVariableToFieldValue, HashSet<VariableDefinition> variablesToNotDeclare, CompilerOptimizedSwitchByStringData switchByStringData)
 		{
-			this.AnalysisResults = analysisResults;
-			this.YieldData = yieldData;
-			this.AsyncData = asyncData;
-			this.IsMethodBodyChanged = isMethodBodyChanged;
-			this.GotoLabels = gotoLabels;
-			this.GotoStatements = gotoStatements;
-			this.StackData = stackData;
-			this.IsBaseConstructorInvokingConstructor = isBaseConstructorInvokingConstructor;
-			this.EnableEventAnalysis = enableEventAnalysis;
-			this.Body = body;
-			this.Variables = variables;
-			this.ControlFlowGraph = controlFlowGraph;
-			this.Expressions = expressions;
-			this.LogicalConstructsTree = logicalConstructsTree;
-			this.LogicalConstructsContext = logicalConstructsContext;
-			this.CtorInvokeExpression = ctorInvokeExpression;
-			this.StatementToLogicalConstruct = statementToLogicalConstruct;
-			this.LogicalConstructToStatements = logicalConstructToStatements;
-			this.VariableDefinitionToNameMap = variableDefinitionToNameMap;
-			this.VariableNamesCollection = variableNamesCollection;
-			this.ParameterDefinitionToNameMap = parameterDefinitionToNameMap;
-			this.VariablesToRename = variablesToRename;
-			this.FieldToExpression = fieldToExpression;
-			this.LambdaVariablesCount = lambdaVariablesCount;
-			this.VariableAssignmentData = variableAssignmentData;
-			this.OutParametersToAssign = outParametersToAssign;
-			this.IsDestructor = isDestructor;
-			this.DestructorStatements = destructorStatements;
-			this.UndeclaredLinqVariables = undeclaredLinqVariables;
-			this.ClosureVariableToFieldValue = closureVariableToFieldValue;
-			this.VariablesToNotDeclare = variablesToNotDeclare;
-			this.SwitchByStringData = switchByStringData;
+			base();
+			this.set_AnalysisResults(analysisResults);
+			this.set_YieldData(yieldData);
+			this.set_AsyncData(asyncData);
+			this.set_IsMethodBodyChanged(isMethodBodyChanged);
+			this.set_GotoLabels(gotoLabels);
+			this.set_GotoStatements(gotoStatements);
+			this.set_StackData(stackData);
+			this.set_IsBaseConstructorInvokingConstructor(isBaseConstructorInvokingConstructor);
+			this.set_EnableEventAnalysis(enableEventAnalysis);
+			this.set_Body(body);
+			this.set_Variables(variables);
+			this.set_ControlFlowGraph(controlFlowGraph);
+			this.set_Expressions(expressions);
+			this.set_LogicalConstructsTree(logicalConstructsTree);
+			this.set_LogicalConstructsContext(logicalConstructsContext);
+			this.set_CtorInvokeExpression(ctorInvokeExpression);
+			this.set_StatementToLogicalConstruct(statementToLogicalConstruct);
+			this.set_LogicalConstructToStatements(logicalConstructToStatements);
+			this.set_VariableDefinitionToNameMap(variableDefinitionToNameMap);
+			this.set_VariableNamesCollection(variableNamesCollection);
+			this.set_ParameterDefinitionToNameMap(parameterDefinitionToNameMap);
+			this.set_VariablesToRename(variablesToRename);
+			this.set_FieldToExpression(fieldToExpression);
+			this.set_LambdaVariablesCount(lambdaVariablesCount);
+			this.set_VariableAssignmentData(variableAssignmentData);
+			this.set_OutParametersToAssign(outParametersToAssign);
+			this.set_IsDestructor(isDestructor);
+			this.set_DestructorStatements(destructorStatements);
+			this.set_UndeclaredLinqVariables(undeclaredLinqVariables);
+			this.set_ClosureVariableToFieldValue(closureVariableToFieldValue);
+			this.set_VariablesToNotDeclare(variablesToNotDeclare);
+			this.set_SwitchByStringData(switchByStringData);
+			return;
 		}
 
 		internal void AddInnerMethodParametersToContext(MethodSpecificContext innerMethodContext)
 		{
-			this.ParameterDefinitionToNameMap.AddRange<ParameterDefinition, string>(innerMethodContext.ParameterDefinitionToNameMap);
-			foreach (ParameterDefinition parameter in innerMethodContext.Method.get_Parameters())
+			this.get_ParameterDefinitionToNameMap().AddRange<ParameterDefinition, string>(innerMethodContext.get_ParameterDefinitionToNameMap());
+			V_0 = innerMethodContext.get_Method().get_Parameters().GetEnumerator();
+			try
 			{
-				this.ParameterDefinitionToNameMap[parameter] = parameter.get_Name();
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.get_ParameterDefinitionToNameMap().set_Item(V_1, V_1.get_Name());
+				}
 			}
+			finally
+			{
+				V_0.Dispose();
+			}
+			return;
 		}
 
 		private HashSet<VariableDefinition> GetMethodVariablesToRename()
 		{
-			HashSet<VariableDefinition> variableDefinitions = new HashSet<VariableDefinition>();
-			foreach (VariableDefinition variable in this.Variables)
+			V_0 = new HashSet<VariableDefinition>();
+			V_1 = this.get_Variables().GetEnumerator();
+			try
 			{
-				if (variable.get_VariableNameChanged())
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (V_2.get_VariableNameChanged())
+					{
+						continue;
+					}
+					dummyVar0 = V_0.Add(V_2);
 				}
-				variableDefinitions.Add(variable);
 			}
-			return variableDefinitions;
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0;
 		}
 
 		internal void RemoveVariable(VariableReference reference)
 		{
 			this.RemoveVariable(reference.Resolve());
+			return;
 		}
 
 		internal void RemoveVariable(VariableDefinition variable)
 		{
-			int num = this.Variables.IndexOf(variable);
-			if (num == -1)
+			V_0 = this.get_Variables().IndexOf(variable);
+			if (V_0 == -1)
 			{
 				return;
 			}
-			this.Variables.RemoveAt(num);
+			this.get_Variables().RemoveAt(V_0);
+			return;
 		}
 	}
 }

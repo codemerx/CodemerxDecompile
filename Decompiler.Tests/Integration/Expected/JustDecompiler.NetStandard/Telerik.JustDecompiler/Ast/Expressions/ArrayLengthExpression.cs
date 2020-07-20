@@ -17,8 +17,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				ArrayLengthExpression arrayLengthExpression = null;
-				yield return arrayLengthExpression.Target;
+				stackVariable1 = new ArrayLengthExpression.u003cget_Childrenu003ed__12(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -26,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ArrayLengthExpression;
+				return 66;
 			}
 		}
 
@@ -38,7 +39,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 			set
 			{
-				base.ExpressionType = value;
+				this.set_ExpressionType(value);
+				return;
 			}
 		}
 
@@ -48,29 +50,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ArrayLengthExpression(Expression target, TypeSystem theTypeSystem, IEnumerable<Instruction> instructions) : base(instructions)
+		public ArrayLengthExpression(Expression target, TypeSystem theTypeSystem, IEnumerable<Instruction> instructions)
 		{
-			this.Target = target;
+			base(instructions);
+			this.set_Target(target);
 			this.theTypeSystem = theTypeSystem;
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new ArrayLengthExpression(this.Target.Clone(), this.theTypeSystem, this.instructions);
+			return new ArrayLengthExpression(this.get_Target().Clone(), this.theTypeSystem, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ArrayLengthExpression(this.Target.CloneExpressionOnly(), this.theTypeSystem, null);
+			return new ArrayLengthExpression(this.get_Target().CloneExpressionOnly(), this.theTypeSystem, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other == null || !(other is ArrayLengthExpression))
+			if (other == null || other as ArrayLengthExpression == null)
 			{
 				return false;
 			}
-			return this.Target.Equals((other as ArrayLengthExpression).Target);
+			return this.get_Target().Equals((other as ArrayLengthExpression).get_Target());
 		}
 	}
 }

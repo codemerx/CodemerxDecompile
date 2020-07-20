@@ -17,11 +17,13 @@ namespace Telerik.JustDecompiler.XmlDocumentationReaders
 		static DocumentationManager()
 		{
 			DocumentationManager.locker = new Object();
+			return;
 		}
 
 		private static void CacheModule(ModuleDefinition module)
 		{
 			DocumentationManager.cachedModuleLocation = module.get_FilePath();
+			return;
 		}
 
 		public static void ClearCache()
@@ -32,44 +34,59 @@ namespace Telerik.JustDecompiler.XmlDocumentationReaders
 			{
 				DocumentationManager.cachedDocumentation.ClearCache();
 			}
+			return;
 		}
 
 		private static DocumentationCache GetDocumentationCache(ModuleDefinition module)
 		{
-			string str;
-			DocumentationCache documentationCache;
 			if (DocumentationManager.IsCachedModule(module))
 			{
 				return DocumentationManager.cachedDocumentation;
 			}
-			lock (DocumentationManager.locker)
+			V_0 = DocumentationManager.locker;
+			V_1 = false;
+			try
 			{
+				Monitor.Enter(V_0, ref V_1);
 				if (!DocumentationManager.IsCachedModule(module))
 				{
-					if (!XmlDocumentationResolver.TryResolveDocumentationLocation(module, out str))
+					if (!XmlDocumentationResolver.TryResolveDocumentationLocation(module, out V_2))
 					{
 						DocumentationManager.cachedDocumentation = null;
 						DocumentationManager.cachedXmlFile = null;
 					}
-					else if (DocumentationManager.cachedXmlFile == str)
-					{
-						documentationCache = DocumentationManager.cachedDocumentation;
-						return documentationCache;
-					}
 					else
 					{
-						DocumentationManager.cachedDocumentation = DocumentationManager.ReadDocumentation(str);
-						DocumentationManager.cachedXmlFile = str;
+						if (!String.op_Inequality(DocumentationManager.cachedXmlFile, V_2))
+						{
+							V_3 = DocumentationManager.cachedDocumentation;
+							goto Label1;
+						}
+						else
+						{
+							DocumentationManager.cachedDocumentation = DocumentationManager.ReadDocumentation(V_2);
+							DocumentationManager.cachedXmlFile = V_2;
+						}
 					}
 					DocumentationManager.CacheModule(module);
-					return DocumentationManager.cachedDocumentation;
+					goto Label0;
 				}
 				else
 				{
-					documentationCache = DocumentationManager.cachedDocumentation;
+					V_3 = DocumentationManager.cachedDocumentation;
 				}
 			}
-			return documentationCache;
+			finally
+			{
+				if (V_1)
+				{
+					Monitor.Exit(V_0);
+				}
+			}
+		Label1:
+			return V_3;
+		Label0:
+			return DocumentationManager.cachedDocumentation;
 		}
 
 		private static DocumentationCache GetDocumentationCache(IMemberDefinition member)
@@ -79,17 +96,17 @@ namespace Telerik.JustDecompiler.XmlDocumentationReaders
 
 		public static string GetDocumentationForMember(IMemberDefinition member)
 		{
-			DocumentationCache documentationCache = DocumentationManager.GetDocumentationCache(member);
-			if (documentationCache == null)
+			V_0 = DocumentationManager.GetDocumentationCache(member);
+			if (V_0 == null)
 			{
 				return null;
 			}
-			return documentationCache.GetDocumentationForMember(member);
+			return V_0.GetDocumentationForMember(member);
 		}
 
 		private static ModuleDefinition GetModuleForMember(IMemberDefinition member)
 		{
-			if (!(member is TypeDefinition))
+			if (member as TypeDefinition == null)
 			{
 				return member.get_DeclaringType().get_Module();
 			}
@@ -98,7 +115,7 @@ namespace Telerik.JustDecompiler.XmlDocumentationReaders
 
 		private static bool IsCachedModule(ModuleDefinition module)
 		{
-			return module.get_FilePath() == DocumentationManager.cachedModuleLocation;
+			return String.op_Equality(module.get_FilePath(), DocumentationManager.cachedModuleLocation);
 		}
 
 		private static DocumentationCache ReadDocumentation(string documentationLocation)

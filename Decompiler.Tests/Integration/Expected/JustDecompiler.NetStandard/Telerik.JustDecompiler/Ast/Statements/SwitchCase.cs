@@ -17,18 +17,23 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.Parent = this;
+					this.body.set_Parent(this);
 				}
+				return;
 			}
 		}
 
 		public SwitchCase()
 		{
+			base();
+			return;
 		}
 
 		public SwitchCase(BlockStatement body)
 		{
-			this.Body = body;
+			base();
+			this.set_Body(body);
+			return;
 		}
 	}
 }

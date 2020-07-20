@@ -10,114 +10,138 @@ namespace Telerik.JustDecompiler.Cil
 	{
 		private readonly MethodBody body;
 
-		private readonly Dictionary<int, InstructionBlock> blocks = new Dictionary<int, InstructionBlock>();
+		private readonly Dictionary<int, InstructionBlock> blocks;
 
 		private readonly HashSet<int> exceptionObjectsOffsets;
 
-		private readonly Dictionary<InstructionBlock, SwitchData> switchBlocksInformation = new Dictionary<InstructionBlock, SwitchData>();
+		private readonly Dictionary<InstructionBlock, SwitchData> switchBlocksInformation;
 
 		private Dictionary<int, Instruction> offsetToInstruction;
 
 		internal ControlFlowGraphBuilder(MethodDefinition method)
 		{
+			this.blocks = new Dictionary<int, InstructionBlock>();
+			this.switchBlocksInformation = new Dictionary<InstructionBlock, SwitchData>();
+			base();
 			this.body = method.get_Body();
 			if (this.body.get_ExceptionHandlers().get_Count() > 0)
 			{
 				this.exceptionObjectsOffsets = new HashSet<int>();
 			}
+			return;
 		}
 
 		private static InstructionBlock[] AddBlock(InstructionBlock block, InstructionBlock[] blocks)
 		{
-			InstructionBlock[] instructionBlockArrays = new InstructionBlock[(int)blocks.Length + 1];
-			Array.Copy(blocks, instructionBlockArrays, (int)blocks.Length);
-			instructionBlockArrays[(int)instructionBlockArrays.Length - 1] = block;
-			return instructionBlockArrays;
+			V_0 = new InstructionBlock[(int)blocks.Length + 1];
+			Array.Copy(blocks, V_0, (int)blocks.Length);
+			V_0[(int)V_0.Length - 1] = block;
+			return V_0;
 		}
 
 		private static void ComputeIndexes(InstructionBlock[] blocks)
 		{
-			for (int i = 0; i < (int)blocks.Length; i++)
+			V_0 = 0;
+			while (V_0 < (int)blocks.Length)
 			{
-				blocks[i].Index = i;
+				blocks[V_0].set_Index(V_0);
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private void ConnectBlock(InstructionBlock block)
 		{
-			OpCode opCode;
-			if (block.Last == null)
+			if (block.get_Last() == null)
 			{
-				int offset = block.First.get_Offset();
-				throw new ArgumentException(String.Concat("Undelimited block at offset ", offset.ToString()));
+				V_1 = block.get_First().get_Offset();
+				throw new ArgumentException(String.Concat("Undelimited block at offset ", V_1.ToString()));
 			}
-			Instruction last = block.Last;
-			switch (last.get_OpCode().get_FlowControl())
+			V_0 = block.get_Last();
+			switch (V_0.get_OpCode().get_FlowControl())
 			{
 				case 0:
 				case 3:
 				{
-					if (!ControlFlowGraphBuilder.HasMultipleBranches(last))
+					if (!ControlFlowGraphBuilder.HasMultipleBranches(V_0))
 					{
-						InstructionBlock branchTargetBlock = this.GetBranchTargetBlock(last);
-						if (last.get_OpCode().get_FlowControl() != 3 || last.get_Next() == null)
+						V_4 = this.GetBranchTargetBlock(V_0);
+						if (V_0.get_OpCode().get_FlowControl() != 3 || V_0.get_Next() == null)
 						{
-							block.Successors = new InstructionBlock[] { branchTargetBlock };
+							stackVariable21 = new InstructionBlock[1];
+							stackVariable21[0] = V_4;
+							block.set_Successors(stackVariable21);
 							return;
 						}
-						block.Successors = new InstructionBlock[] { branchTargetBlock, this.GetBlock(last.get_Next()) };
+						stackVariable28 = new InstructionBlock[2];
+						stackVariable28[0] = V_4;
+						stackVariable28[1] = this.GetBlock(V_0.get_Next());
+						block.set_Successors(stackVariable28);
 						return;
 					}
-					InstructionBlock[] branchTargetsBlocks = this.GetBranchTargetsBlocks(last);
-					InstructionBlock instructionBlocks = null;
-					if (last.get_Next() != null)
+					V_5 = this.GetBranchTargetsBlocks(V_0);
+					V_6 = null;
+					if (V_0.get_Next() != null)
 					{
-						instructionBlocks = this.GetBlock(last.get_Next());
+						V_6 = this.GetBlock(V_0.get_Next());
 					}
-					this.switchBlocksInformation.Add(block, new SwitchData(block, instructionBlocks, branchTargetsBlocks));
-					if (instructionBlocks != null)
+					this.switchBlocksInformation.Add(block, new SwitchData(block, V_6, V_5));
+					if (InstructionBlock.op_Inequality(V_6, null))
 					{
-						branchTargetsBlocks = ControlFlowGraphBuilder.AddBlock(instructionBlocks, branchTargetsBlocks);
+						V_5 = ControlFlowGraphBuilder.AddBlock(V_6, V_5);
 					}
-					block.Successors = branchTargetsBlocks;
+					block.set_Successors(V_5);
 					return;
 				}
 				case 1:
 				case 4:
 				case 6:
 				{
-					opCode = last.get_OpCode();
-					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", opCode.get_FlowControl(), Formatter.FormatInstruction(last)));
+				Label1:
+					V_3 = V_0.get_OpCode();
+					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", V_3.get_FlowControl(), Formatter.FormatInstruction(V_0)));
 				}
 				case 2:
 				case 5:
 				{
-					if (last.get_Next() == null)
+					if (V_0.get_Next() == null)
 					{
-						return;
+						goto Label0;
 					}
-					block.Successors = new InstructionBlock[] { this.GetBlock(last.get_Next()) };
+					stackVariable75 = new InstructionBlock[1];
+					stackVariable75[0] = this.GetBlock(V_0.get_Next());
+					block.set_Successors(stackVariable75);
 					return;
 				}
 				case 7:
 				case 8:
 				{
+				Label0:
 					return;
 				}
 				default:
 				{
-					opCode = last.get_OpCode();
-					throw new NotSupportedException(String.Format("Unhandled instruction flow behavior {0}: {1}", opCode.get_FlowControl(), Formatter.FormatInstruction(last)));
+					goto Label1;
 				}
 			}
 		}
 
 		private void ConnectBlocks()
 		{
-			foreach (InstructionBlock value in this.blocks.Values)
+			V_0 = this.blocks.get_Values().GetEnumerator();
+			try
 			{
-				this.ConnectBlock(value);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.ConnectBlock(V_1);
+				}
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		public ControlFlowGraph CreateGraph()
@@ -130,26 +154,36 @@ namespace Telerik.JustDecompiler.Cil
 
 		private void DelimitBlocks()
 		{
-			Collection<Instruction> instructions = this.body.get_Instructions();
-			this.MarkBlockStarts(instructions);
+			V_0 = this.body.get_Instructions();
+			this.MarkBlockStarts(V_0);
 			this.MarkBlockStarts(this.body.get_ExceptionHandlers());
-			this.MarkBlockEnds(instructions);
+			this.MarkBlockEnds(V_0);
+			return;
 		}
 
 		private void FillOffsetToInstruction()
 		{
 			this.offsetToInstruction = new Dictionary<int, Instruction>();
-			foreach (Instruction instruction in this.body.get_Instructions())
+			V_0 = this.body.get_Instructions().GetEnumerator();
+			try
 			{
-				this.offsetToInstruction.Add(instruction.get_Offset(), instruction);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.offsetToInstruction.Add(V_1.get_Offset(), V_1);
+				}
 			}
+			finally
+			{
+				V_0.Dispose();
+			}
+			return;
 		}
 
 		private InstructionBlock GetBlock(Instruction firstInstruction)
 		{
-			InstructionBlock instructionBlocks;
-			this.blocks.TryGetValue(firstInstruction.get_Offset(), out instructionBlocks);
-			return instructionBlocks;
+			dummyVar0 = this.blocks.TryGetValue(firstInstruction.get_Offset(), out V_0);
+			return V_0;
 		}
 
 		private static Instruction GetBranchTarget(Instruction instruction)
@@ -169,13 +203,15 @@ namespace Telerik.JustDecompiler.Cil
 
 		private InstructionBlock[] GetBranchTargetsBlocks(Instruction instruction)
 		{
-			Instruction[] branchTargets = ControlFlowGraphBuilder.GetBranchTargets(instruction);
-			InstructionBlock[] block = new InstructionBlock[(int)branchTargets.Length];
-			for (int i = 0; i < (int)branchTargets.Length; i++)
+			V_0 = ControlFlowGraphBuilder.GetBranchTargets(instruction);
+			V_1 = new InstructionBlock[(int)V_0.Length];
+			V_2 = 0;
+			while (V_2 < (int)V_0.Length)
 			{
-				block[i] = this.GetBlock(branchTargets[i]);
+				V_1[V_2] = this.GetBlock(V_0[V_2]);
+				V_2 = V_2 + 1;
 			}
-			return block;
+			return V_1;
 		}
 
 		private static bool HasMultipleBranches(Instruction instruction)
@@ -200,125 +236,142 @@ namespace Telerik.JustDecompiler.Cil
 				case 5:
 				case 6:
 				{
+				Label0:
 					return false;
 				}
 				default:
 				{
-					return false;
+					goto Label0;
 				}
 			}
 		}
 
 		private void MarkBlockEnds(Collection<Instruction> instructions)
 		{
-			InstructionBlock[] array = this.ToArray();
-			if (array.Length == 0)
+			V_0 = this.ToArray();
+			if (V_0.Length == 0)
 			{
 				return;
 			}
-			InstructionBlock previous = array[0];
-			for (int i = 1; i < (int)array.Length; i++)
+			V_1 = V_0[0];
+			V_2 = 1;
+			while (V_2 < (int)V_0.Length)
 			{
-				InstructionBlock instructionBlocks = array[i];
-				previous.Last = instructionBlocks.First.get_Previous();
-				previous = instructionBlocks;
+				V_3 = V_0[V_2];
+				V_1.set_Last(V_3.get_First().get_Previous());
+				V_1 = V_3;
+				V_2 = V_2 + 1;
 			}
-			previous.Last = instructions.get_Item(instructions.get_Count() - 1);
+			V_1.set_Last(instructions.get_Item(instructions.get_Count() - 1));
+			return;
 		}
 
 		private void MarkBlockStart(Instruction instruction)
 		{
-			if (this.GetBlock(instruction) != null)
+			if (InstructionBlock.op_Inequality(this.GetBlock(instruction), null))
 			{
 				return;
 			}
 			this.RegisterBlock(new InstructionBlock(instruction));
+			return;
 		}
 
 		private void MarkBlockStarts(Collection<ExceptionHandler> handlers)
 		{
-			for (int i = 0; i < handlers.get_Count(); i++)
+			V_0 = 0;
+			while (V_0 < handlers.get_Count())
 			{
-				ExceptionHandler item = handlers.get_Item(i);
-				this.MarkBlockStart(item.get_TryStart());
-				this.MarkBlockStart(item.get_HandlerStart());
-				if (item.get_HandlerType() == 1)
+				V_1 = handlers.get_Item(V_0);
+				this.MarkBlockStart(V_1.get_TryStart());
+				this.MarkBlockStart(V_1.get_HandlerStart());
+				if (V_1.get_HandlerType() != 1)
 				{
-					this.MarkExceptionObjectPosition(item.get_FilterStart());
-					this.MarkBlockStart(item.get_FilterStart());
+					if (V_1.get_HandlerType() == null)
+					{
+						this.MarkExceptionObjectPosition(V_1.get_HandlerStart());
+					}
 				}
-				else if (item.get_HandlerType() == null)
+				else
 				{
-					this.MarkExceptionObjectPosition(item.get_HandlerStart());
+					this.MarkExceptionObjectPosition(V_1.get_FilterStart());
+					this.MarkBlockStart(V_1.get_FilterStart());
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private void MarkBlockStarts(Collection<Instruction> instructions)
 		{
-			for (int i = 0; i < instructions.get_Count(); i++)
+			V_0 = 0;
+			while (V_0 < instructions.get_Count())
 			{
-				Instruction item = instructions.get_Item(i);
-				if (i == 0)
+				V_1 = instructions.get_Item(V_0);
+				if (V_0 == 0)
 				{
-					this.MarkBlockStart(item);
+					this.MarkBlockStart(V_1);
 				}
-				if (ControlFlowGraphBuilder.IsBlockDelimiter(item))
+				if (ControlFlowGraphBuilder.IsBlockDelimiter(V_1))
 				{
-					if (!ControlFlowGraphBuilder.HasMultipleBranches(item))
+					if (!ControlFlowGraphBuilder.HasMultipleBranches(V_1))
 					{
-						Instruction branchTarget = ControlFlowGraphBuilder.GetBranchTarget(item);
-						if (branchTarget != null)
+						V_5 = ControlFlowGraphBuilder.GetBranchTarget(V_1);
+						if (V_5 != null)
 						{
-							this.MarkBlockStart(branchTarget);
+							this.MarkBlockStart(V_5);
 						}
 					}
 					else
 					{
-						Instruction[] branchTargets = ControlFlowGraphBuilder.GetBranchTargets(item);
-						for (int j = 0; j < (int)branchTargets.Length; j++)
+						V_2 = ControlFlowGraphBuilder.GetBranchTargets(V_1);
+						V_3 = 0;
+						while (V_3 < (int)V_2.Length)
 						{
-							Instruction instruction = branchTargets[j];
-							if (instruction != null)
+							V_4 = V_2[V_3];
+							if (V_4 != null)
 							{
-								this.MarkBlockStart(instruction);
+								this.MarkBlockStart(V_4);
 							}
+							V_3 = V_3 + 1;
 						}
 					}
-					if (item.get_Next() != null)
+					if (V_1.get_Next() != null)
 					{
-						this.MarkBlockStart(item.get_Next());
+						this.MarkBlockStart(V_1.get_Next());
 					}
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private void MarkExceptionObjectPosition(Instruction instruction)
 		{
-			this.exceptionObjectsOffsets.Add(instruction.get_Offset());
+			dummyVar0 = this.exceptionObjectsOffsets.Add(instruction.get_Offset());
+			return;
 		}
 
 		private void RegisterBlock(InstructionBlock block)
 		{
-			this.blocks.Add(block.First.get_Offset(), block);
+			this.blocks.Add(block.get_First().get_Offset(), block);
+			return;
 		}
 
 		private InstructionBlock[] ToArray()
 		{
-			InstructionBlock[] instructionBlockArrays;
 			try
 			{
-				InstructionBlock[] instructionBlockArrays1 = new InstructionBlock[this.blocks.Count];
-				this.blocks.Values.CopyTo(instructionBlockArrays1, 0);
-				Array.Sort<InstructionBlock>(instructionBlockArrays1);
-				ControlFlowGraphBuilder.ComputeIndexes(instructionBlockArrays1);
-				instructionBlockArrays = instructionBlockArrays1;
+				V_0 = new InstructionBlock[this.blocks.get_Count()];
+				this.blocks.get_Values().CopyTo(V_0, 0);
+				Array.Sort<InstructionBlock>(V_0);
+				ControlFlowGraphBuilder.ComputeIndexes(V_0);
+				V_1 = V_0;
 			}
-			catch (Exception exception)
+			catch (Exception exception_0)
 			{
-				throw new InvalidProgramException(exception.Message);
+				throw new InvalidProgramException(exception_0.get_Message());
 			}
-			return instructionBlockArrays;
+			return V_1;
 		}
 	}
 }

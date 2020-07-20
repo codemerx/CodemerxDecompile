@@ -14,11 +14,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				JoinClause joinClause = null;
-				yield return joinClause.InnerIdentifier;
-				yield return joinClause.InnerCollection;
-				yield return joinClause.OuterKey;
-				yield return joinClause.InnerKey;
+				stackVariable1 = new JoinClause.u003cget_Childrenu003ed__23(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -26,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.JoinClause;
+				return 78;
 			}
 		}
 
@@ -54,32 +52,34 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public JoinClause(Expression innerIdentifier, Expression innerCollection, Expression outerKey, Expression innerKey, IEnumerable<Instruction> instructions) : base(instructions)
+		public JoinClause(Expression innerIdentifier, Expression innerCollection, Expression outerKey, Expression innerKey, IEnumerable<Instruction> instructions)
 		{
-			this.InnerIdentifier = innerIdentifier;
-			this.InnerCollection = innerCollection;
-			this.OuterKey = outerKey;
-			this.InnerKey = innerKey;
+			base(instructions);
+			this.set_InnerIdentifier(innerIdentifier);
+			this.set_InnerCollection(innerCollection);
+			this.set_OuterKey(outerKey);
+			this.set_InnerKey(innerKey);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new JoinClause(this.InnerIdentifier.Clone(), this.InnerCollection.Clone(), this.OuterKey.Clone(), this.InnerKey.Clone(), this.instructions);
+			return new JoinClause(this.get_InnerIdentifier().Clone(), this.get_InnerCollection().Clone(), this.get_OuterKey().Clone(), this.get_InnerKey().Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new JoinClause(this.InnerIdentifier.CloneExpressionOnly(), this.InnerCollection.CloneExpressionOnly(), this.OuterKey.CloneExpressionOnly(), this.InnerKey.CloneExpressionOnly(), null);
+			return new JoinClause(this.get_InnerIdentifier().CloneExpressionOnly(), this.get_InnerCollection().CloneExpressionOnly(), this.get_OuterKey().CloneExpressionOnly(), this.get_InnerKey().CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			JoinClause joinClause = other as JoinClause;
-			if (joinClause == null || !this.InnerIdentifier.Equals(joinClause.InnerIdentifier) || !this.InnerCollection.Equals(joinClause.InnerCollection) || !this.OuterKey.Equals(joinClause.OuterKey))
+			V_0 = other as JoinClause;
+			if (V_0 == null || !this.get_InnerIdentifier().Equals(V_0.get_InnerIdentifier()) || !this.get_InnerCollection().Equals(V_0.get_InnerCollection()) || !this.get_OuterKey().Equals(V_0.get_OuterKey()))
 			{
 				return false;
 			}
-			return this.InnerKey.Equals(joinClause.InnerKey);
+			return this.get_InnerKey().Equals(V_0.get_InnerKey());
 		}
 	}
 }

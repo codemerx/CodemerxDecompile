@@ -7,6 +7,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 	{
 		public SwitchCaseCollection()
 		{
+			base();
+			return;
 		}
 	}
 }

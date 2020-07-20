@@ -27,8 +27,10 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public QueryClause(IEnumerable<Instruction> instructions) : base(instructions)
+		public QueryClause(IEnumerable<Instruction> instructions)
 		{
+			base(instructions);
+			return;
 		}
 	}
 }

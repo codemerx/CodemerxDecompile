@@ -27,9 +27,11 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public DecompiledType(TypeDefinition type)
 		{
-			this.Type = type;
-			this.DecompiledMembers = new Dictionary<string, DecompiledMember>();
-			this.TypeContext = new TypeSpecificContext(type);
+			base();
+			this.set_Type(type);
+			this.set_DecompiledMembers(new Dictionary<string, DecompiledMember>());
+			this.set_TypeContext(new TypeSpecificContext(type));
+			return;
 		}
 	}
 }

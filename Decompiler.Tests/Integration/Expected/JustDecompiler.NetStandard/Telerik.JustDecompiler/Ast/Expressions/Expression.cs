@@ -9,7 +9,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 {
 	public abstract class Expression : BaseCodeNode, IEquatable<Expression>
 	{
-		protected readonly List<Instruction> instructions = new List<Instruction>();
+		protected readonly List<Instruction> instructions;
 
 		public virtual TypeReference ExpressionType
 		{
@@ -21,7 +21,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.ExpressionType != (object)null;
+				return (object)this.get_ExpressionType() != (object)null;
 			}
 		}
 
@@ -35,28 +35,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		protected Expression(IEnumerable<Instruction> instructions)
 		{
+			this.instructions = new List<Instruction>();
+			base();
 			if (instructions != null)
 			{
 				this.instructions.AddRange(instructions);
 			}
+			return;
 		}
 
 		public abstract Expression Clone();
 
 		public Expression CloneAndAttachInstructions(IEnumerable<Instruction> instructions)
 		{
-			Expression expression = this.Clone();
-			expression.instructions.AddRange(instructions);
-			return expression;
+			stackVariable1 = this.Clone();
+			stackVariable1.instructions.AddRange(instructions);
+			return stackVariable1;
 		}
 
 		public abstract Expression CloneExpressionOnly();
 
 		public Expression CloneExpressionOnlyAndAttachInstructions(IEnumerable<Instruction> instructions)
 		{
-			Expression expression = this.CloneExpressionOnly();
-			expression.instructions.AddRange(instructions);
-			return expression;
+			stackVariable1 = this.CloneExpressionOnly();
+			stackVariable1.instructions.AddRange(instructions);
+			return stackVariable1;
 		}
 
 		public abstract bool Equals(Expression other);
@@ -68,28 +71,53 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		public void MapBranchInstructions(IEnumerable<Instruction> branchInstructions)
 		{
-			foreach (Instruction branchInstruction in branchInstructions)
+			V_0 = branchInstructions.GetEnumerator();
+			try
 			{
-				if (branchInstruction.get_OpCode().get_Code() == 55 || branchInstruction.get_OpCode().get_Code() == 42)
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (V_1.get_OpCode().get_Code() == 55 || V_1.get_OpCode().get_Code() == 42)
+					{
+						continue;
+					}
+					throw new InvalidOperationException("Only unconditional branch instructions are allowed");
 				}
-				throw new InvalidOperationException("Only unconditional branch instructions are allowed");
+			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
 			}
 			this.instructions.AddRange(branchInstructions);
+			return;
 		}
 
 		public void MapDupInstructions(IEnumerable<Instruction> dupInstructions)
 		{
-			foreach (Instruction dupInstruction in dupInstructions)
+			V_0 = dupInstructions.GetEnumerator();
+			try
 			{
-				if (dupInstruction.get_OpCode().get_Code() == 36)
+				while (V_0.MoveNext())
 				{
-					continue;
+					if (V_0.get_Current().get_OpCode().get_Code() == 36)
+					{
+						continue;
+					}
+					throw new InvalidOperationException("Only dup instructions are allowed");
 				}
-				throw new InvalidOperationException("Only dup instructions are allowed");
+			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
 			}
 			this.instructions.AddRange(dupInstructions);
+			return;
 		}
 	}
 }

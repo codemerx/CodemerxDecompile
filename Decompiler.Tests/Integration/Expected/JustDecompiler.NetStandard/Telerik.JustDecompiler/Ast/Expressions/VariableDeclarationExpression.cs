@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new VariableDeclarationExpression.u003cget_Childrenu003ed__6(-2);
 			}
 		}
 
@@ -22,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.VariableDeclarationExpression;
+				return 27;
 			}
 		}
 
@@ -30,11 +31,12 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Variable.get_VariableType();
+				return this.get_Variable().get_VariableType();
 			}
 			set
 			{
-				this.Variable.set_VariableType(value);
+				this.get_Variable().set_VariableType(value);
+				return;
 			}
 		}
 
@@ -44,29 +46,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public VariableDeclarationExpression(VariableDefinition variable, IEnumerable<Instruction> instructions) : base(instructions)
+		public VariableDeclarationExpression(VariableDefinition variable, IEnumerable<Instruction> instructions)
 		{
-			this.Variable = variable;
+			base(instructions);
+			this.set_Variable(variable);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new VariableDeclarationExpression(this.Variable, this.instructions);
+			return new VariableDeclarationExpression(this.get_Variable(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new VariableDeclarationExpression(this.Variable, null);
+			return new VariableDeclarationExpression(this.get_Variable(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is VariableDeclarationExpression))
+			if (other as VariableDeclarationExpression == null)
 			{
 				return false;
 			}
-			VariableDeclarationExpression variableDeclarationExpression = other as VariableDeclarationExpression;
-			return (object)this.Variable.Resolve() == (object)variableDeclarationExpression.Variable.Resolve();
+			V_0 = other as VariableDeclarationExpression;
+			return (object)this.get_Variable().Resolve() == (object)V_0.get_Variable().Resolve();
 		}
 	}
 }

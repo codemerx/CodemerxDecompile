@@ -1,6 +1,5 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,9 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				DelegateCreationExpression delegateCreationExpression = null;
-				yield return delegateCreationExpression.Target;
-				yield return delegateCreationExpression.MethodExpression;
+				stackVariable1 = new DelegateCreationExpression.u003cget_Childrenu003ed__3(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -26,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.DelegateCreationExpression;
+				return 21;
 			}
 		}
 
@@ -34,7 +33,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Type;
+				return this.get_Type();
 			}
 			set
 			{
@@ -74,38 +73,38 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public DelegateCreationExpression(TypeReference type, Expression method, Expression target, IEnumerable<Instruction> instructions) : base(instructions)
+		public DelegateCreationExpression(TypeReference type, Expression method, Expression target, IEnumerable<Instruction> instructions)
 		{
-			this.Type = type;
-			this.MethodExpression = method;
-			this.Target = target;
-			this.TypeIsImplicitlyInferable = DelegateCreationExpression.ContainsAnonymousType(type);
+			base(instructions);
+			this.set_Type(type);
+			this.set_MethodExpression(method);
+			this.set_Target(target);
+			this.set_TypeIsImplicitlyInferable(DelegateCreationExpression.ContainsAnonymousType(type));
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new DelegateCreationExpression(this.Type, this.MethodExpression.Clone(), this.Target.Clone(), this.instructions)
-			{
-				TypeIsImplicitlyInferable = this.TypeIsImplicitlyInferable
-			};
+			stackVariable10 = new DelegateCreationExpression(this.get_Type(), this.get_MethodExpression().Clone(), this.get_Target().Clone(), this.instructions);
+			stackVariable10.set_TypeIsImplicitlyInferable(this.get_TypeIsImplicitlyInferable());
+			return stackVariable10;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new DelegateCreationExpression(this.Type, this.MethodExpression.CloneExpressionOnly(), this.Target.CloneExpressionOnly(), null)
-			{
-				TypeIsImplicitlyInferable = this.TypeIsImplicitlyInferable
-			};
+			stackVariable9 = new DelegateCreationExpression(this.get_Type(), this.get_MethodExpression().CloneExpressionOnly(), this.get_Target().CloneExpressionOnly(), null);
+			stackVariable9.set_TypeIsImplicitlyInferable(this.get_TypeIsImplicitlyInferable());
+			return stackVariable9;
 		}
 
 		private static bool ContainsAnonymousType(TypeReference type)
 		{
-			TypeDefinition typeDefinition = type.Resolve();
-			if (typeDefinition == null)
+			V_0 = type.Resolve();
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (typeDefinition.IsAnonymous())
+			if (V_0.IsAnonymous())
 			{
 				return true;
 			}
@@ -114,27 +113,30 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is DelegateCreationExpression))
+			if (other as DelegateCreationExpression == null)
 			{
 				return false;
 			}
-			DelegateCreationExpression delegateCreationExpression = other as DelegateCreationExpression;
-			if (this.Target == null)
+			V_0 = other as DelegateCreationExpression;
+			if (this.get_Target() != null)
 			{
-				if (delegateCreationExpression.Target != null)
+				if (!this.get_Target().Equals(V_0.get_Target()))
 				{
 					return false;
 				}
 			}
-			else if (!this.Target.Equals(delegateCreationExpression.Target))
+			else
+			{
+				if (V_0.get_Target() != null)
+				{
+					return false;
+				}
+			}
+			if (!this.get_MethodExpression().Equals(V_0.get_MethodExpression()))
 			{
 				return false;
 			}
-			if (!this.MethodExpression.Equals(delegateCreationExpression.MethodExpression))
-			{
-				return false;
-			}
-			return this.Type.get_FullName() == delegateCreationExpression.Type.get_FullName();
+			return String.op_Equality(this.get_Type().get_FullName(), V_0.get_Type().get_FullName());
 		}
 	}
 }

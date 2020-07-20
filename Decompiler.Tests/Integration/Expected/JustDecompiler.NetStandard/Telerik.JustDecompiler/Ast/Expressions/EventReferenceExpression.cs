@@ -15,11 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				EventReferenceExpression eventReferenceExpression = null;
-				if (eventReferenceExpression.Target != null)
-				{
-					yield return eventReferenceExpression.Target;
-				}
+				stackVariable1 = new EventReferenceExpression.u003cget_Childrenu003ed__10(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -27,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.EventReferenceExpression;
+				return 48;
 			}
 		}
 
@@ -41,7 +39,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Event.get_EventType();
+				return this.get_Event().get_EventType();
 			}
 			set
 			{
@@ -55,59 +53,62 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			internal set;
 		}
 
-		public EventReferenceExpression(Expression target, EventReference @event, IEnumerable<Instruction> instructions) : base(instructions)
+		public EventReferenceExpression(Expression target, EventReference event, IEnumerable<Instruction> instructions)
 		{
-			this.Target = target;
-			this.Event = @event;
+			base(instructions);
+			this.set_Target(target);
+			this.set_Event(event);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			Expression expression;
-			if (this.Target != null)
+			if (this.get_Target() != null)
 			{
-				expression = this.Target.Clone();
+				stackVariable4 = this.get_Target().Clone();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new EventReferenceExpression(expression, this.Event, this.instructions);
+			return new EventReferenceExpression(stackVariable4, this.get_Event(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			Expression expression;
-			if (this.Target != null)
+			if (this.get_Target() != null)
 			{
-				expression = this.Target.CloneExpressionOnly();
+				stackVariable4 = this.get_Target().CloneExpressionOnly();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new EventReferenceExpression(expression, this.Event, null);
+			return new EventReferenceExpression(stackVariable4, this.get_Event(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is EventReferenceExpression))
+			if (other as EventReferenceExpression == null)
 			{
 				return false;
 			}
-			EventReferenceExpression eventReferenceExpression = other as EventReferenceExpression;
-			if (this.Target == null)
+			V_0 = other as EventReferenceExpression;
+			if (this.get_Target() != null)
 			{
-				if (eventReferenceExpression.Target != null)
+				if (!this.get_Target().Equals(V_0.get_Target()))
 				{
 					return false;
 				}
 			}
-			else if (!this.Target.Equals(eventReferenceExpression.Target))
+			else
 			{
-				return false;
+				if (V_0.get_Target() != null)
+				{
+					return false;
+				}
 			}
-			return this.Event.get_FullName() == eventReferenceExpression.Event.get_FullName();
+			return String.op_Equality(this.get_Event().get_FullName(), V_0.get_Event().get_FullName());
 		}
 	}
 }

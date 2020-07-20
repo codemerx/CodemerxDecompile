@@ -9,18 +9,20 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 	{
 		private VariableReference doFinallyVariable;
 
-		public StateMachineDoFinallyCheckRemover(MethodSpecificContext methodContext) : base(methodContext)
+		public StateMachineDoFinallyCheckRemover(MethodSpecificContext methodContext)
 		{
+			base(methodContext);
+			return;
 		}
 
 		private bool GetDoFinallyVariable()
 		{
-			Instruction first = this.theCFG.Blocks[0].First;
-			if (first.get_OpCode().get_Code() != 23)
+			V_0 = this.theCFG.get_Blocks()[0].get_First();
+			if (V_0.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			return StateMachineUtilities.TryGetVariableFromInstruction(first.get_Next(), this.methodVariables, out this.doFinallyVariable);
+			return StateMachineUtilities.TryGetVariableFromInstruction(V_0.get_Next(), this.methodVariables, out this.doFinallyVariable);
 		}
 
 		private bool IsCSharpDebugCheck(InstructionBlock theBlock, Instruction currentInstruction)
@@ -29,55 +31,54 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				return false;
 			}
-			if (theBlock.Last.get_OpCode().get_Code() == 57)
+			if (theBlock.get_Last().get_OpCode().get_Code() == 57)
 			{
 				return true;
 			}
-			return theBlock.Last.get_OpCode().get_Code() == 44;
+			V_0 = theBlock.get_Last().get_OpCode();
+			return V_0.get_Code() == 44;
 		}
 
 		protected override bool IsFinallyCheckBlock(InstructionBlock theBlock)
 		{
-			Instruction i;
-			VariableReference variableReference;
-			for (i = theBlock.First; i.get_OpCode().get_Code() == null; i = i.get_Next())
+			V_0 = theBlock.get_First();
+			while (V_0.get_OpCode().get_Code() == null)
 			{
-				if ((object)i == (object)theBlock.Last)
+				if ((object)V_0 == (object)theBlock.get_Last())
 				{
 					return false;
 				}
+				V_0 = V_0.get_Next();
 			}
-			if ((object)i == (object)theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(i, this.methodVariables, out variableReference) || (object)variableReference != (object)this.doFinallyVariable)
+			if ((object)V_0 == (object)theBlock.get_Last() || !StateMachineUtilities.TryGetVariableFromInstruction(V_0, this.methodVariables, out V_1) || (object)V_1 != (object)this.doFinallyVariable)
 			{
 				return false;
 			}
-			i = i.get_Next();
-			if (i.get_OpCode().get_Code() == 56 || i.get_OpCode().get_Code() == 43)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() == 56 || V_0.get_OpCode().get_Code() == 43)
 			{
 				return true;
 			}
-			if (this.IsCSharpDebugCheck(theBlock, i))
+			if (this.IsCSharpDebugCheck(theBlock, V_0))
 			{
 				return true;
 			}
-			return this.IsVisualBasicDebugCheck(theBlock, i);
+			return this.IsVisualBasicDebugCheck(theBlock, V_0);
 		}
 
 		private bool IsVisualBasicDebugCheck(InstructionBlock theBlock, Instruction currentInstruction)
 		{
-			VariableReference variableReference;
-			VariableReference variableReference1;
-			if ((object)currentInstruction == (object)theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out variableReference))
+			if ((object)currentInstruction == (object)theBlock.get_Last() || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out V_0))
 			{
 				return false;
 			}
 			currentInstruction = currentInstruction.get_Next();
-			if ((object)currentInstruction == (object)theBlock.Last || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out variableReference1) || (object)variableReference != (object)variableReference1)
+			if ((object)currentInstruction == (object)theBlock.get_Last() || !StateMachineUtilities.TryGetVariableFromInstruction(currentInstruction, this.methodVariables, out V_1) || (object)V_0 != (object)V_1)
 			{
 				return false;
 			}
 			currentInstruction = currentInstruction.get_Next();
-			if ((object)currentInstruction != (object)theBlock.Last)
+			if ((object)currentInstruction != (object)theBlock.get_Last())
 			{
 				return false;
 			}
@@ -94,14 +95,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			{
 				return false;
 			}
-			base.MarkFinallyConditionsForRemovalInternal();
+			this.MarkFinallyConditionsForRemovalInternal();
 			return true;
 		}
 
 		public override void MarkFinallyConditionsForRemoval(VariableReference doFinallyVariable)
 		{
 			this.doFinallyVariable = doFinallyVariable;
-			base.MarkFinallyConditionsForRemovalInternal();
+			this.MarkFinallyConditionsForRemovalInternal();
+			return;
 		}
 	}
 }

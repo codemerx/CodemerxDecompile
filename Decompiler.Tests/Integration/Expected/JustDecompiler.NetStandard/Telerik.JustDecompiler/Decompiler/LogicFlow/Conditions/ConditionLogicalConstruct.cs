@@ -2,12 +2,9 @@ using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
-using Telerik.JustDecompiler.Steps;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 {
@@ -29,10 +26,9 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 		{
 			get
 			{
-				ILogicalConstruct logicalConstruct;
-				if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this.FalseCFGSuccessor, this.parent as ILogicalConstruct, out logicalConstruct))
+				if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this.get_FalseCFGSuccessor(), this.parent as ILogicalConstruct, out V_0))
 				{
-					return logicalConstruct;
+					return V_0;
 				}
 				return null;
 			}
@@ -54,10 +50,9 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 		{
 			get
 			{
-				ILogicalConstruct logicalConstruct;
-				if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this.TrueCFGSuccessor, this.parent as ILogicalConstruct, out logicalConstruct))
+				if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this.get_TrueCFGSuccessor(), this.parent as ILogicalConstruct, out V_0))
 				{
-					return logicalConstruct;
+					return V_0;
 				}
 				return null;
 			}
@@ -65,29 +60,36 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private ConditionLogicalConstruct(CFGBlockLogicalConstruct cfgConditionBlock)
 		{
-			this.Entry = cfgConditionBlock;
+			base();
+			this.set_Entry(cfgConditionBlock);
 			this.SetTrueAndFalseSuccessors(cfgConditionBlock);
-			this.ConditionExpression = cfgConditionBlock.LogicalConstructExpressions[0];
-			base.RedirectChildrenToNewParent((IEnumerable<ILogicalConstruct>)(new ILogicalConstruct[] { cfgConditionBlock }));
+			this.set_ConditionExpression(cfgConditionBlock.get_LogicalConstructExpressions().get_Item(0));
+			stackVariable12 = new ILogicalConstruct[1];
+			stackVariable12[0] = cfgConditionBlock;
+			this.RedirectChildrenToNewParent((IEnumerable<ILogicalConstruct>)stackVariable12);
 			this.AddTrueFalseSuccessors();
-			this.LogicalContainer = null;
+			this.set_LogicalContainer(null);
+			return;
 		}
 
 		public ConditionLogicalConstruct(ConditionLogicalConstruct entry, ConditionLogicalConstruct lastNode, HashSet<ConditionLogicalConstruct> body, Expression conditionExpression)
 		{
-			this.Entry = entry.FirstBlock;
-			this.TrueCFGSuccessor = lastNode.TrueCFGSuccessor;
-			this.FalseCFGSuccessor = lastNode.FalseCFGSuccessor;
-			this.ConditionExpression = conditionExpression;
-			base.RedirectChildrenToNewParent(this.RestoreOriginalCFGNodes(body));
+			base();
+			this.set_Entry(entry.get_FirstBlock());
+			this.set_TrueCFGSuccessor(lastNode.get_TrueCFGSuccessor());
+			this.set_FalseCFGSuccessor(lastNode.get_FalseCFGSuccessor());
+			this.set_ConditionExpression(conditionExpression);
+			this.RedirectChildrenToNewParent(this.RestoreOriginalCFGNodes(body));
 			this.AddTrueFalseSuccessors();
-			this.LogicalContainer = null;
+			this.set_LogicalContainer(null);
+			return;
 		}
 
 		private void AddTrueFalseSuccessors()
 		{
-			this.ManageSuccessorInCaseOfLoop(this.TrueCFGSuccessor);
-			this.ManageSuccessorInCaseOfLoop(this.FalseCFGSuccessor);
+			this.ManageSuccessorInCaseOfLoop(this.get_TrueCFGSuccessor());
+			this.ManageSuccessorInCaseOfLoop(this.get_FalseCFGSuccessor());
+			return;
 		}
 
 		public static ConditionLogicalConstruct GroupInSimpleConditionConstruct(CFGBlockLogicalConstruct cfgConditionBlock)
@@ -97,80 +99,119 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private void ManageSuccessorInCaseOfLoop(CFGBlockLogicalConstruct cfgSuccessor)
 		{
-			if (this.FirstBlock == cfgSuccessor)
+			if (this.get_FirstBlock() == cfgSuccessor)
 			{
-				base.AddToSuccessors(cfgSuccessor);
-				foreach (CFGBlockLogicalConstruct child in this.Children)
+				this.AddToSuccessors(cfgSuccessor);
+				V_0 = this.get_Children().GetEnumerator();
+				try
 				{
-					if (!child.CFGSuccessors.Contains(cfgSuccessor))
+					while (V_0.MoveNext())
 					{
-						continue;
+						V_1 = (CFGBlockLogicalConstruct)V_0.get_Current();
+						if (!V_1.get_CFGSuccessors().Contains(cfgSuccessor))
+						{
+							continue;
+						}
+						this.AddToPredecessors(V_1);
 					}
-					base.AddToPredecessors(child);
+				}
+				finally
+				{
+					((IDisposable)V_0).Dispose();
 				}
 			}
+			return;
 		}
 
 		public void Negate(TypeSystem typeSystem)
 		{
-			CFGBlockLogicalConstruct trueCFGSuccessor = this.TrueCFGSuccessor;
-			this.TrueCFGSuccessor = this.FalseCFGSuccessor;
-			this.FalseCFGSuccessor = trueCFGSuccessor;
-			this.ConditionExpression = Negator.Negate(this.ConditionExpression, typeSystem);
+			V_0 = this.get_TrueCFGSuccessor();
+			this.set_TrueCFGSuccessor(this.get_FalseCFGSuccessor());
+			this.set_FalseCFGSuccessor(V_0);
+			this.set_ConditionExpression(Negator.Negate(this.get_ConditionExpression(), typeSystem));
+			return;
 		}
 
 		private HashSet<ILogicalConstruct> RestoreOriginalCFGNodes(HashSet<ConditionLogicalConstruct> body)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
-			foreach (ConditionLogicalConstruct firstBlock in body)
+			V_0 = new HashSet<ILogicalConstruct>();
+			V_1 = body.GetEnumerator();
+			try
 			{
-				if (firstBlock.Parent.Entry == firstBlock)
+				while (V_1.MoveNext())
 				{
-					firstBlock.Parent.Entry = firstBlock.FirstBlock;
-				}
-				foreach (CFGBlockLogicalConstruct child in firstBlock.Children)
-				{
-					child.Parent = firstBlock.Parent;
-					child.Parent.Children.Remove(firstBlock);
-					logicalConstructs.Add(child);
+					V_2 = V_1.get_Current();
+					if (V_2.get_Parent().get_Entry() == V_2)
+					{
+						V_2.get_Parent().set_Entry(V_2.get_FirstBlock());
+					}
+					V_3 = V_2.get_Children().GetEnumerator();
+					try
+					{
+						while (V_3.MoveNext())
+						{
+							V_4 = (CFGBlockLogicalConstruct)V_3.get_Current();
+							V_4.set_Parent(V_2.get_Parent());
+							dummyVar0 = V_4.get_Parent().get_Children().Remove(V_2);
+							dummyVar1 = V_0.Add(V_4);
+						}
+					}
+					finally
+					{
+						((IDisposable)V_3).Dispose();
+					}
 				}
 			}
-			return logicalConstructs;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		private void SetTrueAndFalseSuccessors(CFGBlockLogicalConstruct cfgConditionBlock)
 		{
-			InstructionBlock theBlock = cfgConditionBlock.TheBlock;
-			InstructionBlock successors = theBlock.Successors[0];
-			InstructionBlock instructionBlocks = theBlock.Successors[1];
-			foreach (CFGBlockLogicalConstruct cFGSuccessor in cfgConditionBlock.CFGSuccessors)
+			stackVariable1 = cfgConditionBlock.get_TheBlock();
+			V_0 = stackVariable1.get_Successors()[0];
+			V_1 = stackVariable1.get_Successors()[1];
+			V_2 = cfgConditionBlock.get_CFGSuccessors().GetEnumerator();
+			try
 			{
-				if (cFGSuccessor.TheBlock == successors)
+				while (V_2.MoveNext())
 				{
-					this.TrueCFGSuccessor = cFGSuccessor;
+					V_3 = V_2.get_Current();
+					if (InstructionBlock.op_Equality(V_3.get_TheBlock(), V_0))
+					{
+						this.set_TrueCFGSuccessor(V_3);
+					}
+					if (!InstructionBlock.op_Equality(V_3.get_TheBlock(), V_1))
+					{
+						continue;
+					}
+					this.set_FalseCFGSuccessor(V_3);
 				}
-				if (cFGSuccessor.TheBlock != instructionBlocks)
-				{
-					continue;
-				}
-				this.FalseCFGSuccessor = cFGSuccessor;
 			}
+			finally
+			{
+				((IDisposable)V_2).Dispose();
+			}
+			return;
 		}
 
 		protected override string ToString(string constructName, HashSet<CFGBlockLogicalConstruct> printedBlocks, LogicalFlowBuilderContext context)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.AppendLine("ConditionLogicalConstruct");
-			stringBuilder.AppendLine("{");
-			stringBuilder.Append(String.Format("\t{0}: ", base.NodeILOffset(context, this.FirstBlock)));
-			stringBuilder.AppendLine(this.ConditionExpression.ToCodeString());
-			stringBuilder.AppendLine(String.Format("\tTrueSuccessorBlock: {0}", base.NodeILOffset(context, this.TrueCFGSuccessor)));
-			stringBuilder.AppendLine(String.Format("\tFalseSuccessorBlock: {0}", base.NodeILOffset(context, this.FalseCFGSuccessor)));
-			string str = String.Format("\tFollowNode: {0}", base.NodeILOffset(context, base.CFGFollowNode));
-			stringBuilder.AppendLine(str);
-			stringBuilder.AppendLine("}");
-			printedBlocks.UnionWith(this.CFGBlocks);
-			return stringBuilder.ToString();
+			stackVariable0 = new StringBuilder();
+			dummyVar0 = stackVariable0.AppendLine("ConditionLogicalConstruct");
+			dummyVar1 = stackVariable0.AppendLine("{");
+			dummyVar2 = stackVariable0.Append(String.Format("\t{0}: ", this.NodeILOffset(context, this.get_FirstBlock())));
+			dummyVar3 = stackVariable0.AppendLine(this.get_ConditionExpression().ToCodeString());
+			dummyVar4 = stackVariable0.AppendLine(String.Format("\tTrueSuccessorBlock: {0}", this.NodeILOffset(context, this.get_TrueCFGSuccessor())));
+			dummyVar5 = stackVariable0.AppendLine(String.Format("\tFalseSuccessorBlock: {0}", this.NodeILOffset(context, this.get_FalseCFGSuccessor())));
+			V_0 = String.Format("\tFollowNode: {0}", this.NodeILOffset(context, this.get_CFGFollowNode()));
+			dummyVar6 = stackVariable0.AppendLine(V_0);
+			dummyVar7 = stackVariable0.AppendLine("}");
+			printedBlocks.UnionWith(this.get_CFGBlocks());
+			return stackVariable0.ToString();
 		}
 	}
 }

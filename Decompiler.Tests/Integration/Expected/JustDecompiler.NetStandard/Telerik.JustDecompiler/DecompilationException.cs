@@ -6,10 +6,14 @@ namespace Telerik.JustDecompiler
 	{
 		public DecompilationException()
 		{
+			base();
+			return;
 		}
 
-		public DecompilationException(string message) : base(message)
+		public DecompilationException(string message)
 		{
+			base(message);
+			return;
 		}
 	}
 }

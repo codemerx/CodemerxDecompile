@@ -1,22 +1,18 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
-using Telerik.JustDecompiler.Decompiler.AssignmentAnalysis;
 
 namespace Telerik.JustDecompiler.Steps
 {
 	internal class RebuildAsyncStatementsStep : BaseCodeTransformer, IDecompilationStep
 	{
-		private readonly Dictionary<FieldDefinition, Expression> parameterMappings = new Dictionary<FieldDefinition, Expression>();
+		private readonly Dictionary<FieldDefinition, Expression> parameterMappings;
 
 		private DecompilationContext context;
 
@@ -40,137 +36,150 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildAsyncStatementsStep()
 		{
+			this.parameterMappings = new Dictionary<FieldDefinition, Expression>();
+			base();
+			return;
 		}
 
 		private bool GetBuilderField()
 		{
-			bool flag;
-			MethodDefinition stateMachineMethod = this.GetStateMachineMethod("SetStateMachine") ?? this.GetStateMachineMethod("System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine");
-			if (stateMachineMethod == null || stateMachineMethod.get_Body() == null)
+			stackVariable2 = this.GetStateMachineMethod("SetStateMachine");
+			if (stackVariable2 == null)
+			{
+				dummyVar0 = stackVariable2;
+				stackVariable2 = this.GetStateMachineMethod("System.Runtime.CompilerServices.IAsyncStateMachine.SetStateMachine");
+			}
+			V_0 = stackVariable2;
+			if (V_0 == null || V_0.get_Body() == null)
 			{
 				return false;
 			}
-			if (stateMachineMethod.get_Body().get_Instructions().get_Count() <= 1)
+			if (V_0.get_Body().get_Instructions().get_Count() <= 1)
 			{
-				Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = this.stateMachineTypeDef.get_Fields().GetEnumerator();
+				V_5 = this.stateMachineTypeDef.get_Fields().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_5.MoveNext())
 					{
-						FieldDefinition current = enumerator.get_Current();
-						if (!(current.get_FieldType().get_Name() == "AsyncVoidMethodBuilder") && !(current.get_FieldType().get_Name() == "AsyncTaskMethodBuilder") && !(current.get_FieldType().get_Name() == "AsyncTaskMethodBuilder`1"))
+						V_6 = V_5.get_Current();
+						if (!String.op_Equality(V_6.get_FieldType().get_Name(), "AsyncVoidMethodBuilder") && !String.op_Equality(V_6.get_FieldType().get_Name(), "AsyncTaskMethodBuilder") && !String.op_Equality(V_6.get_FieldType().get_Name(), "AsyncTaskMethodBuilder`1"))
 						{
 							continue;
 						}
-						this.builderField = current;
-						flag = true;
-						return flag;
+						this.builderField = V_6;
+						V_4 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_5.Dispose();
 				}
 			}
 			else
 			{
-				Mono.Collections.Generic.Collection<Instruction>.Enumerator enumerator1 = stateMachineMethod.get_Body().get_Instructions().GetEnumerator();
+				V_1 = V_0.get_Body().get_Instructions().GetEnumerator();
 				try
 				{
-					while (enumerator1.MoveNext())
+					while (V_1.MoveNext())
 					{
-						Instruction instruction = enumerator1.get_Current();
-						if (instruction.get_OpCode().get_Code() != 121)
+						V_2 = V_1.get_Current();
+						if (V_2.get_OpCode().get_Code() != 121)
 						{
 							continue;
 						}
-						this.builderField = ((FieldReference)instruction.get_Operand()).Resolve();
-						flag = true;
-						return flag;
+						this.builderField = ((FieldReference)V_2.get_Operand()).Resolve();
+						V_4 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator1.Dispose();
+					V_1.Dispose();
 				}
 			}
-			return flag;
+		Label1:
+			return V_4;
+		Label0:
+			return false;
 		}
 
 		private string GetFriendlyName(string name)
 		{
-			int num = name.LastIndexOf('\u005F');
-			if (num != -1 && num + 1 < name.Length)
+			V_0 = name.LastIndexOf('\u005F');
+			if (V_0 != -1 && V_0 + 1 < name.get_Length())
 			{
-				name = name.Substring(num + 1);
+				name = name.Substring(V_0 + 1);
 			}
 			return name;
 		}
 
 		private StatementCollection GetMoveNextStatements()
 		{
-			MethodDefinition stateMachineMethod = this.GetStateMachineMethod("MoveNext");
-			if (stateMachineMethod == null || stateMachineMethod.get_Body() == null)
+			V_0 = this.GetStateMachineMethod("MoveNext");
+			if (V_0 == null || V_0.get_Body() == null)
 			{
 				return null;
 			}
-			BlockStatement blockStatement = stateMachineMethod.get_Body().DecompileAsyncStateMachine(this.context, out this.asyncData);
-			if (blockStatement == null)
+			V_1 = V_0.get_Body().DecompileAsyncStateMachine(this.context, out this.asyncData);
+			if (V_1 == null)
 			{
 				return null;
 			}
-			return blockStatement.Statements;
+			return V_1.get_Statements();
 		}
 
 		private MethodDefinition GetStateMachineMethod(string name)
 		{
-			MethodDefinition methodDefinition;
-			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = this.stateMachineTypeDef.get_Methods().GetEnumerator();
+			V_0 = this.stateMachineTypeDef.get_Methods().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					MethodDefinition current = enumerator.get_Current();
-					if (current.get_Name() != name)
+					V_1 = V_0.get_Current();
+					if (!String.op_Equality(V_1.get_Name(), name))
 					{
 						continue;
 					}
-					methodDefinition = current;
-					return methodDefinition;
+					V_2 = V_1;
+					goto Label1;
 				}
-				return null;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return methodDefinition;
+		Label1:
+			return V_2;
+		Label0:
+			return null;
 		}
 
 		private bool IsAsyncFirstAssignmentStatement(Statement statement, out TypeDefinition asyncStateMachineType)
 		{
 			asyncStateMachineType = null;
-			if (statement is ExpressionStatement)
+			if (statement as ExpressionStatement != null)
 			{
-				ExpressionStatement expressionStatement = statement as ExpressionStatement;
-				if (expressionStatement.Expression is BinaryExpression)
+				V_0 = statement as ExpressionStatement;
+				if (V_0.get_Expression() as BinaryExpression != null)
 				{
-					BinaryExpression expression = expressionStatement.Expression as BinaryExpression;
-					if (expression.Right is ThisReferenceExpression && expression.Left is FieldReferenceExpression)
+					V_1 = V_0.get_Expression() as BinaryExpression;
+					if (V_1.get_Right() as ThisReferenceExpression != null && V_1.get_Left() as FieldReferenceExpression != null)
 					{
-						TypeReference declaringType = (expression.Left as FieldReferenceExpression).Field.get_DeclaringType();
-						if (declaringType == null)
+						V_2 = (V_1.get_Left() as FieldReferenceExpression).get_Field().get_DeclaringType();
+						if (V_2 == null)
 						{
 							return false;
 						}
-						TypeDefinition typeDefinition = declaringType.Resolve();
-						if (typeDefinition == null || (object)typeDefinition.get_DeclaringType() != (object)this.methodContext.Method.get_DeclaringType() || !typeDefinition.IsAsyncStateMachine())
+						V_3 = V_2.Resolve();
+						if (V_3 == null || (object)V_3.get_DeclaringType() != (object)this.methodContext.get_Method().get_DeclaringType() || !V_3.IsAsyncStateMachine())
 						{
 							return false;
 						}
-						asyncStateMachineType = typeDefinition;
+						asyncStateMachineType = V_3;
 						return true;
 					}
 				}
@@ -180,11 +189,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool Match()
 		{
-			if (this.originalStatements.Count == 0)
+			if (this.originalStatements.get_Count() == 0)
 			{
 				return false;
 			}
-			if (!this.methodContext.Method.IsAsync(out this.stateMachineTypeDef) && (!this.methodContext.Method.HasAsyncAttributes() || !this.IsAsyncFirstAssignmentStatement(this.originalStatements[0], out this.stateMachineTypeDef) || !this.methodContext.Method.HasAsyncStateMachineVariable()))
+			if (!this.methodContext.get_Method().IsAsync(out this.stateMachineTypeDef) && !this.methodContext.get_Method().HasAsyncAttributes() || !this.IsAsyncFirstAssignmentStatement(this.originalStatements.get_Item(0), out this.stateMachineTypeDef) || !this.methodContext.get_Method().HasAsyncStateMachineVariable())
 			{
 				return false;
 			}
@@ -198,280 +207,306 @@ namespace Telerik.JustDecompiler.Steps
 				return false;
 			}
 			this.SetParameterMappings(this.originalStatements);
-			this.matcherState = RebuildAsyncStatementsStep.MatcherState.FindAwaitExpression;
+			this.matcherState = 0;
 			this.asyncStatements = (StatementCollection)this.Visit(this.asyncStatements);
 			if (this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindAwaitExpression)
 			{
 				return true;
 			}
-			return this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindInitObj;
+			return this.matcherState == 4;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.methodContext = context.MethodContext;
-			this.originalStatements = body.Statements;
+			this.methodContext = context.get_MethodContext();
+			this.originalStatements = body.get_Statements();
 			if (this.Match())
 			{
-				body.Statements = this.asyncStatements;
+				body.set_Statements(this.asyncStatements);
 			}
 			return body;
 		}
 
 		private void SetParameterMappings(StatementCollection statements)
 		{
-			for (int i = 0; i < statements.Count; i++)
+			V_0 = 0;
+			while (V_0 < statements.get_Count())
 			{
-				if (statements[i].IsAssignmentStatement())
+				if (statements.get_Item(V_0).IsAssignmentStatement())
 				{
-					BinaryExpression expression = (statements[i] as ExpressionStatement).Expression as BinaryExpression;
-					if (expression.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
+					V_1 = (statements.get_Item(V_0) as ExpressionStatement).get_Expression() as BinaryExpression;
+					if (V_1.get_Left().get_CodeNodeType() == 30)
 					{
-						FieldReference field = (expression.Left as FieldReferenceExpression).Field;
-						if ((object)field.get_DeclaringType().Resolve() == (object)this.stateMachineTypeDef)
+						V_2 = (V_1.get_Left() as FieldReferenceExpression).get_Field();
+						if ((object)V_2.get_DeclaringType().Resolve() == (object)this.stateMachineTypeDef)
 						{
-							this.parameterMappings[field.Resolve()] = expression.Right;
+							this.parameterMappings.set_Item(V_2.Resolve(), V_1.get_Right());
 						}
 					}
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private bool TryGetStateField(BlockStatement theCatch)
 		{
-			bool flag;
-			using (IEnumerator<Statement> enumerator = theCatch.Statements.GetEnumerator())
+			V_0 = theCatch.get_Statements().GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					Statement current = enumerator.Current;
-					if (!current.IsAssignmentStatement())
+					V_1 = V_0.get_Current();
+					if (!V_1.IsAssignmentStatement())
 					{
 						continue;
 					}
-					BinaryExpression expression = (current as ExpressionStatement).Expression as BinaryExpression;
-					if (expression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+					V_2 = (V_1 as ExpressionStatement).get_Expression() as BinaryExpression;
+					if (V_2.get_Left().get_CodeNodeType() != 30 || V_2.get_Right().get_CodeNodeType() != 22)
 					{
 						continue;
 					}
-					FieldDefinition fieldDefinition = (expression.Left as FieldReferenceExpression).Field.Resolve();
-					if (fieldDefinition == null || fieldDefinition.get_DeclaringType() == null)
+					V_3 = (V_2.get_Left() as FieldReferenceExpression).get_Field().Resolve();
+					if (V_3 == null || V_3.get_DeclaringType() == null)
 					{
-						flag = false;
-						return flag;
-					}
-					else if ((object)fieldDefinition.get_DeclaringType().Resolve() == (object)this.stateMachineTypeDef)
-					{
-						this.asyncData.StateField = fieldDefinition;
-						flag = true;
-						return flag;
+						V_4 = false;
+						goto Label1;
 					}
 					else
 					{
-						flag = false;
-						return flag;
+						if ((object)V_3.get_DeclaringType().Resolve() == (object)this.stateMachineTypeDef)
+						{
+							this.asyncData.set_StateField(V_3);
+							V_4 = true;
+							goto Label1;
+						}
+						else
+						{
+							V_4 = false;
+							goto Label1;
+						}
 					}
 				}
-				return false;
+				goto Label0;
 			}
-			return flag;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+		Label1:
+			return V_4;
+		Label0:
+			return false;
 		}
 
 		private bool TryRemoveOuterTryCatch(StatementCollection statements)
 		{
-			int i;
-			for (i = 0; i < statements.Count; i++)
+			V_0 = 0;
+			while (V_0 < statements.get_Count())
 			{
-				Statement item = statements[i];
-				if (item.CodeNodeType == CodeNodeType.TryStatement && (item as TryStatement).CatchClauses.Count == 1)
+				V_3 = statements.get_Item(V_0);
+				if (V_3.get_CodeNodeType() == 17 && (V_3 as TryStatement).get_CatchClauses().get_Count() == 1)
 				{
 					break;
 				}
+				V_0 = V_0 + 1;
 			}
-			if (i == statements.Count)
+			if (V_0 == statements.get_Count())
 			{
 				return false;
 			}
-			TryStatement tryStatement = statements[i] as TryStatement;
-			StatementCollection statementCollection = tryStatement.Try.Statements;
-			if (this.asyncData.StateField == null && !this.TryGetStateField(tryStatement.CatchClauses[0].Body))
+			V_1 = statements.get_Item(V_0) as TryStatement;
+			V_2 = V_1.get_Try().get_Statements();
+			if (this.asyncData.get_StateField() == null && !this.TryGetStateField(V_1.get_CatchClauses().get_Item(0).get_Body()))
 			{
 				return false;
 			}
-			statements.RemoveAt(i);
-			for (int j = 0; j < statementCollection.Count; j++)
+			statements.RemoveAt(V_0);
+			V_4 = 0;
+			while (V_4 < V_2.get_Count())
 			{
-				statements.Insert(i + j, statementCollection[j]);
+				statements.Insert(V_0 + V_4, V_2.get_Item(V_4));
+				V_4 = V_4 + 1;
 			}
 			return true;
 		}
 
 		public override ICodeNode Visit(ICodeNode node)
 		{
-			if (this.matcherState == RebuildAsyncStatementsStep.MatcherState.Stopped)
+			if (this.matcherState == 8)
 			{
 				return node;
 			}
-			return base.Visit(node);
+			return this.Visit(node);
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.Operator == BinaryOperator.Assign)
+			if (node.get_Operator() == 26)
 			{
-				if (node.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.asyncData.AwaiterVariables.Contains((node.Left as VariableReferenceExpression).Variable))
+				if (node.get_Left().get_CodeNodeType() == 26 && this.asyncData.get_AwaiterVariables().Contains((node.get_Left() as VariableReferenceExpression).get_Variable()))
 				{
-					VariableReference variable = (node.Left as VariableReferenceExpression).Variable;
-					if (node.Right.CodeNodeType == CodeNodeType.MethodInvocationExpression && (node.Right as MethodInvocationExpression).MethodExpression.Method.get_Name() == "GetAwaiter")
+					V_0 = (node.get_Left() as VariableReferenceExpression).get_Variable();
+					if (node.get_Right().get_CodeNodeType() != 19 || !String.op_Equality((node.get_Right() as MethodInvocationExpression).get_MethodExpression().get_Method().get_Name(), "GetAwaiter"))
 					{
-						Expression expression = null;
-						MethodInvocationExpression right = node.Right as MethodInvocationExpression;
-						if (right.MethodExpression.Target != null)
+						if (node.get_Right().get_CodeNodeType() == 40 || node.get_Right().get_CodeNodeType() == 22 && (node.get_Right() as LiteralExpression).get_Value() == null && this.matcherState & 4 == 4 && (object)this.currentAwaiterVariable == (object)V_0)
 						{
-							if (right.Arguments.Count == 0)
-							{
-								expression = (Expression)this.Visit(right.MethodExpression.Target);
-							}
-						}
-						else if (right.Arguments.Count == 1)
-						{
-							expression = (Expression)this.Visit(right.Arguments[0]);
-						}
-						if (expression != null && (this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindAwaitExpression || this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindInitObj))
-						{
-							this.currentAwaiterVariable = variable;
-							this.awaitedExpression = expression;
-							this.matcherState = RebuildAsyncStatementsStep.MatcherState.FindIsCompletedInvoke;
+							this.matcherState = this.matcherState ^ 4;
 							return null;
 						}
 					}
-					else if ((node.Right.CodeNodeType == CodeNodeType.ObjectCreationExpression || node.Right.CodeNodeType == CodeNodeType.LiteralExpression && (node.Right as LiteralExpression).Value == null) && (this.matcherState & RebuildAsyncStatementsStep.MatcherState.FindInitObj) == RebuildAsyncStatementsStep.MatcherState.FindInitObj && (object)this.currentAwaiterVariable == (object)variable)
+					else
 					{
-						this.matcherState ^= RebuildAsyncStatementsStep.MatcherState.FindInitObj;
-						return null;
+						V_1 = null;
+						V_2 = node.get_Right() as MethodInvocationExpression;
+						if (V_2.get_MethodExpression().get_Target() == null)
+						{
+							if (V_2.get_Arguments().get_Count() == 1)
+							{
+								V_1 = (Expression)this.Visit(V_2.get_Arguments().get_Item(0));
+							}
+						}
+						else
+						{
+							if (V_2.get_Arguments().get_Count() == 0)
+							{
+								V_1 = (Expression)this.Visit(V_2.get_MethodExpression().get_Target());
+							}
+						}
+						if (V_1 != null && this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindAwaitExpression || this.matcherState == 4)
+						{
+							this.currentAwaiterVariable = V_0;
+							this.awaitedExpression = V_1;
+							this.matcherState = 1;
+							return null;
+						}
 					}
-					this.matcherState = RebuildAsyncStatementsStep.MatcherState.Stopped;
+					this.matcherState = 8;
 					return node;
 				}
-				if (node.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(node.Left as FieldReferenceExpression).Field.Resolve() == (object)this.asyncData.StateField || node.Right.CodeNodeType == CodeNodeType.ThisReferenceExpression)
+				if (node.get_Left().get_CodeNodeType() == 30 && (object)(node.get_Left() as FieldReferenceExpression).get_Field().Resolve() == (object)this.asyncData.get_StateField() || node.get_Right().get_CodeNodeType() == 28)
 				{
 					return null;
 				}
 			}
-			return base.VisitBinaryExpression(node);
+			return this.VisitBinaryExpression(node);
 		}
 
 		public override ICodeNode VisitExpressionStatement(ExpressionStatement node)
 		{
-			node.Expression = (Expression)this.Visit(node.Expression);
-			if (node.Expression != null)
+			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			if (node.get_Expression() != null)
 			{
 				return node;
 			}
-			if (node.Label != null && node.Label != String.Empty)
+			if (node.get_Label() != null && String.op_Inequality(node.get_Label(), String.Empty))
 			{
-				Statement nextStatement = node.GetNextStatement();
-				if (nextStatement == null || nextStatement.Label != null && nextStatement.Label != String.Empty)
+				V_0 = node.GetNextStatement();
+				if (V_0 == null || V_0.get_Label() != null && String.op_Inequality(V_0.get_Label(), String.Empty))
 				{
-					EmptyStatement emptyStatement = new EmptyStatement()
-					{
-						Label = node.Label
-					};
-					this.methodContext.GotoLabels[node.Label] = emptyStatement;
-					return emptyStatement;
+					stackVariable19 = new EmptyStatement();
+					stackVariable19.set_Label(node.get_Label());
+					V_1 = stackVariable19;
+					this.methodContext.get_GotoLabels().set_Item(node.get_Label(), V_1);
+					return V_1;
 				}
-				nextStatement.Label = node.Label;
-				this.methodContext.GotoLabels[node.Label] = nextStatement;
+				V_0.set_Label(node.get_Label());
+				this.methodContext.get_GotoLabels().set_Item(node.get_Label(), V_0);
 			}
 			return null;
 		}
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if ((object)node.Field.get_DeclaringType().Resolve() != (object)this.stateMachineTypeDef)
+			if ((object)node.get_Field().get_DeclaringType().Resolve() != (object)this.stateMachineTypeDef)
 			{
-				return base.VisitFieldReferenceExpression(node);
+				return this.VisitFieldReferenceExpression(node);
 			}
-			FieldDefinition fieldDefinition = node.Field.Resolve();
-			if (this.parameterMappings.ContainsKey(fieldDefinition))
+			V_0 = node.get_Field().Resolve();
+			if (this.parameterMappings.ContainsKey(V_0))
 			{
-				return this.parameterMappings[fieldDefinition].CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
+				return this.parameterMappings.get_Item(V_0).CloneExpressionOnlyAndAttachInstructions(node.get_UnderlyingSameMethodInstructions());
 			}
-			VariableDefinition variableDefinition = new VariableDefinition(this.GetFriendlyName(fieldDefinition.get_Name()), fieldDefinition.get_FieldType(), this.methodContext.Method);
-			this.methodContext.Variables.Add(variableDefinition);
-			this.methodContext.VariableAssignmentData.Add(variableDefinition, this.asyncData.FieldAssignmentData[fieldDefinition]);
-			this.methodContext.VariablesToRename.Add(variableDefinition);
-			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(variableDefinition, node.UnderlyingSameMethodInstructions);
-			this.parameterMappings[fieldDefinition] = variableReferenceExpression;
-			return variableReferenceExpression;
+			V_1 = new VariableDefinition(this.GetFriendlyName(V_0.get_Name()), V_0.get_FieldType(), this.methodContext.get_Method());
+			this.methodContext.get_Variables().Add(V_1);
+			this.methodContext.get_VariableAssignmentData().Add(V_1, this.asyncData.get_FieldAssignmentData().get_Item(V_0));
+			dummyVar0 = this.methodContext.get_VariablesToRename().Add(V_1);
+			V_2 = new VariableReferenceExpression(V_1, node.get_UnderlyingSameMethodInstructions());
+			this.parameterMappings.set_Item(V_0, V_2);
+			return V_2;
 		}
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			Expression item;
-			MethodReferenceExpression methodExpression = node.MethodExpression;
-			if (methodExpression.Target != null)
+			V_0 = node.get_MethodExpression();
+			if (V_0.get_Target() != null)
 			{
-				if (methodExpression.Target.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.asyncData.AwaiterVariables.Contains((methodExpression.Target as VariableReferenceExpression).Variable))
+				if (V_0.get_Target().get_CodeNodeType() == 26 && this.asyncData.get_AwaiterVariables().Contains((V_0.get_Target() as VariableReferenceExpression).get_Variable()))
 				{
-					VariableReference variable = (methodExpression.Target as VariableReferenceExpression).Variable;
-					if ((object)this.currentAwaiterVariable == (object)variable)
+					V_1 = (V_0.get_Target() as VariableReferenceExpression).get_Variable();
+					if ((object)this.currentAwaiterVariable == (object)V_1)
 					{
-						if (methodExpression.Method.get_Name() == "get_IsCompleted")
+						if (!String.op_Equality(V_0.get_Method().get_Name(), "get_IsCompleted"))
 						{
-							if (this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindIsCompletedInvoke)
+							if (String.op_Equality(V_0.get_Method().get_Name(), "GetResult") && this.matcherState & 2 == 2)
 							{
-								this.matcherState = RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke | RebuildAsyncStatementsStep.MatcherState.FindInitObj;
+								this.matcherState = this.matcherState ^ 2;
+								return new AwaitExpression((Expression)this.Visit(this.awaitedExpression), V_0.get_Method().get_ReturnType(), node.get_UnderlyingSameMethodInstructions());
+							}
+						}
+						else
+						{
+							if (this.matcherState == 1)
+							{
+								this.matcherState = 6;
 								return null;
 							}
 						}
-						else if (methodExpression.Method.get_Name() == "GetResult" && (this.matcherState & RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke) == RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke)
-						{
-							this.matcherState ^= RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke;
-							return new AwaitExpression((Expression)this.Visit(this.awaitedExpression), methodExpression.Method.get_ReturnType(), node.UnderlyingSameMethodInstructions);
-						}
 					}
-					this.matcherState = RebuildAsyncStatementsStep.MatcherState.Stopped;
+					this.matcherState = 8;
 					return node;
 				}
-				if (methodExpression.Target.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(methodExpression.Target as FieldReferenceExpression).Field.Resolve() == (object)this.builderField && methodExpression.Method.get_Name() == "SetResult")
+				if (V_0.get_Target().get_CodeNodeType() == 30 && (object)(V_0.get_Target() as FieldReferenceExpression).get_Field().Resolve() == (object)this.builderField && String.op_Equality(V_0.get_Method().get_Name(), "SetResult"))
 				{
-					if (node.Arguments.Count > 0)
+					if (node.get_Arguments().get_Count() > 0)
 					{
-						item = node.Arguments[0];
+						stackVariable34 = node.get_Arguments().get_Item(0);
 					}
 					else
 					{
-						item = null;
+						stackVariable34 = null;
 					}
-					return new ReturnExpression(item, methodExpression.UnderlyingSameMethodInstructions);
+					return new ReturnExpression(stackVariable34, V_0.get_UnderlyingSameMethodInstructions());
 				}
 			}
-			return base.VisitMethodInvocationExpression(node);
+			return this.VisitMethodInvocationExpression(node);
 		}
 
 		public override ICodeNode VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			MethodReferenceExpression methodExpression = node.MethodExpression;
-			if (methodExpression.Target == null || methodExpression.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || !this.asyncData.AwaiterVariables.Contains((methodExpression.Target as VariableReferenceExpression).Variable))
+			V_0 = node.get_MethodExpression();
+			if (V_0.get_Target() == null || V_0.get_Target().get_CodeNodeType() != 26 || !this.asyncData.get_AwaiterVariables().Contains((V_0.get_Target() as VariableReferenceExpression).get_Variable()))
 			{
-				return base.VisitPropertyReferenceExpression(node);
+				return this.VisitPropertyReferenceExpression(node);
 			}
-			VariableReference variable = (methodExpression.Target as VariableReferenceExpression).Variable;
-			if ((object)this.currentAwaiterVariable == (object)variable && methodExpression.Method.get_Name() == "get_IsCompleted" && this.matcherState == RebuildAsyncStatementsStep.MatcherState.FindIsCompletedInvoke)
+			V_1 = (V_0.get_Target() as VariableReferenceExpression).get_Variable();
+			if ((object)this.currentAwaiterVariable == (object)V_1 && String.op_Equality(V_0.get_Method().get_Name(), "get_IsCompleted") && this.matcherState == 1)
 			{
-				this.matcherState = RebuildAsyncStatementsStep.MatcherState.FindGetResultInvoke | RebuildAsyncStatementsStep.MatcherState.FindInitObj;
+				this.matcherState = 6;
 				return null;
 			}
-			this.matcherState = RebuildAsyncStatementsStep.MatcherState.Stopped;
+			this.matcherState = 8;
 			return node;
 		}
 
 		public override ICodeNode VisitUnaryExpression(UnaryExpression node)
 		{
-			node.Operand = (Expression)this.Visit(node.Operand);
-			if (node.Operand == null)
+			node.set_Operand((Expression)this.Visit(node.get_Operand()));
+			if (node.get_Operand() == null)
 			{
 				return null;
 			}
@@ -480,16 +515,16 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (this.asyncData.VariableToFieldMap.ContainsKey(node.Variable))
+			if (this.asyncData.get_VariableToFieldMap().ContainsKey(node.get_Variable()))
 			{
-				FieldDefinition fieldDefinition = this.asyncData.VariableToFieldMap[node.Variable].Resolve();
-				if (fieldDefinition != null && this.parameterMappings.ContainsKey(fieldDefinition))
+				V_0 = this.asyncData.get_VariableToFieldMap().get_Item(node.get_Variable()).Resolve();
+				if (V_0 != null && this.parameterMappings.ContainsKey(V_0))
 				{
-					return this.parameterMappings[fieldDefinition].CloneExpressionOnly();
+					return this.parameterMappings.get_Item(V_0).CloneExpressionOnly();
 				}
 			}
-			this.methodContext.VariablesToRename.Add(node.Variable.Resolve());
-			return base.VisitVariableReferenceExpression(node);
+			dummyVar0 = this.methodContext.get_VariablesToRename().Add(node.get_Variable().Resolve());
+			return this.VisitVariableReferenceExpression(node);
 		}
 
 		private enum MatcherState

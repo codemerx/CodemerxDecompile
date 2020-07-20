@@ -1,7 +1,6 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
@@ -12,36 +11,48 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public UnsafeMethodBodyStep()
 		{
+			base();
+			return;
 		}
 
 		private bool IsUnsafe(IEnumerable<Instruction> methodBody)
 		{
-			bool flag;
-			using (IEnumerator<Instruction> enumerator = methodBody.GetEnumerator())
+			V_0 = methodBody.GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					Instruction current = enumerator.Current;
-					if (!(current.get_OpCode() == OpCodes.Conv_U) && !(current.get_OpCode() == OpCodes.Conv_I))
+					V_1 = V_0.get_Current();
+					if (!OpCode.op_Equality(V_1.get_OpCode(), OpCodes.Conv_U) && !OpCode.op_Equality(V_1.get_OpCode(), OpCodes.Conv_I))
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
-			return flag;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+		Label1:
+			return V_2;
+		Label0:
+			return false;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			MethodDefinition method = context.MethodContext.Method;
-			if (!method.get_IsUnsafe() && method.get_HasBody() && this.IsUnsafe(method.get_Body().get_Instructions()))
+			V_0 = context.get_MethodContext().get_Method();
+			if (!V_0.get_IsUnsafe() && V_0.get_HasBody() && this.IsUnsafe(V_0.get_Body().get_Instructions()))
 			{
-				UnsafeBlockStatement unsafeBlockStatement = new UnsafeBlockStatement(body.Statements);
-				body.Statements = new StatementCollection();
-				body.AddStatement(unsafeBlockStatement);
+				V_1 = new UnsafeBlockStatement(body.get_Statements());
+				body.set_Statements(new StatementCollection());
+				body.AddStatement(V_1);
 			}
 			return body;
 		}

@@ -15,11 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				ReturnExpression returnExpression = null;
-				if (returnExpression.Value != null)
-				{
-					yield return returnExpression.Value;
-				}
+				stackVariable1 = new ReturnExpression.u003cget_Childrenu003ed__6(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -27,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ReturnExpression;
+				return 57;
 			}
 		}
 
@@ -57,51 +55,51 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ReturnExpression(Expression value, IEnumerable<Instruction> instructions) : base(instructions)
+		public ReturnExpression(Expression value, IEnumerable<Instruction> instructions)
 		{
-			this.Value = value;
+			base(instructions);
+			this.set_Value(value);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			Expression expression;
-			if (this.Value != null)
+			if (this.get_Value() != null)
 			{
-				expression = this.Value.Clone();
+				stackVariable4 = this.get_Value().Clone();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new ReturnExpression(expression, this.instructions);
+			return new ReturnExpression(stackVariable4, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			Expression expression;
-			if (this.Value != null)
+			if (this.get_Value() != null)
 			{
-				expression = this.Value.CloneExpressionOnly();
+				stackVariable4 = this.get_Value().CloneExpressionOnly();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new ReturnExpression(expression, null);
+			return new ReturnExpression(stackVariable4, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is ReturnExpression))
+			if (other as ReturnExpression == null)
 			{
 				return false;
 			}
-			ReturnExpression returnExpression = other as ReturnExpression;
-			if (this.Value == null)
+			V_0 = other as ReturnExpression;
+			if (this.get_Value() == null)
 			{
-				return returnExpression.Value == null;
+				return V_0.get_Value() == null;
 			}
-			return this.Value.Equals(returnExpression.Value);
+			return this.get_Value().Equals(V_0.get_Value());
 		}
 	}
 }

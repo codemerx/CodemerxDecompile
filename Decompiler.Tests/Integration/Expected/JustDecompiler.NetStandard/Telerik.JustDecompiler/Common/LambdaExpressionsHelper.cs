@@ -1,5 +1,4 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 
@@ -9,26 +8,28 @@ namespace Telerik.JustDecompiler.Common
 	{
 		internal static bool HasAnonymousParameter(Collection<ParameterDefinition> parameters)
 		{
-			bool flag;
-			Collection<ParameterDefinition>.Enumerator enumerator = parameters.GetEnumerator();
+			V_0 = parameters.GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					if (!enumerator.get_Current().get_ParameterType().ContainsAnonymousType())
+					if (!V_0.get_Current().get_ParameterType().ContainsAnonymousType())
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_1 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_1;
+		Label0:
+			return false;
 		}
 	}
 }

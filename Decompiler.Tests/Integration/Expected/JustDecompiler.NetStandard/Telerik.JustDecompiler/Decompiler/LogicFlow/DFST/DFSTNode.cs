@@ -50,19 +50,22 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DFST
 			set;
 		}
 
-		public DFSTNode(ISingleEntrySubGraph construct) : base(construct)
+		public DFSTNode(ISingleEntrySubGraph construct)
 		{
-			this.BackEdgeSuccessors = new HashSet<DFSTNode>();
-			this.ForwardEdgeSucessors = new HashSet<DFSTNode>();
-			this.CrossEdgeSuccessors = new HashSet<DFSTNode>();
-			this.BackEdgePredecessors = new HashSet<DFSTNode>();
-			this.ForwardEdgePredecessors = new HashSet<DFSTNode>();
-			this.CrossEdgePredecessors = new HashSet<DFSTNode>();
+			base(construct);
+			this.set_BackEdgeSuccessors(new HashSet<DFSTNode>());
+			this.set_ForwardEdgeSucessors(new HashSet<DFSTNode>());
+			this.set_CrossEdgeSuccessors(new HashSet<DFSTNode>());
+			this.set_BackEdgePredecessors(new HashSet<DFSTNode>());
+			this.set_ForwardEdgePredecessors(new HashSet<DFSTNode>());
+			this.set_CrossEdgePredecessors(new HashSet<DFSTNode>());
+			return;
 		}
 
 		public int CompareTo(DFSTNode other)
 		{
-			return this.ReversePostOrderIndex.CompareTo(other.ReversePostOrderIndex);
+			V_0 = this.get_ReversePostOrderIndex();
+			return V_0.CompareTo(other.get_ReversePostOrderIndex());
 		}
 	}
 }

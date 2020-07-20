@@ -42,27 +42,34 @@ namespace Telerik.JustDecompiler.Decompiler
 			set;
 		}
 
-		public DecompilationContext(MethodSpecificContext methodContext, TypeSpecificContext typeContext, ILanguage language) : this(methodContext, typeContext, new ModuleSpecificContext(), new AssemblySpecificContext(), language)
+		public DecompilationContext(MethodSpecificContext methodContext, TypeSpecificContext typeContext, ILanguage language)
 		{
+			this(methodContext, typeContext, new ModuleSpecificContext(), new AssemblySpecificContext(), language);
+			return;
 		}
 
 		public DecompilationContext(MethodSpecificContext methodContext, TypeSpecificContext typeContext, ModuleSpecificContext moduleContext, AssemblySpecificContext assemblyContext, ILanguage language)
 		{
-			this.MethodContext = methodContext;
-			this.TypeContext = typeContext;
-			this.ModuleContext = moduleContext;
-			this.AssemblyContext = assemblyContext;
-			this.Language = language;
-			this.IsStopped = false;
+			base();
+			this.set_MethodContext(methodContext);
+			this.set_TypeContext(typeContext);
+			this.set_ModuleContext(moduleContext);
+			this.set_AssemblyContext(assemblyContext);
+			this.set_Language(language);
+			this.set_IsStopped(false);
+			return;
 		}
 
 		public DecompilationContext()
 		{
+			base();
+			return;
 		}
 
 		public void StopPipeline()
 		{
-			this.IsStopped = true;
+			this.set_IsStopped(true);
+			return;
 		}
 	}
 }

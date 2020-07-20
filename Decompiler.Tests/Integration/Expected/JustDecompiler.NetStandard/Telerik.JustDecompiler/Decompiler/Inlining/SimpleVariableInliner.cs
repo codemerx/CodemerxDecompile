@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Steps;
 
 namespace Telerik.JustDecompiler.Decompiler.Inlining
 {
@@ -17,7 +16,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		private VariableDefinition variableDef;
 
-		protected Expression @value;
+		protected Expression value;
 
 		protected SimpleVariableInliner.InliningResult status;
 
@@ -25,46 +24,49 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public SimpleVariableInliner(TypeSystem typeSystem)
 		{
+			base();
 			this.typeSystem = typeSystem;
+			return;
 		}
 
 		private void Abort()
 		{
-			if (this.status != SimpleVariableInliner.InliningResult.Success)
+			if (this.status != 1)
 			{
-				this.status = SimpleVariableInliner.InliningResult.Abort;
+				this.status = 2;
 			}
+			return;
 		}
 
 		protected virtual ICodeNode GetNewValue(VariableReferenceExpression node)
 		{
-			return this.@value;
+			return this.value;
 		}
 
 		public bool TryInlineVariable(VariableDefinition variableDef, Expression value, ICodeNode target, bool aggressive, out ICodeNode result)
 		{
 			this.variableDef = variableDef;
-			this.@value = value;
+			this.value = value;
 			if (!aggressive)
 			{
-				SimpleVariableInliner.ASTNodeCounter aSTNodeCounter = new SimpleVariableInliner.ASTNodeCounter();
-				if (aSTNodeCounter.CountNodes(value) + aSTNodeCounter.CountNodes(target) - 1 > 10)
+				V_1 = new SimpleVariableInliner.ASTNodeCounter();
+				if (V_1.CountNodes(value) + V_1.CountNodes(target) - 1 > 10)
 				{
 					result = target;
 					return false;
 				}
 			}
 			this.valueHasSideEffects = (new SideEffectsFinder()).HasSideEffectsRecursive(value);
-			this.status = SimpleVariableInliner.InliningResult.NotFound;
+			this.status = 0;
 			result = this.Visit(target);
-			return this.status == SimpleVariableInliner.InliningResult.Success;
+			return this.status == 1;
 		}
 
 		public override ICodeNode Visit(ICodeNode node)
 		{
 			if (this.status == SimpleVariableInliner.InliningResult.NotFound)
 			{
-				node = base.Visit(node);
+				node = this.Visit(node);
 				if (this.valueHasSideEffects && this.status == SimpleVariableInliner.InliningResult.NotFound && SideEffectsFinder.HasSideEffects(node))
 				{
 					this.Abort();
@@ -75,17 +77,17 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public override ICodeNode VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			node.InstanceReference = (Expression)this.Visit(node.InstanceReference);
-			return base.VisitBaseCtorExpression(node);
+			node.set_InstanceReference((Expression)this.Visit(node.get_InstanceReference()));
+			return this.VisitBaseCtorExpression(node);
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (!node.IsAssignmentExpression || node.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+			if (!node.get_IsAssignmentExpression() || node.get_Left().get_CodeNodeType() != 26)
 			{
-				return base.VisitBinaryExpression(node);
+				return this.VisitBinaryExpression(node);
 			}
-			node.Right = (Expression)this.Visit(node.Right);
+			node.set_Right((Expression)this.Visit(node.get_Right()));
 			return node;
 		}
 
@@ -116,54 +118,54 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public override ICodeNode VisitFixedStatement(FixedStatement node)
 		{
-			node.Expression = (Expression)this.Visit(node.Expression);
+			node.set_Expression((Expression)this.Visit(node.get_Expression()));
 			return node;
 		}
 
 		public override ICodeNode VisitForEachStatement(ForEachStatement node)
 		{
-			node.Collection = (Expression)this.Visit(node.Collection);
+			node.set_Collection((Expression)this.Visit(node.get_Collection()));
 			return node;
 		}
 
 		public override ICodeNode VisitForStatement(ForStatement node)
 		{
-			node.Initializer = (Expression)this.Visit(node.Initializer);
+			node.set_Initializer((Expression)this.Visit(node.get_Initializer()));
 			return node;
 		}
 
 		public override ICodeNode VisitIfElseIfStatement(IfElseIfStatement node)
 		{
-			List<KeyValuePair<Expression, BlockStatement>> conditionBlocks = node.ConditionBlocks;
-			KeyValuePair<Expression, BlockStatement> item = node.ConditionBlocks[0];
-			Expression expression = (Expression)this.Visit(item.Key);
-			item = node.ConditionBlocks[0];
-			conditionBlocks[0] = new KeyValuePair<Expression, BlockStatement>(expression, item.Value);
+			stackVariable1 = node.get_ConditionBlocks();
+			V_0 = node.get_ConditionBlocks().get_Item(0);
+			stackVariable11 = (Expression)this.Visit(V_0.get_Key());
+			V_0 = node.get_ConditionBlocks().get_Item(0);
+			stackVariable1.set_Item(0, new KeyValuePair<Expression, BlockStatement>(stackVariable11, V_0.get_Value()));
 			return node;
 		}
 
 		public override ICodeNode VisitIfStatement(IfStatement node)
 		{
-			node.Condition = (Expression)this.Visit(node.Condition);
+			node.set_Condition((Expression)this.Visit(node.get_Condition()));
 			return node;
 		}
 
 		public override ICodeNode VisitLockStatement(LockStatement node)
 		{
-			node.Expression = (Expression)this.Visit(node.Expression);
+			node.set_Expression((Expression)this.Visit(node.get_Expression()));
 			return node;
 		}
 
 		public override ICodeNode VisitSwitchStatement(SwitchStatement node)
 		{
-			node.Condition = (Expression)this.Visit(node.Condition);
+			node.set_Condition((Expression)this.Visit(node.get_Condition()));
 			return node;
 		}
 
 		public override ICodeNode VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			node.InstanceReference = (Expression)this.Visit(node.InstanceReference);
-			return base.VisitThisCtorExpression(node);
+			node.set_InstanceReference((Expression)this.Visit(node.get_InstanceReference()));
+			return this.VisitThisCtorExpression(node);
 		}
 
 		public override ICodeNode VisitTryStatement(TryStatement node)
@@ -173,36 +175,36 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public override ICodeNode VisitUnaryExpression(UnaryExpression node)
 		{
-			if (this.status == SimpleVariableInliner.InliningResult.Abort)
+			if (this.status == 2)
 			{
 				throw new Exception("Invalid state");
 			}
-			Expression operand = node.Operand;
-			node.Operand = (Expression)this.Visit(node.Operand);
-			if (node.Operator != UnaryOperator.LogicalNot || operand == node.Operand)
+			V_0 = node.get_Operand();
+			node.set_Operand((Expression)this.Visit(node.get_Operand()));
+			if (node.get_Operator() != 1 || V_0 == node.get_Operand())
 			{
 				return node;
 			}
-			return Negator.Negate(node.Operand, this.typeSystem);
+			return Negator.Negate(node.get_Operand(), this.typeSystem);
 		}
 
 		public override ICodeNode VisitUsingStatement(UsingStatement node)
 		{
-			node.Expression = (Expression)this.Visit(node.Expression);
+			node.set_Expression((Expression)this.Visit(node.get_Expression()));
 			return node;
 		}
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (this.status == SimpleVariableInliner.InliningResult.Abort)
+			if (this.status == 2)
 			{
 				throw new Exception("Invalid state");
 			}
-			if ((object)node.Variable.Resolve() != (object)this.variableDef)
+			if ((object)node.get_Variable().Resolve() != (object)this.variableDef)
 			{
 				return node;
 			}
-			this.status = SimpleVariableInliner.InliningResult.Success;
+			this.status = 1;
 			return this.GetNewValue(node);
 		}
 
@@ -217,6 +219,8 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 			public ASTNodeCounter()
 			{
+				base();
+				return;
 			}
 
 			public int CountNodes(ICodeNode node)
@@ -228,56 +232,67 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 			public override void Visit(ICodeNode node)
 			{
-				this.count++;
-				base.Visit(node);
+				this.count = this.count + 1;
+				this.Visit(node);
+				return;
 			}
 
 			public override void VisitFixedStatement(FixedStatement node)
 			{
-				this.Visit(node.Expression);
+				this.Visit(node.get_Expression());
+				return;
 			}
 
 			public override void VisitForEachStatement(ForEachStatement node)
 			{
-				this.Visit(node.Collection);
+				this.Visit(node.get_Collection());
+				return;
 			}
 
 			public override void VisitForStatement(ForStatement node)
 			{
-				this.Visit(node.Initializer);
+				this.Visit(node.get_Initializer());
+				return;
 			}
 
 			public override void VisitIfElseIfStatement(IfElseIfStatement node)
 			{
-				this.Visit(node.ConditionBlocks[0].Key);
+				V_0 = node.get_ConditionBlocks().get_Item(0);
+				this.Visit(V_0.get_Key());
+				return;
 			}
 
 			public override void VisitIfStatement(IfStatement node)
 			{
-				this.Visit(node.Condition);
+				this.Visit(node.get_Condition());
+				return;
 			}
 
 			public override void VisitImplicitCastExpression(ImplicitCastExpression node)
 			{
-				int num = this.count;
-				this.Visit(node.Expression);
-				this.count = num;
+				V_0 = this.count;
+				this.Visit(node.get_Expression());
+				this.count = V_0;
+				return;
 			}
 
 			public override void VisitInitializerExpression(InitializerExpression node)
 			{
-				this.count--;
-				this.Visit(node.Expression);
+				this.count = this.count - 1;
+				this.Visit(node.get_Expression());
+				return;
 			}
 
 			public override void VisitSwitchStatement(SwitchStatement node)
 			{
-				this.Visit(node.Condition);
+				this.Visit(node.get_Condition());
+				return;
 			}
 
 			public override void VisitUsingStatement(UsingStatement node)
 			{
-				this.Visit(node.Expression);
+				this.Visit(node.get_Expression());
+				return;
 			}
 		}
 

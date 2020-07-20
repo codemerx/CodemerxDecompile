@@ -3,7 +3,6 @@ using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Mono.Cecil.Extensions
@@ -12,7 +11,6 @@ namespace Mono.Cecil.Extensions
 	{
 		public static IEnumerable<Instruction> GetMethodInstructions(this MethodDefinition method)
 		{
-			IEnumerable<Instruction> instructions;
 			if (method == null)
 			{
 				throw new ArgumentNullException("MethodDefinition");
@@ -23,13 +21,14 @@ namespace Mono.Cecil.Extensions
 			}
 			try
 			{
-				instructions = method.get_Body().get_Instructions();
+				V_0 = method.get_Body().get_Instructions();
 			}
 			catch
 			{
-				instructions = Enumerable.Empty<Instruction>();
+				dummyVar0 = exception_0;
+				V_0 = Enumerable.Empty<Instruction>();
 			}
-			return instructions;
+			return V_0;
 		}
 
 		public static MethodDefinition GetMoreVisibleMethod(this MethodDefinition method, MethodDefinition other)
@@ -67,81 +66,83 @@ namespace Mono.Cecil.Extensions
 
 		public static bool HasAsyncAttributes(this MethodDefinition self)
 		{
-			bool flag;
-			bool flag1 = false;
-			bool flag2 = false;
-			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
+			V_0 = false;
+			V_1 = false;
+			V_2 = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_2.MoveNext())
 				{
-					CustomAttribute current = enumerator.get_Current();
-					if (!(flag1 & flag2))
+					V_3 = V_2.get_Current();
+					if (!V_0 & V_1)
 					{
-						if (!flag1 && MethodDefinitionExtensions.IsAsyncStateMachineAttribute(current))
+						if (!V_0 && MethodDefinitionExtensions.IsAsyncStateMachineAttribute(V_3))
 						{
-							flag1 = true;
+							V_0 = true;
 						}
-						if (flag2 || !MethodDefinitionExtensions.IsDebuggerStepThroughAttribute(current))
+						if (V_1 || !MethodDefinitionExtensions.IsDebuggerStepThroughAttribute(V_3))
 						{
 							continue;
 						}
-						flag2 = true;
+						V_1 = true;
 					}
 					else
 					{
-						flag = true;
-						return flag;
+						V_4 = true;
+						goto Label1;
 					}
 				}
-				return flag1 & flag2;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_2.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_4;
+		Label0:
+			return V_0 & V_1;
 		}
 
 		public static bool HasAsyncStateMachineVariable(this MethodDefinition self)
 		{
-			bool flag;
-			TypeDefinition typeDefinition;
-			Collection<VariableDefinition>.Enumerator enumerator = self.get_Body().get_Variables().GetEnumerator();
+			V_0 = self.get_Body().get_Variables().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					VariableDefinition current = enumerator.get_Current();
-					if (current.get_VariableType() == null)
+					V_1 = V_0.get_Current();
+					if (V_1.get_VariableType() == null)
 					{
-						typeDefinition = null;
+						stackVariable10 = null;
 					}
 					else
 					{
-						typeDefinition = current.get_VariableType().Resolve();
+						stackVariable10 = V_1.get_VariableType().Resolve();
 					}
-					TypeDefinition typeDefinition1 = typeDefinition;
-					if (typeDefinition1 == null || !typeDefinition1.IsAsyncStateMachine())
+					V_2 = stackVariable10;
+					if (V_2 == null || !V_2.IsAsyncStateMachine())
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_3 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_3;
+		Label0:
+			return false;
 		}
 
 		public static bool IsAsync(this MethodDefinition self)
 		{
-			TypeDefinition typeDefinition;
-			if (self.IsAsync(out typeDefinition))
+			if (self.IsAsync(out V_0))
 			{
 				return true;
 			}
@@ -154,64 +155,66 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsAsync(this MethodDefinition self, out TypeDefinition asyncStateMachineType)
 		{
-			bool flag;
 			asyncStateMachineType = null;
-			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
+			V_0 = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					if (!MethodDefinitionExtensions.IsAsyncAttribute(enumerator.get_Current(), self, self.get_DeclaringType(), out asyncStateMachineType))
+					if (!MethodDefinitionExtensions.IsAsyncAttribute(V_0.get_Current(), self, self.get_DeclaringType(), out asyncStateMachineType))
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_1 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_1;
+		Label0:
+			return false;
 		}
 
 		private static bool IsAsyncAttribute(CustomAttribute customAttribute, MethodDefinition method, TypeDefinition declaringType, out TypeDefinition stateMachineType)
 		{
 			stateMachineType = null;
-			if (customAttribute.get_AttributeType().get_FullName() != "System.Runtime.CompilerServices.AsyncStateMachineAttribute")
+			if (String.op_Inequality(customAttribute.get_AttributeType().get_FullName(), "System.Runtime.CompilerServices.AsyncStateMachineAttribute"))
 			{
 				return false;
 			}
 			customAttribute.Resolve();
-			if (customAttribute.get_ConstructorArguments().get_Count() != 1 || customAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName() != "System.Type")
+			if (customAttribute.get_ConstructorArguments().get_Count() != 1 || String.op_Inequality(customAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName(), "System.Type"))
 			{
 				return false;
 			}
-			CustomAttributeArgument item = customAttribute.get_ConstructorArguments().get_Item(0);
-			TypeReference value = item.get_Value() as TypeReference;
-			if (value == null)
+			V_2 = customAttribute.get_ConstructorArguments().get_Item(0);
+			V_0 = V_2.get_Value() as TypeReference;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			TypeDefinition typeDefinition = value.Resolve();
-			if (typeDefinition == null || (object)typeDefinition.get_DeclaringType() != (object)declaringType || !typeDefinition.IsAsyncStateMachine())
+			V_1 = V_0.Resolve();
+			if (V_1 == null || (object)V_1.get_DeclaringType() != (object)declaringType || !V_1.IsAsyncStateMachine())
 			{
 				return false;
 			}
-			stateMachineType = typeDefinition;
+			stateMachineType = V_1;
 			return true;
 		}
 
 		private static bool IsAsyncStateMachineAttribute(CustomAttribute customAttribute)
 		{
-			return customAttribute.get_AttributeType().get_FullName() == "System.Runtime.CompilerServices.AsyncStateMachineAttribute";
+			return String.op_Equality(customAttribute.get_AttributeType().get_FullName(), "System.Runtime.CompilerServices.AsyncStateMachineAttribute");
 		}
 
 		private static bool IsDebuggerStepThroughAttribute(CustomAttribute customAttribute)
 		{
-			return customAttribute.get_AttributeType().get_FullName() == "System.Diagnostics.DebuggerStepThroughAttribute";
+			return String.op_Equality(customAttribute.get_AttributeType().get_FullName(), "System.Diagnostics.DebuggerStepThroughAttribute");
 		}
 
 		public static bool IsExtern(this MethodDefinition method)
@@ -237,7 +240,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			return self.get_FixedReturnType().get_FullName() != "System.Void";
+			return String.op_Inequality(self.get_FixedReturnType().get_FullName(), "System.Void");
 		}
 
 		public static bool IsQueryableMethod(this MethodDefinition self)
@@ -246,30 +249,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			return self.get_DeclaringType().get_FullName() == "System.Linq.Queryable";
+			return String.op_Equality(self.get_DeclaringType().get_FullName(), "System.Linq.Queryable");
 		}
 
 		public static bool IsQueryMethod(this MethodDefinition self)
 		{
 			// 
 			// Current member / type: System.Boolean Mono.Cecil.Extensions.MethodDefinitionExtensions::IsQueryMethod(Mono.Cecil.MethodDefinition)
-			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
-			// 
-			// Product version: 0.0.0.0
 			// Exception in: System.Boolean IsQueryMethod(Mono.Cecil.MethodDefinition)
-			// 
 			// Object reference not set to an instance of an object.
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.DTree.BaseDominatorTreeBuilder.ComputeDominanceFrontiers() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\DTree\BaseDominatorTreeBuilder.cs:line 107
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.DTree.BaseDominatorTreeBuilder.BuildTreeInternal(BaseDominatorTreeBuilder theBuilder) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\DTree\BaseDominatorTreeBuilder.cs:line 26
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.DominatorTreeDependentStep.GetDominatorTreeFromContext(ILogicalConstruct construct) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\DominatorTreeDependentStep.cs:line 20
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopBuilder.ProcessLogicalConstruct(ILogicalConstruct construct) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\Loops\LoopBuilder.cs:line 68
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopBuilder.BuildLoops(ILogicalConstruct block) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\Loops\LoopBuilder.cs:line 59
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.LogicalFlowBuilderStep.BuildLogicalConstructTree() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\LogicalFlowBuilderStep.cs:line 128
-			//    at Telerik.JustDecompiler.Decompiler.LogicFlow.LogicalFlowBuilderStep.Process(DecompilationContext context, BlockStatement body) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\LogicalFlowBuilderStep.cs:line 51
-			//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.RunInternal(MethodBody body, BlockStatement block, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 81
-			//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.Run(MethodBody body, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 70
-			//    at Telerik.JustDecompiler.Decompiler.Extensions.Decompile(MethodBody body, ILanguage language, DecompilationContext& context, TypeSpecificContext typeContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\Extensions.cs:line 61
-			//    at Telerik.JustDecompiler.Decompiler.WriterContextServices.BaseWriterContextService.DecompileMethod(ILanguage language, MethodDefinition method, TypeSpecificContext typeContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\WriterContextServices\BaseWriterContextService.cs:line 117
 			// 
 			// mailto: JustDecompilePublicFeedback@telerik.com
 

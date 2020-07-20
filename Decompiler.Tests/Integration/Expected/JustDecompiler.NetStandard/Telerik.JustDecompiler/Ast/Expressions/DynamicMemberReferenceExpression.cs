@@ -3,7 +3,6 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -16,15 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				DynamicMemberReferenceExpression dynamicMemberReferenceExpression = null;
-				yield return dynamicMemberReferenceExpression.Target;
-				if (dynamicMemberReferenceExpression.InvocationArguments != null)
-				{
-					foreach (ICodeNode invocationArgument in dynamicMemberReferenceExpression.InvocationArguments)
-					{
-						yield return invocationArgument;
-					}
-				}
+				stackVariable1 = new DynamicMemberReferenceExpression.u003cget_Childrenu003ed__15(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -32,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.DynamicMemberReferenceExpression;
+				return 59;
 			}
 		}
 
@@ -52,7 +45,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.GenericTypeArguments != null;
+				return this.get_GenericTypeArguments() != null;
 			}
 		}
 
@@ -74,112 +67,144 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			internal set;
 		}
 
-		public DynamicMemberReferenceExpression(Expression target, string memberName, TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public DynamicMemberReferenceExpression(Expression target, string memberName, TypeReference type, IEnumerable<Instruction> instructions)
 		{
-			this.IsMethodInvocation = false;
-			this.Target = target;
-			this.MemberName = memberName;
-			this.ExpressionType = type;
+			base(instructions);
+			this.set_IsMethodInvocation(false);
+			this.set_Target(target);
+			this.set_MemberName(memberName);
+			this.set_ExpressionType(type);
+			return;
 		}
 
-		public DynamicMemberReferenceExpression(Expression target, string memberName, TypeReference type, IEnumerable<Instruction> instructions, IEnumerable<Expression> invocationArguments, IEnumerable<TypeReference> genericTypeArguments = null) : base(instructions)
+		public DynamicMemberReferenceExpression(Expression target, string memberName, TypeReference type, IEnumerable<Instruction> instructions, IEnumerable<Expression> invocationArguments, IEnumerable<TypeReference> genericTypeArguments = null)
 		{
-			this.IsMethodInvocation = true;
-			this.Target = target;
-			this.MemberName = memberName;
-			this.ExpressionType = type;
-			this.InvocationArguments = new ExpressionCollection();
-			foreach (Expression invocationArgument in invocationArguments)
+			base(instructions);
+			this.set_IsMethodInvocation(true);
+			this.set_Target(target);
+			this.set_MemberName(memberName);
+			this.set_ExpressionType(type);
+			this.set_InvocationArguments(new ExpressionCollection());
+			V_0 = invocationArguments.GetEnumerator();
+			try
 			{
-				this.InvocationArguments.Add(invocationArgument);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.get_InvocationArguments().Add(V_1);
+				}
+			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
 			}
 			if (genericTypeArguments != null)
 			{
-				this.GenericTypeArguments = new List<TypeReference>(genericTypeArguments);
+				this.set_GenericTypeArguments(new List<TypeReference>(genericTypeArguments));
 			}
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			DynamicMemberReferenceExpression dynamicMemberReferenceExpression = new DynamicMemberReferenceExpression(this.Target.Clone(), this.MemberName, this.ExpressionType, this.instructions);
-			if (this.IsMethodInvocation)
+			V_0 = new DynamicMemberReferenceExpression(this.get_Target().Clone(), this.get_MemberName(), this.get_ExpressionType(), this.instructions);
+			if (this.get_IsMethodInvocation())
 			{
-				dynamicMemberReferenceExpression.IsMethodInvocation = true;
-				dynamicMemberReferenceExpression.InvocationArguments = this.InvocationArguments.Clone();
-				if (this.IsGenericMethod)
+				V_0.set_IsMethodInvocation(true);
+				V_0.set_InvocationArguments(this.get_InvocationArguments().Clone());
+				if (this.get_IsGenericMethod())
 				{
-					dynamicMemberReferenceExpression.GenericTypeArguments = new List<TypeReference>(this.GenericTypeArguments);
+					V_0.set_GenericTypeArguments(new List<TypeReference>(this.get_GenericTypeArguments()));
 				}
 			}
-			return dynamicMemberReferenceExpression;
+			return V_0;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			DynamicMemberReferenceExpression dynamicMemberReferenceExpression = new DynamicMemberReferenceExpression(this.Target.CloneExpressionOnly(), this.MemberName, this.ExpressionType, null);
-			if (this.IsMethodInvocation)
+			V_0 = new DynamicMemberReferenceExpression(this.get_Target().CloneExpressionOnly(), this.get_MemberName(), this.get_ExpressionType(), null);
+			if (this.get_IsMethodInvocation())
 			{
-				dynamicMemberReferenceExpression.IsMethodInvocation = true;
-				dynamicMemberReferenceExpression.InvocationArguments = this.InvocationArguments.CloneExpressionsOnly();
-				if (this.IsGenericMethod)
+				V_0.set_IsMethodInvocation(true);
+				V_0.set_InvocationArguments(this.get_InvocationArguments().CloneExpressionsOnly());
+				if (this.get_IsGenericMethod())
 				{
-					dynamicMemberReferenceExpression.GenericTypeArguments = new List<TypeReference>(this.GenericTypeArguments);
+					V_0.set_GenericTypeArguments(new List<TypeReference>(this.get_GenericTypeArguments()));
 				}
 			}
-			return dynamicMemberReferenceExpression;
+			return V_0;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			bool flag;
-			if (other.CodeNodeType != Telerik.JustDecompiler.Ast.CodeNodeType.DynamicMemberReferenceExpression)
+			if (other.get_CodeNodeType() != 59)
 			{
 				return false;
 			}
-			DynamicMemberReferenceExpression dynamicMemberReferenceExpression = other as DynamicMemberReferenceExpression;
-			if (!this.Target.Equals(dynamicMemberReferenceExpression.Target) || this.MemberName != dynamicMemberReferenceExpression.MemberName || this.IsMethodInvocation != dynamicMemberReferenceExpression.IsMethodInvocation)
+			V_0 = other as DynamicMemberReferenceExpression;
+			if (!this.get_Target().Equals(V_0.get_Target()) || String.op_Inequality(this.get_MemberName(), V_0.get_MemberName()) || this.get_IsMethodInvocation() != V_0.get_IsMethodInvocation())
 			{
 				return false;
 			}
-			if (!this.IsMethodInvocation)
+			if (!this.get_IsMethodInvocation())
 			{
 				return true;
 			}
-			if (!this.InvocationArguments.Equals(dynamicMemberReferenceExpression.InvocationArguments) || this.IsGenericMethod != dynamicMemberReferenceExpression.IsGenericMethod)
+			if (!this.get_InvocationArguments().Equals(V_0.get_InvocationArguments()) || this.get_IsGenericMethod() != V_0.get_IsGenericMethod())
 			{
 				return false;
 			}
-			if (!this.IsGenericMethod)
+			if (!this.get_IsGenericMethod())
 			{
 				return true;
 			}
-			using (IEnumerator<TypeReference> enumerator = this.GenericTypeArguments.GetEnumerator())
+			V_1 = this.get_GenericTypeArguments().GetEnumerator();
+			try
 			{
-				using (IEnumerator<TypeReference> enumerator1 = dynamicMemberReferenceExpression.GenericTypeArguments.GetEnumerator())
+				V_2 = V_0.get_GenericTypeArguments().GetEnumerator();
+				try
 				{
 					do
 					{
-						bool flag1 = enumerator.MoveNext();
-						if (flag1 == enumerator1.MoveNext())
+						V_3 = V_1.MoveNext();
+						if (V_3 == V_2.MoveNext())
 						{
-							if (flag1)
+							if (V_3)
 							{
 								continue;
 							}
-							flag = true;
-							return flag;
+							V_5 = true;
+							goto Label0;
 						}
 						else
 						{
-							flag = false;
-							return flag;
+							V_5 = false;
+							goto Label0;
 						}
 					}
-					while ((object)enumerator.Current == (object)enumerator1.Current);
-					flag = false;
+					while ((object)V_1.get_Current() == (object)V_2.get_Current());
+					V_5 = false;
+				}
+				finally
+				{
+					if (V_2 != null)
+					{
+						V_2.Dispose();
+					}
 				}
 			}
-			return flag;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+		Label0:
+			return V_5;
 		}
 	}
 }

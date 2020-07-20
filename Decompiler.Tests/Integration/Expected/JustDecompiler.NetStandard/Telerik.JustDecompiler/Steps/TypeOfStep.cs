@@ -9,16 +9,17 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public TypeOfStep()
 		{
+			base();
+			return;
 		}
 
 		public ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			TypeReference typeReference;
-			if (!node.IsTypeOfExpression(out typeReference))
+			if (!node.IsTypeOfExpression(out V_0))
 			{
 				return null;
 			}
-			return new TypeOfExpression(typeReference, node.UnderlyingSameMethodInstructions);
+			return new TypeOfExpression(V_0, node.get_UnderlyingSameMethodInstructions());
 		}
 	}
 }

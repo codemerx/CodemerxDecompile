@@ -1,13 +1,7 @@
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 
@@ -15,150 +9,162 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 {
 	internal abstract class BaseInitialisationPattern : CommonPatterns, ICodePattern
 	{
-		public BaseInitialisationPattern(CodePatternsContext patternsContext, TypeSystem ts) : base(patternsContext, ts)
+		public BaseInitialisationPattern(CodePatternsContext patternsContext, TypeSystem ts)
 		{
+			base(patternsContext, ts);
+			return;
 		}
 
 		protected bool CompareTargets(Expression assignee, Expression target)
 		{
-			if (target == null || assignee == null || target.CodeNodeType != assignee.CodeNodeType)
+			if (target == null || assignee == null || target.get_CodeNodeType() != assignee.get_CodeNodeType())
 			{
 				return false;
 			}
-			if (target.CodeNodeType != CodeNodeType.PropertyReferenceExpression)
+			if (target.get_CodeNodeType() != 42)
 			{
 				return target.Equals(assignee);
 			}
-			PropertyReferenceExpression propertyReferenceExpression = target as PropertyReferenceExpression;
-			PropertyReferenceExpression propertyReferenceExpression1 = assignee as PropertyReferenceExpression;
-			if (!propertyReferenceExpression.Property.Equals(propertyReferenceExpression1.Property))
+			V_0 = target as PropertyReferenceExpression;
+			V_1 = assignee as PropertyReferenceExpression;
+			if (!V_0.get_Property().Equals(V_1.get_Property()))
 			{
 				return false;
 			}
-			return this.CompareTargets(propertyReferenceExpression1.Target, propertyReferenceExpression.Target);
+			return this.CompareTargets(V_1.get_Target(), V_0.get_Target());
 		}
 
 		protected bool ImplementsInterface(TypeReference type, string interfaceName)
 		{
-			Func<TypeReference, bool> func = null;
+			V_0 = new BaseInitialisationPattern.u003cu003ec__DisplayClass8_0();
+			V_0.interfaceName = interfaceName;
 			while (type != null)
 			{
-				TypeDefinition typeDefinition = type.Resolve();
-				if (typeDefinition == null)
+				V_1 = type.Resolve();
+				if (V_1 == null)
 				{
 					return false;
 				}
-				Mono.Collections.Generic.Collection<TypeReference> interfaces = typeDefinition.get_Interfaces();
-				Func<TypeReference, bool> func1 = func;
-				if (func1 == null)
+				stackVariable8 = V_1.get_Interfaces();
+				stackVariable10 = V_0.u003cu003e9__0;
+				if (stackVariable10 == null)
 				{
-					Func<TypeReference, bool> fullName = (TypeReference x) => x.get_FullName() == interfaceName;
-					Func<TypeReference, bool> func2 = fullName;
-					func = fullName;
-					func1 = func2;
+					dummyVar0 = stackVariable10;
+					stackVariable18 = new Func<TypeReference, bool>(V_0.u003cImplementsInterfaceu003eb__0);
+					V_2 = stackVariable18;
+					V_0.u003cu003e9__0 = stackVariable18;
+					stackVariable10 = V_2;
 				}
-				if (interfaces.Any<TypeReference>(func1))
+				if (stackVariable8.Any<TypeReference>(stackVariable10))
 				{
 					return true;
 				}
-				type = typeDefinition.get_BaseType();
+				type = V_1.get_BaseType();
 			}
 			return false;
 		}
 
 		protected bool TryGetArrayCreation(StatementCollection statements, int startIndex, out ArrayCreationExpression creation, out Expression assignee)
 		{
-			BinaryExpression binaryExpression;
-			bool flag;
 			assignee = null;
 			creation = null;
-			if (!this.TryGetAssignment(statements, startIndex, out binaryExpression))
+			if (!this.TryGetAssignment(statements, startIndex, out V_0))
 			{
 				return false;
 			}
-			if (binaryExpression.Right.CodeNodeType != CodeNodeType.ArrayCreationExpression)
+			if (V_0.get_Right().get_CodeNodeType() != 38)
 			{
 				return false;
 			}
-			ArrayCreationExpression right = binaryExpression.Right as ArrayCreationExpression;
-			if (!binaryExpression.Right.HasType || !binaryExpression.Right.ExpressionType.get_IsArray())
+			V_1 = V_0.get_Right() as ArrayCreationExpression;
+			if (!V_0.get_Right().get_HasType() || !V_0.get_Right().get_ExpressionType().get_IsArray())
 			{
 				return false;
 			}
-			if (right.Dimensions.Count != 1)
+			if (V_1.get_Dimensions().get_Count() != 1)
 			{
 				return false;
 			}
-			using (IEnumerator<Expression> enumerator = right.Dimensions.GetEnumerator())
+			V_2 = V_1.get_Dimensions().GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_2.MoveNext())
 				{
-					if (enumerator.Current.CodeNodeType == CodeNodeType.LiteralExpression)
+					if (V_2.get_Current().get_CodeNodeType() == 22)
 					{
 						continue;
 					}
-					flag = false;
-					return flag;
+					V_3 = false;
+					goto Label1;
 				}
-				creation = binaryExpression.Right as ArrayCreationExpression;
-				assignee = binaryExpression.Left;
-				return true;
+				goto Label0;
 			}
-			return flag;
+			finally
+			{
+				if (V_2 != null)
+				{
+					V_2.Dispose();
+				}
+			}
+		Label1:
+			return V_3;
+		Label0:
+			creation = V_0.get_Right() as ArrayCreationExpression;
+			assignee = V_0.get_Left();
+			return true;
 		}
 
 		private bool TryGetAssignment(StatementCollection statements, int startIndex, out BinaryExpression binaryExpression)
 		{
 			binaryExpression = null;
-			Statement item = statements[startIndex];
-			if (item.CodeNodeType != CodeNodeType.ExpressionStatement)
+			V_0 = statements.get_Item(startIndex);
+			if (V_0.get_CodeNodeType() != 5)
 			{
 				return false;
 			}
-			Expression expression = (item as ExpressionStatement).Expression;
-			if (expression.CodeNodeType != CodeNodeType.BinaryExpression)
+			V_1 = (V_0 as ExpressionStatement).get_Expression();
+			if (V_1.get_CodeNodeType() != 24)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression1 = expression as BinaryExpression;
-			if (!binaryExpression1.IsAssignmentExpression)
+			V_2 = V_1 as BinaryExpression;
+			if (!V_2.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			if (binaryExpression1.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression && binaryExpression1.Left.CodeNodeType != CodeNodeType.VariableDeclarationExpression && binaryExpression1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression && binaryExpression1.Left.CodeNodeType != CodeNodeType.ThisReferenceExpression && binaryExpression1.Left.CodeNodeType != CodeNodeType.PropertyReferenceExpression && binaryExpression1.Left.CodeNodeType != CodeNodeType.ArgumentReferenceExpression && (binaryExpression1.Left.CodeNodeType != CodeNodeType.UnaryExpression || (binaryExpression1.Left as UnaryExpression).Operand.CodeNodeType != CodeNodeType.ArgumentReferenceExpression))
+			if (V_2.get_Left().get_CodeNodeType() != 26 && V_2.get_Left().get_CodeNodeType() != 27 && V_2.get_Left().get_CodeNodeType() != 30 && V_2.get_Left().get_CodeNodeType() != 28 && V_2.get_Left().get_CodeNodeType() != 42 && V_2.get_Left().get_CodeNodeType() != 25 && V_2.get_Left().get_CodeNodeType() != 23 || (V_2.get_Left() as UnaryExpression).get_Operand().get_CodeNodeType() != 25)
 			{
 				return false;
 			}
-			binaryExpression = binaryExpression1;
+			binaryExpression = V_2;
 			return true;
 		}
 
 		protected bool TryGetNextExpression(Statement statement, out Expression expression)
 		{
 			expression = null;
-			if (statement.CodeNodeType != CodeNodeType.ExpressionStatement || !String.IsNullOrEmpty(statement.Label))
+			if (statement.get_CodeNodeType() != 5 || !String.IsNullOrEmpty(statement.get_Label()))
 			{
 				return false;
 			}
-			expression = (statement as ExpressionStatement).Expression;
+			expression = (statement as ExpressionStatement).get_Expression();
 			return true;
 		}
 
 		protected bool TryGetObjectCreation(StatementCollection statements, int startIndex, out ObjectCreationExpression creation, out Expression assignee)
 		{
-			BinaryExpression binaryExpression;
 			assignee = null;
 			creation = null;
-			if (!this.TryGetAssignment(statements, startIndex, out binaryExpression))
+			if (!this.TryGetAssignment(statements, startIndex, out V_0))
 			{
 				return false;
 			}
-			if (binaryExpression.Right.CodeNodeType != CodeNodeType.ObjectCreationExpression)
+			if (V_0.get_Right().get_CodeNodeType() != 40)
 			{
 				return false;
 			}
-			assignee = binaryExpression.Left;
-			creation = binaryExpression.Right as ObjectCreationExpression;
+			assignee = V_0.get_Left();
+			creation = V_0.get_Right() as ObjectCreationExpression;
 			return true;
 		}
 
@@ -167,22 +173,24 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			startIndex = -1;
 			result = null;
 			replacedStatementsCount = -1;
-			if (statements == null || statements.Count - startIndex < 2)
+			if (statements == null || statements.get_Count() - startIndex < 2)
 			{
 				return false;
 			}
-			for (int i = statements.Count - 1; i >= 0; i--)
+			V_0 = statements.get_Count() - 1;
+			while (V_0 >= 0)
 			{
-				if (this.TryMatchInternal(statements, i, out result, out replacedStatementsCount))
+				if (this.TryMatchInternal(statements, V_0, out result, out replacedStatementsCount))
 				{
-					Expression left = ((result as ExpressionStatement).Expression as BinaryExpression).Left;
-					if (left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
+					V_1 = ((result as ExpressionStatement).get_Expression() as BinaryExpression).get_Left();
+					if (V_1.get_CodeNodeType() == 26)
 					{
-						base.FixContext((left as VariableReferenceExpression).Variable.Resolve(), 0, replacedStatementsCount - 1, null);
+						this.FixContext((V_1 as VariableReferenceExpression).get_Variable().Resolve(), 0, replacedStatementsCount - 1, null);
 					}
-					startIndex = i;
+					startIndex = V_0;
 					return true;
 				}
+				V_0 = V_0 - 1;
 			}
 			return false;
 		}

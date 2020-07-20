@@ -14,6 +14,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
+				return new ExceptionStatement.u003cget_Childrenu003ed__10(-2);
 			}
 		}
 
@@ -21,7 +22,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ExceptionStatement;
+				return 67;
 			}
 		}
 
@@ -39,8 +40,10 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public ExceptionStatement(Exception exceptionObject, IMemberDefinition member)
 		{
-			this.ExceptionObject = exceptionObject;
-			this.Member = member;
+			base();
+			this.set_ExceptionObject(exceptionObject);
+			this.set_Member(member);
+			return;
 		}
 
 		public override Statement Clone()
@@ -50,7 +53,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public override Statement CloneStatementOnly()
 		{
-			return new ExceptionStatement(this.ExceptionObject, this.Member);
+			return new ExceptionStatement(this.get_ExceptionObject(), this.get_Member());
 		}
 	}
 }

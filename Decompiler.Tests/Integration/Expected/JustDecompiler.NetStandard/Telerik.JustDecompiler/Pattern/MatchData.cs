@@ -12,6 +12,7 @@ namespace Telerik.JustDecompiler.Pattern
 		{
 			this.Name = name;
 			this.Value = value;
+			return;
 		}
 	}
 }

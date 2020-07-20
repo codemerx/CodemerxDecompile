@@ -1,9 +1,7 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -17,130 +15,161 @@ namespace Telerik.JustDecompiler.Steps
 
 		public FixMethodOverloadsStep()
 		{
+			base();
+			return;
 		}
 
-		private bool ArgumentsMatchParameters(Mono.Collections.Generic.Collection<ParameterDefinition> parameters, ExpressionCollection arguments)
+		private bool ArgumentsMatchParameters(Collection<ParameterDefinition> parameters, ExpressionCollection arguments)
 		{
-			for (int i = 0; i < parameters.get_Count(); i++)
+			V_0 = 0;
+			while (V_0 < parameters.get_Count())
 			{
-				TypeDefinition typeDefinition = parameters.get_Item(i).get_ParameterType().Resolve();
-				Expression item = arguments[i];
-				if (!item.HasType)
+				V_1 = parameters.get_Item(V_0).get_ParameterType().Resolve();
+				V_2 = arguments.get_Item(V_0);
+				if (!V_2.get_HasType())
 				{
 					return true;
 				}
-				TypeDefinition typeDefinition1 = item.ExpressionType.Resolve();
-				if (typeDefinition == null || typeDefinition1 == null)
+				V_3 = V_2.get_ExpressionType().Resolve();
+				if (V_1 == null || V_3 == null)
 				{
 					return true;
 				}
-				if ((item.CodeNodeType != CodeNodeType.LiteralExpression || ((LiteralExpression)item).Value != null || typeDefinition.get_IsValueType()) && typeDefinition.get_FullName() != typeDefinition1.get_FullName() && !this.IsTypeDescendantOf(typeDefinition1, typeDefinition))
+				if (V_2.get_CodeNodeType() != 22 || ((LiteralExpression)V_2).get_Value() != null || V_1.get_IsValueType() && String.op_Inequality(V_1.get_FullName(), V_3.get_FullName()) && !this.IsTypeDescendantOf(V_3, V_1))
 				{
 					return false;
 				}
+				V_0 = V_0 + 1;
 			}
 			return true;
 		}
 
 		private void FixArguments(MethodReference method, ExpressionCollection arguments)
 		{
-			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
-			if (typeDefinition == null)
+			V_0 = method.get_DeclaringType().Resolve();
+			if (V_0 == null)
 			{
 				return;
 			}
-			List<MethodDefinition> sameNameMethods = this.GetSameNameMethods(typeDefinition, method, arguments);
-			if (sameNameMethods.Count > 0)
+			V_1 = this.GetSameNameMethods(V_0, method, arguments);
+			if (V_1.get_Count() > 0)
 			{
-				for (int i = 0; i < arguments.Count; i++)
+				V_2 = 0;
+				while (V_2 < arguments.get_Count())
 				{
-					TypeReference typeReference = method.get_Parameters().get_Item(i).ResolveParameterType(method);
-					if (arguments[i].HasType && !(arguments[i].ExpressionType.get_FullName() == typeReference.get_FullName()) && this.ShouldAddCast(arguments[i], sameNameMethods, i, typeReference))
+					V_3 = method.get_Parameters().get_Item(V_2).ResolveParameterType(method);
+					if (arguments.get_Item(V_2).get_HasType() && !String.op_Equality(arguments.get_Item(V_2).get_ExpressionType().get_FullName(), V_3.get_FullName()) && this.ShouldAddCast(arguments.get_Item(V_2), V_1, V_2, V_3))
 					{
-						arguments[i] = new ExplicitCastExpression(arguments[i], typeReference, null);
+						arguments.set_Item(V_2, new ExplicitCastExpression(arguments.get_Item(V_2), V_3, null));
 					}
+					V_2 = V_2 + 1;
 				}
 			}
+			return;
 		}
 
 		private List<MethodDefinition> GetSameNameMethods(TypeDefinition declaringTypeDefinition, MethodReference method, ExpressionCollection arguments)
 		{
-			List<MethodDefinition> methodDefinitions = new List<MethodDefinition>();
-			MethodDefinition methodDefinition = method.Resolve();
-			if (methodDefinition == null)
+			V_0 = new List<MethodDefinition>();
+			V_1 = method.Resolve();
+			if (V_1 == null)
 			{
-				return methodDefinitions;
+				return V_0;
 			}
-			foreach (MethodDefinition methodDefinition1 in declaringTypeDefinition.get_Methods())
+			V_2 = declaringTypeDefinition.get_Methods().GetEnumerator();
+			try
 			{
-				if (methodDefinition1.get_Name() != method.get_Name() || methodDefinition1.get_HasParameters() != method.get_HasParameters() || methodDefinition1.get_Parameters().get_Count() != method.get_Parameters().get_Count() || (object)methodDefinition1 == (object)methodDefinition || methodDefinition1.get_HasGenericParameters() != methodDefinition.get_HasGenericParameters() || !this.ArgumentsMatchParameters(methodDefinition1.get_Parameters(), arguments))
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_3 = V_2.get_Current();
+					if (String.op_Inequality(V_3.get_Name(), method.get_Name()) || V_3.get_HasParameters() != method.get_HasParameters() || V_3.get_Parameters().get_Count() != method.get_Parameters().get_Count() || (object)V_3 == (object)V_1 || V_3.get_HasGenericParameters() != V_1.get_HasGenericParameters() || !this.ArgumentsMatchParameters(V_3.get_Parameters(), arguments))
+					{
+						continue;
+					}
+					V_0.Add(V_3);
 				}
-				methodDefinitions.Add(methodDefinition1);
 			}
-			return methodDefinitions;
+			finally
+			{
+				V_2.Dispose();
+			}
+			return V_0;
 		}
 
 		private bool IsTypeDescendantOf(TypeReference descendant, TypeReference ancestor)
 		{
-			bool flag;
-			TypeDefinition typeDefinition;
 			if (descendant.get_IsGenericParameter())
 			{
 				return true;
 			}
-			TypeDefinition typeDefinition1 = descendant.Resolve();
-			if (typeDefinition1 == null)
+			V_0 = descendant.Resolve();
+			if (V_0 == null)
 			{
 				return false;
 			}
 			if (descendant.get_IsArray() == ancestor.get_IsArray())
 			{
-				while (typeDefinition1 != null)
+				while (V_0 != null)
 				{
-					if (typeDefinition1.get_BaseType() != null && typeDefinition1.get_BaseType().get_FullName() == ancestor.get_FullName())
+					if (V_0.get_BaseType() != null && String.op_Equality(V_0.get_BaseType().get_FullName(), ancestor.get_FullName()))
 					{
 						return true;
 					}
-					if (typeDefinition1.get_HasInterfaces())
+					if (V_0.get_HasInterfaces())
 					{
-						foreach (TypeReference @interface in typeDefinition1.get_Interfaces())
+						V_1 = V_0.get_Interfaces().GetEnumerator();
+						try
 						{
-							if (@interface.get_FullName() != ancestor.get_FullName())
+							while (V_1.MoveNext())
 							{
-								continue;
+								if (!String.op_Equality(V_1.get_Current().get_FullName(), ancestor.get_FullName()))
+								{
+									continue;
+								}
+								V_2 = true;
+								goto Label0;
 							}
-							flag = true;
-							return flag;
+						}
+						finally
+						{
+							V_1.Dispose();
 						}
 					}
-					if (typeDefinition1.get_BaseType() == null)
+					if (V_0.get_BaseType() == null)
 					{
-						typeDefinition = null;
+						stackVariable16 = null;
 					}
 					else
 					{
-						typeDefinition = typeDefinition1.get_BaseType().Resolve();
+						stackVariable16 = V_0.get_BaseType().Resolve();
 					}
-					typeDefinition1 = typeDefinition;
+					V_0 = stackVariable16;
 				}
 				return false;
 			}
 			else
 			{
-				foreach (TypeReference typeReference in typeDefinition1.get_Interfaces())
+				V_1 = V_0.get_Interfaces().GetEnumerator();
+				try
 				{
-					if (typeReference.get_FullName() != ancestor.get_FullName())
+					while (V_1.MoveNext())
 					{
-						continue;
+						if (!String.op_Equality(V_1.get_Current().get_FullName(), ancestor.get_FullName()))
+						{
+							continue;
+						}
+						V_2 = true;
+						goto Label0;
 					}
-					flag = true;
-					return flag;
+				}
+				finally
+				{
+					V_1.Dispose();
 				}
 				return false;
 			}
-			return flag;
+		Label0:
+			return V_2;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -152,83 +181,89 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool ShouldAddCast(Expression argument, List<MethodDefinition> sameNameMethods, int argumentIndex, TypeReference calledMethodParamType)
 		{
-			bool flag;
-			if (!argument.HasType)
+			if (!argument.get_HasType())
 			{
 				return true;
 			}
-			TypeReference expressionType = argument.ExpressionType;
-			List<MethodDefinition>.Enumerator enumerator = sameNameMethods.GetEnumerator();
+			V_0 = argument.get_ExpressionType();
+			V_1 = sameNameMethods.GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_1.MoveNext())
 				{
-					TypeReference parameterType = enumerator.Current.get_Parameters().get_Item(argumentIndex).get_ParameterType();
-					if (this.IsTypeDescendantOf(calledMethodParamType, parameterType) || calledMethodParamType.get_FullName() == parameterType.get_FullName())
+					V_2 = V_1.get_Current().get_Parameters().get_Item(argumentIndex).get_ParameterType();
+					if (this.IsTypeDescendantOf(calledMethodParamType, V_2) || String.op_Equality(calledMethodParamType.get_FullName(), V_2.get_FullName()))
 					{
 						continue;
 					}
-					if (this.IsTypeDescendantOf(expressionType, parameterType) || expressionType.get_FullName() == parameterType.get_FullName())
+					if (this.IsTypeDescendantOf(V_0, V_2) || String.op_Equality(V_0.get_FullName(), V_2.get_FullName()))
 					{
-						flag = true;
-						return flag;
+						V_3 = true;
+						goto Label1;
 					}
 					else
 					{
-						if (argument.CodeNodeType != CodeNodeType.LiteralExpression || ((LiteralExpression)argument).Value != null || parameterType.get_IsValueType())
+						if (argument.get_CodeNodeType() != 22 || ((LiteralExpression)argument).get_Value() != null || V_2.get_IsValueType())
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_3 = true;
+						goto Label1;
 					}
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_1).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_3;
+		Label0:
+			return false;
 		}
 
 		public override void VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			base.VisitBaseCtorExpression(node);
-			MethodReference method = node.MethodExpression.Method;
-			if (node.Arguments.Count > 0)
+			this.VisitBaseCtorExpression(node);
+			V_0 = node.get_MethodExpression().get_Method();
+			if (node.get_Arguments().get_Count() > 0)
 			{
-				this.FixArguments(method, node.Arguments);
+				this.FixArguments(V_0, node.get_Arguments());
 			}
+			return;
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			base.VisitMethodInvocationExpression(node);
-			if (node.MethodExpression.CodeNodeType == CodeNodeType.MethodReferenceExpression)
+			this.VisitMethodInvocationExpression(node);
+			if (node.get_MethodExpression().get_CodeNodeType() == 20)
 			{
-				this.FixArguments(node.MethodExpression.Method, node.Arguments);
+				this.FixArguments(node.get_MethodExpression().get_Method(), node.get_Arguments());
 			}
+			return;
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			base.VisitObjectCreationExpression(node);
-			MethodReference constructor = node.Constructor;
-			if (constructor != null)
+			this.VisitObjectCreationExpression(node);
+			V_0 = node.get_Constructor();
+			if (V_0 != null)
 			{
-				this.FixArguments(constructor, node.Arguments);
+				this.FixArguments(V_0, node.get_Arguments());
 			}
+			return;
 		}
 
 		public override void VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			base.VisitThisCtorExpression(node);
-			MethodReference method = node.MethodExpression.Method;
-			if (node.Arguments.Count > 0)
+			this.VisitThisCtorExpression(node);
+			V_0 = node.get_MethodExpression().get_Method();
+			if (node.get_Arguments().get_Count() > 0)
 			{
-				this.FixArguments(method, node.Arguments);
+				this.FixArguments(V_0, node.get_Arguments());
 			}
+			return;
 		}
 	}
 }

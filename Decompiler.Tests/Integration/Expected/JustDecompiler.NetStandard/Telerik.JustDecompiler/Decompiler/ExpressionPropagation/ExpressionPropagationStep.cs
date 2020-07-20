@@ -1,8 +1,6 @@
 using Mono.Cecil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -17,6 +15,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 
 		public ExpressionPropagationStep()
 		{
+			base();
+			return;
 		}
 
 		private bool CanBePropagated(Expression expression)
@@ -26,121 +26,132 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 
 		private bool ChangesAssignedExpression(Expression currentExpression, Expression assignedValue, Expression assignmentRecipient)
 		{
-			bool flag;
-			if (currentExpression is MethodInvocationExpression)
+			if (currentExpression as MethodInvocationExpression != null)
 			{
-				MethodInvocationExpression methodInvocationExpression = currentExpression as MethodInvocationExpression;
-				if (assignedValue.ExpressionType.get_IsByReference() && methodInvocationExpression.MethodExpression.Target != null)
+				V_1 = currentExpression as MethodInvocationExpression;
+				if (assignedValue.get_ExpressionType().get_IsByReference() && V_1.get_MethodExpression().get_Target() != null)
 				{
-					Expression target = methodInvocationExpression.MethodExpression.Target;
-					if (target.Equals(assignmentRecipient))
+					V_2 = V_1.get_MethodExpression().get_Target();
+					if (V_2.Equals(assignmentRecipient))
 					{
 						return false;
 					}
-					if (target is UnaryExpression && (target as UnaryExpression).Operator == UnaryOperator.AddressDereference && (target as UnaryExpression).Operand.Equals(assignmentRecipient))
+					if (V_2 as UnaryExpression != null && (V_2 as UnaryExpression).get_Operator() == 8 && (V_2 as UnaryExpression).get_Operand().Equals(assignmentRecipient))
 					{
 						return false;
 					}
 				}
 				return true;
 			}
-			if (!(currentExpression is BinaryExpression))
+			if (currentExpression as BinaryExpression == null)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression = currentExpression as BinaryExpression;
-			if (binaryExpression.Left.Equals(assignedValue))
+			V_0 = currentExpression as BinaryExpression;
+			if (V_0.get_Left().Equals(assignedValue))
 			{
 				return true;
 			}
-			if (assignedValue is ArrayIndexerExpression)
+			if (assignedValue as ArrayIndexerExpression != null)
 			{
-				ArrayIndexerExpression arrayIndexerExpression = assignedValue as ArrayIndexerExpression;
-				if (binaryExpression.Left.Equals(arrayIndexerExpression.Target))
+				V_3 = assignedValue as ArrayIndexerExpression;
+				if (V_0.get_Left().Equals(V_3.get_Target()))
 				{
 					return true;
 				}
-				using (IEnumerator<Expression> enumerator = arrayIndexerExpression.Indices.GetEnumerator())
+				V_4 = V_3.get_Indices().GetEnumerator();
+				try
 				{
-					while (enumerator.MoveNext())
+					while (V_4.MoveNext())
 					{
-						Expression current = enumerator.Current;
-						if (!binaryExpression.Left.Equals(current))
+						V_5 = V_4.get_Current();
+						if (!V_0.get_Left().Equals(V_5))
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_6 = true;
+						goto Label1;
 					}
-					if (assignedValue is UnaryExpression)
-					{
-						return this.ChangesAssignedExpression(currentExpression, (assignedValue as UnaryExpression).Operand, assignmentRecipient);
-					}
-					if (assignedValue is ExplicitCastExpression)
-					{
-						return this.ChangesAssignedExpression(currentExpression, (assignedValue as ExplicitCastExpression).Expression, assignmentRecipient);
-					}
-					if (!(assignedValue is CanCastExpression))
-					{
-						return false;
-					}
-					return this.ChangesAssignedExpression(currentExpression, (assignedValue as CanCastExpression).Expression, assignmentRecipient);
+					goto Label0;
 				}
-				return flag;
+				finally
+				{
+					if (V_4 != null)
+					{
+						V_4.Dispose();
+					}
+				}
+			Label1:
+				return V_6;
 			}
-			if (assignedValue is UnaryExpression)
+		Label0:
+			if (assignedValue as UnaryExpression != null)
 			{
-				return this.ChangesAssignedExpression(currentExpression, (assignedValue as UnaryExpression).Operand, assignmentRecipient);
+				return this.ChangesAssignedExpression(currentExpression, (assignedValue as UnaryExpression).get_Operand(), assignmentRecipient);
 			}
-			if (assignedValue is ExplicitCastExpression)
+			if (assignedValue as ExplicitCastExpression != null)
 			{
-				return this.ChangesAssignedExpression(currentExpression, (assignedValue as ExplicitCastExpression).Expression, assignmentRecipient);
+				return this.ChangesAssignedExpression(currentExpression, (assignedValue as ExplicitCastExpression).get_Expression(), assignmentRecipient);
 			}
-			if (!(assignedValue is CanCastExpression))
+			if (assignedValue as CanCastExpression == null)
 			{
 				return false;
 			}
-			return this.ChangesAssignedExpression(currentExpression, (assignedValue as CanCastExpression).Expression, assignmentRecipient);
+			return this.ChangesAssignedExpression(currentExpression, (assignedValue as CanCastExpression).get_Expression(), assignmentRecipient);
 		}
 
 		private IEnumerable<BinaryExpression> GetAssignmentExpressions(IList<Expression> blockExpressions)
 		{
-			List<BinaryExpression> binaryExpressions = new List<BinaryExpression>();
-			foreach (Expression blockExpression in blockExpressions)
+			V_0 = new List<BinaryExpression>();
+			V_1 = blockExpressions.GetEnumerator();
+			try
 			{
-				if (!(blockExpression is BinaryExpression) || !(blockExpression as BinaryExpression).IsAssignmentExpression)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (V_2 as BinaryExpression == null || !(V_2 as BinaryExpression).get_IsAssignmentExpression())
+					{
+						continue;
+					}
+					V_3 = V_2 as BinaryExpression;
+					if (!this.CanBePropagated(V_3.get_Right()) || V_3.get_Left() as VariableReferenceExpression == null)
+					{
+						continue;
+					}
+					V_4 = V_3.get_Left() as VariableReferenceExpression;
+					if (!V_4.get_ExpressionType().get_IsByReference() && !V_4.get_ExpressionType().get_IsPointer())
+					{
+						continue;
+					}
+					V_0.Add(V_3);
 				}
-				BinaryExpression binaryExpression = blockExpression as BinaryExpression;
-				if (!this.CanBePropagated(binaryExpression.Right) || !(binaryExpression.Left is VariableReferenceExpression))
-				{
-					continue;
-				}
-				VariableReferenceExpression left = binaryExpression.Left as VariableReferenceExpression;
-				if (!left.ExpressionType.get_IsByReference() && !left.ExpressionType.get_IsPointer())
-				{
-					continue;
-				}
-				binaryExpressions.Add(binaryExpression);
 			}
-			return binaryExpressions;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		private List<Expression> GetDominatedExpressions(BinaryExpression assignment, IList<Expression> blockExpressions)
 		{
-			int num = blockExpressions.IndexOf(assignment);
-			Expression right = assignment.Right;
-			List<Expression> expressions = new List<Expression>();
-			if (this.ChangesAssignedExpression(assignment.Right, assignment.Left, assignment.Left))
+			V_0 = blockExpressions.IndexOf(assignment);
+			V_1 = assignment.get_Right();
+			V_2 = new List<Expression>();
+			if (this.ChangesAssignedExpression(assignment.get_Right(), assignment.get_Left(), assignment.get_Left()))
 			{
-				return expressions;
+				return V_2;
 			}
-			for (int i = num + 1; i < blockExpressions.Count && !this.ChangesAssignedExpression(blockExpressions[i], right, assignment.Left); i++)
+			V_3 = V_0 + 1;
+			while (V_3 < blockExpressions.get_Count() && !this.ChangesAssignedExpression(blockExpressions.get_Item(V_3), V_1, assignment.get_Left()))
 			{
-				expressions.Add(blockExpressions[i]);
+				V_2.Add(blockExpressions.get_Item(V_3));
+				V_3 = V_3 + 1;
 			}
-			return expressions;
+			return V_2;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -152,26 +163,53 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 
 		private void PropagateExpressions()
 		{
-			foreach (IList<Expression> value in this.context.MethodContext.Expressions.BlockExpressions.Values)
+			V_0 = this.context.get_MethodContext().get_Expressions().get_BlockExpressions().get_Values().GetEnumerator();
+			try
 			{
-				foreach (BinaryExpression assignmentExpression in this.GetAssignmentExpressions(value))
+				while (V_0.MoveNext())
 				{
-					List<Expression> dominatedExpressions = this.GetDominatedExpressions(assignmentExpression, value);
-					for (int i = 0; i < dominatedExpressions.Count; i++)
+					V_1 = V_0.get_Current();
+					V_2 = this.GetAssignmentExpressions(V_1).GetEnumerator();
+					try
 					{
-						this.TryPropagate(dominatedExpressions[i], assignmentExpression.Left, assignmentExpression.Right);
+						while (V_2.MoveNext())
+						{
+							V_3 = V_2.get_Current();
+							V_4 = this.GetDominatedExpressions(V_3, V_1);
+							V_5 = 0;
+							while (V_5 < V_4.get_Count())
+							{
+								this.TryPropagate(V_4.get_Item(V_5), V_3.get_Left(), V_3.get_Right());
+								V_5 = V_5 + 1;
+							}
+						}
+					}
+					finally
+					{
+						if (V_2 != null)
+						{
+							V_2.Dispose();
+						}
+					}
+					V_6 = 0;
+					while (V_6 < V_1.get_Count())
+					{
+						V_1.set_Item(V_6, this.TrySimplifyExpression(V_1.get_Item(V_6)));
+						V_6 = V_6 + 1;
 					}
 				}
-				for (int j = 0; j < value.Count; j++)
-				{
-					value[j] = this.TrySimplifyExpression(value[j]);
-				}
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private void TryPropagate(Expression dominatedExpression, Expression original, Expression replacement)
 		{
-			(new ExpressionPropagationStep.ExpressionTreeTransformer(original, replacement)).Visit(dominatedExpression);
+			dummyVar0 = (new ExpressionPropagationStep.ExpressionTreeTransformer(original, replacement)).Visit(dominatedExpression);
+			return;
 		}
 
 		private Expression TrySimplifyExpression(Expression expression)
@@ -187,18 +225,20 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 
 			public ExpressionTreeTransformer(Expression original, Expression replacement)
 			{
+				base();
 				this.replacement = replacement;
 				this.original = original;
+				return;
 			}
 
 			public override ICodeNode Visit(ICodeNode node)
 			{
-				Expression expression = node as Expression;
-				if (expression != null && expression.Equals(this.original))
+				V_0 = node as Expression;
+				if (V_0 != null && V_0.Equals(this.original))
 				{
 					return this.replacement.CloneExpressionOnly();
 				}
-				return base.Visit(node);
+				return this.Visit(node);
 			}
 		}
 
@@ -210,13 +250,15 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 
 			public ExpressionTreeVisitor()
 			{
+				base();
+				return;
 			}
 
 			public bool CanBePropagated(Expression expression)
 			{
 				this.canBePropagated = true;
-				this.state = ExpressionPropagationStep.ExpressionTreeVisitor.SearchState.Propagation;
-				base.Visit(expression);
+				this.state = 0;
+				this.Visit(expression);
 				return this.canBePropagated;
 			}
 
@@ -227,7 +269,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitAnonymousObjectCreationExpression(node);
+				this.VisitAnonymousObjectCreationExpression(node);
+				return;
 			}
 
 			public override void VisitArrayCreationExpression(ArrayCreationExpression node)
@@ -237,7 +280,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitArrayCreationExpression(node);
+				this.VisitArrayCreationExpression(node);
+				return;
 			}
 
 			public override void VisitBaseCtorExpression(BaseCtorExpression node)
@@ -247,7 +291,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitBaseCtorExpression(node);
+				this.VisitBaseCtorExpression(node);
+				return;
 			}
 
 			public override void VisitDelegateCreationExpression(DelegateCreationExpression node)
@@ -257,7 +302,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitDelegateCreationExpression(node);
+				this.VisitDelegateCreationExpression(node);
+				return;
 			}
 
 			public override void VisitDelegateInvokeExpression(DelegateInvokeExpression node)
@@ -267,7 +313,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitDelegateInvokeExpression(node);
+				this.VisitDelegateInvokeExpression(node);
+				return;
 			}
 
 			public override void VisitLambdaExpression(LambdaExpression node)
@@ -277,7 +324,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitLambdaExpression(node);
+				this.VisitLambdaExpression(node);
+				return;
 			}
 
 			public override void VisitMakeRefExpression(MakeRefExpression node)
@@ -287,7 +335,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitMakeRefExpression(node);
+				this.VisitMakeRefExpression(node);
+				return;
 			}
 
 			public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
@@ -297,7 +346,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitMethodInvocationExpression(node);
+				this.VisitMethodInvocationExpression(node);
+				return;
 			}
 
 			public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
@@ -307,7 +357,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitMethodReferenceExpression(node);
+				this.VisitMethodReferenceExpression(node);
+				return;
 			}
 
 			public override void VisitObjectCreationExpression(ObjectCreationExpression node)
@@ -317,7 +368,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitObjectCreationExpression(node);
+				this.VisitObjectCreationExpression(node);
+				return;
 			}
 
 			public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
@@ -327,7 +379,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitPropertyReferenceExpression(node);
+				this.VisitPropertyReferenceExpression(node);
+				return;
 			}
 
 			public override void VisitStackAllocExpression(StackAllocExpression node)
@@ -337,7 +390,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitStackAllocExpression(node);
+				this.VisitStackAllocExpression(node);
+				return;
 			}
 
 			public override void VisitThisCtorExpression(ThisCtorExpression node)
@@ -347,7 +401,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitThisCtorExpression(node);
+				this.VisitThisCtorExpression(node);
+				return;
 			}
 
 			public override void VisitYieldBreakExpression(YieldBreakExpression node)
@@ -357,7 +412,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitYieldBreakExpression(node);
+				this.VisitYieldBreakExpression(node);
+				return;
 			}
 
 			public override void VisitYieldReturnExpression(YieldReturnExpression node)
@@ -367,7 +423,8 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 					this.canBePropagated = false;
 					return;
 				}
-				base.VisitYieldReturnExpression(node);
+				this.VisitYieldReturnExpression(node);
+				return;
 			}
 
 			private enum SearchState
@@ -380,29 +437,31 @@ namespace Telerik.JustDecompiler.Decompiler.ExpressionPropagation
 		{
 			public Simplifier()
 			{
+				base();
+				return;
 			}
 
 			public override ICodeNode VisitUnaryExpression(UnaryExpression node)
 			{
-				if (node.Operator == UnaryOperator.AddressDereference)
+				if (node.get_Operator() == 8)
 				{
-					if (node.Operand is UnaryExpression)
+					if (node.get_Operand() as UnaryExpression != null)
 					{
-						UnaryExpression operand = node.Operand as UnaryExpression;
-						if (operand.Operator == UnaryOperator.AddressOf || operand.Operator == UnaryOperator.AddressReference)
+						V_0 = node.get_Operand() as UnaryExpression;
+						if (V_0.get_Operator() == 9 || V_0.get_Operator() == 7)
 						{
-							return this.Visit(operand.Operand);
+							return this.Visit(V_0.get_Operand());
 						}
 					}
-					if (node.Operand is ExplicitCastExpression && node.Operand.ExpressionType.get_IsByReference())
+					if (node.get_Operand() as ExplicitCastExpression != null && node.get_Operand().get_ExpressionType().get_IsByReference())
 					{
-						ExplicitCastExpression explicitCastExpression = node.Operand as ExplicitCastExpression;
-						TypeReference elementType = (explicitCastExpression.ExpressionType as ByReferenceType).get_ElementType();
-						ExplicitCastExpression explicitCastExpression1 = new ExplicitCastExpression(explicitCastExpression.Expression, elementType, explicitCastExpression.MappedInstructions);
-						return this.Visit(explicitCastExpression1);
+						V_1 = node.get_Operand() as ExplicitCastExpression;
+						V_2 = (V_1.get_ExpressionType() as ByReferenceType).get_ElementType();
+						V_3 = new ExplicitCastExpression(V_1.get_Expression(), V_2, V_1.get_MappedInstructions());
+						return this.Visit(V_3);
 					}
 				}
-				return base.VisitUnaryExpression(node);
+				return this.VisitUnaryExpression(node);
 			}
 		}
 	}

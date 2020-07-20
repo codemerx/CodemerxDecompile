@@ -1,12 +1,9 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
-using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DFST;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DTree;
@@ -15,69 +12,100 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 {
 	internal class LoopBuilder : DominatorTreeDependentStep
 	{
-		private readonly Dictionary<ILogicalConstruct, HashSet<ILogicalConstruct>> removedEdges = new Dictionary<ILogicalConstruct, HashSet<ILogicalConstruct>>();
+		private readonly Dictionary<ILogicalConstruct, HashSet<ILogicalConstruct>> removedEdges;
 
 		private readonly TypeSystem typeSystem;
 
-		public LoopBuilder(LogicalFlowBuilderContext logicalContext, TypeSystem typeSystem) : base(logicalContext)
+		public LoopBuilder(LogicalFlowBuilderContext logicalContext, TypeSystem typeSystem)
 		{
+			this.removedEdges = new Dictionary<ILogicalConstruct, HashSet<ILogicalConstruct>>();
+			base(logicalContext);
 			this.typeSystem = typeSystem;
+			return;
 		}
 
 		private HashSet<ILogicalConstruct> BuildLoop(DFSTree tree, out HashSet<ILogicalConstruct> loopBody)
 		{
 			loopBody = new HashSet<ILogicalConstruct>();
-			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
-			foreach (DFSTEdge backEdge in tree.BackEdges)
+			V_0 = new HashSet<ILogicalConstruct>();
+			V_1 = tree.get_BackEdges().GetEnumerator();
+			try
 			{
-				ILogicalConstruct construct = backEdge.End.Construct as ILogicalConstruct;
-				ILogicalConstruct logicalConstruct = backEdge.Start.Construct as ILogicalConstruct;
-				if (this.removedEdges.ContainsKey(logicalConstruct) && this.removedEdges[logicalConstruct].Contains(construct))
+				while (V_1.MoveNext())
 				{
-					continue;
-				}
-				ICollection<DFSTNode> path = tree.GetPath(backEdge.End, backEdge.Start);
-				ICollection<DFSTNode> dFSTNodes = this.ExpandLoopBodyWithCrossEdges(path);
-				ICollection<ILogicalConstruct> constructsCollection = this.GetConstructsCollection(dFSTNodes);
-				if (!this.CanBeLoop(construct, logicalConstruct, dFSTNodes))
-				{
-					continue;
-				}
-				logicalConstructs.Add(logicalConstruct);
-				foreach (ILogicalConstruct logicalConstruct1 in constructsCollection)
-				{
-					loopBody.Add(logicalConstruct1);
+					V_2 = V_1.get_Current();
+					V_3 = V_2.get_End().get_Construct() as ILogicalConstruct;
+					V_4 = V_2.get_Start().get_Construct() as ILogicalConstruct;
+					if (this.removedEdges.ContainsKey(V_4) && this.removedEdges.get_Item(V_4).Contains(V_3))
+					{
+						continue;
+					}
+					V_5 = tree.GetPath(V_2.get_End(), V_2.get_Start());
+					V_6 = this.ExpandLoopBodyWithCrossEdges(V_5);
+					V_7 = this.GetConstructsCollection(V_6);
+					if (!this.CanBeLoop(V_3, V_4, V_6))
+					{
+						continue;
+					}
+					dummyVar0 = V_0.Add(V_4);
+					V_8 = V_7.GetEnumerator();
+					try
+					{
+						while (V_8.MoveNext())
+						{
+							V_9 = V_8.get_Current();
+							dummyVar1 = loopBody.Add(V_9);
+						}
+					}
+					finally
+					{
+						if (V_8 != null)
+						{
+							V_8.Dispose();
+						}
+					}
 				}
 			}
-			return logicalConstructs;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		public void BuildLoops(ILogicalConstruct block)
 		{
-			if (block.Children.Count == 0)
+			if (block.get_Children().get_Count() == 0)
 			{
 				return;
 			}
-			foreach (ISingleEntrySubGraph child in block.Children)
+			V_0 = block.get_Children().GetEnumerator();
+			try
 			{
-				ILogicalConstruct logicalConstruct = child as ILogicalConstruct;
-				if (logicalConstruct == null)
+				while (V_0.MoveNext())
 				{
-					throw new ArgumentException("Child is not a logical construct.");
+					V_1 = V_0.get_Current() as ILogicalConstruct;
+					if (V_1 == null)
+					{
+						throw new ArgumentException("Child is not a logical construct.");
+					}
+					if (V_1 as ConditionLogicalConstruct != null)
+					{
+						continue;
+					}
+					this.BuildLoops(V_1);
 				}
-				if (logicalConstruct is ConditionLogicalConstruct)
-				{
-					continue;
-				}
-				this.BuildLoops(logicalConstruct);
+			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
 			}
 			this.ProcessLogicalConstruct(block);
+			return;
 		}
 
 		private bool CanBeInLoop(ILogicalConstruct node, ICollection<ILogicalConstruct> nodesInLoop, ILogicalConstruct loopHeader)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs;
-			bool flag;
 			if (node == null)
 			{
 				return false;
@@ -86,58 +114,72 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 			{
 				return true;
 			}
-			HashSet<ISingleEntrySubGraph>.Enumerator enumerator = node.SameParentPredecessors.GetEnumerator();
+			V_0 = node.get_SameParentPredecessors().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					ILogicalConstruct current = enumerator.Current as ILogicalConstruct;
-					if (current != null)
+					V_1 = V_0.get_Current() as ILogicalConstruct;
+					if (V_1 != null)
 					{
-						if (nodesInLoop.Contains(current) && (!this.removedEdges.TryGetValue(current, out logicalConstructs) || !logicalConstructs.Contains(node)))
+						if (nodesInLoop.Contains(V_1) && !this.removedEdges.TryGetValue(V_1, out V_2) || !V_2.Contains(node))
 						{
 							continue;
 						}
-						flag = false;
-						return flag;
+						V_3 = false;
+						goto Label1;
 					}
 					else
 					{
-						flag = false;
-						return flag;
+						V_3 = false;
+						goto Label1;
 					}
 				}
-				return true;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_0).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_3;
+		Label0:
+			return true;
 		}
 
 		private bool CanBeLoop(ILogicalConstruct header, ILogicalConstruct latchingNode, ICollection<DFSTNode> nodesInLoop)
 		{
-			bool flag;
 			if (header == null || latchingNode == null)
 			{
 				return false;
 			}
-			ICollection<ILogicalConstruct> constructsCollection = this.GetConstructsCollection(nodesInLoop);
-			using (IEnumerator<ILogicalConstruct> enumerator = constructsCollection.GetEnumerator())
+			V_0 = this.GetConstructsCollection(nodesInLoop);
+			V_1 = V_0.GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_1.MoveNext())
 				{
-					if (this.CanBeInLoop(enumerator.Current, constructsCollection, header))
+					V_2 = V_1.get_Current();
+					if (this.CanBeInLoop(V_2, V_0, header))
 					{
 						continue;
 					}
-					flag = false;
-					return flag;
+					V_3 = false;
+					goto Label1;
 				}
-				return true;
+				goto Label0;
 			}
-			return flag;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+		Label1:
+			return V_3;
+		Label0:
+			return true;
 		}
 
 		private bool CanBeLoopCondition(ILogicalConstruct node, HashSet<ILogicalConstruct> loopBody)
@@ -146,369 +188,509 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 			{
 				return false;
 			}
-			if (!(node is ConditionLogicalConstruct))
+			if (node as ConditionLogicalConstruct == null)
 			{
 				return false;
 			}
-			int num = 0;
-			foreach (ILogicalConstruct sameParentSuccessor in node.SameParentSuccessors)
+			V_0 = 0;
+			V_1 = node.get_SameParentSuccessors().GetEnumerator();
+			try
 			{
-				if (!loopBody.Contains(sameParentSuccessor))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = (ILogicalConstruct)V_1.get_Current();
+					if (!loopBody.Contains(V_2))
+					{
+						continue;
+					}
+					V_0 = V_0 + 1;
 				}
-				num++;
 			}
-			return num == 1;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0 == 1;
 		}
 
 		private void CleanUpEdges(LoopLogicalConstruct loopConstruct)
 		{
-			DFSTNode item = DFSTBuilder.BuildTree(loopConstruct.Parent).ConstructToNodeMap[loopConstruct];
-			if (item.BackEdgeSuccessors.Count == 0)
+			V_0 = DFSTBuilder.BuildTree(loopConstruct.get_Parent()).get_ConstructToNodeMap().get_Item(loopConstruct);
+			if (V_0.get_BackEdgeSuccessors().get_Count() == 0)
 			{
 				return;
 			}
-			foreach (DFSTNode backEdgeSuccessor in item.BackEdgeSuccessors)
+			V_1 = V_0.get_BackEdgeSuccessors().GetEnumerator();
+			try
 			{
-				if (backEdgeSuccessor.Construct as ILogicalConstruct is ConditionLogicalConstruct)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (V_2.get_Construct() as ILogicalConstruct as ConditionLogicalConstruct != null)
+					{
+						continue;
+					}
+					this.MarkAsGotoEdge(loopConstruct, V_2.get_Construct() as ILogicalConstruct);
 				}
-				this.MarkAsGotoEdge(loopConstruct, backEdgeSuccessor.Construct as ILogicalConstruct);
 			}
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return;
 		}
 
 		private LoopType DetermineLoopType(HashSet<ILogicalConstruct> loopBody, HashSet<ILogicalConstruct> latchingNodes, IntervalConstruct interval, DominatorTree dominatorTree, out ConditionLogicalConstruct loopCondition)
 		{
-			LoopType loopType;
-			ILogicalConstruct entry = interval.Entry as ILogicalConstruct;
-			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>(latchingNodes);
-			logicalConstructs.Add(entry);
-			DFSTree dFSTree = DFSTBuilder.BuildTree(entry.Parent as ILogicalConstruct);
-			HashSet<ILogicalConstruct> logicalConstructs1 = new HashSet<ILogicalConstruct>();
-			foreach (ILogicalConstruct logicalConstruct in loopBody)
+			V_0 = interval.get_Entry() as ILogicalConstruct;
+			V_1 = new HashSet<ILogicalConstruct>(latchingNodes);
+			dummyVar0 = V_1.Add(V_0);
+			V_2 = DFSTBuilder.BuildTree(V_0.get_Parent() as ILogicalConstruct);
+			V_3 = new HashSet<ILogicalConstruct>();
+			V_4 = loopBody.GetEnumerator();
+			try
 			{
-				foreach (ILogicalConstruct dominanceFrontier in dominatorTree.GetDominanceFrontier(logicalConstruct))
+				while (V_4.MoveNext())
 				{
-					if (!interval.Children.Contains(dominanceFrontier) || loopBody.Contains(dominanceFrontier))
+					V_5 = V_4.get_Current();
+					V_6 = dominatorTree.GetDominanceFrontier(V_5).GetEnumerator();
+					try
 					{
-						continue;
+						while (V_6.MoveNext())
+						{
+							V_7 = (ILogicalConstruct)V_6.get_Current();
+							if (!interval.get_Children().Contains(V_7) || loopBody.Contains(V_7))
+							{
+								continue;
+							}
+							dummyVar1 = V_3.Add(V_7);
+						}
 					}
-					logicalConstructs1.Add(dominanceFrontier);
+					finally
+					{
+						((IDisposable)V_6).Dispose();
+					}
 				}
 			}
-			if (logicalConstructs1.Count == 0)
+			finally
 			{
-				List<DFSTNode>.Enumerator enumerator = dFSTree.ReversePostOrder.GetEnumerator();
+				((IDisposable)V_4).Dispose();
+			}
+			if (V_3.get_Count() == 0)
+			{
+				V_8 = V_2.get_ReversePostOrder().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_8.MoveNext())
 					{
-						ILogicalConstruct construct = enumerator.Current.Construct as ILogicalConstruct;
-						if (loopBody.Contains(construct))
+						V_9 = V_8.get_Current().get_Construct() as ILogicalConstruct;
+						if (loopBody.Contains(V_9))
 						{
 							continue;
 						}
-						loopCondition = this.GetLoopConditionWithMaxIndex(dFSTree, loopBody, logicalConstructs, construct);
+						loopCondition = this.GetLoopConditionWithMaxIndex(V_2, loopBody, V_1, V_9);
 						if (loopCondition == null)
 						{
 							continue;
 						}
-						this.ExpandLoopBody(interval, loopBody, construct);
-						if (loopCondition != entry)
+						this.ExpandLoopBody(interval, loopBody, V_9);
+						if (loopCondition != V_0)
 						{
-							loopType = LoopType.PostTestedLoop;
-							return loopType;
+							V_10 = 2;
+							goto Label1;
 						}
 						else
 						{
-							loopType = LoopType.PreTestedLoop;
-							return loopType;
+							V_10 = 1;
+							goto Label1;
 						}
 					}
-					if (!this.CanBeLoopCondition(entry, loopBody))
-					{
-						loopCondition = null;
-						return LoopType.InfiniteLoop;
-					}
-					loopCondition = entry as ConditionLogicalConstruct;
-					return LoopType.PreTestedLoop;
+					goto Label0;
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					((IDisposable)V_8).Dispose();
 				}
-				return loopType;
+			Label1:
+				return V_10;
 			}
-			int count = dFSTree.ReversePostOrder.Count;
-			foreach (ILogicalConstruct logicalConstruct1 in logicalConstructs1)
+			V_11 = V_2.get_ReversePostOrder().get_Count();
+			V_4 = V_3.GetEnumerator();
+			try
 			{
-				int reversePostOrderIndex = dFSTree.ConstructToNodeMap[logicalConstruct1].ReversePostOrderIndex;
-				if (reversePostOrderIndex >= count)
+				while (V_4.MoveNext())
 				{
-					continue;
+					V_13 = V_4.get_Current();
+					V_14 = V_2.get_ConstructToNodeMap().get_Item(V_13).get_ReversePostOrderIndex();
+					if (V_14 >= V_11)
+					{
+						continue;
+					}
+					V_11 = V_14;
 				}
-				count = reversePostOrderIndex;
 			}
-			ILogicalConstruct construct1 = dFSTree.ReversePostOrder[count].Construct as ILogicalConstruct;
-			loopCondition = this.GetLoopConditionWithMaxIndex(dFSTree, loopBody, logicalConstructs, construct1);
-			this.ExpandLoopBody(interval, loopBody, construct1);
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+			V_12 = V_2.get_ReversePostOrder().get_Item(V_11).get_Construct() as ILogicalConstruct;
+			loopCondition = this.GetLoopConditionWithMaxIndex(V_2, loopBody, V_1, V_12);
+			this.ExpandLoopBody(interval, loopBody, V_12);
 			if (loopCondition == null)
 			{
-				return LoopType.InfiniteLoop;
+				return 0;
 			}
-			if (loopCondition == entry)
+			if (loopCondition == V_0)
 			{
-				return LoopType.PreTestedLoop;
+				return 1;
 			}
-			return LoopType.PostTestedLoop;
+			return 2;
+		Label0:
+			if (!this.CanBeLoopCondition(V_0, loopBody))
+			{
+				loopCondition = null;
+				return 0;
+			}
+			loopCondition = V_0 as ConditionLogicalConstruct;
+			return 1;
 		}
 
 		private void ExpandLoopBody(IntervalConstruct interval, HashSet<ILogicalConstruct> loopBody, ILogicalConstruct loopSuccessor)
 		{
-			HashSet<ILogicalConstruct> intervalSuccessors = this.GetIntervalSuccessors(interval, loopSuccessor);
-			intervalSuccessors.Add(loopSuccessor);
-			foreach (LogicalConstructBase child in interval.Children)
+			V_0 = this.GetIntervalSuccessors(interval, loopSuccessor);
+			dummyVar0 = V_0.Add(loopSuccessor);
+			V_1 = interval.get_Children().GetEnumerator();
+			try
 			{
-				if (intervalSuccessors.Contains(child))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = (LogicalConstructBase)V_1.get_Current();
+					if (V_0.Contains(V_2))
+					{
+						continue;
+					}
+					dummyVar1 = loopBody.Add(V_2);
 				}
-				loopBody.Add(child);
 			}
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return;
 		}
 
 		private ICollection<DFSTNode> ExpandLoopBodyWithCrossEdges(ICollection<DFSTNode> nodesInLoop)
 		{
-			HashSet<DFSTNode> dFSTNodes = new HashSet<DFSTNode>(nodesInLoop);
-			Queue<DFSTNode> dFSTNodes1 = new Queue<DFSTNode>(nodesInLoop);
-			while (dFSTNodes1.Count > 0)
+			V_0 = new HashSet<DFSTNode>(nodesInLoop);
+			V_1 = new Queue<DFSTNode>(nodesInLoop);
+			while (V_1.get_Count() > 0)
 			{
-				DFSTNode dFSTNode = dFSTNodes1.Dequeue();
-				foreach (DFSTNode crossEdgePredecessor in dFSTNode.CrossEdgePredecessors)
+				V_2 = V_1.Dequeue();
+				V_4 = V_2.get_CrossEdgePredecessors().GetEnumerator();
+				try
 				{
-					if (dFSTNodes.Contains(crossEdgePredecessor))
+					while (V_4.MoveNext())
 					{
-						continue;
+						V_5 = V_4.get_Current();
+						if (V_0.Contains(V_5))
+						{
+							continue;
+						}
+						dummyVar0 = V_0.Add(V_5);
+						V_1.Enqueue(V_5);
 					}
-					dFSTNodes.Add(crossEdgePredecessor);
-					dFSTNodes1.Enqueue(crossEdgePredecessor);
 				}
-				DFSTNode predecessor = dFSTNode.Predecessor as DFSTNode;
-				if (predecessor == null || dFSTNodes.Contains(predecessor))
+				finally
+				{
+					((IDisposable)V_4).Dispose();
+				}
+				V_3 = V_2.get_Predecessor() as DFSTNode;
+				if (V_3 == null || V_0.Contains(V_3))
 				{
 					continue;
 				}
-				dFSTNodes.Add(predecessor);
-				dFSTNodes1.Enqueue(predecessor);
+				dummyVar1 = V_0.Add(V_3);
+				V_1.Enqueue(V_3);
 			}
-			return dFSTNodes;
+			return V_0;
 		}
 
 		private ICollection<ILogicalConstruct> GetConstructsCollection(ICollection<DFSTNode> nodeCollection)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
-			foreach (DFSTNode dFSTNode in nodeCollection)
+			V_0 = new HashSet<ILogicalConstruct>();
+			V_1 = nodeCollection.GetEnumerator();
+			try
 			{
-				logicalConstructs.Add(dFSTNode.Construct as ILogicalConstruct);
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					dummyVar0 = V_0.Add(V_2.get_Construct() as ILogicalConstruct);
+				}
 			}
-			return logicalConstructs;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		private HashSet<ILogicalConstruct> GetIntervalSuccessors(IntervalConstruct interval, ILogicalConstruct startNode)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
-			if (!interval.Children.Contains(startNode))
+			V_0 = new HashSet<ILogicalConstruct>();
+			if (!interval.get_Children().Contains(startNode))
 			{
-				return logicalConstructs;
+				return V_0;
 			}
-			Queue<ILogicalConstruct> logicalConstructs1 = new Queue<ILogicalConstruct>();
-			logicalConstructs1.Enqueue(startNode);
-			HashSet<ILogicalConstruct> logicalConstructs2 = new HashSet<ILogicalConstruct>();
-			logicalConstructs2.Add(startNode);
-			while (logicalConstructs1.Count > 0)
+			V_1 = new Queue<ILogicalConstruct>();
+			V_1.Enqueue(startNode);
+			V_2 = new HashSet<ILogicalConstruct>();
+			dummyVar0 = V_2.Add(startNode);
+			while (V_1.get_Count() > 0)
 			{
-				foreach (ILogicalConstruct sameParentSuccessor in logicalConstructs1.Dequeue().SameParentSuccessors)
+				V_3 = V_1.Dequeue().get_SameParentSuccessors().GetEnumerator();
+				try
 				{
-					if (logicalConstructs2.Contains(sameParentSuccessor) || !interval.Children.Contains(sameParentSuccessor) || !logicalConstructs.Add(sameParentSuccessor))
+					while (V_3.MoveNext())
 					{
-						continue;
+						V_4 = (ILogicalConstruct)V_3.get_Current();
+						if (V_2.Contains(V_4) || !interval.get_Children().Contains(V_4) || !V_0.Add(V_4))
+						{
+							continue;
+						}
+						dummyVar1 = V_2.Add(V_4);
+						V_1.Enqueue(V_4);
 					}
-					logicalConstructs2.Add(sameParentSuccessor);
-					logicalConstructs1.Enqueue(sameParentSuccessor);
+				}
+				finally
+				{
+					((IDisposable)V_3).Dispose();
 				}
 			}
-			return logicalConstructs;
+			return V_0;
 		}
 
 		private ConditionLogicalConstruct GetLoopConditionWithMaxIndex(DFSTree dfsTree, HashSet<ILogicalConstruct> loopBody, HashSet<ILogicalConstruct> loopExits, ILogicalConstruct loopSuccessor)
 		{
-			int num = -1;
-			foreach (ILogicalConstruct loopExit in loopExits)
+			V_0 = -1;
+			V_1 = loopExits.GetEnumerator();
+			try
 			{
-				int reversePostOrderIndex = dfsTree.ConstructToNodeMap[loopExit].ReversePostOrderIndex;
-				if (!loopExit.SameParentSuccessors.Contains(loopSuccessor) || reversePostOrderIndex <= num || !this.CanBeLoopCondition(loopExit, loopBody))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					V_3 = dfsTree.get_ConstructToNodeMap().get_Item(V_2).get_ReversePostOrderIndex();
+					if (!V_2.get_SameParentSuccessors().Contains(loopSuccessor) || V_3 <= V_0 || !this.CanBeLoopCondition(V_2, loopBody))
+					{
+						continue;
+					}
+					V_0 = V_3;
 				}
-				num = reversePostOrderIndex;
 			}
-			if (num <= -1)
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			if (V_0 <= -1)
 			{
 				return null;
 			}
-			return dfsTree.ReversePostOrder[num].Construct as ConditionLogicalConstruct;
+			return dfsTree.get_ReversePostOrder().get_Item(V_0).get_Construct() as ConditionLogicalConstruct;
 		}
 
 		private void MarkAsGotoEdge(ILogicalConstruct start, ILogicalConstruct end)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs;
 			if (start == null || end == null)
 			{
 				throw new ArgumentOutOfRangeException("GoTo edge's ends must implement ILogicalConstruct.");
 			}
-			if (!this.removedEdges.TryGetValue(start, out logicalConstructs))
+			if (!this.removedEdges.TryGetValue(start, out V_0))
 			{
-				logicalConstructs = new HashSet<ILogicalConstruct>();
-				this.removedEdges[start] = logicalConstructs;
+				V_0 = new HashSet<ILogicalConstruct>();
+				this.removedEdges.set_Item(start, V_0);
 			}
-			logicalConstructs.Add(end);
+			dummyVar0 = V_0.Add(end);
+			return;
 		}
 
 		private void ProcessLogicalConstruct(ILogicalConstruct construct)
 		{
-			DominatorTree dominatorTreeFromContext = base.GetDominatorTreeFromContext(construct);
-			int count = 0x7fffffff;
+			V_0 = this.GetDominatorTreeFromContext(construct);
+			V_1 = 0x7fffffff;
 			this.RemoveBackEdgesFromSwitchConstructs(construct);
-			while (count > 1)
+			while (V_1 > 1)
 			{
-				List<IntervalConstruct> intervalConstructs = (new IntervalAnalyzer(construct, this.removedEdges)).ReduceCfg();
-				List<IntervalConstruct> intervalConstructs1 = new List<IntervalConstruct>(intervalConstructs);
-				intervalConstructs1.Reverse();
-				bool flag = false;
-				foreach (IntervalConstruct intervalConstruct in intervalConstructs1)
+				V_2 = (new IntervalAnalyzer(construct, this.removedEdges)).ReduceCfg();
+				stackVariable14 = new List<IntervalConstruct>(V_2);
+				stackVariable14.Reverse();
+				V_3 = false;
+				V_4 = stackVariable14.GetEnumerator();
+				try
 				{
-					if (!this.TryMakeLoop(intervalConstruct, dominatorTreeFromContext))
+					while (V_4.MoveNext())
 					{
-						continue;
+						V_5 = V_4.get_Current();
+						if (!this.TryMakeLoop(V_5, V_0))
+						{
+							continue;
+						}
+						V_3 = true;
+						goto Label0;
 					}
-					flag = true;
-					goto Label0;
+				}
+				finally
+				{
+					((IDisposable)V_4).Dispose();
 				}
 			Label0:
-				if (!flag)
+				if (!V_3)
 				{
-					if (intervalConstructs.Count == count)
+					if (V_2.get_Count() == V_1)
 					{
-						this.RemoveBlockingEdges(intervalConstructs);
+						this.RemoveBlockingEdges(V_2);
 					}
-					if (intervalConstructs.Count > count)
+					if (V_2.get_Count() > V_1)
 					{
 						throw new Exception("Intervails are more than in the last iteration.");
 					}
-					count = intervalConstructs.Count;
+					V_1 = V_2.get_Count();
 				}
 				else
 				{
-					count = intervalConstructs.Count;
+					V_1 = V_2.get_Count();
 				}
 			}
+			return;
 		}
 
 		private void RemoveBackEdgesFromSwitchConstructs(ILogicalConstruct theConstruct)
 		{
-			foreach (DFSTEdge backEdge in DFSTBuilder.BuildTree(theConstruct).BackEdges)
+			V_0 = DFSTBuilder.BuildTree(theConstruct).get_BackEdges().GetEnumerator();
+			try
 			{
-				ILogicalConstruct construct = backEdge.Start.Construct as ILogicalConstruct;
-				if (construct is ConditionLogicalConstruct)
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					V_2 = V_1.get_Start().get_Construct() as ILogicalConstruct;
+					if (V_2 as ConditionLogicalConstruct != null)
+					{
+						continue;
+					}
+					V_3 = V_2 as CFGBlockLogicalConstruct;
+					if (V_3 == null || V_3.get_TheBlock().get_Last().get_OpCode().get_Code() != 68)
+					{
+						continue;
+					}
+					this.MarkAsGotoEdge(V_2, V_1.get_End().get_Construct() as ILogicalConstruct);
 				}
-				CFGBlockLogicalConstruct cFGBlockLogicalConstruct = construct as CFGBlockLogicalConstruct;
-				if (cFGBlockLogicalConstruct == null || cFGBlockLogicalConstruct.TheBlock.Last.get_OpCode().get_Code() != 68)
-				{
-					continue;
-				}
-				this.MarkAsGotoEdge(construct, backEdge.End.Construct as ILogicalConstruct);
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private void RemoveBlockingEdges(List<IntervalConstruct> intervals)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs;
-			IntervalConstruct intervalConstruct = new IntervalConstruct(intervals[0]);
-			for (int i = 1; i < intervals.Count; i++)
+			V_0 = new IntervalConstruct(intervals.get_Item(0));
+			V_5 = 1;
+			while (V_5 < intervals.get_Count())
 			{
-				intervalConstruct.Children.Add(intervals[i]);
+				dummyVar0 = V_0.get_Children().Add(intervals.get_Item(V_5));
+				V_5 = V_5 + 1;
 			}
-			DFSTree dFSTree = DFSTBuilder.BuildTree(intervalConstruct);
-			DFSTEdge dFSTEdge = dFSTree.BackEdges.FirstOrDefault<DFSTEdge>() ?? dFSTree.CrossEdges.FirstOrDefault<DFSTEdge>();
-			IntervalConstruct construct = dFSTEdge.Start.Construct as IntervalConstruct;
-			IntervalConstruct construct1 = dFSTEdge.End.Construct as IntervalConstruct;
-			foreach (ILogicalConstruct sameParentPredecessor in construct1.Entry.SameParentPredecessors)
+			V_1 = DFSTBuilder.BuildTree(V_0);
+			V_2 = V_1.get_BackEdges().FirstOrDefault<DFSTEdge>();
+			if (V_2 == null)
 			{
-				if (!construct.Children.Contains(sameParentPredecessor))
-				{
-					continue;
-				}
-				ILogicalConstruct logicalConstruct = sameParentPredecessor;
-				ILogicalConstruct entry = construct1.Entry as ILogicalConstruct;
-				if (this.removedEdges.TryGetValue(logicalConstruct, out logicalConstructs) && logicalConstructs.Contains(entry))
-				{
-					continue;
-				}
-				this.MarkAsGotoEdge(logicalConstruct, entry);
-				return;
+				V_2 = V_1.get_CrossEdges().FirstOrDefault<DFSTEdge>();
 			}
+			V_3 = V_2.get_Start().get_Construct() as IntervalConstruct;
+			V_4 = V_2.get_End().get_Construct() as IntervalConstruct;
+			V_6 = V_4.get_Entry().get_SameParentPredecessors().GetEnumerator();
+			try
+			{
+				while (V_6.MoveNext())
+				{
+					V_7 = (ILogicalConstruct)V_6.get_Current();
+					if (!V_3.get_Children().Contains(V_7))
+					{
+						continue;
+					}
+					V_8 = V_7;
+					V_9 = V_4.get_Entry() as ILogicalConstruct;
+					if (this.removedEdges.TryGetValue(V_8, out V_10) && V_10.Contains(V_9))
+					{
+						continue;
+					}
+					this.MarkAsGotoEdge(V_8, V_9);
+					goto Label0;
+				}
+			}
+			finally
+			{
+				((IDisposable)V_6).Dispose();
+			}
+		Label0:
+			return;
 		}
 
 		private bool TryMakeLoop(IntervalConstruct interval, DominatorTree dominatorTree)
 		{
-			HashSet<ILogicalConstruct> logicalConstructs;
-			ConditionLogicalConstruct conditionLogicalConstruct;
-			DFSTree dFSTree = DFSTBuilder.BuildTree(interval);
-			if (dFSTree.BackEdges.Count == 0)
+			V_0 = DFSTBuilder.BuildTree(interval);
+			if (V_0.get_BackEdges().get_Count() == 0)
 			{
 				return false;
 			}
-			HashSet<ILogicalConstruct> logicalConstructs1 = this.BuildLoop(dFSTree, out logicalConstructs);
-			LoopType loopType = this.DetermineLoopType(logicalConstructs, logicalConstructs1, interval, dominatorTree, out conditionLogicalConstruct);
-			if (logicalConstructs.Count > 0)
+			V_2 = this.BuildLoop(V_0, out V_1);
+			V_4 = this.DetermineLoopType(V_1, V_2, interval, dominatorTree, out V_3);
+			if (V_1.get_Count() > 0)
 			{
-				LoopLogicalConstruct loopLogicalConstruct = new LoopLogicalConstruct(interval.Entry as ILogicalConstruct, logicalConstructs, loopType, conditionLogicalConstruct, this.typeSystem);
-				this.CleanUpEdges(loopLogicalConstruct);
-				this.UpdateDominatorTree(dominatorTree, loopLogicalConstruct);
+				V_5 = new LoopLogicalConstruct(interval.get_Entry() as ILogicalConstruct, V_1, V_4, V_3, this.typeSystem);
+				this.CleanUpEdges(V_5);
+				this.UpdateDominatorTree(dominatorTree, V_5);
 				return true;
 			}
-			foreach (DFSTEdge backEdge in dFSTree.BackEdges)
+			V_6 = V_0.get_BackEdges().GetEnumerator();
+			try
 			{
-				this.MarkAsGotoEdge(backEdge.Start.Construct as ILogicalConstruct, backEdge.End.Construct as ILogicalConstruct);
+				while (V_6.MoveNext())
+				{
+					V_7 = V_6.get_Current();
+					this.MarkAsGotoEdge(V_7.get_Start().get_Construct() as ILogicalConstruct, V_7.get_End().get_Construct() as ILogicalConstruct);
+				}
+			}
+			finally
+			{
+				((IDisposable)V_6).Dispose();
 			}
 			return false;
 		}
 
 		private void UpdateDominatorTree(DominatorTree dominatorTree, LoopLogicalConstruct theLoopConstruct)
 		{
-			ISingleEntrySubGraph loopCondition;
-			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
-			if (theLoopConstruct.LoopCondition != null)
+			V_0 = new HashSet<ISingleEntrySubGraph>();
+			if (theLoopConstruct.get_LoopCondition() != null)
 			{
-				singleEntrySubGraphs.Add(theLoopConstruct.LoopCondition);
+				dummyVar0 = V_0.Add(theLoopConstruct.get_LoopCondition());
 			}
-			if (theLoopConstruct.LoopBodyBlock != null)
+			if (theLoopConstruct.get_LoopBodyBlock() != null)
 			{
-				singleEntrySubGraphs.UnionWith(theLoopConstruct.LoopBodyBlock.Children);
+				V_0.UnionWith(theLoopConstruct.get_LoopBodyBlock().get_Children());
 			}
-			if (theLoopConstruct.LoopType == LoopType.PreTestedLoop)
+			if (theLoopConstruct.get_LoopType() == 1)
 			{
-				loopCondition = theLoopConstruct.LoopCondition;
+				stackVariable10 = theLoopConstruct.get_LoopCondition();
 			}
 			else
 			{
-				loopCondition = theLoopConstruct.LoopBodyBlock.Entry;
+				stackVariable10 = theLoopConstruct.get_LoopBodyBlock().get_Entry();
 			}
-			dominatorTree.MergeNodes(singleEntrySubGraphs, loopCondition, theLoopConstruct);
+			dominatorTree.MergeNodes(V_0, stackVariable10, theLoopConstruct);
+			return;
 		}
 	}
 }

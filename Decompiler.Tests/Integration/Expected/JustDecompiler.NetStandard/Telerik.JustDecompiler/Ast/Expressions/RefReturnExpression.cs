@@ -11,54 +11,54 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.RefReturnExpression;
+				return 94;
 			}
 		}
 
-		public RefReturnExpression(Expression value, IEnumerable<Instruction> instructions) : base(value, instructions)
+		public RefReturnExpression(Expression value, IEnumerable<Instruction> instructions)
 		{
+			base(value, instructions);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			Expression expression;
-			if (base.Value != null)
+			if (this.get_Value() != null)
 			{
-				expression = base.Value.Clone();
+				stackVariable4 = this.get_Value().Clone();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new RefReturnExpression(expression, this.instructions);
+			return new RefReturnExpression(stackVariable4, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			Expression expression;
-			if (base.Value != null)
+			if (this.get_Value() != null)
 			{
-				expression = base.Value.CloneExpressionOnly();
+				stackVariable4 = this.get_Value().CloneExpressionOnly();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new RefReturnExpression(expression, null);
+			return new RefReturnExpression(stackVariable4, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is RefReturnExpression))
+			if (other as RefReturnExpression == null)
 			{
 				return false;
 			}
-			RefReturnExpression refReturnExpression = other as RefReturnExpression;
-			if (base.Value == null)
+			V_0 = other as RefReturnExpression;
+			if (this.get_Value() == null)
 			{
-				return refReturnExpression.Value == null;
+				return V_0.get_Value() == null;
 			}
-			return base.Value.Equals(refReturnExpression.Value);
+			return this.get_Value().Equals(V_0.get_Value());
 		}
 	}
 }

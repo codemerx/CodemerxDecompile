@@ -1,187 +1,182 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Decompiler
 {
 	public static class AttributesUtilities
 	{
-		private static void AddMethodCodeType(MethodDefinition method, Mono.Cecil.CustomAttribute attribute)
+		private static void AddMethodCodeType(MethodDefinition method, CustomAttribute attribute)
 		{
 			if (method.get_IsNative() || method.get_IsOPTIL() || method.get_IsRuntime())
 			{
-				MethodCodeType methodCodeType = MethodCodeType.IL;
+				V_0 = 0;
 				if (method.get_IsNative())
 				{
-					methodCodeType |= MethodCodeType.Native;
+					V_0 = V_0 | 1;
 				}
 				if (method.get_IsOPTIL())
 				{
-					methodCodeType |= MethodCodeType.OPTIL;
+					V_0 = V_0 | 2;
 				}
 				if (method.get_IsRuntime())
 				{
-					methodCodeType |= MethodCodeType.Runtime;
+					V_0 = V_0 | 3;
 				}
-				attribute.get_Fields().Add(new Mono.Cecil.CustomAttributeNamedArgument("MethodCodeType", AttributesUtilities.GetMethodImplAttributeArgument(method, methodCodeType)));
+				attribute.get_Fields().Add(new CustomAttributeNamedArgument("MethodCodeType", AttributesUtilities.GetMethodImplAttributeArgument(method, V_0)));
 			}
+			return;
 		}
 
-		private static void AddMethodImplOptions(MethodDefinition method, Mono.Cecil.CustomAttribute attribute)
+		private static void AddMethodImplOptions(MethodDefinition method, CustomAttribute attribute)
 		{
 			if (AttributesUtilities.DoesMethodHaveMethodImplOptions(method))
 			{
-				MethodImplOptions methodImplOption = 0;
+				V_0 = 0;
 				if (method.get_AggressiveInlining())
 				{
-					methodImplOption |= MethodImplOptions.AggressiveInlining;
+					V_0 = V_0 | 0x100;
 				}
 				if (method.get_IsForwardRef())
 				{
-					methodImplOption |= MethodImplOptions.ForwardRef;
+					V_0 = V_0 | 16;
 				}
 				if (method.get_IsInternalCall())
 				{
-					methodImplOption |= MethodImplOptions.InternalCall;
+					V_0 = V_0 | 0x1000;
 				}
 				if (method.get_NoInlining())
 				{
-					methodImplOption |= MethodImplOptions.NoInlining;
+					V_0 = V_0 | 8;
 				}
 				if (method.get_NoOptimization())
 				{
-					methodImplOption |= MethodImplOptions.NoOptimization;
+					V_0 = V_0 | 64;
 				}
 				if (method.get_IsPreserveSig() && !method.get_HasPInvokeInfo())
 				{
-					methodImplOption |= MethodImplOptions.PreserveSig;
+					V_0 = V_0 | 128;
 				}
 				if (method.get_IsSynchronized())
 				{
-					methodImplOption |= MethodImplOptions.Synchronized;
+					V_0 = V_0 | 32;
 				}
 				if (method.get_IsUnmanaged())
 				{
-					methodImplOption |= MethodImplOptions.Unmanaged;
+					V_0 = V_0 | 4;
 				}
-				attribute.get_ConstructorArguments().Add(AttributesUtilities.GetMethodImplAttributeArgument(method, methodImplOption));
+				attribute.get_ConstructorArguments().Add(AttributesUtilities.GetMethodImplAttributeArgument(method, V_0));
 			}
+			return;
 		}
 
-		private static void CreateAndAddBestFitMappingFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+		private static void CreateAndAddBestFitMappingFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
 			if (method.get_PInvokeInfo().get_IsBestFitDisabled())
 			{
-				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
-				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("BestFitMapping", new CustomAttributeArgument(flag, false));
-				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
+				V_0 = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
+				V_1 = new CustomAttributeArgument(V_0, false);
+				V_2 = new CustomAttributeNamedArgument("BestFitMapping", V_1);
+				dllImportAttr.get_Fields().Add(V_2);
 			}
+			return;
 		}
 
-		private static void CreateAndAddCallingConventionFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+		private static void CreateAndAddCallingConventionFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
 			if (!method.get_PInvokeInfo().get_IsCallConvWinapi())
 			{
-				TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(CallingConvention), method.get_DeclaringType().get_Module());
-				int num = 0;
-				if (method.get_PInvokeInfo().get_IsCallConvFastcall())
-				{
-					num = 5;
-				}
-				else if (method.get_PInvokeInfo().get_IsCallConvThiscall())
-				{
-					num = 4;
-				}
-				else if (!method.get_PInvokeInfo().get_IsCallConvStdCall())
-				{
-					num = (!method.get_PInvokeInfo().get_IsCallConvCdecl() ? 1 : 2);
-				}
-				else
-				{
-					num = 3;
-				}
-				CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(corlibTypeReference, (object)num);
-				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("CallingConvention", customAttributeArgument);
-				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
-			}
-		}
+				V_0 = Utilities.GetCorlibTypeReference(Type.GetTypeFromHandle(// 
+				// Current member / type: System.Void Telerik.JustDecompiler.Decompiler.AttributesUtilities::CreateAndAddCallingConventionFieldArgument(Mono.Cecil.MethodDefinition,Mono.Cecil.CustomAttribute)
+				// Exception in: System.Void CreateAndAddCallingConventionFieldArgument(Mono.Cecil.MethodDefinition,Mono.Cecil.CustomAttribute)
+				// Specified method is not supported.
+				// 
+				// mailto: JustDecompilePublicFeedback@telerik.com
 
-		private static void CreateAndAddCharSetFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+
+		private static void CreateAndAddCharSetFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
-			CharSet charSet = CharSet.None;
+			V_0 = 1;
 			if (method.get_PInvokeInfo().get_IsCharSetAnsi())
 			{
-				charSet = CharSet.Ansi;
+				V_0 = 2;
 			}
 			if (method.get_PInvokeInfo().get_IsCharSetUnicode())
 			{
-				charSet = CharSet.Unicode;
+				V_0 = 3;
 			}
 			if (method.get_PInvokeInfo().get_IsCharSetAuto())
 			{
-				charSet = CharSet.Auto;
+				V_0 = 4;
 			}
-			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(CharSet), method.get_DeclaringType().get_Module());
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(corlibTypeReference, (object)((Int32)charSet));
-			Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("CharSet", customAttributeArgument);
-			dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
-		}
+			V_1 = Utilities.GetCorlibTypeReference(Type.GetTypeFromHandle(// 
+			// Current member / type: System.Void Telerik.JustDecompiler.Decompiler.AttributesUtilities::CreateAndAddCharSetFieldArgument(Mono.Cecil.MethodDefinition,Mono.Cecil.CustomAttribute)
+			// Exception in: System.Void CreateAndAddCharSetFieldArgument(Mono.Cecil.MethodDefinition,Mono.Cecil.CustomAttribute)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
 
-		private static void CreateAndAddEntryPointFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+
+		private static void CreateAndAddEntryPointFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
-			if (method.get_PInvokeInfo().get_EntryPoint() != method.get_Name())
+			if (String.op_Inequality(method.get_PInvokeInfo().get_EntryPoint(), method.get_Name()))
 			{
-				TypeReference str = method.get_DeclaringType().get_Module().get_TypeSystem().get_String();
-				CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(str, method.get_PInvokeInfo().get_EntryPoint());
-				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("EntryPoint", customAttributeArgument);
-				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
+				V_0 = method.get_DeclaringType().get_Module().get_TypeSystem().get_String();
+				V_1 = new CustomAttributeArgument(V_0, method.get_PInvokeInfo().get_EntryPoint());
+				V_2 = new CustomAttributeNamedArgument("EntryPoint", V_1);
+				dllImportAttr.get_Fields().Add(V_2);
 			}
+			return;
 		}
 
-		private static void CreateAndAddExactSpellingFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+		private static void CreateAndAddExactSpellingFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
-			TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(flag, (object)method.get_PInvokeInfo().get_IsNoMangle());
-			Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("ExactSpelling", customAttributeArgument);
-			dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
+			V_0 = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
+			V_1 = new CustomAttributeArgument(V_0, (object)method.get_PInvokeInfo().get_IsNoMangle());
+			V_2 = new CustomAttributeNamedArgument("ExactSpelling", V_1);
+			dllImportAttr.get_Fields().Add(V_2);
+			return;
 		}
 
-		private static void CreateAndAddPreserveSigFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+		private static void CreateAndAddPreserveSigFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
 			if (!method.get_IsPreserveSig())
 			{
-				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
-				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("PreserveSig", new CustomAttributeArgument(flag, false));
-				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
+				V_0 = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
+				V_1 = new CustomAttributeArgument(V_0, false);
+				V_2 = new CustomAttributeNamedArgument("PreserveSig", V_1);
+				dllImportAttr.get_Fields().Add(V_2);
 			}
+			return;
 		}
 
-		private static void CreateAndAddSetLastErrorFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+		private static void CreateAndAddSetLastErrorFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
 			if (method.get_PInvokeInfo().get_SupportsLastError())
 			{
-				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
-				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("SetLastError", new CustomAttributeArgument(flag, true));
-				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
+				V_0 = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
+				V_1 = new CustomAttributeArgument(V_0, true);
+				V_2 = new CustomAttributeNamedArgument("SetLastError", V_1);
+				dllImportAttr.get_Fields().Add(V_2);
 			}
+			return;
 		}
 
-		private static void CreateAndAddThrowOnUnmappableCharFieldArgument(MethodDefinition method, Mono.Cecil.CustomAttribute dllImportAttr)
+		private static void CreateAndAddThrowOnUnmappableCharFieldArgument(MethodDefinition method, CustomAttribute dllImportAttr)
 		{
 			if (method.get_PInvokeInfo().get_IsThrowOnUnmappableCharEnabled())
 			{
-				TypeReference flag = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
-				Mono.Cecil.CustomAttributeNamedArgument customAttributeNamedArgument = new Mono.Cecil.CustomAttributeNamedArgument("ThrowOnUnmappableChar", new CustomAttributeArgument(flag, true));
-				dllImportAttr.get_Fields().Add(customAttributeNamedArgument);
+				V_0 = method.get_DeclaringType().get_Module().get_TypeSystem().get_Boolean();
+				V_1 = new CustomAttributeArgument(V_0, true);
+				V_2 = new CustomAttributeNamedArgument("ThrowOnUnmappableChar", V_1);
+				dllImportAttr.get_Fields().Add(V_2);
 			}
+			return;
 		}
 
 		private static bool DoesMethodHaveMethodImplOptions(MethodDefinition method)
@@ -195,363 +190,543 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static ICollection<TypeReference> GetAssemblyAttributesUsedTypes(AssemblyDefinition assembly)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			List<ICustomAttribute> customAttributes = new List<ICustomAttribute>()
+			V_0 = new List<TypeReference>();
+			V_1 = new List<ICustomAttribute>();
+			V_1.Add(AttributesUtilities.GetAssemblyVersionAttribute(assembly));
+			V_3 = assembly.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				AttributesUtilities.GetAssemblyVersionAttribute(assembly)
-			};
-			foreach (Mono.Cecil.CustomAttribute customAttribute in assembly.get_CustomAttributes())
+				while (V_3.MoveNext())
+				{
+					V_4 = V_3.get_Current();
+					V_4.Resolve();
+					V_1.Add(V_4);
+				}
+			}
+			finally
 			{
-				customAttribute.Resolve();
-				customAttributes.Add(customAttribute);
+				V_3.Dispose();
 			}
 			if (assembly.get_HasSecurityDeclarations())
 			{
-				foreach (SecurityDeclaration securityDeclaration in assembly.get_SecurityDeclarations())
+				V_5 = assembly.get_SecurityDeclarations().GetEnumerator();
+				try
 				{
-					if (!securityDeclaration.get_HasSecurityAttributes())
+					while (V_5.MoveNext())
 					{
-						continue;
+						V_6 = V_5.get_Current();
+						if (!V_6.get_HasSecurityAttributes())
+						{
+							continue;
+						}
+						V_7 = V_6.get_SecurityAttributes().GetEnumerator();
+						try
+						{
+							while (V_7.MoveNext())
+							{
+								V_8 = V_7.get_Current();
+								V_1.Add(V_8);
+							}
+						}
+						finally
+						{
+							V_7.Dispose();
+						}
 					}
-					foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
-					{
-						customAttributes.Add(securityAttribute);
-					}
+				}
+				finally
+				{
+					V_5.Dispose();
 				}
 			}
 			if (assembly.get_MainModule().get_HasExportedTypes())
 			{
-				foreach (ExportedType exportedType in assembly.get_MainModule().get_ExportedTypes())
+				V_9 = assembly.get_MainModule().get_ExportedTypes().GetEnumerator();
+				try
 				{
-					if (exportedType.get_Scope() is ModuleReference)
+					while (V_9.MoveNext())
 					{
-						continue;
+						V_10 = V_9.get_Current();
+						if (V_10.get_Scope() as ModuleReference != null)
+						{
+							continue;
+						}
+						V_1.Add(AttributesUtilities.GetExportedTypeAttribute(V_10, assembly.get_MainModule()));
 					}
-					customAttributes.Add(AttributesUtilities.GetExportedTypeAttribute(exportedType, assembly.get_MainModule()));
+				}
+				finally
+				{
+					V_9.Dispose();
 				}
 			}
-			foreach (ICustomAttribute customAttribute1 in customAttributes)
+			V_11 = V_1.GetEnumerator();
+			try
 			{
-				if (!(customAttribute1 is Mono.Cecil.CustomAttribute))
+				while (V_11.MoveNext())
 				{
-					if (!(customAttribute1 is SecurityAttribute))
+					V_12 = V_11.get_Current();
+					if (V_12 as CustomAttribute == null)
 					{
-						continue;
+						if (V_12 as SecurityAttribute == null)
+						{
+							continue;
+						}
+						V_13 = AttributesUtilities.GetSecurityAttributeUsedTypes(V_12 as SecurityAttribute).GetEnumerator();
+						try
+						{
+							while (V_13.MoveNext())
+							{
+								V_15 = V_13.get_Current();
+								V_0.Add(V_15);
+							}
+						}
+						finally
+						{
+							if (V_13 != null)
+							{
+								V_13.Dispose();
+							}
+						}
 					}
-					foreach (TypeReference securityAttributeUsedType in AttributesUtilities.GetSecurityAttributeUsedTypes(customAttribute1 as SecurityAttribute))
+					else
 					{
-						typeReferences.Add(securityAttributeUsedType);
-					}
-				}
-				else
-				{
-					foreach (TypeReference customAttributeUsedType in AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute1 as Mono.Cecil.CustomAttribute))
-					{
-						typeReferences.Add(customAttributeUsedType);
+						V_13 = AttributesUtilities.GetCustomAttributeUsedTypes(V_12 as CustomAttribute).GetEnumerator();
+						try
+						{
+							while (V_13.MoveNext())
+							{
+								V_14 = V_13.get_Current();
+								V_0.Add(V_14);
+							}
+						}
+						finally
+						{
+							if (V_13 != null)
+							{
+								V_13.Dispose();
+							}
+						}
 					}
 				}
 			}
-			return typeReferences;
+			finally
+			{
+				((IDisposable)V_11).Dispose();
+			}
+			return V_0;
 		}
 
-		public static Mono.Cecil.CustomAttribute GetAssemblyVersionAttribute(AssemblyDefinition assembly)
+		public static CustomAttribute GetAssemblyVersionAttribute(AssemblyDefinition assembly)
 		{
-			IMetadataScope scope = assembly.get_MainModule().get_TypeSystem().get_Boolean().get_Scope();
-			TypeReference typeReference = new TypeReference("System.Reflection", "AssemblyVersionAttribute", assembly.get_MainModule(), scope);
-			MethodReference methodReference = new MethodReference(".ctor", assembly.get_MainModule().get_TypeSystem().get_Void(), typeReference);
-			methodReference.get_Parameters().Add(new ParameterDefinition(assembly.get_MainModule().get_TypeSystem().get_String()));
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(methodReference);
-			string str = assembly.get_Name().get_Version().ToString(4);
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(assembly.get_MainModule().get_TypeSystem().get_String(), str);
-			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
-			return customAttribute;
+			V_0 = assembly.get_MainModule().get_TypeSystem().get_Boolean().get_Scope();
+			V_1 = new TypeReference("System.Reflection", "AssemblyVersionAttribute", assembly.get_MainModule(), V_0);
+			stackVariable17 = new MethodReference(".ctor", assembly.get_MainModule().get_TypeSystem().get_Void(), V_1);
+			stackVariable17.get_Parameters().Add(new ParameterDefinition(assembly.get_MainModule().get_TypeSystem().get_String()));
+			stackVariable24 = new CustomAttribute(stackVariable17);
+			V_2 = assembly.get_Name().get_Version().ToString(4);
+			V_3 = new CustomAttributeArgument(assembly.get_MainModule().get_TypeSystem().get_String(), V_2);
+			stackVariable24.get_ConstructorArguments().Add(V_3);
+			return stackVariable24;
 		}
 
 		private static ICollection<TypeReference> GetAttributeArgumentArrayUsedTypes(CustomAttributeArgument argument)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			CustomAttributeArgument[] value = argument.get_Value() as CustomAttributeArgument[];
-			typeReferences.Add(argument.get_Type());
-			for (int i = 0; i < (int)value.Length; i++)
+			V_0 = new List<TypeReference>();
+			V_1 = argument.get_Value() as CustomAttributeArgument[];
+			V_0.Add(argument.get_Type());
+			V_2 = 0;
+			while (V_2 < (int)V_1.Length)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(value[i]));
+				V_0.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(V_1[V_2]));
+				V_2 = V_2 + 1;
 			}
-			return typeReferences;
+			return V_0;
 		}
 
 		private static ICollection<TypeReference> GetAttributeArgumentValueUsedTypes(CustomAttributeArgument argument)
 		{
-			if (argument.get_Value() is CustomAttributeArgument)
+			if (argument.get_Value() as CustomAttributeArgument != null)
 			{
 				return AttributesUtilities.GetAttributeArgumentValueUsedTypes((CustomAttributeArgument)argument.get_Value());
 			}
-			if (argument.get_Value() is CustomAttributeArgument[])
+			if (argument.get_Value() as CustomAttributeArgument[] != null)
 			{
 				return AttributesUtilities.GetAttributeArgumentArrayUsedTypes(argument);
 			}
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			TypeDefinition typeDefinition = (argument.get_Type().get_IsDefinition() ? argument.get_Type() as TypeDefinition : argument.get_Type().Resolve());
-			if (typeDefinition != null && typeDefinition.get_IsEnum())
+			V_0 = new List<TypeReference>();
+			if (argument.get_Type().get_IsDefinition())
 			{
-				List<FieldDefinition> enumFieldDefinitionByValue = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(typeDefinition.get_Fields(), argument.get_Value(), typeDefinition.get_CustomAttributes());
-				if (enumFieldDefinitionByValue.Count != 0)
+				stackVariable12 = argument.get_Type() as TypeDefinition;
+			}
+			else
+			{
+				stackVariable12 = argument.get_Type().Resolve();
+			}
+			V_1 = stackVariable12;
+			if (V_1 == null || !V_1.get_IsEnum())
+			{
+				if (String.op_Equality(argument.get_Type().get_Name(), "Type") && String.op_Equality(argument.get_Type().get_Namespace(), "System"))
 				{
-					for (int i = 0; i < enumFieldDefinitionByValue.Count; i++)
+					V_0.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(argument.get_Value() as TypeReference));
+				}
+			}
+			else
+			{
+				V_2 = EnumValueToFieldCombinationMatcher.GetEnumFieldDefinitionByValue(V_1.get_Fields(), argument.get_Value(), V_1.get_CustomAttributes());
+				if (V_2.get_Count() != 0)
+				{
+					V_3 = 0;
+					while (V_3 < V_2.get_Count())
 					{
-						typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(enumFieldDefinitionByValue[i].get_DeclaringType()));
+						V_0.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(V_2.get_Item(V_3).get_DeclaringType()));
+						V_3 = V_3 + 1;
 					}
 				}
 			}
-			else if (argument.get_Type().get_Name() == "Type" && argument.get_Type().get_Namespace() == "System")
-			{
-				typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(argument.get_Value() as TypeReference));
-			}
-			return typeReferences;
+			return V_0;
 		}
 
-		private static ICollection<TypeReference> GetAttributeNamedArgsUsedTypes(TypeDefinition attributeType, Collection<Mono.Cecil.CustomAttributeNamedArgument> namedArguments, bool fields)
+		private static ICollection<TypeReference> GetAttributeNamedArgsUsedTypes(TypeDefinition attributeType, Collection<CustomAttributeNamedArgument> namedArguments, bool fields)
 		{
-			IList properties;
-			IList lists;
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			for (int i = 0; i < namedArguments.get_Count(); i++)
+			V_0 = new List<TypeReference>();
+			V_1 = 0;
+			while (V_1 < namedArguments.get_Count())
 			{
 				if (attributeType != null)
 				{
 					if (fields)
 					{
-						properties = attributeType.get_Fields();
+						stackVariable19 = attributeType.get_Fields();
 					}
 					else
 					{
-						properties = attributeType.get_Properties();
+						stackVariable19 = attributeType.get_Properties();
 					}
-					MemberReference memberReference = null;
-					IList lists1 = properties;
-					TypeDefinition typeDefinition = attributeType;
+					V_2 = null;
+					V_3 = stackVariable19;
+					V_4 = attributeType;
 					do
 					{
-						memberReference = Utilities.FindMemberArgumentRefersTo(lists1, namedArguments.get_Item(i));
-						if (typeDefinition.get_BaseType() == null)
+						V_2 = Utilities.FindMemberArgumentRefersTo(V_3, namedArguments.get_Item(V_1));
+						if (V_4.get_BaseType() == null)
 						{
 							break;
 						}
-						typeDefinition = typeDefinition.get_BaseType().Resolve();
-						if (typeDefinition == null)
+						V_4 = V_4.get_BaseType().Resolve();
+						if (V_4 == null)
 						{
 							break;
 						}
 						if (fields)
 						{
-							lists = typeDefinition.get_Fields();
+							stackVariable40 = V_4.get_Fields();
 						}
 						else
 						{
-							lists = typeDefinition.get_Properties();
+							stackVariable40 = V_4.get_Properties();
 						}
-						lists1 = lists;
+						V_3 = stackVariable40;
 					}
-					while (memberReference == null);
-					if (memberReference != null)
+					while (V_2 == null);
+					if (V_2 != null)
 					{
-						typeReferences.Add(memberReference.get_DeclaringType());
+						V_0.Add(V_2.get_DeclaringType());
 					}
 				}
-				Mono.Cecil.CustomAttributeNamedArgument item = namedArguments.get_Item(i);
-				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(item.get_Argument()));
+				V_6 = namedArguments.get_Item(V_1);
+				V_0.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(V_6.get_Argument()));
+				V_1 = V_1 + 1;
 			}
-			return typeReferences;
+			return V_0;
 		}
 
-		private static ICollection<TypeReference> GetCustomAttributeUsedTypes(Mono.Cecil.CustomAttribute attribute)
+		private static ICollection<TypeReference> GetCustomAttributeUsedTypes(CustomAttribute attribute)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
+			V_0 = new List<TypeReference>();
 			attribute.Resolve();
-			typeReferences.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(attribute.get_AttributeType()));
-			for (int i = 0; i < attribute.get_ConstructorArguments().get_Count(); i++)
+			V_0.AddRange(Utilities.GetTypeReferenceTypesDepedningOn(attribute.get_AttributeType()));
+			V_1 = 0;
+			while (V_1 < attribute.get_ConstructorArguments().get_Count())
 			{
-				typeReferences.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(attribute.get_ConstructorArguments().get_Item(i)));
+				V_0.AddRange(AttributesUtilities.GetAttributeArgumentValueUsedTypes(attribute.get_ConstructorArguments().get_Item(V_1)));
+				V_1 = V_1 + 1;
 			}
 			if (attribute.get_HasConstructorArguments() || attribute.get_HasFields() || attribute.get_HasProperties())
 			{
 				if (attribute.get_HasProperties())
 				{
-					TypeDefinition typeDefinition = attribute.get_AttributeType().Resolve();
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.get_Properties(), false));
+					V_2 = attribute.get_AttributeType().Resolve();
+					V_0.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(V_2, attribute.get_Properties(), false));
 				}
 				if (attribute.get_HasFields())
 				{
-					TypeDefinition typeDefinition1 = attribute.get_AttributeType().Resolve();
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition1, attribute.get_Fields(), true));
+					V_3 = attribute.get_AttributeType().Resolve();
+					V_0.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(V_3, attribute.get_Fields(), true));
 				}
 			}
-			return typeReferences;
+			return V_0;
 		}
 
-		public static ICollection<TypeReference> GetEventAttributesUsedTypes(EventDefinition @event, ILanguage language)
+		public static ICollection<TypeReference> GetEventAttributesUsedTypes(EventDefinition event, ILanguage language)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in @event.get_CustomAttributes())
+			V_0 = new List<TypeReference>();
+			V_1 = event.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(V_2));
+				}
 			}
-			if (@event.get_AddMethod() != null)
+			finally
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.get_AddMethod(), language));
+				V_1.Dispose();
 			}
-			if (@event.get_RemoveMethod() != null)
+			if (event.get_AddMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.get_RemoveMethod(), language));
+				V_0.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(event.get_AddMethod(), language));
 			}
-			if (@event.get_InvokeMethod() != null)
+			if (event.get_RemoveMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(@event.get_InvokeMethod(), language));
+				V_0.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(event.get_RemoveMethod(), language));
 			}
-			return typeReferences;
+			if (event.get_InvokeMethod() != null)
+			{
+				V_0.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(event.get_InvokeMethod(), language));
+			}
+			return V_0;
 		}
 
-		public static Mono.Cecil.CustomAttribute GetExportedTypeAttribute(ExportedType exportedType, ModuleDefinition module)
+		public static CustomAttribute GetExportedTypeAttribute(ExportedType exportedType, ModuleDefinition module)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(TypeForwardedToAttribute), module, (IList<Type>)(new Type[] { typeof(Type) })));
-			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(Type), module);
-			TypeReference typeReference = exportedType.CreateReference();
-			customAttribute.get_ConstructorArguments().Add(new CustomAttributeArgument(corlibTypeReference, typeReference));
-			return customAttribute;
-		}
+			stackVariable1 = Type.GetTypeFromHandle(// 
+			// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetExportedTypeAttribute(Mono.Cecil.ExportedType,Mono.Cecil.ModuleDefinition)
+			// Exception in: Mono.Cecil.CustomAttribute GetExportedTypeAttribute(Mono.Cecil.ExportedType,Mono.Cecil.ModuleDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		public static ICollection<TypeReference> GetFieldAttributesUsedTypes(FieldDefinition field)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in field.get_CustomAttributes())
+			V_0 = new List<TypeReference>();
+			V_1 = field.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(V_2));
+				}
+			}
+			finally
+			{
+				V_1.Dispose();
 			}
 			if (field.get_IsNotSerialized())
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetFieldNotSerializedAttribute(field)));
+				V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetFieldNotSerializedAttribute(field)));
 			}
 			if (field.get_DeclaringType().get_IsExplicitLayout())
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetFieldFieldOffsetAttribute(field)));
+				V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetFieldFieldOffsetAttribute(field)));
 			}
-			return typeReferences;
+			return V_0;
 		}
 
-		public static Mono.Cecil.CustomAttribute GetFieldFieldOffsetAttribute(FieldDefinition field)
+		public static CustomAttribute GetFieldFieldOffsetAttribute(FieldDefinition field)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(FieldOffsetAttribute), field.get_DeclaringType().get_Module(), (IList<Type>)(new Type[] { typeof(Int32) })));
-			TypeReference num = field.get_FieldType().get_Module().get_TypeSystem().get_Int32();
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(num, (object)field.get_Offset());
-			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
-			return customAttribute;
-		}
+			stackVariable1 = Type.GetTypeFromHandle(// 
+			// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetFieldFieldOffsetAttribute(Mono.Cecil.FieldDefinition)
+			// Exception in: Mono.Cecil.CustomAttribute GetFieldFieldOffsetAttribute(Mono.Cecil.FieldDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
 
-		public static Mono.Cecil.CustomAttribute GetFieldNotSerializedAttribute(FieldDefinition field)
+
+		public static CustomAttribute GetFieldNotSerializedAttribute(FieldDefinition field)
 		{
-			return new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(NonSerializedAttribute), field.get_DeclaringType().get_Module(), null));
-		}
+			return new CustomAttribute(Utilities.GetEmptyConstructor(Type.GetTypeFromHandle(// 
+			// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetFieldNotSerializedAttribute(Mono.Cecil.FieldDefinition)
+			// Exception in: Mono.Cecil.CustomAttribute GetFieldNotSerializedAttribute(Mono.Cecil.FieldDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		public static ICollection<TypeReference> GetMethodAttributesUsedTypes(MethodDefinition method, ILanguage language)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in method.get_CustomAttributes())
+			V_0 = new List<TypeReference>();
+			V_2 = method.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
+				while (V_2.MoveNext())
+				{
+					V_3 = V_2.get_Current();
+					V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(V_3));
+				}
 			}
-			ModuleDefinition module = method.get_DeclaringType().get_Module();
+			finally
+			{
+				V_2.Dispose();
+			}
+			V_1 = method.get_DeclaringType().get_Module();
 			if (method.get_HasSecurityDeclarations())
 			{
-				foreach (SecurityDeclaration securityDeclaration in method.get_SecurityDeclarations())
+				V_4 = method.get_SecurityDeclarations().GetEnumerator();
+				try
 				{
-					if (securityDeclaration.get_HasSecurityAttributes())
+					while (V_4.MoveNext())
 					{
-						foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
+						V_5 = V_4.get_Current();
+						if (V_5.get_HasSecurityAttributes())
 						{
-							typeReferences.AddRange(AttributesUtilities.GetSecurityAttributeUsedTypes(securityAttribute));
+							V_6 = V_5.get_SecurityAttributes().GetEnumerator();
+							try
+							{
+								while (V_6.MoveNext())
+								{
+									V_7 = V_6.get_Current();
+									V_0.AddRange(AttributesUtilities.GetSecurityAttributeUsedTypes(V_7));
+								}
+							}
+							finally
+							{
+								V_6.Dispose();
+							}
 						}
+						V_0.Add(V_5.GetSecurityActionTypeReference(V_1));
 					}
-					typeReferences.Add(securityDeclaration.GetSecurityActionTypeReference(module));
+				}
+				finally
+				{
+					V_4.Dispose();
 				}
 			}
-			foreach (ParameterDefinition parameter in method.get_Parameters())
+			V_8 = method.get_Parameters().GetEnumerator();
+			try
 			{
-				if (parameter.IsOutParameter() && !language.HasOutKeyword)
+				while (V_8.MoveNext())
 				{
-					TypeReference outAttributeTypeReference = AttributesUtilities.GetOutAttributeTypeReference(method.get_DeclaringType().get_Module());
-					typeReferences.Add(outAttributeTypeReference);
+					stackVariable22 = V_8.get_Current();
+					if (stackVariable22.IsOutParameter() && !language.get_HasOutKeyword())
+					{
+						V_9 = AttributesUtilities.GetOutAttributeTypeReference(method.get_DeclaringType().get_Module());
+						V_0.Add(V_9);
+					}
+					V_2 = stackVariable22.get_CustomAttributes().GetEnumerator();
+					try
+					{
+						while (V_2.MoveNext())
+						{
+							V_10 = V_2.get_Current();
+							V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(V_10));
+						}
+					}
+					finally
+					{
+						V_2.Dispose();
+					}
 				}
-				foreach (Mono.Cecil.CustomAttribute customAttribute1 in parameter.get_CustomAttributes())
-				{
-					typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute1));
-				}
+			}
+			finally
+			{
+				V_8.Dispose();
 			}
 			if (method.get_HasPInvokeInfo() && method.get_PInvokeInfo() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetMethodDllImportAttribute(method)));
+				V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetMethodDllImportAttribute(method)));
 			}
 			if (method.get_HasImplAttributes() && AttributesUtilities.ShouldWriteMethodImplAttribute(method))
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetMethodImplAttribute(method)));
+				V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetMethodImplAttribute(method)));
 			}
-			return typeReferences;
+			return V_0;
 		}
 
-		public static Mono.Cecil.CustomAttribute GetMethodDllImportAttribute(MethodDefinition method)
+		public static CustomAttribute GetMethodDllImportAttribute(MethodDefinition method)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(DllImportAttribute), method.get_DeclaringType().get_Module(), (IList<Type>)(new Type[] { typeof(String) })));
-			string name = method.get_PInvokeInfo().get_Module().get_Name();
-			TypeReference str = method.get_DeclaringType().get_Module().get_TypeSystem().get_String();
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(str, name);
-			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
-			AttributesUtilities.CreateAndAddBestFitMappingFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddCallingConventionFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddCharSetFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddEntryPointFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddExactSpellingFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddPreserveSigFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddSetLastErrorFieldArgument(method, customAttribute);
-			AttributesUtilities.CreateAndAddThrowOnUnmappableCharFieldArgument(method, customAttribute);
-			return customAttribute;
-		}
+			stackVariable1 = Type.GetTypeFromHandle(// 
+			// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetMethodDllImportAttribute(Mono.Cecil.MethodDefinition)
+			// Exception in: Mono.Cecil.CustomAttribute GetMethodDllImportAttribute(Mono.Cecil.MethodDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
 
-		public static Mono.Cecil.CustomAttribute GetMethodImplAttribute(MethodDefinition method)
+
+		public static CustomAttribute GetMethodImplAttribute(MethodDefinition method)
 		{
-			Type[] typeArray = (AttributesUtilities.DoesMethodHaveMethodImplOptions(method) ? new Type[] { typeof(MethodImplOptions) } : new Type[0]);
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(MethodImplAttribute), method.get_DeclaringType().get_Module(), typeArray));
-			AttributesUtilities.AddMethodImplOptions(method, customAttribute);
-			AttributesUtilities.AddMethodCodeType(method, customAttribute);
-			return customAttribute;
-		}
+			if (AttributesUtilities.DoesMethodHaveMethodImplOptions(method))
+			{
+				stackVariable3 = new Type[1];
+				stackVariable3[0] = Type.GetTypeFromHandle(// 
+				// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetMethodImplAttribute(Mono.Cecil.MethodDefinition)
+				// Exception in: Mono.Cecil.CustomAttribute GetMethodImplAttribute(Mono.Cecil.MethodDefinition)
+				// Specified method is not supported.
+				// 
+				// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		private static CustomAttributeArgument GetMethodImplAttributeArgument(MethodDefinition method, object value)
 		{
-			ModuleDefinition module = method.get_DeclaringType().get_Module();
-			AssemblyNameReference assemblyNameReference = module.ReferencedMscorlibRef();
-			Type type = value.GetType();
-			return new CustomAttributeArgument(new TypeReference(type.Namespace, type.Name, module, assemblyNameReference), (object)((Int32)value));
+			V_0 = method.get_DeclaringType().get_Module();
+			V_1 = V_0.ReferencedMscorlibRef();
+			V_2 = value.GetType();
+			return new CustomAttributeArgument(new TypeReference(V_2.get_Namespace(), V_2.get_Name(), V_0, V_1), (object)((Int32)value));
 		}
 
 		public static ICollection<TypeReference> GetModuleAttributesUsedTypes(ModuleDefinition module)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			List<Mono.Cecil.CustomAttribute> customAttributes = new List<Mono.Cecil.CustomAttribute>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in module.get_CustomAttributes())
+			V_0 = new List<TypeReference>();
+			V_1 = new List<CustomAttribute>();
+			V_2 = module.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				customAttribute.Resolve();
-				customAttributes.Add(customAttribute);
-			}
-			foreach (Mono.Cecil.CustomAttribute customAttribute1 in customAttributes)
-			{
-				if (customAttribute1.get_AttributeType().get_FullName().Equals("System.Security.UnverifiableCodeAttribute", StringComparison.Ordinal))
+				while (V_2.MoveNext())
 				{
-					continue;
-				}
-				foreach (TypeReference customAttributeUsedType in AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute1))
-				{
-					typeReferences.Add(customAttributeUsedType);
+					V_3 = V_2.get_Current();
+					V_3.Resolve();
+					V_1.Add(V_3);
 				}
 			}
-			return typeReferences;
+			finally
+			{
+				V_2.Dispose();
+			}
+			V_4 = V_1.GetEnumerator();
+			try
+			{
+				while (V_4.MoveNext())
+				{
+					V_5 = V_4.get_Current();
+					if (V_5.get_AttributeType().get_FullName().Equals("System.Security.UnverifiableCodeAttribute", 4))
+					{
+						continue;
+					}
+					V_6 = AttributesUtilities.GetCustomAttributeUsedTypes(V_5).GetEnumerator();
+					try
+					{
+						while (V_6.MoveNext())
+						{
+							V_7 = V_6.get_Current();
+							V_0.Add(V_7);
+						}
+					}
+					finally
+					{
+						if (V_6 != null)
+						{
+							V_6.Dispose();
+						}
+					}
+				}
+			}
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+			return V_0;
 		}
 
 		public static TypeReference GetOutAttributeTypeReference(ModuleDefinition module)
@@ -561,90 +736,130 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static ICollection<TypeReference> GetPropertyAttributesUsedTypes(PropertyDefinition property, ILanguage language)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in property.get_CustomAttributes())
+			V_0 = new List<TypeReference>();
+			V_1 = property.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(V_2));
+				}
+			}
+			finally
+			{
+				V_1.Dispose();
 			}
 			if (property.get_GetMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.get_GetMethod(), language));
+				V_0.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.get_GetMethod(), language));
 			}
 			if (property.get_SetMethod() != null)
 			{
-				typeReferences.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.get_SetMethod(), language));
+				V_0.AddRange(AttributesUtilities.GetMethodAttributesUsedTypes(property.get_SetMethod(), language));
 			}
-			return typeReferences;
+			return V_0;
 		}
 
 		private static ICollection<TypeReference> GetSecurityAttributeUsedTypes(SecurityAttribute attribute)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>()
-			{
-				attribute.get_AttributeType()
-			};
+			V_0 = new List<TypeReference>();
+			V_0.Add(attribute.get_AttributeType());
 			if (attribute.get_HasFields() || attribute.get_HasProperties())
 			{
-				TypeDefinition typeDefinition = attribute.get_AttributeType().Resolve();
+				V_1 = attribute.get_AttributeType().Resolve();
 				if (attribute.get_HasProperties())
 				{
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.get_Properties(), false));
+					V_0.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(V_1, attribute.get_Properties(), false));
 				}
 				if (attribute.get_HasFields())
 				{
-					typeReferences.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(typeDefinition, attribute.get_Fields(), true));
+					V_0.AddRange(AttributesUtilities.GetAttributeNamedArgsUsedTypes(V_1, attribute.get_Fields(), true));
 				}
 			}
-			return typeReferences;
+			return V_0;
 		}
 
 		public static ICollection<TypeReference> GetTypeAttributesUsedTypes(TypeDefinition type)
 		{
-			List<TypeReference> typeReferences = new List<TypeReference>();
-			foreach (Mono.Cecil.CustomAttribute customAttribute in type.get_CustomAttributes())
+			V_0 = new List<TypeReference>();
+			V_1 = type.get_CustomAttributes().GetEnumerator();
+			try
 			{
-				customAttribute.Resolve();
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(customAttribute));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_2.Resolve();
+					V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(V_2));
+				}
+			}
+			finally
+			{
+				V_1.Dispose();
 			}
 			if (type.get_IsSerializable())
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetTypeSerializableAttribute(type)));
+				V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetTypeSerializableAttribute(type)));
 			}
 			if (type.get_IsExplicitLayout())
 			{
-				typeReferences.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetTypeExplicitLayoutAttribute(type)));
+				V_0.AddRange(AttributesUtilities.GetCustomAttributeUsedTypes(AttributesUtilities.GetTypeExplicitLayoutAttribute(type)));
 			}
 			if (type.get_HasSecurityDeclarations())
 			{
-				ModuleDefinition module = type.get_Module();
-				foreach (SecurityDeclaration securityDeclaration in type.get_SecurityDeclarations())
+				V_3 = type.get_Module();
+				V_4 = type.get_SecurityDeclarations().GetEnumerator();
+				try
 				{
-					if (securityDeclaration.get_HasSecurityAttributes())
+					while (V_4.MoveNext())
 					{
-						foreach (SecurityAttribute securityAttribute in securityDeclaration.get_SecurityAttributes())
+						V_5 = V_4.get_Current();
+						if (V_5.get_HasSecurityAttributes())
 						{
-							typeReferences.AddRange(AttributesUtilities.GetSecurityAttributeUsedTypes(securityAttribute));
+							V_6 = V_5.get_SecurityAttributes().GetEnumerator();
+							try
+							{
+								while (V_6.MoveNext())
+								{
+									V_7 = V_6.get_Current();
+									V_0.AddRange(AttributesUtilities.GetSecurityAttributeUsedTypes(V_7));
+								}
+							}
+							finally
+							{
+								V_6.Dispose();
+							}
 						}
+						V_0.Add(V_5.GetSecurityActionTypeReference(V_3));
 					}
-					typeReferences.Add(securityDeclaration.GetSecurityActionTypeReference(module));
+				}
+				finally
+				{
+					V_4.Dispose();
 				}
 			}
-			return typeReferences;
+			return V_0;
 		}
 
-		public static Mono.Cecil.CustomAttribute GetTypeExplicitLayoutAttribute(TypeDefinition type)
+		public static CustomAttribute GetTypeExplicitLayoutAttribute(TypeDefinition type)
 		{
-			Mono.Cecil.CustomAttribute customAttribute = new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(StructLayoutAttribute), type.get_Module(), (IList<Type>)(new Type[] { typeof(LayoutKind) })));
-			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(typeof(LayoutKind), type.get_Module());
-			CustomAttributeArgument customAttributeArgument = new CustomAttributeArgument(corlibTypeReference, (object)2);
-			customAttribute.get_ConstructorArguments().Add(customAttributeArgument);
-			return customAttribute;
-		}
+			stackVariable1 = Type.GetTypeFromHandle(// 
+			// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetTypeExplicitLayoutAttribute(Mono.Cecil.TypeDefinition)
+			// Exception in: Mono.Cecil.CustomAttribute GetTypeExplicitLayoutAttribute(Mono.Cecil.TypeDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
 
-		public static Mono.Cecil.CustomAttribute GetTypeSerializableAttribute(TypeDefinition type)
+
+		public static CustomAttribute GetTypeSerializableAttribute(TypeDefinition type)
 		{
-			return new Mono.Cecil.CustomAttribute(Utilities.GetEmptyConstructor(typeof(SerializableAttribute), type.get_Module(), null));
-		}
+			return new CustomAttribute(Utilities.GetEmptyConstructor(Type.GetTypeFromHandle(// 
+			// Current member / type: Mono.Cecil.CustomAttribute Telerik.JustDecompiler.Decompiler.AttributesUtilities::GetTypeSerializableAttribute(Mono.Cecil.TypeDefinition)
+			// Exception in: Mono.Cecil.CustomAttribute GetTypeSerializableAttribute(Mono.Cecil.TypeDefinition)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		internal static bool ShouldWriteMethodImplAttribute(MethodDefinition method)
 		{

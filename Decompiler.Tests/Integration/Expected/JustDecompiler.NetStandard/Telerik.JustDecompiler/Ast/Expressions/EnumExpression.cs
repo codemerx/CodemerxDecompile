@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new EnumExpression.u003cget_Childrenu003ed__2(-2);
 			}
 		}
 
@@ -22,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.EnumExpression;
+				return 49;
 			}
 		}
 
@@ -30,7 +31,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.get_DeclaringType();
+				return this.get_Field().get_DeclaringType();
 			}
 			set
 			{
@@ -48,7 +49,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.get_Name();
+				return this.get_Field().get_Name();
 			}
 		}
 
@@ -60,28 +61,30 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public EnumExpression(FieldDefinition fieldDefinition, IEnumerable<Instruction> instructions) : base(instructions)
+		public EnumExpression(FieldDefinition fieldDefinition, IEnumerable<Instruction> instructions)
 		{
-			this.Field = fieldDefinition;
+			base(instructions);
+			this.set_Field(fieldDefinition);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new EnumExpression(this.Field, this.instructions);
+			return new EnumExpression(this.get_Field(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new EnumExpression(this.Field, null);
+			return new EnumExpression(this.get_Field(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is EnumExpression))
+			if (other as EnumExpression == null)
 			{
 				return false;
 			}
-			return this.Field.get_FullName() == (other as EnumExpression).Field.get_FullName();
+			return String.op_Equality(this.get_Field().get_FullName(), (other as EnumExpression).get_Field().get_FullName());
 		}
 	}
 }

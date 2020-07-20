@@ -10,8 +10,10 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 {
 	public class WinRTWriterContextService : TypeCollisionWriterContextService
 	{
-		public WinRTWriterContextService(IDecompilationCacheService cacheService, bool renameInvalidMembers) : base(cacheService, renameInvalidMembers)
+		public WinRTWriterContextService(IDecompilationCacheService cacheService, bool renameInvalidMembers)
 		{
+			base(cacheService, renameInvalidMembers);
+			return;
 		}
 
 		protected override MemberRenamingData GetMemberRenamingData(ModuleDefinition module, ILanguage language)
@@ -21,12 +23,12 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		protected override TypeSpecificContext GetTypeContext(TypeDefinition type, ILanguage language, Dictionary<string, DecompiledType> decompiledTypes)
 		{
-			TypeSpecificContext typeContext = base.GetTypeContext(type, language, decompiledTypes);
-			if (!typeContext.IsWinRTImplementation && typeContext.CurrentType.get_IsNotPublic() && typeContext.CurrentType.get_IsSealed() && typeContext.CurrentType.get_Name().StartsWith("<CLR>"))
+			V_0 = this.GetTypeContext(type, language, decompiledTypes);
+			if (!V_0.get_IsWinRTImplementation() && V_0.get_CurrentType().get_IsNotPublic() && V_0.get_CurrentType().get_IsSealed() && V_0.get_CurrentType().get_Name().StartsWith("<CLR>"))
 			{
-				typeContext.IsWinRTImplementation = true;
+				V_0.set_IsWinRTImplementation(true);
 			}
-			return typeContext;
+			return V_0;
 		}
 	}
 }

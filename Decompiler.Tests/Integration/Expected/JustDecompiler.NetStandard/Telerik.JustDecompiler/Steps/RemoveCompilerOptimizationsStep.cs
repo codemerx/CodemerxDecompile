@@ -1,10 +1,7 @@
-using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Cil;
@@ -26,25 +23,27 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RemoveCompilerOptimizationsStep()
 		{
+			base();
+			return;
 		}
 
 		private bool IsCaseBlock(IList<Expression> expressions, Expression switchExpression)
 		{
-			if (expressions.Count != 1 || expressions[0].CodeNodeType != CodeNodeType.UnaryExpression)
+			if (expressions.get_Count() != 1 || expressions.get_Item(0).get_CodeNodeType() != 23)
 			{
 				return false;
 			}
-			UnaryExpression item = expressions[0] as UnaryExpression;
-			if (item.Operator != UnaryOperator.None || item.Operand.CodeNodeType != CodeNodeType.MethodInvocationExpression)
+			V_0 = expressions.get_Item(0) as UnaryExpression;
+			if (V_0.get_Operator() != 11 || V_0.get_Operand().get_CodeNodeType() != 19)
 			{
 				return false;
 			}
-			MethodInvocationExpression operand = item.Operand as MethodInvocationExpression;
-			if (operand.MethodExpression.Method.get_Name() != "op_Equality" || operand.Arguments[1].CodeNodeType != CodeNodeType.LiteralExpression || (operand.Arguments[1] as LiteralExpression).ExpressionType.get_FullName() != "System.String")
+			V_1 = V_0.get_Operand() as MethodInvocationExpression;
+			if (String.op_Inequality(V_1.get_MethodExpression().get_Method().get_Name(), "op_Equality") || V_1.get_Arguments().get_Item(1).get_CodeNodeType() != 22 || String.op_Inequality((V_1.get_Arguments().get_Item(1) as LiteralExpression).get_ExpressionType().get_FullName(), "System.String"))
 			{
 				return false;
 			}
-			if (!operand.Arguments[0].Equals(switchExpression))
+			if (!V_1.get_Arguments().get_Item(0).Equals(switchExpression))
 			{
 				return false;
 			}
@@ -53,26 +52,26 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsEmptyStringCaseBlock(IList<Expression> expressions, Expression switchExpression)
 		{
-			if (expressions.Count != 1 || expressions[0].CodeNodeType != CodeNodeType.BinaryExpression)
+			if (expressions.get_Count() != 1 || expressions.get_Item(0).get_CodeNodeType() != 24)
 			{
 				return false;
 			}
-			BinaryExpression item = expressions[0] as BinaryExpression;
-			if (item.Operator != BinaryOperator.ValueEquality || item.Left.CodeNodeType != CodeNodeType.MethodInvocationExpression || item.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+			V_0 = expressions.get_Item(0) as BinaryExpression;
+			if (V_0.get_Operator() != 9 || V_0.get_Left().get_CodeNodeType() != 19 || V_0.get_Right().get_CodeNodeType() != 22)
 			{
 				return false;
 			}
-			MethodInvocationExpression left = item.Left as MethodInvocationExpression;
-			if (left.MethodExpression.Method.get_FullName() != "System.Int32 System.String::get_Length()" || left.MethodExpression.Target == null)
+			V_1 = V_0.get_Left() as MethodInvocationExpression;
+			if (String.op_Inequality(V_1.get_MethodExpression().get_Method().get_FullName(), "System.Int32 System.String::get_Length()") || V_1.get_MethodExpression().get_Target() == null)
 			{
 				return false;
 			}
-			LiteralExpression right = item.Right as LiteralExpression;
-			if (right.ExpressionType.get_FullName() != "System.Int32" && (Int32)right.Value != 0)
+			V_2 = V_0.get_Right() as LiteralExpression;
+			if (String.op_Inequality(V_2.get_ExpressionType().get_FullName(), "System.Int32") && (Int32)V_2.get_Value() != 0)
 			{
 				return false;
 			}
-			if (!left.MethodExpression.Target.Equals(switchExpression))
+			if (!V_1.get_MethodExpression().get_Target().Equals(switchExpression))
 			{
 				return false;
 			}
@@ -81,25 +80,25 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsNullCaseBlock(IList<Expression> expressions, Expression switchExpression)
 		{
-			if (expressions.Count != 1)
+			if (expressions.get_Count() != 1)
 			{
 				return false;
 			}
-			if (expressions[0].CodeNodeType != CodeNodeType.BinaryExpression)
+			if (expressions.get_Item(0).get_CodeNodeType() != 24)
 			{
 				return false;
 			}
-			BinaryExpression item = expressions[0] as BinaryExpression;
-			if (item.Operator != BinaryOperator.ValueEquality || item.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+			V_0 = expressions.get_Item(0) as BinaryExpression;
+			if (V_0.get_Operator() != 9 || V_0.get_Right().get_CodeNodeType() != 22)
 			{
 				return false;
 			}
-			LiteralExpression right = item.Right as LiteralExpression;
-			if (right.ExpressionType.get_FullName() != "System.Object" || right.Value != null)
+			V_1 = V_0.get_Right() as LiteralExpression;
+			if (String.op_Inequality(V_1.get_ExpressionType().get_FullName(), "System.Object") || V_1.get_Value() != null)
 			{
 				return false;
 			}
-			if (!item.Left.Equals(switchExpression))
+			if (!V_0.get_Left().Equals(switchExpression))
 			{
 				return false;
 			}
@@ -108,12 +107,12 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsOptimizationBlock(IList<Expression> expressions, VariableReference optimizationVariable)
 		{
-			if (expressions.Count != 1 || expressions[0].CodeNodeType != CodeNodeType.BinaryExpression)
+			if (expressions.get_Count() != 1 || expressions.get_Item(0).get_CodeNodeType() != 24)
 			{
 				return false;
 			}
-			BinaryExpression item = expressions[0] as BinaryExpression;
-			if (item.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && item.Right.CodeNodeType == CodeNodeType.LiteralExpression && item.IsComparisonExpression && (object)(item.Left as VariableReferenceExpression).Variable == (object)optimizationVariable)
+			V_0 = expressions.get_Item(0) as BinaryExpression;
+			if (V_0.get_Left().get_CodeNodeType() == 26 && V_0.get_Right().get_CodeNodeType() == 22 && V_0.get_IsComparisonExpression() && (object)(V_0.get_Left() as VariableReferenceExpression).get_Variable() == (object)optimizationVariable)
 			{
 				return true;
 			}
@@ -122,174 +121,212 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsUnconditionJumpBlock(InstructionBlock block)
 		{
-			if ((object)block.First != (object)block.Last || block.First.get_OpCode().get_Code() != 55 && block.First.get_OpCode().get_Code() != 42)
+			if ((object)block.get_First() != (object)block.get_Last() || block.get_First().get_OpCode().get_Code() != 55 && block.get_First().get_OpCode().get_Code() != 42)
 			{
 				return false;
 			}
-			return (int)block.Successors.Length == 1;
+			return (int)block.get_Successors().Length == 1;
 		}
 
 		private void MarkOptimizationAndCaseBlocks(InstructionBlock block, RemoveCompilerOptimizationsStep.SwitchData data)
 		{
-			Queue<InstructionBlock> instructionBlocks = new Queue<InstructionBlock>();
-			HashSet<int> nums = new HashSet<int>();
-			InstructionBlock[] successors = block.Successors;
-			for (int i = 0; i < (int)successors.Length; i++)
+			V_0 = new Queue<InstructionBlock>();
+			V_1 = new HashSet<int>();
+			V_2 = block.get_Successors();
+			V_3 = 0;
+			while (V_3 < (int)V_2.Length)
 			{
-				instructionBlocks.Enqueue(successors[i]);
+				V_0.Enqueue(V_2[V_3]);
+				V_3 = V_3 + 1;
 			}
-			while (instructionBlocks.Count > 0)
+			while (V_0.get_Count() > 0)
 			{
-				InstructionBlock last = instructionBlocks.Dequeue();
-				nums.Add(last.First.get_Offset());
-				if (!this.IsOptimizationBlock(this.blockExpressions[last.First.get_Offset()], data.OptimizationVariable))
+				V_5 = V_0.Dequeue();
+				dummyVar0 = V_1.Add(V_5.get_First().get_Offset());
+				if (!this.IsOptimizationBlock(this.blockExpressions.get_Item(V_5.get_First().get_Offset()), data.get_OptimizationVariable()))
 				{
-					if (!this.IsCaseBlock(this.blockExpressions[last.First.get_Offset()], data.SwitchExpression) && !this.IsNullCaseBlock(this.blockExpressions[last.First.get_Offset()], data.SwitchExpression))
+					if (!this.IsCaseBlock(this.blockExpressions.get_Item(V_5.get_First().get_Offset()), data.get_SwitchExpression()) && !this.IsNullCaseBlock(this.blockExpressions.get_Item(V_5.get_First().get_Offset()), data.get_SwitchExpression()))
 					{
 						continue;
 					}
-					this.switchBlocksToCasesMap[block.First.get_Offset()].Add(last.First.get_Offset());
-					InstructionBlock successors1 = last.Successors[1];
-					if (this.IsEmptyStringCaseBlock(this.blockExpressions[successors1.First.get_Offset()], data.SwitchExpression))
+					this.switchBlocksToCasesMap.get_Item(block.get_First().get_Offset()).Add(V_5.get_First().get_Offset());
+					V_8 = V_5.get_Successors()[1];
+					if (this.IsEmptyStringCaseBlock(this.blockExpressions.get_Item(V_8.get_First().get_Offset()), data.get_SwitchExpression()))
 					{
-						last.Last = successors1.Last;
-						last.Successors = successors1.Successors;
-						BinaryExpression item = this.blockExpressions[last.First.get_Offset()][0] as BinaryExpression;
-						item.Right = new LiteralExpression("", this.methodContext.Method.get_Module().get_TypeSystem(), null);
-						IEnumerable<Instruction> underlyingSameMethodInstructions = this.blockExpressions[successors1.First.get_Offset()][0].UnderlyingSameMethodInstructions;
-						item = item.CloneAndAttachInstructions(underlyingSameMethodInstructions) as BinaryExpression;
-						this.blockExpressions[last.First.get_Offset()][0] = new UnaryExpression(UnaryOperator.None, item, null);
-						this.blocksToBeRemoved.Add(successors1.First.get_Offset());
+						V_5.set_Last(V_8.get_Last());
+						V_5.set_Successors(V_8.get_Successors());
+						V_9 = this.blockExpressions.get_Item(V_5.get_First().get_Offset()).get_Item(0) as BinaryExpression;
+						V_9.set_Right(new LiteralExpression("", this.methodContext.get_Method().get_Module().get_TypeSystem(), null));
+						V_10 = this.blockExpressions.get_Item(V_8.get_First().get_Offset()).get_Item(0).get_UnderlyingSameMethodInstructions();
+						V_9 = V_9.CloneAndAttachInstructions(V_10) as BinaryExpression;
+						this.blockExpressions.get_Item(V_5.get_First().get_Offset()).set_Item(0, new UnaryExpression(11, V_9, null));
+						this.blocksToBeRemoved.Add(V_8.get_First().get_Offset());
 					}
-					this.MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(last);
+					dummyVar1 = this.MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(V_5);
 				}
 				else
 				{
-					InstructionBlock instructionBlocks1 = last.Successors[0];
-					if (!nums.Contains(instructionBlocks1.First.get_Offset()))
+					V_6 = V_5.get_Successors()[0];
+					if (!V_1.Contains(V_6.get_First().get_Offset()))
 					{
-						instructionBlocks.Enqueue(instructionBlocks1);
+						V_0.Enqueue(V_6);
 					}
-					InstructionBlock instructionBlocks2 = this.MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(last);
-					if (!nums.Contains(instructionBlocks2.First.get_Offset()) && this.IsOptimizationBlock(this.blockExpressions[last.First.get_Offset()], data.OptimizationVariable))
+					V_7 = this.MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(V_5);
+					if (!V_1.Contains(V_7.get_First().get_Offset()) && this.IsOptimizationBlock(this.blockExpressions.get_Item(V_5.get_First().get_Offset()), data.get_OptimizationVariable()))
 					{
-						instructionBlocks.Enqueue(instructionBlocks2);
+						V_0.Enqueue(V_7);
 					}
-					this.blocksToBeRemoved.Add(last.First.get_Offset());
+					this.blocksToBeRemoved.Add(V_5.get_First().get_Offset());
 				}
 			}
+			return;
 		}
 
 		private InstructionBlock MarkSecondSuccessorForRemovalIfItIsUnconditionalJump(InstructionBlock block)
 		{
-			InstructionBlock successors = block.Successors[1];
-			if (this.IsUnconditionJumpBlock(successors))
+			V_0 = block.get_Successors()[1];
+			if (this.IsUnconditionJumpBlock(V_0))
 			{
-				block.RemoveFromSuccessors(successors);
-				block.AddToSuccessors(successors.Successors[0]);
-				this.blocksToBeRemoved.Add(successors.First.get_Offset());
-				successors = successors.Successors[0];
+				block.RemoveFromSuccessors(V_0);
+				block.AddToSuccessors(V_0.get_Successors()[0]);
+				this.blocksToBeRemoved.Add(V_0.get_First().get_Offset());
+				V_0 = V_0.get_Successors()[0];
 			}
-			return successors;
+			return V_0;
 		}
 
 		private void MergeFirstCFGBlockWithFirstCaseIf(int index)
 		{
-			InstructionBlock item = this.instructionToBlockMapping[this.switchBlocksToCasesMap[index][0]];
-			InstructionBlock last = this.instructionToBlockMapping[index];
-			last.Last = item.Last;
-			last.Successors = item.Successors;
-			foreach (Expression expression in this.blockExpressions[item.First.get_Offset()])
+			V_0 = this.instructionToBlockMapping.get_Item(this.switchBlocksToCasesMap.get_Item(index).get_Item(0));
+			stackVariable12 = this.instructionToBlockMapping.get_Item(index);
+			stackVariable12.set_Last(V_0.get_Last());
+			stackVariable12.set_Successors(V_0.get_Successors());
+			V_1 = this.blockExpressions.get_Item(V_0.get_First().get_Offset()).GetEnumerator();
+			try
 			{
-				this.blockExpressions[index].Add(expression);
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					this.blockExpressions.get_Item(index).Add(V_2);
+				}
 			}
-			this.blocksToBeRemoved.Add(item.First.get_Offset());
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			this.blocksToBeRemoved.Add(V_0.get_First().get_Offset());
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.MethodContext;
-			this.blockExpressions = this.methodContext.Expressions.BlockExpressions;
-			this.instructionToBlockMapping = this.methodContext.ControlFlowGraph.InstructionToBlockMapping;
+			this.methodContext = context.get_MethodContext();
+			this.blockExpressions = this.methodContext.get_Expressions().get_BlockExpressions();
+			this.instructionToBlockMapping = this.methodContext.get_ControlFlowGraph().get_InstructionToBlockMapping();
 			this.blocksToBeRemoved = new List<int>();
-			this.switchBlocksToCasesMap = this.methodContext.SwitchByStringData.SwitchBlocksToCasesMap;
+			this.switchBlocksToCasesMap = this.methodContext.get_SwitchByStringData().get_SwitchBlocksToCasesMap();
 			this.RemoveSwitchByStringOptimizations();
 			return body;
 		}
 
 		private void ReconnectBlocks(int index)
 		{
-			InstructionBlock item = this.instructionToBlockMapping[index];
-			for (int i = 1; i < this.switchBlocksToCasesMap[index].Count; i++)
+			V_0 = this.instructionToBlockMapping.get_Item(index);
+			V_1 = 1;
+			while (V_1 < this.switchBlocksToCasesMap.get_Item(index).get_Count())
 			{
-				InstructionBlock instructionBlocks = this.instructionToBlockMapping[this.switchBlocksToCasesMap[index][i]];
-				item.RemoveFromSuccessors(item.Successors.Last<InstructionBlock>());
-				item.AddToSuccessors(instructionBlocks);
-				item = instructionBlocks;
+				V_2 = this.instructionToBlockMapping.get_Item(this.switchBlocksToCasesMap.get_Item(index).get_Item(V_1));
+				V_0.RemoveFromSuccessors(V_0.get_Successors().Last<InstructionBlock>());
+				V_0.AddToSuccessors(V_2);
+				V_0 = V_2;
+				V_1 = V_1 + 1;
 			}
+			return;
 		}
 
 		private void RemoveExpressionsFromFirstBlock(int index)
 		{
-			this.blockExpressions[index].RemoveAt(this.blockExpressions[index].Count - 1);
-			this.blockExpressions[index].RemoveAt(this.blockExpressions[index].Count - 1);
+			this.blockExpressions.get_Item(index).RemoveAt(this.blockExpressions.get_Item(index).get_Count() - 1);
+			this.blockExpressions.get_Item(index).RemoveAt(this.blockExpressions.get_Item(index).get_Count() - 1);
+			return;
 		}
 
 		private bool RemoveOptimizationBlocks()
 		{
 			this.blocksToBeRemoved.Sort();
-			foreach (int num in this.blocksToBeRemoved)
+			V_0 = this.blocksToBeRemoved.GetEnumerator();
+			try
 			{
-				this.methodContext.ControlFlowGraph.RemoveBlockAt(this.instructionToBlockMapping[num].Index);
-				this.blockExpressions.Remove(num);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.methodContext.get_ControlFlowGraph().RemoveBlockAt(this.instructionToBlockMapping.get_Item(V_1).get_Index());
+					dummyVar0 = this.blockExpressions.Remove(V_1);
+				}
 			}
-			return this.blocksToBeRemoved.Count > 0;
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return this.blocksToBeRemoved.get_Count() > 0;
 		}
 
 		private void RemoveSwitchByStringOptimizations()
 		{
-			RemoveCompilerOptimizationsStep.SwitchData switchDatum;
-			foreach (int switchBlocksStartInstruction in this.methodContext.SwitchByStringData.SwitchBlocksStartInstructions)
+			V_0 = this.methodContext.get_SwitchByStringData().get_SwitchBlocksStartInstructions().GetEnumerator();
+			try
 			{
-				if (!this.TryGetSwitchData(this.blockExpressions[switchBlocksStartInstruction], out switchDatum))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (!this.TryGetSwitchData(this.blockExpressions.get_Item(V_1), out V_2))
+					{
+						continue;
+					}
+					this.switchBlocksToCasesMap.Add(V_1, new List<int>());
+					this.MarkOptimizationAndCaseBlocks(this.instructionToBlockMapping.get_Item(V_1), V_2);
+					this.switchBlocksToCasesMap.get_Item(V_1).Sort();
+					this.RemoveExpressionsFromFirstBlock(V_1);
+					this.MergeFirstCFGBlockWithFirstCaseIf(V_1);
+					this.ReconnectBlocks(V_1);
 				}
-				this.switchBlocksToCasesMap.Add(switchBlocksStartInstruction, new List<int>());
-				this.MarkOptimizationAndCaseBlocks(this.instructionToBlockMapping[switchBlocksStartInstruction], switchDatum);
-				this.switchBlocksToCasesMap[switchBlocksStartInstruction].Sort();
-				this.RemoveExpressionsFromFirstBlock(switchBlocksStartInstruction);
-				this.MergeFirstCFGBlockWithFirstCaseIf(switchBlocksStartInstruction);
-				this.ReconnectBlocks(switchBlocksStartInstruction);
+			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
 			}
 			if (this.RemoveOptimizationBlocks())
 			{
-				this.methodContext.IsMethodBodyChanged = true;
+				this.methodContext.set_IsMethodBodyChanged(true);
 			}
+			return;
 		}
 
 		private bool TryGetSwitchData(IList<Expression> expressions, out RemoveCompilerOptimizationsStep.SwitchData data)
 		{
 			data = null;
-			if (expressions.Count < 2 || expressions[expressions.Count - 2].CodeNodeType != CodeNodeType.BinaryExpression)
+			if (expressions.get_Count() < 2 || expressions.get_Item(expressions.get_Count() - 2).get_CodeNodeType() != 24)
 			{
 				return false;
 			}
-			BinaryExpression item = expressions[expressions.Count - 2] as BinaryExpression;
-			if (!item.IsAssignmentExpression)
+			V_0 = expressions.get_Item(expressions.get_Count() - 2) as BinaryExpression;
+			if (!V_0.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			if (item.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || item.Right.CodeNodeType != CodeNodeType.MethodInvocationExpression)
+			if (V_0.get_Left().get_CodeNodeType() != 26 || V_0.get_Right().get_CodeNodeType() != 19)
 			{
 				return false;
 			}
-			MethodInvocationExpression right = item.Right as MethodInvocationExpression;
-			if (!Utilities.IsComputeStringHashMethod(right.MethodExpression.Method))
+			V_1 = V_0.get_Right() as MethodInvocationExpression;
+			if (!Utilities.IsComputeStringHashMethod(V_1.get_MethodExpression().get_Method()))
 			{
 				return false;
 			}
-			data = new RemoveCompilerOptimizationsStep.SwitchData((item.Left as VariableReferenceExpression).Variable, right.Arguments[0]);
+			data = new RemoveCompilerOptimizationsStep.SwitchData((V_0.get_Left() as VariableReferenceExpression).get_Variable(), V_1.get_Arguments().get_Item(0));
 			return true;
 		}
 
@@ -309,8 +346,10 @@ namespace Telerik.JustDecompiler.Steps
 
 			public SwitchData(VariableReference optimizationVariable, Expression switchExpression)
 			{
-				this.OptimizationVariable = optimizationVariable;
-				this.SwitchExpression = switchExpression;
+				base();
+				this.set_OptimizationVariable(optimizationVariable);
+				this.set_SwitchExpression(switchExpression);
+				return;
 			}
 		}
 	}

@@ -1,12 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -18,90 +16,105 @@ namespace Telerik.JustDecompiler.Steps
 
 		public VisualBasicRemoveDelegateCachingStep()
 		{
+			base();
 			this.variablesToNotInline = new HashSet<VariableReference>();
 			this.initializationsToFix = new Dictionary<VariableReference, Statement>();
+			return;
 		}
 
 		protected override ICodeNode GetIfSubstitution(IfStatement node)
 		{
-			BinaryExpression condition = node.Condition as BinaryExpression;
-			if (condition.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression)
+			V_0 = node.get_Condition() as BinaryExpression;
+			if (V_0.get_Left().get_CodeNodeType() != 30)
 			{
 				return null;
 			}
-			FieldDefinition fieldDefinition = (condition.Left as FieldReferenceExpression).Field.Resolve();
-			if (!this.fieldToReplacingExpressionMap.ContainsKey(fieldDefinition))
+			V_1 = (V_0.get_Left() as FieldReferenceExpression).get_Field().Resolve();
+			if (!this.fieldToReplacingExpressionMap.ContainsKey(V_1))
 			{
 				throw new Exception("Caching field not found.");
 			}
-			VariableDefinition variableDefinition = new VariableDefinition(fieldDefinition.get_FieldType(), this.context.MethodContext.Method);
-			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(variableDefinition, null);
-			ExpressionStatement expressionStatement = new ExpressionStatement(new BinaryExpression(BinaryOperator.Assign, variableReferenceExpression, this.fieldToReplacingExpressionMap[fieldDefinition], this.context.MethodContext.Method.get_Module().get_TypeSystem(), null, false));
-			this.initializationsToRemove.Add(variableDefinition, expressionStatement);
-			this.variableToReplacingExpressionMap.Add(variableDefinition, this.fieldToReplacingExpressionMap[fieldDefinition]);
-			this.fieldToReplacingExpressionMap[fieldDefinition] = variableReferenceExpression;
-			this.context.MethodContext.Variables.Add(variableDefinition);
-			this.context.MethodContext.VariablesToRename.Add(variableDefinition);
-			return expressionStatement;
+			V_2 = new VariableDefinition(V_1.get_FieldType(), this.context.get_MethodContext().get_Method());
+			V_3 = new VariableReferenceExpression(V_2, null);
+			V_4 = new ExpressionStatement(new BinaryExpression(26, V_3, this.fieldToReplacingExpressionMap.get_Item(V_1), this.context.get_MethodContext().get_Method().get_Module().get_TypeSystem(), null, false));
+			this.initializationsToRemove.Add(V_2, V_4);
+			this.variableToReplacingExpressionMap.Add(V_2, this.fieldToReplacingExpressionMap.get_Item(V_1));
+			this.fieldToReplacingExpressionMap.set_Item(V_1, V_3);
+			this.context.get_MethodContext().get_Variables().Add(V_2);
+			dummyVar0 = this.context.get_MethodContext().get_VariablesToRename().Add(V_2);
+			return V_4;
 		}
 
 		protected override void ProcessInitializations()
 		{
-			foreach (KeyValuePair<VariableReference, Statement> item in this.initializationsToFix)
+			V_0 = this.initializationsToFix.GetEnumerator();
+			try
 			{
-				if (!this.variableToReplacingExpressionMap.ContainsKey(item.Key))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (!this.variableToReplacingExpressionMap.ContainsKey(V_1.get_Key()))
+					{
+						continue;
+					}
+					((V_1.get_Value() as ExpressionStatement).get_Expression() as BinaryExpression).set_Right(this.variableToReplacingExpressionMap.get_Item(V_1.get_Key()));
 				}
-				((item.Value as ExpressionStatement).Expression as BinaryExpression).Right = this.variableToReplacingExpressionMap[item.Key];
 			}
-			base.RemoveInitializations();
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			this.RemoveInitializations();
+			return;
 		}
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			ICodeNode codeNode = base.VisitFieldReferenceExpression(node);
-			if (codeNode.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+			V_0 = this.VisitFieldReferenceExpression(node);
+			if (V_0.get_CodeNodeType() != 26)
 			{
-				return codeNode;
+				return V_0;
 			}
-			return this.Visit(codeNode);
+			return this.Visit(V_0);
 		}
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			Expression target = node.GetTarget();
-			if (target != null)
+			V_0 = node.GetTarget();
+			if (V_0 != null)
 			{
-				if (target.CodeNodeType == CodeNodeType.VariableReferenceExpression)
+				if (V_0.get_CodeNodeType() != 26)
 				{
-					VariableReference variable = (target as VariableReferenceExpression).Variable;
-					if (this.variableToReplacingExpressionMap.ContainsKey(variable))
+					if (V_0.get_CodeNodeType() == 30)
 					{
-						this.variablesToNotInline.Add(variable);
+						V_2 = (V_0 as FieldReferenceExpression).get_Field().Resolve();
+						if (this.fieldToReplacingExpressionMap.ContainsKey(V_2))
+						{
+							V_3 = (this.fieldToReplacingExpressionMap.get_Item(V_2) as VariableReferenceExpression).get_Variable();
+							dummyVar1 = this.variablesToNotInline.Add(V_3);
+						}
 					}
 				}
-				else if (target.CodeNodeType == CodeNodeType.FieldReferenceExpression)
+				else
 				{
-					FieldDefinition fieldDefinition = (target as FieldReferenceExpression).Field.Resolve();
-					if (this.fieldToReplacingExpressionMap.ContainsKey(fieldDefinition))
+					V_1 = (V_0 as VariableReferenceExpression).get_Variable();
+					if (this.variableToReplacingExpressionMap.ContainsKey(V_1))
 					{
-						VariableReference variableReference = (this.fieldToReplacingExpressionMap[fieldDefinition] as VariableReferenceExpression).Variable;
-						this.variablesToNotInline.Add(variableReference);
+						dummyVar0 = this.variablesToNotInline.Add(V_1);
 					}
 				}
 			}
-			return base.VisitMethodInvocationExpression(node);
+			return this.VisitMethodInvocationExpression(node);
 		}
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (!this.variableToReplacingExpressionMap.ContainsKey(node.Variable) || !this.variablesToNotInline.Contains(node.Variable))
+			if (!this.variableToReplacingExpressionMap.ContainsKey(node.get_Variable()) || !this.variablesToNotInline.Contains(node.get_Variable()))
 			{
-				return base.VisitVariableReferenceExpression(node);
+				return this.VisitVariableReferenceExpression(node);
 			}
-			this.initializationsToFix.Add(node.Variable, this.initializationsToRemove[node.Variable]);
-			this.initializationsToRemove.Remove(node.Variable);
+			this.initializationsToFix.Add(node.get_Variable(), this.initializationsToRemove.get_Item(node.get_Variable()));
+			dummyVar0 = this.initializationsToRemove.Remove(node.get_Variable());
 			return node;
 		}
 	}

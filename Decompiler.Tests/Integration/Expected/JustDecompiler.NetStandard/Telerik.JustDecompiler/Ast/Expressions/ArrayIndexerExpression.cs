@@ -3,7 +3,6 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -16,12 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				ArrayIndexerExpression arrayIndexerExpression = null;
-				yield return arrayIndexerExpression.Target;
-				foreach (ICodeNode index in arrayIndexerExpression.Indices)
-				{
-					yield return index;
-				}
+				stackVariable1 = new ArrayIndexerExpression.u003cget_Childrenu003ed__2(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -29,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ArrayIndexerExpression;
+				return 39;
 			}
 		}
 
@@ -37,40 +33,40 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				TypeReference expressionType = this.Target.ExpressionType;
-				if (expressionType == null)
+				V_0 = this.get_Target().get_ExpressionType();
+				if (V_0 == null)
 				{
 					return null;
 				}
-				if (this.Target is ArgumentReferenceExpression)
+				if (this.get_Target() as ArgumentReferenceExpression != null)
 				{
-					TypeReference typeReference = (this.Target as ArgumentReferenceExpression).ExpressionType;
-					if (typeReference.get_IsByReference())
+					V_1 = (this.get_Target() as ArgumentReferenceExpression).get_ExpressionType();
+					if (V_1.get_IsByReference())
 					{
-						expressionType = (typeReference as ByReferenceType).get_ElementType();
+						V_0 = (V_1 as ByReferenceType).get_ElementType();
 					}
 				}
-				if (expressionType.get_IsOptionalModifier())
+				if (V_0.get_IsOptionalModifier())
 				{
-					expressionType = (expressionType as OptionalModifierType).get_ElementType();
+					V_0 = (V_0 as OptionalModifierType).get_ElementType();
 				}
-				if (expressionType.get_IsRequiredModifier())
+				if (V_0.get_IsRequiredModifier())
 				{
-					expressionType = (expressionType as RequiredModifierType).get_ElementType();
+					V_0 = (V_0 as RequiredModifierType).get_ElementType();
 				}
-				if (expressionType.get_IsArray())
+				if (V_0.get_IsArray())
 				{
-					return (expressionType as ArrayType).get_ElementType();
+					return (V_0 as ArrayType).get_ElementType();
 				}
-				if (expressionType.get_FullName() == "System.Array")
+				if (String.op_Equality(V_0.get_FullName(), "System.Array"))
 				{
-					return expressionType.get_Module().get_TypeSystem().get_Object();
+					return V_0.get_Module().get_TypeSystem().get_Object();
 				}
-				if (expressionType.get_FullName() != "System.String")
+				if (!String.op_Equality(V_0.get_FullName(), "System.String"))
 				{
 					throw new ArgumentOutOfRangeException("Target of array indexer expression is not an array.");
 				}
-				return expressionType.get_Module().get_TypeSystem().get_Char();
+				return V_0.get_Module().get_TypeSystem().get_Char();
 			}
 			set
 			{
@@ -82,7 +78,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Target.HasType;
+				return this.get_Target().get_HasType();
 			}
 		}
 
@@ -104,42 +100,42 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ArrayIndexerExpression(Expression target, IEnumerable<Instruction> instructions) : base(instructions)
+		public ArrayIndexerExpression(Expression target, IEnumerable<Instruction> instructions)
 		{
-			this.Target = target;
-			this.Indices = new ExpressionCollection();
+			base(instructions);
+			this.set_Target(target);
+			this.set_Indices(new ExpressionCollection());
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new ArrayIndexerExpression(this.Target.Clone(), this.instructions)
-			{
-				Indices = this.Indices.Clone(),
-				IsSimpleStore = this.IsSimpleStore
-			};
+			stackVariable5 = new ArrayIndexerExpression(this.get_Target().Clone(), this.instructions);
+			stackVariable5.set_Indices(this.get_Indices().Clone());
+			stackVariable5.set_IsSimpleStore(this.get_IsSimpleStore());
+			return stackVariable5;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ArrayIndexerExpression(this.Target.CloneExpressionOnly(), null)
-			{
-				Indices = this.Indices.CloneExpressionsOnly(),
-				IsSimpleStore = this.IsSimpleStore
-			};
+			stackVariable4 = new ArrayIndexerExpression(this.get_Target().CloneExpressionOnly(), null);
+			stackVariable4.set_Indices(this.get_Indices().CloneExpressionsOnly());
+			stackVariable4.set_IsSimpleStore(this.get_IsSimpleStore());
+			return stackVariable4;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is ArrayIndexerExpression))
+			if (other as ArrayIndexerExpression == null)
 			{
 				return false;
 			}
-			ArrayIndexerExpression arrayIndexerExpression = other as ArrayIndexerExpression;
-			if (!this.Target.Equals(arrayIndexerExpression.Target))
+			V_0 = other as ArrayIndexerExpression;
+			if (!this.get_Target().Equals(V_0.get_Target()))
 			{
 				return false;
 			}
-			return this.Indices.Equals(arrayIndexerExpression.Indices);
+			return this.get_Indices().Equals(V_0.get_Indices());
 		}
 	}
 }

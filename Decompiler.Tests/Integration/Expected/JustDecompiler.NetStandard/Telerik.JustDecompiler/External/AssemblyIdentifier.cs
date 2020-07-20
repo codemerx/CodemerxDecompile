@@ -18,12 +18,14 @@ namespace Telerik.JustDecompiler.External
 			private set
 			{
 				this.path = value;
+				return;
 			}
 		}
 
 		public AssemblyIdentifier(string path)
 		{
 			this.path = path;
+			return;
 		}
 	}
 }

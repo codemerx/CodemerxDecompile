@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.Line = line;
 			this.Column = column;
+			return;
 		}
 	}
 }

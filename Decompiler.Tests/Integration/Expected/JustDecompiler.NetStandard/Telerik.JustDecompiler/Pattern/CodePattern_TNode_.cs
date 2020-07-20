@@ -15,20 +15,22 @@ namespace Telerik.JustDecompiler.Pattern
 
 		protected CodePattern()
 		{
+			base();
+			return;
 		}
 
 		public override bool Match(MatchContext context, object node)
 		{
-			TNode tNode = (TNode)(node as TNode);
-			if (tNode == null)
+			V_0 = (TNode)(node as TNode);
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (this.Bind != null)
+			if (this.get_Bind() != null)
 			{
-				context.AddData(this.Bind(tNode));
+				context.AddData(this.get_Bind().Invoke(V_0));
 			}
-			return this.OnMatch(context, tNode);
+			return this.OnMatch(context, V_0);
 		}
 
 		protected abstract bool OnMatch(MatchContext context, TNode node);

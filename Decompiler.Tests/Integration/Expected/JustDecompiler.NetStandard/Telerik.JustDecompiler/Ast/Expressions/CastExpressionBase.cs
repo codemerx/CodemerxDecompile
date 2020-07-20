@@ -15,8 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				CastExpressionBase castExpressionBase = null;
-				yield return castExpressionBase.Expression;
+				stackVariable1 = new CastExpressionBase.u003cget_Childrenu003ed__15(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -30,11 +31,12 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.TargetType;
+				return this.get_TargetType();
 			}
 			set
 			{
-				this.TargetType = value;
+				this.set_TargetType(value);
+				return;
 			}
 		}
 
@@ -52,23 +54,25 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public CastExpressionBase(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions) : base(instructions)
+		public CastExpressionBase(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions)
 		{
-			this.Expression = expression;
-			this.TargetType = targetType;
+			base(instructions);
+			this.set_Expression(expression);
+			this.set_TargetType(targetType);
+			return;
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (!(other is CastExpressionBase))
+			if (other as CastExpressionBase == null)
 			{
 				return false;
 			}
-			if (this.TargetType.get_FullName() != (other as CastExpressionBase).TargetType.get_FullName())
+			if (String.op_Inequality(this.get_TargetType().get_FullName(), (other as CastExpressionBase).get_TargetType().get_FullName()))
 			{
 				return false;
 			}
-			return this.Expression.Equals((other as CastExpressionBase).Expression);
+			return this.get_Expression().Equals((other as CastExpressionBase).get_Expression());
 		}
 	}
 }

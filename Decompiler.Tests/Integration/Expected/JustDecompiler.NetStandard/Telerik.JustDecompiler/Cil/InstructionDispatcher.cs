@@ -7,6 +7,8 @@ namespace Telerik.JustDecompiler.Cil
 	{
 		public InstructionDispatcher()
 		{
+			base();
+			return;
 		}
 
 		public static void Dispatch(Instruction instruction, IInstructionVisitor visitor)
@@ -1001,6 +1003,7 @@ namespace Telerik.JustDecompiler.Cil
 				}
 				case 214:
 				{
+				Label0:
 					throw new ArgumentException(Formatter.FormatInstruction(instruction), "instruction");
 				}
 				case 215:
@@ -1024,7 +1027,7 @@ namespace Telerik.JustDecompiler.Cil
 				}
 				default:
 				{
-					throw new ArgumentException(Formatter.FormatInstruction(instruction), "instruction");
+					goto Label0;
 				}
 			}
 		}

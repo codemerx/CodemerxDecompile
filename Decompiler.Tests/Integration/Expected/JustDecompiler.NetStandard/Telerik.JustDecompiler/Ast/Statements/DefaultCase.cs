@@ -13,11 +13,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				DefaultCase defaultCase = null;
-				if (defaultCase.Body != null)
-				{
-					yield return defaultCase.Body;
-				}
+				stackVariable1 = new DefaultCase.u003cget_Childrenu003ed__2(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -25,44 +23,44 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.DefaultCase;
+				return 14;
 			}
 		}
 
-		public DefaultCase(BlockStatement body) : base(body)
+		public DefaultCase(BlockStatement body)
 		{
+			base(body);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			BlockStatement blockStatement;
-			if (base.Body != null)
+			if (this.get_Body() != null)
 			{
-				blockStatement = base.Body.Clone() as BlockStatement;
+				stackVariable5 = this.get_Body().Clone() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			DefaultCase defaultCase = new DefaultCase(blockStatement);
-			base.CopyParentAndLabel(defaultCase);
-			return defaultCase;
+			V_0 = new DefaultCase(stackVariable5);
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			BlockStatement blockStatement;
-			if (base.Body != null)
+			if (this.get_Body() != null)
 			{
-				blockStatement = base.Body.CloneStatementOnly() as BlockStatement;
+				stackVariable5 = this.get_Body().CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			DefaultCase defaultCase = new DefaultCase(blockStatement);
-			base.CopyParentAndLabel(defaultCase);
-			return defaultCase;
+			V_0 = new DefaultCase(stackVariable5);
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 	}
 }

@@ -24,51 +24,58 @@ namespace Telerik.JustDecompiler.External
 
 		public MemberIdentifier(AssemblyIdentifier declaringAssembly, IUniqueMemberIdentifier uniqueMemberIdentifier)
 		{
-			this.Assembly = declaringAssembly;
-			this.UniqueMemberIdentifier = uniqueMemberIdentifier;
+			base();
+			this.set_Assembly(declaringAssembly);
+			this.set_UniqueMemberIdentifier(uniqueMemberIdentifier);
+			return;
 		}
 
 		public int CompareTo(MemberIdentifier other)
 		{
-			if (other.Assembly.AssemblyPath != this.Assembly.AssemblyPath)
+			if (String.op_Inequality(other.get_Assembly().get_AssemblyPath(), this.get_Assembly().get_AssemblyPath()))
 			{
-				return this.Assembly.AssemblyPath.CompareTo(other.Assembly.AssemblyPath);
+				stackVariable34 = this.get_Assembly().get_AssemblyPath();
+				V_0 = other.get_Assembly();
+				return stackVariable34.CompareTo(V_0.get_AssemblyPath());
 			}
-			if (other.UniqueMemberIdentifier.ModuleFilePath != this.UniqueMemberIdentifier.ModuleFilePath)
+			if (String.op_Inequality(other.get_UniqueMemberIdentifier().get_ModuleFilePath(), this.get_UniqueMemberIdentifier().get_ModuleFilePath()))
 			{
-				return this.UniqueMemberIdentifier.ModuleFilePath.CompareTo(other.UniqueMemberIdentifier.ModuleFilePath);
+				return this.get_UniqueMemberIdentifier().get_ModuleFilePath().CompareTo(other.get_UniqueMemberIdentifier().get_ModuleFilePath());
 			}
-			return this.UniqueMemberIdentifier.MetadataToken.CompareTo(other.UniqueMemberIdentifier.MetadataToken);
+			V_1 = this.get_UniqueMemberIdentifier().get_MetadataToken();
+			return V_1.CompareTo(other.get_UniqueMemberIdentifier().get_MetadataToken());
 		}
 
 		public override bool Equals(object obj)
 		{
-			MemberIdentifier memberIdentifier = obj as MemberIdentifier;
-			if (memberIdentifier == null)
+			V_0 = obj as MemberIdentifier;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (!String.Equals(this.Assembly.AssemblyPath, memberIdentifier.Assembly.AssemblyPath, StringComparison.OrdinalIgnoreCase))
+			if (!String.Equals(this.get_Assembly().get_AssemblyPath(), V_0.get_Assembly().get_AssemblyPath(), 5))
 			{
 				return false;
 			}
-			if (!String.Equals(this.UniqueMemberIdentifier.ModuleFilePath, memberIdentifier.UniqueMemberIdentifier.ModuleFilePath, StringComparison.OrdinalIgnoreCase))
+			if (!String.Equals(this.get_UniqueMemberIdentifier().get_ModuleFilePath(), V_0.get_UniqueMemberIdentifier().get_ModuleFilePath(), 5))
 			{
 				return false;
 			}
-			return this.UniqueMemberIdentifier.MetadataToken == memberIdentifier.UniqueMemberIdentifier.MetadataToken;
+			return this.get_UniqueMemberIdentifier().get_MetadataToken() == V_0.get_UniqueMemberIdentifier().get_MetadataToken();
 		}
 
 		public override int GetHashCode()
 		{
-			AssemblyIdentifier assembly = this.Assembly;
-			return assembly.GetHashCode() ^ this.UniqueMemberIdentifier.ModuleFilePath.GetHashCode() ^ this.UniqueMemberIdentifier.MetadataToken.GetHashCode();
+			V_0 = this.get_Assembly();
+			stackVariable8 = V_0.GetHashCode() ^ this.get_UniqueMemberIdentifier().get_ModuleFilePath().GetHashCode();
+			V_1 = this.get_UniqueMemberIdentifier().get_MetadataToken();
+			return stackVariable8 ^ V_1.GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			AssemblyIdentifier assembly = this.Assembly;
-			return String.Format("{0} 0x{1:x8}", (object)assembly.AssemblyPath, this.UniqueMemberIdentifier);
+			V_0 = this.get_Assembly();
+			return String.Format("{0} 0x{1:x8}", V_0.get_AssemblyPath(), this.get_UniqueMemberIdentifier());
 		}
 	}
 }

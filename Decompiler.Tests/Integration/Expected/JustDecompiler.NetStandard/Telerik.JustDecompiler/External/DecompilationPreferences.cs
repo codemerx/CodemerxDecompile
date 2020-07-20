@@ -23,6 +23,7 @@ namespace Telerik.JustDecompiler.External
 			set
 			{
 				this.renameInvalidMembers = value;
+				return;
 			}
 		}
 
@@ -35,6 +36,7 @@ namespace Telerik.JustDecompiler.External
 			set
 			{
 				this.renameInvalidMembers = value;
+				return;
 			}
 		}
 
@@ -58,11 +60,13 @@ namespace Telerik.JustDecompiler.External
 
 		public DecompilationPreferences()
 		{
-			this.WriteDocumentation = true;
-			this.WriteFullNames = false;
+			base();
+			this.set_WriteDocumentation(true);
+			this.set_WriteFullNames(false);
 			this.renameInvalidMembers = true;
-			this.WriteLargeNumbersInHex = true;
-			this.DecompileDangerousResources = false;
+			this.set_WriteLargeNumbersInHex(true);
+			this.set_DecompileDangerousResources(false);
+			return;
 		}
 	}
 }

@@ -1,39 +1,39 @@
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using System;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Decompiler;
-using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Languages;
-using Telerik.JustDecompiler.Languages.CSharp;
 
 namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 {
 	internal class IntermediateDecompilationCSharpLanguageWriter : TestCaseCSharpWriter
 	{
-		private readonly bool renameInvalidMembers = true;
+		private readonly bool renameInvalidMembers;
 
 		protected override ModuleSpecificContext ModuleContext
 		{
 			get
 			{
-				ModuleSpecificContext moduleContext;
 				try
 				{
-					moduleContext = base.ModuleContext;
+					V_0 = this.get_ModuleContext();
 				}
-				catch (NullReferenceException nullReferenceException)
+				catch (NullReferenceException exception_0)
 				{
-					moduleContext = new ModuleSpecificContext();
+					dummyVar0 = exception_0;
+					V_0 = new ModuleSpecificContext();
 				}
-				return moduleContext;
+				return V_0;
 			}
 		}
 
-		public IntermediateDecompilationCSharpLanguageWriter(IFormatter formatter) : base(LanguageFactory.GetLanguage(CSharpVersion.None), formatter, new WriterSettings(true, false, false, false, false, false, true, false))
+		public IntermediateDecompilationCSharpLanguageWriter(IFormatter formatter)
 		{
+			this.renameInvalidMembers = true;
+			base(LanguageFactory.GetLanguage(0), formatter, new WriterSettings(true, false, false, false, false, false, true, false));
 			this.writerContextService = new SimpleWriterContextService(new DefaultDecompilationCacheService(), this.renameInvalidMembers);
+			return;
 		}
 
 		protected override string GetArgumentName(ParameterReference parameter)
@@ -53,12 +53,14 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			this.WriteTypeAndName(node.Variable.get_VariableType(), node.Variable.get_Name());
+			this.WriteTypeAndName(node.get_Variable().get_VariableType(), node.get_Variable().get_Name());
+			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			this.Write(node.Variable.get_Name());
+			this.Write(node.get_Variable().get_Name());
+			return;
 		}
 	}
 }

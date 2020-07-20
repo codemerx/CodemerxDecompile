@@ -13,7 +13,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ExplicitCastExpression;
+				return 31;
 			}
 		}
 
@@ -33,7 +33,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.DynamicPositioningFlags != null;
+				return this.get_DynamicPositioningFlags() != null;
 			}
 		}
 
@@ -47,7 +47,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return base.TargetType;
+				return this.get_TargetType();
 			}
 		}
 
@@ -57,71 +57,80 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			internal set;
 		}
 
-		public ExplicitCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions) : base(expression, targetType, instructions)
+		public ExplicitCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions)
 		{
+			base(expression, targetType, instructions);
 			this.DetermineIsChecked();
+			return;
 		}
 
-		public ExplicitCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions, MemberReference unresolvedReferenceForAmbiguousCastToObject) : this(expression, targetType, instructions)
+		public ExplicitCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions, MemberReference unresolvedReferenceForAmbiguousCastToObject)
 		{
-			this.UnresolvedReferenceForAmbiguousCastToObject = unresolvedReferenceForAmbiguousCastToObject;
+			this(expression, targetType, instructions);
+			this.set_UnresolvedReferenceForAmbiguousCastToObject(unresolvedReferenceForAmbiguousCastToObject);
+			return;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			bool[] flagArray;
-			ExplicitCastExpression explicitCastExpression = new ExplicitCastExpression(base.Expression.Clone(), base.TargetType, this.instructions)
+			stackVariable7 = new ExplicitCastExpression(this.get_Expression().Clone(), this.get_TargetType(), this.instructions);
+			stackVariable7.set_IsChecked(this.get_IsChecked());
+			stackVariable7.set_IsExplicitInterfaceCast(this.get_IsExplicitInterfaceCast());
+			stackVariable7.set_UnresolvedReferenceForAmbiguousCastToObject(this.get_UnresolvedReferenceForAmbiguousCastToObject());
+			if (this.get_DynamicPositioningFlags() != null)
 			{
-				IsChecked = this.IsChecked,
-				IsExplicitInterfaceCast = this.IsExplicitInterfaceCast,
-				UnresolvedReferenceForAmbiguousCastToObject = this.UnresolvedReferenceForAmbiguousCastToObject
-			};
-			if (this.DynamicPositioningFlags != null)
-			{
-				flagArray = (bool[])this.DynamicPositioningFlags.Clone();
+				stackVariable19 = (bool[])this.get_DynamicPositioningFlags().Clone();
 			}
 			else
 			{
-				flagArray = null;
+				stackVariable19 = null;
 			}
-			explicitCastExpression.DynamicPositioningFlags = flagArray;
-			return explicitCastExpression;
+			stackVariable7.set_DynamicPositioningFlags(stackVariable19);
+			return stackVariable7;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			bool[] flagArray;
-			ExplicitCastExpression explicitCastExpression = new ExplicitCastExpression(base.Expression.CloneExpressionOnly(), base.TargetType, null)
+			stackVariable6 = new ExplicitCastExpression(this.get_Expression().CloneExpressionOnly(), this.get_TargetType(), null);
+			stackVariable6.set_IsChecked(this.get_IsChecked());
+			stackVariable6.set_IsExplicitInterfaceCast(this.get_IsExplicitInterfaceCast());
+			stackVariable6.set_UnresolvedReferenceForAmbiguousCastToObject(this.get_UnresolvedReferenceForAmbiguousCastToObject());
+			if (this.get_DynamicPositioningFlags() != null)
 			{
-				IsChecked = this.IsChecked,
-				IsExplicitInterfaceCast = this.IsExplicitInterfaceCast,
-				UnresolvedReferenceForAmbiguousCastToObject = this.UnresolvedReferenceForAmbiguousCastToObject
-			};
-			if (this.DynamicPositioningFlags != null)
-			{
-				flagArray = (bool[])this.DynamicPositioningFlags.Clone();
+				stackVariable18 = (bool[])this.get_DynamicPositioningFlags().Clone();
 			}
 			else
 			{
-				flagArray = null;
+				stackVariable18 = null;
 			}
-			explicitCastExpression.DynamicPositioningFlags = flagArray;
-			return explicitCastExpression;
+			stackVariable6.set_DynamicPositioningFlags(stackVariable18);
+			return stackVariable6;
 		}
 
 		private void DetermineIsChecked()
 		{
-			foreach (Instruction instruction in this.instructions)
+			V_0 = this.instructions.GetEnumerator();
+			try
 			{
-				Code code = instruction.get_OpCode().get_Code();
-				if (code - 127 > 9 && code - 163 > 7 && code - 178 > 1)
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_2 = V_0.get_Current().get_OpCode();
+					V_1 = V_2.get_Code();
+					if (V_1 - 127 > 9 && V_1 - 163 > 7 && V_1 - 178 > 1)
+					{
+						continue;
+					}
+					this.set_IsChecked(true);
+					goto Label0;
 				}
-				this.IsChecked = true;
-				return;
 			}
-			this.IsChecked = false;
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			this.set_IsChecked(false);
+		Label0:
+			return;
 		}
 	}
 }

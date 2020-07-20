@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 
@@ -12,7 +11,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 {
 	public class LiteralExpression : Expression
 	{
-		private object @value;
+		private object value;
 
 		private readonly TypeSystem typeSystem;
 
@@ -20,6 +19,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new LiteralExpression.u003cget_Childrenu003ed__4(-2);
 			}
 		}
 
@@ -27,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.LiteralExpression;
+				return 22;
 			}
 		}
 
@@ -35,122 +35,125 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.@value;
+				return this.value;
 			}
 			set
 			{
-				this.@value = value;
+				this.value = value;
 				this.ResolveType();
+				return;
 			}
 		}
 
-		public LiteralExpression(object value, TypeSystem typeSystem, IEnumerable<Instruction> instructions) : base(instructions)
+		public LiteralExpression(object value, TypeSystem typeSystem, IEnumerable<Instruction> instructions)
 		{
+			base(instructions);
 			this.typeSystem = typeSystem;
-			this.Value = value;
+			this.set_Value(value);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new LiteralExpression(this.@value, this.typeSystem, this.instructions);
+			return new LiteralExpression(this.value, this.typeSystem, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new LiteralExpression(this.@value, this.typeSystem, null);
+			return new LiteralExpression(this.value, this.typeSystem, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is LiteralExpression))
+			if (other as LiteralExpression == null)
 			{
 				return false;
 			}
-			if (this.Value == null)
+			if (this.get_Value() == null)
 			{
-				return (object)(other as LiteralExpression).Value == (object)null;
+				return (object)(other as LiteralExpression).get_Value() == (object)null;
 			}
-			return this.Value.Equals((other as LiteralExpression).Value);
+			return this.get_Value().Equals((other as LiteralExpression).get_Value());
 		}
 
 		private void ResolveType()
 		{
-			if (this.Value == null)
+			if (this.get_Value() == null)
 			{
-				this.ExpressionType = this.typeSystem.get_Object();
+				this.set_ExpressionType(this.typeSystem.get_Object());
 				return;
 			}
-			string name = this.Value.GetType().Name;
-			if (name != null)
+			V_0 = this.get_Value().GetType().get_Name();
+			if (V_0 != null)
 			{
-				if (name == "String")
+				if (String.op_Equality(V_0, "String"))
 				{
-					this.ExpressionType = this.typeSystem.get_String();
+					this.set_ExpressionType(this.typeSystem.get_String());
 					return;
 				}
-				if (name == "Boolean")
+				if (String.op_Equality(V_0, "Boolean"))
 				{
-					this.ExpressionType = this.typeSystem.get_Boolean();
+					this.set_ExpressionType(this.typeSystem.get_Boolean());
 					return;
 				}
-				if (name == "Byte")
+				if (String.op_Equality(V_0, "Byte"))
 				{
-					this.ExpressionType = this.typeSystem.get_Byte();
+					this.set_ExpressionType(this.typeSystem.get_Byte());
 					return;
 				}
-				if (name == "SByte")
+				if (String.op_Equality(V_0, "SByte"))
 				{
-					this.ExpressionType = this.typeSystem.get_SByte();
+					this.set_ExpressionType(this.typeSystem.get_SByte());
 					return;
 				}
-				if (name == "Char")
+				if (String.op_Equality(V_0, "Char"))
 				{
-					this.ExpressionType = this.typeSystem.get_Char();
+					this.set_ExpressionType(this.typeSystem.get_Char());
 					return;
 				}
-				if (name == "UInt16")
+				if (String.op_Equality(V_0, "UInt16"))
 				{
-					this.ExpressionType = this.typeSystem.get_UInt16();
+					this.set_ExpressionType(this.typeSystem.get_UInt16());
 					return;
 				}
-				if (name == "Int16")
+				if (String.op_Equality(V_0, "Int16"))
 				{
-					this.ExpressionType = this.typeSystem.get_Int16();
+					this.set_ExpressionType(this.typeSystem.get_Int16());
 					return;
 				}
-				if (name == "Int32")
+				if (String.op_Equality(V_0, "Int32"))
 				{
-					this.ExpressionType = this.typeSystem.get_Int32();
+					this.set_ExpressionType(this.typeSystem.get_Int32());
 					return;
 				}
-				if (name == "UInt32")
+				if (String.op_Equality(V_0, "UInt32"))
 				{
-					this.ExpressionType = this.typeSystem.get_UInt32();
+					this.set_ExpressionType(this.typeSystem.get_UInt32());
 					return;
 				}
-				if (name == "Int64")
+				if (String.op_Equality(V_0, "Int64"))
 				{
-					this.ExpressionType = this.typeSystem.get_Int64();
+					this.set_ExpressionType(this.typeSystem.get_Int64());
 					return;
 				}
-				if (name == "UInt64")
+				if (String.op_Equality(V_0, "UInt64"))
 				{
-					this.ExpressionType = this.typeSystem.get_UInt64();
+					this.set_ExpressionType(this.typeSystem.get_UInt64());
 					return;
 				}
-				if (name == "Single")
+				if (String.op_Equality(V_0, "Single"))
 				{
-					this.ExpressionType = this.typeSystem.get_Single();
+					this.set_ExpressionType(this.typeSystem.get_Single());
 					return;
 				}
-				if (name == "Double")
+				if (String.op_Equality(V_0, "Double"))
 				{
-					this.ExpressionType = this.typeSystem.get_Double();
+					this.set_ExpressionType(this.typeSystem.get_Double());
 					return;
 				}
-				if (name == "IntPtr")
+				if (String.op_Equality(V_0, "IntPtr"))
 				{
-					this.ExpressionType = this.typeSystem.get_IntPtr();
+					this.set_ExpressionType(this.typeSystem.get_IntPtr());
 					return;
 				}
 			}

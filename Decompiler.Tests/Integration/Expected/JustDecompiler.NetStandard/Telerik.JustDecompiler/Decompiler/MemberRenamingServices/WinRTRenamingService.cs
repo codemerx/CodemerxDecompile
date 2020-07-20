@@ -7,13 +7,23 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 	{
 		private const string CLRPrefix = "<CLR>";
 
-		public WinRTRenamingService(ILanguage language, bool renameInvalidMembers) : base(language, renameInvalidMembers)
+		public WinRTRenamingService(ILanguage language, bool renameInvalidMembers)
 		{
+			base(language, renameInvalidMembers);
+			return;
 		}
 
 		protected override string GetActualTypeName(string typeName)
 		{
-			return base.GetActualTypeName((typeName.StartsWith("<CLR>") ? typeName.Substring("<CLR>".Length) : typeName));
+			if (typeName.StartsWith("<CLR>"))
+			{
+				stackVariable7 = typeName.Substring("<CLR>".get_Length());
+			}
+			else
+			{
+				stackVariable7 = typeName;
+			}
+			return this.GetActualTypeName(stackVariable7);
 		}
 	}
 }

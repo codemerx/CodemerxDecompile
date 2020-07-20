@@ -12,22 +12,24 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ImplicitCastExpression;
+				return 32;
 			}
 		}
 
-		public ImplicitCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions) : base(expression, targetType, instructions)
+		public ImplicitCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions)
 		{
+			base(expression, targetType, instructions);
+			return;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new ImplicitCastExpression(base.Expression.Clone(), base.TargetType, this.instructions);
+			return new ImplicitCastExpression(this.get_Expression().Clone(), this.get_TargetType(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new ImplicitCastExpression(base.Expression.Clone(), base.TargetType, null);
+			return new ImplicitCastExpression(this.get_Expression().Clone(), this.get_TargetType(), null);
 		}
 	}
 }

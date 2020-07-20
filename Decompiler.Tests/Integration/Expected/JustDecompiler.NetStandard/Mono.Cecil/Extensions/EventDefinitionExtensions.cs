@@ -10,137 +10,209 @@ namespace Mono.Cecil.Extensions
 	{
 		public static ICollection<ImplementedMember> GetExplicitlyImplementedEvents(this EventDefinition self)
 		{
-			List<ImplementedMember> implementedMembers = new List<ImplementedMember>();
+			V_0 = new List<ImplementedMember>();
 			if (!self.IsExplicitImplementation())
 			{
-				return implementedMembers;
+				return V_0;
 			}
 			if (self.get_AddMethod() != null)
 			{
-				foreach (ImplementedMember explicitlyImplementedMethod in self.get_AddMethod().GetExplicitlyImplementedMethods())
+				V_1 = self.get_AddMethod().GetExplicitlyImplementedMethods().GetEnumerator();
+				try
 				{
-					EventDefinition methodDeclaringEvent = EventDefinitionExtensions.GetMethodDeclaringEvent(explicitlyImplementedMethod.Member as MethodReference);
-					if (methodDeclaringEvent == null)
+					while (V_1.MoveNext())
 					{
-						continue;
+						V_2 = V_1.get_Current();
+						V_3 = EventDefinitionExtensions.GetMethodDeclaringEvent(V_2.get_Member() as MethodReference);
+						if (V_3 == null)
+						{
+							continue;
+						}
+						V_0.Add(new ImplementedMember(V_2.get_DeclaringType(), V_3));
 					}
-					implementedMembers.Add(new ImplementedMember(explicitlyImplementedMethod.DeclaringType, methodDeclaringEvent));
 				}
-				return implementedMembers;
+				finally
+				{
+					if (V_1 != null)
+					{
+						V_1.Dispose();
+					}
+				}
+				return V_0;
 			}
 			if (self.get_RemoveMethod() == null)
 			{
-				return implementedMembers;
+				return V_0;
 			}
-			foreach (ImplementedMember implementedMember in self.get_RemoveMethod().GetExplicitlyImplementedMethods())
+			V_1 = self.get_RemoveMethod().GetExplicitlyImplementedMethods().GetEnumerator();
+			try
 			{
-				EventDefinition eventDefinition = EventDefinitionExtensions.GetMethodDeclaringEvent(implementedMember.Member as MethodReference);
-				if (eventDefinition == null)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_4 = V_1.get_Current();
+					V_5 = EventDefinitionExtensions.GetMethodDeclaringEvent(V_4.get_Member() as MethodReference);
+					if (V_5 == null)
+					{
+						continue;
+					}
+					V_0.Add(new ImplementedMember(V_4.get_DeclaringType(), V_5));
 				}
-				implementedMembers.Add(new ImplementedMember(implementedMember.DeclaringType, eventDefinition));
 			}
-			return implementedMembers;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		public static ICollection<ImplementedMember> GetImplementedEvents(this EventDefinition self)
 		{
-			List<ImplementedMember> implementedMembers = new List<ImplementedMember>();
+			V_0 = new List<ImplementedMember>();
 			if (self.get_AddMethod() != null)
 			{
-				foreach (ImplementedMember implementedMethod in self.get_AddMethod().GetImplementedMethods())
+				V_1 = self.get_AddMethod().GetImplementedMethods().GetEnumerator();
+				try
 				{
-					EventDefinition methodDeclaringEvent = EventDefinitionExtensions.GetMethodDeclaringEvent(implementedMethod.Member as MethodReference);
-					if (methodDeclaringEvent == null)
+					while (V_1.MoveNext())
 					{
-						continue;
+						V_2 = V_1.get_Current();
+						V_3 = EventDefinitionExtensions.GetMethodDeclaringEvent(V_2.get_Member() as MethodReference);
+						if (V_3 == null)
+						{
+							continue;
+						}
+						V_0.Add(new ImplementedMember(V_2.get_DeclaringType(), V_3));
 					}
-					implementedMembers.Add(new ImplementedMember(implementedMethod.DeclaringType, methodDeclaringEvent));
 				}
-				return implementedMembers;
+				finally
+				{
+					if (V_1 != null)
+					{
+						V_1.Dispose();
+					}
+				}
+				return V_0;
 			}
 			if (self.get_RemoveMethod() == null)
 			{
-				return implementedMembers;
+				return V_0;
 			}
-			foreach (ImplementedMember implementedMember in self.get_RemoveMethod().GetImplementedMethods())
+			V_1 = self.get_RemoveMethod().GetImplementedMethods().GetEnumerator();
+			try
 			{
-				EventDefinition eventDefinition = EventDefinitionExtensions.GetMethodDeclaringEvent(implementedMember.Member as MethodReference);
-				if (eventDefinition == null)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_4 = V_1.get_Current();
+					V_5 = EventDefinitionExtensions.GetMethodDeclaringEvent(V_4.get_Member() as MethodReference);
+					if (V_5 == null)
+					{
+						continue;
+					}
+					V_0.Add(new ImplementedMember(V_4.get_DeclaringType(), V_5));
 				}
-				implementedMembers.Add(new ImplementedMember(implementedMember.DeclaringType, eventDefinition));
 			}
-			return implementedMembers;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		private static EventDefinition GetMethodDeclaringEvent(MethodReference method)
 		{
-			EventDefinition eventDefinition;
 			if (method == null)
 			{
 				return null;
 			}
-			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
-			if (typeDefinition != null)
+			V_0 = method.get_DeclaringType().Resolve();
+			if (V_0 != null)
 			{
-				Collection<EventDefinition>.Enumerator enumerator = typeDefinition.get_Events().GetEnumerator();
+				V_1 = V_0.get_Events().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						EventDefinition current = enumerator.get_Current();
-						if ((current.get_AddMethod() == null || !current.get_AddMethod().HasSameSignatureWith(method)) && (current.get_RemoveMethod() == null || !current.get_RemoveMethod().HasSameSignatureWith(method)))
+						V_2 = V_1.get_Current();
+						if (V_2.get_AddMethod() == null || !V_2.get_AddMethod().HasSameSignatureWith(method) && V_2.get_RemoveMethod() == null || !V_2.get_RemoveMethod().HasSameSignatureWith(method))
 						{
 							continue;
 						}
-						eventDefinition = current;
-						return eventDefinition;
+						V_3 = V_2;
+						goto Label1;
 					}
-					return null;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return eventDefinition;
+			Label1:
+				return V_3;
 			}
+		Label0:
 			return null;
 		}
 
 		public static ICollection<EventDefinition> GetOverridenAndImplementedEvents(this EventDefinition self)
 		{
-			List<EventDefinition> eventDefinitions = new List<EventDefinition>()
+			V_0 = new List<EventDefinition>();
+			V_0.Add(self);
+			if (self.get_AddMethod() == null)
 			{
-				self
-			};
-			if (self.get_AddMethod() != null)
-			{
-				foreach (MethodDefinition overridenAndImplementedMethod in self.get_AddMethod().GetOverridenAndImplementedMethods())
+				if (self.get_RemoveMethod() != null)
 				{
-					EventDefinition methodDeclaringEvent = EventDefinitionExtensions.GetMethodDeclaringEvent(overridenAndImplementedMethod);
-					if (methodDeclaringEvent == null)
+					V_1 = self.get_RemoveMethod().GetOverridenAndImplementedMethods().GetEnumerator();
+					try
 					{
-						continue;
+						while (V_1.MoveNext())
+						{
+							V_3 = EventDefinitionExtensions.GetMethodDeclaringEvent(V_1.get_Current());
+							if (V_3 == null)
+							{
+								continue;
+							}
+							V_0.Add(V_3);
+						}
 					}
-					eventDefinitions.Add(methodDeclaringEvent);
+					finally
+					{
+						if (V_1 != null)
+						{
+							V_1.Dispose();
+						}
+					}
 				}
 			}
-			else if (self.get_RemoveMethod() != null)
+			else
 			{
-				foreach (MethodDefinition methodDefinition in self.get_RemoveMethod().GetOverridenAndImplementedMethods())
+				V_1 = self.get_AddMethod().GetOverridenAndImplementedMethods().GetEnumerator();
+				try
 				{
-					EventDefinition eventDefinition = EventDefinitionExtensions.GetMethodDeclaringEvent(methodDefinition);
-					if (eventDefinition == null)
+					while (V_1.MoveNext())
 					{
-						continue;
+						V_2 = EventDefinitionExtensions.GetMethodDeclaringEvent(V_1.get_Current());
+						if (V_2 == null)
+						{
+							continue;
+						}
+						V_0.Add(V_2);
 					}
-					eventDefinitions.Add(eventDefinition);
+				}
+				finally
+				{
+					if (V_1 != null)
+					{
+						V_1.Dispose();
+					}
 				}
 			}
-			return eventDefinitions;
+			return V_0;
 		}
 
 		public static bool IsAbstract(this EventDefinition self)
@@ -173,13 +245,13 @@ namespace Mono.Cecil.Extensions
 			return false;
 		}
 
-		public static bool IsExplicitImplementationOf(this EventDefinition self, TypeDefinition @interface)
+		public static bool IsExplicitImplementationOf(this EventDefinition self, TypeDefinition interface)
 		{
-			if (@interface == null)
+			if (interface == null)
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.get_IsInterface())
+			if (!interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
@@ -187,15 +259,15 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			if (self.get_DeclaringType().get_FullName() == @interface.get_FullName())
+			if (String.op_Equality(self.get_DeclaringType().get_FullName(), interface.get_FullName()))
 			{
 				return true;
 			}
-			if (self.get_AddMethod() != null && !self.get_AddMethod().IsExplicitImplementationOf(@interface))
+			if (self.get_AddMethod() != null && !self.get_AddMethod().IsExplicitImplementationOf(interface))
 			{
 				return false;
 			}
-			if (self.get_RemoveMethod() != null && !self.get_RemoveMethod().IsExplicitImplementationOf(@interface))
+			if (self.get_RemoveMethod() != null && !self.get_RemoveMethod().IsExplicitImplementationOf(interface))
 			{
 				return false;
 			}

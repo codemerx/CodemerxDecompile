@@ -17,6 +17,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new PropertyInitializerExpression.u003cget_Childrenu003ed__20(-2);
 			}
 		}
 
@@ -24,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.PropertyInitializerExpression;
+				return 85;
 			}
 		}
 
@@ -52,7 +53,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Property.get_Name();
+				return this.get_Property().get_Name();
 			}
 		}
 
@@ -62,24 +63,28 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			protected set;
 		}
 
-		public PropertyInitializerExpression(PropertyDefinition property, TypeReference type) : this(property, type, null)
+		public PropertyInitializerExpression(PropertyDefinition property, TypeReference type)
 		{
+			this(property, type, null);
+			return;
 		}
 
-		public PropertyInitializerExpression(PropertyDefinition property, TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public PropertyInitializerExpression(PropertyDefinition property, TypeReference type, IEnumerable<Instruction> instructions)
 		{
-			this.Property = property;
+			base(instructions);
+			this.set_Property(property);
 			this.expressionType = type;
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new PropertyInitializerExpression(this.Property, this.expressionType, this.instructions);
+			return new PropertyInitializerExpression(this.get_Property(), this.expressionType, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new PropertyInitializerExpression(this.Property, this.expressionType, null);
+			return new PropertyInitializerExpression(this.get_Property(), this.expressionType, null);
 		}
 
 		public override bool Equals(Expression other)

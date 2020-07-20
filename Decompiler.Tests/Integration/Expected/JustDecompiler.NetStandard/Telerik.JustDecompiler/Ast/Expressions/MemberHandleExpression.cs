@@ -2,7 +2,6 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 
@@ -22,7 +21,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.MemberHandleExpression;
+				return 90;
 			}
 		}
 
@@ -32,29 +31,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			private set;
 		}
 
-		public MemberHandleExpression(Mono.Cecil.MemberReference memberRef, IEnumerable<Instruction> instructions) : base(instructions)
+		public MemberHandleExpression(Mono.Cecil.MemberReference memberRef, IEnumerable<Instruction> instructions)
 		{
-			this.MemberReference = memberRef;
+			base(instructions);
+			this.set_MemberReference(memberRef);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new MemberHandleExpression(this.MemberReference, this.instructions);
+			return new MemberHandleExpression(this.get_MemberReference(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new MemberHandleExpression(this.MemberReference, null);
+			return new MemberHandleExpression(this.get_MemberReference(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			MemberHandleExpression memberHandleExpression = other as MemberHandleExpression;
-			if (memberHandleExpression == null)
+			V_0 = other as MemberHandleExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			return this.MemberReference.get_FullName() == memberHandleExpression.MemberReference.get_FullName();
+			return String.op_Equality(this.get_MemberReference().get_FullName(), V_0.get_MemberReference().get_FullName());
 		}
 	}
 }

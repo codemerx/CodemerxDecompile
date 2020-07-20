@@ -14,8 +14,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				ExpressionStatement expressionStatement = null;
-				yield return expressionStatement.Expression;
+				stackVariable1 = new ExpressionStatement.u003cget_Childrenu003ed__2(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -23,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ExpressionStatement;
+				return 5;
 			}
 		}
 
@@ -35,21 +36,23 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public ExpressionStatement(Telerik.JustDecompiler.Ast.Expressions.Expression expression)
 		{
-			this.Expression = expression;
+			base();
+			this.set_Expression(expression);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			ExpressionStatement expressionStatement = new ExpressionStatement(this.Expression.Clone());
-			base.CopyParentAndLabel(expressionStatement);
-			return expressionStatement;
+			V_0 = new ExpressionStatement(this.get_Expression().Clone());
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			ExpressionStatement expressionStatement = new ExpressionStatement(this.Expression.CloneExpressionOnly());
-			base.CopyParentAndLabel(expressionStatement);
-			return expressionStatement;
+			V_0 = new ExpressionStatement(this.get_Expression().CloneExpressionOnly());
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 	}
 }

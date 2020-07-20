@@ -18,9 +18,9 @@ namespace Telerik.JustDecompiler.Cil
 
 		private Instruction last;
 
-		private InstructionBlock[] successors = InstructionBlock.NoSuccessors;
+		private InstructionBlock[] successors;
 
-		private HashSet<InstructionBlock> parents = new HashSet<InstructionBlock>();
+		private HashSet<InstructionBlock> parents;
 
 		private bool invalidated;
 
@@ -35,6 +35,7 @@ namespace Telerik.JustDecompiler.Cil
 			internal set
 			{
 				this.first = value;
+				return;
 			}
 		}
 
@@ -47,6 +48,7 @@ namespace Telerik.JustDecompiler.Cil
 			internal set
 			{
 				this.index = value;
+				return;
 			}
 		}
 
@@ -59,6 +61,7 @@ namespace Telerik.JustDecompiler.Cil
 			internal set
 			{
 				this.last = value;
+				return;
 			}
 		}
 
@@ -88,35 +91,42 @@ namespace Telerik.JustDecompiler.Cil
 				this.successors = value;
 				this.SetNewParent();
 				this.Invalidate();
+				return;
 			}
 		}
 
 		static InstructionBlock()
 		{
 			InstructionBlock.NoSuccessors = new InstructionBlock[0];
+			return;
 		}
 
 		internal InstructionBlock(Instruction first)
 		{
+			this.successors = InstructionBlock.NoSuccessors;
+			this.parents = new HashSet<InstructionBlock>();
+			base();
 			if (first == null)
 			{
 				throw new ArgumentNullException("first");
 			}
 			this.first = first;
-			this.StackContentAfterLeavingBlock = new Stack<Expression>();
+			this.set_StackContentAfterLeavingBlock(new Stack<Expression>());
+			return;
 		}
 
 		public void AddToSuccessors(InstructionBlock toBeAdded)
 		{
-			InstructionBlock[] instructionBlockArrays = new InstructionBlock[(int)this.Successors.Length + 1];
-			this.Successors.CopyTo(instructionBlockArrays, 0);
-			instructionBlockArrays[(int)instructionBlockArrays.Length - 1] = toBeAdded;
-			this.Successors = instructionBlockArrays;
+			V_0 = new InstructionBlock[(int)this.get_Successors().Length + 1];
+			this.get_Successors().CopyTo(V_0, 0);
+			V_0[(int)V_0.Length - 1] = toBeAdded;
+			this.set_Successors(V_0);
+			return;
 		}
 
 		public int CompareTo(InstructionBlock block)
 		{
-			return this.first.get_Offset() - block.First.get_Offset();
+			return this.first.get_Offset() - block.get_First().get_Offset();
 		}
 
 		public bool Equals(InstructionBlock x, InstructionBlock y)
@@ -129,16 +139,16 @@ namespace Telerik.JustDecompiler.Cil
 			{
 				return false;
 			}
-			if (x.first.get_Offset() != y.First.get_Offset())
+			if (x.first.get_Offset() != y.get_First().get_Offset())
 			{
 				return false;
 			}
-			return x.Last.get_Offset() == y.Last.get_Offset();
+			return x.get_Last().get_Offset() == y.get_Last().get_Offset();
 		}
 
 		public override bool Equals(object obj)
 		{
-			if (obj == null || !(obj is InstructionBlock))
+			if (obj == null || InstructionBlock.op_Equality(obj as InstructionBlock, null))
 			{
 				return false;
 			}
@@ -170,40 +180,17 @@ namespace Telerik.JustDecompiler.Cil
 
 		protected internal static IEnumerable<InstructionBlock> GetChildTree(InstructionBlock block, HashSet<int> visited)
 		{
-			visited.Add(block.Index);
-			yield return block;
-			InstructionBlock[] instructionBlockArrays = block.Successors;
-			if (instructionBlockArrays.Length != 0)
-			{
-				for (int i = 0; i < (int)instructionBlockArrays.Length; i++)
-				{
-					if (instructionBlockArrays[i].Index > block.Index && !visited.Contains(instructionBlockArrays[i].Index))
-					{
-						foreach (InstructionBlock childTree in InstructionBlock.GetChildTree(instructionBlockArrays[i], visited))
-						{
-							yield return childTree;
-						}
-					}
-				}
-			}
-			else
-			{
-			}
+			stackVariable1 = new InstructionBlock.u003cGetChildTreeu003ed__34(-2);
+			stackVariable1.u003cu003e3__block = block;
+			stackVariable1.u003cu003e3__visited = visited;
+			return stackVariable1;
 		}
 
 		public IEnumerator<Instruction> GetEnumerator()
 		{
-			InstructionBlock instructionBlocks = null;
-			Instruction next = instructionBlocks.first;
-			while (true)
-			{
-				yield return next;
-				if ((object)next == (object)instructionBlocks.last)
-				{
-					break;
-				}
-				next = next.get_Next();
-			}
+			stackVariable1 = new InstructionBlock.u003cGetEnumeratoru003ed__37(0);
+			stackVariable1.u003cu003e4__this = this;
+			return stackVariable1;
 		}
 
 		public int GetHashCode(InstructionBlock obj)
@@ -218,10 +205,19 @@ namespace Telerik.JustDecompiler.Cil
 				return;
 			}
 			this.invalidated = true;
-			foreach (InstructionBlock parent in this.parents)
+			V_0 = this.parents.GetEnumerator();
+			try
 			{
-				parent.Invalidate();
+				while (V_0.MoveNext())
+				{
+					V_0.get_Current().Invalidate();
+				}
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		public static bool operator ==(InstructionBlock a, InstructionBlock b)
@@ -244,28 +240,32 @@ namespace Telerik.JustDecompiler.Cil
 
 		public void RemoveFromSuccessors(InstructionBlock toBeRemoved)
 		{
-			InstructionBlock[] successors = new InstructionBlock[(int)this.Successors.Length - 1];
-			int num = 0;
-			int num1 = 0;
-			while (num < (int)this.Successors.Length)
+			V_0 = new InstructionBlock[(int)this.get_Successors().Length - 1];
+			V_1 = 0;
+			V_2 = 0;
+			while (V_1 < (int)this.get_Successors().Length)
 			{
-				if (this.Successors[num] != toBeRemoved)
+				if (InstructionBlock.op_Inequality(this.get_Successors()[V_1], toBeRemoved))
 				{
-					int num2 = num1;
-					num1 = num2 + 1;
-					successors[num2] = this.Successors[num];
+					stackVariable24 = V_2;
+					V_2 = stackVariable24 + 1;
+					V_0[stackVariable24] = this.get_Successors()[V_1];
 				}
-				num++;
+				V_1 = V_1 + 1;
 			}
-			this.Successors = successors;
+			this.set_Successors(V_0);
+			return;
 		}
 
 		private void SetNewParent()
 		{
-			for (int i = 0; i < (int)this.successors.Length; i++)
+			V_0 = 0;
+			while (V_0 < (int)this.successors.Length)
 			{
-				this.successors[i].parents.Add(this);
+				dummyVar0 = this.successors[V_0].parents.Add(this);
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -277,11 +277,14 @@ namespace Telerik.JustDecompiler.Cil
 		{
 			if (this.successors != null)
 			{
-				for (int i = 0; i < (int)this.successors.Length; i++)
+				V_0 = 0;
+				while (V_0 < (int)this.successors.Length)
 				{
-					this.successors[i].parents.Remove(this);
+					dummyVar0 = this.successors[V_0].parents.Remove(this);
+					V_0 = V_0 + 1;
 				}
 			}
+			return;
 		}
 	}
 }

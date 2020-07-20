@@ -1,22 +1,16 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
-using Mono.Cecil.Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
-using Telerik.JustDecompiler.Steps;
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -24,9 +18,9 @@ namespace Telerik.JustDecompiler.Languages
 	{
 		private Telerik.JustDecompiler.Languages.AttributeWriter attributeWriter;
 
-		private readonly Stack<bool> shouldOmitSemicolon = new Stack<bool>();
+		private readonly Stack<bool> shouldOmitSemicolon;
 
-		private readonly Stack<MethodReference> methodReferences = new Stack<MethodReference>();
+		private readonly Stack<MethodReference> methodReferences;
 
 		private const string DoublePositiveInfinityFieldSignature = "System.Double System.Double::PositiveInfinity";
 
@@ -153,9 +147,13 @@ namespace Telerik.JustDecompiler.Languages
 			}
 		}
 
-		public BaseImperativeLanguageWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings) : base(language, formatter, exceptionFormatter, settings)
+		public BaseImperativeLanguageWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
 		{
-			this.KeyWordWriter = this.CreateKeyWordWriter();
+			this.shouldOmitSemicolon = new Stack<bool>();
+			this.methodReferences = new Stack<MethodReference>();
+			base(language, formatter, exceptionFormatter, settings);
+			this.set_KeyWordWriter(this.CreateKeyWordWriter());
+			return;
 		}
 
 		private bool CheckIfParameterIsByRef(MethodReference methodReference, int parameterIndex)
@@ -165,15 +163,24 @@ namespace Telerik.JustDecompiler.Languages
 
 		private ExpressionCollection CopyMethodParametersAsArguments(MethodDefinition method)
 		{
-			ExpressionCollection expressionCollection = new ExpressionCollection();
+			V_0 = new ExpressionCollection();
 			if (method.get_HasParameters())
 			{
-				foreach (ParameterDefinition parameter in method.get_Parameters())
+				V_1 = method.get_Parameters().GetEnumerator();
+				try
 				{
-					expressionCollection.Add(new ArgumentReferenceExpression(parameter, null));
+					while (V_1.MoveNext())
+					{
+						V_2 = V_1.get_Current();
+						V_0.Add(new ArgumentReferenceExpression(V_2, null));
+					}
+				}
+				finally
+				{
+					V_1.Dispose();
 				}
 			}
-			return expressionCollection;
+			return V_0;
 		}
 
 		protected abstract Telerik.JustDecompiler.Languages.AttributeWriter CreateAttributeWriter();
@@ -182,108 +189,112 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected void DoVisit(ICodeNode node)
 		{
-			base.Visit(node);
+			this.Visit(node);
+			return;
 		}
 
 		protected void EnterMethodInvocation(MethodReference methodReference)
 		{
 			this.methodReferences.Push(methodReference);
+			return;
 		}
 
 		private OffsetSpan ExecuteAndGetOffsetSpan(Action toBeExecuted)
 		{
-			int num = this.formatter.CurrentPosition;
-			EventHandler<int> eventHandler = (object sender, int currentPosition) => this.startPosition = currentPosition;
-			EventHandler eventHandler1 = (object sender, EventArgs args) => this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten -= eventHandler;
-			this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten += eventHandler;
-			this.formatter.NewLineWritten += eventHandler1;
-			toBeExecuted();
-			this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten -= eventHandler;
-			this.formatter.NewLineWritten -= eventHandler1;
-			return new OffsetSpan(num, this.formatter.CurrentPosition);
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass62_0();
+			V_0.u003cu003e4__this = this;
+			V_0.startPosition = this.formatter.get_CurrentPosition();
+			V_0.onFirstNonWhiteSpaceCharacter = new EventHandler<int>(V_0.u003cExecuteAndGetOffsetSpanu003eb__0);
+			V_1 = new EventHandler(V_0.u003cExecuteAndGetOffsetSpanu003eb__1);
+			this.formatter.add_FirstNonWhiteSpaceCharacterOnLineWritten(V_0.onFirstNonWhiteSpaceCharacter);
+			this.formatter.add_NewLineWritten(V_1);
+			toBeExecuted.Invoke();
+			this.formatter.remove_FirstNonWhiteSpaceCharacterOnLineWritten(V_0.onFirstNonWhiteSpaceCharacter);
+			this.formatter.remove_NewLineWritten(V_1);
+			V_2 = this.formatter.get_CurrentPosition();
+			return new OffsetSpan(V_0.startPosition, V_2);
 		}
 
 		protected virtual string GetArgumentName(ParameterReference parameter)
 		{
-			string name;
-			ParameterDefinition parameterDefinition = parameter.Resolve();
-			if (!this.GetCurrentMethodContext().ParameterDefinitionToNameMap.TryGetValue(parameterDefinition, out name))
+			V_0 = parameter.Resolve();
+			if (!this.GetCurrentMethodContext().get_ParameterDefinitionToNameMap().TryGetValue(V_0, out V_1))
 			{
-				name = parameterDefinition.get_Name();
+				V_1 = V_0.get_Name();
 			}
-			if (!base.Language.IsValidIdentifier(name))
+			if (!this.get_Language().IsValidIdentifier(V_1))
 			{
-				name = base.Language.ReplaceInvalidCharactersInIdentifier(name);
+				V_1 = this.get_Language().ReplaceInvalidCharactersInIdentifier(V_1);
 			}
-			if (base.Language.IsGlobalKeyword(name))
+			if (this.get_Language().IsGlobalKeyword(V_1))
 			{
-				name = Utilities.EscapeNameIfNeeded(name, base.Language);
+				V_1 = Utilities.EscapeNameIfNeeded(V_1, this.get_Language());
 			}
-			return name;
+			return V_1;
 		}
 
 		protected TypeReference GetBaseElementType(TypeReference type)
 		{
-			TypeReference elementType = type;
-			while (elementType is ArrayType)
+			V_0 = type;
+			while (V_0 as ArrayType != null)
 			{
-				elementType = (elementType as ArrayType).get_ElementType();
+				V_0 = (V_0 as ArrayType).get_ElementType();
 			}
-			return elementType;
+			return V_0;
 		}
 
 		private TypeReference GetCollidingType(TypeReference typeReference)
 		{
-			if (!(typeReference is TypeSpecification))
+			if (typeReference as TypeSpecification == null)
 			{
 				return typeReference;
 			}
-			TypeSpecification typeSpecification = typeReference as TypeSpecification;
-			if (typeSpecification is PointerType)
+			V_0 = typeReference as TypeSpecification;
+			if (V_0 as PointerType != null)
 			{
-				return typeSpecification.get_ElementType();
+				return V_0.get_ElementType();
 			}
-			if (typeSpecification is PinnedType)
+			if (V_0 as PinnedType != null)
 			{
-				if (!(typeSpecification.get_ElementType() is ByReferenceType))
+				if (V_0.get_ElementType() as ByReferenceType == null)
 				{
-					return typeSpecification.get_ElementType();
+					return V_0.get_ElementType();
 				}
-				return (typeSpecification.get_ElementType() as ByReferenceType).get_ElementType();
+				return (V_0.get_ElementType() as ByReferenceType).get_ElementType();
 			}
-			if (typeSpecification is ByReferenceType)
+			if (V_0 as ByReferenceType != null)
 			{
-				return typeSpecification.get_ElementType();
+				return V_0.get_ElementType();
 			}
-			if (typeSpecification is ArrayType)
+			if (V_0 as ArrayType != null)
 			{
-				TypeReference elementType = typeSpecification.get_ElementType();
-				while (elementType is ArrayType)
+				V_2 = V_0.get_ElementType();
+				while (V_2 as ArrayType != null)
 				{
-					elementType = (elementType as ArrayType).get_ElementType();
+					V_2 = (V_2 as ArrayType).get_ElementType();
 				}
-				return elementType;
+				return V_2;
 			}
-			GenericInstanceType genericInstanceType = typeSpecification as GenericInstanceType;
-			if (genericInstanceType == null)
+			V_1 = V_0 as GenericInstanceType;
+			if (V_1 == null)
 			{
-				return typeSpecification;
+				return V_0;
 			}
-			if (!this.SupportsSpecialNullable || genericInstanceType.GetFriendlyFullName(base.Language).IndexOf("System.Nullable<") != 0 || !genericInstanceType.get_GenericArguments().get_Item(0).get_IsValueType())
+			if (!this.get_SupportsSpecialNullable() || V_1.GetFriendlyFullName(this.get_Language()).IndexOf("System.Nullable<") != 0 || !V_1.get_GenericArguments().get_Item(0).get_IsValueType())
 			{
-				return genericInstanceType;
+				return V_1;
 			}
-			TypeReference item = genericInstanceType.get_GenericArguments().get_Item(0);
-			if (genericInstanceType.get_PostionToArgument().ContainsKey(0))
+			V_3 = V_1.get_GenericArguments().get_Item(0);
+			if (V_1.get_PostionToArgument().ContainsKey(0))
 			{
-				item = genericInstanceType.get_PostionToArgument()[0];
+				V_3 = V_1.get_PostionToArgument().get_Item(0);
 			}
-			return item;
+			return V_3;
 		}
 
 		private string GetCollidingTypeName(TypeReference typeReference)
 		{
-			if (typeReference.get_Namespace() != "System")
+			if (!String.op_Equality(typeReference.get_Namespace(), "System"))
 			{
 				return typeReference.get_Name();
 			}
@@ -292,39 +303,39 @@ namespace Telerik.JustDecompiler.Languages
 
 		private MethodSpecificContext GetCurrentMethodContext()
 		{
-			if (!(this.membersStack.Peek() is FieldDefinition))
+			if (this.membersStack.Peek() as FieldDefinition == null)
 			{
-				return base.MethodContext;
+				return this.get_MethodContext();
 			}
-			FieldDefinition fieldDefinition = this.membersStack.Peek() as FieldDefinition;
-			return base.GetMethodContext(this.TypeContext.AssignmentData[fieldDefinition.get_FullName()].AssignmentMethod);
+			V_0 = this.membersStack.Peek() as FieldDefinition;
+			return this.GetMethodContext(this.get_TypeContext().get_AssignmentData().get_Item(V_0.get_FullName()).get_AssignmentMethod());
 		}
 
 		private DefaultObjectExpression GetDefaultValueExpression(ParameterDefinition parameter)
 		{
-			TypeReference parameterType = parameter.get_ParameterType();
-			if (parameterType.get_IsByReference())
+			V_0 = parameter.get_ParameterType();
+			if (V_0.get_IsByReference())
 			{
-				parameterType = (parameterType as ByReferenceType).get_ElementType();
+				V_0 = (V_0 as ByReferenceType).get_ElementType();
 			}
-			return new DefaultObjectExpression(parameterType, null);
+			return new DefaultObjectExpression(V_0, null);
 		}
 
 		private TypeReference GetMemberType(IMemberDefinition member)
 		{
-			if (member is MethodDefinition)
+			if (member as MethodDefinition != null)
 			{
 				return ((MethodDefinition)member).get_FixedReturnType();
 			}
-			if (member is FieldDefinition)
+			if (member as FieldDefinition != null)
 			{
 				return ((FieldDefinition)member).get_FieldType();
 			}
-			if (member is PropertyDefinition)
+			if (member as PropertyDefinition != null)
 			{
 				return ((PropertyDefinition)member).get_PropertyType();
 			}
-			if (!(member is EventDefinition))
+			if (member as EventDefinition == null)
 			{
 				throw new NotSupportedException();
 			}
@@ -335,119 +346,144 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			if (this.IsOperator(method))
 			{
-				return this.KeyWordWriter.Operator;
+				return this.get_KeyWordWriter().get_Operator();
 			}
 			if (method.IsFunction())
 			{
-				return this.KeyWordWriter.Function;
+				return this.get_KeyWordWriter().get_Function();
 			}
-			return this.KeyWordWriter.Sub;
+			return this.get_KeyWordWriter().get_Sub();
 		}
 
 		private string GetMethodOriginalName(MethodDefinition method)
 		{
-			if (!this.TypeContext.MethodDefinitionToNameMap.ContainsKey(method))
+			if (!this.get_TypeContext().get_MethodDefinitionToNameMap().ContainsKey(method))
 			{
 				return method.get_Name();
 			}
-			return this.TypeContext.MethodDefinitionToNameMap[method];
+			return this.get_TypeContext().get_MethodDefinitionToNameMap().get_Item(method);
 		}
 
 		protected virtual string GetOriginalFieldName(FieldDefinition field)
 		{
-			if (!this.TypeContext.BackingFieldToNameMap.ContainsKey(field))
+			if (!this.get_TypeContext().get_BackingFieldToNameMap().ContainsKey(field))
 			{
 				return field.get_Name();
 			}
-			return this.TypeContext.BackingFieldToNameMap[field];
+			return this.get_TypeContext().get_BackingFieldToNameMap().get_Item(field);
 		}
 
 		protected string GetParameterName(ParameterDefinition parameter)
 		{
-			string name = parameter.get_Name();
-			if (base.MethodContext != null && (base.MethodContext.Method.get_Body().get_Instructions().Count<Instruction>() > 0 || base.MethodContext.Method.get_IsJustDecompileGenerated()) && base.MethodContext.Method == parameter.get_Method() && !base.MethodContext.ParameterDefinitionToNameMap.TryGetValue(parameter, out name))
+			V_0 = parameter.get_Name();
+			if (this.get_MethodContext() != null && this.get_MethodContext().get_Method().get_Body().get_Instructions().Count<Instruction>() > 0 || this.get_MethodContext().get_Method().get_IsJustDecompileGenerated() && this.get_MethodContext().get_Method() == parameter.get_Method() && !this.get_MethodContext().get_ParameterDefinitionToNameMap().TryGetValue(parameter, out V_0))
 			{
-				name = parameter.get_Name();
+				V_0 = parameter.get_Name();
 			}
-			return name;
+			return V_0;
 		}
 
 		private ICollection<string> GetUsedNamespaces()
 		{
-			HashSet<string> strs = new HashSet<string>();
-			foreach (string usedNamespace in this.TypeContext.UsedNamespaces)
+			V_0 = new HashSet<string>();
+			V_2 = this.get_TypeContext().get_UsedNamespaces().GetEnumerator();
+			try
 			{
-				strs.Add(usedNamespace);
-			}
-			string[] strArray = this.TypeContext.CurrentType.get_Namespace().Split(new Char[] { '.' });
-			if (strArray.Count<string>() > 0)
-			{
-				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = 0; i < (int)strArray.Length; i++)
+				while (V_2.MoveNext())
 				{
-					if (i > 0)
-					{
-						stringBuilder.Append(".");
-					}
-					stringBuilder.Append(strArray[i]);
-					string str = stringBuilder.ToString();
-					if (!strs.Contains(str))
-					{
-						strs.Add(str);
-					}
+					V_3 = V_2.get_Current();
+					dummyVar0 = V_0.Add(V_3);
 				}
 			}
-			return strs;
+			finally
+			{
+				if (V_2 != null)
+				{
+					V_2.Dispose();
+				}
+			}
+			stackVariable15 = this.get_TypeContext().get_CurrentType().get_Namespace();
+			stackVariable17 = new Char[1];
+			stackVariable17[0] = '.';
+			V_1 = stackVariable15.Split(stackVariable17);
+			if (V_1.Count<string>() > 0)
+			{
+				V_4 = new StringBuilder();
+				V_5 = 0;
+				while (V_5 < (int)V_1.Length)
+				{
+					if (V_5 > 0)
+					{
+						dummyVar1 = V_4.Append(".");
+					}
+					dummyVar2 = V_4.Append(V_1[V_5]);
+					V_6 = V_4.ToString();
+					if (!V_0.Contains(V_6))
+					{
+						dummyVar3 = V_0.Add(V_6);
+					}
+					V_5 = V_5 + 1;
+				}
+			}
+			return V_0;
 		}
 
 		protected string GetVariableName(VariableReference variable)
 		{
-			string name;
-			VariableDefinition variableDefinition = variable.Resolve();
-			if (!this.GetCurrentMethodContext().VariableDefinitionToNameMap.TryGetValue(variableDefinition, out name))
+			V_0 = variable.Resolve();
+			if (!this.GetCurrentMethodContext().get_VariableDefinitionToNameMap().TryGetValue(V_0, out V_1))
 			{
-				name = variableDefinition.get_Name();
+				V_1 = V_0.get_Name();
 			}
-			return name;
+			return V_1;
 		}
 
 		protected bool HasArguments(PropertyDefinition property)
 		{
-			MethodDefinition setMethod;
-			int num = 0;
+			V_1 = 0;
 			if (property.get_GetMethod() == null)
 			{
-				setMethod = property.get_SetMethod();
-				num = 1;
+				V_0 = property.get_SetMethod();
+				V_1 = 1;
 			}
 			else
 			{
-				setMethod = property.get_GetMethod();
+				V_0 = property.get_GetMethod();
 			}
-			if (setMethod == null)
+			if (V_0 == null)
 			{
 				return false;
 			}
-			return setMethod.get_Parameters().get_Count() > num;
+			return V_0.get_Parameters().get_Count() > V_1;
 		}
 
 		private bool HasNoEmptyStatements(StatementCollection statements)
 		{
-			bool flag;
-			using (IEnumerator<Statement> enumerator = statements.GetEnumerator())
+			V_0 = statements.GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					if (enumerator.Current is EmptyStatement)
+					if (V_0.get_Current() as EmptyStatement != null)
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_1 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
-			return flag;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+		Label1:
+			return V_1;
+		Label0:
+			return false;
 		}
 
 		private bool HaveSameConstraints(GenericParameter outerParameter, GenericParameter innerParameter)
@@ -460,7 +496,23 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return false;
 			}
-			if ((!innerParameter.get_HasDefaultConstructorConstraint() ? false : !innerParameter.get_HasNotNullableValueTypeConstraint()) ^ (!outerParameter.get_HasDefaultConstructorConstraint() ? false : !outerParameter.get_HasNotNullableValueTypeConstraint()))
+			if (!innerParameter.get_HasDefaultConstructorConstraint())
+			{
+				stackVariable12 = false;
+			}
+			else
+			{
+				stackVariable12 = !innerParameter.get_HasNotNullableValueTypeConstraint();
+			}
+			if (!outerParameter.get_HasDefaultConstructorConstraint())
+			{
+				stackVariable15 = false;
+			}
+			else
+			{
+				stackVariable15 = !outerParameter.get_HasNotNullableValueTypeConstraint();
+			}
+			if (stackVariable12 ^ stackVariable15)
 			{
 				return false;
 			}
@@ -472,40 +524,57 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return false;
 			}
-			List<TypeReference> typeReferences = new List<TypeReference>(innerParameter.get_Constraints());
-			List<TypeReference> typeReferences1 = new List<TypeReference>(outerParameter.get_Constraints());
-			typeReferences.Sort((TypeReference x, TypeReference y) => x.get_FullName().CompareTo(y.get_FullName()));
-			typeReferences1.Sort((TypeReference x, TypeReference y) => x.get_FullName().CompareTo(y.get_FullName()));
-			for (int i = 0; i < typeReferences.Count; i++)
+			V_0 = new List<TypeReference>(innerParameter.get_Constraints());
+			V_1 = new List<TypeReference>(outerParameter.get_Constraints());
+			stackVariable34 = V_0;
+			stackVariable35 = BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__273_0;
+			if (stackVariable35 == null)
 			{
-				if (typeReferences[i].get_FullName() != typeReferences1[i].get_FullName())
+				dummyVar0 = stackVariable35;
+				stackVariable35 = new Comparison<TypeReference>(BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9.u003cHaveSameConstraintsu003eb__273_0);
+				BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__273_0 = stackVariable35;
+			}
+			stackVariable34.Sort(stackVariable35);
+			stackVariable36 = V_1;
+			stackVariable37 = BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__273_1;
+			if (stackVariable37 == null)
+			{
+				dummyVar1 = stackVariable37;
+				stackVariable37 = new Comparison<TypeReference>(BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9.u003cHaveSameConstraintsu003eb__273_1);
+				BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__273_1 = stackVariable37;
+			}
+			stackVariable36.Sort(stackVariable37);
+			V_2 = 0;
+			while (V_2 < V_0.get_Count())
+			{
+				if (String.op_Inequality(V_0.get_Item(V_2).get_FullName(), V_1.get_Item(V_2).get_FullName()))
 				{
 					return false;
 				}
+				V_2 = V_2 + 1;
 			}
 			return true;
 		}
 
 		protected virtual bool IsComplexTarget(Expression target)
 		{
-			if (target.CodeNodeType == CodeNodeType.UnaryExpression)
+			if (target.get_CodeNodeType() == 23)
 			{
-				UnaryExpression unaryExpression = target as UnaryExpression;
-				if (unaryExpression.Operator == UnaryOperator.AddressDereference && unaryExpression.Operand.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && (unaryExpression.Operand as ArgumentReferenceExpression).ExpressionType.get_IsByReference())
+				V_0 = target as UnaryExpression;
+				if (V_0.get_Operator() == 8 && V_0.get_Operand().get_CodeNodeType() == 25 && (V_0.get_Operand() as ArgumentReferenceExpression).get_ExpressionType().get_IsByReference())
 				{
 					return false;
 				}
 			}
-			if (target.CodeNodeType == CodeNodeType.BinaryExpression || target.CodeNodeType == CodeNodeType.UnaryExpression || target.CodeNodeType == CodeNodeType.ArrayCreationExpression || target.CodeNodeType == CodeNodeType.ObjectCreationExpression)
+			if (target.get_CodeNodeType() == 24 || target.get_CodeNodeType() == 23 || target.get_CodeNodeType() == 38 || target.get_CodeNodeType() == 40)
 			{
 				return true;
 			}
-			return target.CodeNodeType == CodeNodeType.LambdaExpression;
+			return target.get_CodeNodeType() == 50;
 		}
 
 		protected bool IsImplemented(TypeDefinition type, TypeDefinition baseType)
 		{
-			bool flag;
 			if (baseType == null || type == null)
 			{
 				return true;
@@ -514,205 +583,221 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return true;
 			}
-			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = baseType.get_Methods().GetEnumerator();
+			V_0 = baseType.get_Methods().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					MethodDefinition current = enumerator.get_Current();
-					if (!current.get_IsAbstract() || type.get_Methods().FirstOrDefault<MethodDefinition>((MethodDefinition x) => current.HasSameSignatureWith(x)) != null)
+					V_1 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass21_0();
+					V_1.method = V_0.get_Current();
+					if (!V_1.method.get_IsAbstract() || type.get_Methods().FirstOrDefault<MethodDefinition>(new Func<MethodDefinition, bool>(V_1.u003cIsImplementedu003eb__0)) != null)
 					{
 						continue;
 					}
-					flag = false;
-					return flag;
+					V_2 = false;
+					goto Label1;
 				}
-				return true;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return true;
 		}
 
 		private bool IsIndexerPropertyHiding(PropertyDefinition property)
 		{
-			bool flag;
-			TypeDefinition typeDefinition;
-			TypeDefinition typeDefinition1;
-			MethodDefinition methodDefinition = (property.get_GetMethod() != null ? property.get_GetMethod() : property.get_SetMethod());
-			if (property.get_DeclaringType().get_BaseType() != null)
+			if (property.get_GetMethod() != null)
 			{
-				typeDefinition = property.get_DeclaringType().get_BaseType().Resolve();
+				stackVariable3 = property.get_GetMethod();
 			}
 			else
 			{
-				typeDefinition = null;
+				stackVariable3 = property.get_SetMethod();
 			}
-			TypeDefinition typeDefinition2 = typeDefinition;
-		Label2:
-			while (typeDefinition2 != null)
+			V_0 = stackVariable3;
+			if (property.get_DeclaringType().get_BaseType() != null)
 			{
-				Mono.Collections.Generic.Collection<PropertyDefinition>.Enumerator enumerator = typeDefinition2.get_Properties().GetEnumerator();
+				stackVariable10 = property.get_DeclaringType().get_BaseType().Resolve();
+			}
+			else
+			{
+				stackVariable10 = null;
+			}
+			V_1 = stackVariable10;
+		Label2:
+			while (V_1 != null)
+			{
+				V_2 = V_1.get_Properties().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_2.MoveNext())
 					{
-						PropertyDefinition current = enumerator.get_Current();
-						if (current.IsPrivate() || !current.IsIndexer())
+						V_3 = V_2.get_Current();
+						if (V_3.IsPrivate() || !V_3.IsIndexer())
 						{
 							continue;
 						}
-						MethodDefinition methodDefinition1 = (current.get_GetMethod() != null ? current.get_GetMethod() : current.get_SetMethod());
-						if (methodDefinition1.get_Parameters().get_Count() != methodDefinition.get_Parameters().get_Count())
+						if (V_3.get_GetMethod() != null)
+						{
+							stackVariable26 = V_3.get_GetMethod();
+						}
+						else
+						{
+							stackVariable26 = V_3.get_SetMethod();
+						}
+						V_4 = stackVariable26;
+						if (V_4.get_Parameters().get_Count() != V_0.get_Parameters().get_Count())
 						{
 							continue;
 						}
-						bool flag1 = true;
-						int num = 0;
-						while (num < methodDefinition1.get_Parameters().get_Count())
+						V_5 = true;
+						V_6 = 0;
+						while (V_6 < V_4.get_Parameters().get_Count())
 						{
-							if (methodDefinition1.get_Parameters().get_Item(num).get_ParameterType().get_FullName() == methodDefinition.get_Parameters().get_Item(num).get_ParameterType().get_FullName())
+							if (!String.op_Inequality(V_4.get_Parameters().get_Item(V_6).get_ParameterType().get_FullName(), V_0.get_Parameters().get_Item(V_6).get_ParameterType().get_FullName()))
 							{
-								num++;
+								V_6 = V_6 + 1;
 							}
 							else
 							{
-								flag1 = false;
+								V_5 = false;
 								break;
 							}
 						}
-						if (!flag1)
+						if (!V_5)
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_7 = true;
+						goto Label1;
 					}
 					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_2.Dispose();
 				}
-				return flag;
+			Label1:
+				return V_7;
 			}
 			return false;
 		Label0:
-			if (typeDefinition2.get_BaseType() != null)
+			if (V_1.get_BaseType() != null)
 			{
-				typeDefinition1 = typeDefinition2.get_BaseType().Resolve();
+				stackVariable64 = V_1.get_BaseType().Resolve();
 			}
 			else
 			{
-				typeDefinition1 = null;
+				stackVariable64 = null;
 			}
-			typeDefinition2 = typeDefinition1;
+			V_1 = stackVariable64;
 			goto Label2;
 		}
 
 		private bool IsMethodHiding(MethodDefinition method)
 		{
-			bool flag;
-			TypeDefinition typeDefinition;
-			TypeDefinition typeDefinition1;
 			if (method.get_DeclaringType().get_BaseType() != null)
 			{
-				typeDefinition = method.get_DeclaringType().get_BaseType().Resolve();
+				stackVariable6 = method.get_DeclaringType().get_BaseType().Resolve();
 			}
 			else
 			{
-				typeDefinition = null;
+				stackVariable6 = null;
 			}
-			TypeDefinition typeDefinition2 = typeDefinition;
+			V_0 = stackVariable6;
 		Label2:
-			while (typeDefinition2 != null)
+			while (V_0 != null)
 			{
-				Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = typeDefinition2.get_Methods().GetEnumerator();
+				V_1 = V_0.get_Methods().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						MethodDefinition current = enumerator.get_Current();
-						if (current.get_IsPrivate() || !(current.get_Name() == method.get_Name()) || current.get_Parameters().get_Count() != method.get_Parameters().get_Count())
+						V_2 = V_1.get_Current();
+						if (V_2.get_IsPrivate() || !String.op_Equality(V_2.get_Name(), method.get_Name()) || V_2.get_Parameters().get_Count() != method.get_Parameters().get_Count())
 						{
 							continue;
 						}
-						bool flag1 = true;
-						int num = 0;
-						while (num < current.get_Parameters().get_Count())
+						V_3 = true;
+						V_4 = 0;
+						while (V_4 < V_2.get_Parameters().get_Count())
 						{
-							if (current.get_Parameters().get_Item(num).get_ParameterType().get_FullName() == method.get_Parameters().get_Item(num).get_ParameterType().get_FullName())
+							if (!String.op_Inequality(V_2.get_Parameters().get_Item(V_4).get_ParameterType().get_FullName(), method.get_Parameters().get_Item(V_4).get_ParameterType().get_FullName()))
 							{
-								num++;
+								V_4 = V_4 + 1;
 							}
 							else
 							{
-								flag1 = false;
+								V_3 = false;
 								break;
 							}
 						}
-						if (!flag1)
+						if (!V_3)
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_5 = true;
+						goto Label1;
 					}
 					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return flag;
+			Label1:
+				return V_5;
 			}
 			return false;
 		Label0:
-			if (typeDefinition2.get_BaseType() != null)
+			if (V_0.get_BaseType() != null)
 			{
-				typeDefinition1 = typeDefinition2.get_BaseType().Resolve();
+				stackVariable58 = V_0.get_BaseType().Resolve();
 			}
 			else
 			{
-				typeDefinition1 = null;
+				stackVariable58 = null;
 			}
-			typeDefinition2 = typeDefinition1;
+			V_0 = stackVariable58;
 			goto Label2;
 		}
 
 		private bool IsNewDelegate(ObjectCreationExpression node)
 		{
-			if (node.Constructor == null || node.Constructor.get_DeclaringType() == null)
+			if (node.get_Constructor() == null || node.get_Constructor().get_DeclaringType() == null)
 			{
 				return false;
 			}
-			TypeDefinition typeDefinition = node.Constructor.get_DeclaringType().Resolve();
-			if (typeDefinition != null && typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_FullName() == typeof(MulticastDelegate).FullName)
-			{
-				return true;
-			}
-			return false;
-		}
+			V_0 = node.get_Constructor().get_DeclaringType().Resolve();
+			if (V_0 != null && V_0.get_BaseType() != null && String.op_Equality(V_0.get_BaseType().get_FullName(), Type.GetTypeFromHandle(// 
+			// Current member / type: System.Boolean Telerik.JustDecompiler.Languages.BaseImperativeLanguageWriter::IsNewDelegate(Telerik.JustDecompiler.Ast.Expressions.ObjectCreationExpression)
+			// Exception in: System.Boolean IsNewDelegate(Telerik.JustDecompiler.Ast.Expressions.ObjectCreationExpression)
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		private bool IsNull(Expression node)
 		{
-			if (node.CodeNodeType != CodeNodeType.LiteralExpression)
+			if (node.get_CodeNodeType() != 22)
 			{
 				return false;
 			}
-			return (object)(node as LiteralExpression).Value == (object)null;
+			return (object)(node as LiteralExpression).get_Value() == (object)null;
 		}
 
 		private bool IsOperator(MethodDefinition method)
 		{
-			string str;
 			if (!method.get_IsOperator())
 			{
 				return false;
 			}
-			if (!base.Language.TryGetOperatorName(method.get_OperatorName(), out str))
+			if (!this.get_Language().TryGetOperatorName(method.get_OperatorName(), out V_0))
 			{
 				return false;
 			}
@@ -721,7 +806,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected bool IsPostUnaryOperator(UnaryOperator op)
 		{
-			if ((int)op - (int)UnaryOperator.PostDecrement <= (int)UnaryOperator.LogicalNot)
+			if (op - 3 <= 1)
 			{
 				return true;
 			}
@@ -730,63 +815,61 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool IsPropertyHiding(PropertyDefinition property)
 		{
-			bool flag;
-			TypeDefinition typeDefinition;
-			TypeDefinition typeDefinition1;
 			if (property.get_DeclaringType().get_BaseType() != null)
 			{
-				typeDefinition = property.get_DeclaringType().get_BaseType().Resolve();
+				stackVariable6 = property.get_DeclaringType().get_BaseType().Resolve();
 			}
 			else
 			{
-				typeDefinition = null;
+				stackVariable6 = null;
 			}
-			TypeDefinition typeDefinition2 = typeDefinition;
+			V_0 = stackVariable6;
 		Label2:
-			while (typeDefinition2 != null)
+			while (V_0 != null)
 			{
-				Mono.Collections.Generic.Collection<PropertyDefinition>.Enumerator enumerator = typeDefinition2.get_Properties().GetEnumerator();
+				V_1 = V_0.get_Properties().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						PropertyDefinition current = enumerator.get_Current();
-						if (current.IsPrivate() || !(current.get_Name() == property.get_Name()))
+						V_2 = V_1.get_Current();
+						if (V_2.IsPrivate() || !String.op_Equality(V_2.get_Name(), property.get_Name()))
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_3 = true;
+						goto Label1;
 					}
 					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return flag;
+			Label1:
+				return V_3;
 			}
 			return false;
 		Label0:
-			if (typeDefinition2.get_BaseType() != null)
+			if (V_0.get_BaseType() != null)
 			{
-				typeDefinition1 = typeDefinition2.get_BaseType().Resolve();
+				stackVariable28 = V_0.get_BaseType().Resolve();
 			}
 			else
 			{
-				typeDefinition1 = null;
+				stackVariable28 = null;
 			}
-			typeDefinition2 = typeDefinition1;
+			V_0 = stackVariable28;
 			goto Label2;
 		}
 
 		protected bool IsReferenceFromMscorlib(TypeReference reference)
 		{
-			if (reference.get_Scope().get_Name() == "mscorlib" || reference.get_Scope().get_Name() == "CommonLanguageRuntimeLibrary")
+			if (String.op_Equality(reference.get_Scope().get_Name(), "mscorlib") || String.op_Equality(reference.get_Scope().get_Name(), "CommonLanguageRuntimeLibrary"))
 			{
 				return true;
 			}
-			return reference.get_Scope().get_Name() == "System.Runtime";
+			return String.op_Equality(reference.get_Scope().get_Name(), "System.Runtime");
 		}
 
 		protected virtual bool IsTypeNameInCollision(string typeName)
@@ -816,28 +899,32 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool IsTypeNameInCollisionWithMembers(string typeName)
 		{
-			return this.TypeContext.VisibleMembersNames.Contains(typeName);
+			return this.get_TypeContext().get_VisibleMembersNames().Contains(typeName);
 		}
 
 		private bool IsTypeNameInCollisionWithNamespace(string typeName)
 		{
-			HashSet<string> strs;
-			string[] strArray = this.TypeContext.CurrentType.get_Namespace().Split(new Char[] { '.' });
-			if (strArray.Count<string>() > 0)
+			stackVariable3 = this.get_TypeContext().get_CurrentType().get_Namespace();
+			stackVariable5 = new Char[1];
+			stackVariable5[0] = '.';
+			V_0 = stackVariable3.Split(stackVariable5);
+			if (V_0.Count<string>() > 0)
 			{
-				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = 0; i < (int)strArray.Length; i++)
+				V_1 = new StringBuilder();
+				V_2 = 0;
+				while (V_2 < (int)V_0.Length)
 				{
-					if (i > 0)
+					if (V_2 > 0)
 					{
-						stringBuilder.Append(".");
+						dummyVar0 = V_1.Append(".");
 					}
-					stringBuilder.Append(strArray[i]);
-					string str = stringBuilder.ToString();
-					if (this.ModuleContext.NamespaceHieararchy.TryGetValue(str, out strs) && strs.Contains(typeName))
+					dummyVar1 = V_1.Append(V_0[V_2]);
+					V_3 = V_1.ToString();
+					if (this.get_ModuleContext().get_NamespaceHieararchy().TryGetValue(V_3, out V_4) && V_4.Contains(typeName))
 					{
 						return true;
 					}
+					V_2 = V_2 + 1;
 				}
 			}
 			return false;
@@ -845,9 +932,8 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool IsTypeNameInCollisionWithOtherType(string typeName)
 		{
-			List<string> strs;
-			ICollection<string> usedNamespaces = this.GetUsedNamespaces();
-			if (this.ModuleContext.CollisionTypesData.TryGetValue(typeName, out strs) && strs.Intersect<string>(usedNamespaces).Count<string>() > 1)
+			V_0 = this.GetUsedNamespaces();
+			if (this.get_ModuleContext().get_CollisionTypesData().TryGetValue(typeName, out V_1) && V_1.Intersect<string>(V_0).Count<string>() > 1)
 			{
 				return true;
 			}
@@ -856,49 +942,50 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool IsTypeNameInCollisionWithParameters(string typeName)
 		{
-			bool flag;
-			if (base.CurrentMethod != null)
+			if (this.get_CurrentMethod() != null)
 			{
-				Mono.Collections.Generic.Collection<ParameterDefinition>.Enumerator enumerator = base.CurrentMethod.get_Parameters().GetEnumerator();
+				V_0 = this.get_CurrentMethod().get_Parameters().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_0.MoveNext())
 					{
-						ParameterDefinition current = enumerator.get_Current();
-						if (base.Language.IdentifierComparer.Compare(current.get_Name(), typeName) != 0)
+						V_1 = V_0.get_Current();
+						if (this.get_Language().get_IdentifierComparer().Compare(V_1.get_Name(), typeName) != 0)
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_2 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_0.Dispose();
 				}
-				return flag;
+			Label1:
+				return V_2;
 			}
+		Label0:
 			return false;
 		}
 
 		private bool IsTypeNameinCollisionWithVariables(string typeName)
 		{
-			if (base.MethodContext == null)
+			if (this.get_MethodContext() == null)
 			{
 				return false;
 			}
-			return base.MethodContext.VariableNamesCollection.Contains(typeName);
+			return this.get_MethodContext().get_VariableNamesCollection().Contains(typeName);
 		}
 
 		protected bool IsTypeParameterRedeclaration(GenericParameter genericParameter)
 		{
-			TypeReference owner = genericParameter.get_Owner() as TypeReference;
-			if (owner != null && owner.get_IsNested())
+			V_0 = genericParameter.get_Owner() as TypeReference;
+			if (V_0 != null && V_0.get_IsNested())
 			{
-				TypeReference declaringType = owner.get_DeclaringType();
-				if (declaringType.get_HasGenericParameters() && genericParameter.get_Position() < declaringType.get_GenericParameters().get_Count())
+				V_1 = V_0.get_DeclaringType();
+				if (V_1.get_HasGenericParameters() && genericParameter.get_Position() < V_1.get_GenericParameters().get_Count())
 				{
 					return true;
 				}
@@ -908,76 +995,94 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected void LeaveMethodInvocation()
 		{
-			this.methodReferences.Pop();
+			dummyVar0 = this.methodReferences.Pop();
+			return;
 		}
 
 		private void NormalizeNameContainingGenericSymbols(string[] tokensCollection, char genericSymbol, StringBuilder stringBuilder)
 		{
-			for (int i = 0; i < (int)tokensCollection.Length; i++)
+			V_0 = 0;
+			while (V_0 < (int)tokensCollection.Length)
 			{
-				if (i > 0)
+				if (V_0 > 0)
 				{
-					stringBuilder.Append(genericSymbol);
+					dummyVar0 = stringBuilder.Append(genericSymbol);
 				}
-				if (!this.NormalizeNameIfContainingGenericSymbols(tokensCollection[i], stringBuilder))
+				if (!this.NormalizeNameIfContainingGenericSymbols(tokensCollection[V_0], stringBuilder))
 				{
-					string[] strArray = tokensCollection[i].Split(new Char[] { ',' });
-					for (int j = 0; j < (int)strArray.Length; j++)
+					stackVariable19 = tokensCollection[V_0];
+					stackVariable21 = new Char[1];
+					stackVariable21[0] = ',';
+					V_2 = stackVariable19.Split(stackVariable21);
+					V_3 = 0;
+					while (V_3 < (int)V_2.Length)
 					{
-						if (j > 0)
+						if (V_3 > 0)
 						{
-							stringBuilder.Append(", ");
+							dummyVar1 = stringBuilder.Append(", ");
 						}
-						stringBuilder.Append(base.Language.ReplaceInvalidCharactersInIdentifier(strArray[j]));
+						dummyVar2 = stringBuilder.Append(this.get_Language().ReplaceInvalidCharactersInIdentifier(V_2[V_3]));
+						V_3 = V_3 + 1;
 					}
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private bool NormalizeNameIfContainingGenericSymbols(string name, StringBuilder stringBuilder)
 		{
-			bool flag = false;
-			string[] strArray = name.Split(new Char[] { '<' });
-			string[] strArray1 = name.Split(new Char[] { '>' });
-			if ((int)strArray.Length > 1)
+			V_0 = false;
+			stackVariable3 = new Char[1];
+			stackVariable3[0] = '<';
+			V_1 = name.Split(stackVariable3);
+			stackVariable9 = new Char[1];
+			stackVariable9[0] = '>';
+			V_2 = name.Split(stackVariable9);
+			if ((int)V_1.Length <= 1)
 			{
-				flag = true;
-				this.NormalizeNameContainingGenericSymbols(strArray, '<', stringBuilder);
+				if ((int)V_2.Length > 1)
+				{
+					V_0 = true;
+					this.NormalizeNameContainingGenericSymbols(V_2, '>', stringBuilder);
+				}
 			}
-			else if ((int)strArray1.Length > 1)
+			else
 			{
-				flag = true;
-				this.NormalizeNameContainingGenericSymbols(strArray1, '>', stringBuilder);
+				V_0 = true;
+				this.NormalizeNameContainingGenericSymbols(V_1, '<', stringBuilder);
 			}
-			return flag;
+			return V_0;
 		}
 
 		protected virtual void PostWriteGenericParametersConstraints(IGenericDefinition generic)
 		{
+			return;
 		}
 
 		protected virtual void PostWriteMethodReturnType(MethodDefinition method)
 		{
+			return;
 		}
 
 		protected bool ShouldWriteConstraintsAsComment(GenericParameter genericParameter)
 		{
-			TypeReference owner = genericParameter.get_Owner() as TypeReference;
-			if (owner == null)
+			V_0 = genericParameter.get_Owner() as TypeReference;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			TypeReference declaringType = owner.get_DeclaringType();
-			if (declaringType == null || !declaringType.get_HasGenericParameters() || declaringType.get_GenericParameters().get_Count() <= genericParameter.get_Position())
+			V_1 = V_0.get_DeclaringType();
+			if (V_1 == null || !V_1.get_HasGenericParameters() || V_1.get_GenericParameters().get_Count() <= genericParameter.get_Position())
 			{
 				return false;
 			}
-			GenericParameter item = declaringType.get_GenericParameters().get_Item(genericParameter.get_Position());
-			if (item == null)
+			V_2 = V_1.get_GenericParameters().get_Item(genericParameter.get_Position());
+			if (V_2 == null)
 			{
 				return false;
 			}
-			if (this.HaveSameConstraints(item, genericParameter))
+			if (this.HaveSameConstraints(V_2, genericParameter))
 			{
 				return false;
 			}
@@ -986,12 +1091,13 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected void StartInitializer(InitializerExpression node)
 		{
-			if (node.IsMultiLine)
+			if (node.get_IsMultiLine())
 			{
 				this.WriteLine();
 				return;
 			}
 			this.WriteSpace();
+			return;
 		}
 
 		internal abstract string ToEscapedTypeString(TypeReference reference);
@@ -1004,44 +1110,43 @@ namespace Telerik.JustDecompiler.Languages
 
 		private bool TryWriteMethodAsOperator(MethodDefinition method)
 		{
-			string genericName;
 			if (!method.get_IsOperator())
 			{
 				return false;
 			}
-			if (!base.Language.TryGetOperatorName(method.get_OperatorName(), out genericName))
+			if (!this.get_Language().TryGetOperatorName(method.get_OperatorName(), out V_0))
 			{
 				return false;
 			}
-			bool flag = false;
-			if (method.get_OperatorName() == "Implicit" || method.get_OperatorName() == "Explicit")
+			V_1 = false;
+			if (String.op_Equality(method.get_OperatorName(), "Implicit") || String.op_Equality(method.get_OperatorName(), "Explicit"))
 			{
-				if (method.get_OperatorName() != "Implicit")
+				if (!String.op_Equality(method.get_OperatorName(), "Implicit"))
 				{
-					this.WriteKeyword(this.KeyWordWriter.Explicit);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Explicit());
 				}
 				else
 				{
-					this.WriteKeyword(this.KeyWordWriter.Implicit);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Implicit());
 				}
-				if (genericName == "")
+				if (String.op_Equality(V_0, ""))
 				{
-					genericName = method.get_ReturnType().GetGenericName(base.Language, this.GenericLeftBracket, this.GenericRightBracket);
+					V_0 = method.get_ReturnType().GetGenericName(this.get_Language(), this.get_GenericLeftBracket(), this.get_GenericRightBracket());
 				}
 				this.WriteSpace();
-				flag = true;
+				V_1 = true;
 			}
-			if (!flag && this.KeyWordWriter.Sub == null)
+			if (!V_1 && this.get_KeyWordWriter().get_Sub() == null)
 			{
 				this.WriteMethodReturnType(method);
 				this.WriteSpace();
 			}
-			this.WriteKeyword(this.KeyWordWriter.Operator);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Operator());
 			this.WriteSpace();
-			int currentPosition = this.formatter.CurrentPosition;
-			this.WriteReference(genericName, method);
-			int num = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(currentPosition, num);
+			V_2 = this.formatter.get_CurrentPosition();
+			this.WriteReference(V_0, method);
+			V_3 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(method, new OffsetSpan(V_2, V_3));
 			return true;
 		}
 
@@ -1049,734 +1154,853 @@ namespace Telerik.JustDecompiler.Languages
 
 		public override void Visit(ICodeNode node)
 		{
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass61_0();
+			V_0.u003cu003e4__this = this;
+			V_0.node = node;
 			if (!this.isStopped)
 			{
-				this.WriteCodeNodeLabel(node);
-				if (node == null || node.CodeNodeType == CodeNodeType.EmptyStatement)
+				this.WriteCodeNodeLabel(V_0.node);
+				if (V_0.node == null || V_0.node.get_CodeNodeType() == 58)
 				{
-					this.DoVisit(node);
+					this.DoVisit(V_0.node);
 				}
 				else
 				{
-					OffsetSpan offsetSpan = this.ExecuteAndGetOffsetSpan(() => this.u003cu003en__0(node));
-					if (node != null)
+					V_1 = this.ExecuteAndGetOffsetSpan(new Action(V_0.u003cVisitu003eb__0));
+					if (V_0.node != null)
 					{
-						this.currentWritingInfo.CodeMappingInfo.Add(node, new OffsetSpan(offsetSpan.StartOffset, offsetSpan.EndOffset - 1));
-						if (node is Expression)
+						this.currentWritingInfo.get_CodeMappingInfo().Add(V_0.node, new OffsetSpan(V_1.StartOffset, V_1.EndOffset - 1));
+						if (V_0.node as Expression != null)
 						{
 							try
 							{
-								foreach (Instruction mappedInstruction in (node as Expression).MappedInstructions)
+								V_2 = (V_0.node as Expression).get_MappedInstructions().GetEnumerator();
+								try
 								{
-									this.currentWritingInfo.CodeMappingInfo.Add(mappedInstruction, offsetSpan);
+									while (V_2.MoveNext())
+									{
+										V_3 = V_2.get_Current();
+										this.currentWritingInfo.get_CodeMappingInfo().Add(V_3, V_1);
+									}
+								}
+								finally
+								{
+									if (V_2 != null)
+									{
+										V_2.Dispose();
+									}
 								}
 							}
-							catch (ArgumentException argumentException)
+							catch (ArgumentException exception_0)
 							{
-								base.OnExceptionThrown(argumentException);
+								this.OnExceptionThrown(exception_0);
 							}
 						}
 					}
 				}
 			}
+			return;
 		}
 
 		public override void Visit(IEnumerable collection)
 		{
-			bool flag = false;
-			foreach (ICodeNode codeNode in collection)
+			V_0 = false;
+			V_1 = collection.GetEnumerator();
+			try
 			{
-				if (codeNode.CodeNodeType != CodeNodeType.EmptyStatement || codeNode is Statement && (codeNode as Statement).Label != "")
+				while (V_1.MoveNext())
 				{
-					if (!flag)
+					V_2 = (ICodeNode)V_1.get_Current();
+					if (V_2.get_CodeNodeType() != 58 || V_2 as Statement != null && String.op_Inequality((V_2 as Statement).get_Label(), ""))
 					{
-						flag = true;
+						if (!V_0)
+						{
+							V_0 = true;
+						}
+						else
+						{
+							this.WriteLine();
+						}
 					}
-					else
-					{
-						this.WriteLine();
-					}
+					this.Visit(V_2);
 				}
-				this.Visit(codeNode);
 			}
+			finally
+			{
+				V_3 = V_1 as IDisposable;
+				if (V_3 != null)
+				{
+					V_3.Dispose();
+				}
+			}
+			return;
 		}
 
 		private void VisitAddressDereferenceExpression(UnaryExpression node)
 		{
-			if (node.Operand.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && node.Operand.ExpressionType.get_IsByReference())
+			if (node.get_Operand().get_CodeNodeType() == 25 && node.get_Operand().get_ExpressionType().get_IsByReference())
 			{
-				this.Visit(node.Operand);
+				this.Visit(node.get_Operand());
 				return;
 			}
-			this.WriteKeyword(this.KeyWordWriter.Dereference);
-			this.Visit(node.Operand);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Dereference());
+			this.Visit(node.get_Operand());
+			return;
 		}
 
 		public override void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.New);
-			if (this.KeyWordWriter.ObjectInitializer != null)
+			this.WriteKeyword(this.get_KeyWordWriter().get_New());
+			if (this.get_KeyWordWriter().get_ObjectInitializer() != null)
 			{
 				this.WriteSpace();
-				this.WriteKeyword(this.KeyWordWriter.ObjectInitializer);
+				this.WriteKeyword(this.get_KeyWordWriter().get_ObjectInitializer());
 			}
-			this.StartInitializer(node.Initializer);
-			this.Visit(node.Initializer);
+			this.StartInitializer(node.get_Initializer());
+			this.Visit(node.get_Initializer());
+			return;
 		}
 
 		public override void VisitAnonymousPropertyInitializerExpression(AnonymousPropertyInitializerExpression node)
 		{
-			this.WritePropertyName(node.Property);
+			this.WritePropertyName(node.get_Property());
+			return;
 		}
 
 		public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 		{
-			this.Write(this.GetArgumentName(node.Parameter));
+			this.Write(this.GetArgumentName(node.get_Parameter()));
+			return;
 		}
 
 		public override void VisitArrayAssignmentFieldReferenceExpression(ArrayAssignmentFieldReferenceExpression node)
 		{
-			this.Visit(node.Field);
+			this.Visit(node.get_Field());
+			return;
 		}
 
 		public override void VisitArrayAssignmentVariableReferenceExpression(ArrayVariableReferenceExpression node)
 		{
-			this.Visit(node.Variable);
+			this.Visit(node.get_Variable());
+			return;
 		}
 
 		public override void VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.New);
+			this.WriteKeyword(this.get_KeyWordWriter().get_New());
 			this.WriteSpace();
-			this.WriteReferenceAndNamespaceIfInCollision(this.GetBaseElementType(node.ElementType));
-			bool flag = Utilities.IsInitializerPresent(node.Initializer);
-			this.WriteArrayDimensions(node.Dimensions, node.ElementType, flag);
-			if (flag)
+			this.WriteReferenceAndNamespaceIfInCollision(this.GetBaseElementType(node.get_ElementType()));
+			V_0 = Utilities.IsInitializerPresent(node.get_Initializer());
+			this.WriteArrayDimensions(node.get_Dimensions(), node.get_ElementType(), V_0);
+			if (V_0)
 			{
-				this.StartInitializer(node.Initializer);
-				this.Visit(node.Initializer);
+				this.StartInitializer(node.get_Initializer());
+				this.Visit(node.get_Initializer());
 			}
+			return;
 		}
 
 		public override void VisitArrayLengthExpression(ArrayLengthExpression node)
 		{
-			bool flag = this.IsComplexTarget(node.Target);
-			if (flag)
+			stackVariable3 = this.IsComplexTarget(node.get_Target());
+			if (stackVariable3)
 			{
 				this.WriteToken("(");
 			}
-			base.Visit(node.Target);
-			if (flag)
+			this.Visit(node.get_Target());
+			if (stackVariable3)
 			{
 				this.WriteToken(")");
 			}
 			this.WriteToken(".");
 			this.WriteReference("Length", null);
+			return;
 		}
 
 		public override void VisitArrayVariableDeclarationExpression(ArrayVariableDeclarationExpression node)
 		{
-			this.Visit(node.Variable);
+			this.Visit(node.get_Variable());
+			return;
 		}
 
 		public override void VisitAutoPropertyConstructorInitializerExpression(AutoPropertyConstructorInitializerExpression node)
 		{
-			if (node.Target == null)
+			if (node.get_Target() == null)
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.Property.get_DeclaringType());
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_Property().get_DeclaringType());
 			}
 			else
 			{
-				if (!(node.Target is ThisReferenceExpression))
+				if (node.get_Target() as ThisReferenceExpression == null)
 				{
 					throw new ArgumentException();
 				}
-				this.Visit(node.Target);
+				this.Visit(node.get_Target());
 			}
 			this.WriteToken(".");
-			this.WritePropertyName(node.Property);
+			this.WritePropertyName(node.get_Property());
+			return;
 		}
 
 		public override void VisitAwaitExpression(AwaitExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Await);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Await());
 			this.WriteSpace();
-			this.Visit(node.Expression);
+			this.Visit(node.get_Expression());
+			return;
 		}
 
 		public override void VisitBaseReferenceExpression(BaseReferenceExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Base);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Base());
+			return;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			bool flag;
-			this.Visit(node.Left);
+			this.Visit(node.get_Left());
 			this.WriteSpace();
-			flag = (this.IsNull(node.Left) ? true : this.IsNull(node.Right));
-			string str = this.ToString(node.Operator, flag);
-			if (!base.Language.IsOperatorKeyword(str))
+			if (this.IsNull(node.get_Left()))
 			{
-				this.Write(str);
+				stackVariable8 = true;
 			}
 			else
 			{
-				this.WriteKeyword(str);
+				stackVariable8 = this.IsNull(node.get_Right());
 			}
-			if (node.Right.CodeNodeType != CodeNodeType.InitializerExpression)
+			V_1 = this.ToString(node.get_Operator(), stackVariable8);
+			if (!this.get_Language().IsOperatorKeyword(V_1))
+			{
+				this.Write(V_1);
+			}
+			else
+			{
+				this.WriteKeyword(V_1);
+			}
+			if (node.get_Right().get_CodeNodeType() != 88)
 			{
 				this.WriteSpace();
 			}
 			else
 			{
-				this.StartInitializer(node.Right as InitializerExpression);
+				this.StartInitializer(node.get_Right() as InitializerExpression);
 			}
 			this.WriteRightPartOfBinaryExpression(node);
+			return;
 		}
 
 		public override void VisitBlockExpression(BlockExpression node)
 		{
 			this.WriteToken("{ ");
-			this.VisitList(node.Expressions);
+			this.VisitList(node.get_Expressions());
 			this.WriteToken(" }");
+			return;
 		}
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
-			this.WriteBlock(() => {
-				this.Visit(node.Statements);
-				if (node.Statements.Count != 0 && this.HasNoEmptyStatements(node.Statements))
-				{
-					this.WriteLine();
-				}
-			}, node.Label);
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass105_0();
+			V_0.u003cu003e4__this = this;
+			V_0.node = node;
+			this.WriteBlock(new Action(V_0.u003cVisitBlockStatementu003eb__0), V_0.node.get_Label());
+			return;
 		}
 
 		public override void VisitCanCastExpression(CanCastExpression node)
 		{
-			if (this.KeyWordWriter.IsType != null)
+			if (this.get_KeyWordWriter().get_IsType() != null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.IsType);
+				this.WriteKeyword(this.get_KeyWordWriter().get_IsType());
 				this.WriteSpace();
 			}
-			this.Visit(node.Expression);
+			this.Visit(node.get_Expression());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.Is);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Is());
 			this.WriteSpace();
-			this.WriteReferenceAndNamespaceIfInCollision(node.TargetType);
+			this.WriteReferenceAndNamespaceIfInCollision(node.get_TargetType());
+			return;
 		}
 
 		public override void VisitCaseGotoStatement(CaseGotoStatement node)
 		{
 			this.VisitGotoStatement(node);
+			return;
 		}
 
 		public override void VisitDelegateCreationExpression(DelegateCreationExpression node)
 		{
-			if (!node.TypeIsImplicitlyInferable)
+			if (!node.get_TypeIsImplicitlyInferable())
 			{
-				this.WriteKeyword(this.KeyWordWriter.New);
+				this.WriteKeyword(this.get_KeyWordWriter().get_New());
 				this.WriteSpace();
-				this.WriteReference(node.Type);
+				this.WriteReference(node.get_Type());
 				this.Write("(");
 			}
-			if (node.MethodExpression.CodeNodeType != CodeNodeType.LambdaExpression)
+			if (node.get_MethodExpression().get_CodeNodeType() != 50)
 			{
-				this.Write(node.Target);
+				this.Write(node.get_Target());
 				this.Write(".");
 			}
-			this.Write(node.MethodExpression);
-			if (!node.TypeIsImplicitlyInferable)
+			this.Write(node.get_MethodExpression());
+			if (!node.get_TypeIsImplicitlyInferable())
 			{
 				this.Write(")");
 			}
+			return;
 		}
 
 		public override void VisitDelegateInvokeExpression(DelegateInvokeExpression node)
 		{
-			bool flag = this.IsComplexTarget(node.Target);
-			bool flag1 = false;
-			if (flag)
+			stackVariable3 = this.IsComplexTarget(node.get_Target());
+			V_0 = false;
+			if (stackVariable3)
 			{
 				this.WriteToken("(");
-				if (node.Target.CodeNodeType == CodeNodeType.LambdaExpression && (node.Target as LambdaExpression).HasType)
+				if (node.get_Target().get_CodeNodeType() == 50 && (node.get_Target() as LambdaExpression).get_HasType())
 				{
-					flag1 = true;
+					V_0 = true;
 					this.WriteToken("(");
-					this.WriteReferenceAndNamespaceIfInCollision((node.Target as LambdaExpression).ExpressionType);
+					this.WriteReferenceAndNamespaceIfInCollision((node.get_Target() as LambdaExpression).get_ExpressionType());
 					this.WriteToken(")");
 					this.WriteToken("(");
 				}
 			}
-			this.Visit(node.Target);
-			if (flag)
+			this.Visit(node.get_Target());
+			if (stackVariable3)
 			{
-				if (flag1)
+				if (V_0)
 				{
 					this.WriteToken(")");
 				}
 				this.WriteToken(")");
 			}
 			this.WriteToken("(");
-			this.EnterMethodInvocation(node.InvokeMethodReference);
-			this.VisitMethodParameters(node.Arguments);
+			this.EnterMethodInvocation(node.get_InvokeMethodReference());
+			this.VisitMethodParameters(node.get_Arguments());
 			this.LeaveMethodInvocation();
 			this.WriteToken(")");
+			return;
 		}
 
 		public override void VisitDoWhileStatement(DoWhileStatement node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Do);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Do());
 			this.WriteLine();
-			this.Visit(node.Body);
+			this.Visit(node.get_Body());
 			this.WriteLine();
-			this.WriteKeyword(this.KeyWordWriter.LoopWhile);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LoopWhile());
 			this.WriteSpace();
-			this.WriteSpecialBetweenParenthesis(node.Condition);
+			this.WriteSpecialBetweenParenthesis(node.get_Condition());
 			this.WriteEndOfStatement();
+			return;
 		}
 
 		public override void VisitEnumExpression(EnumExpression node)
 		{
-			if (node.FieldName == null)
+			if (node.get_FieldName() == null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Null);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Null());
 				return;
 			}
-			this.WriteReferenceAndNamespaceIfInCollision(node.ExpressionType);
+			this.WriteReferenceAndNamespaceIfInCollision(node.get_ExpressionType());
 			this.Write(".");
-			string fieldName = this.GetFieldName(node.Field);
-			this.WriteReference(fieldName, node.Field);
+			V_0 = this.GetFieldName(node.get_Field());
+			this.WriteReference(V_0, node.get_Field());
+			return;
 		}
 
 		public override void VisitEventReferenceExpression(EventReferenceExpression node)
 		{
-			if (node.Target == null)
+			if (node.get_Target() == null)
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.Event.get_DeclaringType());
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_Event().get_DeclaringType());
 			}
 			else
 			{
-				bool flag = this.IsComplexTarget(node.Target);
-				if (flag)
+				stackVariable17 = this.IsComplexTarget(node.get_Target());
+				if (stackVariable17)
 				{
 					this.WriteToken("(");
 				}
-				this.Visit(node.Target);
-				if (flag)
+				this.Visit(node.get_Target());
+				if (stackVariable17)
 				{
 					this.WriteToken(")");
 				}
 			}
 			this.WriteToken(".");
-			this.WriteReference(node.Event.get_Name(), node.Event);
+			this.WriteReference(node.get_Event().get_Name(), node.get_Event());
+			return;
 		}
 
 		public override void VisitExpressionStatement(ExpressionStatement node)
 		{
-			this.Visit(node.Expression);
-			if (this.ShouldOmitSemicolon.Count == 0 || !this.ShouldOmitSemicolon.Peek())
+			this.Visit(node.get_Expression());
+			if (this.get_ShouldOmitSemicolon().get_Count() == 0 || !this.get_ShouldOmitSemicolon().Peek())
 			{
 				this.WriteEndOfStatement();
 			}
+			return;
 		}
 
 		protected void VisitExtensionMethodParameters(IList<Expression> list)
 		{
 			this.VisitMethodParametersInternal(list, true);
+			return;
 		}
 
 		public override void VisitFieldInitializerExpression(FieldInitializerExpression node)
 		{
-			this.WriteFieldName(node.Field);
+			this.WriteFieldName(node.get_Field());
+			return;
 		}
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (node.Target == null)
+			if (node.get_Target() == null)
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.Field.get_DeclaringType());
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_Field().get_DeclaringType());
 			}
 			else
 			{
-				bool flag = this.IsComplexTarget(node.Target);
-				if (flag)
+				stackVariable14 = this.IsComplexTarget(node.get_Target());
+				if (stackVariable14)
 				{
 					this.WriteToken("(");
 				}
-				this.Visit(node.Target);
-				if (flag)
+				this.Visit(node.get_Target());
+				if (stackVariable14)
 				{
 					this.WriteToken(")");
 				}
 			}
 			this.WriteToken(".");
-			this.WriteFieldName(node.Field);
+			this.WriteFieldName(node.get_Field());
+			return;
 		}
 
 		public override void VisitFixedStatement(FixedStatement expression)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Fixed);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Fixed());
 			this.WriteSpace();
-			this.WriteBetweenParenthesis(expression.Expression);
+			this.WriteBetweenParenthesis(expression.get_Expression());
 			this.WriteLine();
-			this.Visit(expression.Body);
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Fixed);
+			this.Visit(expression.get_Body());
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Fixed());
+			return;
 		}
 
 		public override void VisitFromClause(FromClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqFrom);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqFrom());
 			this.WriteSpace();
-			this.Visit(node.Identifier);
+			this.Visit(node.get_Identifier());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.LinqIn);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqIn());
 			this.WriteSpace();
-			this.Visit(node.Collection);
+			this.Visit(node.get_Collection());
+			return;
 		}
 
 		public override void VisitGotoStatement(GotoStatement node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.GoTo);
+			this.WriteKeyword(this.get_KeyWordWriter().get_GoTo());
 			this.WriteSpace();
-			this.Write(node.TargetLabel);
+			this.Write(node.get_TargetLabel());
 			this.WriteEndOfStatement();
+			return;
 		}
 
 		public override void VisitGroupClause(GroupClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqGroup);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqGroup());
 			this.WriteSpace();
-			this.Visit(node.Expression);
+			this.Visit(node.get_Expression());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.LinqBy);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqBy());
 			this.WriteSpace();
-			this.Visit(node.GroupKey);
+			this.Visit(node.get_GroupKey());
+			return;
 		}
 
 		public override void VisitIfElseIfStatement(IfElseIfStatement node)
 		{
-			for (int i = 0; i < node.ConditionBlocks.Count; i++)
+			V_0 = 0;
+			while (V_0 < node.get_ConditionBlocks().get_Count())
 			{
-				if (i != 0)
+				if (V_0 != 0)
 				{
 					this.WriteLine();
-					this.WriteKeyword(this.KeyWordWriter.ElseIf);
+					this.WriteKeyword(this.get_KeyWordWriter().get_ElseIf());
 				}
 				else
 				{
-					this.WriteKeyword(this.KeyWordWriter.If);
+					this.WriteKeyword(this.get_KeyWordWriter().get_If());
 				}
 				this.WriteSpace();
-				KeyValuePair<Expression, BlockStatement> item = node.ConditionBlocks[i];
-				this.WriteBetweenParenthesis(item.Key);
-				if (this.KeyWordWriter.Then != null)
+				V_1 = node.get_ConditionBlocks().get_Item(V_0);
+				this.WriteBetweenParenthesis(V_1.get_Key());
+				if (this.get_KeyWordWriter().get_Then() != null)
 				{
 					this.WriteSpace();
-					this.WriteKeyword(this.KeyWordWriter.Then);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Then());
 				}
 				this.WriteLine();
-				item = node.ConditionBlocks[i];
-				this.Visit(item.Value);
+				V_1 = node.get_ConditionBlocks().get_Item(V_0);
+				this.Visit(V_1.get_Value());
+				V_0 = V_0 + 1;
 			}
-			if (node.Else != null)
+			if (node.get_Else() != null)
 			{
 				this.WriteLine();
-				this.WriteKeyword(this.KeyWordWriter.Else);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Else());
 				this.WriteLine();
-				this.Visit(node.Else);
+				this.Visit(node.get_Else());
 			}
-			this.WriteSpecialEndBlock(this.KeyWordWriter.If);
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_If());
+			return;
 		}
 
 		public override void VisitIfStatement(IfStatement node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.If);
+			this.WriteKeyword(this.get_KeyWordWriter().get_If());
 			this.WriteSpace();
-			this.WriteBetweenParenthesis(node.Condition);
-			if (this.KeyWordWriter.Then != null)
+			this.WriteBetweenParenthesis(node.get_Condition());
+			if (this.get_KeyWordWriter().get_Then() != null)
 			{
 				this.WriteSpace();
-				this.WriteKeyword(this.KeyWordWriter.Then);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Then());
 			}
 			this.WriteLine();
-			this.Visit(node.Then);
-			if (node.Else == null)
+			this.Visit(node.get_Then());
+			if (node.get_Else() == null)
 			{
-				this.WriteSpecialEndBlock(this.KeyWordWriter.If);
+				this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_If());
 				return;
 			}
 			this.WriteLine();
-			this.WriteKeyword(this.KeyWordWriter.Else);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Else());
 			this.WriteLine();
-			this.Visit(node.Else);
-			this.WriteSpecialEndBlock(this.KeyWordWriter.If);
+			this.Visit(node.get_Else());
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_If());
+			return;
 		}
 
 		protected override void VisitIIndexerExpression(IIndexerExpression node)
 		{
-			bool flag = this.IsComplexTarget(node.Target);
-			if (flag)
+			stackVariable3 = this.IsComplexTarget(node.get_Target());
+			if (stackVariable3)
 			{
 				this.WriteToken("(");
 			}
-			this.Visit(node.Target);
-			if (flag)
+			this.Visit(node.get_Target());
+			if (stackVariable3)
 			{
 				this.WriteToken(")");
 			}
-			this.WriteToken(this.IndexLeftBracket);
-			this.VisitList(node.Indices);
-			this.WriteToken(this.IndexRightBracket);
+			this.WriteToken(this.get_IndexLeftBracket());
+			this.VisitList(node.get_Indices());
+			this.WriteToken(this.get_IndexRightBracket());
+			return;
 		}
 
 		public override void VisitInitializerExpression(InitializerExpression node)
 		{
 			this.WriteToken("{");
-			if (!node.IsMultiLine)
+			if (!node.get_IsMultiLine())
 			{
 				this.WriteSpace();
-				this.VisitList(node.Expressions);
+				this.VisitList(node.get_Expressions());
 				this.WriteSpace();
 			}
 			else
 			{
 				this.Indent();
 				this.WriteLine();
-				this.VisitMultilineList(node.Expressions);
+				this.VisitMultilineList(node.get_Expressions());
 				this.WriteLine();
 				this.Outdent();
 			}
 			this.WriteToken("}");
+			return;
 		}
 
 		public override void VisitIntoClause(IntoClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqInto);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqInto());
 			this.WriteSpace();
-			this.Visit(node.Identifier);
+			this.Visit(node.get_Identifier());
+			return;
 		}
 
 		public override void VisitJoinClause(JoinClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqJoin);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqJoin());
 			this.WriteSpace();
-			this.Visit(node.InnerIdentifier);
+			this.Visit(node.get_InnerIdentifier());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.LinqIn);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqIn());
 			this.WriteSpace();
-			this.Visit(node.InnerCollection);
+			this.Visit(node.get_InnerCollection());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.LinqOn);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqOn());
 			this.WriteSpace();
-			this.Visit(node.OuterKey);
+			this.Visit(node.get_OuterKey());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.LinqEquals);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqEquals());
 			this.WriteSpace();
-			this.Visit(node.InnerKey);
+			this.Visit(node.get_InnerKey());
+			return;
 		}
 
 		public override void VisitLambdaExpression(LambdaExpression node)
 		{
-			if (node.IsAsync && this.KeyWordWriter.Async != null)
+			if (node.get_IsAsync() && this.get_KeyWordWriter().get_Async() != null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Async);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Async());
 				this.WriteSpace();
 			}
+			return;
 		}
 
 		public override void VisitLambdaParameterExpression(LambdaParameterExpression node)
 		{
-			if (!node.DisplayType)
+			if (!node.get_DisplayType())
 			{
-				this.Write(this.GetArgumentName(node.Parameter));
+				this.Write(this.GetArgumentName(node.get_Parameter()));
 				return;
 			}
-			this.WriteTypeAndName(node.ExpressionType, this.GetArgumentName(node.Parameter));
+			this.WriteTypeAndName(node.get_ExpressionType(), this.GetArgumentName(node.get_Parameter()));
+			return;
 		}
 
 		public override void VisitLetClause(LetClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqLet);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqLet());
 			this.WriteSpace();
-			this.Visit(node.Identifier);
+			this.Visit(node.get_Identifier());
 			this.Write(" = ");
-			this.Visit(node.Expression);
+			this.Visit(node.get_Expression());
+			return;
 		}
 
 		protected void VisitList(IList<Expression> list)
 		{
-			for (int i = 0; i < list.Count; i++)
+			V_0 = 0;
+			while (V_0 < list.get_Count())
 			{
-				if (i > 0)
+				if (V_0 > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				this.Visit(list[i]);
+				this.Visit(list.get_Item(V_0));
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		public override void VisitLiteralExpression(LiteralExpression node)
 		{
-			this.WriteLiteralInLanguageSyntax(node.Value);
+			this.WriteLiteralInLanguageSyntax(node.get_Value());
+			return;
 		}
 
 		public override void VisitLockStatement(LockStatement expression)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Lock);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Lock());
 			this.WriteSpace();
-			this.WriteSpecialBetweenParenthesis(expression.Expression);
+			this.WriteSpecialBetweenParenthesis(expression.get_Expression());
 			this.WriteLine();
-			this.Visit(expression.Body);
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Lock);
+			this.Visit(expression.get_Body());
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Lock());
+			return;
 		}
 
 		public override void VisitMakeRefExpression(MakeRefExpression node)
 		{
 			this.WriteKeyword("__makeref");
 			this.WriteToken("(");
-			this.Visit(node.Expression);
+			this.Visit(node.get_Expression());
 			this.WriteToken(")");
+			return;
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			bool isExtensionMethod = false;
-			if (node.MethodExpression.CodeNodeType == CodeNodeType.MethodReferenceExpression)
+			V_0 = false;
+			if (node.get_MethodExpression().get_CodeNodeType() == 20)
 			{
-				MethodReferenceExpression methodExpression = node.MethodExpression;
-				MethodReference method = methodExpression.Method;
-				if (method != null && !method.get_HasThis() && methodExpression.MethodDefinition != null)
+				V_2 = node.get_MethodExpression();
+				V_3 = V_2.get_Method();
+				if (V_3 != null && !V_3.get_HasThis() && V_2.get_MethodDefinition() != null)
 				{
-					isExtensionMethod = methodExpression.MethodDefinition.get_IsExtensionMethod();
+					V_0 = V_2.get_MethodDefinition().get_IsExtensionMethod();
 				}
 			}
-			if (!isExtensionMethod)
+			if (!V_0)
 			{
-				if (node.MethodExpression.Target != null)
+				if (node.get_MethodExpression().get_Target() != null)
 				{
-					this.WriteMethodTarget(node.MethodExpression.Target);
+					this.WriteMethodTarget(node.get_MethodExpression().get_Target());
 				}
-				if (!node.MethodExpression.Method.get_HasThis() && (node.MethodExpression.MethodDefinition != null && !node.MethodExpression.MethodDefinition.get_IsExtensionMethod() || node.MethodExpression.MethodDefinition == null))
+				if (!node.get_MethodExpression().get_Method().get_HasThis() && node.get_MethodExpression().get_MethodDefinition() != null && !node.get_MethodExpression().get_MethodDefinition().get_IsExtensionMethod() || node.get_MethodExpression().get_MethodDefinition() == null)
 				{
-					this.WriteReferenceAndNamespaceIfInCollision(node.MethodExpression.Method.get_DeclaringType());
+					this.WriteReferenceAndNamespaceIfInCollision(node.get_MethodExpression().get_Method().get_DeclaringType());
 					this.WriteToken(".");
 				}
 			}
-			else if (node.Arguments.Count > 0)
+			else
 			{
-				this.WriteMethodTarget(node.Arguments[0]);
+				if (node.get_Arguments().get_Count() > 0)
+				{
+					this.WriteMethodTarget(node.get_Arguments().get_Item(0));
+				}
 			}
-			this.WriteMethodReference(node.MethodExpression);
-			bool flag = false;
-			this.WriteToken((flag ? this.IndexLeftBracket : "("));
-			if (node.MethodExpression == null)
+			this.WriteMethodReference(node.get_MethodExpression());
+			V_1 = false;
+			if (V_1)
 			{
-				this.VisitMethodParameters(node.Arguments);
+				stackVariable20 = this.get_IndexLeftBracket();
 			}
 			else
 			{
-				this.EnterMethodInvocation(node.MethodExpression.Method);
-				if (isExtensionMethod)
+				stackVariable20 = "(";
+			}
+			this.WriteToken(stackVariable20);
+			if (node.get_MethodExpression() == null)
+			{
+				this.VisitMethodParameters(node.get_Arguments());
+			}
+			else
+			{
+				this.EnterMethodInvocation(node.get_MethodExpression().get_Method());
+				if (V_0)
 				{
-					this.VisitExtensionMethodParameters(node.Arguments);
+					this.VisitExtensionMethodParameters(node.get_Arguments());
 				}
 				else
 				{
-					this.VisitMethodParameters(node.Arguments);
+					this.VisitMethodParameters(node.get_Arguments());
 				}
 				this.LeaveMethodInvocation();
 			}
-			this.WriteToken((flag ? this.IndexRightBracket : ")"));
+			if (V_1)
+			{
+				stackVariable29 = this.get_IndexRightBracket();
+			}
+			else
+			{
+				stackVariable29 = ")";
+			}
+			this.WriteToken(stackVariable29);
+			return;
 		}
 
 		protected void VisitMethodParameters(IList<Expression> list)
 		{
 			this.VisitMethodParametersInternal(list, false);
+			return;
 		}
 
 		private void VisitMethodParametersInternal(IList<Expression> list, bool isExtensionMethod)
 		{
-			for (int i = (isExtensionMethod ? 1 : 0); i < list.Count; i++)
+			if (isExtensionMethod)
 			{
-				if (i > 0 && !isExtensionMethod || i > 1 & isExtensionMethod)
+				stackVariable1 = 1;
+			}
+			else
+			{
+				stackVariable1 = 0;
+			}
+			V_0 = stackVariable1;
+			while (V_0 < list.get_Count())
+			{
+				if (V_0 > 0 && !isExtensionMethod || V_0 > 1 & isExtensionMethod)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				bool flag = false;
-				if (list[i].CodeNodeType == CodeNodeType.ArgumentReferenceExpression && (list[i] as ArgumentReferenceExpression).Parameter.get_ParameterType().get_IsByReference())
+				V_1 = false;
+				if (list.get_Item(V_0).get_CodeNodeType() == 25 && (list.get_Item(V_0) as ArgumentReferenceExpression).get_Parameter().get_ParameterType().get_IsByReference())
 				{
-					flag = true;
+					V_1 = true;
 				}
-				if (list[i] is UnaryExpression && (list[i] as UnaryExpression).Operator == UnaryOperator.AddressReference && this.MethodReferences.Count > 0)
+				if (list.get_Item(V_0) as UnaryExpression != null && (list.get_Item(V_0) as UnaryExpression).get_Operator() == 7 && this.get_MethodReferences().get_Count() > 0)
 				{
-					flag = true;
+					V_1 = true;
 				}
-				if (list[i].CodeNodeType == CodeNodeType.MethodInvocationExpression && (list[i] as MethodInvocationExpression).IsByReference)
+				if (list.get_Item(V_0).get_CodeNodeType() == 19 && (list.get_Item(V_0) as MethodInvocationExpression).get_IsByReference())
 				{
-					flag = this.CheckIfParameterIsByRef(this.MethodReferences.Peek(), i);
+					V_1 = this.CheckIfParameterIsByRef(this.get_MethodReferences().Peek(), V_0);
 				}
-				if (list[i].CodeNodeType == CodeNodeType.VariableReferenceExpression && (list[i] as VariableReferenceExpression).Variable.get_VariableType().get_IsByReference())
+				if (list.get_Item(V_0).get_CodeNodeType() == 26 && (list.get_Item(V_0) as VariableReferenceExpression).get_Variable().get_VariableType().get_IsByReference())
 				{
-					flag = this.CheckIfParameterIsByRef(this.MethodReferences.Peek(), i);
+					V_1 = this.CheckIfParameterIsByRef(this.get_MethodReferences().Peek(), V_0);
 				}
-				if (flag)
+				if (V_1)
 				{
-					MethodDefinition methodDefinition = this.MethodReferences.Peek().Resolve();
-					if (methodDefinition != null)
+					V_2 = this.get_MethodReferences().Peek().Resolve();
+					if (V_2 == null)
 					{
-						if (this.ShouldWriteOutAndRefOnInvocation)
+						if (this.get_ShouldWriteOutAndRefOnInvocation())
 						{
-							this.WriteOutOrRefKeyWord(methodDefinition.get_Parameters().get_Item(i));
+							this.WriteKeyword(this.get_KeyWordWriter().get_ByRef());
 							this.WriteSpace();
 						}
 					}
-					else if (this.ShouldWriteOutAndRefOnInvocation)
+					else
 					{
-						this.WriteKeyword(this.KeyWordWriter.ByRef);
-						this.WriteSpace();
+						if (this.get_ShouldWriteOutAndRefOnInvocation())
+						{
+							this.WriteOutOrRefKeyWord(V_2.get_Parameters().get_Item(V_0));
+							this.WriteSpace();
+						}
 					}
-					if (!(list[i] is UnaryExpression))
+					if (list.get_Item(V_0) as UnaryExpression == null)
 					{
 						goto Label1;
 					}
-					this.Visit((list[i] as UnaryExpression).Operand);
+					this.Visit((list.get_Item(V_0) as UnaryExpression).get_Operand());
 					goto Label0;
 				}
 			Label1:
-				this.Visit(list[i]);
+				this.Visit(list.get_Item(V_0));
 			Label0:
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			if (node.Target == null)
+			if (node.get_Target() == null)
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.Method.get_DeclaringType());
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_Method().get_DeclaringType());
 				this.WriteToken(".");
 			}
 			else
 			{
-				this.WriteMethodTarget(node.Target);
+				this.WriteMethodTarget(node.get_Target());
 			}
 			this.WriteMethodReference(node);
+			return;
 		}
 
 		private void VisitMultilineList(ExpressionCollection expressions)
 		{
-			for (int i = 0; i < expressions.Count; i++)
+			V_0 = 0;
+			while (V_0 < expressions.get_Count())
 			{
-				this.Visit(expressions[i]);
-				if (i != expressions.Count - 1)
+				this.Visit(expressions.get_Item(V_0));
+				if (V_0 != expressions.get_Count() - 1)
 				{
 					this.WriteToken(",");
 					this.WriteLine();
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
@@ -1786,226 +2010,252 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteDelegateCreation(node);
 				return;
 			}
-			this.WriteKeyword(this.KeyWordWriter.New);
+			this.WriteKeyword(this.get_KeyWordWriter().get_New());
 			this.WriteSpace();
-			if (node.Constructor == null)
+			if (node.get_Constructor() == null)
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.Type);
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_Type());
 			}
 			else
 			{
 				this.WriteConstructorInvocation(node);
 			}
 			this.WriteToken("(");
-			this.EnterMethodInvocation(node.Constructor);
-			this.VisitMethodParameters(node.Arguments);
+			this.EnterMethodInvocation(node.get_Constructor());
+			this.VisitMethodParameters(node.get_Arguments());
 			this.LeaveMethodInvocation();
 			this.WriteToken(")");
-			if (node.Initializer != null)
+			if (node.get_Initializer() != null)
 			{
-				if (node.Initializer.InitializerType == InitializerType.ObjectInitializer)
+				if (node.get_Initializer().get_InitializerType() != 1)
 				{
-					if (this.KeyWordWriter.ObjectInitializer != null)
+					if (node.get_Initializer().get_InitializerType() == InitializerType.CollectionInitializer && this.get_KeyWordWriter().get_CollectionInitializer() != null)
 					{
 						this.WriteSpace();
-						this.WriteKeyword(this.KeyWordWriter.ObjectInitializer);
+						this.WriteKeyword(this.get_KeyWordWriter().get_CollectionInitializer());
 					}
 				}
-				else if (node.Initializer.InitializerType == InitializerType.CollectionInitializer && this.KeyWordWriter.CollectionInitializer != null)
+				else
 				{
-					this.WriteSpace();
-					this.WriteKeyword(this.KeyWordWriter.CollectionInitializer);
+					if (this.get_KeyWordWriter().get_ObjectInitializer() != null)
+					{
+						this.WriteSpace();
+						this.WriteKeyword(this.get_KeyWordWriter().get_ObjectInitializer());
+					}
 				}
-				this.StartInitializer(node.Initializer);
-				this.Visit(node.Initializer);
+				this.StartInitializer(node.get_Initializer());
+				this.Visit(node.get_Initializer());
 			}
+			return;
 		}
 
 		public override void VisitOrderByClause(OrderByClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqOrderBy);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqOrderBy());
 			this.WriteSpace();
-			for (int i = 0; i < node.ExpressionToOrderDirectionMap.Count; i++)
+			V_0 = 0;
+			while (V_0 < node.get_ExpressionToOrderDirectionMap().get_Count())
 			{
-				if (i > 0)
+				if (V_0 > 0)
 				{
 					this.Write(", ");
 				}
-				this.Visit(node.ExpressionToOrderDirectionMap[i].Key);
-				if (node.ExpressionToOrderDirectionMap[i].Value == OrderDirection.Descending)
+				V_1 = node.get_ExpressionToOrderDirectionMap().get_Item(V_0);
+				this.Visit(V_1.get_Key());
+				if (node.get_ExpressionToOrderDirectionMap().get_Item(V_0).get_Value() == 1)
 				{
 					this.WriteSpace();
-					this.WriteKeyword(this.KeyWordWriter.LinqDescending);
+					this.WriteKeyword(this.get_KeyWordWriter().get_LinqDescending());
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		public override void VisitParenthesesExpression(ParenthesesExpression parenthesesExpression)
 		{
 			this.WriteToken("(");
-			this.Visit(parenthesesExpression.Expression);
+			this.Visit(parenthesesExpression.get_Expression());
 			this.WriteToken(")");
+			return;
 		}
 
 		public override void VisitPropertyInitializerExpression(PropertyInitializerExpression node)
 		{
-			this.WritePropertyName(node.Property);
+			this.WritePropertyName(node.get_Property());
+			return;
 		}
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			if (node.Target == null)
+			if (node.get_Target() == null)
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.DeclaringType);
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_DeclaringType());
 			}
 			else
 			{
-				bool flag = this.IsComplexTarget(node.Target);
-				if (flag)
+				stackVariable17 = this.IsComplexTarget(node.get_Target());
+				if (stackVariable17)
 				{
 					this.WriteToken("(");
 				}
-				this.Visit(node.Target);
-				if (flag)
+				this.Visit(node.get_Target());
+				if (stackVariable17)
 				{
 					this.WriteToken(")");
 				}
 			}
-			if (node.IsIndexer)
+			if (node.get_IsIndexer())
 			{
 				this.WriteIndexerArguments(node);
 				return;
 			}
 			this.WriteToken(".");
-			this.WritePropertyName(node.Property);
+			this.WritePropertyName(node.get_Property());
+			return;
 		}
 
 		public override void VisitReturnExpression(ReturnExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Return);
-			if (node.Value != null)
+			this.WriteKeyword(this.get_KeyWordWriter().get_Return());
+			if (node.get_Value() != null)
 			{
 				this.WriteSpace();
-				this.Visit(node.Value);
+				this.Visit(node.get_Value());
 			}
+			return;
 		}
 
 		public override void VisitSelectClause(SelectClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqSelect);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqSelect());
 			this.WriteSpace();
-			this.Visit(node.Expression);
+			this.Visit(node.get_Expression());
+			return;
 		}
 
 		public override void VisitShortFormReturnExpression(ShortFormReturnExpression node)
 		{
-			if (node.Value != null)
+			if (node.get_Value() != null)
 			{
-				this.Visit(node.Value);
+				this.Visit(node.get_Value());
 			}
+			return;
 		}
 
 		public override void VisitSizeOfExpression(SizeOfExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.SizeOf);
+			this.WriteKeyword(this.get_KeyWordWriter().get_SizeOf());
 			this.WriteToken("(");
-			this.WriteReferenceAndNamespaceIfInCollision(node.Type);
+			this.WriteReferenceAndNamespaceIfInCollision(node.get_Type());
 			this.WriteToken(")");
+			return;
 		}
 
 		public override void VisitStackAllocExpression(StackAllocExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Stackalloc);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Stackalloc());
 			this.WriteSpace();
-			this.WriteReference((node.ExpressionType as PointerType).get_ElementType());
-			this.WriteToken(this.IndexLeftBracket);
-			this.Visit(node.Expression);
-			this.WriteToken(this.IndexRightBracket);
+			this.WriteReference((node.get_ExpressionType() as PointerType).get_ElementType());
+			this.WriteToken(this.get_IndexLeftBracket());
+			this.Visit(node.get_Expression());
+			this.WriteToken(this.get_IndexRightBracket());
+			return;
 		}
 
 		public override void VisitThisReferenceExpression(ThisReferenceExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.This);
+			this.WriteKeyword(this.get_KeyWordWriter().get_This());
+			return;
 		}
 
 		public override void VisitThrowExpression(ThrowExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Throw);
-			if (node.Expression != null)
+			this.WriteKeyword(this.get_KeyWordWriter().get_Throw());
+			if (node.get_Expression() != null)
 			{
 				this.WriteSpace();
-				this.Visit(node.Expression);
+				this.Visit(node.get_Expression());
 			}
+			return;
 		}
 
 		public override void VisitTryStatement(TryStatement node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Try);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Try());
 			this.WriteLine();
-			this.Visit(node.Try);
-			if (node.CatchClauses.Count != 0)
+			this.Visit(node.get_Try());
+			if (node.get_CatchClauses().get_Count() != 0)
 			{
 				this.WriteLine();
-				this.Visit(node.CatchClauses);
+				this.Visit(node.get_CatchClauses());
 			}
-			if (node.Finally != null)
+			if (node.get_Finally() != null)
 			{
 				this.WriteLine();
-				this.WriteKeyword(this.KeyWordWriter.Finally);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Finally());
 				this.WriteLine();
-				this.Visit(node.Finally);
+				this.Visit(node.get_Finally());
 			}
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Try);
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Try());
+			return;
 		}
 
 		public override void VisitTypeOfExpression(TypeOfExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.TypeOf);
+			this.WriteKeyword(this.get_KeyWordWriter().get_TypeOf());
 			this.WriteToken("(");
-			this.WriteGenericReference(node.Type);
+			this.WriteGenericReference(node.get_Type());
 			this.WriteToken(")");
+			return;
 		}
 
 		public override void VisitTypeReferenceExpression(TypeReferenceExpression node)
 		{
-			this.WriteReferenceAndNamespaceIfInCollision(node.Type);
+			this.WriteReferenceAndNamespaceIfInCollision(node.get_Type());
+			return;
 		}
 
 		public override void VisitUnaryExpression(UnaryExpression node)
 		{
-			if (node.Operator == UnaryOperator.AddressDereference)
+			if (node.get_Operator() == 8)
 			{
 				this.VisitAddressDereferenceExpression(node);
 				return;
 			}
-			this.Visit(node.Operand);
+			this.Visit(node.get_Operand());
+			return;
 		}
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			this.WriteVariableTypeAndName(node.Variable);
+			this.WriteVariableTypeAndName(node.get_Variable());
+			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			this.Write(this.GetVariableName(node.Variable));
+			this.Write(this.GetVariableName(node.get_Variable()));
+			return;
 		}
 
 		public override void VisitWhereClause(WhereClause node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.LinqWhere);
+			this.WriteKeyword(this.get_KeyWordWriter().get_LinqWhere());
 			this.WriteSpace();
-			this.Visit(node.Condition);
+			this.Visit(node.get_Condition());
+			return;
 		}
 
 		public override void VisitWhileStatement(WhileStatement node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.While);
+			this.WriteKeyword(this.get_KeyWordWriter().get_While());
 			this.WriteSpace();
-			this.WriteSpecialBetweenParenthesis(node.Condition);
+			this.WriteSpecialBetweenParenthesis(node.get_Condition());
 			this.WriteLine();
-			this.Visit(node.Body);
-			this.WriteSpecialEndBlock(this.KeyWordWriter.While);
+			this.Visit(node.get_Body());
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_While());
+			return;
 		}
 
 		protected override void Write(FieldDefinition field)
@@ -2015,158 +2265,180 @@ namespace Telerik.JustDecompiler.Languages
 				return;
 			}
 			this.WriteFieldDeclaration(field);
-			if (this.TypeContext.AssignmentData.ContainsKey(field.get_FullName()) && this.TypeContext.AssignmentData[field.get_FullName()] != null)
+			if (this.get_TypeContext().get_AssignmentData().ContainsKey(field.get_FullName()) && this.get_TypeContext().get_AssignmentData().get_Item(field.get_FullName()) != null)
 			{
 				this.WriteSpace();
 				this.WriteToken("=");
 				this.WriteSpace();
-				this.Visit(this.TypeContext.AssignmentData[field.get_FullName()].AssignmentExpression);
+				this.Visit(this.get_TypeContext().get_AssignmentData().get_Item(field.get_FullName()).get_AssignmentExpression());
 			}
 			this.WriteEndOfStatement();
+			return;
 		}
 
 		protected override void Write(Statement statement)
 		{
 			this.Visit(statement);
+			return;
 		}
 
-		protected override void Write(EventDefinition @event)
+		protected override void Write(EventDefinition event)
 		{
-			bool flag;
-			if (@event.get_AddMethod() == null || @event.get_AddMethod().get_Body() != null)
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass66_0();
+			V_0.u003cu003e4__this = this;
+			V_0.event = event;
+			if (V_0.event.get_AddMethod() == null || V_0.event.get_AddMethod().get_Body() != null)
 			{
-				flag = (@event.get_RemoveMethod() == null ? false : @event.get_RemoveMethod().get_Body() == null);
+				if (V_0.event.get_RemoveMethod() == null)
+				{
+					stackVariable11 = false;
+				}
+				else
+				{
+					stackVariable11 = V_0.event.get_RemoveMethod().get_Body() == null;
+				}
 			}
 			else
 			{
-				flag = true;
+				stackVariable11 = true;
 			}
-			bool flag1 = true;
-			if (!flag)
+			V_1 = true;
+			if (!stackVariable11)
 			{
-				flag1 = this.TypeContext.AutoImplementedEvents.Contains(@event);
+				V_1 = this.get_TypeContext().get_AutoImplementedEvents().Contains(V_0.event);
 			}
-			this.WriteEventDeclaration(@event, flag1);
-			if (flag1)
+			this.WriteEventDeclaration(V_0.event, V_1);
+			if (V_1)
 			{
 				this.WriteEndOfStatement();
 				return;
 			}
-			int currentPosition = this.formatter.CurrentPosition;
+			V_2 = this.formatter.get_CurrentPosition();
 			this.formatter.WriteStartBlock();
 			this.WriteLine();
-			this.WriteBlock(() => {
-				this.WriteEventMethods(@event);
-				this.WriteLine();
-			}, "");
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Event);
-			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap[@event] = new OffsetSpan(currentPosition, this.formatter.CurrentPosition - 1);
+			this.WriteBlock(new Action(V_0.u003cWriteu003eb__0), "");
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Event());
+			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().set_Item(V_0.event, new OffsetSpan(V_2, this.formatter.get_CurrentPosition() - 1));
 			this.formatter.WriteEndBlock();
+			return;
 		}
 
 		protected override void Write(PropertyDefinition property)
 		{
-			if (property.ShouldStaySplit() && !base.MethodContextsMissing)
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass71_0();
+			V_0.u003cu003e4__this = this;
+			V_0.property = property;
+			if (V_0.property.ShouldStaySplit() && !this.get_MethodContextsMissing())
 			{
-				this.WriteSplitProperty(property);
+				this.WriteSplitProperty(V_0.property);
 				return;
 			}
-			if (base.Language.SupportsInlineInitializationOfAutoProperties && this.TypeContext.AutoImplementedProperties.Contains(property) && this.TypeContext.AssignmentData.ContainsKey(property.get_FullName()) && this.TypeContext.AssignmentData[property.get_FullName()] != null)
+			if (this.get_Language().get_SupportsInlineInitializationOfAutoProperties() && this.get_TypeContext().get_AutoImplementedProperties().Contains(V_0.property) && this.get_TypeContext().get_AssignmentData().ContainsKey(V_0.property.get_FullName()) && this.get_TypeContext().get_AssignmentData().get_Item(V_0.property.get_FullName()) != null)
 			{
-				this.WriteInitializedAutoProperty(property, this.TypeContext.AssignmentData[property.get_FullName()].AssignmentExpression);
+				this.WriteInitializedAutoProperty(V_0.property, this.get_TypeContext().get_AssignmentData().get_Item(V_0.property.get_FullName()).get_AssignmentExpression());
 				return;
 			}
-			this.WritePropertyDeclaration(property);
-			int currentPosition = this.formatter.CurrentPosition;
+			this.WritePropertyDeclaration(V_0.property);
+			V_1 = this.formatter.get_CurrentPosition();
 			this.formatter.WriteStartBlock();
 			this.WriteLine();
-			this.WriteBlock(() => {
-				this.WritePropertyMethods(property, false);
-				this.WriteLine();
-			}, "");
-			if (this.KeyWordWriter.Property != null)
+			this.WriteBlock(new Action(V_0.u003cWriteu003eb__0), "");
+			if (this.get_KeyWordWriter().get_Property() != null)
 			{
-				this.WriteSpecialEndBlock(this.KeyWordWriter.Property);
+				this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Property());
 			}
-			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap[property] = new OffsetSpan(currentPosition, this.formatter.CurrentPosition - 1);
+			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().set_Item(V_0.property, new OffsetSpan(V_1, this.formatter.get_CurrentPosition() - 1));
 			this.formatter.WriteEndBlock();
+			return;
 		}
 
 		protected override void Write(MethodDefinition method)
 		{
-			if (base.MethodContext != null && base.MethodContext.IsDestructor)
+			if (this.get_MethodContext() != null && this.get_MethodContext().get_IsDestructor())
 			{
 				this.WriteDestructor(method);
 				return;
 			}
 			this.WriteMethod(method);
+			return;
 		}
 
 		protected override void Write(Expression expression)
 		{
 			this.Visit(expression);
+			return;
 		}
 
-		protected virtual void WriteAddOn(EventDefinition @event)
+		protected virtual void WriteAddOn(EventDefinition event)
 		{
-			uint num = @event.get_AddMethod().get_MetadataToken().ToUInt32();
-			this.membersStack.Push(@event.get_AddMethod());
-			int currentPosition = this.formatter.CurrentPosition;
-			this.AttributeWriter.WriteMemberAttributesAndNewLine(@event.get_AddMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-			base.AddMemberAttributesOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
-			int currentPosition1 = this.formatter.CurrentPosition;
-			int num1 = this.formatter.CurrentPosition;
-			this.WriteMoreRestrictiveMethodVisibility(@event.get_AddMethod(), @event.get_RemoveMethod());
-			int currentPosition2 = this.formatter.CurrentPosition;
-			this.WriteKeyword(this.KeyWordWriter.AddOn);
-			this.WriteEventAddOnParameters(@event);
-			int num2 = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.get_AddMethod()] = new OffsetSpan(currentPosition2, num2);
+			V_7 = event.get_AddMethod().get_MetadataToken();
+			V_0 = V_7.ToUInt32();
+			this.membersStack.Push(event.get_AddMethod());
+			V_1 = this.formatter.get_CurrentPosition();
+			stackVariable13 = this.get_AttributeWriter();
+			stackVariable15 = event.get_AddMethod();
+			stackVariable17 = new String[1];
+			stackVariable17[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+			stackVariable13.WriteMemberAttributesAndNewLine(stackVariable15, stackVariable17, false);
+			this.AddMemberAttributesOffsetSpan(V_0, V_1, this.formatter.get_CurrentPosition());
+			V_2 = this.formatter.get_CurrentPosition();
+			V_3 = this.formatter.get_CurrentPosition();
+			this.WriteMoreRestrictiveMethodVisibility(event.get_AddMethod(), event.get_RemoveMethod());
+			V_4 = this.formatter.get_CurrentPosition();
+			this.WriteKeyword(this.get_KeyWordWriter().get_AddOn());
+			this.WriteEventAddOnParameters(event);
+			V_5 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(event.get_AddMethod(), new OffsetSpan(V_4, V_5));
 			this.WriteLine();
-			this.Write(base.GetStatement(@event.get_AddMethod()));
-			this.WriteSpecialEndBlock(this.KeyWordWriter.AddOn);
-			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap.Add(@event.get_AddMethod(), new OffsetSpan(currentPosition1, this.formatter.CurrentPosition - 1));
-			this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(num1, this.formatter.CurrentPosition - 1));
-			this.membersStack.Pop();
+			this.Write(this.GetStatement(event.get_AddMethod()));
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_AddOn());
+			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().Add(event.get_AddMethod(), new OffsetSpan(V_2, this.formatter.get_CurrentPosition() - 1));
+			this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_0, new OffsetSpan(V_3, this.formatter.get_CurrentPosition() - 1));
+			dummyVar0 = this.membersStack.Pop();
+			return;
 		}
 
 		protected void WriteAndMapParameterToCode(Action write, int index)
 		{
-			int currentPosition = this.formatter.CurrentPosition;
-			write();
-			IMemberDefinition memberDefinition = this.membersStack.Peek();
-			OffsetSpan offsetSpan = new OffsetSpan(currentPosition, this.formatter.CurrentPosition);
-			this.currentWritingInfo.CodeMappingInfo.Add(memberDefinition, index, offsetSpan);
+			V_0 = this.formatter.get_CurrentPosition();
+			write.Invoke();
+			V_1 = this.membersStack.Peek();
+			V_2 = new OffsetSpan(V_0, this.formatter.get_CurrentPosition());
+			this.currentWritingInfo.get_CodeMappingInfo().Add(V_1, index, V_2);
+			return;
 		}
 
 		protected void WriteAndMapVariableToCode(Action write, VariableDefinition variable)
 		{
-			int currentPosition = this.formatter.CurrentPosition;
-			write();
-			OffsetSpan offsetSpan = new OffsetSpan(currentPosition, this.formatter.CurrentPosition);
+			V_0 = this.formatter.get_CurrentPosition();
+			write.Invoke();
+			V_1 = new OffsetSpan(V_0, this.formatter.get_CurrentPosition());
 			try
 			{
-				this.currentWritingInfo.CodeMappingInfo.Add(variable, offsetSpan);
+				this.currentWritingInfo.get_CodeMappingInfo().Add(variable, V_1);
 			}
-			catch (ArgumentException argumentException)
+			catch (ArgumentException exception_0)
 			{
-				base.OnExceptionThrown(argumentException);
+				this.OnExceptionThrown(exception_0);
 			}
+			return;
 		}
 
 		protected virtual void WriteArrayDimensions(ExpressionCollection dimensions, TypeReference arrayType, bool isInitializerPresent)
 		{
-			ArrayType arrayType1 = null;
-			List<int> nums = new List<int>();
-			for (TypeReference i = arrayType; i is ArrayType; i = arrayType1.get_ElementType())
+			V_0 = new List<int>();
+			V_1 = arrayType;
+			while (V_1 as ArrayType != null)
 			{
-				arrayType1 = i as ArrayType;
-				nums.Add(arrayType1.get_Dimensions().get_Count());
+				V_2 = V_1 as ArrayType;
+				V_0.Add(V_2.get_Dimensions().get_Count());
+				V_1 = V_2.get_ElementType();
 			}
-			this.WriteToken(this.IndexLeftBracket);
-			for (int j = 0; j < dimensions.Count; j++)
+			this.WriteToken(this.get_IndexLeftBracket());
+			V_3 = 0;
+			while (V_3 < dimensions.get_Count())
 			{
-				if (j > 0)
+				if (V_3 > 0)
 				{
 					this.WriteToken(",");
 					if (!isInitializerPresent)
@@ -2176,46 +2448,76 @@ namespace Telerik.JustDecompiler.Languages
 				}
 				if (!isInitializerPresent)
 				{
-					this.Visit(dimensions[j]);
+					this.Visit(dimensions.get_Item(V_3));
 				}
+				V_3 = V_3 + 1;
 			}
-			this.WriteToken(this.IndexRightBracket);
-			foreach (int num in nums)
+			this.WriteToken(this.get_IndexRightBracket());
+			V_4 = V_0.GetEnumerator();
+			try
 			{
-				this.WriteToken(this.IndexLeftBracket);
-				for (int k = 1; k < num; k++)
+				while (V_4.MoveNext())
 				{
-					this.WriteToken(",");
+					V_5 = V_4.get_Current();
+					this.WriteToken(this.get_IndexLeftBracket());
+					V_6 = 1;
+					while (V_6 < V_5)
+					{
+						this.WriteToken(",");
+						V_6 = V_6 + 1;
+					}
+					this.WriteToken(this.get_IndexRightBracket());
 				}
-				this.WriteToken(this.IndexRightBracket);
 			}
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+			return;
 		}
 
 		protected override void WriteAttributes(IMemberDefinition member, IEnumerable<string> ignoredAttributes = null)
 		{
-			MethodDefinition methodDefinition = member as MethodDefinition;
-			if (methodDefinition != null && methodDefinition.IsAsync())
+			V_0 = member as MethodDefinition;
+			if (V_0 != null && V_0.IsAsync())
 			{
-				string[] strArray = new String[] { "System.Diagnostics.DebuggerStepThroughAttribute", "System.Runtime.CompilerServices.AsyncStateMachineAttribute" };
+				stackVariable17 = new String[2];
+				stackVariable17[0] = "System.Diagnostics.DebuggerStepThroughAttribute";
+				stackVariable17[1] = "System.Runtime.CompilerServices.AsyncStateMachineAttribute";
+				V_1 = stackVariable17;
 				if (ignoredAttributes != null)
 				{
 					ignoredAttributes = new List<string>(ignoredAttributes);
-					((List<string>)ignoredAttributes).AddRange(strArray);
+					((List<string>)ignoredAttributes).AddRange(V_1);
 				}
 				else
 				{
-					ignoredAttributes = new List<string>(strArray);
+					ignoredAttributes = new List<string>(V_1);
 				}
 			}
-			this.AttributeWriter.WriteMemberAttributesAndNewLine(member, ignoredAttributes, (this.TypeContext.CurrentType != member ? false : this.TypeContext.IsWinRTImplementation));
+			stackVariable4 = this.get_AttributeWriter();
+			stackVariable5 = member;
+			stackVariable6 = ignoredAttributes;
+			if (this.get_TypeContext().get_CurrentType() != member)
+			{
+				stackVariable11 = false;
+			}
+			else
+			{
+				stackVariable11 = this.get_TypeContext().get_IsWinRTImplementation();
+			}
+			stackVariable4.WriteMemberAttributesAndNewLine(stackVariable5, stackVariable6, stackVariable11);
+			return;
 		}
 
 		protected virtual void WriteBaseConstructorInvokation(MethodInvocationExpression baseConstructorInvokation)
 		{
+			return;
 		}
 
 		protected virtual void WriteBaseTypeInheritColon()
 		{
+			return;
 		}
 
 		protected void WriteBetweenParenthesis(Expression expression)
@@ -2223,268 +2525,310 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteToken("(");
 			this.Visit(expression);
 			this.WriteToken(")");
+			return;
 		}
 
 		public void WriteBitwiseOr()
 		{
-			this.WriteKeyword(this.ToString(BinaryOperator.BitwiseOr, false));
+			this.WriteKeyword(this.ToString(21, false));
+			return;
 		}
 
 		protected virtual void WriteBlock(Action action, string label)
 		{
+			return;
 		}
 
 		protected override void WriteBodyInternal(IMemberDefinition member)
 		{
 			this.membersStack.Push(member);
-			if (member is MethodDefinition)
+			if (member as MethodDefinition == null)
 			{
-				MethodDefinition methodDefinition = (MethodDefinition)member;
-				if (methodDefinition.get_Body() != null)
+				if (member as PropertyDefinition == null)
 				{
-					Statement statement = base.GetStatement(methodDefinition);
-					if (base.MethodContext.Method.get_IsConstructor() && !base.MethodContext.Method.get_IsStatic() && base.MethodContext.CtorInvokeExpression != null && !this.RemoveBaseConstructorInvocation)
+					if (member as EventDefinition != null)
 					{
-						this.WriteBaseConstructorInvokation(base.MethodContext.CtorInvokeExpression);
+						V_3 = (EventDefinition)member;
+						if (V_3.get_AddMethod() != null && V_3.get_AddMethod().get_Body() == null || V_3.get_RemoveMethod() != null && V_3.get_RemoveMethod().get_Body() == null)
+						{
+							return;
+						}
+						this.WriteEventMethods(V_3);
 					}
-					this.Write(statement);
+				}
+				else
+				{
+					this.WritePropertyMethods((PropertyDefinition)member, false);
+				}
+			}
+			else
+			{
+				V_0 = (MethodDefinition)member;
+				if (V_0.get_Body() != null)
+				{
+					V_1 = this.GetStatement(V_0);
+					if (this.get_MethodContext().get_Method().get_IsConstructor() && !this.get_MethodContext().get_Method().get_IsStatic() && this.get_MethodContext().get_CtorInvokeExpression() != null && !this.get_RemoveBaseConstructorInvocation())
+					{
+						this.WriteBaseConstructorInvokation(this.get_MethodContext().get_CtorInvokeExpression());
+					}
+					this.Write(V_1);
 				}
 				else
 				{
 					this.WriteEndOfStatement();
 				}
 			}
-			else if (member is PropertyDefinition)
-			{
-				this.WritePropertyMethods((PropertyDefinition)member, false);
-			}
-			else if (member is EventDefinition)
-			{
-				EventDefinition eventDefinition = (EventDefinition)member;
-				if (eventDefinition.get_AddMethod() != null && eventDefinition.get_AddMethod().get_Body() == null || eventDefinition.get_RemoveMethod() != null && eventDefinition.get_RemoveMethod().get_Body() == null)
-				{
-					return;
-				}
-				this.WriteEventMethods(eventDefinition);
-			}
-			this.membersStack.Pop();
+			dummyVar0 = this.membersStack.Pop();
+			return;
 		}
 
 		protected void WriteCodeNodeLabel(ICodeNode node)
 		{
-			if (node is Statement && node.CodeNodeType != CodeNodeType.BlockStatement)
+			if (node as Statement != null && node.get_CodeNodeType() != CodeNodeType.BlockStatement)
 			{
-				Statement statement = node as Statement;
-				this.WriteLabel(statement.Label);
-				if (node.CodeNodeType != CodeNodeType.EmptyStatement && statement.Label != "")
+				V_0 = node as Statement;
+				this.WriteLabel(V_0.get_Label());
+				if (node.get_CodeNodeType() != 58 && String.op_Inequality(V_0.get_Label(), ""))
 				{
 					this.WriteLine();
 				}
 			}
+			return;
 		}
 
 		protected virtual void WriteConstructorGenericConstraint()
 		{
-			this.WriteKeyword(this.KeyWordWriter.New);
+			this.WriteKeyword(this.get_KeyWordWriter().get_New());
+			return;
 		}
 
 		private void WriteConstructorInvocation(ObjectCreationExpression node)
 		{
-			if (node.Constructor.get_DeclaringType() is TypeSpecification)
+			if (node.get_Constructor().get_DeclaringType() as TypeSpecification != null)
 			{
-				GenericInstanceType declaringType = node.Constructor.get_DeclaringType() as GenericInstanceType;
-				if (declaringType != null && this.SupportsSpecialNullable && declaringType.GetFriendlyFullName(base.Language).IndexOf("System.Nullable<") == 0 && declaringType.get_GenericArguments().get_Item(0).get_IsValueType())
+				V_0 = node.get_Constructor().get_DeclaringType() as GenericInstanceType;
+				if (V_0 != null && this.get_SupportsSpecialNullable() && V_0.GetFriendlyFullName(this.get_Language()).IndexOf("System.Nullable<") == 0 && V_0.get_GenericArguments().get_Item(0).get_IsValueType())
 				{
-					TypeReference item = declaringType.get_GenericArguments().get_Item(0);
-					if (declaringType.get_PostionToArgument().ContainsKey(0))
+					V_1 = V_0.get_GenericArguments().get_Item(0);
+					if (V_0.get_PostionToArgument().ContainsKey(0))
 					{
-						item = declaringType.get_PostionToArgument()[0];
+						V_1 = V_0.get_PostionToArgument().get_Item(0);
 					}
-					this.WriteReferenceAndNamespaceIfInCollision(item);
+					this.WriteReferenceAndNamespaceIfInCollision(V_1);
 					this.WriteToken("?");
 					return;
 				}
 			}
-			if (node.Constructor.get_DeclaringType().get_Namespace() == "System")
+			if (String.op_Equality(node.get_Constructor().get_DeclaringType().get_Namespace(), "System"))
 			{
-				this.WriteReferenceAndNamespaceIfInCollision(node.Constructor.get_DeclaringType());
+				this.WriteReferenceAndNamespaceIfInCollision(node.get_Constructor().get_DeclaringType());
 				return;
 			}
-			if (node.Constructor.get_DeclaringType().get_DeclaringType() == null)
+			if (node.get_Constructor().get_DeclaringType().get_DeclaringType() == null)
 			{
-				bool flag = this.IsTypeNameInCollision(node.Constructor.get_DeclaringType().get_Name());
-				this.WriteNamespace(node.Constructor.get_DeclaringType().GetElementType(), flag);
+				V_9 = this.IsTypeNameInCollision(node.get_Constructor().get_DeclaringType().get_Name());
+				this.WriteNamespace(node.get_Constructor().get_DeclaringType().GetElementType(), V_9);
 				this.WriteConstructorNameAndGenericArguments(node, true, 0);
 				return;
 			}
-			TypeReference typeReference = node.Constructor.get_DeclaringType().get_DeclaringType();
-			if (node.Constructor.get_DeclaringType().get_IsGenericInstance())
+			V_2 = node.get_Constructor().get_DeclaringType().get_DeclaringType();
+			if (node.get_Constructor().get_DeclaringType().get_IsGenericInstance())
 			{
-				GenericInstanceType genericInstanceType = node.Constructor.get_DeclaringType() as GenericInstanceType;
-				if (typeReference.get_HasGenericParameters())
+				V_3 = node.get_Constructor().get_DeclaringType() as GenericInstanceType;
+				if (V_2.get_HasGenericParameters())
 				{
-					GenericInstanceType genericInstanceType1 = new GenericInstanceType(typeReference);
-					Mono.Collections.Generic.Collection<TypeReference> collection = new Mono.Collections.Generic.Collection<TypeReference>(genericInstanceType.get_GenericArguments());
-					Mono.Collections.Generic.Collection<TypeReference> collection1 = new Mono.Collections.Generic.Collection<TypeReference>(genericInstanceType1.get_GenericArguments());
-					int count = typeReference.get_GenericParameters().get_Count();
-					for (int i = 0; i < count; i++)
+					V_4 = new GenericInstanceType(V_2);
+					V_5 = new Collection<TypeReference>(V_3.get_GenericArguments());
+					V_6 = new Collection<TypeReference>(V_4.get_GenericArguments());
+					V_7 = V_2.get_GenericParameters().get_Count();
+					V_8 = 0;
+					while (V_8 < V_7)
 					{
-						genericInstanceType1.AddGenericArgument(genericInstanceType.get_GenericArguments().get_Item(i));
-						genericInstanceType1.get_GenericArguments().Add(genericInstanceType.get_GenericArguments().get_Item(i));
+						V_4.AddGenericArgument(V_3.get_GenericArguments().get_Item(V_8));
+						V_4.get_GenericArguments().Add(V_3.get_GenericArguments().get_Item(V_8));
+						V_8 = V_8 + 1;
 					}
-					this.WriteReferenceAndNamespaceIfInCollision(genericInstanceType1);
+					this.WriteReferenceAndNamespaceIfInCollision(V_4);
 					this.Write(".");
-					if (genericInstanceType.get_GenericArguments().get_Count() - count <= 0)
+					if (V_3.get_GenericArguments().get_Count() - V_7 <= 0)
 					{
 						this.WriteConstructorNameAndGenericArguments(node, false, 0);
 					}
 					else
 					{
-						this.WriteConstructorNameAndGenericArguments(node, true, count);
+						this.WriteConstructorNameAndGenericArguments(node, true, V_7);
 					}
-					genericInstanceType.get_GenericArguments().Clear();
-					genericInstanceType.get_GenericArguments().AddRange(collection);
-					genericInstanceType1.get_GenericArguments().Clear();
-					genericInstanceType1.get_GenericArguments().AddRange(collection1);
+					V_3.get_GenericArguments().Clear();
+					V_3.get_GenericArguments().AddRange(V_5);
+					V_4.get_GenericArguments().Clear();
+					V_4.get_GenericArguments().AddRange(V_6);
 					return;
 				}
 			}
-			this.WriteReferenceAndNamespaceIfInCollision(typeReference);
+			this.WriteReferenceAndNamespaceIfInCollision(V_2);
 			this.Write(".");
 			this.WriteConstructorNameAndGenericArguments(node, true, 0);
+			return;
 		}
 
 		private void WriteConstructorName(MethodDefinition method)
 		{
-			string typeName = this.GetTypeName(method.get_DeclaringType());
-			if (this.KeyWordWriter.Constructor != null)
+			V_0 = this.GetTypeName(method.get_DeclaringType());
+			if (this.get_KeyWordWriter().get_Constructor() != null)
 			{
-				if (this.KeyWordWriter.Sub != null)
+				if (this.get_KeyWordWriter().get_Sub() != null)
 				{
-					this.WriteKeyword(this.KeyWordWriter.Sub);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Sub());
 					this.WriteSpace();
 				}
-				typeName = this.KeyWordWriter.Constructor;
+				V_0 = this.get_KeyWordWriter().get_Constructor();
 			}
-			int currentPosition = this.formatter.CurrentPosition;
-			this.WriteReference(typeName, method);
-			int num = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(currentPosition, num);
+			V_1 = this.formatter.get_CurrentPosition();
+			this.WriteReference(V_0, method);
+			V_2 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(method, new OffsetSpan(V_1, V_2));
+			return;
 		}
 
 		private void WriteConstructorNameAndGenericArguments(ObjectCreationExpression node, bool writeGenericArguments = true, int startArgumentIndex = 0)
 		{
-			string typeName = this.GetTypeName(node.Constructor.get_DeclaringType());
-			this.WriteReference(typeName, node.Constructor);
-			if (writeGenericArguments && node.ExpressionType.get_IsGenericInstance())
+			V_0 = this.GetTypeName(node.get_Constructor().get_DeclaringType());
+			this.WriteReference(V_0, node.get_Constructor());
+			if (writeGenericArguments && node.get_ExpressionType().get_IsGenericInstance())
 			{
-				this.WriteToken(this.GenericLeftBracket);
-				Mono.Collections.Generic.Collection<TypeReference> genericArguments = (node.ExpressionType as GenericInstanceType).get_GenericArguments();
-				for (int i = startArgumentIndex; i < genericArguments.get_Count(); i++)
+				this.WriteToken(this.get_GenericLeftBracket());
+				V_1 = (node.get_ExpressionType() as GenericInstanceType).get_GenericArguments();
+				V_2 = startArgumentIndex;
+				while (V_2 < V_1.get_Count())
 				{
-					if (i > startArgumentIndex)
+					if (V_2 > startArgumentIndex)
 					{
 						this.WriteToken(",");
 						this.WriteSpace();
 					}
-					this.WriteReferenceAndNamespaceIfInCollision(genericArguments.get_Item(i));
+					this.WriteReferenceAndNamespaceIfInCollision(V_1.get_Item(V_2));
+					V_2 = V_2 + 1;
 				}
-				this.WriteToken(this.GenericRightBracket);
+				this.WriteToken(this.get_GenericRightBracket());
 			}
+			return;
 		}
 
 		protected override void WriteDelegate(TypeDefinition delegateDefinition)
 		{
 			this.WriteTypeVisiblity(delegateDefinition);
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.Delegate);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Delegate());
 			this.WriteSpace();
-			MethodDefinition item = delegateDefinition.get_Methods().get_Item(0);
-			for (int i = 1; i < delegateDefinition.get_Methods().get_Count() && item.get_Name() != "Invoke"; i++)
+			V_0 = delegateDefinition.get_Methods().get_Item(0);
+			V_1 = 1;
+			while (V_1 < delegateDefinition.get_Methods().get_Count() && String.op_Inequality(V_0.get_Name(), "Invoke"))
 			{
-				item = delegateDefinition.get_Methods().get_Item(i);
+				V_0 = delegateDefinition.get_Methods().get_Item(V_1);
+				V_1 = V_1 + 1;
 			}
-			if (this.KeyWordWriter.Sub == null || this.KeyWordWriter.Function == null)
+			if (this.get_KeyWordWriter().get_Sub() == null || this.get_KeyWordWriter().get_Function() == null)
 			{
-				this.WriteMethodReturnType(item);
+				this.WriteMethodReturnType(V_0);
 				this.WriteSpace();
 			}
 			else
 			{
-				this.WriteKeyword(this.GetMethodKeyWord(item));
+				this.WriteKeyword(this.GetMethodKeyWord(V_0));
 				this.WriteSpace();
 			}
 			this.WriteGenericName(delegateDefinition);
 			this.WriteToken("(");
-			this.WriteParameters(item);
+			this.WriteParameters(V_0);
 			this.WriteToken(")");
-			this.PostWriteMethodReturnType(item);
+			this.PostWriteMethodReturnType(V_0);
 			if (delegateDefinition.get_HasGenericParameters())
 			{
 				this.PostWriteGenericParametersConstraints(delegateDefinition);
 			}
 			this.WriteEndOfStatement();
+			return;
 		}
 
 		protected void WriteDelegateArgument(ObjectCreationExpression node)
 		{
-			if (node.Arguments[0].CodeNodeType == CodeNodeType.LiteralExpression && (node.Arguments[0] as LiteralExpression).Value == null || !(node.Arguments[1] is MethodReferenceExpression) || (node.Arguments[1] as MethodReferenceExpression).Target != null)
+			if (node.get_Arguments().get_Item(0).get_CodeNodeType() == 22 && (node.get_Arguments().get_Item(0) as LiteralExpression).get_Value() == null || node.get_Arguments().get_Item(1) as MethodReferenceExpression == null || (node.get_Arguments().get_Item(1) as MethodReferenceExpression).get_Target() != null)
 			{
-				this.Write(node.Arguments[1]);
+				this.Write(node.get_Arguments().get_Item(1));
 				return;
 			}
-			this.Write(node.Arguments[0]);
+			this.Write(node.get_Arguments().get_Item(0));
 			this.WriteToken(".");
-			this.WriteMethodReference(node.Arguments[1] as MethodReferenceExpression);
+			this.WriteMethodReference(node.get_Arguments().get_Item(1) as MethodReferenceExpression);
+			return;
 		}
 
 		protected virtual void WriteDelegateCreation(ObjectCreationExpression node)
 		{
-			this.WriteKeyword(this.KeyWordWriter.New);
+			this.WriteKeyword(this.get_KeyWordWriter().get_New());
 			this.WriteSpace();
-			this.WriteReferenceAndNamespaceIfInCollision(node.ExpressionType);
+			this.WriteReferenceAndNamespaceIfInCollision(node.get_ExpressionType());
 			this.WriteToken("(");
 			this.WriteDelegateArgument(node);
 			this.WriteToken(")");
+			return;
 		}
 
 		protected abstract void WriteDestructor(MethodDefinition method);
 
 		private void WriteDoubleConstantValue(IMemberDefinition currentMember, double value, string fieldName)
 		{
-			TypeDefinition typeDefinition = null;
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass123_0();
+			V_0.fieldName = fieldName;
+			V_1 = null;
 			if (currentMember != null)
 			{
-				typeDefinition = (!(currentMember is TypeDefinition) ? currentMember.get_DeclaringType().get_Module().get_TypeSystem().get_Double().Resolve() : (currentMember as TypeDefinition).get_Module().get_TypeSystem().get_Double().Resolve());
+				if (currentMember as TypeDefinition == null)
+				{
+					V_1 = currentMember.get_DeclaringType().get_Module().get_TypeSystem().get_Double().Resolve();
+				}
+				else
+				{
+					V_1 = (currentMember as TypeDefinition).get_Module().get_TypeSystem().get_Double().Resolve();
+				}
 			}
-			if (currentMember.get_FullName() == fieldName)
+			if (String.op_Equality(currentMember.get_FullName(), V_0.fieldName))
 			{
 				if (Double.IsInfinity(value) || Double.IsNaN(value))
 				{
 					this.WriteSpecialDoubleConstants(value, currentMember);
 					return;
 				}
-				this.WriteLiteral(value.ToString("R", CultureInfo.InvariantCulture));
+				this.WriteLiteral(value.ToString("R", CultureInfo.get_InvariantCulture()));
 				return;
 			}
-			FieldDefinition fieldDefinition = null;
-			if (typeDefinition != null)
+			V_2 = null;
+			if (V_1 != null)
 			{
-				fieldDefinition = typeDefinition.get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_FullName() == fieldName);
-				this.WriteReferenceAndNamespaceIfInCollision(typeDefinition);
+				V_2 = V_1.get_Fields().First<FieldDefinition>(new Func<FieldDefinition, bool>(V_0.u003cWriteDoubleConstantValueu003eb__0));
+				this.WriteReferenceAndNamespaceIfInCollision(V_1);
 				this.WriteToken(".");
 			}
-			if (fieldDefinition != null)
+			if (V_2 != null)
 			{
-				this.WriteReference(fieldDefinition.get_Name(), fieldDefinition);
+				this.WriteReference(V_2.get_Name(), V_2);
 				return;
 			}
-			this.WriteToken(fieldName.Substring(fieldName.IndexOf("::") + 2));
+			this.WriteToken(V_0.fieldName.Substring(V_0.fieldName.IndexOf("::") + 2));
+			return;
 		}
 
 		private void WriteDoubleInfinity(IMemberDefinition infinityMember, double value)
 		{
-			FieldDefinition fieldDefinition = infinityMember.get_DeclaringType().get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_FullName() == "System.Double System.Double::Epsilon");
+			stackVariable2 = infinityMember.get_DeclaringType().get_Fields();
+			stackVariable3 = BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__126_0;
+			if (stackVariable3 == null)
+			{
+				dummyVar0 = stackVariable3;
+				stackVariable3 = new Func<FieldDefinition, bool>(BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9.u003cWriteDoubleInfinityu003eb__126_0);
+				BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__126_0 = stackVariable3;
+			}
+			V_0 = stackVariable2.First<FieldDefinition>(stackVariable3);
 			if (!Double.IsPositiveInfinity(value))
 			{
 				this.WriteLiteral("-1");
@@ -2496,128 +2840,146 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteSpace();
 			this.Write("/");
 			this.WriteSpace();
-			this.WriteReference("Epsilon", fieldDefinition);
+			this.WriteReference("Epsilon", V_0);
+			return;
 		}
 
 		private void WriteDoubleLiteral(object value)
 		{
-			double num = (Double)value;
-			IMemberDefinition memberDefinition = null;
-			if (this.membersStack.Count > 0)
+			V_0 = (Double)value;
+			V_1 = null;
+			if (this.membersStack.get_Count() > 0)
 			{
-				memberDefinition = this.membersStack.Peek();
+				V_1 = this.membersStack.Peek();
 			}
-			if (Double.IsPositiveInfinity(num))
+			if (Double.IsPositiveInfinity(V_0))
 			{
-				this.WriteDoubleConstantValue(memberDefinition, num, "System.Double System.Double::PositiveInfinity");
+				this.WriteDoubleConstantValue(V_1, V_0, "System.Double System.Double::PositiveInfinity");
 				return;
 			}
-			if (Double.IsNegativeInfinity(num))
+			if (Double.IsNegativeInfinity(V_0))
 			{
-				this.WriteDoubleConstantValue(memberDefinition, num, "System.Double System.Double::NegativeInfinity");
+				this.WriteDoubleConstantValue(V_1, V_0, "System.Double System.Double::NegativeInfinity");
 				return;
 			}
-			if (Double.IsNaN(num))
+			if (Double.IsNaN(V_0))
 			{
-				this.WriteDoubleConstantValue(memberDefinition, num, "System.Double System.Double::NaN");
+				this.WriteDoubleConstantValue(V_1, V_0, "System.Double System.Double::NaN");
 				return;
 			}
-			if (MaxValue == num)
+			if (MaxValue == V_0)
 			{
-				this.WriteDoubleConstantValue(memberDefinition, num, "System.Double System.Double::MaxValue");
+				this.WriteDoubleConstantValue(V_1, V_0, "System.Double System.Double::MaxValue");
 				return;
 			}
-			if (MinValue == num)
+			if (MinValue == V_0)
 			{
-				this.WriteDoubleConstantValue(memberDefinition, num, "System.Double System.Double::MinValue");
+				this.WriteDoubleConstantValue(V_1, V_0, "System.Double System.Double::MinValue");
 				return;
 			}
-			this.WriteLiteral(num.ToString(CultureInfo.InvariantCulture));
+			this.WriteLiteral(V_0.ToString(CultureInfo.get_InvariantCulture()));
+			return;
 		}
 
 		private void WriteDoubleNan(IMemberDefinition nanMember)
 		{
-			FieldDefinition fieldDefinition = nanMember.get_DeclaringType().get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_FullName() == "System.Double System.Double::PositiveInfinity");
-			this.WriteReference("PositiveInfinity", fieldDefinition);
+			stackVariable2 = nanMember.get_DeclaringType().get_Fields();
+			stackVariable3 = BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__125_0;
+			if (stackVariable3 == null)
+			{
+				dummyVar0 = stackVariable3;
+				stackVariable3 = new Func<FieldDefinition, bool>(BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9.u003cWriteDoubleNanu003eb__125_0);
+				BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__125_0 = stackVariable3;
+			}
+			V_0 = stackVariable2.First<FieldDefinition>(stackVariable3);
+			this.WriteReference("PositiveInfinity", V_0);
 			this.WriteSpace();
 			this.Write("/");
 			this.WriteSpace();
-			this.WriteReference("PositiveInfinity", fieldDefinition);
+			this.WriteReference("PositiveInfinity", V_0);
+			return;
 		}
 
 		protected virtual void WriteEmptyMethodEndOfStatement(MethodDefinition method)
 		{
 			this.WriteEndOfStatement();
+			return;
 		}
 
 		protected virtual void WriteEnumBaseTypeInheritColon()
 		{
 			this.WriteBaseTypeInheritColon();
+			return;
 		}
 
 		protected virtual void WriteEscapeCharLiteral(char p)
 		{
+			return;
 		}
 
-		protected virtual void WriteEventAddOnParameters(EventDefinition @event)
+		protected virtual void WriteEventAddOnParameters(EventDefinition event)
 		{
+			return;
 		}
 
-		protected override void WriteEventDeclaration(EventDefinition @event)
+		protected override void WriteEventDeclaration(EventDefinition event)
 		{
-			this.WriteEventDeclaration(@event, true);
+			this.WriteEventDeclaration(event, true);
+			return;
 		}
 
-		private void WriteEventDeclaration(EventDefinition @event, bool isAutoGenerated)
+		private void WriteEventDeclaration(EventDefinition event, bool isAutoGenerated)
 		{
-			MethodDefinition moreVisibleMethod = @event.get_AddMethod().GetMoreVisibleMethod(@event.get_RemoveMethod());
-			this.WriteMethodVisibilityAndSpace(moreVisibleMethod);
-			if (this.TypeSupportsExplicitStaticMembers(moreVisibleMethod.get_DeclaringType()) && moreVisibleMethod.get_IsStatic())
+			V_0 = event.get_AddMethod().GetMoreVisibleMethod(event.get_RemoveMethod());
+			this.WriteMethodVisibilityAndSpace(V_0);
+			if (this.TypeSupportsExplicitStaticMembers(V_0.get_DeclaringType()) && V_0.get_IsStatic())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Static);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Static());
 				this.WriteSpace();
 			}
-			if (!isAutoGenerated && this.KeyWordWriter.Custom != null)
+			if (!isAutoGenerated && this.get_KeyWordWriter().get_Custom() != null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Custom);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Custom());
 				this.WriteSpace();
 			}
-			if (@event.IsVirtual() && !@event.get_DeclaringType().get_IsInterface() && this.WriteEventKeywords(@event))
+			if (event.IsVirtual() && !event.get_DeclaringType().get_IsInterface() && this.WriteEventKeywords(event))
 			{
 				this.WriteSpace();
 			}
-			this.WriteKeyword(this.KeyWordWriter.Event);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Event());
 			this.WriteSpace();
-			this.WriteEventTypeAndName(@event);
-			this.WriteEventInterfaceImplementations(@event);
+			this.WriteEventTypeAndName(event);
+			this.WriteEventInterfaceImplementations(event);
+			return;
 		}
 
-		protected virtual void WriteEventInterfaceImplementations(EventDefinition @event)
+		protected virtual void WriteEventInterfaceImplementations(EventDefinition event)
 		{
+			return;
 		}
 
-		private bool WriteEventKeywords(EventDefinition @event)
+		private bool WriteEventKeywords(EventDefinition event)
 		{
-			if (!@event.IsNewSlot())
+			if (!event.IsNewSlot())
 			{
-				if (@event.IsFinal())
+				if (event.IsFinal())
 				{
-					this.WriteKeyword(this.KeyWordWriter.SealedMethod);
+					this.WriteKeyword(this.get_KeyWordWriter().get_SealedMethod());
 					this.WriteSpace();
 				}
-				this.WriteKeyword(this.KeyWordWriter.Override);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Override());
 				return true;
 			}
-			if (@event.IsAbstract())
+			if (event.IsAbstract())
 			{
-				this.WriteKeyword(this.KeyWordWriter.AbstractMember);
+				this.WriteKeyword(this.get_KeyWordWriter().get_AbstractMember());
 				return true;
 			}
-			if (@event.IsFinal())
+			if (event.IsFinal())
 			{
 				return false;
 			}
-			this.WriteKeyword(this.KeyWordWriter.Virtual);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Virtual());
 			return true;
 		}
 
@@ -2635,30 +2997,34 @@ namespace Telerik.JustDecompiler.Languages
 				}
 				this.WriteRemoveOn(eventDef);
 			}
-			eventDef.get_InvokeMethod();
+			dummyVar0 = eventDef.get_InvokeMethod();
+			return;
 		}
 
-		protected virtual void WriteEventRemoveOnParameters(EventDefinition @event)
+		protected virtual void WriteEventRemoveOnParameters(EventDefinition event)
 		{
+			return;
 		}
 
-		protected virtual void WriteEventTypeAndName(EventDefinition @event)
+		protected virtual void WriteEventTypeAndName(EventDefinition event)
 		{
-			this.WriteTypeAndName(@event.get_EventType(), @event.get_Name(), @event);
+			this.WriteTypeAndName(event.get_EventType(), event.get_Name(), event);
+			return;
 		}
 
 		private void WriteExternAndSpaceIfNecessary(MethodDefinition method)
 		{
-			if (method.IsExtern() && this.KeyWordWriter.Extern != null)
+			if (method.IsExtern() && this.get_KeyWordWriter().get_Extern() != null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Extern);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Extern());
 				this.WriteSpace();
 			}
+			return;
 		}
 
 		protected virtual void WriteFieldDeclaration(FieldDefinition field)
 		{
-			if (!this.TypeContext.BackingFieldToNameMap.ContainsKey(field) && this.ModuleContext.RenamedMembers.Contains(field.get_MetadataToken().ToUInt32()))
+			if (!this.get_TypeContext().get_BackingFieldToNameMap().ContainsKey(field) && this.get_ModuleContext().get_RenamedMembers().Contains(field.get_MetadataToken().ToUInt32()))
 			{
 				this.WriteComment(this.GetOriginalFieldName(field));
 				this.WriteLine();
@@ -2667,17 +3033,20 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteSpace();
 			if (field.get_IsInitOnly())
 			{
-				this.WriteKeyword(this.KeyWordWriter.ReadOnly);
+				this.WriteKeyword(this.get_KeyWordWriter().get_ReadOnly());
 				this.WriteSpace();
 			}
-			if (field.get_IsLiteral())
+			if (!field.get_IsLiteral())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Const);
-				this.WriteSpace();
+				if (this.TypeSupportsExplicitStaticMembers(field.get_DeclaringType()) && field.get_IsStatic())
+				{
+					this.WriteKeyword(this.get_KeyWordWriter().get_Static());
+					this.WriteSpace();
+				}
 			}
-			else if (this.TypeSupportsExplicitStaticMembers(field.get_DeclaringType()) && field.get_IsStatic())
+			else
 			{
-				this.WriteKeyword(this.KeyWordWriter.Static);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Const());
 				this.WriteSpace();
 			}
 			this.WriteFieldTypeAndName(field);
@@ -2686,57 +3055,74 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteSpace();
 				this.WriteToken("=");
 				this.WriteSpace();
-				int currentPosition = this.formatter.CurrentPosition;
-				TypeDefinition typeDefinition = field.get_FieldType().Resolve();
-				if (typeDefinition == null || !typeDefinition.get_IsEnum())
+				V_2 = this.formatter.get_CurrentPosition();
+				V_3 = field.get_FieldType().Resolve();
+				if (V_3 == null || !V_3.get_IsEnum())
 				{
 					this.WriteLiteralInLanguageSyntax(field.get_Constant().get_Value());
 				}
 				else
 				{
-					LiteralExpression literalExpression = new LiteralExpression(field.get_Constant().get_Value(), field.get_DeclaringType().get_Module().get_TypeSystem(), null);
-					Expression enumExpression = EnumHelper.GetEnumExpression(typeDefinition, literalExpression, field.get_DeclaringType().get_Module().get_TypeSystem());
-					this.Write(enumExpression);
+					V_4 = new LiteralExpression(field.get_Constant().get_Value(), field.get_DeclaringType().get_Module().get_TypeSystem(), null);
+					V_5 = EnumHelper.GetEnumExpression(V_3, V_4, field.get_DeclaringType().get_Module().get_TypeSystem());
+					this.Write(V_5);
 				}
-				this.currentWritingInfo.CodeMappingInfo.Add(field, new OffsetSpan(currentPosition, this.formatter.CurrentPosition));
+				this.currentWritingInfo.get_CodeMappingInfo().Add(field, new OffsetSpan(V_2, this.formatter.get_CurrentPosition()));
 			}
+			return;
 		}
 
 		protected virtual void WriteFieldName(FieldReference field)
 		{
 			this.WriteReference(this.GetFieldName(field), field);
+			return;
 		}
 
 		protected virtual void WriteFieldTypeAndName(FieldDefinition field)
 		{
-			string fieldName = this.GetFieldName(field);
-			this.WriteTypeAndName(field.get_FieldType(), fieldName, field);
+			V_0 = this.GetFieldName(field);
+			this.WriteTypeAndName(field.get_FieldType(), V_0, field);
+			return;
 		}
 
-		protected virtual void WriteFire(EventDefinition @event)
+		protected virtual void WriteFire(EventDefinition event)
 		{
-			uint num = @event.get_InvokeMethod().get_MetadataToken().ToUInt32();
-			int currentPosition = this.formatter.CurrentPosition;
-			this.AttributeWriter.WriteMemberAttributesAndNewLine(@event.get_InvokeMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-			base.AddMemberAttributesOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
-			int currentPosition1 = this.formatter.CurrentPosition;
-			this.WriteMethodVisibilityAndSpace(@event.get_InvokeMethod());
-			int num1 = this.formatter.CurrentPosition;
-			this.WriteKeyword(this.KeyWordWriter.Fire);
-			int currentPosition2 = this.formatter.CurrentPosition;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.get_InvokeMethod()] = new OffsetSpan(num1, currentPosition2);
+			V_6 = event.get_InvokeMethod().get_MetadataToken();
+			V_0 = V_6.ToUInt32();
+			V_1 = this.formatter.get_CurrentPosition();
+			stackVariable9 = this.get_AttributeWriter();
+			stackVariable11 = event.get_InvokeMethod();
+			stackVariable13 = new String[1];
+			stackVariable13[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+			stackVariable9.WriteMemberAttributesAndNewLine(stackVariable11, stackVariable13, false);
+			this.AddMemberAttributesOffsetSpan(V_0, V_1, this.formatter.get_CurrentPosition());
+			V_2 = this.formatter.get_CurrentPosition();
+			this.WriteMethodVisibilityAndSpace(event.get_InvokeMethod());
+			V_3 = this.formatter.get_CurrentPosition();
+			this.WriteKeyword(this.get_KeyWordWriter().get_Fire());
+			V_4 = this.formatter.get_CurrentPosition();
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(event.get_InvokeMethod(), new OffsetSpan(V_3, V_4));
 			this.WriteToken("(");
-			this.WriteParameters(@event.get_InvokeMethod());
+			this.WriteParameters(event.get_InvokeMethod());
 			this.WriteToken(")");
 			this.WriteLine();
-			this.Write(base.GetStatement(@event.get_InvokeMethod()));
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Fire);
-			this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(currentPosition1, this.formatter.CurrentPosition - 1));
+			this.Write(this.GetStatement(event.get_InvokeMethod()));
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Fire());
+			this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_0, new OffsetSpan(V_2, this.formatter.get_CurrentPosition() - 1));
+			return;
 		}
 
 		private void WriteFloatInfinity(IMemberDefinition infinityMember, double value)
 		{
-			FieldDefinition fieldDefinition = infinityMember.get_DeclaringType().get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_FullName() == "System.Single System.Single::Epsilon");
+			stackVariable2 = infinityMember.get_DeclaringType().get_Fields();
+			stackVariable3 = BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__137_0;
+			if (stackVariable3 == null)
+			{
+				dummyVar0 = stackVariable3;
+				stackVariable3 = new Func<FieldDefinition, bool>(BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9.u003cWriteFloatInfinityu003eb__137_0);
+				BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__137_0 = stackVariable3;
+			}
+			V_0 = stackVariable2.First<FieldDefinition>(stackVariable3);
 			if (!Double.IsPositiveInfinity(value))
 			{
 				this.WriteLiteral("-1");
@@ -2748,117 +3134,142 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteSpace();
 			this.Write("/");
 			this.WriteSpace();
-			this.WriteReference("Epsilon", fieldDefinition);
+			this.WriteReference("Epsilon", V_0);
+			return;
 		}
 
 		private void WriteFloatInfinityValue(IMemberDefinition currentMember, float value, string fieldName)
 		{
-			TypeDefinition typeDefinition = null;
+			V_0 = new BaseImperativeLanguageWriter.u003cu003ec__DisplayClass134_0();
+			V_0.fieldName = fieldName;
+			V_1 = null;
 			if (currentMember != null)
 			{
-				typeDefinition = (!(currentMember is TypeDefinition) ? currentMember.get_DeclaringType().get_Module().get_TypeSystem().get_Single().Resolve() : (currentMember as TypeDefinition).get_Module().get_TypeSystem().get_Single().Resolve());
+				if (currentMember as TypeDefinition == null)
+				{
+					V_1 = currentMember.get_DeclaringType().get_Module().get_TypeSystem().get_Single().Resolve();
+				}
+				else
+				{
+					V_1 = (currentMember as TypeDefinition).get_Module().get_TypeSystem().get_Single().Resolve();
+				}
 			}
-			if (currentMember.get_FullName() == fieldName)
+			if (String.op_Equality(currentMember.get_FullName(), V_0.fieldName))
 			{
 				if (Single.IsInfinity(value) || Single.IsNaN(value))
 				{
 					this.WriteSpecialFloatValue(value, currentMember);
 					return;
 				}
-				this.WriteLiteral(String.Concat(value.ToString("R", CultureInfo.InvariantCulture), base.Language.FloatingLiteralsConstant));
+				this.WriteLiteral(String.Concat(value.ToString("R", CultureInfo.get_InvariantCulture()), this.get_Language().get_FloatingLiteralsConstant()));
 				return;
 			}
-			FieldDefinition fieldDefinition = null;
-			if (typeDefinition != null)
+			V_2 = null;
+			if (V_1 != null)
 			{
-				fieldDefinition = typeDefinition.get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_FullName() == fieldName);
-				this.WriteReferenceAndNamespaceIfInCollision(typeDefinition);
+				V_2 = V_1.get_Fields().First<FieldDefinition>(new Func<FieldDefinition, bool>(V_0.u003cWriteFloatInfinityValueu003eb__0));
+				this.WriteReferenceAndNamespaceIfInCollision(V_1);
 				this.WriteToken(".");
 			}
-			if (fieldDefinition != null)
+			if (V_2 != null)
 			{
-				this.WriteReference(fieldDefinition.get_Name(), fieldDefinition);
+				this.WriteReference(V_2.get_Name(), V_2);
 				return;
 			}
-			this.WriteToken(fieldName.Substring(fieldName.IndexOf("::") + 2));
+			this.WriteToken(V_0.fieldName.Substring(V_0.fieldName.IndexOf("::") + 2));
+			return;
 		}
 
 		private void WriteFloatLiteral(object value)
 		{
-			float single = (Single)value;
-			IMemberDefinition memberDefinition = null;
-			if (this.membersStack.Count > 0)
+			V_0 = (Single)value;
+			V_1 = null;
+			if (this.membersStack.get_Count() > 0)
 			{
-				memberDefinition = this.membersStack.Peek();
+				V_1 = this.membersStack.Peek();
 			}
-			if (Single.IsPositiveInfinity(single))
+			if (Single.IsPositiveInfinity(V_0))
 			{
-				this.WriteFloatInfinityValue(memberDefinition, single, "System.Single System.Single::PositiveInfinity");
+				this.WriteFloatInfinityValue(V_1, V_0, "System.Single System.Single::PositiveInfinity");
 				return;
 			}
-			if (Single.IsNegativeInfinity(single))
+			if (Single.IsNegativeInfinity(V_0))
 			{
-				this.WriteFloatInfinityValue(memberDefinition, single, "System.Single System.Single::NegativeInfinity");
+				this.WriteFloatInfinityValue(V_1, V_0, "System.Single System.Single::NegativeInfinity");
 				return;
 			}
-			if (MinValue == single)
+			if (MinValue == V_0)
 			{
-				this.WriteFloatInfinityValue(memberDefinition, single, "System.Single System.Single::MinValue");
+				this.WriteFloatInfinityValue(V_1, V_0, "System.Single System.Single::MinValue");
 				return;
 			}
-			if (MaxValue == single)
+			if (MaxValue == V_0)
 			{
-				this.WriteFloatInfinityValue(memberDefinition, single, "System.Single System.Single::MaxValue");
+				this.WriteFloatInfinityValue(V_1, V_0, "System.Single System.Single::MaxValue");
 				return;
 			}
-			if (Single.IsNaN(single))
+			if (Single.IsNaN(V_0))
 			{
-				this.WriteFloatInfinityValue(memberDefinition, single, "System.Single System.Single::NaN");
+				this.WriteFloatInfinityValue(V_1, V_0, "System.Single System.Single::NaN");
 				return;
 			}
-			this.WriteLiteral(String.Concat(single.ToString("R", CultureInfo.InvariantCulture), base.Language.FloatingLiteralsConstant));
+			this.WriteLiteral(String.Concat(V_0.ToString("R", CultureInfo.get_InvariantCulture()), this.get_Language().get_FloatingLiteralsConstant()));
+			return;
 		}
 
 		private void WriteFloatNan(IMemberDefinition nanMember)
 		{
-			FieldDefinition fieldDefinition = nanMember.get_DeclaringType().get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_FullName() == "System.Single System.Single::PositiveInfinity");
-			this.WriteReference("PositiveInfinity", fieldDefinition);
+			stackVariable2 = nanMember.get_DeclaringType().get_Fields();
+			stackVariable3 = BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__136_0;
+			if (stackVariable3 == null)
+			{
+				dummyVar0 = stackVariable3;
+				stackVariable3 = new Func<FieldDefinition, bool>(BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9.u003cWriteFloatNanu003eb__136_0);
+				BaseImperativeLanguageWriter.u003cu003ec.u003cu003e9__136_0 = stackVariable3;
+			}
+			V_0 = stackVariable2.First<FieldDefinition>(stackVariable3);
+			this.WriteReference("PositiveInfinity", V_0);
 			this.WriteSpace();
 			this.Write("/");
 			this.WriteSpace();
-			this.WriteReference("PositiveInfinity", fieldDefinition);
+			this.WriteReference("PositiveInfinity", V_0);
+			return;
 		}
 
 		protected void WriteGenericInstance(GenericInstanceType genericInstance, int startingArgument = 0)
 		{
 			this.WriteReference(this.GetTypeName(genericInstance), genericInstance.get_ElementType());
-			this.WriteToken(this.GenericLeftBracket);
-			for (int i = startingArgument; i < genericInstance.get_GenericArguments().get_Count(); i++)
+			this.WriteToken(this.get_GenericLeftBracket());
+			V_1 = startingArgument;
+			while (V_1 < genericInstance.get_GenericArguments().get_Count())
 			{
-				if (i > startingArgument)
+				if (V_1 > startingArgument)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				TypeReference item = genericInstance.get_GenericArguments().get_Item(i);
-				if (genericInstance.get_PostionToArgument().ContainsKey(i))
+				V_2 = genericInstance.get_GenericArguments().get_Item(V_1);
+				if (genericInstance.get_PostionToArgument().ContainsKey(V_1))
 				{
-					item = genericInstance.get_PostionToArgument()[i];
+					V_2 = genericInstance.get_PostionToArgument().get_Item(V_1);
 				}
-				this.WriteReferenceAndNamespaceIfInCollision(item);
+				this.WriteReferenceAndNamespaceIfInCollision(V_2);
+				V_1 = V_1 + 1;
 			}
-			this.WriteToken(this.GenericRightBracket);
+			this.WriteToken(this.get_GenericRightBracket());
+			return;
 		}
 
 		protected virtual void WriteGenericInstanceMethod(GenericInstanceMethod genericMethod)
 		{
 			this.WriteGenericInstanceMethodWithArguments(genericMethod, genericMethod.get_GenericArguments());
+			return;
 		}
 
-		protected void WriteGenericInstanceMethodWithArguments(GenericInstanceMethod genericMethod, Mono.Collections.Generic.Collection<TypeReference> genericArguments)
+		protected void WriteGenericInstanceMethodWithArguments(GenericInstanceMethod genericMethod, Collection<TypeReference> genericArguments)
 		{
-			MethodReference elementMethod = genericMethod.get_ElementMethod();
-			this.WriteReference(this.GetMethodName(elementMethod), elementMethod);
+			V_0 = genericMethod.get_ElementMethod();
+			this.WriteReference(this.GetMethodName(V_0), V_0);
 			if (genericMethod.HasAnonymousArgument())
 			{
 				return;
@@ -2867,103 +3278,118 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return;
 			}
-			this.WriteToken(this.GenericLeftBracket);
-			for (int i = 0; i < genericArguments.get_Count(); i++)
+			this.WriteToken(this.get_GenericLeftBracket());
+			V_2 = 0;
+			while (V_2 < genericArguments.get_Count())
 			{
-				if (i > 0)
+				if (V_2 > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				this.WriteReferenceAndNamespaceIfInCollision(genericArguments.get_Item(i));
+				this.WriteReferenceAndNamespaceIfInCollision(genericArguments.get_Item(V_2));
+				V_2 = V_2 + 1;
 			}
-			this.WriteToken(this.GenericRightBracket);
+			this.WriteToken(this.get_GenericRightBracket());
+			return;
 		}
 
 		private void WriteGenericInstanceTypeArguments(IGenericInstance genericInstance)
 		{
-			this.WriteToken(this.GenericLeftBracket);
-			for (int i = 0; i < genericInstance.get_GenericArguments().get_Count(); i++)
+			this.WriteToken(this.get_GenericLeftBracket());
+			V_0 = 0;
+			while (V_0 < genericInstance.get_GenericArguments().get_Count())
 			{
-				if (i > 0)
+				if (V_0 > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				TypeReference item = genericInstance.get_GenericArguments().get_Item(i);
-				if (genericInstance.get_PostionToArgument().ContainsKey(i))
+				V_1 = genericInstance.get_GenericArguments().get_Item(V_0);
+				if (genericInstance.get_PostionToArgument().ContainsKey(V_0))
 				{
-					item = genericInstance.get_PostionToArgument()[i];
+					V_1 = genericInstance.get_PostionToArgument().get_Item(V_0);
 				}
-				this.WriteTypeReferenceNavigationName(item);
+				this.WriteTypeReferenceNavigationName(V_1);
+				V_0 = V_0 + 1;
 			}
-			this.WriteToken(this.GenericRightBracket);
+			this.WriteToken(this.get_GenericRightBracket());
+			return;
 		}
 
 		protected virtual void WriteGenericName(IGenericDefinition genericDefinition)
 		{
-			IGenericParameterProvider genericParameterProvider;
-			string typeName;
-			if (!(genericDefinition is MethodDefinition))
+			if (genericDefinition as MethodDefinition == null)
 			{
-				typeName = this.GetTypeName(genericDefinition as TypeDefinition);
-				genericParameterProvider = genericDefinition as TypeDefinition;
+				V_1 = this.GetTypeName(genericDefinition as TypeDefinition);
+				V_0 = genericDefinition as TypeDefinition;
 			}
 			else
 			{
-				typeName = this.GetMethodName(genericDefinition as MethodDefinition);
-				genericParameterProvider = genericDefinition as MethodDefinition;
+				V_1 = this.GetMethodName(genericDefinition as MethodDefinition);
+				V_0 = genericDefinition as MethodDefinition;
 			}
-			this.WriteReference(typeName, genericDefinition);
-			BaseImperativeLanguageWriter baseImperativeLanguageWriter = this;
-			this.WriteGenericParametersToDefinition(genericParameterProvider, new Action<GenericParameter>(baseImperativeLanguageWriter.WriteGenericParameterConstraints), true);
+			this.WriteReference(V_1, genericDefinition);
+			stackVariable13 = this;
+			this.WriteGenericParametersToDefinition(V_0, new Action<GenericParameter>(stackVariable13.WriteGenericParameterConstraints), true);
+			return;
 		}
 
 		protected virtual void WriteGenericParameterConstraints(GenericParameter parameter)
 		{
+			return;
 		}
 
 		private void WriteGenericParametersToDefinition(IGenericParameterProvider genericDefinition, Action<GenericParameter> writeParamConstraints, bool renameInvalidCharacters)
 		{
-			int count = 0;
-			if (genericDefinition is TypeDefinition)
+			V_0 = 0;
+			if (genericDefinition as TypeDefinition != null)
 			{
-				TypeDefinition declaringType = (genericDefinition as TypeDefinition).get_DeclaringType();
-				if (declaringType != null && declaringType.get_HasGenericParameters())
+				V_1 = (genericDefinition as TypeDefinition).get_DeclaringType();
+				if (V_1 != null && V_1.get_HasGenericParameters())
 				{
-					count = declaringType.get_GenericParameters().get_Count();
+					V_0 = V_1.get_GenericParameters().get_Count();
 				}
 			}
-			if (count < genericDefinition.get_GenericParameters().get_Count())
+			if (V_0 < genericDefinition.get_GenericParameters().get_Count())
 			{
-				this.WriteToken(this.GenericLeftBracket);
-				while (count < genericDefinition.get_GenericParameters().get_Count())
+				this.WriteToken(this.get_GenericLeftBracket());
+				while (V_0 < genericDefinition.get_GenericParameters().get_Count())
 				{
-					GenericParameter item = genericDefinition.get_GenericParameters().get_Item(count);
-					if (item.get_IsCovariant())
+					V_2 = genericDefinition.get_GenericParameters().get_Item(V_0);
+					if (V_2.get_IsCovariant())
 					{
-						this.WriteKeyword(this.KeyWordWriter.Covariant);
+						this.WriteKeyword(this.get_KeyWordWriter().get_Covariant());
 						this.WriteSpace();
 					}
-					if (item.get_IsContravariant())
+					if (V_2.get_IsContravariant())
 					{
-						this.WriteKeyword(this.KeyWordWriter.Contravariant);
+						this.WriteKeyword(this.get_KeyWordWriter().get_Contravariant());
 						this.WriteSpace();
 					}
-					this.WriteReference((renameInvalidCharacters ? GenericHelper.ReplaceInvalidCharactersName(base.Language, item.get_Name()) : item.get_Name()), null);
-					if ((item.get_HasConstraints() || item.get_HasDefaultConstructorConstraint() || item.get_HasReferenceTypeConstraint() || item.get_HasNotNullableValueTypeConstraint()) && writeParamConstraints != null)
+					if (renameInvalidCharacters)
 					{
-						writeParamConstraints(item);
+						stackVariable28 = GenericHelper.ReplaceInvalidCharactersName(this.get_Language(), V_2.get_Name());
 					}
-					if (count != genericDefinition.get_GenericParameters().get_Count() - 1)
+					else
+					{
+						stackVariable28 = V_2.get_Name();
+					}
+					this.WriteReference(stackVariable28, null);
+					if (V_2.get_HasConstraints() || V_2.get_HasDefaultConstructorConstraint() || V_2.get_HasReferenceTypeConstraint() || V_2.get_HasNotNullableValueTypeConstraint() && writeParamConstraints != null)
+					{
+						writeParamConstraints.Invoke(V_2);
+					}
+					if (V_0 != genericDefinition.get_GenericParameters().get_Count() - 1)
 					{
 						this.WriteToken(",");
 						this.WriteSpace();
 					}
-					count++;
+					V_0 = V_0 + 1;
 				}
-				this.WriteToken(this.GenericRightBracket);
+				this.WriteToken(this.get_GenericRightBracket());
 			}
+			return;
 		}
 
 		public virtual void WriteGenericReference(TypeReference type)
@@ -2973,7 +3399,7 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteGenericReference(type.get_DeclaringType());
 				this.WriteToken(".");
 			}
-			if (type is TypeSpecification)
+			if (type as TypeSpecification != null)
 			{
 				this.WriteTypeSpecification(type as TypeSpecification, 0);
 				return;
@@ -2987,10 +3413,10 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteReference(this.ToEscapedTypeString(type), null);
 				return;
 			}
-			TypeDefinition typeDefinition = type.Resolve();
-			if (typeDefinition == null || !typeDefinition.get_HasGenericParameters())
+			V_0 = type.Resolve();
+			if (V_0 == null || !V_0.get_HasGenericParameters())
 			{
-				if (type.get_Namespace() != "System")
+				if (String.op_Inequality(type.get_Namespace(), "System"))
 				{
 					this.WriteReference(this.GetTypeName(type), type);
 					return;
@@ -2998,58 +3424,70 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteReference(this.ToEscapedTypeString(type), type);
 				return;
 			}
-			this.WriteReference(this.GetTypeName(typeDefinition), typeDefinition);
-			this.WriteToken(this.GenericLeftBracket);
-			for (int i = 1; i < typeDefinition.get_GenericParameters().get_Count(); i++)
+			this.WriteReference(this.GetTypeName(V_0), V_0);
+			this.WriteToken(this.get_GenericLeftBracket());
+			V_2 = 1;
+			while (V_2 < V_0.get_GenericParameters().get_Count())
 			{
 				this.WriteToken(",");
+				V_2 = V_2 + 1;
 			}
-			this.WriteToken(this.GenericRightBracket);
+			this.WriteToken(this.get_GenericRightBracket());
+			return;
 		}
 
 		protected void WriteGetMethod(PropertyDefinition property, bool isAutoImplemented)
 		{
-			uint num = property.get_GetMethod().get_MetadataToken().ToUInt32();
+			V_6 = property.get_GetMethod().get_MetadataToken();
+			V_0 = V_6.ToUInt32();
 			this.membersStack.Push(property.get_GetMethod());
-			int currentPosition = this.formatter.CurrentPosition;
-			this.AttributeWriter.WriteMemberAttributesAndNewLine(property.get_GetMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-			base.AddMemberAttributesOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
-			int currentPosition1 = this.formatter.CurrentPosition;
-			int num1 = this.formatter.CurrentPosition;
+			V_1 = this.formatter.get_CurrentPosition();
+			stackVariable13 = this.get_AttributeWriter();
+			stackVariable15 = property.get_GetMethod();
+			stackVariable17 = new String[1];
+			stackVariable17[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+			stackVariable13.WriteMemberAttributesAndNewLine(stackVariable15, stackVariable17, false);
+			this.AddMemberAttributesOffsetSpan(V_0, V_1, this.formatter.get_CurrentPosition());
+			V_2 = this.formatter.get_CurrentPosition();
+			V_3 = this.formatter.get_CurrentPosition();
 			this.WriteMoreRestrictiveMethodVisibility(property.get_GetMethod(), property.get_SetMethod());
-			int currentPosition2 = this.formatter.CurrentPosition;
-			this.WriteKeyword(this.KeyWordWriter.Get);
-			int num2 = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property.get_GetMethod()] = new OffsetSpan(currentPosition2, num2);
-			if (property.get_GetMethod().get_Body() == null || this.SupportsAutoProperties & isAutoImplemented)
+			V_4 = this.formatter.get_CurrentPosition();
+			this.WriteKeyword(this.get_KeyWordWriter().get_Get());
+			V_5 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(property.get_GetMethod(), new OffsetSpan(V_4, V_5));
+			if (property.get_GetMethod().get_Body() == null || this.get_SupportsAutoProperties() & isAutoImplemented)
 			{
 				this.WriteEndOfStatement();
 			}
 			else
 			{
 				this.WriteLine();
-				this.Write(base.GetStatement(property.get_GetMethod()));
+				this.Write(this.GetStatement(property.get_GetMethod()));
 			}
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Get);
-			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap.Add(property.get_GetMethod(), new OffsetSpan(currentPosition1, this.formatter.CurrentPosition - 1));
-			this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(num1, this.formatter.CurrentPosition - 1));
-			this.membersStack.Pop();
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Get());
+			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().Add(property.get_GetMethod(), new OffsetSpan(V_2, this.formatter.get_CurrentPosition() - 1));
+			this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_0, new OffsetSpan(V_3, this.formatter.get_CurrentPosition() - 1));
+			dummyVar0 = this.membersStack.Pop();
+			return;
 		}
 
 		protected void WriteIndexerArguments(PropertyReferenceExpression node)
 		{
-			this.WriteToken(this.IndexLeftBracket);
-			for (int i = 0; i < node.Arguments.Count; i++)
+			this.WriteToken(this.get_IndexLeftBracket());
+			V_0 = 0;
+			while (V_0 < node.get_Arguments().get_Count())
 			{
-				Expression item = node.Arguments[i];
-				if (i > 0)
+				V_1 = node.get_Arguments().get_Item(V_0);
+				if (V_0 > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				this.Write(item);
+				this.Write(V_1);
+				V_0 = V_0 + 1;
 			}
-			this.WriteToken(this.IndexRightBracket);
+			this.WriteToken(this.get_IndexRightBracket());
+			return;
 		}
 
 		protected abstract void WriteIndexerKeywords();
@@ -3058,6 +3496,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.WriteToken(",");
 			this.WriteSpace();
+			return;
 		}
 
 		private void WriteInitializedAutoProperty(PropertyDefinition property, Expression assignment)
@@ -3073,128 +3512,140 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteSpace();
 			this.Visit(assignment);
 			this.WriteEndOfStatement();
+			return;
 		}
 
 		protected virtual void WriteInterfacesInheritColon(TypeDefinition type)
 		{
+			return;
 		}
 
 		protected void WriteLabel(string label)
 		{
-			if (label != "")
+			if (String.op_Inequality(label, ""))
 			{
 				this.Outdent();
 				this.Write(label);
 				this.WriteToken(":");
 				this.Indent();
 			}
+			return;
 		}
 
 		public void WriteLiteralInLanguageSyntax(object value)
 		{
 			if (value == null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Null);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Null());
 				return;
 			}
-			switch (Type.GetTypeCode(value.GetType()))
+			switch (Type.GetTypeCode(value.GetType()) - 3)
 			{
-				case TypeCode.Boolean:
+				case 0:
 				{
-					this.WriteKeyword(((Boolean)value ? this.KeyWordWriter.True : this.KeyWordWriter.False));
+					if ((Boolean)value)
+					{
+						stackVariable12 = this.get_KeyWordWriter().get_True();
+					}
+					else
+					{
+						stackVariable12 = this.get_KeyWordWriter().get_False();
+					}
+					this.WriteKeyword(stackVariable12);
 					return;
 				}
-				case TypeCode.Char:
+				case 1:
 				{
 					this.WriteEscapeCharLiteral((Char)value);
 					return;
 				}
-				case TypeCode.SByte:
-				case TypeCode.Byte:
-				case TypeCode.Decimal:
-				case TypeCode.DateTime:
-				case TypeCode.Object | TypeCode.DateTime:
+				case 2:
+				case 3:
+				case 12:
+				case 13:
+				case 14:
 				{
+				Label0:
 					this.WriteLiteral(value.ToString());
 					return;
 				}
-				case TypeCode.Int16:
+				case 4:
 				{
-					short num = (Int16)value;
-					if (num < 0xff || !base.Settings.WriteLargeNumbersInHex)
+					V_0 = (Int16)value;
+					if (V_0 < 0xff || !this.get_Settings().get_WriteLargeNumbersInHex())
 					{
-						this.WriteLiteral(num.ToString());
+						this.WriteLiteral(V_0.ToString());
 						return;
 					}
-					this.WriteLiteral(String.Concat(this.HexValuePrefix, num.ToString("X").ToLowerInvariant()));
+					this.WriteLiteral(String.Concat(this.get_HexValuePrefix(), V_0.ToString("X").ToLowerInvariant()));
 					return;
 				}
-				case TypeCode.UInt16:
+				case 5:
 				{
-					ushort num1 = (UInt16)value;
-					if (num1 < 0xff || !base.Settings.WriteLargeNumbersInHex)
+					V_2 = (UInt16)value;
+					if (V_2 < 0xff || !this.get_Settings().get_WriteLargeNumbersInHex())
 					{
-						this.WriteLiteral(num1.ToString());
+						this.WriteLiteral(V_2.ToString());
 						return;
 					}
-					this.WriteLiteral(String.Concat(this.HexValuePrefix, num1.ToString("X").ToLowerInvariant()));
+					this.WriteLiteral(String.Concat(this.get_HexValuePrefix(), V_2.ToString("X").ToLowerInvariant()));
 					return;
 				}
-				case TypeCode.Int32:
+				case 6:
 				{
-					int num2 = (Int32)value;
-					if (num2 < 0xff || !base.Settings.WriteLargeNumbersInHex)
+					V_1 = (Int32)value;
+					if (V_1 < 0xff || !this.get_Settings().get_WriteLargeNumbersInHex())
 					{
-						this.WriteLiteral(num2.ToString());
+						this.WriteLiteral(V_1.ToString());
 						return;
 					}
-					this.WriteLiteral(String.Concat(this.HexValuePrefix, num2.ToString("X").ToLowerInvariant()));
+					this.WriteLiteral(String.Concat(this.get_HexValuePrefix(), V_1.ToString("X").ToLowerInvariant()));
 					return;
 				}
-				case TypeCode.UInt32:
+				case 7:
 				{
-					uint num3 = (UInt32)value;
-					if (num3 < 0xff || !base.Settings.WriteLargeNumbersInHex)
+					V_3 = (UInt32)value;
+					if (V_3 < 0xff || !this.get_Settings().get_WriteLargeNumbersInHex())
 					{
-						this.WriteLiteral(num3.ToString());
+						this.WriteLiteral(V_3.ToString());
 						return;
 					}
-					this.WriteLiteral(String.Concat(this.HexValuePrefix, num3.ToString("X").ToLowerInvariant()));
+					this.WriteLiteral(String.Concat(this.get_HexValuePrefix(), V_3.ToString("X").ToLowerInvariant()));
 					return;
 				}
-				case TypeCode.Int64:
+				case 8:
 				{
-					long num4 = (Int64)value;
-					if (num4 < (long)0xff || !base.Settings.WriteLargeNumbersInHex)
+					V_4 = (Int64)value;
+					if (V_4 < (long)0xff || !this.get_Settings().get_WriteLargeNumbersInHex())
 					{
-						this.WriteLiteral(String.Concat(num4.ToString(), "L"));
+						this.WriteLiteral(String.Concat(V_4.ToString(), "L"));
 						return;
 					}
-					this.WriteLiteral(String.Concat(this.HexValuePrefix, num4.ToString("X").ToLowerInvariant(), "L"));
+					this.WriteLiteral(String.Concat(this.get_HexValuePrefix(), V_4.ToString("X").ToLowerInvariant(), "L"));
 					return;
 				}
-				case TypeCode.UInt64:
+				case 9:
 				{
-					ulong num5 = (UInt64)value;
-					if (num5 < (long)0xff || !base.Settings.WriteLargeNumbersInHex)
+					V_5 = (UInt64)value;
+					if (V_5 < (long)0xff || !this.get_Settings().get_WriteLargeNumbersInHex())
 					{
-						this.WriteLiteral(String.Concat(num5.ToString(), "L"));
+						this.WriteLiteral(String.Concat(V_5.ToString(), "L"));
 						return;
 					}
-					this.WriteLiteral(String.Concat(this.HexValuePrefix, num5.ToString("X").ToLowerInvariant(), "L"));
+					this.WriteLiteral(String.Concat(this.get_HexValuePrefix(), V_5.ToString("X").ToLowerInvariant(), "L"));
 					return;
 				}
-				case TypeCode.Single:
+				case 10:
 				{
 					this.WriteFloatLiteral(value);
 					return;
 				}
-				case TypeCode.Double:
+				case 11:
 				{
 					this.WriteDoubleLiteral(value);
 					return;
 				}
-				case TypeCode.String:
+				case 15:
 				{
 					this.WriteLiteral("\"");
 					this.WriteEscapeLiteral(value.ToString());
@@ -3203,183 +3654,199 @@ namespace Telerik.JustDecompiler.Languages
 				}
 				default:
 				{
-					this.WriteLiteral(value.ToString());
-					return;
+					goto Label0;
 				}
 			}
 		}
 
 		protected string WriteLogicalToken(BinaryOperator logical)
 		{
-			if (logical == BinaryOperator.LogicalOr)
+			if (logical == 11)
 			{
-				return this.ToString(BinaryOperator.LogicalOr, false);
+				return this.ToString(11, false);
 			}
-			if (logical != BinaryOperator.LogicalAnd)
+			if (logical != 12)
 			{
 				return String.Empty;
 			}
-			return this.ToString(BinaryOperator.LogicalAnd, false);
+			return this.ToString(12, false);
 		}
 
 		public override void WriteMemberNavigationName(object memberDefinition)
 		{
-			if (memberDefinition is MethodReference)
+			if (memberDefinition as MethodReference != null)
 			{
 				this.WriteMethodReferenceNavigationName(memberDefinition as MethodReference);
 				return;
 			}
-			if (memberDefinition is TypeReference)
+			if (memberDefinition as TypeReference != null)
 			{
 				this.WriteTypeReferenceNavigationName(memberDefinition as TypeReference);
 				return;
 			}
-			if (memberDefinition is IMemberDefinition)
+			if (memberDefinition as IMemberDefinition != null)
 			{
-				IMemberDefinition memberDefinition1 = memberDefinition as IMemberDefinition;
-				string nonGenericName = GenericHelper.GetNonGenericName(memberDefinition1.get_Name());
-				if (Utilities.IsExplicitInterfaceImplementataion(memberDefinition1))
+				V_0 = memberDefinition as IMemberDefinition;
+				V_1 = GenericHelper.GetNonGenericName(V_0.get_Name());
+				if (!Utilities.IsExplicitInterfaceImplementataion(V_0))
 				{
-					string[] strArray = nonGenericName.Split(new Char[] { '.' });
-					StringBuilder stringBuilder = new StringBuilder();
-					for (int i = 0; i < (int)strArray.Length; i++)
+					if (this.get_Settings().get_RenameInvalidMembers())
 					{
-						if (i > 0)
-						{
-							stringBuilder.Append('.');
-						}
-						if (!base.Settings.RenameInvalidMembers)
-						{
-							stringBuilder.Append(strArray[i]);
-						}
-						else if (!this.NormalizeNameIfContainingGenericSymbols(strArray[i], stringBuilder))
-						{
-							stringBuilder.Append(base.Language.ReplaceInvalidCharactersInIdentifier(strArray[i]));
-						}
+						V_1 = this.get_Language().ReplaceInvalidCharactersInIdentifier(V_1);
 					}
-					nonGenericName = stringBuilder.ToString();
 				}
-				else if (base.Settings.RenameInvalidMembers)
+				else
 				{
-					nonGenericName = base.Language.ReplaceInvalidCharactersInIdentifier(nonGenericName);
+					stackVariable33 = new Char[1];
+					stackVariable33[0] = '.';
+					V_3 = V_1.Split(stackVariable33);
+					V_4 = new StringBuilder();
+					V_5 = 0;
+					while (V_5 < (int)V_3.Length)
+					{
+						if (V_5 > 0)
+						{
+							dummyVar0 = V_4.Append('.');
+						}
+						if (!this.get_Settings().get_RenameInvalidMembers())
+						{
+							dummyVar2 = V_4.Append(V_3[V_5]);
+						}
+						else
+						{
+							if (!this.NormalizeNameIfContainingGenericSymbols(V_3[V_5], V_4))
+							{
+								dummyVar1 = V_4.Append(this.get_Language().ReplaceInvalidCharactersInIdentifier(V_3[V_5]));
+							}
+						}
+						V_5 = V_5 + 1;
+					}
+					V_1 = V_4.ToString();
 				}
-				this.formatter.Write(nonGenericName);
+				this.formatter.Write(V_1);
 				this.formatter.Write(" : ");
-				this.WriteTypeReferenceNavigationName(this.GetMemberType(memberDefinition1));
+				this.WriteTypeReferenceNavigationName(this.GetMemberType(V_0));
 			}
+			return;
 		}
 
 		protected void WriteMemberVisibility(IVisibilityDefinition member)
 		{
 			if (member.get_IsPrivate())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Private);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Private());
 				return;
 			}
 			if (member.get_IsPublic())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Public);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Public());
 				return;
 			}
 			if (member.get_IsFamily())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Protected);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Protected());
 				return;
 			}
 			if (member.get_IsAssembly())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Internal);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Internal());
 				return;
 			}
 			if (member.get_IsFamilyOrAssembly() || member.get_IsFamilyAndAssembly())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Protected);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Protected());
 				this.WriteSpace();
-				this.WriteKeyword(this.KeyWordWriter.Internal);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Internal());
 				return;
 			}
-			if ((!(member is MethodDefinition) || !(member as MethodDefinition).get_IsCompilerControlled()) && (!(member is FieldDefinition) || !(member as FieldDefinition).get_IsCompilerControlled()))
+			if (member as MethodDefinition == null || !(member as MethodDefinition).get_IsCompilerControlled() && member as FieldDefinition == null || !(member as FieldDefinition).get_IsCompilerControlled())
 			{
 				throw new NotSupportedException();
 			}
 			this.WriteComment("privatescope");
 			this.WriteLine();
-			this.WriteKeyword(this.KeyWordWriter.Internal);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Internal());
+			return;
 		}
 
 		protected void WriteMethod(MethodDefinition method)
 		{
-			Statement statement;
 			this.membersStack.Push(method);
-			bool flag = false;
+			V_0 = false;
 			try
 			{
 				if (method.get_Body() == null || method.get_Body().get_Instructions().get_Count() <= 0 && !method.get_IsJustDecompileGenerated())
 				{
-					statement = null;
+					stackVariable6 = null;
 				}
 				else
 				{
-					statement = base.GetStatement(method);
+					stackVariable6 = this.GetStatement(method);
 				}
-				Statement statement1 = statement;
+				V_1 = stackVariable6;
 				this.WriteMethodDeclaration(method, false);
-				if (method.get_Body() == null)
+				if (method.get_Body() != null)
+				{
+					if (method.get_Body().get_Instructions().get_Count() != 0 || method.get_IsJustDecompileGenerated())
+					{
+						if (this.get_MethodContext() != null && this.get_MethodContext().get_Method().get_IsConstructor() && this.get_MethodContext().get_CtorInvokeExpression() != null)
+						{
+							this.WriteBaseConstructorInvokation(this.get_MethodContext().get_CtorInvokeExpression());
+						}
+						V_2 = method.IsExtern();
+						V_3 = 0;
+						if (!method.get_IsAbstract() && !V_2)
+						{
+							V_3 = this.formatter.get_CurrentPosition();
+							this.formatter.WriteStartBlock();
+							V_0 = true;
+						}
+						this.WriteLine();
+						this.Write(V_1);
+						if (this.get_KeyWordWriter().get_Sub() != null && this.get_KeyWordWriter().get_Function() != null && this.get_KeyWordWriter().get_Operator() != null)
+						{
+							this.WriteSpecialEndBlock(this.GetMethodKeyWord(method));
+						}
+						if (!method.get_IsAbstract() && !V_2)
+						{
+							this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().set_Item(method, new OffsetSpan(V_3, this.formatter.get_CurrentPosition() - 1));
+							this.formatter.WriteEndBlock();
+						}
+					}
+					else
+					{
+						this.WriteBeginBlock(false);
+						this.WriteLine();
+						this.WriteEndBlock(this.GetMethodName(method));
+						dummyVar1 = this.membersStack.Pop();
+						goto Label0;
+					}
+				}
+				else
 				{
 					this.WriteEmptyMethodEndOfStatement(method);
-					this.membersStack.Pop();
-					return;
-				}
-				else if (method.get_Body().get_Instructions().get_Count() != 0 || method.get_IsJustDecompileGenerated())
-				{
-					if (base.MethodContext != null && base.MethodContext.Method.get_IsConstructor() && base.MethodContext.CtorInvokeExpression != null)
-					{
-						this.WriteBaseConstructorInvokation(base.MethodContext.CtorInvokeExpression);
-					}
-					bool flag1 = method.IsExtern();
-					int currentPosition = 0;
-					if (!method.get_IsAbstract() && !flag1)
-					{
-						currentPosition = this.formatter.CurrentPosition;
-						this.formatter.WriteStartBlock();
-						flag = true;
-					}
-					this.WriteLine();
-					this.Write(statement1);
-					if (this.KeyWordWriter.Sub != null && this.KeyWordWriter.Function != null && this.KeyWordWriter.Operator != null)
-					{
-						this.WriteSpecialEndBlock(this.GetMethodKeyWord(method));
-					}
-					if (!method.get_IsAbstract() && !flag1)
-					{
-						this.currentWritingInfo.MemberDefinitionToFoldingPositionMap[method] = new OffsetSpan(currentPosition, this.formatter.CurrentPosition - 1);
-						this.formatter.WriteEndBlock();
-					}
-				}
-				else
-				{
-					this.WriteBeginBlock(false);
-					this.WriteLine();
-					this.WriteEndBlock(this.GetMethodName(method));
-					this.membersStack.Pop();
-					return;
+					dummyVar0 = this.membersStack.Pop();
+					goto Label0;
 				}
 			}
-			catch (Exception exception)
+			catch (Exception exception_0)
 			{
-				if (flag)
+				dummyVar2 = exception_0;
+				if (V_0)
 				{
 					this.formatter.WriteEndBlock();
 				}
-				this.membersStack.Pop();
+				dummyVar3 = this.membersStack.Pop();
 				throw;
 			}
-			this.membersStack.Pop();
+			dummyVar4 = this.membersStack.Pop();
+		Label0:
+			return;
 		}
 
 		protected override void WriteMethodDeclaration(MethodDefinition method, bool writeDocumentation = false)
 		{
-			if (!method.get_IsConstructor() && !method.get_HasOverrides() && this.ModuleContext.RenamedMembers.Contains(method.get_MetadataToken().ToUInt32()))
+			if (!method.get_IsConstructor() && !method.get_HasOverrides() && this.get_ModuleContext().get_RenamedMembers().Contains(method.get_MetadataToken().ToUInt32()))
 			{
 				this.WriteComment(GenericHelper.GetNonGenericName(this.GetMethodOriginalName(method)));
 				this.WriteLine();
@@ -3396,32 +3863,35 @@ namespace Telerik.JustDecompiler.Languages
 				}
 				if (this.TypeSupportsExplicitStaticMembers(method.get_DeclaringType()) && method.get_IsStatic())
 				{
-					this.WriteKeyword(this.KeyWordWriter.Static);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Static());
 					this.WriteSpace();
 				}
-				if (!method.get_IsConstructor() && (!method.get_IsVirtual() || method.get_IsNewSlot()) && this.IsMethodHiding(method))
+				if (!method.get_IsConstructor() && !method.get_IsVirtual() || method.get_IsNewSlot() && this.IsMethodHiding(method))
 				{
-					this.WriteKeyword(this.KeyWordWriter.Hiding);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Hiding());
 					this.WriteSpace();
 				}
 				this.WriteExternAndSpaceIfNecessary(method);
-				if (method.get_IsUnsafe() && this.KeyWordWriter.Unsafe != String.Empty)
+				if (method.get_IsUnsafe() && String.op_Inequality(this.get_KeyWordWriter().get_Unsafe(), String.Empty))
 				{
-					this.WriteKeyword(this.KeyWordWriter.Unsafe);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Unsafe());
 					this.WriteSpace();
 				}
-				if (this.KeyWordWriter.Async != null && method.IsAsync())
+				if (this.get_KeyWordWriter().get_Async() != null && method.IsAsync())
 				{
-					this.WriteKeyword(this.KeyWordWriter.Async);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Async());
 					this.WriteSpace();
 				}
 				if (method.get_IsConstructor())
 				{
 					this.WriteConstructorName(method);
 				}
-				else if (!this.TryWriteMethodAsOperator(method))
+				else
 				{
-					this.WriteMethodName(method);
+					if (!this.TryWriteMethodAsOperator(method))
+					{
+						this.WriteMethodName(method);
+					}
 				}
 			}
 			else
@@ -3440,10 +3910,12 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteMethodInterfaceImplementations(method);
 			}
+			return;
 		}
 
 		protected virtual void WriteMethodInterfaceImplementations(MethodDefinition method)
 		{
+			return;
 		}
 
 		private bool WriteMethodKeywords(MethodDefinition method)
@@ -3452,33 +3924,33 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				if (method.get_IsAbstract())
 				{
-					this.WriteKeyword(this.KeyWordWriter.AbstractMember);
+					this.WriteKeyword(this.get_KeyWordWriter().get_AbstractMember());
 					return true;
 				}
 				if (method.get_IsFinal() || method.get_DeclaringType().get_IsSealed())
 				{
 					return false;
 				}
-				this.WriteKeyword(this.KeyWordWriter.Virtual);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Virtual());
 				return true;
 			}
 			if (method.get_IsFinal())
 			{
-				this.WriteKeyword(this.KeyWordWriter.SealedMethod);
+				this.WriteKeyword(this.get_KeyWordWriter().get_SealedMethod());
 				this.WriteSpace();
 			}
-			this.WriteKeyword(this.KeyWordWriter.Override);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Override());
 			if (method.get_IsAbstract())
 			{
 				this.WriteSpace();
-				this.WriteKeyword(this.KeyWordWriter.AbstractMember);
+				this.WriteKeyword(this.get_KeyWordWriter().get_AbstractMember());
 			}
 			return true;
 		}
 
 		private void WriteMethodName(MethodDefinition method)
 		{
-			if (this.KeyWordWriter.Sub == null || this.KeyWordWriter.Function == null)
+			if (this.get_KeyWordWriter().get_Sub() == null || this.get_KeyWordWriter().get_Function() == null)
 			{
 				this.WriteMethodReturnType(method);
 				this.WriteSpace();
@@ -3488,96 +3960,122 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteKeyword(this.GetMethodKeyWord(method));
 				this.WriteSpace();
 			}
-			int currentPosition = this.formatter.CurrentPosition;
+			V_0 = this.formatter.get_CurrentPosition();
 			this.WriteGenericName(method);
-			int num = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(currentPosition, num);
+			V_1 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(method, new OffsetSpan(V_0, V_1));
+			return;
 		}
 
 		protected virtual void WriteMethodReference(MethodReferenceExpression methodReferenceExpression)
 		{
-			MethodReference method = methodReferenceExpression.Method;
-			if (method is GenericInstanceMethod)
+			V_0 = methodReferenceExpression.get_Method();
+			if (V_0 as GenericInstanceMethod != null)
 			{
-				this.WriteGenericInstanceMethod(method as GenericInstanceMethod);
+				this.WriteGenericInstanceMethod(V_0 as GenericInstanceMethod);
 				return;
 			}
-			this.WriteReference(this.GetMethodName(method), method);
+			this.WriteReference(this.GetMethodName(V_0), V_0);
+			return;
 		}
 
 		private void WriteMethodReferenceNavigationName(MethodReference method)
 		{
-			string name = method.get_Name();
-			bool flag = (!method.get_IsConstructor() ? false : (object)method.get_DeclaringType() != (object)null);
-			if (flag)
+			V_0 = method.get_Name();
+			if (!method.get_IsConstructor())
 			{
-				name = method.get_DeclaringType().get_Name();
+				stackVariable4 = false;
 			}
-			string[] strArray = GenericHelper.GetNonGenericName(name).Split(new Char[] { '.' });
-			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = 0; i < (int)strArray.Length; i++)
+			else
 			{
-				if (i > 0)
+				stackVariable4 = (object)method.get_DeclaringType() != (object)null;
+			}
+			V_1 = stackVariable4;
+			if (V_1)
+			{
+				V_0 = method.get_DeclaringType().get_Name();
+			}
+			stackVariable7 = GenericHelper.GetNonGenericName(V_0);
+			stackVariable9 = new Char[1];
+			stackVariable9[0] = '.';
+			V_2 = stackVariable7.Split(stackVariable9);
+			V_3 = new StringBuilder();
+			V_4 = 0;
+			while (V_4 < (int)V_2.Length)
+			{
+				if (V_4 > 0)
 				{
-					stringBuilder.Append('.');
+					dummyVar0 = V_3.Append('.');
 				}
-				if (!base.Settings.RenameInvalidMembers)
+				if (!this.get_Settings().get_RenameInvalidMembers())
 				{
-					stringBuilder.Append(strArray[i]);
+					dummyVar2 = V_3.Append(V_2[V_4]);
 				}
-				else if (!this.NormalizeNameIfContainingGenericSymbols(strArray[i], stringBuilder))
+				else
 				{
-					stringBuilder.Append(base.Language.ReplaceInvalidCharactersInIdentifier(strArray[i]));
+					if (!this.NormalizeNameIfContainingGenericSymbols(V_2[V_4], V_3))
+					{
+						dummyVar1 = V_3.Append(this.get_Language().ReplaceInvalidCharactersInIdentifier(V_2[V_4]));
+					}
+				}
+				V_4 = V_4 + 1;
+			}
+			this.formatter.Write(V_3.ToString());
+			if (method as GenericInstanceMethod == null)
+			{
+				if (method.get_HasGenericParameters())
+				{
+					this.WriteGenericParametersToDefinition(method, null, this.get_Settings().get_RenameInvalidMembers());
 				}
 			}
-			this.formatter.Write(stringBuilder.ToString());
-			if (method is GenericInstanceMethod)
+			else
 			{
 				this.WriteGenericInstanceTypeArguments((GenericInstanceMethod)method);
-			}
-			else if (method.get_HasGenericParameters())
-			{
-				this.WriteGenericParametersToDefinition(method, null, base.Settings.RenameInvalidMembers);
 			}
 			this.formatter.Write("(");
 			if (method.get_HasParameters())
 			{
-				for (int j = 0; j < method.get_Parameters().get_Count(); j++)
+				V_5 = 0;
+				while (V_5 < method.get_Parameters().get_Count())
 				{
-					if (j > 0)
+					if (V_5 > 0)
 					{
 						this.formatter.Write(", ");
 					}
-					ParameterDefinition item = method.get_Parameters().get_Item(j);
-					this.WriteTypeReferenceNavigationName(item.get_ParameterType());
+					V_6 = method.get_Parameters().get_Item(V_5);
+					this.WriteTypeReferenceNavigationName(V_6.get_ParameterType());
+					V_5 = V_5 + 1;
 				}
 			}
 			this.formatter.Write(")");
-			if (!flag)
+			if (!V_1)
 			{
 				this.formatter.Write(" : ");
 				this.WriteTypeReferenceNavigationName(method.get_FixedReturnType());
 			}
+			return;
 		}
 
 		protected virtual void WriteMethodReturnType(MethodDefinition method)
 		{
 			this.WriteReferenceAndNamespaceIfInCollision(method.get_ReturnType());
+			return;
 		}
 
 		protected void WriteMethodTarget(Expression expression)
 		{
-			bool flag = this.IsComplexTarget(expression);
-			if (flag)
+			stackVariable2 = this.IsComplexTarget(expression);
+			if (stackVariable2)
 			{
 				this.WriteToken("(");
 			}
 			this.Visit(expression);
-			if (flag)
+			if (stackVariable2)
 			{
 				this.WriteToken(")");
 			}
 			this.WriteToken(".");
+			return;
 		}
 
 		protected virtual bool WriteMethodVisibility(MethodDefinition method)
@@ -3596,6 +4094,7 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteSpace();
 			}
+			return;
 		}
 
 		protected void WriteMoreRestrictiveMethodVisibility(MethodDefinition currentMethod, MethodDefinition otherMethod)
@@ -3608,7 +4107,7 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteMethodVisibilityAndSpace(currentMethod);
 			}
-			if ((currentMethod.get_IsFamily() || currentMethod.get_IsAssembly()) && (otherMethod.get_IsPublic() || otherMethod.get_IsFamilyOrAssembly()))
+			if (currentMethod.get_IsFamily() || currentMethod.get_IsAssembly() && otherMethod.get_IsPublic() || otherMethod.get_IsFamilyOrAssembly())
 			{
 				this.WriteMethodVisibilityAndSpace(currentMethod);
 			}
@@ -3616,6 +4115,7 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteMethodVisibilityAndSpace(currentMethod);
 			}
+			return;
 		}
 
 		public virtual void WriteNamespaceIfTypeInCollision(TypeReference reference)
@@ -3624,112 +4124,132 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return;
 			}
-			TypeReference collidingType = this.GetCollidingType(reference);
-			while (collidingType.get_DeclaringType() != null)
+			V_0 = this.GetCollidingType(reference);
+			while (V_0.get_DeclaringType() != null)
 			{
-				collidingType = this.GetCollidingType(collidingType.get_DeclaringType());
+				V_0 = this.GetCollidingType(V_0.get_DeclaringType());
 			}
-			if (this.IsTypeNameInCollision(this.GetCollidingTypeName(collidingType)))
+			if (this.IsTypeNameInCollision(this.GetCollidingTypeName(V_0)))
 			{
-				this.WriteNamespace(collidingType, true);
+				this.WriteNamespace(V_0, true);
 			}
+			return;
 		}
 
 		protected virtual void WriteOptional(ParameterDefinition parameter)
 		{
+			return;
 		}
 
 		protected virtual void WriteOutOrRefKeyWord(ParameterDefinition parameter)
 		{
 			if (parameter.IsOutParameter())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Out);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Out());
 				return;
 			}
-			this.WriteKeyword(this.KeyWordWriter.ByRef);
+			this.WriteKeyword(this.get_KeyWordWriter().get_ByRef());
+			return;
 		}
 
 		protected virtual void WriteParameters(MethodDefinition method)
 		{
-			for (int i = 0; i < method.get_Parameters().get_Count(); i++)
+			V_0 = 0;
+			while (V_0 < method.get_Parameters().get_Count())
 			{
-				ParameterDefinition item = method.get_Parameters().get_Item(i);
-				if (i > 0)
+				V_1 = method.get_Parameters().get_Item(V_0);
+				if (V_0 > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				if (i == 0 && this.KeyWordWriter.ExtensionThis != null && method.get_IsExtensionMethod())
+				if (V_0 == 0 && this.get_KeyWordWriter().get_ExtensionThis() != null && method.get_IsExtensionMethod())
 				{
-					this.WriteKeyword(this.KeyWordWriter.ExtensionThis);
+					this.WriteKeyword(this.get_KeyWordWriter().get_ExtensionThis());
 					this.WriteSpace();
 				}
-				if (this.AttributeWriter.WriteParameterAttributes(item, (!this.TypeContext.IsWinRTImplementation ? false : (object)this.TypeContext.CurrentType == (object)method.get_DeclaringType())) > 0)
+				stackVariable13 = this.get_AttributeWriter();
+				stackVariable14 = V_1;
+				if (!this.get_TypeContext().get_IsWinRTImplementation())
+				{
+					stackVariable18 = false;
+				}
+				else
+				{
+					stackVariable18 = (object)this.get_TypeContext().get_CurrentType() == (object)method.get_DeclaringType();
+				}
+				if (stackVariable13.WriteParameterAttributes(stackVariable14, stackVariable18) > 0)
 				{
 					this.WriteSpace();
 				}
-				if (item.get_IsOptional())
+				if (V_1.get_IsOptional())
 				{
-					this.WriteOptional(item);
+					this.WriteOptional(V_1);
 				}
-				TypeReference parameterType = item.get_ParameterType();
-				if (parameterType is ByReferenceType)
+				V_2 = V_1.get_ParameterType();
+				if (V_2 as ByReferenceType == null)
 				{
-					this.WriteOutOrRefKeyWord(item);
+					if (this.get_KeyWordWriter().get_ByVal() != null)
+					{
+						this.WriteKeyword(this.get_KeyWordWriter().get_ByVal());
+						this.WriteSpace();
+					}
+				}
+				else
+				{
+					this.WriteOutOrRefKeyWord(V_1);
 					this.WriteSpace();
-					parameterType = (parameterType as TypeSpecification).get_ElementType();
+					V_2 = (V_2 as TypeSpecification).get_ElementType();
 				}
-				else if (this.KeyWordWriter.ByVal != null)
-				{
-					this.WriteKeyword(this.KeyWordWriter.ByVal);
-					this.WriteSpace();
-				}
-				this.WriteParameterTypeAndName(parameterType, this.GetParameterName(item), item);
-				if (item.get_IsOptional())
+				this.WriteParameterTypeAndName(V_2, this.GetParameterName(V_1), V_1);
+				if (V_1.get_IsOptional())
 				{
 					this.WriteSpace();
 					this.Write("=");
 					this.WriteSpace();
-					if (!item.get_HasDefault())
+					if (!V_1.get_HasDefault())
 					{
-						this.Write(this.GetDefaultValueExpression(item));
+						this.Write(this.GetDefaultValueExpression(V_1));
 					}
 					else
 					{
-						this.WriteLiteralInLanguageSyntax(item.get_Constant().get_Value());
+						this.WriteLiteralInLanguageSyntax(V_1.get_Constant().get_Value());
 					}
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		protected virtual void WriteParameterTypeAndName(TypeReference typeReference, string name, ParameterDefinition reference)
 		{
+			return;
 		}
 
 		protected abstract bool WritePropertyAsIndexer(PropertyDefinition property);
 
 		protected override void WritePropertyDeclaration(PropertyDefinition property)
 		{
-			MethodDefinition moreVisibleMethod = property.get_GetMethod().GetMoreVisibleMethod(property.get_SetMethod());
+			V_0 = property.get_GetMethod().GetMoreVisibleMethod(property.get_SetMethod());
 			if (property.IsIndexer())
 			{
 				this.WriteIndexerKeywords();
 			}
-			if (this.ModuleContext.RenamedMembers.Contains(property.get_MetadataToken().ToUInt32()))
+			if (this.get_ModuleContext().get_RenamedMembers().Contains(property.get_MetadataToken().ToUInt32()))
 			{
 				this.WriteComment(property.get_Name());
 				this.WriteLine();
 			}
 			if (!property.IsExplicitImplementation())
 			{
-				this.WriteMethodVisibilityAndSpace(moreVisibleMethod);
+				this.WriteMethodVisibilityAndSpace(V_0);
 			}
 			if (!property.IsVirtual() || property.IsNewSlot())
 			{
-				bool flag = property.IsIndexer();
-				if (flag && this.IsIndexerPropertyHiding(property) || !flag && this.IsPropertyHiding(property))
+				V_2 = property.IsIndexer();
+				if (V_2 && this.IsIndexerPropertyHiding(property) || !V_2 && this.IsPropertyHiding(property))
 				{
-					this.WriteKeyword(this.KeyWordWriter.Hiding);
+					this.WriteKeyword(this.get_KeyWordWriter().get_Hiding());
 					this.WriteSpace();
 				}
 			}
@@ -3740,12 +4260,12 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteReadOnlyWriteOnlyProperty(property);
 			if (this.TypeSupportsExplicitStaticMembers(property.get_DeclaringType()) && property.IsStatic())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Static);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Static());
 				this.WriteSpace();
 			}
-			if (this.KeyWordWriter.Property != null)
+			if (this.get_KeyWordWriter().get_Property() != null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Property);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Property());
 				this.WriteSpace();
 			}
 			if (property.IsIndexer() && this.WritePropertyAsIndexer(property))
@@ -3754,10 +4274,12 @@ namespace Telerik.JustDecompiler.Languages
 			}
 			this.WritePropertyTypeAndNameWithArguments(property);
 			this.WritePropertyInterfaceImplementations(property);
+			return;
 		}
 
 		protected virtual void WritePropertyInterfaceImplementations(PropertyDefinition property)
 		{
+			return;
 		}
 
 		private bool WritePropertyKeywords(PropertyDefinition property)
@@ -3766,31 +4288,31 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				if (property.IsFinal())
 				{
-					this.WriteKeyword(this.KeyWordWriter.SealedMethod);
+					this.WriteKeyword(this.get_KeyWordWriter().get_SealedMethod());
 					this.WriteSpace();
 				}
-				this.WriteKeyword(this.KeyWordWriter.Override);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Override());
 				return true;
 			}
 			if (property.IsAbstract())
 			{
-				this.WriteKeyword(this.KeyWordWriter.AbstractMember);
+				this.WriteKeyword(this.get_KeyWordWriter().get_AbstractMember());
 				return true;
 			}
 			if (property.IsFinal() || property.get_DeclaringType().get_IsSealed())
 			{
 				return false;
 			}
-			this.WriteKeyword(this.KeyWordWriter.Virtual);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Virtual());
 			return true;
 		}
 
 		protected void WritePropertyMethods(PropertyDefinition property, bool inline = false)
 		{
-			bool flag = this.TypeContext.AutoImplementedProperties.Contains(property);
+			V_0 = this.get_TypeContext().get_AutoImplementedProperties().Contains(property);
 			if (property.get_GetMethod() != null)
 			{
-				this.WriteGetMethod(property, flag);
+				this.WriteGetMethod(property, V_0);
 			}
 			if (property.get_SetMethod() != null)
 			{
@@ -3805,294 +4327,340 @@ namespace Telerik.JustDecompiler.Languages
 						this.WriteSpace();
 					}
 				}
-				this.WriteSetMethod(property, flag);
+				this.WriteSetMethod(property, V_0);
 			}
+			return;
 		}
 
 		protected virtual void WritePropertyName(PropertyDefinition property)
 		{
 			this.WriteReference(this.GetPropertyName(property), property);
+			return;
 		}
 
 		protected void WritePropertyParameters(PropertyDefinition property)
 		{
-			MethodDefinition setMethod;
-			int num = 0;
+			V_1 = 0;
 			if (property.get_GetMethod() == null)
 			{
-				setMethod = property.get_SetMethod();
-				num = 1;
+				V_0 = property.get_SetMethod();
+				V_1 = 1;
 			}
 			else
 			{
-				setMethod = property.get_GetMethod();
+				V_0 = property.get_GetMethod();
 			}
-			if (setMethod == null)
+			if (V_0 == null)
 			{
 				return;
 			}
-			for (int i = 0; i < setMethod.get_Parameters().get_Count() - num; i++)
+			V_2 = 0;
+			while (V_2 < V_0.get_Parameters().get_Count() - V_1)
 			{
-				ParameterDefinition item = setMethod.get_Parameters().get_Item(i);
-				if (i > 0)
+				V_3 = V_0.get_Parameters().get_Item(V_2);
+				if (V_2 > 0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				TypeReference parameterType = item.get_ParameterType();
-				if (parameterType is ByReferenceType)
+				V_4 = V_3.get_ParameterType();
+				if (V_4 as ByReferenceType == null)
 				{
-					this.WriteOutOrRefKeyWord(item);
+					if (this.get_KeyWordWriter().get_ByVal() != null)
+					{
+						this.WriteKeyword(this.get_KeyWordWriter().get_ByVal());
+						this.WriteSpace();
+					}
+				}
+				else
+				{
+					this.WriteOutOrRefKeyWord(V_3);
 					this.WriteSpace();
-					parameterType = (parameterType as TypeSpecification).get_ElementType();
+					V_4 = (V_4 as TypeSpecification).get_ElementType();
 				}
-				else if (this.KeyWordWriter.ByVal != null)
+				V_5 = V_3.get_Name();
+				if (this.get_MethodContext() != null && this.get_MethodContext().get_Method() == V_3.get_Method() && this.get_MethodContext().get_ParameterDefinitionToNameMap().ContainsKey(V_3))
 				{
-					this.WriteKeyword(this.KeyWordWriter.ByVal);
-					this.WriteSpace();
+					V_5 = this.get_MethodContext().get_ParameterDefinitionToNameMap().get_Item(V_3);
 				}
-				string name = item.get_Name();
-				if (base.MethodContext != null && base.MethodContext.Method == item.get_Method() && base.MethodContext.ParameterDefinitionToNameMap.ContainsKey(item))
-				{
-					name = base.MethodContext.ParameterDefinitionToNameMap[item];
-				}
-				this.WriteParameterTypeAndName(parameterType, name, item);
+				this.WriteParameterTypeAndName(V_4, V_5, V_3);
+				V_2 = V_2 + 1;
 			}
+			return;
 		}
 
 		protected virtual void WritePropertyTypeAndNameWithArguments(PropertyDefinition property)
 		{
+			return;
 		}
 
 		protected virtual void WriteReadOnlyWriteOnlyProperty(PropertyDefinition property)
 		{
+			return;
 		}
 
 		private void WriteReference(TypeReference reference)
 		{
-			string escapedTypeString;
 			if (reference.get_DeclaringType() != null && !reference.get_IsGenericParameter())
 			{
-				TypeReference declaringType = reference.get_DeclaringType();
+				V_1 = reference.get_DeclaringType();
 				if (!reference.get_IsGenericInstance())
 				{
-					this.WriteReference(declaringType);
+					this.WriteReference(V_1);
 					this.Write(".");
 				}
 				else
 				{
-					GenericInstanceType genericInstanceType = reference as GenericInstanceType;
-					if (declaringType.get_HasGenericParameters())
+					V_2 = reference as GenericInstanceType;
+					if (V_1.get_HasGenericParameters())
 					{
-						GenericInstanceType genericInstanceType1 = new GenericInstanceType(declaringType);
-						Mono.Collections.Generic.Collection<TypeReference> collection = new Mono.Collections.Generic.Collection<TypeReference>(genericInstanceType.get_GenericArguments());
-						Mono.Collections.Generic.Collection<TypeReference> collection1 = new Mono.Collections.Generic.Collection<TypeReference>(genericInstanceType1.get_GenericArguments());
-						int count = declaringType.get_GenericParameters().get_Count();
-						for (int i = 0; i < count; i++)
+						V_3 = new GenericInstanceType(V_1);
+						V_4 = new Collection<TypeReference>(V_2.get_GenericArguments());
+						V_5 = new Collection<TypeReference>(V_3.get_GenericArguments());
+						V_6 = V_1.get_GenericParameters().get_Count();
+						V_7 = 0;
+						while (V_7 < V_6)
 						{
-							genericInstanceType1.AddGenericArgument(genericInstanceType.get_GenericArguments().get_Item(i));
-							genericInstanceType1.get_GenericArguments().Add(genericInstanceType.get_GenericArguments().get_Item(i));
+							V_3.AddGenericArgument(V_2.get_GenericArguments().get_Item(V_7));
+							V_3.get_GenericArguments().Add(V_2.get_GenericArguments().get_Item(V_7));
+							V_7 = V_7 + 1;
 						}
-						this.WriteReference(genericInstanceType1);
+						this.WriteReference(V_3);
 						this.Write(".");
-						if (genericInstanceType.get_GenericArguments().get_Count() - count <= 0)
+						if (V_2.get_GenericArguments().get_Count() - V_6 <= 0)
 						{
 							this.WriteReference(this.GetTypeName(reference), reference);
 						}
 						else
 						{
-							this.WriteTypeSpecification(genericInstanceType, count);
+							this.WriteTypeSpecification(V_2, V_6);
 						}
-						genericInstanceType.get_GenericArguments().Clear();
-						genericInstanceType.get_GenericArguments().AddRange(collection);
-						genericInstanceType1.get_GenericArguments().Clear();
-						genericInstanceType1.get_GenericArguments().AddRange(collection1);
+						V_2.get_GenericArguments().Clear();
+						V_2.get_GenericArguments().AddRange(V_4);
+						V_3.get_GenericArguments().Clear();
+						V_3.get_GenericArguments().AddRange(V_5);
 						return;
 					}
-					this.WriteReference(declaringType);
+					this.WriteReference(V_1);
 					this.Write(".");
 				}
 			}
-			if (reference is TypeSpecification)
+			if (reference as TypeSpecification != null)
 			{
 				this.WriteTypeSpecification(reference as TypeSpecification, 0);
 				return;
 			}
-			if (reference.get_Namespace() == "System")
+			if (!String.op_Inequality(reference.get_Namespace(), "System"))
 			{
-				escapedTypeString = this.ToEscapedTypeString(reference);
+				V_0 = this.ToEscapedTypeString(reference);
 				if (!this.IsReferenceFromMscorlib(reference))
 				{
-					escapedTypeString = Utilities.EscapeTypeNameIfNeeded(escapedTypeString, base.Language);
+					V_0 = Utilities.EscapeTypeNameIfNeeded(V_0, this.get_Language());
 				}
 			}
 			else
 			{
-				escapedTypeString = this.GetTypeName(reference);
+				V_0 = this.GetTypeName(reference);
 			}
-			if (reference.get_HasGenericParameters() || !base.Language.IsEscapedWord(escapedTypeString) && !base.Language.IsValidIdentifier(escapedTypeString))
+			if (reference.get_HasGenericParameters() || !this.get_Language().IsEscapedWord(V_0) && !this.get_Language().IsValidIdentifier(V_0))
 			{
-				if (!(reference is TypeDefinition) || !reference.get_HasGenericParameters())
+				if (reference as TypeDefinition == null || !reference.get_HasGenericParameters())
 				{
-					escapedTypeString = this.GetTypeName(reference);
+					V_0 = this.GetTypeName(reference);
 				}
 				else
 				{
-					escapedTypeString = this.GetTypeName(reference);
-					int num = 0;
+					V_0 = this.GetTypeName(reference);
+					V_9 = 0;
 					if (reference.get_DeclaringType() != null && reference.get_DeclaringType().get_HasGenericParameters())
 					{
-						num = reference.get_DeclaringType().get_GenericParameters().get_Count();
+						V_9 = reference.get_DeclaringType().get_GenericParameters().get_Count();
 					}
-					if (num < reference.get_GenericParameters().get_Count())
+					if (V_9 < reference.get_GenericParameters().get_Count())
 					{
-						escapedTypeString = String.Concat(escapedTypeString, this.GenericLeftBracket);
-						for (int j = num; j < reference.get_GenericParameters().get_Count(); j++)
+						V_0 = String.Concat(V_0, this.get_GenericLeftBracket());
+						V_10 = V_9;
+						while (V_10 < reference.get_GenericParameters().get_Count())
 						{
-							if (j > num)
+							if (V_10 > V_9)
 							{
-								escapedTypeString = String.Concat(escapedTypeString, ", ");
+								V_0 = String.Concat(V_0, ", ");
 							}
-							escapedTypeString = (base.Language.IsValidIdentifier(reference.get_GenericParameters().get_Item(j).get_Name()) ? String.Concat(escapedTypeString, reference.get_GenericParameters().get_Item(j).get_Name()) : String.Concat(escapedTypeString, base.Language.ReplaceInvalidCharactersInIdentifier(reference.get_GenericParameters().get_Item(j).get_Name())));
+							if (this.get_Language().IsValidIdentifier(reference.get_GenericParameters().get_Item(V_10).get_Name()))
+							{
+								V_0 = String.Concat(V_0, reference.get_GenericParameters().get_Item(V_10).get_Name());
+							}
+							else
+							{
+								V_0 = String.Concat(V_0, this.get_Language().ReplaceInvalidCharactersInIdentifier(reference.get_GenericParameters().get_Item(V_10).get_Name()));
+							}
+							V_10 = V_10 + 1;
 						}
-						escapedTypeString = String.Concat(escapedTypeString, this.GenericRightBracket);
+						V_0 = String.Concat(V_0, this.get_GenericRightBracket());
 					}
 				}
 			}
 			if (reference.get_IsGenericParameter())
 			{
-				this.WriteReference(escapedTypeString, null);
+				this.WriteReference(V_0, null);
 				return;
 			}
-			this.WriteReference(escapedTypeString, reference);
+			this.WriteReference(V_0, reference);
+			return;
 		}
 
 		public virtual void WriteReferenceAndNamespaceIfInCollision(TypeReference reference)
 		{
 			this.WriteNamespaceIfTypeInCollision(reference);
 			this.WriteReference(reference);
+			return;
 		}
 
-		protected virtual void WriteRemoveOn(EventDefinition @event)
+		protected virtual void WriteRemoveOn(EventDefinition event)
 		{
-			uint num = @event.get_RemoveMethod().get_MetadataToken().ToUInt32();
-			this.membersStack.Push(@event.get_RemoveMethod());
-			int currentPosition = this.formatter.CurrentPosition;
-			this.AttributeWriter.WriteMemberAttributesAndNewLine(@event.get_RemoveMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-			base.AddMemberAttributesOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
-			int currentPosition1 = this.formatter.CurrentPosition;
-			int num1 = this.formatter.CurrentPosition;
-			this.WriteMoreRestrictiveMethodVisibility(@event.get_RemoveMethod(), @event.get_AddMethod());
-			int currentPosition2 = this.formatter.CurrentPosition;
-			this.WriteKeyword(this.KeyWordWriter.RemoveOn);
-			this.WriteEventRemoveOnParameters(@event);
-			int num2 = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.get_RemoveMethod()] = new OffsetSpan(currentPosition2, num2);
+			V_7 = event.get_RemoveMethod().get_MetadataToken();
+			V_0 = V_7.ToUInt32();
+			this.membersStack.Push(event.get_RemoveMethod());
+			V_1 = this.formatter.get_CurrentPosition();
+			stackVariable13 = this.get_AttributeWriter();
+			stackVariable15 = event.get_RemoveMethod();
+			stackVariable17 = new String[1];
+			stackVariable17[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+			stackVariable13.WriteMemberAttributesAndNewLine(stackVariable15, stackVariable17, false);
+			this.AddMemberAttributesOffsetSpan(V_0, V_1, this.formatter.get_CurrentPosition());
+			V_2 = this.formatter.get_CurrentPosition();
+			V_3 = this.formatter.get_CurrentPosition();
+			this.WriteMoreRestrictiveMethodVisibility(event.get_RemoveMethod(), event.get_AddMethod());
+			V_4 = this.formatter.get_CurrentPosition();
+			this.WriteKeyword(this.get_KeyWordWriter().get_RemoveOn());
+			this.WriteEventRemoveOnParameters(event);
+			V_5 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(event.get_RemoveMethod(), new OffsetSpan(V_4, V_5));
 			this.WriteLine();
-			this.Write(base.GetStatement(@event.get_RemoveMethod()));
-			this.WriteSpecialEndBlock(this.KeyWordWriter.RemoveOn);
-			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap.Add(@event.get_RemoveMethod(), new OffsetSpan(currentPosition1, this.formatter.CurrentPosition - 1));
-			this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(num1, this.formatter.CurrentPosition - 1));
-			this.membersStack.Pop();
+			this.Write(this.GetStatement(event.get_RemoveMethod()));
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_RemoveOn());
+			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().Add(event.get_RemoveMethod(), new OffsetSpan(V_2, this.formatter.get_CurrentPosition() - 1));
+			this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_0, new OffsetSpan(V_3, this.formatter.get_CurrentPosition() - 1));
+			dummyVar0 = this.membersStack.Pop();
+			return;
 		}
 
 		protected virtual void WriteRightPartOfBinaryExpression(BinaryExpression binaryExpression)
 		{
-			this.Visit(binaryExpression.Right);
+			this.Visit(binaryExpression.get_Right());
+			return;
 		}
 
 		protected void WriteSetMethod(PropertyDefinition property, bool isAutoImplemented)
 		{
-			uint num = property.get_SetMethod().get_MetadataToken().ToUInt32();
+			V_6 = property.get_SetMethod().get_MetadataToken();
+			V_0 = V_6.ToUInt32();
 			this.membersStack.Push(property.get_SetMethod());
-			int currentPosition = this.formatter.CurrentPosition;
-			this.AttributeWriter.WriteMemberAttributesAndNewLine(property.get_SetMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-			base.AddMemberAttributesOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
-			int currentPosition1 = this.formatter.CurrentPosition;
-			int num1 = this.formatter.CurrentPosition;
+			V_1 = this.formatter.get_CurrentPosition();
+			stackVariable13 = this.get_AttributeWriter();
+			stackVariable15 = property.get_SetMethod();
+			stackVariable17 = new String[1];
+			stackVariable17[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+			stackVariable13.WriteMemberAttributesAndNewLine(stackVariable15, stackVariable17, false);
+			this.AddMemberAttributesOffsetSpan(V_0, V_1, this.formatter.get_CurrentPosition());
+			V_2 = this.formatter.get_CurrentPosition();
+			V_3 = this.formatter.get_CurrentPosition();
 			this.WriteMoreRestrictiveMethodVisibility(property.get_SetMethod(), property.get_GetMethod());
-			int currentPosition2 = this.formatter.CurrentPosition;
-			this.WriteKeyword(this.KeyWordWriter.Set);
-			int num2 = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property.get_SetMethod()] = new OffsetSpan(currentPosition2, num2);
-			if (this.KeyWordWriter.ByVal != null)
+			V_4 = this.formatter.get_CurrentPosition();
+			this.WriteKeyword(this.get_KeyWordWriter().get_Set());
+			V_5 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(property.get_SetMethod(), new OffsetSpan(V_4, V_5));
+			if (this.get_KeyWordWriter().get_ByVal() != null)
 			{
 				this.WriteToken("(");
-				this.WriteKeyword(this.KeyWordWriter.ByVal);
+				this.WriteKeyword(this.get_KeyWordWriter().get_ByVal());
 				this.WriteSpace();
 				this.WriteTypeAndName(property.get_PropertyType(), "value", null);
 				this.WriteToken(")");
 			}
-			if (property.get_SetMethod().get_Body() == null || this.SupportsAutoProperties & isAutoImplemented)
+			if (property.get_SetMethod().get_Body() == null || this.get_SupportsAutoProperties() & isAutoImplemented)
 			{
 				this.WriteEndOfStatement();
 			}
 			else
 			{
 				this.WriteLine();
-				this.Write(base.GetStatement(property.get_SetMethod()));
+				this.Write(this.GetStatement(property.get_SetMethod()));
 			}
-			this.WriteSpecialEndBlock(this.KeyWordWriter.Set);
-			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap.Add(property.get_SetMethod(), new OffsetSpan(currentPosition1, this.formatter.CurrentPosition - 1));
-			this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(num1, this.formatter.CurrentPosition - 1));
-			this.membersStack.Pop();
+			this.WriteSpecialEndBlock(this.get_KeyWordWriter().get_Set());
+			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().Add(property.get_SetMethod(), new OffsetSpan(V_2, this.formatter.get_CurrentPosition() - 1));
+			this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_0, new OffsetSpan(V_3, this.formatter.get_CurrentPosition() - 1));
+			dummyVar0 = this.membersStack.Pop();
+			return;
 		}
 
 		protected void WriteSingleGenericParameterConstraintsList(GenericParameter genericParameter)
 		{
-			bool flag = false;
+			V_0 = false;
 			if (genericParameter.get_HasNotNullableValueTypeConstraint())
 			{
-				if (flag)
+				if (V_0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				flag = true;
-				this.WriteKeyword(this.KeyWordWriter.Struct);
+				V_0 = true;
+				this.WriteKeyword(this.get_KeyWordWriter().get_Struct());
 			}
 			if (genericParameter.get_HasReferenceTypeConstraint())
 			{
-				if (flag)
+				if (V_0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				flag = true;
-				this.WriteKeyword(this.KeyWordWriter.Class);
+				V_0 = true;
+				this.WriteKeyword(this.get_KeyWordWriter().get_Class());
 			}
-			foreach (TypeReference constraint in genericParameter.get_Constraints())
+			V_1 = genericParameter.get_Constraints().GetEnumerator();
+			try
 			{
-				if (genericParameter.get_HasNotNullableValueTypeConstraint() && constraint.get_FullName() == "System.ValueType")
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (genericParameter.get_HasNotNullableValueTypeConstraint() && String.op_Equality(V_2.get_FullName(), "System.ValueType"))
+					{
+						continue;
+					}
+					if (V_0)
+					{
+						this.WriteToken(",");
+						this.WriteSpace();
+					}
+					this.WriteReferenceAndNamespaceIfInCollision(V_2);
+					V_0 = true;
 				}
-				if (flag)
-				{
-					this.WriteToken(",");
-					this.WriteSpace();
-				}
-				this.WriteReferenceAndNamespaceIfInCollision(constraint);
-				flag = true;
+			}
+			finally
+			{
+				V_1.Dispose();
 			}
 			if (genericParameter.get_HasDefaultConstructorConstraint() && !genericParameter.get_HasNotNullableValueTypeConstraint())
 			{
-				if (flag)
+				if (V_0)
 				{
 					this.WriteToken(",");
 					this.WriteSpace();
 				}
-				flag = true;
+				V_0 = true;
 				this.WriteConstructorGenericConstraint();
 			}
+			return;
 		}
 
 		protected virtual void WriteSpecialBetweenParenthesis(Expression expression)
 		{
+			return;
 		}
 
 		protected virtual void WriteSpecialBetweenParenthesis(Action action)
 		{
+			return;
 		}
 
 		private void WriteSpecialDoubleConstants(double value, IMemberDefinition currentMember)
@@ -4105,10 +4673,12 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteDoubleInfinity(currentMember, value);
 			}
+			return;
 		}
 
 		protected virtual void WriteSpecialEndBlock(string statementName)
 		{
+			return;
 		}
 
 		private void WriteSpecialFloatValue(float value, IMemberDefinition currentMember)
@@ -4121,16 +4691,16 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.WriteFloatInfinity(currentMember, (double)value);
 			}
+			return;
 		}
 
 		private void WriteSplitProperty(PropertyDefinition property)
 		{
-			MetadataToken metadataToken;
-			MethodDefinition moreVisibleMethod = property.get_GetMethod().GetMoreVisibleMethod(property.get_SetMethod());
-			this.WriteMethodVisibilityAndSpace(moreVisibleMethod);
-			if (this.KeyWordWriter.Property != null)
+			V_0 = property.get_GetMethod().GetMoreVisibleMethod(property.get_SetMethod());
+			this.WriteMethodVisibilityAndSpace(V_0);
+			if (this.get_KeyWordWriter().get_Property() != null)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Property);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Property());
 				this.WriteSpace();
 			}
 			this.WritePropertyTypeAndNameWithArguments(property);
@@ -4140,40 +4710,48 @@ namespace Telerik.JustDecompiler.Languages
 			this.Indent();
 			if (property.get_GetMethod() != null)
 			{
-				metadataToken = property.get_GetMethod().get_MetadataToken();
-				uint num = metadataToken.ToUInt32();
-				int currentPosition = this.formatter.CurrentPosition;
-				this.AttributeWriter.WriteMemberAttributesAndNewLine(property.get_GetMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-				base.AddMemberAttributesOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
+				V_5 = property.get_GetMethod().get_MetadataToken();
+				V_2 = V_5.ToUInt32();
+				V_3 = this.formatter.get_CurrentPosition();
+				stackVariable102 = this.get_AttributeWriter();
+				stackVariable104 = property.get_GetMethod();
+				stackVariable106 = new String[1];
+				stackVariable106[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+				stackVariable102.WriteMemberAttributesAndNewLine(stackVariable104, stackVariable106, false);
+				this.AddMemberAttributesOffsetSpan(V_2, V_3, this.formatter.get_CurrentPosition());
 				this.membersStack.Push(property.get_GetMethod());
-				int currentPosition1 = this.formatter.CurrentPosition;
+				V_4 = this.formatter.get_CurrentPosition();
 				this.WriteSplitPropertyGetter(property);
-				this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(currentPosition1, this.formatter.CurrentPosition - 1));
-				this.membersStack.Pop();
+				this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_2, new OffsetSpan(V_4, this.formatter.get_CurrentPosition() - 1));
+				dummyVar0 = this.membersStack.Pop();
 				this.WriteLine();
 			}
 			if (property.get_SetMethod() != null)
 			{
-				metadataToken = property.get_SetMethod().get_MetadataToken();
-				uint num1 = metadataToken.ToUInt32();
-				int currentPosition2 = this.formatter.CurrentPosition;
-				this.AttributeWriter.WriteMemberAttributesAndNewLine(property.get_SetMethod(), new String[] { "System.Runtime.CompilerServices.CompilerGeneratedAttribute" }, false);
-				base.AddMemberAttributesOffsetSpan(num1, currentPosition2, this.formatter.CurrentPosition);
+				V_5 = property.get_SetMethod().get_MetadataToken();
+				V_6 = V_5.ToUInt32();
+				V_7 = this.formatter.get_CurrentPosition();
+				stackVariable55 = this.get_AttributeWriter();
+				stackVariable57 = property.get_SetMethod();
+				stackVariable59 = new String[1];
+				stackVariable59[0] = "System.Runtime.CompilerServices.CompilerGeneratedAttribute";
+				stackVariable55.WriteMemberAttributesAndNewLine(stackVariable57, stackVariable59, false);
+				this.AddMemberAttributesOffsetSpan(V_6, V_7, this.formatter.get_CurrentPosition());
 				this.membersStack.Push(property.get_SetMethod());
-				int num2 = this.formatter.CurrentPosition;
+				V_8 = this.formatter.get_CurrentPosition();
 				this.WriteSplitPropertySetter(property);
-				this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num1, new OffsetSpan(num2, this.formatter.CurrentPosition - 1));
-				this.membersStack.Pop();
+				this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_6, new OffsetSpan(V_8, this.formatter.get_CurrentPosition() - 1));
+				dummyVar1 = this.membersStack.Pop();
 				this.WriteLine();
 			}
 			this.Outdent();
 			this.WriteEndBlock("Property");
-			FieldDefinition compileGeneratedBackingField = Utilities.GetCompileGeneratedBackingField(property);
-			if (compileGeneratedBackingField != null)
+			V_1 = Utilities.GetCompileGeneratedBackingField(property);
+			if (V_1 != null)
 			{
 				this.WriteLine();
 				this.WriteLine();
-				this.Write(compileGeneratedBackingField);
+				this.Write(V_1);
 			}
 			if (property.get_GetMethod() != null)
 			{
@@ -4187,36 +4765,37 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteLine();
 				this.Write(property.get_SetMethod());
 			}
+			return;
 		}
 
 		private void WriteSplitPropertyGetter(PropertyDefinition property)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Get);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Get());
 			this.WriteBeginBlock(false);
 			this.WriteLine();
 			this.Indent();
-			this.Write(new ExpressionStatement(new ReturnExpression(new MethodInvocationExpression(new MethodReferenceExpression(null, property.get_GetMethod(), null), null)
-			{
-				Arguments = this.CopyMethodParametersAsArguments(property.get_GetMethod())
-			}, null)));
+			stackVariable14 = new MethodInvocationExpression(new MethodReferenceExpression(null, property.get_GetMethod(), null), null);
+			stackVariable14.set_Arguments(this.CopyMethodParametersAsArguments(property.get_GetMethod()));
+			this.Write(new ExpressionStatement(new ReturnExpression(stackVariable14, null)));
 			this.WriteLine();
 			this.Outdent();
 			this.WriteEndBlock("Get");
+			return;
 		}
 
 		private void WriteSplitPropertySetter(PropertyDefinition property)
 		{
-			this.WriteKeyword(this.KeyWordWriter.Set);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Set());
 			this.WriteBeginBlock(false);
 			this.WriteLine();
 			this.Indent();
-			this.Write(new ExpressionStatement(new MethodInvocationExpression(new MethodReferenceExpression(null, property.get_SetMethod(), null), null)
-			{
-				Arguments = this.CopyMethodParametersAsArguments(property.get_SetMethod())
-			}));
+			stackVariable14 = new MethodInvocationExpression(new MethodReferenceExpression(null, property.get_SetMethod(), null), null);
+			stackVariable14.set_Arguments(this.CopyMethodParametersAsArguments(property.get_SetMethod()));
+			this.Write(new ExpressionStatement(stackVariable14));
 			this.WriteLine();
 			this.Outdent();
 			this.WriteEndBlock("Set");
+			return;
 		}
 
 		protected void WriteTokenBetweenSpace(string token)
@@ -4224,107 +4803,114 @@ namespace Telerik.JustDecompiler.Languages
 			this.WriteSpace();
 			this.WriteToken(token);
 			this.WriteSpace();
+			return;
 		}
 
 		protected virtual void WriteTypeAndName(TypeReference typeReference, string name, object reference)
 		{
+			return;
 		}
 
 		protected virtual void WriteTypeAndName(TypeReference typeReference, string name)
 		{
+			return;
 		}
 
 		protected virtual bool WriteTypeBaseTypes(TypeDefinition type, bool isPartial = false)
 		{
-			bool flag = false;
-			if (type.get_BaseType() != null && type.get_BaseType().get_FullName() != "System.Object" && (!isPartial || this.IsImplemented(type, type.get_BaseType().Resolve())))
+			V_0 = false;
+			if (type.get_BaseType() != null && String.op_Inequality(type.get_BaseType().get_FullName(), "System.Object") && !isPartial || this.IsImplemented(type, type.get_BaseType().Resolve()))
 			{
-				flag = true;
+				V_0 = true;
 				this.WriteBaseTypeInheritColon();
 				this.WriteReferenceAndNamespaceIfInCollision(type.get_BaseType());
 			}
-			return flag;
+			return V_0;
 		}
 
 		protected virtual void WriteTypeBaseTypesAndInterfaces(TypeDefinition type, bool isPartial)
 		{
-			bool flag = false;
+			V_0 = false;
 			if (!type.get_IsEnum() && !type.get_IsValueType())
 			{
-				flag = this.WriteTypeBaseTypes(type, isPartial);
+				V_0 = this.WriteTypeBaseTypes(type, isPartial);
 			}
 			if (!type.get_IsEnum())
 			{
-				this.WriteTypeInterfaces(type, isPartial, flag);
+				this.WriteTypeInterfaces(type, isPartial, V_0);
 			}
+			return;
 		}
 
 		protected override string WriteTypeDeclaration(TypeDefinition type, bool isPartial = false)
 		{
-			string nonGenericName = GenericHelper.GetNonGenericName(type.get_Name());
-			if (this.ModuleContext.RenamedMembers.Contains(type.get_MetadataToken().ToUInt32()))
+			V_0 = GenericHelper.GetNonGenericName(type.get_Name());
+			if (this.get_ModuleContext().get_RenamedMembers().Contains(type.get_MetadataToken().ToUInt32()))
 			{
-				this.WriteComment(nonGenericName);
+				this.WriteComment(V_0);
 				this.WriteLine();
 			}
-			string empty = String.Empty;
+			V_1 = String.Empty;
 			this.WriteTypeVisiblity(type);
 			this.WriteSpace();
 			if (isPartial)
 			{
-				this.WriteKeyword(this.KeyWordWriter.Partial);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Partial());
 				this.WriteSpace();
 			}
-			if (type.get_IsEnum())
+			if (!type.get_IsEnum())
 			{
-				empty = this.KeyWordWriter.Enum;
-			}
-			else if (!type.get_IsValueType())
-			{
-				if (type.get_IsClass())
+				if (!type.get_IsValueType())
 				{
-					if (!type.get_IsStaticClass())
+					if (type.get_IsClass())
 					{
-						if (type.get_IsSealed())
+						if (!type.get_IsStaticClass())
 						{
-							this.WriteKeyword(this.KeyWordWriter.SealedType);
-							this.WriteSpace();
+							if (type.get_IsSealed())
+							{
+								this.WriteKeyword(this.get_KeyWordWriter().get_SealedType());
+								this.WriteSpace();
+							}
+							if (type.get_IsAbstract())
+							{
+								this.WriteKeyword(this.get_KeyWordWriter().get_AbstractType());
+								this.WriteSpace();
+							}
+							V_1 = this.get_KeyWordWriter().get_Class();
 						}
-						if (type.get_IsAbstract())
+						else
 						{
-							this.WriteKeyword(this.KeyWordWriter.AbstractType);
-							this.WriteSpace();
+							this.WriteTypeStaticKeywordAndSpace();
+							V_1 = this.get_KeyWordWriter().get_StaticClass();
 						}
-						empty = this.KeyWordWriter.Class;
 					}
-					else
+					if (type.get_IsInterface())
 					{
-						this.WriteTypeStaticKeywordAndSpace();
-						empty = this.KeyWordWriter.StaticClass;
+						V_1 = this.get_KeyWordWriter().get_Interface();
 					}
 				}
-				if (type.get_IsInterface())
+				else
 				{
-					empty = this.KeyWordWriter.Interface;
+					V_1 = this.get_KeyWordWriter().get_Struct();
 				}
 			}
 			else
 			{
-				empty = this.KeyWordWriter.Struct;
+				V_1 = this.get_KeyWordWriter().get_Enum();
 			}
-			this.WriteKeyword(empty);
+			this.WriteKeyword(V_1);
 			this.WriteSpace();
-			int currentPosition = this.formatter.CurrentPosition;
+			V_2 = this.formatter.get_CurrentPosition();
 			this.WriteGenericName(type);
-			int num = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[type] = new OffsetSpan(currentPosition, num);
+			V_3 = this.formatter.get_CurrentPosition() - 1;
+			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(type, new OffsetSpan(V_2, V_3));
 			if (!type.get_IsDefaultEnum() && type.get_IsEnum())
 			{
-				TypeReference fieldType = type.get_Fields().get_Item(0).get_FieldType();
-				if (fieldType.get_Name() != "Int32")
+				V_5 = type.get_Fields().get_Item(0).get_FieldType();
+				if (String.op_Inequality(V_5.get_Name(), "Int32"))
 				{
 					this.WriteEnumBaseTypeInheritColon();
-					this.WriteReferenceAndNamespaceIfInCollision(fieldType);
+					this.WriteReferenceAndNamespaceIfInCollision(V_5);
 				}
 			}
 			this.WriteTypeBaseTypesAndInterfaces(type, isPartial);
@@ -4332,7 +4918,7 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.PostWriteGenericParametersConstraints(type);
 			}
-			return empty;
+			return V_1;
 		}
 
 		protected abstract void WriteTypeInterfaces(TypeDefinition type, bool isPartial, bool baseTypeWritten);
@@ -4341,6 +4927,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.WriteLine();
 			this.Indent();
+			return;
 		}
 
 		private void WriteTypeReferenceNavigationName(TypeReference type)
@@ -4366,44 +4953,43 @@ namespace Telerik.JustDecompiler.Languages
 			}
 			if (type.get_IsArray())
 			{
-				int count = (type as ArrayType).get_Dimensions().get_Count();
+				V_1 = (type as ArrayType).get_Dimensions().get_Count();
 				type = (type as ArrayType).get_ElementType();
 				this.WriteTypeReferenceNavigationName(type);
-				this.formatter.Write(this.IndexLeftBracket);
-				this.formatter.Write(new String(',', count - 1));
-				this.formatter.Write(this.IndexRightBracket);
+				this.formatter.Write(this.get_IndexLeftBracket());
+				this.formatter.Write(new String(',', V_1 - 1));
+				this.formatter.Write(this.get_IndexRightBracket());
 				return;
 			}
-			string nonGenericName = GenericHelper.GetNonGenericName(type.get_Name());
-			if (base.Settings.RenameInvalidMembers)
+			V_0 = GenericHelper.GetNonGenericName(type.get_Name());
+			if (this.get_Settings().get_RenameInvalidMembers())
 			{
-				nonGenericName = base.Language.ReplaceInvalidCharactersInIdentifier(nonGenericName);
+				V_0 = this.get_Language().ReplaceInvalidCharactersInIdentifier(V_0);
 			}
-			this.formatter.Write(nonGenericName);
-			if (type is GenericInstanceType)
+			this.formatter.Write(V_0);
+			if (type as GenericInstanceType != null)
 			{
 				this.WriteGenericInstanceTypeArguments((GenericInstanceType)type);
 				return;
 			}
 			if (type.get_HasGenericParameters())
 			{
-				this.WriteGenericParametersToDefinition(type, null, base.Settings.RenameInvalidMembers);
+				this.WriteGenericParametersToDefinition(type, null, this.get_Settings().get_RenameInvalidMembers());
 			}
+			return;
 		}
 
 		protected virtual void WriteTypeSpecification(TypeSpecification typeSpecification, int startingArgument = 0)
 		{
-			TypeReference i;
-			ArrayType arrayType = null;
-			if (typeSpecification is PointerType)
+			if (typeSpecification as PointerType != null)
 			{
 				this.WriteReference(typeSpecification.get_ElementType());
 				this.WriteToken("*");
 				return;
 			}
-			if (typeSpecification is PinnedType)
+			if (typeSpecification as PinnedType != null)
 			{
-				if (!(typeSpecification.get_ElementType() is ByReferenceType))
+				if (typeSpecification.get_ElementType() as ByReferenceType == null)
 				{
 					this.WriteReference(typeSpecification.get_ElementType());
 					return;
@@ -4412,44 +4998,59 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteToken("*");
 				return;
 			}
-			if (typeSpecification is ByReferenceType)
+			if (typeSpecification as ByReferenceType != null)
 			{
 				this.WriteReference(typeSpecification.get_ElementType());
 				this.WriteToken("&");
 				return;
 			}
-			ArrayType arrayType1 = typeSpecification as ArrayType;
-			if (arrayType1 != null)
+			V_0 = typeSpecification as ArrayType;
+			if (V_0 != null)
 			{
-				List<int> nums = new List<int>();
-				for (i = typeSpecification.get_ElementType(); i is ArrayType; i = arrayType.get_ElementType())
+				V_2 = new List<int>();
+				V_3 = typeSpecification.get_ElementType();
+				while (V_3 as ArrayType != null)
 				{
-					arrayType = i as ArrayType;
-					nums.Add(arrayType.get_Dimensions().get_Count());
+					V_4 = V_3 as ArrayType;
+					V_2.Add(V_4.get_Dimensions().get_Count());
+					V_3 = V_4.get_ElementType();
 				}
-				this.WriteReference(i);
-				this.WriteToken(this.IndexLeftBracket);
-				if (arrayType1.get_Dimensions() != null)
+				this.WriteReference(V_3);
+				this.WriteToken(this.get_IndexLeftBracket());
+				if (V_0.get_Dimensions() != null)
 				{
-					for (int j = 1; j < arrayType1.get_Dimensions().get_Count(); j++)
+					V_5 = 1;
+					while (V_5 < V_0.get_Dimensions().get_Count())
 					{
 						this.WriteToken(",");
+						V_5 = V_5 + 1;
 					}
 				}
-				this.WriteToken(this.IndexRightBracket);
-				foreach (int num in nums)
+				this.WriteToken(this.get_IndexRightBracket());
+				V_6 = V_2.GetEnumerator();
+				try
 				{
-					this.WriteToken(this.IndexLeftBracket);
-					for (int k = 1; k < num; k++)
+					while (V_6.MoveNext())
 					{
-						this.WriteToken(",");
+						V_7 = V_6.get_Current();
+						this.WriteToken(this.get_IndexLeftBracket());
+						V_8 = 1;
+						while (V_8 < V_7)
+						{
+							this.WriteToken(",");
+							V_8 = V_8 + 1;
+						}
+						this.WriteToken(this.get_IndexRightBracket());
 					}
-					this.WriteToken(this.IndexRightBracket);
+				}
+				finally
+				{
+					((IDisposable)V_6).Dispose();
 				}
 				return;
 			}
-			GenericInstanceType genericInstanceType = typeSpecification as GenericInstanceType;
-			if (genericInstanceType == null)
+			V_1 = typeSpecification as GenericInstanceType;
+			if (V_1 == null)
 			{
 				if (typeSpecification.get_MetadataType() == 32)
 				{
@@ -4460,7 +5061,7 @@ namespace Telerik.JustDecompiler.Languages
 				{
 					throw new NotSupportedException();
 				}
-				if (this.isWritingComment && (typeSpecification as RequiredModifierType).get_ModifierType().get_FullName() == "System.Runtime.CompilerServices.IsVolatile")
+				if (this.isWritingComment && String.op_Equality((typeSpecification as RequiredModifierType).get_ModifierType().get_FullName(), "System.Runtime.CompilerServices.IsVolatile"))
 				{
 					this.WriteVolatileType(typeSpecification.get_ElementType());
 					return;
@@ -4468,56 +5069,58 @@ namespace Telerik.JustDecompiler.Languages
 				this.WriteReference(typeSpecification.get_ElementType());
 				return;
 			}
-			if (!this.SupportsSpecialNullable || genericInstanceType.GetFriendlyFullName(base.Language).IndexOf("System.Nullable<") != 0 || !genericInstanceType.get_GenericArguments().get_Item(0).get_IsValueType())
+			if (!this.get_SupportsSpecialNullable() || V_1.GetFriendlyFullName(this.get_Language()).IndexOf("System.Nullable<") != 0 || !V_1.get_GenericArguments().get_Item(0).get_IsValueType())
 			{
-				this.WriteGenericInstance(genericInstanceType, startingArgument);
+				this.WriteGenericInstance(V_1, startingArgument);
 				return;
 			}
-			TypeReference item = genericInstanceType.get_GenericArguments().get_Item(0);
-			if (genericInstanceType.get_PostionToArgument().ContainsKey(0))
+			V_9 = V_1.get_GenericArguments().get_Item(0);
+			if (V_1.get_PostionToArgument().ContainsKey(0))
 			{
-				item = genericInstanceType.get_PostionToArgument()[0];
+				V_9 = V_1.get_PostionToArgument().get_Item(0);
 			}
-			this.WriteReference(item);
+			this.WriteReference(V_9);
 			this.WriteToken("?");
+			return;
 		}
 
 		protected virtual void WriteTypeStaticKeywordAndSpace()
 		{
-			this.WriteKeyword(this.KeyWordWriter.Static);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Static());
 			this.WriteSpace();
+			return;
 		}
 
 		protected void WriteTypeVisiblity(TypeDefinition type)
 		{
-			if (this.TypeContext.IsWinRTImplementation)
+			if (this.get_TypeContext().get_IsWinRTImplementation())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Public);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Public());
 				return;
 			}
 			if (type.get_IsPublic())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Public);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Public());
 				return;
 			}
 			if (type.get_IsNestedPublic())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Public);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Public());
 				return;
 			}
 			if (type.get_IsNestedFamily())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Protected);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Protected());
 				return;
 			}
 			if (type.get_IsNestedPrivate())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Private);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Private());
 				return;
 			}
 			if (type.get_IsNestedAssembly())
 			{
-				this.WriteKeyword(this.KeyWordWriter.Internal);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Internal());
 				return;
 			}
 			if (!type.get_IsNestedFamilyOrAssembly() && !type.get_IsNestedFamilyAndAssembly())
@@ -4526,20 +5129,23 @@ namespace Telerik.JustDecompiler.Languages
 				{
 					throw new NotSupportedException();
 				}
-				this.WriteKeyword(this.KeyWordWriter.Internal);
+				this.WriteKeyword(this.get_KeyWordWriter().get_Internal());
 				return;
 			}
-			this.WriteKeyword(this.KeyWordWriter.Protected);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Protected());
 			this.WriteSpace();
-			this.WriteKeyword(this.KeyWordWriter.Internal);
+			this.WriteKeyword(this.get_KeyWordWriter().get_Internal());
+			return;
 		}
 
 		protected virtual void WriteVariableTypeAndName(VariableDefinition variable)
 		{
+			return;
 		}
 
 		protected virtual void WriteVolatileType(TypeReference reference)
 		{
+			return;
 		}
 	}
 }

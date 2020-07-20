@@ -2,7 +2,6 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Steps;
 
@@ -16,71 +15,74 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		protected BaseAssignmentAnalysisStep()
 		{
+			base();
+			return;
 		}
 
 		protected abstract void AnalyzeAssignments();
 
 		protected AssignmentType AnalyzeAssignmentType(BaseUsageFinder usageFinder)
 		{
-			int count;
 			this.PrepareNodes();
-			AssignmentAnalyzer assignmentAnalyzer = new AssignmentAnalyzer(usageFinder, this.context.MethodContext.Expressions);
-			AssignmentType assignmentType = assignmentAnalyzer.CheckAssignmentType(this.mappedNodes[0]);
-			if (assignmentType == AssignmentType.NotAssigned)
+			V_0 = new AssignmentAnalyzer(usageFinder, this.context.get_MethodContext().get_Expressions());
+			V_1 = V_0.CheckAssignmentType(this.mappedNodes[0]);
+			if (V_1 == 1)
 			{
-				return AssignmentType.NotAssigned;
+				return 1;
 			}
-			AssignmentType assignmentType1 = assignmentType;
-			List<ExceptionHandler> exceptionHandlers = new List<ExceptionHandler>(this.context.MethodContext.ControlFlowGraph.RawExceptionHandlers);
+			V_2 = V_1;
+			V_3 = new List<ExceptionHandler>(this.context.get_MethodContext().get_ControlFlowGraph().get_RawExceptionHandlers());
 			do
 			{
-				count = exceptionHandlers.Count;
-				for (int i = 0; i < exceptionHandlers.Count; i++)
+				V_4 = V_3.get_Count();
+				V_5 = 0;
+				while (V_5 < V_3.get_Count())
 				{
-					ExceptionHandler item = exceptionHandlers[i];
-					if (this.GetNodeFromBlockOffset(item.get_TryStart().get_Offset()).NodeState != AssignmentNodeState.Unknown)
+					V_6 = V_3.get_Item(V_5);
+					if (this.GetNodeFromBlockOffset(V_6.get_TryStart().get_Offset()).get_NodeState() != AssignmentNodeState.Unknown)
 					{
-						int num = i;
-						i = num - 1;
-						exceptionHandlers.RemoveAt(num);
-						this.CheckHandler(this.GetNodeFromBlockOffset(item.get_HandlerStart().get_Offset()), assignmentAnalyzer, ref assignmentType1);
-						if (assignmentType1 == AssignmentType.NotAssigned)
+						stackVariable41 = V_5;
+						V_5 = stackVariable41 - 1;
+						V_3.RemoveAt(stackVariable41);
+						this.CheckHandler(this.GetNodeFromBlockOffset(V_6.get_HandlerStart().get_Offset()), V_0, ref V_2);
+						if (V_2 == 1)
 						{
-							return AssignmentType.NotAssigned;
+							return 1;
 						}
-						if (item.get_HandlerType() == 1)
+						if (V_6.get_HandlerType() == 1)
 						{
-							this.CheckHandler(this.GetNodeFromBlockOffset(item.get_FilterStart().get_Offset()), assignmentAnalyzer, ref assignmentType1);
-							if (assignmentType1 == AssignmentType.NotAssigned)
+							this.CheckHandler(this.GetNodeFromBlockOffset(V_6.get_FilterStart().get_Offset()), V_0, ref V_2);
+							if (V_2 == 1)
 							{
-								return AssignmentType.NotAssigned;
+								return 1;
 							}
 						}
 					}
+					V_5 = V_5 + 1;
 				}
 			}
-			while (count != exceptionHandlers.Count);
-			return assignmentType1;
+			while (V_4 != V_3.get_Count());
+			return V_2;
 		}
 
 		private void CheckHandler(AssignmentFlowNode handlerEntry, AssignmentAnalyzer analyzer, ref AssignmentType result)
 		{
-			AssignmentType assignmentType = analyzer.CheckAssignmentType(handlerEntry);
-			switch (assignmentType)
+			V_0 = analyzer.CheckAssignmentType(handlerEntry);
+			switch (V_0 - 1)
 			{
-				case AssignmentType.NotAssigned:
-				case AssignmentType.MultipleAssignments:
+				case 0:
+				case 2:
 				{
-					result = assignmentType;
+					result = V_0;
 					break;
 				}
-				case AssignmentType.SingleAssignment:
+				case 1:
 				{
 					if ((int)result == 3)
 					{
 						break;
 					}
-					result = assignmentType;
+					result = V_0;
 					return;
 				}
 				default:
@@ -88,20 +90,24 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 					return;
 				}
 			}
+			return;
 		}
 
 		private AssignmentFlowNode GetNodeFromBlockOffset(int offset)
 		{
-			return this.mappedNodes[this.context.MethodContext.ControlFlowGraph.InstructionToBlockMapping[offset].Index];
+			return this.mappedNodes[this.context.get_MethodContext().get_ControlFlowGraph().get_InstructionToBlockMapping().get_Item(offset).get_Index()];
 		}
 
 		private void PrepareNodes()
 		{
-			AssignmentFlowNode[] assignmentFlowNodeArray = this.mappedNodes;
-			for (int i = 0; i < (int)assignmentFlowNodeArray.Length; i++)
+			V_0 = this.mappedNodes;
+			V_1 = 0;
+			while (V_1 < (int)V_0.Length)
 			{
-				assignmentFlowNodeArray[i].NodeState = AssignmentNodeState.Unknown;
+				V_0[V_1].set_NodeState(0);
+				V_1 = V_1 + 1;
 			}
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -117,20 +123,27 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		private void ProcessTheCFG()
 		{
-			this.mappedNodes = new AssignmentFlowNode[(int)this.context.MethodContext.ControlFlowGraph.Blocks.Length];
-			for (int i = 0; i < (int)this.mappedNodes.Length; i++)
+			this.mappedNodes = new AssignmentFlowNode[(int)this.context.get_MethodContext().get_ControlFlowGraph().get_Blocks().Length];
+			V_0 = 0;
+			while (V_0 < (int)this.mappedNodes.Length)
 			{
-				this.mappedNodes[i] = new AssignmentFlowNode(this.context.MethodContext.ControlFlowGraph.Blocks[i]);
+				this.mappedNodes[V_0] = new AssignmentFlowNode(this.context.get_MethodContext().get_ControlFlowGraph().get_Blocks()[V_0]);
+				V_0 = V_0 + 1;
 			}
-			AssignmentFlowNode[] assignmentFlowNodeArray = this.mappedNodes;
-			for (int j = 0; j < (int)assignmentFlowNodeArray.Length; j++)
+			V_1 = this.mappedNodes;
+			V_2 = 0;
+			while (V_2 < (int)V_1.Length)
 			{
-				AssignmentFlowNode assignmentFlowNode = assignmentFlowNodeArray[j];
-				for (int k = 0; k < assignmentFlowNode.Successors.Count; k++)
+				V_3 = V_1[V_2];
+				V_4 = 0;
+				while (V_4 < V_3.get_Successors().get_Count())
 				{
-					assignmentFlowNode.Successors[k] = this.mappedNodes[assignmentFlowNode.CFGBlock.Successors[k].Index];
+					V_3.get_Successors().set_Item(V_4, this.mappedNodes[V_3.get_CFGBlock().get_Successors()[V_4].get_Index()]);
+					V_4 = V_4 + 1;
 				}
+				V_2 = V_2 + 1;
 			}
+			return;
 		}
 
 		protected virtual bool ShouldExecuteStep()

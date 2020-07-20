@@ -21,12 +21,16 @@ namespace Telerik.JustDecompiler.Languages.IL
 			{
 				if (this.invertedList == null)
 				{
-					List<ILRange> lRanges = this.MemberCodeMappings.ConvertAll<ILRange>((SourceCodeMapping s) => new ILRange()
+					stackVariable5 = this.get_MemberCodeMappings();
+					stackVariable6 = MemberMapping.u003cu003ec.u003cu003e9__18_0;
+					if (stackVariable6 == null)
 					{
-						From = s.ILInstructionOffset.From,
-						To = s.ILInstructionOffset.To
-					});
-					this.invertedList = ILRange.OrderAndJoint(ILRange.Invert(lRanges, this.CodeSize));
+						dummyVar0 = stackVariable6;
+						stackVariable6 = new Converter<SourceCodeMapping, ILRange>(MemberMapping.u003cu003ec.u003cu003e9.u003cget_InvertedListu003eb__18_0);
+						MemberMapping.u003cu003ec.u003cu003e9__18_0 = stackVariable6;
+					}
+					V_0 = stackVariable5.ConvertAll<ILRange>(stackVariable6);
+					this.invertedList = ILRange.OrderAndJoint(ILRange.Invert(V_0, this.get_CodeSize()));
 				}
 				return this.invertedList;
 			}
@@ -52,6 +56,8 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public MemberMapping()
 		{
+			base();
+			return;
 		}
 	}
 }

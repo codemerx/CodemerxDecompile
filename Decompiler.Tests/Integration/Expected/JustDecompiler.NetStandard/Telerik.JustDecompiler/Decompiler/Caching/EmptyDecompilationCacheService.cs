@@ -10,26 +10,33 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 	{
 		public EmptyDecompilationCacheService()
 		{
+			base();
+			return;
 		}
 
 		public void AddAssemblyContextToCache(AssemblyDefinition assembly, ILanguage language, bool renameInvalidMembers, AssemblySpecificContext assemblyContext)
 		{
+			return;
 		}
 
 		public void AddDecompiledMemberToCache(IMemberDefinition member, ILanguage language, bool renameInvalidMembers, CachedDecompiledMember decompiledMember)
 		{
+			return;
 		}
 
 		public void AddModuleContextToCache(ModuleDefinition module, ILanguage language, bool renameInvalidMembers, ModuleSpecificContext assemblyContext)
 		{
+			return;
 		}
 
 		public void AddNestedDecompiledTypesToCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers, Dictionary<string, DecompiledType> decompiledTypes)
 		{
+			return;
 		}
 
 		public void AddTypeContextToCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers, TypeSpecificContext typeContex)
 		{
+			return;
 		}
 
 		public bool AreNestedDecompiledTypesInCache(TypeDefinition type, ILanguage language, bool renameInvalidMembers)
@@ -84,6 +91,7 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		public void ReplaceCachedTypeContext(TypeDefinition type, ILanguage language, bool renameInvalidMembers, TypeSpecificContext newContext)
 		{
+			return;
 		}
 	}
 }

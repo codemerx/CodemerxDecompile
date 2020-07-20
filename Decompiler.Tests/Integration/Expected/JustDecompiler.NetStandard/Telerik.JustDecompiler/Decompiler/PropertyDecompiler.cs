@@ -1,15 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.External.Interfaces;
@@ -47,96 +42,99 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public PropertyDecompiler(PropertyDefinition property, ILanguage language, bool renameInvalidMembers, IDecompilationCacheService cacheService, TypeSpecificContext typeContext = null)
 		{
+			base();
 			this.propertyDef = property;
 			this.language = language;
 			this.renameInvalidMembers = renameInvalidMembers;
 			this.cacheService = cacheService;
 			this.typeContext = typeContext;
 			this.propertyFieldDef = null;
-			this.ExceptionsWhileDecompiling = new List<MethodDefinition>();
+			this.set_ExceptionsWhileDecompiling(new List<MethodDefinition>());
+			return;
 		}
 
-		public PropertyDecompiler(PropertyDefinition property, ILanguage language, TypeSpecificContext typeContext = null) : this(property, language, false, null, typeContext)
+		public PropertyDecompiler(PropertyDefinition property, ILanguage language, TypeSpecificContext typeContext = null)
 		{
+			this(property, language, false, null, typeContext);
+			return;
 		}
 
 		private bool CheckFieldReferenceExpression(FieldReferenceExpression fieldRefExpression)
 		{
-			if (fieldRefExpression.Field == null)
+			if (fieldRefExpression.get_Field() == null)
 			{
 				return false;
 			}
 			if (this.propertyFieldDef != null)
 			{
-				return (object)fieldRefExpression.Field.Resolve() == (object)this.propertyFieldDef;
+				return (object)fieldRefExpression.get_Field().Resolve() == (object)this.propertyFieldDef;
 			}
-			FieldDefinition fieldDefinition = fieldRefExpression.Field.Resolve();
-			if (fieldDefinition == null || (object)fieldDefinition.get_DeclaringType() != (object)this.propertyDef.get_DeclaringType())
+			V_0 = fieldRefExpression.get_Field().Resolve();
+			if (V_0 == null || (object)V_0.get_DeclaringType() != (object)this.propertyDef.get_DeclaringType())
 			{
 				return false;
 			}
-			if (!fieldDefinition.HasCompilerGeneratedAttribute())
+			if (!V_0.HasCompilerGeneratedAttribute())
 			{
 				return false;
 			}
-			this.propertyFieldDef = fieldDefinition;
+			this.propertyFieldDef = V_0;
 			return true;
 		}
 
 		private bool CheckGetter(BlockStatement getterStatements)
 		{
-			FieldReferenceExpression right;
-			if (getterStatements == null || getterStatements.Statements == null || getterStatements.Statements.Count != 1 && getterStatements.Statements.Count != 2 || getterStatements.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
+			if (getterStatements == null || getterStatements.get_Statements() == null || getterStatements.get_Statements().get_Count() != 1 && getterStatements.get_Statements().get_Count() != 2 || getterStatements.get_Statements().get_Item(0).get_CodeNodeType() != 5)
 			{
 				return false;
 			}
-			if (getterStatements.Statements.Count != 1)
+			if (getterStatements.get_Statements().get_Count() != 1)
 			{
-				BinaryExpression expression = (getterStatements.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
-				if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.FieldReferenceExpression)
+				V_2 = (getterStatements.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
+				if (V_2 == null || !V_2.get_IsAssignmentExpression() || V_2.get_Left().get_CodeNodeType() != 26 || V_2.get_Right().get_CodeNodeType() != 30)
 				{
 					return false;
 				}
-				if (getterStatements.Statements[1].CodeNodeType != CodeNodeType.ExpressionStatement)
+				if (getterStatements.get_Statements().get_Item(1).get_CodeNodeType() != 5)
 				{
 					return false;
 				}
-				ReturnExpression returnExpression = (getterStatements.Statements[1] as ExpressionStatement).Expression as ReturnExpression;
-				if (returnExpression == null || returnExpression.Value == null || returnExpression.Value.CodeNodeType != CodeNodeType.VariableReferenceExpression)
+				V_3 = (getterStatements.get_Statements().get_Item(1) as ExpressionStatement).get_Expression() as ReturnExpression;
+				if (V_3 == null || V_3.get_Value() == null || V_3.get_Value().get_CodeNodeType() != 26)
 				{
 					return false;
 				}
-				right = expression.Right as FieldReferenceExpression;
+				V_0 = V_2.get_Right() as FieldReferenceExpression;
 			}
 			else
 			{
-				ReturnExpression expression1 = (getterStatements.Statements[0] as ExpressionStatement).Expression as ReturnExpression;
-				if (expression1 == null || expression1.Value == null || expression1.Value.CodeNodeType != CodeNodeType.FieldReferenceExpression)
+				V_1 = (getterStatements.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as ReturnExpression;
+				if (V_1 == null || V_1.get_Value() == null || V_1.get_Value().get_CodeNodeType() != 30)
 				{
 					return false;
 				}
-				right = expression1.Value as FieldReferenceExpression;
+				V_0 = V_1.get_Value() as FieldReferenceExpression;
 			}
-			return this.CheckFieldReferenceExpression(right);
+			return this.CheckFieldReferenceExpression(V_0);
 		}
 
 		private bool CheckSetter(BlockStatement setterStatements)
 		{
-			if (setterStatements == null || setterStatements.Statements == null || setterStatements.Statements.Count != 2 || setterStatements.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement || setterStatements.Statements[1].CodeNodeType != CodeNodeType.ExpressionStatement)
+			if (setterStatements == null || setterStatements.get_Statements() == null || setterStatements.get_Statements().get_Count() != 2 || setterStatements.get_Statements().get_Item(0).get_CodeNodeType() != 5 || setterStatements.get_Statements().get_Item(1).get_CodeNodeType() != 5)
 			{
 				return false;
 			}
-			ReturnExpression expression = (setterStatements.Statements[1] as ExpressionStatement).Expression as ReturnExpression;
-			if (expression == null || expression.Value != null)
+			V_0 = (setterStatements.get_Statements().get_Item(1) as ExpressionStatement).get_Expression() as ReturnExpression;
+			if (V_0 == null || V_0.get_Value() != null)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression = (setterStatements.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
-			if (binaryExpression == null || !binaryExpression.IsAssignmentExpression || binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.ArgumentReferenceExpression)
+			V_1 = (setterStatements.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
+			if (V_1 == null || !V_1.get_IsAssignmentExpression() || V_1.get_Left().get_CodeNodeType() != 30 || V_1.get_Right().get_CodeNodeType() != 25)
 			{
 				return false;
 			}
-			return this.CheckFieldReferenceExpression(binaryExpression.Left as FieldReferenceExpression);
+			return this.CheckFieldReferenceExpression(V_1.get_Left() as FieldReferenceExpression);
 		}
 
 		public void Decompile(out CachedDecompiledMember getMethod, out CachedDecompiledMember setMethod, out bool isAutoImplemented)
@@ -153,7 +151,7 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 			if (this.propertyDef.get_SetMethod() == null)
 			{
-				if (this.language.SupportsGetterOnlyAutoProperties)
+				if (this.language.get_SupportsGetterOnlyAutoProperties())
 				{
 					isAutoImplemented = this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_GetMethod(), out getMethod, true, new Func<BlockStatement, bool>(this.CheckGetter));
 					return;
@@ -171,14 +169,14 @@ namespace Telerik.JustDecompiler.Decompiler
 				return;
 			}
 			isAutoImplemented = this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_GetMethod(), out getMethod, true, new Func<BlockStatement, bool>(this.CheckGetter)) & this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_SetMethod(), out setMethod, true, new Func<BlockStatement, bool>(this.CheckSetter));
+			return;
 		}
 
 		private bool DecompileAndCheckForAutoImplementedPropertyMethod(MethodDefinition method, out CachedDecompiledMember decompiledMember, bool needDecompiledMember, Func<BlockStatement, bool> checker)
 		{
-			DecompilationContext decompilationContext;
 			decompiledMember = null;
-			BlockStatement blockStatement = this.DecompileMethodPartially(method.get_Body(), out decompilationContext, needDecompiledMember);
-			if (blockStatement == null && decompilationContext == null)
+			V_1 = this.DecompileMethodPartially(method.get_Body(), out V_0, needDecompiledMember);
+			if (V_1 == null && V_0 == null)
 			{
 				if (needDecompiledMember)
 				{
@@ -186,19 +184,19 @@ namespace Telerik.JustDecompiler.Decompiler
 				}
 				return false;
 			}
-			if (blockStatement.Statements.Count == 1 && blockStatement.Statements[0].CodeNodeType == CodeNodeType.ExceptionStatement)
+			if (V_1.get_Statements().get_Count() == 1 && V_1.get_Statements().get_Item(0).get_CodeNodeType() == 67)
 			{
 				if (needDecompiledMember)
 				{
-					decompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, new MethodSpecificContext(method.get_Body())));
+					decompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), V_1, new MethodSpecificContext(method.get_Body())));
 				}
 				return false;
 			}
-			if (!checker(blockStatement))
+			if (!checker.Invoke(V_1))
 			{
 				if (needDecompiledMember)
 				{
-					decompiledMember = this.FinishDecompilationOfMember(method, blockStatement, decompilationContext);
+					decompiledMember = this.FinishDecompilationOfMember(method, V_1, V_0);
 				}
 				return false;
 			}
@@ -206,11 +204,11 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				if (!this.propertyDef.ShouldStaySplit())
 				{
-					decompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, decompilationContext.MethodContext));
+					decompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), V_1, V_0.get_MethodContext()));
 				}
 				else
 				{
-					decompiledMember = this.FinishDecompilationOfMember(method, blockStatement, decompilationContext);
+					decompiledMember = this.FinishDecompilationOfMember(method, V_1, V_0);
 				}
 			}
 			return true;
@@ -218,159 +216,165 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private CachedDecompiledMember DecompileMember(MethodDefinition method)
 		{
-			MethodSpecificContext methodSpecificContext;
-			CachedDecompiledMember cachedDecompiledMember = null;
+			V_0 = null;
 			if (method != null)
 			{
 				if (method.get_Body() != null)
 				{
-					if (this.IsCachingEnabled && this.cacheService.IsDecompiledMemberInCache(method, this.language, this.renameInvalidMembers))
+					if (this.get_IsCachingEnabled() && this.cacheService.IsDecompiledMemberInCache(method, this.language, this.renameInvalidMembers))
 					{
 						return this.cacheService.GetDecompiledMemberFromCache(method, this.language, this.renameInvalidMembers);
 					}
-					BlockStatement blockStatement = this.DecompileMethod(method.get_Body(), out methodSpecificContext);
-					cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, methodSpecificContext));
-					if (this.IsCachingEnabled)
+					V_2 = this.DecompileMethod(method.get_Body(), out V_1);
+					V_0 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), V_2, V_1));
+					if (this.get_IsCachingEnabled())
 					{
-						this.cacheService.AddDecompiledMemberToCache(method, this.language, this.renameInvalidMembers, cachedDecompiledMember);
+						this.cacheService.AddDecompiledMemberToCache(method, this.language, this.renameInvalidMembers, V_0);
 					}
 				}
 				else
 				{
-					cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null));
+					V_0 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null));
 				}
 			}
-			return cachedDecompiledMember;
+			return V_0;
 		}
 
 		private BlockStatement DecompileMethod(MethodBody body, out MethodSpecificContext methodContext)
 		{
-			BlockStatement blockStatement;
 			methodContext = null;
 			try
 			{
-				DecompilationContext decompilationContext = new DecompilationContext(new MethodSpecificContext(body), this.typeContext ?? new TypeSpecificContext(body.get_Method().get_DeclaringType()), this.language);
-				DecompilationPipeline decompilationPipeline = this.language.CreatePipeline(decompilationContext);
-				methodContext = decompilationPipeline.Run(body, this.language).MethodContext;
-				blockStatement = decompilationPipeline.Body;
+				stackVariable3 = new MethodSpecificContext(body);
+				stackVariable5 = this.typeContext;
+				if (stackVariable5 == null)
+				{
+					dummyVar0 = stackVariable5;
+					stackVariable5 = new TypeSpecificContext(body.get_Method().get_DeclaringType());
+				}
+				V_1 = new DecompilationContext(stackVariable3, stackVariable5, this.language);
+				V_2 = this.language.CreatePipeline(V_1);
+				methodContext = V_2.Run(body, this.language).get_MethodContext();
+				V_0 = V_2.get_Body();
 			}
-			catch (Exception exception1)
+			catch (Exception exception_0)
 			{
-				Exception exception = exception1;
-				this.ExceptionsWhileDecompiling.Add(body.get_Method());
+				V_3 = exception_0;
+				this.get_ExceptionsWhileDecompiling().Add(body.get_Method());
 				methodContext = new MethodSpecificContext(body);
-				blockStatement = new BlockStatement();
-				blockStatement.AddStatement(new ExceptionStatement(exception, body.get_Method()));
-				base.OnExceptionThrown(exception);
+				V_0 = new BlockStatement();
+				V_0.AddStatement(new ExceptionStatement(V_3, body.get_Method()));
+				this.OnExceptionThrown(V_3);
 			}
-			return blockStatement;
+			return V_0;
 		}
 
 		private BlockStatement DecompileMethodPartially(MethodBody body, out DecompilationContext context, bool needDecompiledMember = false)
 		{
-			BlockStatement blockStatement;
 			context = null;
-			if (this.IsCachingEnabled && this.cacheService.IsDecompiledMemberInCache(body.get_Method(), this.language, this.renameInvalidMembers))
+			if (this.get_IsCachingEnabled() && this.cacheService.IsDecompiledMemberInCache(body.get_Method(), this.language, this.renameInvalidMembers))
 			{
-				return this.cacheService.GetDecompiledMemberFromCache(body.get_Method(), this.language, this.renameInvalidMembers).Member.Statement as BlockStatement;
+				return this.cacheService.GetDecompiledMemberFromCache(body.get_Method(), this.language, this.renameInvalidMembers).get_Member().get_Statement() as BlockStatement;
 			}
-			if ((int)(new ControlFlowGraphBuilder(body.get_Method())).CreateGraph().Blocks.Length > 2)
+			if ((int)(new ControlFlowGraphBuilder(body.get_Method())).CreateGraph().get_Blocks().Length > 2)
 			{
 				return null;
 			}
 			try
 			{
-				DecompilationContext decompilationContext = new DecompilationContext(new MethodSpecificContext(body), this.typeContext ?? new TypeSpecificContext(body.get_Method().get_DeclaringType()), this.language);
+				stackVariable13 = new MethodSpecificContext(body);
+				stackVariable15 = this.typeContext;
+				if (stackVariable15 == null)
+				{
+					dummyVar0 = stackVariable15;
+					stackVariable15 = new TypeSpecificContext(body.get_Method().get_DeclaringType());
+				}
+				V_2 = new DecompilationContext(stackVariable13, stackVariable15, this.language);
 				if (!needDecompiledMember)
 				{
-					decompilationContext.MethodContext.EnableEventAnalysis = false;
+					V_2.get_MethodContext().set_EnableEventAnalysis(false);
 				}
-				DecompilationPipeline decompilationPipeline = new DecompilationPipeline(BaseLanguage.IntermediateRepresenationPipeline.Steps, decompilationContext);
-				context = decompilationPipeline.Run(body, this.language);
-				blockStatement = decompilationPipeline.Body;
+				V_1 = new DecompilationPipeline(BaseLanguage.get_IntermediateRepresenationPipeline().get_Steps(), V_2);
+				context = V_1.Run(body, this.language);
+				V_0 = V_1.get_Body();
 			}
-			catch (Exception exception1)
+			catch (Exception exception_0)
 			{
-				Exception exception = exception1;
-				this.ExceptionsWhileDecompiling.Add(body.get_Method());
-				blockStatement = new BlockStatement();
-				blockStatement.AddStatement(new ExceptionStatement(exception, body.get_Method()));
-				base.OnExceptionThrown(exception);
+				V_3 = exception_0;
+				this.get_ExceptionsWhileDecompiling().Add(body.get_Method());
+				V_0 = new BlockStatement();
+				V_0.AddStatement(new ExceptionStatement(V_3, body.get_Method()));
+				this.OnExceptionThrown(V_3);
 			}
-			return blockStatement;
+			return V_0;
 		}
 
 		private CachedDecompiledMember FinishDecompilationOfMember(MethodDefinition method, BlockStatement block, DecompilationContext context)
 		{
-			MethodSpecificContext methodSpecificContext;
-			if (this.IsCachingEnabled && this.cacheService.IsDecompiledMemberInCache(method, this.language, this.renameInvalidMembers))
+			if (this.get_IsCachingEnabled() && this.cacheService.IsDecompiledMemberInCache(method, this.language, this.renameInvalidMembers))
 			{
 				return this.cacheService.GetDecompiledMemberFromCache(method, this.language, this.renameInvalidMembers);
 			}
-			BlockStatement blockStatement = this.FinishDecompilationOfMethod(block, context, out methodSpecificContext);
-			CachedDecompiledMember cachedDecompiledMember = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, methodSpecificContext));
-			if (this.IsCachingEnabled)
+			V_1 = this.FinishDecompilationOfMethod(block, context, out V_0);
+			V_2 = new CachedDecompiledMember(new DecompiledMember(Utilities.GetMemberUniqueName(method), V_1, V_0));
+			if (this.get_IsCachingEnabled())
 			{
-				this.cacheService.AddDecompiledMemberToCache(method, this.language, this.renameInvalidMembers, cachedDecompiledMember);
+				this.cacheService.AddDecompiledMemberToCache(method, this.language, this.renameInvalidMembers, V_2);
 			}
-			return cachedDecompiledMember;
+			return V_2;
 		}
 
 		private BlockStatement FinishDecompilationOfMethod(BlockStatement block, DecompilationContext context, out MethodSpecificContext methodContext)
 		{
-			BlockStatement body;
 			methodContext = null;
 			try
 			{
-				BlockDecompilationPipeline blockDecompilationPipeline = this.language.CreatePropertyPipeline(context);
-				methodContext = blockDecompilationPipeline.Run(context.MethodContext.Method.get_Body(), block, this.language).MethodContext;
-				body = blockDecompilationPipeline.Body;
+				V_1 = this.language.CreatePropertyPipeline(context);
+				methodContext = V_1.Run(context.get_MethodContext().get_Method().get_Body(), block, this.language).get_MethodContext();
+				V_0 = V_1.get_Body();
 			}
-			catch (Exception exception1)
+			catch (Exception exception_0)
 			{
-				Exception exception = exception1;
-				this.ExceptionsWhileDecompiling.Add(context.MethodContext.Method);
-				methodContext = new MethodSpecificContext(context.MethodContext.Method.get_Body());
-				body = new BlockStatement();
-				body.AddStatement(new ExceptionStatement(exception, context.MethodContext.Method));
-				base.OnExceptionThrown(exception);
+				V_2 = exception_0;
+				this.get_ExceptionsWhileDecompiling().Add(context.get_MethodContext().get_Method());
+				methodContext = new MethodSpecificContext(context.get_MethodContext().get_Method().get_Body());
+				V_0 = new BlockStatement();
+				V_0.AddStatement(new ExceptionStatement(V_2, context.get_MethodContext().get_Method()));
+				this.OnExceptionThrown(V_2);
 			}
-			return body;
+			return V_0;
 		}
 
 		public bool IsAutoImplemented(out FieldDefinition propertyField)
 		{
-			bool flag = this.IsAutoImplemented();
+			stackVariable1 = this.IsAutoImplemented();
 			propertyField = this.propertyFieldDef;
-			return flag;
+			return stackVariable1;
 		}
 
 		public bool IsAutoImplemented()
 		{
-			CachedDecompiledMember cachedDecompiledMember;
-			CachedDecompiledMember cachedDecompiledMember1;
-			CachedDecompiledMember cachedDecompiledMember2;
 			if (this.propertyDef.get_GetMethod() == null || this.propertyDef.get_GetMethod().get_Parameters().get_Count() != 0 || !this.propertyDef.get_GetMethod().get_HasBody() || this.propertyDef.get_OtherMethods().get_Count() != 0)
 			{
 				return false;
 			}
 			if (this.propertyDef.get_SetMethod() == null)
 			{
-				if (!this.language.SupportsGetterOnlyAutoProperties)
+				if (!this.language.get_SupportsGetterOnlyAutoProperties())
 				{
 					return false;
 				}
-				return this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_GetMethod(), out cachedDecompiledMember2, false, new Func<BlockStatement, bool>(this.CheckGetter));
+				return this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_GetMethod(), out V_2, false, new Func<BlockStatement, bool>(this.CheckGetter));
 			}
 			if (this.propertyDef.get_SetMethod().get_Parameters().get_Count() != 1 || !this.propertyDef.get_SetMethod().get_HasBody())
 			{
 				return false;
 			}
-			if (!this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_GetMethod(), out cachedDecompiledMember, false, new Func<BlockStatement, bool>(this.CheckGetter)))
+			if (!this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_GetMethod(), out V_0, false, new Func<BlockStatement, bool>(this.CheckGetter)))
 			{
 				return false;
 			}
-			return this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_SetMethod(), out cachedDecompiledMember1, false, new Func<BlockStatement, bool>(this.CheckSetter));
+			return this.DecompileAndCheckForAutoImplementedPropertyMethod(this.propertyDef.get_SetMethod(), out V_1, false, new Func<BlockStatement, bool>(this.CheckSetter));
 		}
 	}
 }

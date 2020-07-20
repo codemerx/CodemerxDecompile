@@ -1,6 +1,5 @@
 using Mono.Cecil.Cil;
 using System;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
 namespace Telerik.JustDecompiler.Steps
@@ -11,43 +10,48 @@ namespace Telerik.JustDecompiler.Steps
 
 		private VariableMatcher(VariableReference variable)
 		{
+			base();
 			this.variable = variable;
+			return;
 		}
 
 		public static bool FindVariableInExpression(VariableReference variable, Expression expression)
 		{
-			VariableMatcher variableMatcher = new VariableMatcher(variable);
-			variableMatcher.Visit(expression);
-			return variableMatcher.Match;
+			stackVariable1 = new VariableMatcher(variable);
+			stackVariable1.Visit(expression);
+			return stackVariable1.get_Match();
 		}
 
 		private void VisitAddressOfExpression(UnaryExpression node)
 		{
-			VariableReferenceExpression operand = node.Operand as VariableReferenceExpression;
-			if (operand != null)
+			V_0 = node.get_Operand() as VariableReferenceExpression;
+			if (V_0 != null)
 			{
-				this.VisitVariableReferenceExpression(operand);
+				this.VisitVariableReferenceExpression(V_0);
 			}
+			return;
 		}
 
 		public override void VisitUnaryExpression(UnaryExpression node)
 		{
-			if (node.Operator == UnaryOperator.AddressOf)
+			if (node.get_Operator() == 9)
 			{
 				this.VisitAddressOfExpression(node);
 				return;
 			}
-			base.VisitUnaryExpression(node);
+			this.VisitUnaryExpression(node);
+			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if ((object)node.Variable != (object)this.variable)
+			if ((object)node.get_Variable() != (object)this.variable)
 			{
 				return;
 			}
-			base.Match = true;
-			base.Continue = false;
+			this.set_Match(true);
+			this.set_Continue(false);
+			return;
 		}
 	}
 }

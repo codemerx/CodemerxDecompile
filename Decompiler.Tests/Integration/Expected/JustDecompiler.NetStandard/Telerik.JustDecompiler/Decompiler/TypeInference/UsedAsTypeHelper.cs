@@ -1,11 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
-using Mono.Collections.Generic;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Decompiler;
@@ -20,22 +16,24 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		public UsedAsTypeHelper(MethodSpecificContext methodContext)
 		{
+			base();
 			this.methodContext = methodContext;
-			this.typeSystem = methodContext.Method.get_Module().get_TypeSystem();
+			this.typeSystem = methodContext.get_Method().get_Module().get_TypeSystem();
+			return;
 		}
 
 		public TypeReference GetUseExpressionTypeNode(Instruction instruction, Expression instructionExpression, VariableReference variable)
 		{
-			Code code = instruction.get_OpCode().get_Code();
-			if (code == 112)
+			V_0 = instruction.get_OpCode().get_Code();
+			if (V_0 == 112)
 			{
 				return instruction.get_Operand() as TypeReference;
 			}
-			if (UsedAsTypeHelper.IsConditionalBranch(code))
+			if (UsedAsTypeHelper.IsConditionalBranch(V_0))
 			{
 				return this.typeSystem.get_Boolean();
 			}
-			if (code == 37)
+			if (V_0 == 37)
 			{
 				return null;
 			}
@@ -44,93 +42,97 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private TypeReference GetUseExpressionTypeNode(Expression expression, VariableReference variable)
 		{
-			CodeNodeType codeNodeType = expression.CodeNodeType;
-			if (codeNodeType > CodeNodeType.PropertyReferenceExpression)
+			V_1 = expression.get_CodeNodeType();
+			if (V_1 > 42)
 			{
-				if ((int)codeNodeType - (int)CodeNodeType.BaseCtorExpression <= (int)CodeNodeType.UnsafeBlock)
+				if (V_1 - 52 <= 1)
 				{
-					return this.GetUseInMethodInvocation(expression as MethodInvocationExpression, variable);
+					goto Label0;
 				}
-				if (codeNodeType == CodeNodeType.ReturnExpression)
+				if (V_1 == 57)
 				{
-					return this.methodContext.Method.get_FixedReturnType();
+					return this.methodContext.get_Method().get_FixedReturnType();
 				}
-				if (codeNodeType == CodeNodeType.BoxExpression)
+				if (V_1 == 62)
 				{
-					return (expression as BoxExpression).BoxedAs;
+					return (expression as BoxExpression).get_BoxedAs();
 				}
 			}
 			else
 			{
-				if (codeNodeType == CodeNodeType.ThrowExpression)
+				if (V_1 == 6)
 				{
 					return null;
 				}
-				switch (codeNodeType)
+				switch (V_1 - 19)
 				{
-					case CodeNodeType.MethodInvocationExpression:
+					case 0:
 					{
-						return this.GetUseInMethodInvocation(expression as MethodInvocationExpression, variable);
+						goto Label0;
 					}
-					case CodeNodeType.MethodReferenceExpression:
-					case CodeNodeType.DelegateCreationExpression:
-					case CodeNodeType.LiteralExpression:
-					case CodeNodeType.ArgumentReferenceExpression:
-					case CodeNodeType.ThisReferenceExpression:
-					case CodeNodeType.BaseReferenceExpression:
-					case CodeNodeType.ImplicitCastExpression:
+					case 1:
+					case 2:
+					case 3:
+					case 6:
+					case 9:
+					case 10:
+					case 13:
 					{
 						break;
 					}
-					case CodeNodeType.UnaryExpression:
+					case 4:
 					{
-						return this.GetUseExpressionTypeNode((expression as UnaryExpression).Operand, variable);
+						return this.GetUseExpressionTypeNode((expression as UnaryExpression).get_Operand(), variable);
 					}
-					case CodeNodeType.BinaryExpression:
+					case 5:
 					{
 						return this.GetUseInBinaryExpression(expression as BinaryExpression, variable);
 					}
-					case CodeNodeType.VariableReferenceExpression:
+					case 7:
 					{
-						VariableReferenceExpression variableReferenceExpression = expression as VariableReferenceExpression;
-						if ((object)variableReferenceExpression.Variable != (object)variable)
+						V_0 = expression as VariableReferenceExpression;
+						if ((object)V_0.get_Variable() != (object)variable)
 						{
 							return null;
 						}
-						return variableReferenceExpression.Variable.get_VariableType();
+						return V_0.get_Variable().get_VariableType();
 					}
-					case CodeNodeType.VariableDeclarationExpression:
+					case 8:
 					{
-						return (expression as VariableDeclarationExpression).Variable.get_VariableType();
+						return (expression as VariableDeclarationExpression).get_Variable().get_VariableType();
 					}
-					case CodeNodeType.FieldReferenceExpression:
+					case 11:
 					{
-						return (expression as FieldReferenceExpression).Field.get_DeclaringType();
+						return (expression as FieldReferenceExpression).get_Field().get_DeclaringType();
 					}
-					case CodeNodeType.ExplicitCastExpression:
-					case CodeNodeType.SafeCastExpression:
+					case 12:
+					case 14:
 					{
 						return this.typeSystem.get_Object();
 					}
 					default:
 					{
-						switch (codeNodeType)
+						switch (V_1 - 38)
 						{
-							case CodeNodeType.ArrayCreationExpression:
+							case 0:
 							{
 								return this.GetUseInArrayCreation(expression as ArrayCreationExpression, variable);
 							}
-							case CodeNodeType.ArrayIndexerExpression:
+							case 1:
 							{
 								return this.GetUseInArrayIndexer(expression as ArrayIndexerExpression, variable);
 							}
-							case CodeNodeType.ObjectCreationExpression:
+							case 2:
 							{
 								return this.GetUseInObjectCreation(expression as ObjectCreationExpression, variable);
 							}
-							case CodeNodeType.PropertyReferenceExpression:
+							case 3:
 							{
-								return this.GetUseInMethodInvocation(expression as MethodInvocationExpression, variable);
+								break;
+							}
+							case 4:
+							{
+								goto Label0;
 							}
 						}
 						break;
@@ -138,106 +140,170 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 				}
 			}
 			throw new ArgumentOutOfRangeException("Expression is not evaluated to any type.");
+		Label0:
+			return this.GetUseInMethodInvocation(expression as MethodInvocationExpression, variable);
 		}
 
 		private TypeReference GetUseInArrayCreation(ArrayCreationExpression arrayCreationExpression, VariableReference variable)
 		{
-			TypeReference num;
-			foreach (Expression dimension in arrayCreationExpression.Dimensions)
+			V_0 = arrayCreationExpression.get_Dimensions().GetEnumerator();
+			try
 			{
-				if (!(dimension is VariableReferenceExpression) || (object)(dimension as VariableReferenceExpression).Variable != (object)variable)
+				while (V_0.MoveNext())
 				{
-					continue;
-				}
-				num = this.typeSystem.get_Int32();
-				return num;
-			}
-			using (IEnumerator<Expression> enumerator = arrayCreationExpression.Initializer.Expressions.GetEnumerator())
-			{
-				while (enumerator.MoveNext())
-				{
-					Expression current = enumerator.Current;
-					if (!(current is VariableReferenceExpression) || (object)(current as VariableReferenceExpression).Variable != (object)variable)
+					V_1 = V_0.get_Current();
+					if (V_1 as VariableReferenceExpression == null || (object)(V_1 as VariableReferenceExpression).get_Variable() != (object)variable)
 					{
 						continue;
 					}
-					num = arrayCreationExpression.ElementType;
-					return num;
+					V_2 = this.typeSystem.get_Int32();
+					goto Label0;
 				}
-				throw new ArgumentOutOfRangeException("Expression is not evaluated to any type.");
 			}
-			return num;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			V_0 = arrayCreationExpression.get_Initializer().get_Expressions().GetEnumerator();
+			try
+			{
+				while (V_0.MoveNext())
+				{
+					V_3 = V_0.get_Current();
+					if (V_3 as VariableReferenceExpression == null || (object)(V_3 as VariableReferenceExpression).get_Variable() != (object)variable)
+					{
+						continue;
+					}
+					V_2 = arrayCreationExpression.get_ElementType();
+					goto Label0;
+				}
+				goto Label1;
+			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+		Label0:
+			return V_2;
+		Label1:
+			throw new ArgumentOutOfRangeException("Expression is not evaluated to any type.");
 		}
 
 		private TypeReference GetUseInArrayIndexer(ArrayIndexerExpression arrayIndexerExpression, VariableReference variable)
 		{
-			TypeReference num;
-			using (IEnumerator<Expression> enumerator = arrayIndexerExpression.Indices.GetEnumerator())
+			V_0 = arrayIndexerExpression.get_Indices().GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					Expression current = enumerator.Current;
-					if (!(current is VariableReferenceExpression) || (object)(current as VariableReferenceExpression).Variable != (object)variable)
+					V_1 = V_0.get_Current();
+					if (V_1 as VariableReferenceExpression == null || (object)(V_1 as VariableReferenceExpression).get_Variable() != (object)variable)
 					{
 						continue;
 					}
-					num = this.typeSystem.get_Int32();
-					return num;
+					V_2 = this.typeSystem.get_Int32();
+					goto Label1;
 				}
-				return new TypeReference("System", "Array", this.typeSystem.get_Object().get_Module(), this.typeSystem.get_Object().get_Scope());
+				goto Label0;
 			}
-			return num;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+		Label1:
+			return V_2;
+		Label0:
+			return new TypeReference("System", "Array", this.typeSystem.get_Object().get_Module(), this.typeSystem.get_Object().get_Scope());
 		}
 
 		private TypeReference GetUseInBinaryExpression(BinaryExpression binaryExpression, VariableReference variable)
 		{
-			if (binaryExpression.Right.CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(binaryExpression.Right as VariableReferenceExpression).Variable == (object)variable)
+			if (binaryExpression.get_Right().get_CodeNodeType() == 26 && (object)(binaryExpression.get_Right() as VariableReferenceExpression).get_Variable() == (object)variable)
 			{
-				return binaryExpression.Left.ExpressionType;
+				return binaryExpression.get_Left().get_ExpressionType();
 			}
-			if (binaryExpression.Left is VariableReferenceExpression && (object)(binaryExpression.Left as VariableReferenceExpression).Variable == (object)variable)
+			if (binaryExpression.get_Left() as VariableReferenceExpression != null && (object)(binaryExpression.get_Left() as VariableReferenceExpression).get_Variable() == (object)variable)
 			{
-				return binaryExpression.Right.ExpressionType;
+				return binaryExpression.get_Right().get_ExpressionType();
 			}
-			return this.GetUseExpressionTypeNode(binaryExpression.Left, variable) ?? this.GetUseExpressionTypeNode(binaryExpression.Right, variable);
+			stackVariable11 = this.GetUseExpressionTypeNode(binaryExpression.get_Left(), variable);
+			if (stackVariable11 == null)
+			{
+				dummyVar0 = stackVariable11;
+				stackVariable11 = this.GetUseExpressionTypeNode(binaryExpression.get_Right(), variable);
+			}
+			return stackVariable11;
 		}
 
 		private TypeReference GetUseInMethodInvocation(MethodInvocationExpression methodInvocationExpression, VariableReference variable)
 		{
-			Expression expression = null;
-			foreach (Expression argument in methodInvocationExpression.Arguments)
+			V_0 = null;
+			V_1 = methodInvocationExpression.get_Arguments().GetEnumerator();
+			try
 			{
-				if (!(argument is VariableReferenceExpression) || (object)(argument as VariableReferenceExpression).Variable != (object)variable)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (V_2 as VariableReferenceExpression == null || (object)(V_2 as VariableReferenceExpression).get_Variable() != (object)variable)
+					{
+						continue;
+					}
+					V_0 = V_2;
 				}
-				expression = argument;
 			}
-			if (expression == null)
+			finally
 			{
-				if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)variable)
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			if (V_0 == null)
+			{
+				if ((object)(methodInvocationExpression.get_MethodExpression().get_Target() as VariableReferenceExpression).get_Variable() != (object)variable)
 				{
 					return null;
 				}
-				return methodInvocationExpression.MethodExpression.Member.get_DeclaringType();
+				return methodInvocationExpression.get_MethodExpression().get_Member().get_DeclaringType();
 			}
-			int num = methodInvocationExpression.Arguments.IndexOf(expression);
-			MethodReference method = methodInvocationExpression.MethodExpression.Method;
-			return method.get_Parameters().get_Item(num).ResolveParameterType(method);
+			V_3 = methodInvocationExpression.get_Arguments().IndexOf(V_0);
+			V_4 = methodInvocationExpression.get_MethodExpression().get_Method();
+			return V_4.get_Parameters().get_Item(V_3).ResolveParameterType(V_4);
 		}
 
 		private TypeReference GetUseInObjectCreation(ObjectCreationExpression objectCreationExpression, VariableReference variable)
 		{
-			Expression expression = null;
-			foreach (Expression argument in objectCreationExpression.Arguments)
+			V_0 = null;
+			V_1 = objectCreationExpression.get_Arguments().GetEnumerator();
+			try
 			{
-				if (!(argument is VariableReferenceExpression) || (object)(argument as VariableReferenceExpression).Variable != (object)variable)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (V_2 as VariableReferenceExpression == null || (object)(V_2 as VariableReferenceExpression).get_Variable() != (object)variable)
+					{
+						continue;
+					}
+					V_0 = V_2;
 				}
-				expression = argument;
 			}
-			return objectCreationExpression.Constructor.get_Parameters().get_Item(objectCreationExpression.Arguments.IndexOf(expression)).ResolveParameterType(objectCreationExpression.Constructor);
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return objectCreationExpression.get_Constructor().get_Parameters().get_Item(objectCreationExpression.get_Arguments().IndexOf(V_0)).ResolveParameterType(objectCreationExpression.get_Constructor());
 		}
 
 		private static bool IsConditionalBranch(Code instructionOpCode)

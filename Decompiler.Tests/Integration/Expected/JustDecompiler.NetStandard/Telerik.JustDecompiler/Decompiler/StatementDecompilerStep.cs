@@ -1,16 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Cil;
-using Telerik.JustDecompiler.Common;
-using Telerik.JustDecompiler.Decompiler.DefineUseAnalysis;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions;
@@ -60,6 +54,7 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public StatementDecompilerStep()
 		{
+			base();
 			this.gotoEndpointToOrigins = new Dictionary<CFGBlockLogicalConstruct, HashSet<CFGBlockLogicalConstruct>>();
 			this.gotoEndpointConstructToLabel = new Dictionary<ILogicalConstruct, string>();
 			this.gotoOriginBlockToGoToStatement = new Dictionary<CFGBlockLogicalConstruct, Dictionary<CFGBlockLogicalConstruct, GotoStatement>>();
@@ -70,273 +65,307 @@ namespace Telerik.JustDecompiler.Decompiler
 			this.breaksOriginToEndPoint = new Dictionary<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct>();
 			this.continuesOriginToEndPoint = new Dictionary<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct>();
 			this.breaksContainerToBreakEndPoint = new Dictionary<IBreaksContainer, CFGBlockLogicalConstruct>();
+			return;
 		}
 
 		private void AddAndRegisterGoToLabel(ILogicalConstruct gotoConstruct, string theLabel)
 		{
-			Statement item = null;
-			if (!(gotoConstruct is ConditionLogicalConstruct) || (gotoConstruct as ConditionLogicalConstruct).LogicalContainer == null)
+			V_0 = null;
+			if (gotoConstruct as ConditionLogicalConstruct == null || (gotoConstruct as ConditionLogicalConstruct).get_LogicalContainer() == null)
 			{
-				item = (!(gotoConstruct is CFGBlockLogicalConstruct) || !(gotoConstruct.Parent is SwitchLogicalConstruct) ? this.logicalConstructToStatements[gotoConstruct][0] : this.logicalConstructToStatements[gotoConstruct.Parent as ILogicalConstruct][0]);
-			}
-			else
-			{
-				ConditionLogicalConstruct conditionLogicalConstruct = gotoConstruct as ConditionLogicalConstruct;
-				if (!(conditionLogicalConstruct.LogicalContainer is LoopLogicalConstruct))
+				if (gotoConstruct as CFGBlockLogicalConstruct == null || gotoConstruct.get_Parent() as SwitchLogicalConstruct == null)
 				{
-					if (!(conditionLogicalConstruct.LogicalContainer is IfLogicalConstruct))
-					{
-						throw new Exception("Condition containing construct unaccounted for.");
-					}
-					item = this.logicalConstructToStatements[conditionLogicalConstruct.LogicalContainer][0];
+					V_0 = this.logicalConstructToStatements.get_Item(gotoConstruct).get_Item(0);
 				}
 				else
 				{
-					LoopLogicalConstruct parent = (LoopLogicalConstruct)gotoConstruct.Parent;
-					if (parent.LoopType != LoopType.PostTestedLoop)
+					V_0 = this.logicalConstructToStatements.get_Item(gotoConstruct.get_Parent() as ILogicalConstruct).get_Item(0);
+				}
+			}
+			else
+			{
+				V_1 = gotoConstruct as ConditionLogicalConstruct;
+				if (V_1.get_LogicalContainer() as LoopLogicalConstruct == null)
+				{
+					if (V_1.get_LogicalContainer() as IfLogicalConstruct == null)
 					{
-						if (parent.LoopType != LoopType.PreTestedLoop)
+						throw new Exception("Condition containing construct unaccounted for.");
+					}
+					V_0 = this.logicalConstructToStatements.get_Item(V_1.get_LogicalContainer()).get_Item(0);
+				}
+				else
+				{
+					V_2 = (LoopLogicalConstruct)gotoConstruct.get_Parent();
+					if (V_2.get_LoopType() != 2)
+					{
+						if (V_2.get_LoopType() != 1)
 						{
 							throw new Exception("Infinite loop with condition encountered.");
 						}
-						item = this.logicalConstructToStatements[parent][0];
+						V_0 = this.logicalConstructToStatements.get_Item(V_2).get_Item(0);
 					}
 					else
 					{
-						item = new EmptyStatement();
-						((DoWhileStatement)this.logicalConstructToStatements[parent][0]).Body.AddStatement(item);
+						V_0 = new EmptyStatement();
+						((DoWhileStatement)this.logicalConstructToStatements.get_Item(V_2).get_Item(0)).get_Body().AddStatement(V_0);
 					}
 				}
 			}
-			item.Label = theLabel;
-			this.contextGotoLabels.Add(item.Label, item);
+			V_0.set_Label(theLabel);
+			this.contextGotoLabels.Add(V_0.get_Label(), V_0);
+			return;
 		}
 
 		private void AppendGoToFromConditionStartingAt(List<CFGBlockLogicalConstruct> goToStartPointHosts, CFGBlockLogicalConstruct theSuccessor, List<Statement> results)
 		{
-			this.AppendGoToStartingAt(goToStartPointHosts[0], results);
-			GotoStatement item = this.gotoOriginBlockToGoToStatement[goToStartPointHosts[0]][theSuccessor];
-			for (int i = 1; i < goToStartPointHosts.Count; i++)
+			this.AppendGoToStartingAt(goToStartPointHosts.get_Item(0), results);
+			V_0 = this.gotoOriginBlockToGoToStatement.get_Item(goToStartPointHosts.get_Item(0)).get_Item(theSuccessor);
+			V_1 = 1;
+			while (V_1 < goToStartPointHosts.get_Count())
 			{
-				if (!this.gotoOriginBlockToGoToStatement.ContainsKey(goToStartPointHosts[i]))
+				if (!this.gotoOriginBlockToGoToStatement.ContainsKey(goToStartPointHosts.get_Item(V_1)))
 				{
-					this.gotoOriginBlockToGoToStatement[goToStartPointHosts[i]] = new Dictionary<CFGBlockLogicalConstruct, GotoStatement>();
+					this.gotoOriginBlockToGoToStatement.set_Item(goToStartPointHosts.get_Item(V_1), new Dictionary<CFGBlockLogicalConstruct, GotoStatement>());
 				}
-				this.gotoOriginBlockToGoToStatement[goToStartPointHosts[i]].Add(theSuccessor, item);
+				this.gotoOriginBlockToGoToStatement.get_Item(goToStartPointHosts.get_Item(V_1)).Add(theSuccessor, V_0);
+				V_1 = V_1 + 1;
 			}
+			return;
 		}
 
 		private void AppendGoToStartingAt(CFGBlockLogicalConstruct goToStartPointHost, List<Statement> results)
 		{
-			CFGBlockLogicalConstruct cFGBlockLogicalConstruct = this.gotoOriginsToEndpoints[goToStartPointHost].FirstOrDefault<CFGBlockLogicalConstruct>();
-			GotoStatement statementToContext = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(goToStartPointHost, cFGBlockLogicalConstruct));
-			Dictionary<CFGBlockLogicalConstruct, GotoStatement> cFGBlockLogicalConstructs = new Dictionary<CFGBlockLogicalConstruct, GotoStatement>()
-			{
-				{ cFGBlockLogicalConstruct, statementToContext }
-			};
-			this.gotoOriginBlockToGoToStatement.Add(goToStartPointHost, cFGBlockLogicalConstructs);
-			results.Add(statementToContext);
+			V_0 = this.gotoOriginsToEndpoints.get_Item(goToStartPointHost).FirstOrDefault<CFGBlockLogicalConstruct>();
+			V_1 = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(goToStartPointHost, V_0));
+			V_2 = new Dictionary<CFGBlockLogicalConstruct, GotoStatement>();
+			V_2.Add(V_0, V_1);
+			this.gotoOriginBlockToGoToStatement.Add(goToStartPointHost, V_2);
+			results.Add(V_1);
+			return;
 		}
 
 		private bool CheckForBreak(ILogicalConstruct theConstruct)
 		{
-			bool flag;
-			if (!(theConstruct is CFGBlockLogicalConstruct))
+			if (theConstruct as CFGBlockLogicalConstruct == null)
 			{
-				if (!(theConstruct is ConditionLogicalConstruct))
+				if (theConstruct as ConditionLogicalConstruct == null)
 				{
 					throw new Exception("The given construct cannot be break.");
 				}
-				HashSet<ISingleEntrySubGraph>.Enumerator enumerator = theConstruct.Children.GetEnumerator();
+				V_0 = theConstruct.get_Children().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_0.MoveNext())
 					{
-						CFGBlockLogicalConstruct current = (CFGBlockLogicalConstruct)enumerator.Current;
-						if (!this.breaksOriginToEndPoint.ContainsKey(current))
+						V_1 = (CFGBlockLogicalConstruct)V_0.get_Current();
+						if (!this.breaksOriginToEndPoint.ContainsKey(V_1))
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_2 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					((IDisposable)V_0).Dispose();
 				}
-				return flag;
+			Label1:
+				return V_2;
 			}
-			else if (this.breaksOriginToEndPoint.ContainsKey(theConstruct as CFGBlockLogicalConstruct))
+			else
 			{
-				return true;
+				if (this.breaksOriginToEndPoint.ContainsKey(theConstruct as CFGBlockLogicalConstruct))
+				{
+					return true;
+				}
 			}
+		Label0:
 			return false;
 		}
 
 		private bool CheckForContinue(ILogicalConstruct theConstruct)
 		{
-			bool flag;
-			if (!(theConstruct is CFGBlockLogicalConstruct))
+			if (theConstruct as CFGBlockLogicalConstruct == null)
 			{
-				if (!(theConstruct is ConditionLogicalConstruct))
+				if (theConstruct as ConditionLogicalConstruct == null)
 				{
 					throw new Exception("The given construct cannot be continue.");
 				}
-				HashSet<ISingleEntrySubGraph>.Enumerator enumerator = theConstruct.Children.GetEnumerator();
+				V_0 = theConstruct.get_Children().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_0.MoveNext())
 					{
-						CFGBlockLogicalConstruct current = (CFGBlockLogicalConstruct)enumerator.Current;
-						if (!this.continuesOriginToEndPoint.ContainsKey(current))
+						V_1 = (CFGBlockLogicalConstruct)V_0.get_Current();
+						if (!this.continuesOriginToEndPoint.ContainsKey(V_1))
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_2 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					((IDisposable)enumerator).Dispose();
+					((IDisposable)V_0).Dispose();
 				}
-				return flag;
+			Label1:
+				return V_2;
 			}
-			else if (this.continuesOriginToEndPoint.ContainsKey(theConstruct as CFGBlockLogicalConstruct))
+			else
 			{
-				return true;
+				if (this.continuesOriginToEndPoint.ContainsKey(theConstruct as CFGBlockLogicalConstruct))
+				{
+					return true;
+				}
 			}
+		Label0:
 			return false;
 		}
 
 		private bool CheckForNormalFlowReachability(ILogicalConstruct startPoint, ILogicalConstruct parentConstruct)
 		{
-			for (ILogicalConstruct i = startPoint; i != parentConstruct; i = i.Parent as ILogicalConstruct)
+			V_0 = startPoint;
+			while (V_0 != parentConstruct)
 			{
-				if (i.CFGFollowNode != null)
+				if (V_0.get_CFGFollowNode() != null)
 				{
 					return false;
 				}
+				V_0 = V_0.get_Parent() as ILogicalConstruct;
 			}
 			return true;
 		}
 
 		private GotoStatement ConstructAndRecordGoToStatementToContext(string label, IEnumerable<Instruction> jumps)
 		{
-			GotoStatement gotoStatement = new GotoStatement(label, jumps);
-			this.contextGotoStatements.Add(gotoStatement);
-			return gotoStatement;
+			V_0 = new GotoStatement(label, jumps);
+			this.contextGotoStatements.Add(V_0);
+			return V_0;
 		}
 
 		private void DetermineBreaksEndPoint(IBreaksContainer breaksContainer)
 		{
-			CFGBlockLogicalConstruct breakContainerCFGFollowNode = this.GetBreakContainerCFGFollowNode(breaksContainer);
-			if (breakContainerCFGFollowNode != null)
+			V_0 = this.GetBreakContainerCFGFollowNode(breaksContainer);
+			if (V_0 != null)
 			{
-				this.breaksContainerToBreakEndPoint[breaksContainer] = breakContainerCFGFollowNode;
+				this.breaksContainerToBreakEndPoint.set_Item(breaksContainer, V_0);
 			}
+			return;
 		}
 
 		private bool ExistsStatementForConstruct(ILogicalConstruct theConstruct)
 		{
-			if (!(theConstruct is ConditionLogicalConstruct) || (theConstruct as ConditionLogicalConstruct).LogicalContainer == null)
+			if (theConstruct as ConditionLogicalConstruct == null || (theConstruct as ConditionLogicalConstruct).get_LogicalContainer() == null)
 			{
 				return this.logicalConstructToStatements.ContainsKey(theConstruct);
 			}
-			return this.logicalConstructToStatements.ContainsKey((theConstruct as ConditionLogicalConstruct).LogicalContainer);
+			return this.logicalConstructToStatements.ContainsKey((theConstruct as ConditionLogicalConstruct).get_LogicalContainer());
 		}
 
 		private void FindAndMarkGoToExits(ILogicalConstruct current, bool gotoReachableConstruct)
 		{
-			if (current is IBreaksContainer)
+			if (current as IBreaksContainer != null)
 			{
 				this.DetermineBreaksEndPoint((IBreaksContainer)current);
 			}
-			if (current is CFGBlockLogicalConstruct)
+			if (current as CFGBlockLogicalConstruct != null)
 			{
-				this.FindBreak(current as CFGBlockLogicalConstruct);
-				this.FindContinue(current as CFGBlockLogicalConstruct);
+				dummyVar0 = this.FindBreak(current as CFGBlockLogicalConstruct);
+				dummyVar1 = this.FindContinue(current as CFGBlockLogicalConstruct);
 			}
-			foreach (ILogicalConstruct allSuccessor in current.AllSuccessors)
+			V_0 = current.get_AllSuccessors().GetEnumerator();
+			try
 			{
-				CFGBlockLogicalConstruct nearestFollowNode = this.GetNearestFollowNode(current);
-				if (allSuccessor.FirstBlock != nearestFollowNode)
+				while (V_0.MoveNext())
 				{
-					this.MarkGoTosIfNotLoopEdge(current, allSuccessor);
-				}
-				else if (!(current is LoopLogicalConstruct) || (current as LoopLogicalConstruct).LoopType == LoopType.InfiniteLoop || (current as LoopLogicalConstruct).LoopCondition.FalseCFGSuccessor == nearestFollowNode.FirstBlock)
-				{
-					if (!gotoReachableConstruct)
+					V_1 = (ILogicalConstruct)V_0.get_Current();
+					V_2 = this.GetNearestFollowNode(current);
+					if (V_1.get_FirstBlock() == V_2)
 					{
-						continue;
+						if (current as LoopLogicalConstruct == null || (current as LoopLogicalConstruct).get_LoopType() == LoopType.InfiniteLoop || (current as LoopLogicalConstruct).get_LoopCondition().get_FalseCFGSuccessor() == V_2.get_FirstBlock())
+						{
+							if (!gotoReachableConstruct)
+							{
+								continue;
+							}
+							V_3 = V_2;
+							while (V_3.get_Parent() != null && ((ILogicalConstruct)V_3.get_Parent()).get_FirstBlock() == V_2)
+							{
+								V_3 = (ILogicalConstruct)V_3.get_Parent();
+							}
+							if (!this.ExistsStatementForConstruct(V_3))
+							{
+								continue;
+							}
+							this.MarkGoTosIfNotLoopEdge(current, V_1);
+						}
+						else
+						{
+							this.MarkGoTosIfNotLoopEdge(current, V_1);
+						}
 					}
-					ILogicalConstruct parent = nearestFollowNode;
-					while (parent.Parent != null && ((ILogicalConstruct)parent.Parent).FirstBlock == nearestFollowNode)
+					else
 					{
-						parent = (ILogicalConstruct)parent.Parent;
+						this.MarkGoTosIfNotLoopEdge(current, V_1);
 					}
-					if (!this.ExistsStatementForConstruct(parent))
-					{
-						continue;
-					}
-					this.MarkGoTosIfNotLoopEdge(current, allSuccessor);
-				}
-				else
-				{
-					this.MarkGoTosIfNotLoopEdge(current, allSuccessor);
 				}
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private CFGBlockLogicalConstruct FindBreak(CFGBlockLogicalConstruct startPoint)
 		{
-			CFGBlockLogicalConstruct cFGBlockLogicalConstruct;
 			if (this.breaksOriginToEndPoint.ContainsKey(startPoint))
 			{
-				return this.breaksOriginToEndPoint[startPoint];
+				return this.breaksOriginToEndPoint.get_Item(startPoint);
 			}
-			IBreaksContainer innerMostParentOfType = this.GetInnerMostParentOfType<IBreaksContainer>(startPoint);
-			if (innerMostParentOfType == null || this.ExistsStatementForConstruct(innerMostParentOfType))
+			V_0 = this.GetInnerMostParentOfType<IBreaksContainer>(startPoint);
+			if (V_0 == null || this.ExistsStatementForConstruct(V_0))
 			{
 				return null;
 			}
-			if (!this.breaksContainerToBreakEndPoint.TryGetValue(innerMostParentOfType, out cFGBlockLogicalConstruct) || !startPoint.CFGSuccessors.Contains(cFGBlockLogicalConstruct))
+			if (!this.breaksContainerToBreakEndPoint.TryGetValue(V_0, out V_1) || !startPoint.get_CFGSuccessors().Contains(V_1))
 			{
 				return null;
 			}
-			this.breaksOriginToEndPoint[startPoint] = cFGBlockLogicalConstruct;
-			return cFGBlockLogicalConstruct;
+			this.breaksOriginToEndPoint.set_Item(startPoint, V_1);
+			return V_1;
 		}
 
 		private CFGBlockLogicalConstruct FindContinue(CFGBlockLogicalConstruct startPoint)
 		{
 			if (this.continuesOriginToEndPoint.ContainsKey(startPoint))
 			{
-				return this.continuesOriginToEndPoint[startPoint];
+				return this.continuesOriginToEndPoint.get_Item(startPoint);
 			}
-			LoopLogicalConstruct innerMostParentOfType = this.GetInnerMostParentOfType<LoopLogicalConstruct>(startPoint);
-			if (innerMostParentOfType == null || this.ExistsStatementForConstruct(innerMostParentOfType))
+			V_0 = this.GetInnerMostParentOfType<LoopLogicalConstruct>(startPoint);
+			if (V_0 == null || this.ExistsStatementForConstruct(V_0))
 			{
 				return null;
 			}
-			if (startPoint.CFGSuccessors.Contains(innerMostParentOfType.LoopContinueEndPoint))
+			if (startPoint.get_CFGSuccessors().Contains(V_0.get_LoopContinueEndPoint()))
 			{
-				if (!this.CheckForNormalFlowReachability(startPoint, innerMostParentOfType))
+				if (!this.CheckForNormalFlowReachability(startPoint, V_0))
 				{
-					this.continuesOriginToEndPoint[startPoint] = innerMostParentOfType.LoopContinueEndPoint;
-					return innerMostParentOfType.LoopContinueEndPoint;
+					this.continuesOriginToEndPoint.set_Item(startPoint, V_0.get_LoopContinueEndPoint());
+					return V_0.get_LoopContinueEndPoint();
 				}
-				IBreaksContainer breaksContainer = this.GetInnerMostParentOfType<IBreaksContainer>(startPoint);
-				if (breaksContainer != null)
+				V_1 = this.GetInnerMostParentOfType<IBreaksContainer>(startPoint);
+				if (V_1 != null)
 				{
-					LoopLogicalConstruct loopLogicalConstruct = this.GetInnerMostParentOfType<LoopLogicalConstruct>(breaksContainer);
-					if (loopLogicalConstruct != null && loopLogicalConstruct == innerMostParentOfType)
+					V_2 = this.GetInnerMostParentOfType<LoopLogicalConstruct>(V_1);
+					if (V_2 != null && V_2 == V_0)
 					{
-						this.continuesOriginToEndPoint[startPoint] = innerMostParentOfType.LoopContinueEndPoint;
-						return innerMostParentOfType.LoopContinueEndPoint;
+						this.continuesOriginToEndPoint.set_Item(startPoint, V_0.get_LoopContinueEndPoint());
+						return V_0.get_LoopContinueEndPoint();
 					}
 				}
 			}
@@ -347,352 +376,458 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			if (gotoEndPoint == gotoOrigin)
 			{
-				if (!(gotoEndPoint.Parent is ConditionLogicalConstruct) || !(gotoEndPoint.Parent.Parent is LoopLogicalConstruct) && !(gotoEndPoint.Parent.Parent is IfLogicalConstruct))
+				if (gotoEndPoint.get_Parent() as ConditionLogicalConstruct == null || gotoEndPoint.get_Parent().get_Parent() as LoopLogicalConstruct == null && gotoEndPoint.get_Parent().get_Parent() as IfLogicalConstruct == null)
 				{
-					return (ILogicalConstruct)gotoEndPoint.Parent;
+					return (ILogicalConstruct)gotoEndPoint.get_Parent();
 				}
-				return (ILogicalConstruct)gotoEndPoint.Parent.Parent;
+				return (ILogicalConstruct)gotoEndPoint.get_Parent().get_Parent();
 			}
-			ILogicalConstruct logicalConstruct = (ILogicalConstruct)LogicalFlowUtilities.FindFirstCommonParent((IEnumerable<ISingleEntrySubGraph>)(new ISingleEntrySubGraph[] { gotoEndPoint, gotoOrigin }));
-			ILogicalConstruct parent = gotoEndPoint;
-			while (parent.Parent != logicalConstruct)
+			stackVariable3 = new ISingleEntrySubGraph[2];
+			stackVariable3[0] = gotoEndPoint;
+			stackVariable3[1] = gotoOrigin;
+			V_0 = (ILogicalConstruct)LogicalFlowUtilities.FindFirstCommonParent((IEnumerable<ISingleEntrySubGraph>)stackVariable3);
+			V_1 = gotoEndPoint;
+			while (V_1.get_Parent() != V_0)
 			{
-				parent = (ILogicalConstruct)parent.Parent;
+				V_1 = (ILogicalConstruct)V_1.get_Parent();
 			}
-			if (parent.FirstBlock != gotoEndPoint)
+			if (V_1.get_FirstBlock() != gotoEndPoint)
 			{
 				throw new Exception("GoTo misplaced.");
 			}
-			if (parent is CaseLogicalConstruct)
+			if (V_1 as CaseLogicalConstruct == null)
 			{
-				parent = parent.Entry as ILogicalConstruct;
+				if (V_1 as CFGBlockLogicalConstruct != null && V_1.get_Parent() as SwitchLogicalConstruct != null)
+				{
+					V_1 = V_1.get_Parent() as ILogicalConstruct;
+				}
 			}
-			else if (parent is CFGBlockLogicalConstruct && parent.Parent is SwitchLogicalConstruct)
+			else
 			{
-				parent = parent.Parent as ILogicalConstruct;
+				V_1 = V_1.get_Entry() as ILogicalConstruct;
 			}
-			return parent;
+			return V_1;
 		}
 
 		private ILogicalConstruct FindTopMostParentOfBlock(CFGBlockLogicalConstruct gotoEndPoint)
 		{
-			ILogicalConstruct parent = gotoEndPoint;
-			while (parent.Parent != null && ((ILogicalConstruct)parent.Parent).FirstBlock == gotoEndPoint)
+			V_0 = gotoEndPoint;
+			while (V_0.get_Parent() != null && ((ILogicalConstruct)V_0.get_Parent()).get_FirstBlock() == gotoEndPoint)
 			{
-				parent = (ILogicalConstruct)parent.Parent;
+				V_0 = (ILogicalConstruct)V_0.get_Parent();
 			}
-			if (parent is BlockLogicalConstruct)
+			if (V_0 as BlockLogicalConstruct != null)
 			{
-				parent = (ILogicalConstruct)parent.Entry;
+				V_0 = (ILogicalConstruct)V_0.get_Entry();
 			}
-			return parent;
+			return V_0;
 		}
 
 		private string GenerateGoToLabel()
 		{
-			uint num = this.gotoLabelsCounter;
-			this.gotoLabelsCounter = num + 1;
-			return String.Concat("Label", num.ToString());
+			V_0 = this.gotoLabelsCounter;
+			this.gotoLabelsCounter = V_0 + 1;
+			return String.Concat("Label", V_0.ToString());
 		}
 
 		private CFGBlockLogicalConstruct GetBreakContainerCFGFollowNode(IBreaksContainer breaksContainer)
 		{
-			ILogicalConstruct loopCondition;
-			ILogicalConstruct parent = breaksContainer;
-			while (parent != null && parent.CFGFollowNode == null)
+			V_0 = breaksContainer;
+			while (V_0 != null && V_0.get_CFGFollowNode() == null)
 			{
-				parent = parent.Parent as ILogicalConstruct;
-				if (!(parent is IBreaksContainer))
+				V_0 = V_0.get_Parent() as ILogicalConstruct;
+				if (V_0 as IBreaksContainer == null)
 				{
 					continue;
 				}
 				return null;
 			}
-			if (parent == null || this.ExistsStatementForConstruct(parent.FollowNode))
+			if (V_0 == null || this.ExistsStatementForConstruct(V_0.get_FollowNode()))
 			{
 				return null;
 			}
-			if (breaksContainer is SwitchLogicalConstruct)
+			if (breaksContainer as SwitchLogicalConstruct != null)
 			{
-				return parent.CFGFollowNode;
+				return V_0.get_CFGFollowNode();
 			}
-			LoopLogicalConstruct loopLogicalConstruct = (LoopLogicalConstruct)breaksContainer;
-			if (loopLogicalConstruct.LoopType != LoopType.InfiniteLoop)
+			V_1 = (LoopLogicalConstruct)breaksContainer;
+			if (V_1.get_LoopType() != LoopType.InfiniteLoop)
 			{
-				loopCondition = loopLogicalConstruct.LoopCondition;
+				V_2 = V_1.get_LoopCondition();
 			}
 			else
 			{
-				loopCondition = loopLogicalConstruct.LoopBodyBlock;
+				V_2 = V_1.get_LoopBodyBlock();
 			}
-			if (!loopCondition.CFGSuccessors.Contains(parent.CFGFollowNode))
+			if (!V_2.get_CFGSuccessors().Contains(V_0.get_CFGFollowNode()))
 			{
 				return null;
 			}
-			return parent.CFGFollowNode;
+			return V_0.get_CFGFollowNode();
 		}
 
 		private CFGBlockLogicalConstruct GetEffectiveGotoEndPoint(CFGBlockLogicalConstruct gotoEndPointBlock)
 		{
-			List<Statement> statements;
-			CFGBlockLogicalConstruct current = gotoEndPointBlock;
-			while (this.logicalConstructToStatements.TryGetValue(current, out statements) && statements.Count == 0)
+			V_0 = gotoEndPointBlock;
+			while (this.logicalConstructToStatements.TryGetValue(V_0, out V_1) && V_1.get_Count() == 0)
 			{
-				IEnumerator<CFGBlockLogicalConstruct> enumerator = current.CFGSuccessors.GetEnumerator();
-				using (enumerator)
+				V_2 = V_0.get_CFGSuccessors().GetEnumerator();
+				V_3 = V_2;
+				try
 				{
-					if (!enumerator.MoveNext())
+					if (!V_2.MoveNext())
 					{
 						throw new Exception("End block with no statements reached.");
 					}
-					current = enumerator.Current;
-					if (enumerator.MoveNext())
+					V_0 = V_2.get_Current();
+					if (V_2.MoveNext())
 					{
 						throw new Exception("No statements generated for multi exit block");
 					}
 				}
+				finally
+				{
+					if (V_3 != null)
+					{
+						V_3.Dispose();
+					}
+				}
 			}
-			return current;
+			return V_0;
 		}
 
 		private T GetInnerMostParentOfType<T>()
 		where T : class
 		{
-			ILogicalConstruct[] array = this.parents.ToArray();
-			for (int i = 0; i < (int)array.Length; i++)
+			V_0 = this.parents.ToArray();
+			V_1 = 0;
+			while (V_1 < (int)V_0.Length)
 			{
-				ILogicalConstruct logicalConstruct = array[i];
-				if (logicalConstruct is T)
+				V_2 = V_0[V_1];
+				if (V_2 as T != null)
 				{
-					return (T)(logicalConstruct as T);
+					return (T)(V_2 as T);
 				}
+				V_1 = V_1 + 1;
 			}
-			return default(T);
+			V_3 = default(T);
+			return V_3;
 		}
 
 		private T GetInnerMostParentOfType<T>(ILogicalConstruct startNode)
 		where T : class
 		{
-			for (ILogicalConstruct i = startNode.Parent as ILogicalConstruct; i != null; i = i.Parent as ILogicalConstruct)
+			V_0 = startNode.get_Parent() as ILogicalConstruct;
+			while (V_0 != null)
 			{
-				if (i is T)
+				if (V_0 as T != null)
 				{
-					return (T)(i as T);
+					return (T)(V_0 as T);
 				}
+				V_0 = V_0.get_Parent() as ILogicalConstruct;
 			}
-			return default(T);
+			V_1 = default(T);
+			return V_1;
 		}
 
 		private List<Instruction> GetJumpingInstructions(ILogicalConstruct from, CFGBlockLogicalConstruct to)
 		{
-			if (!(from is CFGBlockLogicalConstruct) || from.Parent is ConditionLogicalConstruct || !this.IsUnconditionalJump((from as CFGBlockLogicalConstruct).TheBlock.Last))
+			if (from as CFGBlockLogicalConstruct == null || from.get_Parent() as ConditionLogicalConstruct != null || !this.IsUnconditionalJump((from as CFGBlockLogicalConstruct).get_TheBlock().get_Last()))
 			{
 				return null;
 			}
-			List<Instruction> instructions = new List<Instruction>();
-			foreach (CFGBlockLogicalConstruct cFGBlock in from.CFGBlocks)
+			V_0 = new List<Instruction>();
+			V_1 = from.get_CFGBlocks().GetEnumerator();
+			try
 			{
-				if (!cFGBlock.CFGSuccessors.Contains(to))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (!V_2.get_CFGSuccessors().Contains(to))
+					{
+						continue;
+					}
+					V_0.Add(V_2.get_TheBlock().get_Last());
 				}
-				instructions.Add(cFGBlock.TheBlock.Last);
 			}
-			return instructions;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		private CFGBlockLogicalConstruct GetNearestFollowNode(ILogicalConstruct current)
 		{
-			if (current.CFGFollowNode != null)
+			if (current.get_CFGFollowNode() != null)
 			{
-				return current.CFGFollowNode;
+				return current.get_CFGFollowNode();
 			}
-			ILogicalConstruct[] array = this.parents.ToArray();
-			for (int i = 0; i < (int)array.Length; i++)
+			V_0 = this.parents.ToArray();
+			V_1 = 0;
+			while (V_1 < (int)V_0.Length)
 			{
-				ILogicalConstruct logicalConstruct = array[i];
-				if (logicalConstruct.CFGFollowNode != null)
+				V_2 = V_0[V_1];
+				if (V_2.get_CFGFollowNode() != null)
 				{
-					return logicalConstruct.CFGFollowNode;
+					return V_2.get_CFGFollowNode();
 				}
+				V_1 = V_1 + 1;
 			}
 			return null;
 		}
 
 		private List<CFGBlockLogicalConstruct> HostsGoToStartPoint(ConditionLogicalConstruct condition)
 		{
-			List<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs = new List<CFGBlockLogicalConstruct>();
-			foreach (CFGBlockLogicalConstruct cFGBlock in condition.CFGBlocks)
+			V_0 = new List<CFGBlockLogicalConstruct>();
+			V_1 = condition.get_CFGBlocks().GetEnumerator();
+			try
 			{
-				if (!this.gotoOriginsToEndpoints.ContainsKey(cFGBlock))
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (!this.gotoOriginsToEndpoints.ContainsKey(V_2))
+					{
+						continue;
+					}
+					V_0.Add(V_2);
 				}
-				cFGBlockLogicalConstructs.Add(cFGBlock);
 			}
-			return cFGBlockLogicalConstructs;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 
 		private BlockStatement InsertGotoEndpoints(BlockStatement body)
 		{
-			bool count = false;
+			V_0 = false;
 			do
 			{
-				HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
-				foreach (CFGBlockLogicalConstruct key in this.gotoEndpointToOrigins.Keys)
+				V_1 = new HashSet<ILogicalConstruct>();
+				V_2 = this.gotoEndpointToOrigins.get_Keys().GetEnumerator();
+				try
 				{
-					ILogicalConstruct logicalConstruct = this.FindTopMostParentOfBlock(key);
-					if (this.ExistsStatementForConstruct(logicalConstruct))
+					while (V_2.MoveNext())
 					{
-						continue;
+						V_3 = V_2.get_Current();
+						V_4 = this.FindTopMostParentOfBlock(V_3);
+						if (this.ExistsStatementForConstruct(V_4))
+						{
+							continue;
+						}
+						dummyVar0 = V_1.Add(V_4);
 					}
-					logicalConstructs.Add(logicalConstruct);
 				}
-				count = logicalConstructs.Count > 0;
-				foreach (ILogicalConstruct logicalConstruct1 in logicalConstructs)
+				finally
 				{
-					if (this.ExistsStatementForConstruct(logicalConstruct1))
+					((IDisposable)V_2).Dispose();
+				}
+				V_0 = V_1.get_Count() > 0;
+				V_5 = V_1.GetEnumerator();
+				try
+				{
+					while (V_5.MoveNext())
 					{
-						continue;
+						V_6 = V_5.get_Current();
+						if (this.ExistsStatementForConstruct(V_6))
+						{
+							continue;
+						}
+						V_7 = this.TraverseGoToOnlyReachableStatements(V_6).GetEnumerator();
+						try
+						{
+							while (V_7.MoveNext())
+							{
+								V_8 = V_7.get_Current();
+								body.AddStatement(V_8);
+							}
+						}
+						finally
+						{
+							((IDisposable)V_7).Dispose();
+						}
 					}
-					foreach (Statement onlyReachableStatement in this.TraverseGoToOnlyReachableStatements(logicalConstruct1))
+				}
+				finally
+				{
+					((IDisposable)V_5).Dispose();
+				}
+			}
+			while (V_0);
+			V_2 = this.gotoEndpointToOrigins.get_Keys().GetEnumerator();
+			try
+			{
+				while (V_2.MoveNext())
+				{
+					V_9 = V_2.get_Current();
+					V_10 = this.GetEffectiveGotoEndPoint(V_9);
+					V_11 = this.gotoEndpointToOrigins.get_Item(V_9).GetEnumerator();
+					try
 					{
-						body.AddStatement(onlyReachableStatement);
+						while (V_11.MoveNext())
+						{
+							V_12 = V_11.get_Current();
+							V_13 = this.FindGoToEndpointConstruct(V_10, V_12);
+							if (!this.gotoEndpointConstructToLabel.ContainsKey(V_13))
+							{
+								V_14 = this.GenerateGoToLabel();
+								this.AddAndRegisterGoToLabel(V_13, V_14);
+								this.gotoEndpointConstructToLabel.set_Item(V_13, V_14);
+							}
+							this.gotoOriginBlockToGoToStatement.get_Item(V_12).get_Item(V_9).set_TargetLabel(this.gotoEndpointConstructToLabel.get_Item(V_13));
+						}
+					}
+					finally
+					{
+						((IDisposable)V_11).Dispose();
 					}
 				}
 			}
-			while (count);
-			foreach (CFGBlockLogicalConstruct item in this.gotoEndpointToOrigins.Keys)
+			finally
 			{
-				CFGBlockLogicalConstruct effectiveGotoEndPoint = this.GetEffectiveGotoEndPoint(item);
-				foreach (CFGBlockLogicalConstruct cFGBlockLogicalConstruct in this.gotoEndpointToOrigins[item])
-				{
-					ILogicalConstruct endpointConstruct = this.FindGoToEndpointConstruct(effectiveGotoEndPoint, cFGBlockLogicalConstruct);
-					if (!this.gotoEndpointConstructToLabel.ContainsKey(endpointConstruct))
-					{
-						string label = this.GenerateGoToLabel();
-						this.AddAndRegisterGoToLabel(endpointConstruct, label);
-						this.gotoEndpointConstructToLabel[endpointConstruct] = label;
-					}
-					this.gotoOriginBlockToGoToStatement[cFGBlockLogicalConstruct][item].TargetLabel = this.gotoEndpointConstructToLabel[endpointConstruct];
-				}
+				((IDisposable)V_2).Dispose();
 			}
 			return body;
 		}
 
 		private bool IsLoopCondition(CFGBlockLogicalConstruct cfgBlock)
 		{
-			if (!(cfgBlock.Parent is ConditionLogicalConstruct))
+			if (cfgBlock.get_Parent() as ConditionLogicalConstruct == null)
 			{
 				return false;
 			}
-			return (cfgBlock.Parent as ConditionLogicalConstruct).LogicalContainer is LoopLogicalConstruct;
+			return (cfgBlock.get_Parent() as ConditionLogicalConstruct).get_LogicalContainer() as LoopLogicalConstruct != null;
 		}
 
 		private bool IsUnconditionalJump(Instruction instruction)
 		{
-			Code code = instruction.get_OpCode().get_Code();
-			if (code == 55)
+			V_0 = instruction.get_OpCode().get_Code();
+			if (V_0 == 55)
 			{
 				return true;
 			}
-			return code == 42;
+			return V_0 == 42;
 		}
 
 		private void MarkGoTosIfNotLoopEdge(ILogicalConstruct start, ILogicalConstruct end)
 		{
-			ILogicalConstruct logicalConstruct;
-			HashSet<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs;
-			CFGBlockLogicalConstruct firstBlock = end.FirstBlock;
-			LoopLogicalConstruct innerMostParentOfType = this.GetInnerMostParentOfType<LoopLogicalConstruct>();
-			HashSet<CFGBlockLogicalConstruct> cFGBlocks = start.CFGBlocks;
-			foreach (CFGBlockLogicalConstruct cFGPredecessor in firstBlock.CFGPredecessors)
+			V_0 = end.get_FirstBlock();
+			V_1 = this.GetInnerMostParentOfType<LoopLogicalConstruct>();
+			V_2 = start.get_CFGBlocks();
+			V_3 = V_0.get_CFGPredecessors().GetEnumerator();
+			try
 			{
-				if (!cFGBlocks.Contains(cFGPredecessor))
+				while (V_3.MoveNext())
 				{
-					continue;
-				}
-				logicalConstruct = (!this.IsLoopCondition(cFGPredecessor) ? this.GetInnerMostParentOfType<LoopLogicalConstruct>(cFGPredecessor) : this.GetInnerMostParentOfType<LoopLogicalConstruct>(cFGPredecessor.Parent.Parent as ILogicalConstruct));
-				ILogicalConstruct innerMostParentOfType1 = this.GetInnerMostParentOfType<IBreaksContainer>(cFGPredecessor);
-				CFGBlockLogicalConstruct cFGBlockLogicalConstruct = this.FindBreak(cFGPredecessor);
-				CFGBlockLogicalConstruct cFGBlockLogicalConstruct1 = this.FindContinue(cFGPredecessor);
-				if (cFGBlockLogicalConstruct == firstBlock && !this.ExistsStatementForConstruct(innerMostParentOfType1) || cFGBlockLogicalConstruct1 == firstBlock && !this.ExistsStatementForConstruct(logicalConstruct) || innerMostParentOfType != null && logicalConstruct == innerMostParentOfType && !this.ExistsStatementForConstruct(innerMostParentOfType) && innerMostParentOfType.LoopContinueEndPoint == firstBlock && this.CheckForNormalFlowReachability(cFGPredecessor, innerMostParentOfType))
-				{
-					continue;
-				}
-				if ((!this.gotoOriginsToEndpoints.TryGetValue(cFGPredecessor, out cFGBlockLogicalConstructs) ? false : cFGBlockLogicalConstructs.Contains(firstBlock)))
-				{
-					continue;
-				}
-				if (!this.gotoEndpointToOrigins.ContainsKey(firstBlock))
-				{
-					this.gotoEndpointToOrigins.Add(firstBlock, new HashSet<CFGBlockLogicalConstruct>());
-				}
-				if (!this.gotoEndpointToOrigins[firstBlock].Contains(cFGPredecessor))
-				{
-					this.gotoEndpointToOrigins[firstBlock].Add(cFGPredecessor);
-				}
-				if (this.gotoOriginsToEndpoints.ContainsKey(cFGPredecessor))
-				{
-					this.gotoOriginsToEndpoints[cFGPredecessor].Add(firstBlock);
-				}
-				else
-				{
-					this.gotoOriginsToEndpoints.Add(cFGPredecessor, new HashSet<CFGBlockLogicalConstruct>(new CFGBlockLogicalConstruct[] { firstBlock }));
+					V_4 = V_3.get_Current();
+					if (!V_2.Contains(V_4))
+					{
+						continue;
+					}
+					if (!this.IsLoopCondition(V_4))
+					{
+						V_5 = this.GetInnerMostParentOfType<LoopLogicalConstruct>(V_4);
+					}
+					else
+					{
+						V_5 = this.GetInnerMostParentOfType<LoopLogicalConstruct>(V_4.get_Parent().get_Parent() as ILogicalConstruct);
+					}
+					V_6 = this.GetInnerMostParentOfType<IBreaksContainer>(V_4);
+					stackVariable27 = this.FindBreak(V_4);
+					V_7 = this.FindContinue(V_4);
+					if (stackVariable27 == V_0 && !this.ExistsStatementForConstruct(V_6) || V_7 == V_0 && !this.ExistsStatementForConstruct(V_5) || V_1 != null && V_5 == V_1 && !this.ExistsStatementForConstruct(V_1) && V_1.get_LoopContinueEndPoint() == V_0 && this.CheckForNormalFlowReachability(V_4, V_1))
+					{
+						continue;
+					}
+					if (!this.gotoOriginsToEndpoints.TryGetValue(V_4, out V_8))
+					{
+						stackVariable40 = false;
+					}
+					else
+					{
+						stackVariable40 = V_8.Contains(V_0);
+					}
+					if (stackVariable40)
+					{
+						continue;
+					}
+					if (!this.gotoEndpointToOrigins.ContainsKey(V_0))
+					{
+						this.gotoEndpointToOrigins.Add(V_0, new HashSet<CFGBlockLogicalConstruct>());
+					}
+					if (!this.gotoEndpointToOrigins.get_Item(V_0).Contains(V_4))
+					{
+						dummyVar0 = this.gotoEndpointToOrigins.get_Item(V_0).Add(V_4);
+					}
+					if (this.gotoOriginsToEndpoints.ContainsKey(V_4))
+					{
+						dummyVar1 = this.gotoOriginsToEndpoints.get_Item(V_4).Add(V_0);
+					}
+					else
+					{
+						stackVariable62 = this.gotoOriginsToEndpoints;
+						stackVariable65 = new CFGBlockLogicalConstruct[1];
+						stackVariable65[0] = V_0;
+						stackVariable62.Add(V_4, new HashSet<CFGBlockLogicalConstruct>(stackVariable65));
+					}
 				}
 			}
+			finally
+			{
+				((IDisposable)V_3).Dispose();
+			}
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.contextGotoLabels = context.MethodContext.GotoLabels;
-			this.contextGotoStatements = context.MethodContext.GotoStatements;
-			this.theCFG = context.MethodContext.ControlFlowGraph;
-			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
-			this.logicalTree = context.MethodContext.LogicalConstructsTree;
-			this.expressions = context.MethodContext.Expressions;
-			body = (BlockStatement)this.ProcessLogicalConstruct(this.logicalTree, false)[0];
+			this.contextGotoLabels = context.get_MethodContext().get_GotoLabels();
+			this.contextGotoStatements = context.get_MethodContext().get_GotoStatements();
+			this.theCFG = context.get_MethodContext().get_ControlFlowGraph();
+			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.logicalTree = context.get_MethodContext().get_LogicalConstructsTree();
+			this.expressions = context.get_MethodContext().get_Expressions();
+			body = (BlockStatement)this.ProcessLogicalConstruct(this.logicalTree, false).get_Item(0);
 			body = this.InsertGotoEndpoints(body);
-			context.MethodContext.StatementToLogicalConstruct = this.statementToLogicalConstruct;
-			context.MethodContext.LogicalConstructToStatements = this.logicalConstructToStatements;
+			context.get_MethodContext().set_StatementToLogicalConstruct(this.statementToLogicalConstruct);
+			context.get_MethodContext().set_LogicalConstructToStatements(this.logicalConstructToStatements);
 			return body;
 		}
 
 		private BlockStatement ProcessBlockLogicalConstruct(ILogicalConstruct theConstruct, bool gotoReachableConstruct)
 		{
-			BlockStatement blockStatement = new BlockStatement();
-			for (ILogicalConstruct i = (ILogicalConstruct)theConstruct.Entry; i != null; i = i.FollowNode)
+			V_0 = new BlockStatement();
+			V_1 = (ILogicalConstruct)theConstruct.get_Entry();
+			while (V_1 != null)
 			{
-				foreach (Statement statement in this.ProcessLogicalConstruct(i, gotoReachableConstruct))
+				V_2 = this.ProcessLogicalConstruct(V_1, gotoReachableConstruct).GetEnumerator();
+				try
 				{
-					blockStatement.AddStatement(statement);
+					while (V_2.MoveNext())
+					{
+						V_3 = V_2.get_Current();
+						V_0.AddStatement(V_3);
+					}
 				}
+				finally
+				{
+					((IDisposable)V_2).Dispose();
+				}
+				V_1 = V_1.get_FollowNode();
 			}
-			return blockStatement;
+			return V_0;
 		}
 
 		private void ProcessCfgBlockLogicalConstruct(CFGBlockLogicalConstruct theBlock, List<Statement> results, bool closestBreakContainerExists, bool closestLoopParentExists)
 		{
 			// 
 			// Current member / type: System.Void Telerik.JustDecompiler.Decompiler.StatementDecompilerStep::ProcessCfgBlockLogicalConstruct(Telerik.JustDecompiler.Decompiler.LogicFlow.CFGBlockLogicalConstruct,System.Collections.Generic.List`1<Telerik.JustDecompiler.Ast.Statements.Statement>,System.Boolean,System.Boolean)
-			// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
-			// 
-			// Product version: 0.0.0.0
 			// Exception in: System.Void ProcessCfgBlockLogicalConstruct(Telerik.JustDecompiler.Decompiler.LogicFlow.CFGBlockLogicalConstruct,System.Collections.Generic.List<Telerik.JustDecompiler.Ast.Statements.Statement>,System.Boolean,System.Boolean)
-			// 
 			// Specified argument was out of the range of valid values.
 			// Parameter name: Target of array indexer expression is not an array.
-			//    at Telerik.JustDecompiler.Ast.Expressions.ArrayIndexerExpression.get_ExpressionType() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Ast\Expressions\ArrayIndexerExpression.cs:line 129
-			//    at Telerik.JustDecompiler.Ast.Expressions.BinaryExpression.UpdateType() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Ast\Expressions\BinaryExpression.cs:line 228
-			//    at Telerik.JustDecompiler.Steps.FixBinaryExpressionsStep.VisitBinaryExpression(BinaryExpression expression) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Steps\FixBinaryExpressionsStep.cs:line 74
-			//    at Telerik.JustDecompiler.Ast.BaseCodeTransformer.Visit(ICodeNode node) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Ast\BaseCodeTransformer.cs:line 276
-			//    at Telerik.JustDecompiler.Steps.FixBinaryExpressionsStep.Process(DecompilationContext context, BlockStatement body) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Steps\FixBinaryExpressionsStep.cs:line 44
-			//    at Telerik.JustDecompiler.Decompiler.ExpressionDecompilerStep.Process(DecompilationContext theContext, BlockStatement body) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\ExpressionDecompilerStep.cs:line 93
-			//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.RunInternal(MethodBody body, BlockStatement block, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 81
-			//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.Run(MethodBody body, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 70
-			//    at Telerik.JustDecompiler.Decompiler.Extensions.Decompile(MethodBody body, ILanguage language, DecompilationContext& context, TypeSpecificContext typeContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\Extensions.cs:line 61
-			//    at Telerik.JustDecompiler.Decompiler.WriterContextServices.BaseWriterContextService.DecompileMethod(ILanguage language, MethodDefinition method, TypeSpecificContext typeContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\WriterContextServices\BaseWriterContextService.cs:line 117
 			// 
 			// mailto: JustDecompilePublicFeedback@telerik.com
 
@@ -700,393 +835,465 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private IfStatement ProcessConditionLogicalConstruct(ConditionLogicalConstruct clc, bool closestBreakContainerExists, IBreaksContainer closestBreakContainerParent, bool closestLoopParentExists)
 		{
-			bool flag;
-			BlockStatement blockStatement = new BlockStatement();
-			BlockStatement blockStatement1 = new BlockStatement();
+			V_0 = new BlockStatement();
+			V_1 = new BlockStatement();
 			if (!closestBreakContainerExists && this.CheckForBreak(clc))
 			{
-				CFGBlockLogicalConstruct item = this.breaksContainerToBreakEndPoint[closestBreakContainerParent];
-				List<Instruction> jumpingInstructions = this.GetJumpingInstructions(clc, item);
-				if (clc.TrueCFGSuccessor != item)
+				V_3 = this.breaksContainerToBreakEndPoint.get_Item(closestBreakContainerParent);
+				V_4 = this.GetJumpingInstructions(clc, V_3);
+				if (clc.get_TrueCFGSuccessor() != V_3)
 				{
-					if (clc.FalseCFGSuccessor != item)
+					if (clc.get_FalseCFGSuccessor() != V_3)
 					{
 						throw new Exception("Incorrect mark as break child!");
 					}
-					blockStatement1.AddStatement(new BreakStatement(jumpingInstructions));
+					V_1.AddStatement(new BreakStatement(V_4));
 				}
 				else
 				{
-					blockStatement.AddStatement(new BreakStatement(jumpingInstructions));
+					V_0.AddStatement(new BreakStatement(V_4));
 				}
 			}
 			if (!closestLoopParentExists && this.CheckForContinue(clc))
 			{
-				CFGBlockLogicalConstruct loopContinueEndPoint = this.GetInnerMostParentOfType<LoopLogicalConstruct>().LoopContinueEndPoint;
-				if (clc.TrueCFGSuccessor != loopContinueEndPoint || blockStatement.Statements.Count != 0)
+				V_5 = this.GetInnerMostParentOfType<LoopLogicalConstruct>().get_LoopContinueEndPoint();
+				if (clc.get_TrueCFGSuccessor() != V_5 || V_0.get_Statements().get_Count() != 0)
 				{
-					if (clc.FalseCFGSuccessor != loopContinueEndPoint || blockStatement1.Statements.Count != 0)
+					if (clc.get_FalseCFGSuccessor() != V_5 || V_1.get_Statements().get_Count() != 0)
 					{
 						throw new Exception("Incorrect mark as continue child!");
 					}
-					blockStatement1.AddStatement(new ContinueStatement(this.GetJumpingInstructions(clc, loopContinueEndPoint)));
+					V_1.AddStatement(new ContinueStatement(this.GetJumpingInstructions(clc, V_5)));
 				}
 				else
 				{
-					blockStatement.AddStatement(new ContinueStatement(this.GetJumpingInstructions(clc, loopContinueEndPoint)));
+					V_0.AddStatement(new ContinueStatement(this.GetJumpingInstructions(clc, V_5)));
 				}
 			}
-			flag = (!this.gotoEndpointToOrigins.ContainsKey(clc.TrueCFGSuccessor) ? false : this.TryCreateGoTosForConditinalConstructSuccessor(blockStatement, clc, clc.TrueCFGSuccessor));
-			bool flag1 = (!this.gotoEndpointToOrigins.ContainsKey(clc.FalseCFGSuccessor) ? false : this.TryCreateGoTosForConditinalConstructSuccessor(blockStatement1, clc, clc.FalseCFGSuccessor));
-			if (!flag && !flag1 && blockStatement.Statements.Count == 0 && blockStatement1.Statements.Count == 0)
+			if (!this.gotoEndpointToOrigins.ContainsKey(clc.get_TrueCFGSuccessor()))
+			{
+				stackVariable9 = false;
+			}
+			else
+			{
+				stackVariable9 = this.TryCreateGoTosForConditinalConstructSuccessor(V_0, clc, clc.get_TrueCFGSuccessor());
+			}
+			if (!this.gotoEndpointToOrigins.ContainsKey(clc.get_FalseCFGSuccessor()))
+			{
+				stackVariable15 = false;
+			}
+			else
+			{
+				stackVariable15 = this.TryCreateGoTosForConditinalConstructSuccessor(V_1, clc, clc.get_FalseCFGSuccessor());
+			}
+			V_2 = stackVariable15;
+			if (!stackVariable9 && !V_2 && V_0.get_Statements().get_Count() == 0 && V_1.get_Statements().get_Count() == 0)
 			{
 				throw new Exception("Orphaned condition not properly marked as goto!");
 			}
-			if (blockStatement.Statements.Count == 0)
+			if (V_0.get_Statements().get_Count() == 0)
 			{
-				BlockStatement blockStatement2 = blockStatement;
-				blockStatement = blockStatement1;
-				blockStatement1 = blockStatement2;
+				stackVariable28 = V_0;
+				V_0 = V_1;
+				V_1 = stackVariable28;
 				clc.Negate(this.typeSystem);
 			}
-			if (blockStatement1.Statements.Count == 0)
+			if (V_1.get_Statements().get_Count() == 0)
 			{
-				blockStatement1 = null;
+				V_1 = null;
 			}
-			return new IfStatement(clc.ConditionExpression, blockStatement, blockStatement1);
+			return new IfStatement(clc.get_ConditionExpression(), V_0, V_1);
 		}
 
 		private TryStatement ProcessExceptionHandlingLogicalConstruct(ExceptionHandlingLogicalConstruct exceptionHandlingConstruct, bool gotoReachableConstruct)
 		{
-			VariableDefinition variableDefinition;
-			VariableDeclarationExpression variableDeclarationExpression;
-			BlockStatement item = (BlockStatement)this.ProcessLogicalConstruct(exceptionHandlingConstruct.Try, gotoReachableConstruct)[0];
-			if (exceptionHandlingConstruct is TryFinallyLogicalConstruct)
+			V_0 = (BlockStatement)this.ProcessLogicalConstruct(exceptionHandlingConstruct.get_Try(), gotoReachableConstruct).get_Item(0);
+			if (exceptionHandlingConstruct as TryFinallyLogicalConstruct != null)
 			{
-				TryFinallyLogicalConstruct tryFinallyLogicalConstruct = exceptionHandlingConstruct as TryFinallyLogicalConstruct;
-				FinallyClause finallyClause = new FinallyClause((BlockStatement)this.ProcessLogicalConstruct(tryFinallyLogicalConstruct.Finally, gotoReachableConstruct)[0], null);
-				return new TryStatement(item, null, finallyClause);
+				V_1 = exceptionHandlingConstruct as TryFinallyLogicalConstruct;
+				V_2 = new FinallyClause((BlockStatement)this.ProcessLogicalConstruct(V_1.get_Finally(), gotoReachableConstruct).get_Item(0), null);
+				return new TryStatement(V_0, null, V_2);
 			}
-			if (exceptionHandlingConstruct is TryFaultLogicalConstruct)
+			if (exceptionHandlingConstruct as TryFaultLogicalConstruct != null)
 			{
-				TryFaultLogicalConstruct tryFaultLogicalConstruct = exceptionHandlingConstruct as TryFaultLogicalConstruct;
-				BlockStatement blockStatement = (BlockStatement)this.ProcessLogicalConstruct(tryFaultLogicalConstruct.Fault, gotoReachableConstruct)[0];
-				return new TryStatement(item, blockStatement, null);
+				V_3 = exceptionHandlingConstruct as TryFaultLogicalConstruct;
+				V_4 = (BlockStatement)this.ProcessLogicalConstruct(V_3.get_Fault(), gotoReachableConstruct).get_Item(0);
+				return new TryStatement(V_0, V_4, null);
 			}
-			TryStatement tryStatement = new TryStatement()
+			stackVariable14 = new TryStatement();
+			stackVariable14.set_Try(V_0);
+			V_5 = stackVariable14;
+			V_6 = (exceptionHandlingConstruct as TryCatchFilterLogicalConstruct).get_Handlers();
+			V_7 = 0;
+			while (V_7 < (int)V_6.Length)
 			{
-				Try = item
-			};
-			IFilteringExceptionHandler[] handlers = (exceptionHandlingConstruct as TryCatchFilterLogicalConstruct).Handlers;
-			for (int i = 0; i < (int)handlers.Length; i++)
-			{
-				IFilteringExceptionHandler filteringExceptionHandler = handlers[i];
-				if (!(filteringExceptionHandler is ExceptionHandlingBlockCatch))
+				V_8 = V_6[V_7];
+				if (V_8 as ExceptionHandlingBlockCatch == null)
 				{
-					ExceptionHandlingBlockFilter exceptionHandlingBlockFilter = filteringExceptionHandler as ExceptionHandlingBlockFilter;
-					BlockStatement item1 = (BlockStatement)this.ProcessLogicalConstruct(exceptionHandlingBlockFilter.Filter, gotoReachableConstruct)[0];
-					BlockStatement blockStatement1 = (BlockStatement)this.ProcessLogicalConstruct(exceptionHandlingBlockFilter.Handler, gotoReachableConstruct)[0];
-					tryStatement.AddToCatchClauses(new CatchClause(blockStatement1, null, null, item1));
+					V_13 = V_8 as ExceptionHandlingBlockFilter;
+					V_14 = (BlockStatement)this.ProcessLogicalConstruct(V_13.get_Filter(), gotoReachableConstruct).get_Item(0);
+					V_15 = (BlockStatement)this.ProcessLogicalConstruct(V_13.get_Handler(), gotoReachableConstruct).get_Item(0);
+					V_5.AddToCatchClauses(new CatchClause(V_15, null, null, V_14));
 				}
 				else
 				{
-					ExceptionHandlingBlockCatch exceptionHandlingBlockCatch = filteringExceptionHandler as ExceptionHandlingBlockCatch;
-					BlockStatement item2 = (BlockStatement)this.ProcessLogicalConstruct(exceptionHandlingBlockCatch, gotoReachableConstruct)[0];
-					if (this.context.MethodContext.StackData.ExceptionHandlerStartToExceptionVariableMap.TryGetValue(exceptionHandlingBlockCatch.FirstBlock.TheBlock.First.get_Offset(), out variableDefinition))
+					V_9 = V_8 as ExceptionHandlingBlockCatch;
+					V_10 = (BlockStatement)this.ProcessLogicalConstruct(V_9, gotoReachableConstruct).get_Item(0);
+					if (this.context.get_MethodContext().get_StackData().get_ExceptionHandlerStartToExceptionVariableMap().TryGetValue(V_9.get_FirstBlock().get_TheBlock().get_First().get_Offset(), out V_11))
 					{
-						variableDeclarationExpression = new VariableDeclarationExpression(variableDefinition, null);
+						stackVariable77 = new VariableDeclarationExpression(V_11, null);
 					}
 					else
 					{
-						variableDeclarationExpression = null;
+						stackVariable77 = null;
 					}
-					VariableDeclarationExpression variableDeclarationExpression1 = variableDeclarationExpression;
-					tryStatement.AddToCatchClauses(new CatchClause(item2, exceptionHandlingBlockCatch.CatchType, variableDeclarationExpression1, null));
+					V_12 = stackVariable77;
+					V_5.AddToCatchClauses(new CatchClause(V_10, V_9.get_CatchType(), V_12, null));
 				}
+				V_7 = V_7 + 1;
 			}
-			return tryStatement;
+			return V_5;
 		}
 
 		private IfStatement ProcessIfLogicalConstruct(IfLogicalConstruct theIf, bool gotoReachableConstruct)
 		{
-			BlockStatement item = (BlockStatement)this.ProcessLogicalConstruct(theIf.Then, gotoReachableConstruct)[0];
-			BlockStatement blockStatement = null;
-			if (theIf.Else != null)
+			V_0 = (BlockStatement)this.ProcessLogicalConstruct(theIf.get_Then(), gotoReachableConstruct).get_Item(0);
+			V_1 = null;
+			if (theIf.get_Else() != null)
 			{
-				blockStatement = (BlockStatement)this.ProcessLogicalConstruct(theIf.Else, gotoReachableConstruct)[0];
+				V_1 = (BlockStatement)this.ProcessLogicalConstruct(theIf.get_Else(), gotoReachableConstruct).get_Item(0);
 			}
-			if (blockStatement != null && blockStatement.Statements.Count == 0)
+			if (V_1 != null && V_1.get_Statements().get_Count() == 0)
 			{
-				blockStatement = null;
+				V_1 = null;
 			}
-			if (blockStatement != null && item.Statements.Count == 0)
+			if (V_1 != null && V_0.get_Statements().get_Count() == 0)
 			{
 				theIf.Negate(this.typeSystem);
-				item = blockStatement;
-				blockStatement = null;
+				V_0 = V_1;
+				V_1 = null;
 			}
-			IfStatement ifStatement = new IfStatement(theIf.Condition.ConditionExpression, item, blockStatement);
-			List<CFGBlockLogicalConstruct> startPoint = this.HostsGoToStartPoint(theIf.Condition);
-			if (startPoint.Count != 0)
+			V_2 = new IfStatement(theIf.get_Condition().get_ConditionExpression(), V_0, V_1);
+			V_3 = this.HostsGoToStartPoint(theIf.get_Condition());
+			if (V_3.get_Count() != 0)
 			{
-				if (theIf.Else != null)
+				if (theIf.get_Else() != null)
 				{
 					throw new Exception("Malformed IF statement.");
 				}
-				List<Statement> statements = new List<Statement>();
-				this.AppendGoToFromConditionStartingAt(startPoint, theIf.Condition.FalseCFGSuccessor, statements);
-				ifStatement.Else = new BlockStatement();
-				ifStatement.Else.AddStatement(statements[0]);
+				V_4 = new List<Statement>();
+				this.AppendGoToFromConditionStartingAt(V_3, theIf.get_Condition().get_FalseCFGSuccessor(), V_4);
+				V_2.set_Else(new BlockStatement());
+				V_2.get_Else().AddStatement(V_4.get_Item(0));
 			}
-			return ifStatement;
+			return V_2;
 		}
 
 		private List<Statement> ProcessLogicalConstruct(ILogicalConstruct theConstruct, bool gotoReachableConstruct)
 		{
 			if (this.logicalConstructToStatements.ContainsKey(theConstruct))
 			{
-				return this.logicalConstructToStatements[theConstruct];
+				return this.logicalConstructToStatements.get_Item(theConstruct);
 			}
-			List<Statement> statements = new List<Statement>();
+			V_0 = new List<Statement>();
 			this.FindAndMarkGoToExits(theConstruct, gotoReachableConstruct);
 			this.parents.Push(theConstruct);
-			if (!(theConstruct is BlockLogicalConstruct))
+			if (theConstruct as BlockLogicalConstruct == null)
 			{
-				LoopLogicalConstruct innerMostParentOfType = this.GetInnerMostParentOfType<LoopLogicalConstruct>(theConstruct);
-				bool flag = (innerMostParentOfType == null ? false : this.ExistsStatementForConstruct(innerMostParentOfType));
-				IBreaksContainer breaksContainer = this.GetInnerMostParentOfType<IBreaksContainer>(theConstruct);
-				bool flag1 = (breaksContainer == null ? false : this.ExistsStatementForConstruct(breaksContainer));
-				if (theConstruct is ExceptionHandlingLogicalConstruct)
+				V_1 = this.GetInnerMostParentOfType<LoopLogicalConstruct>(theConstruct);
+				if (V_1 == null)
 				{
-					statements.Add(this.ProcessExceptionHandlingLogicalConstruct(theConstruct as ExceptionHandlingLogicalConstruct, gotoReachableConstruct));
+					stackVariable17 = false;
 				}
-				else if (theConstruct is IfLogicalConstruct)
+				else
 				{
-					statements.Add(this.ProcessIfLogicalConstruct(theConstruct as IfLogicalConstruct, gotoReachableConstruct));
+					stackVariable17 = this.ExistsStatementForConstruct(V_1);
 				}
-				else if (theConstruct is LoopLogicalConstruct)
+				V_2 = stackVariable17;
+				V_3 = this.GetInnerMostParentOfType<IBreaksContainer>(theConstruct);
+				if (V_3 == null)
 				{
-					this.ProcessLoopLogicalConstruct(theConstruct as LoopLogicalConstruct, gotoReachableConstruct, statements);
+					stackVariable22 = false;
 				}
-				else if (theConstruct is SwitchLogicalConstruct)
+				else
 				{
-					statements.Add(this.ProcessSwitchLogicalConstruct(theConstruct as SwitchLogicalConstruct, gotoReachableConstruct));
+					stackVariable22 = this.ExistsStatementForConstruct(V_3);
 				}
-				else if (theConstruct is CFGBlockLogicalConstruct)
+				V_4 = stackVariable22;
+				if (theConstruct as ExceptionHandlingLogicalConstruct == null)
 				{
-					this.ProcessCfgBlockLogicalConstruct(theConstruct as CFGBlockLogicalConstruct, statements, flag1, flag);
+					if (theConstruct as IfLogicalConstruct == null)
+					{
+						if (theConstruct as LoopLogicalConstruct == null)
+						{
+							if (theConstruct as SwitchLogicalConstruct == null)
+							{
+								if (theConstruct as CFGBlockLogicalConstruct == null)
+								{
+									if (theConstruct as ConditionLogicalConstruct != null)
+									{
+										V_0.Add(this.ProcessConditionLogicalConstruct(theConstruct as ConditionLogicalConstruct, V_4, V_3, V_2));
+									}
+								}
+								else
+								{
+									this.ProcessCfgBlockLogicalConstruct(theConstruct as CFGBlockLogicalConstruct, V_0, V_4, V_2);
+								}
+							}
+							else
+							{
+								V_0.Add(this.ProcessSwitchLogicalConstruct(theConstruct as SwitchLogicalConstruct, gotoReachableConstruct));
+							}
+						}
+						else
+						{
+							this.ProcessLoopLogicalConstruct(theConstruct as LoopLogicalConstruct, gotoReachableConstruct, V_0);
+						}
+					}
+					else
+					{
+						V_0.Add(this.ProcessIfLogicalConstruct(theConstruct as IfLogicalConstruct, gotoReachableConstruct));
+					}
 				}
-				else if (theConstruct is ConditionLogicalConstruct)
+				else
 				{
-					statements.Add(this.ProcessConditionLogicalConstruct(theConstruct as ConditionLogicalConstruct, flag1, breaksContainer, flag));
+					V_0.Add(this.ProcessExceptionHandlingLogicalConstruct(theConstruct as ExceptionHandlingLogicalConstruct, gotoReachableConstruct));
 				}
 			}
 			else
 			{
-				statements.Add(this.ProcessBlockLogicalConstruct(theConstruct, gotoReachableConstruct));
+				V_0.Add(this.ProcessBlockLogicalConstruct(theConstruct, gotoReachableConstruct));
 			}
-			this.parents.Pop();
-			this.logicalConstructToStatements.Add(theConstruct, statements);
-			foreach (Statement statement in statements)
+			dummyVar0 = this.parents.Pop();
+			this.logicalConstructToStatements.Add(theConstruct, V_0);
+			V_5 = V_0.GetEnumerator();
+			try
 			{
-				this.statementToLogicalConstruct[statement] = theConstruct;
+				while (V_5.MoveNext())
+				{
+					V_6 = V_5.get_Current();
+					this.statementToLogicalConstruct.set_Item(V_6, theConstruct);
+				}
 			}
-			return statements;
+			finally
+			{
+				((IDisposable)V_5).Dispose();
+			}
+			return V_0;
 		}
 
 		private void ProcessLoopLogicalConstruct(LoopLogicalConstruct theLogicalLoop, bool gotoReachableConstruct, List<Statement> results)
 		{
-			BlockStatement blockStatement;
-			Expression literalExpression;
-			blockStatement = (theLogicalLoop.LoopBodyBlock == null ? new BlockStatement() : (BlockStatement)this.ProcessLogicalConstruct(theLogicalLoop.LoopBodyBlock, gotoReachableConstruct)[0]);
-			if (theLogicalLoop.LoopCondition == null)
+			if (theLogicalLoop.get_LoopBodyBlock() == null)
 			{
-				literalExpression = new LiteralExpression(true, this.typeSystem, null);
+				V_0 = new BlockStatement();
 			}
 			else
 			{
-				literalExpression = theLogicalLoop.LoopCondition.ConditionExpression;
+				V_0 = (BlockStatement)this.ProcessLogicalConstruct(theLogicalLoop.get_LoopBodyBlock(), gotoReachableConstruct).get_Item(0);
 			}
-			if (theLogicalLoop.LoopType == LoopType.PreTestedLoop || theLogicalLoop.LoopType == LoopType.InfiniteLoop)
+			if (theLogicalLoop.get_LoopCondition() == null)
 			{
-				results.Add(new WhileStatement(literalExpression, blockStatement));
+				V_1 = new LiteralExpression(true, this.typeSystem, null);
 			}
-			else if (theLogicalLoop.LoopType == LoopType.PostTestedLoop)
+			else
 			{
-				results.Add(new DoWhileStatement(literalExpression, blockStatement));
+				V_1 = theLogicalLoop.get_LoopCondition().get_ConditionExpression();
 			}
-			if (theLogicalLoop.LoopCondition != null)
+			if (theLogicalLoop.get_LoopType() == 1 || theLogicalLoop.get_LoopType() == LoopType.InfiniteLoop)
 			{
-				List<CFGBlockLogicalConstruct> startPoint = this.HostsGoToStartPoint(theLogicalLoop.LoopCondition);
-				if (startPoint.Count != 0)
+				results.Add(new WhileStatement(V_1, V_0));
+			}
+			else
+			{
+				if (theLogicalLoop.get_LoopType() == 2)
 				{
-					this.AppendGoToFromConditionStartingAt(startPoint, theLogicalLoop.LoopCondition.FalseCFGSuccessor, results);
+					results.Add(new DoWhileStatement(V_1, V_0));
 				}
 			}
+			if (theLogicalLoop.get_LoopCondition() != null)
+			{
+				V_2 = this.HostsGoToStartPoint(theLogicalLoop.get_LoopCondition());
+				if (V_2.get_Count() != 0)
+				{
+					this.AppendGoToFromConditionStartingAt(V_2, theLogicalLoop.get_LoopCondition().get_FalseCFGSuccessor(), results);
+				}
+			}
+			return;
 		}
 
 		private SwitchStatement ProcessSwitchLogicalConstruct(SwitchLogicalConstruct theLogicalSwitch, bool gotoReachableConstruct)
 		{
-			List<int> key;
-			BlockStatement blockStatement;
-			KeyValuePair<List<int>, CFGBlockLogicalConstruct> item;
-			HashSet<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs;
-			CFGBlockLogicalConstruct cFGBlockLogicalConstruct;
-			HashSet<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs1;
-			CFGBlockLogicalConstruct cFGBlockLogicalConstruct1;
-			SwitchStatement switchStatement = new SwitchStatement(theLogicalSwitch.SwitchConditionExpression, (theLogicalSwitch.Entry as ILogicalConstruct).FirstBlock.TheBlock.Last);
-			Dictionary<CFGBlockLogicalConstruct, GotoStatement> cFGBlockLogicalConstructs2 = new Dictionary<CFGBlockLogicalConstruct, GotoStatement>();
-			this.gotoOriginBlockToGoToStatement.Add(theLogicalSwitch.FirstBlock, cFGBlockLogicalConstructs2);
-			int num = 0;
-			int num1 = 0;
-			while (num != (int)theLogicalSwitch.ConditionCases.Length || num1 != theLogicalSwitch.NonDominatedCFGSuccessors.Count)
+			V_0 = new SwitchStatement(theLogicalSwitch.get_SwitchConditionExpression(), (theLogicalSwitch.get_Entry() as ILogicalConstruct).get_FirstBlock().get_TheBlock().get_Last());
+			V_1 = new Dictionary<CFGBlockLogicalConstruct, GotoStatement>();
+			this.gotoOriginBlockToGoToStatement.Add(theLogicalSwitch.get_FirstBlock(), V_1);
+			V_2 = 0;
+			V_3 = 0;
+			while (V_2 != (int)theLogicalSwitch.get_ConditionCases().Length || V_3 != theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Count())
 			{
-				CaseLogicalConstruct conditionCases = null;
-				CFGBlockLogicalConstruct value = null;
-				if (num < (int)theLogicalSwitch.ConditionCases.Length && num1 < theLogicalSwitch.NonDominatedCFGSuccessors.Count)
+				V_5 = null;
+				V_6 = null;
+				if (V_2 >= (int)theLogicalSwitch.get_ConditionCases().Length || V_3 >= theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Count())
 				{
-					if (theLogicalSwitch.ConditionCases[num].CaseNumbers[0] >= theLogicalSwitch.NonDominatedCFGSuccessors[num1].Key[0])
+					if (V_2 != (int)theLogicalSwitch.get_ConditionCases().Length)
 					{
-						item = theLogicalSwitch.NonDominatedCFGSuccessors[num1];
-						key = item.Key;
-						item = theLogicalSwitch.NonDominatedCFGSuccessors[num1];
-						value = item.Value;
-						num1++;
+						V_5 = theLogicalSwitch.get_ConditionCases()[V_2];
+						V_4 = V_5.get_CaseNumbers();
+						V_2 = V_2 + 1;
 					}
 					else
 					{
-						conditionCases = theLogicalSwitch.ConditionCases[num];
-						key = conditionCases.CaseNumbers;
-						num++;
-					}
-				}
-				else if (num != (int)theLogicalSwitch.ConditionCases.Length)
-				{
-					conditionCases = theLogicalSwitch.ConditionCases[num];
-					key = conditionCases.CaseNumbers;
-					num++;
-				}
-				else
-				{
-					item = theLogicalSwitch.NonDominatedCFGSuccessors[num1];
-					key = item.Key;
-					item = theLogicalSwitch.NonDominatedCFGSuccessors[num1];
-					value = item.Value;
-					num1++;
-				}
-				for (int i = 0; i < key.Count - 1; i++)
-				{
-					int item1 = key[i];
-					switchStatement.AddCase(new ConditionCase()
-					{
-						Condition = new LiteralExpression((object)item1, this.typeSystem, null)
-					});
-				}
-				LiteralExpression literalExpression = new LiteralExpression((object)key[key.Count - 1], this.typeSystem, null)
-				{
-					ExpressionType = this.context.MethodContext.Method.get_Module().get_TypeSystem().get_Int32()
-				};
-				if (conditionCases == null)
-				{
-					blockStatement = new BlockStatement();
-					if (this.continuesOriginToEndPoint.TryGetValue(theLogicalSwitch.FirstBlock, out cFGBlockLogicalConstruct) && cFGBlockLogicalConstruct == value)
-					{
-						blockStatement.AddStatement(new ContinueStatement(null));
-					}
-					else if (!this.gotoEndpointToOrigins.TryGetValue(value, out cFGBlockLogicalConstructs) || !cFGBlockLogicalConstructs.Contains(theLogicalSwitch.FirstBlock))
-					{
-						blockStatement.AddStatement(new BreakStatement(null));
-					}
-					else
-					{
-						GotoStatement statementToContext = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(theLogicalSwitch.FirstBlock, value));
-						cFGBlockLogicalConstructs2.Add(value, statementToContext);
-						blockStatement.AddStatement(statementToContext);
+						V_9 = theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Item(V_3);
+						V_4 = V_9.get_Key();
+						V_9 = theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Item(V_3);
+						V_6 = V_9.get_Value();
+						V_3 = V_3 + 1;
 					}
 				}
 				else
 				{
-					blockStatement = (BlockStatement)this.ProcessLogicalConstruct(conditionCases, gotoReachableConstruct)[0];
+					if (theLogicalSwitch.get_ConditionCases()[V_2].get_CaseNumbers().get_Item(0) >= theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Item(V_3).get_Key().get_Item(0))
+					{
+						V_9 = theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Item(V_3);
+						V_4 = V_9.get_Key();
+						V_9 = theLogicalSwitch.get_NonDominatedCFGSuccessors().get_Item(V_3);
+						V_6 = V_9.get_Value();
+						V_3 = V_3 + 1;
+					}
+					else
+					{
+						V_5 = theLogicalSwitch.get_ConditionCases()[V_2];
+						V_4 = V_5.get_CaseNumbers();
+						V_2 = V_2 + 1;
+					}
 				}
-				if (SwitchHelpers.BlockHasFallThroughSemantics(blockStatement))
+				V_10 = 0;
+				while (V_10 < V_4.get_Count() - 1)
 				{
-					blockStatement.AddStatement(new BreakSwitchCaseStatement());
+					V_11 = V_4.get_Item(V_10);
+					stackVariable53 = new ConditionCase();
+					stackVariable53.set_Condition(new LiteralExpression((object)V_11, this.typeSystem, null));
+					V_0.AddCase(stackVariable53);
+					V_10 = V_10 + 1;
 				}
-				switchStatement.AddCase(new ConditionCase(literalExpression, blockStatement));
+				V_7 = new LiteralExpression((object)V_4.get_Item(V_4.get_Count() - 1), this.typeSystem, null);
+				V_7.set_ExpressionType(this.context.get_MethodContext().get_Method().get_Module().get_TypeSystem().get_Int32());
+				if (V_5 == null)
+				{
+					V_8 = new BlockStatement();
+					if (!this.continuesOriginToEndPoint.TryGetValue(theLogicalSwitch.get_FirstBlock(), out V_13) || V_13 != V_6)
+					{
+						if (!this.gotoEndpointToOrigins.TryGetValue(V_6, out V_12) || !V_12.Contains(theLogicalSwitch.get_FirstBlock()))
+						{
+							V_8.AddStatement(new BreakStatement(null));
+						}
+						else
+						{
+							V_14 = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(theLogicalSwitch.get_FirstBlock(), V_6));
+							V_1.Add(V_6, V_14);
+							V_8.AddStatement(V_14);
+						}
+					}
+					else
+					{
+						V_8.AddStatement(new ContinueStatement(null));
+					}
+				}
+				else
+				{
+					V_8 = (BlockStatement)this.ProcessLogicalConstruct(V_5, gotoReachableConstruct).get_Item(0);
+				}
+				if (SwitchHelpers.BlockHasFallThroughSemantics(V_8))
+				{
+					V_8.AddStatement(new BreakSwitchCaseStatement());
+				}
+				V_0.AddCase(new ConditionCase(V_7, V_8));
 			}
-			if (theLogicalSwitch.DefaultCase == null)
+			if (theLogicalSwitch.get_DefaultCase() == null)
 			{
-				BlockStatement blockStatement1 = new BlockStatement();
-				if (this.continuesOriginToEndPoint.TryGetValue(theLogicalSwitch.FirstBlock, out cFGBlockLogicalConstruct1) && cFGBlockLogicalConstruct1 == theLogicalSwitch.DefaultCFGSuccessor)
+				V_16 = new BlockStatement();
+				if (!this.continuesOriginToEndPoint.TryGetValue(theLogicalSwitch.get_FirstBlock(), out V_18) || V_18 != theLogicalSwitch.get_DefaultCFGSuccessor())
 				{
-					blockStatement1.AddStatement(new ContinueStatement(null));
+					if (this.gotoEndpointToOrigins.TryGetValue(theLogicalSwitch.get_DefaultCFGSuccessor(), out V_17) && V_17.Contains(theLogicalSwitch.get_FirstBlock()))
+					{
+						V_19 = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(theLogicalSwitch.get_FirstBlock(), theLogicalSwitch.get_DefaultCFGSuccessor()));
+						V_1.Add(theLogicalSwitch.get_DefaultCFGSuccessor(), V_19);
+						V_16.AddStatement(V_19);
+					}
 				}
-				else if (this.gotoEndpointToOrigins.TryGetValue(theLogicalSwitch.DefaultCFGSuccessor, out cFGBlockLogicalConstructs1) && cFGBlockLogicalConstructs1.Contains(theLogicalSwitch.FirstBlock))
+				else
 				{
-					GotoStatement gotoStatement = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(theLogicalSwitch.FirstBlock, theLogicalSwitch.DefaultCFGSuccessor));
-					cFGBlockLogicalConstructs2.Add(theLogicalSwitch.DefaultCFGSuccessor, gotoStatement);
-					blockStatement1.AddStatement(gotoStatement);
+					V_16.AddStatement(new ContinueStatement(null));
 				}
-				if (blockStatement1.Statements.Count > 0)
+				if (V_16.get_Statements().get_Count() > 0)
 				{
-					switchStatement.AddCase(new DefaultCase(blockStatement1));
+					V_0.AddCase(new DefaultCase(V_16));
 				}
 			}
 			else
 			{
-				BlockStatement item2 = (BlockStatement)this.ProcessLogicalConstruct(theLogicalSwitch.DefaultCase, gotoReachableConstruct)[0];
-				if (this.gotoEndpointToOrigins.ContainsKey(theLogicalSwitch.DefaultCase.FirstBlock) || item2.Statements.Count > 1 || item2.Statements.Count == 1 && item2.Statements[0].CodeNodeType != CodeNodeType.BreakStatement)
+				V_15 = (BlockStatement)this.ProcessLogicalConstruct(theLogicalSwitch.get_DefaultCase(), gotoReachableConstruct).get_Item(0);
+				if (this.gotoEndpointToOrigins.ContainsKey(theLogicalSwitch.get_DefaultCase().get_FirstBlock()) || V_15.get_Statements().get_Count() > 1 || V_15.get_Statements().get_Count() == 1 && V_15.get_Statements().get_Item(0).get_CodeNodeType() != 9)
 				{
-					if (SwitchHelpers.BlockHasFallThroughSemantics(item2))
+					if (SwitchHelpers.BlockHasFallThroughSemantics(V_15))
 					{
-						item2.AddStatement(new BreakSwitchCaseStatement());
+						V_15.AddStatement(new BreakSwitchCaseStatement());
 					}
-					switchStatement.AddCase(new DefaultCase(item2));
+					V_0.AddCase(new DefaultCase(V_15));
 				}
 			}
-			return switchStatement;
+			return V_0;
 		}
 
 		private List<Statement> TraverseGoToOnlyReachableStatements(ILogicalConstruct start)
 		{
-			List<Statement> statements = new List<Statement>();
-			ILogicalConstruct followNode = start;
+			V_0 = new List<Statement>();
+			V_1 = start;
 			do
 			{
-				statements.AddRange(this.ProcessLogicalConstruct(followNode, true));
-				if (followNode.FollowNode != null && this.ExistsStatementForConstruct(followNode.FollowNode))
+				V_0.AddRange(this.ProcessLogicalConstruct(V_1, true));
+				if (V_1.get_FollowNode() != null && this.ExistsStatementForConstruct(V_1.get_FollowNode()))
 				{
 					break;
 				}
-				followNode = followNode.FollowNode;
+				V_1 = V_1.get_FollowNode();
 			}
-			while (followNode != null);
-			return statements;
+			while (V_1 != null);
+			return V_0;
 		}
 
 		private bool TryCreateGoTosForConditinalConstructSuccessor(BlockStatement theBlock, ConditionLogicalConstruct clc, CFGBlockLogicalConstruct theSuccessor)
 		{
-			GotoStatement statementToContext = null;
-			bool flag = false;
-			foreach (CFGBlockLogicalConstruct cFGPredecessor in theSuccessor.CFGPredecessors)
+			V_0 = null;
+			V_1 = false;
+			V_2 = theSuccessor.get_CFGPredecessors().GetEnumerator();
+			try
 			{
-				if (!clc.CFGBlocks.Contains(cFGPredecessor) || !this.gotoEndpointToOrigins[theSuccessor].Contains(cFGPredecessor))
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_3 = V_2.get_Current();
+					if (!clc.get_CFGBlocks().Contains(V_3) || !this.gotoEndpointToOrigins.get_Item(theSuccessor).Contains(V_3))
+					{
+						continue;
+					}
+					if (V_0 == null)
+					{
+						V_0 = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(V_3, theSuccessor));
+						theBlock.AddStatement(V_0);
+					}
+					if (!this.gotoOriginBlockToGoToStatement.ContainsKey(V_3))
+					{
+						this.gotoOriginBlockToGoToStatement.Add(V_3, new Dictionary<CFGBlockLogicalConstruct, GotoStatement>());
+					}
+					this.gotoOriginBlockToGoToStatement.get_Item(V_3).Add(theSuccessor, V_0);
+					V_1 = true;
 				}
-				if (statementToContext == null)
-				{
-					statementToContext = this.ConstructAndRecordGoToStatementToContext("", this.GetJumpingInstructions(cFGPredecessor, theSuccessor));
-					theBlock.AddStatement(statementToContext);
-				}
-				if (!this.gotoOriginBlockToGoToStatement.ContainsKey(cFGPredecessor))
-				{
-					this.gotoOriginBlockToGoToStatement.Add(cFGPredecessor, new Dictionary<CFGBlockLogicalConstruct, GotoStatement>());
-				}
-				this.gotoOriginBlockToGoToStatement[cFGPredecessor].Add(theSuccessor, statementToContext);
-				flag = true;
 			}
-			return flag;
+			finally
+			{
+				((IDisposable)V_2).Dispose();
+			}
+			return V_1;
 		}
 	}
 }

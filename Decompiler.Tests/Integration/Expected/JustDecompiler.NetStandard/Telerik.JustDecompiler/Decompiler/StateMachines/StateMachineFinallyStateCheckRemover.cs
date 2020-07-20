@@ -9,25 +9,26 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 	{
 		private VariableReference stateVariable;
 
-		public StateMachineFinallyStateCheckRemover(MethodSpecificContext moveNextMethodContext) : base(moveNextMethodContext)
+		public StateMachineFinallyStateCheckRemover(MethodSpecificContext moveNextMethodContext)
 		{
+			base(moveNextMethodContext);
+			return;
 		}
 
 		protected override bool IsFinallyCheckBlock(InstructionBlock finallyEntry)
 		{
-			VariableReference variableReference;
-			Instruction first = finallyEntry.First;
-			if (!StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out variableReference) || (object)variableReference != (object)this.stateVariable)
+			V_0 = finallyEntry.get_First();
+			if (!StateMachineUtilities.TryGetVariableFromInstruction(V_0, this.methodVariables, out V_1) || (object)V_1 != (object)this.stateVariable)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 22)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 22)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 59 && first.get_OpCode().get_Code() != 46)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 59 && V_0.get_OpCode().get_Code() != 46)
 			{
 				return false;
 			}
@@ -37,7 +38,8 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 		public override void MarkFinallyConditionsForRemoval(VariableReference stateVariable)
 		{
 			this.stateVariable = stateVariable;
-			base.MarkFinallyConditionsForRemovalInternal();
+			this.MarkFinallyConditionsForRemovalInternal();
+			return;
 		}
 	}
 }

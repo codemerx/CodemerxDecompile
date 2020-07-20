@@ -1,7 +1,5 @@
 using Mono.Cecil;
-using Mono.Collections.Generic;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Mono.Cecil.Extensions
@@ -10,58 +8,61 @@ namespace Mono.Cecil.Extensions
 	{
 		public static TypeReference ResolveParameterType(this ParameterReference param, MethodReference method)
 		{
-			TypeReference parameterType = param.get_ParameterType();
-			GenericParameter elementType = parameterType as GenericParameter;
-			bool flag = false;
-			bool flag1 = false;
-			if (parameterType.get_IsByReference())
+			V_0 = param.get_ParameterType();
+			V_1 = V_0 as GenericParameter;
+			V_2 = false;
+			V_3 = false;
+			if (V_0.get_IsByReference())
 			{
-				elementType = parameterType.GetElementType() as GenericParameter;
-				flag = true;
+				V_1 = V_0.GetElementType() as GenericParameter;
+				V_2 = true;
 			}
-			if (parameterType.get_IsArray())
+			if (V_0.get_IsArray())
 			{
-				elementType = parameterType.GetElementType() as GenericParameter;
-				flag1 = true;
+				V_1 = V_0.GetElementType() as GenericParameter;
+				V_3 = true;
 			}
-			if (elementType == null)
+			if (V_1 == null)
 			{
-				return parameterType;
+				return V_0;
 			}
-			int position = elementType.get_Position();
-			if (elementType.get_Owner() is MethodReference && method.get_IsGenericInstance())
+			V_4 = V_1.get_Position();
+			if (V_1.get_Owner() as MethodReference == null || !method.get_IsGenericInstance())
 			{
-				GenericInstanceMethod genericInstanceMethod = method as GenericInstanceMethod;
-				if (position >= 0 && position < genericInstanceMethod.get_GenericArguments().get_Count())
+				if (V_1.get_Owner() as TypeReference != null && method.get_DeclaringType().get_IsGenericInstance())
 				{
-					parameterType = genericInstanceMethod.get_GenericArguments().get_Item(position);
-					if (genericInstanceMethod.get_PostionToArgument().ContainsKey(position))
+					V_6 = method.get_DeclaringType() as GenericInstanceType;
+					if (V_4 >= 0 && V_4 < V_6.get_GenericArguments().get_Count())
 					{
-						parameterType = genericInstanceMethod.get_PostionToArgument()[position];
+						V_0 = V_6.get_GenericArguments().get_Item(V_4);
+						if (V_6.get_PostionToArgument().ContainsKey(V_4))
+						{
+							V_0 = V_6.get_PostionToArgument().get_Item(V_4);
+						}
 					}
 				}
 			}
-			else if (elementType.get_Owner() is TypeReference && method.get_DeclaringType().get_IsGenericInstance())
+			else
 			{
-				GenericInstanceType declaringType = method.get_DeclaringType() as GenericInstanceType;
-				if (position >= 0 && position < declaringType.get_GenericArguments().get_Count())
+				V_5 = method as GenericInstanceMethod;
+				if (V_4 >= 0 && V_4 < V_5.get_GenericArguments().get_Count())
 				{
-					parameterType = declaringType.get_GenericArguments().get_Item(position);
-					if (declaringType.get_PostionToArgument().ContainsKey(position))
+					V_0 = V_5.get_GenericArguments().get_Item(V_4);
+					if (V_5.get_PostionToArgument().ContainsKey(V_4))
 					{
-						parameterType = declaringType.get_PostionToArgument()[position];
+						V_0 = V_5.get_PostionToArgument().get_Item(V_4);
 					}
 				}
 			}
-			if (flag)
+			if (V_2)
 			{
-				return new ByReferenceType(parameterType);
+				return new ByReferenceType(V_0);
 			}
-			if (!flag1)
+			if (!V_3)
 			{
-				return parameterType;
+				return V_0;
 			}
-			return new ArrayType(parameterType);
+			return new ArrayType(V_0);
 		}
 	}
 }

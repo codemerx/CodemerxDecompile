@@ -14,16 +14,17 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public ContextVariableReference()
 		{
+			base();
+			return;
 		}
 
 		protected override bool OnMatch(MatchContext context, VariableReferenceExpression node)
 		{
-			object obj;
-			if (!context.TryGetData(this.Name, out obj))
+			if (!context.TryGetData(this.get_Name(), out V_0))
 			{
 				return false;
 			}
-			return node.Variable == obj;
+			return node.get_Variable() == V_0;
 		}
 	}
 }

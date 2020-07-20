@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
@@ -12,7 +11,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 		{
 			get
 			{
-				return this.Try;
+				return this.get_Try();
 			}
 		}
 
@@ -24,17 +23,24 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 
 		protected ExceptionHandlingLogicalConstruct()
 		{
+			base();
+			return;
 		}
 
-		protected ExceptionHandlingLogicalConstruct(BlockLogicalConstruct @try)
+		protected ExceptionHandlingLogicalConstruct(BlockLogicalConstruct try)
 		{
-			this.InitiExceptionHandlingLogicalConstruct(@try);
+			base();
+			this.InitiExceptionHandlingLogicalConstruct(try);
+			return;
 		}
 
-		protected void InitiExceptionHandlingLogicalConstruct(BlockLogicalConstruct @try)
+		protected void InitiExceptionHandlingLogicalConstruct(BlockLogicalConstruct try)
 		{
-			this.Try = @try;
-			base.RedirectChildrenToNewParent((IEnumerable<ILogicalConstruct>)(new BlockLogicalConstruct[] { @try }));
+			this.set_Try(try);
+			stackVariable4 = new BlockLogicalConstruct[1];
+			stackVariable4[0] = try;
+			this.RedirectChildrenToNewParent((IEnumerable<ILogicalConstruct>)stackVariable4);
+			return;
 		}
 	}
 }

@@ -12,38 +12,15 @@ namespace Telerik.JustDecompiler.Ast.Statements
 	{
 		private List<KeyValuePair<Expression, BlockStatement>> conditionBlocks;
 
-		private BlockStatement @else;
+		private BlockStatement else;
 
 		public override IEnumerable<ICodeNode> Children
 		{
 			get
 			{
-				// 
-				// Current member / type: System.Collections.Generic.IEnumerable`1<Telerik.JustDecompiler.Ast.ICodeNode> Telerik.JustDecompiler.Ast.Statements.IfElseIfStatement::get_Children()
-				// File path: C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\Decompiler.Tests\bin\Release\netcoreapp2.1\Integration\Actual\JustDecompiler.NetStandard.dll
-				// 
-				// Product version: 0.0.0.0
-				// Exception in: System.Collections.Generic.IEnumerable<Telerik.JustDecompiler.Ast.ICodeNode> get_Children()
-				// 
-				// Invalid state value
-				//    at Telerik.JustDecompiler.Decompiler.LogicFlow.YieldGuardedBlocksBuilder.ProcessCurrentNode(YieldExceptionHandlerInfo handlerInfo, Queue`1 bfsQueue, ILogicalConstruct currentNode) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\YieldGuardedBlocksBuilder.cs:line 203
-				//    at Telerik.JustDecompiler.Decompiler.LogicFlow.YieldGuardedBlocksBuilder.BuildTryBody(YieldExceptionHandlerInfo handlerInfo) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\YieldGuardedBlocksBuilder.cs:line 187
-				//    at Telerik.JustDecompiler.Decompiler.LogicFlow.YieldGuardedBlocksBuilder.GenerateTryFinallyHandler(YieldExceptionHandlerInfo handlerInfo) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\YieldGuardedBlocksBuilder.cs:line 129
-				//    at Telerik.JustDecompiler.Decompiler.LogicFlow.YieldGuardedBlocksBuilder.BuildGuardedBlocks(BlockLogicalConstruct theBlock) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\YieldGuardedBlocksBuilder.cs:line 76
-				//    at Telerik.JustDecompiler.Decompiler.LogicFlow.LogicalFlowBuilderStep.BuildLogicalConstructTree() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\LogicalFlowBuilderStep.cs:line 127
-				//    at Telerik.JustDecompiler.Decompiler.LogicFlow.LogicalFlowBuilderStep.Process(DecompilationContext context, BlockStatement body) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\LogicFlow\LogicalFlowBuilderStep.cs:line 51
-				//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.RunInternal(MethodBody body, BlockStatement block, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 81
-				//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.Run(MethodBody body, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 70
-				//    at Telerik.JustDecompiler.Decompiler.Extensions.DecompileStateMachine(MethodBody body, DecompilationContext enclosingContext, BaseStateMachineRemoverStep removeStateMachineStep, Func`2 stateMachineDataSelector, DecompilationContext& decompilationContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\Extensions.cs:line 103
-				//    at Telerik.JustDecompiler.Decompiler.Extensions.DecompileYieldStateMachine(MethodBody body, DecompilationContext enclosingContext, YieldData& yieldData) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\Extensions.cs:line 139
-				//    at Telerik.JustDecompiler.Steps.RebuildYieldStatementsStep.GetStatements() in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Steps\RebuildYieldStatementsStep.cs:line 151
-				//    at Telerik.JustDecompiler.Steps.RebuildYieldStatementsStep.Match(StatementCollection statements) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Steps\RebuildYieldStatementsStep.cs:line 49
-				//    at Telerik.JustDecompiler.Steps.RebuildYieldStatementsStep.Process(DecompilationContext context, BlockStatement body) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Steps\RebuildYieldStatementsStep.cs:line 20
-				//    at Telerik.JustDecompiler.Decompiler.DecompilationPipeline.RunInternal(MethodBody body, BlockStatement block, ILanguage language) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\DecompilationPipeline.cs:line 81
-				//    at Telerik.JustDecompiler.Decompiler.PropertyDecompiler.FinishDecompilationOfMethod(BlockStatement block, DecompilationContext context, MethodSpecificContext& methodContext) in C:\Users\CodeMerx\Work\CodemerxDecompileEngine\CodemerxDecompileEngine\JustDecompiler.Shared\Decompiler\PropertyDecompiler.cs:line 420
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				stackVariable1 = new IfElseIfStatement.u003cget_Childrenu003ed__4(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -51,7 +28,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.IfElseIfStatement;
+				return 4;
 			}
 		}
 
@@ -64,10 +41,20 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			set
 			{
 				this.conditionBlocks = value;
-				foreach (KeyValuePair<Expression, BlockStatement> conditionBlock in this.conditionBlocks)
+				V_0 = this.conditionBlocks.GetEnumerator();
+				try
 				{
-					conditionBlock.Value.Parent = this;
+					while (V_0.MoveNext())
+					{
+						V_1 = V_0.get_Current();
+						V_1.get_Value().set_Parent(this);
+					}
 				}
+				finally
+				{
+					((IDisposable)V_0).Dispose();
+				}
+				return;
 			}
 		}
 
@@ -75,22 +62,25 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return this.@else;
+				return this.else;
 			}
 			set
 			{
-				this.@else = value;
-				if (this.@else != null)
+				this.else = value;
+				if (this.else != null)
 				{
-					this.@else.Parent = this;
+					this.else.set_Parent(this);
 				}
+				return;
 			}
 		}
 
-		public IfElseIfStatement(List<KeyValuePair<Expression, BlockStatement>> conditionBlocks, BlockStatement @else)
+		public IfElseIfStatement(List<KeyValuePair<Expression, BlockStatement>> conditionBlocks, BlockStatement else)
 		{
-			this.ConditionBlocks = conditionBlocks;
-			this.Else = @else;
+			base();
+			this.set_ConditionBlocks(conditionBlocks);
+			this.set_Else(else);
+			return;
 		}
 
 		public override Statement Clone()
@@ -100,20 +90,53 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		private Statement CloneStatement(bool copyInstructions)
 		{
-			List<KeyValuePair<Expression, BlockStatement>> keyValuePairs = new List<KeyValuePair<Expression, BlockStatement>>();
-			foreach (KeyValuePair<Expression, BlockStatement> conditionBlock in this.conditionBlocks)
+			V_0 = new List<KeyValuePair<Expression, BlockStatement>>();
+			V_3 = this.conditionBlocks.GetEnumerator();
+			try
 			{
-				Expression expression = (copyInstructions ? conditionBlock.Key.Clone() : conditionBlock.Key.CloneExpressionOnly());
-				keyValuePairs.Add(new KeyValuePair<Expression, BlockStatement>(expression, (copyInstructions ? (BlockStatement)conditionBlock.Value.Clone() : (BlockStatement)conditionBlock.Value.CloneStatementOnly())));
+				while (V_3.MoveNext())
+				{
+					V_4 = V_3.get_Current();
+					if (copyInstructions)
+					{
+						stackVariable11 = V_4.get_Key().Clone();
+					}
+					else
+					{
+						stackVariable11 = V_4.get_Key().CloneExpressionOnly();
+					}
+					V_5 = stackVariable11;
+					if (copyInstructions)
+					{
+						stackVariable16 = (BlockStatement)V_4.get_Value().Clone();
+					}
+					else
+					{
+						stackVariable16 = (BlockStatement)V_4.get_Value().CloneStatementOnly();
+					}
+					V_0.Add(new KeyValuePair<Expression, BlockStatement>(V_5, stackVariable16));
+				}
 			}
-			BlockStatement blockStatement = null;
-			if (this.@else != null)
+			finally
 			{
-				blockStatement = (copyInstructions ? (BlockStatement)this.@else.Clone() : (BlockStatement)this.@else.CloneStatementOnly());
+				((IDisposable)V_3).Dispose();
 			}
-			IfElseIfStatement ifElseIfStatement = new IfElseIfStatement(keyValuePairs, blockStatement);
-			base.CopyParentAndLabel(ifElseIfStatement);
-			return ifElseIfStatement;
+			V_1 = null;
+			if (this.else != null)
+			{
+				if (copyInstructions)
+				{
+					stackVariable39 = (BlockStatement)this.else.Clone();
+				}
+				else
+				{
+					stackVariable39 = (BlockStatement)this.else.CloneStatementOnly();
+				}
+				V_1 = stackVariable39;
+			}
+			V_2 = new IfElseIfStatement(V_0, V_1);
+			this.CopyParentAndLabel(V_2);
+			return V_2;
 		}
 
 		public override Statement CloneStatementOnly()

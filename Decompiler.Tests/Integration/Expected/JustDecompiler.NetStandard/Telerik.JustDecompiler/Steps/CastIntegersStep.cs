@@ -1,8 +1,5 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
-using Mono.Collections.Generic;
 using System;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -18,52 +15,57 @@ namespace Telerik.JustDecompiler.Steps
 
 		public CastIntegersStep()
 		{
+			base();
+			return;
 		}
 
 		private void CastMethodArguments(MethodReference method, ExpressionCollection arguments)
 		{
-			for (int i = 0; i < arguments.Count; i++)
+			V_0 = 0;
+			while (V_0 < arguments.get_Count())
 			{
-				Expression item = arguments[i];
-				TypeReference typeReference = method.get_Parameters().get_Item(i).ResolveParameterType(method);
-				if (item.HasType && typeReference != null && !(item is LiteralExpression))
+				V_1 = arguments.get_Item(V_0);
+				V_2 = method.get_Parameters().get_Item(V_0).ResolveParameterType(method);
+				if (V_1.get_HasType() && V_2 != null && V_1 as LiteralExpression == null)
 				{
-					TypeReference expressionType = item.ExpressionType;
-					if (this.IsUnsignedIntegerType(expressionType) && this.IsSignedIntegerType(typeReference) || this.IsSignedIntegerType(expressionType) && this.IsUnsignedIntegerType(typeReference))
+					V_3 = V_1.get_ExpressionType();
+					if (this.IsUnsignedIntegerType(V_3) && this.IsSignedIntegerType(V_2) || this.IsSignedIntegerType(V_3) && this.IsUnsignedIntegerType(V_2))
 					{
-						Expression expression = item;
-						if (item is ExplicitCastExpression)
+						V_4 = V_1;
+						if (V_1 as ExplicitCastExpression != null)
 						{
-							ExplicitCastExpression explicitCastExpression = item as ExplicitCastExpression;
-							if (this.IsIntegerType(explicitCastExpression.TargetType))
+							V_5 = V_1 as ExplicitCastExpression;
+							if (this.IsIntegerType(V_5.get_TargetType()))
 							{
-								expression = explicitCastExpression.Expression;
+								V_4 = V_5.get_Expression();
 							}
 						}
-						arguments[i] = new ExplicitCastExpression(expression, typeReference, null);
+						arguments.set_Item(V_0, new ExplicitCastExpression(V_4, V_2, null));
 					}
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		private int GetIntegerTypeBytes(TypeReference type)
 		{
-			string fullName = type.get_FullName();
-			if (fullName != null)
+			V_0 = type.get_FullName();
+			if (V_0 != null)
 			{
-				if (fullName == "System.SByte" || fullName == "System.Byte")
+				if (String.op_Equality(V_0, "System.SByte") || String.op_Equality(V_0, "System.Byte"))
 				{
 					return 1;
 				}
-				if (fullName == "System.Int16" || fullName == "System.UInt16")
+				if (String.op_Equality(V_0, "System.Int16") || String.op_Equality(V_0, "System.UInt16"))
 				{
 					return 2;
 				}
-				if (fullName == "System.Int32" || fullName == "System.UInt32")
+				if (String.op_Equality(V_0, "System.Int32") || String.op_Equality(V_0, "System.UInt32"))
 				{
 					return 4;
 				}
-				if (fullName == "System.Int64" || fullName == "System.UInt64")
+				if (String.op_Equality(V_0, "System.Int64") || String.op_Equality(V_0, "System.UInt64"))
 				{
 					return 8;
 				}
@@ -82,32 +84,32 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsSignedIntegerType(TypeReference type)
 		{
-			string fullName = type.get_FullName();
-			if (fullName == this.typeSystem.get_SByte().get_FullName() || fullName == this.typeSystem.get_Int16().get_FullName() || fullName == this.typeSystem.get_Int32().get_FullName())
+			V_0 = type.get_FullName();
+			if (String.op_Equality(V_0, this.typeSystem.get_SByte().get_FullName()) || String.op_Equality(V_0, this.typeSystem.get_Int16().get_FullName()) || String.op_Equality(V_0, this.typeSystem.get_Int32().get_FullName()))
 			{
 				return true;
 			}
-			return fullName == this.typeSystem.get_Int64().get_FullName();
+			return String.op_Equality(V_0, this.typeSystem.get_Int64().get_FullName());
 		}
 
 		private bool IsUnsignedIntegerType(TypeReference type)
 		{
-			string fullName = type.get_FullName();
-			if (fullName == this.typeSystem.get_Byte().get_FullName() || fullName == this.typeSystem.get_UInt16().get_FullName() || fullName == this.typeSystem.get_UInt32().get_FullName())
+			V_0 = type.get_FullName();
+			if (String.op_Equality(V_0, this.typeSystem.get_Byte().get_FullName()) || String.op_Equality(V_0, this.typeSystem.get_UInt16().get_FullName()) || String.op_Equality(V_0, this.typeSystem.get_UInt32().get_FullName()))
 			{
 				return true;
 			}
-			return fullName == this.typeSystem.get_UInt64().get_FullName();
+			return String.op_Equality(V_0, this.typeSystem.get_UInt64().get_FullName());
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
-			this.decompiledMethodReturnType = context.MethodContext.Method.get_ReturnType();
+			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.decompiledMethodReturnType = context.get_MethodContext().get_Method().get_ReturnType();
 			this.Visit(body);
-			if (context.MethodContext.CtorInvokeExpression != null)
+			if (context.get_MethodContext().get_CtorInvokeExpression() != null)
 			{
-				this.Visit(context.MethodContext.CtorInvokeExpression);
+				this.Visit(context.get_MethodContext().get_CtorInvokeExpression());
 			}
 			return body;
 		}
@@ -131,62 +133,68 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			base.VisitBaseCtorExpression(node);
-			this.CastMethodArguments(node.MethodExpression.Method, node.Arguments);
+			this.VisitBaseCtorExpression(node);
+			this.CastMethodArguments(node.get_MethodExpression().get_Method(), node.get_Arguments());
+			return;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			base.VisitBinaryExpression(node);
-			if (node.IsAssignmentExpression && node.Left.HasType && !(node.Right is LiteralExpression) && node.Right.HasType && this.ShouldAddCastToAssignment(node.Left.ExpressionType, node.Right.ExpressionType))
+			this.VisitBinaryExpression(node);
+			if (node.get_IsAssignmentExpression() && node.get_Left().get_HasType() && node.get_Right() as LiteralExpression == null && node.get_Right().get_HasType() && this.ShouldAddCastToAssignment(node.get_Left().get_ExpressionType(), node.get_Right().get_ExpressionType()))
 			{
-				Expression right = node.Right;
-				if (node.Right is ExplicitCastExpression)
+				V_0 = node.get_Right();
+				if (node.get_Right() as ExplicitCastExpression != null)
 				{
-					ExplicitCastExpression explicitCastExpression = node.Right as ExplicitCastExpression;
-					if (this.IsIntegerType(explicitCastExpression.TargetType))
+					V_1 = node.get_Right() as ExplicitCastExpression;
+					if (this.IsIntegerType(V_1.get_TargetType()))
 					{
-						right = explicitCastExpression.Expression;
+						V_0 = V_1.get_Expression();
 					}
 				}
-				node.Right = new ExplicitCastExpression(right, node.Left.ExpressionType, null);
+				node.set_Right(new ExplicitCastExpression(V_0, node.get_Left().get_ExpressionType(), null));
 			}
+			return;
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			base.VisitMethodInvocationExpression(node);
-			this.CastMethodArguments(node.MethodExpression.Method, node.Arguments);
+			this.VisitMethodInvocationExpression(node);
+			this.CastMethodArguments(node.get_MethodExpression().get_Method(), node.get_Arguments());
+			return;
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			base.VisitObjectCreationExpression(node);
-			this.CastMethodArguments(node.Constructor, node.Arguments);
+			this.VisitObjectCreationExpression(node);
+			this.CastMethodArguments(node.get_Constructor(), node.get_Arguments());
+			return;
 		}
 
 		public override void VisitReturnExpression(ReturnExpression node)
 		{
-			base.VisitReturnExpression(node);
-			if (this.decompiledMethodReturnType != null && node.Value != null && node.Value.HasType && this.ShouldAddCastToAssignment(this.decompiledMethodReturnType, node.Value.ExpressionType))
+			this.VisitReturnExpression(node);
+			if (this.decompiledMethodReturnType != null && node.get_Value() != null && node.get_Value().get_HasType() && this.ShouldAddCastToAssignment(this.decompiledMethodReturnType, node.get_Value().get_ExpressionType()))
 			{
-				Expression value = node.Value;
-				if (node.Value is ExplicitCastExpression)
+				V_0 = node.get_Value();
+				if (node.get_Value() as ExplicitCastExpression != null)
 				{
-					ExplicitCastExpression explicitCastExpression = node.Value as ExplicitCastExpression;
-					if (this.IsIntegerType(explicitCastExpression.TargetType))
+					V_1 = node.get_Value() as ExplicitCastExpression;
+					if (this.IsIntegerType(V_1.get_TargetType()))
 					{
-						value = explicitCastExpression.Expression;
+						V_0 = V_1.get_Expression();
 					}
 				}
-				node.Value = new ExplicitCastExpression(value, this.decompiledMethodReturnType, null);
+				node.set_Value(new ExplicitCastExpression(V_0, this.decompiledMethodReturnType, null));
 			}
+			return;
 		}
 
 		public override void VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			base.VisitThisCtorExpression(node);
-			this.CastMethodArguments(node.MethodExpression.Method, node.Arguments);
+			this.VisitThisCtorExpression(node);
+			this.CastMethodArguments(node.get_MethodExpression().get_Method(), node.get_Arguments());
+			return;
 		}
 	}
 }

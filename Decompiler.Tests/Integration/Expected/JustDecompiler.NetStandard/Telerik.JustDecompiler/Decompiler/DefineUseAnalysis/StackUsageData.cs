@@ -33,10 +33,12 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 
 		public StackUsageData()
 		{
-			this.InstructionOffsetToAssignedVariableMap = new Dictionary<int, VariableDefinition>();
-			this.InstructionOffsetToUsedStackVariablesMap = new Dictionary<int, List<VariableDefinition>>();
-			this.ExceptionHandlerStartToExceptionVariableMap = new Dictionary<int, VariableDefinition>();
-			this.VariableToDefineUseInfo = new Dictionary<VariableDefinition, StackVariableDefineUseInfo>();
+			base();
+			this.set_InstructionOffsetToAssignedVariableMap(new Dictionary<int, VariableDefinition>());
+			this.set_InstructionOffsetToUsedStackVariablesMap(new Dictionary<int, List<VariableDefinition>>());
+			this.set_ExceptionHandlerStartToExceptionVariableMap(new Dictionary<int, VariableDefinition>());
+			this.set_VariableToDefineUseInfo(new Dictionary<VariableDefinition, StackVariableDefineUseInfo>());
+			return;
 		}
 	}
 }

@@ -10,6 +10,8 @@ namespace Telerik.JustDecompiler.Languages
 
 		public InfinityConstants()
 		{
+			base();
+			return;
 		}
 	}
 }

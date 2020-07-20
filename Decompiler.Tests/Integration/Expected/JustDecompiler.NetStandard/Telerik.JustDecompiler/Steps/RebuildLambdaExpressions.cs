@@ -1,13 +1,9 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
@@ -18,6 +14,8 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildLambdaExpressions()
 		{
+			base();
+			return;
 		}
 
 		public bool CheckTypeForCompilerGeneratedAttribute(TypeDefinition typeDefinition)
@@ -35,11 +33,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		private DecompilationContext CreateDecompilationContext(MethodDefinition lambdaMethodDefinition)
 		{
-			if ((object)lambdaMethodDefinition.get_DeclaringType() != (object)this.context.TypeContext.CurrentType)
+			if ((object)lambdaMethodDefinition.get_DeclaringType() != (object)this.context.get_TypeContext().get_CurrentType())
 			{
-				return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.get_Body()), new TypeSpecificContext(lambdaMethodDefinition.get_DeclaringType()), this.context.Language);
+				return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.get_Body()), new TypeSpecificContext(lambdaMethodDefinition.get_DeclaringType()), this.context.get_Language());
 			}
-			return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.get_Body()), this.context.TypeContext, this.context.ModuleContext, this.context.AssemblyContext, this.context.Language);
+			return new DecompilationContext(new MethodSpecificContext(lambdaMethodDefinition.get_Body()), this.context.get_TypeContext(), this.context.get_ModuleContext(), this.context.get_AssemblyContext(), this.context.get_Language());
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -50,65 +48,74 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			node.MethodExpression = (MethodReferenceExpression)base.VisitMethodReferenceExpression(node.MethodExpression);
-			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
+			node.set_MethodExpression((MethodReferenceExpression)this.VisitMethodReferenceExpression(node.get_MethodExpression()));
+			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
 			return node;
 		}
 
 		public override ICodeNode VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			MethodDefinition methodDefinition = node.Method.Resolve();
-			TypeDefinition currentType = this.context.TypeContext.CurrentType;
-			if (methodDefinition == null || (object)methodDefinition.get_DeclaringType() != (object)currentType && !methodDefinition.get_DeclaringType().IsNestedIn(currentType))
+			V_0 = node.get_Method().Resolve();
+			V_1 = this.context.get_TypeContext().get_CurrentType();
+			if (V_0 == null || (object)V_0.get_DeclaringType() != (object)V_1 && !V_0.get_DeclaringType().IsNestedIn(V_1))
 			{
-				return base.VisitMethodReferenceExpression(node);
+				return this.VisitMethodReferenceExpression(node);
 			}
-			if (methodDefinition.get_IsGetter() || methodDefinition.get_IsSetter() || !methodDefinition.IsCompilerGenerated(true) && !this.CheckTypeForCompilerGeneratedAttribute(methodDefinition.get_DeclaringType()))
+			if (V_0.get_IsGetter() || V_0.get_IsSetter() || !V_0.IsCompilerGenerated(true) && !this.CheckTypeForCompilerGeneratedAttribute(V_0.get_DeclaringType()))
 			{
-				return base.VisitMethodReferenceExpression(node);
+				return this.VisitMethodReferenceExpression(node);
 			}
-			BlockStatement blockStatement = null;
-			if (methodDefinition.get_Body() != null)
+			V_2 = null;
+			if (V_0.get_Body() != null)
 			{
-				DecompilationContext decompilationContext = this.CreateDecompilationContext(methodDefinition);
-				blockStatement = methodDefinition.get_Body().DecompileLambda(this.context.Language, decompilationContext);
-				if (blockStatement.Statements.Count == 1 && blockStatement.Statements[0].CodeNodeType == CodeNodeType.ExpressionStatement && (blockStatement.Statements[0] as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ReturnExpression)
+				V_5 = this.CreateDecompilationContext(V_0);
+				V_2 = V_0.get_Body().DecompileLambda(this.context.get_Language(), V_5);
+				if (V_2.get_Statements().get_Count() == 1 && V_2.get_Statements().get_Item(0).get_CodeNodeType() == 5 && (V_2.get_Statements().get_Item(0) as ExpressionStatement).get_Expression().get_CodeNodeType() == 57)
 				{
-					ReturnExpression expression = (blockStatement.Statements[0] as ExpressionStatement).Expression as ReturnExpression;
-					ShortFormReturnExpression shortFormReturnExpression = new ShortFormReturnExpression(expression.Value, expression.MappedInstructions);
-					blockStatement = new BlockStatement();
-					blockStatement.Statements.Add(new ExpressionStatement(shortFormReturnExpression));
+					V_6 = (V_2.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as ReturnExpression;
+					V_7 = new ShortFormReturnExpression(V_6.get_Value(), V_6.get_MappedInstructions());
+					V_2 = new BlockStatement();
+					V_2.get_Statements().Add(new ExpressionStatement(V_7));
 				}
-				this.context.MethodContext.VariableDefinitionToNameMap.AddRange<VariableDefinition, string>(decompilationContext.MethodContext.VariableDefinitionToNameMap);
-				this.context.MethodContext.VariableNamesCollection.UnionWith(decompilationContext.MethodContext.VariableNamesCollection);
-				this.context.MethodContext.AddInnerMethodParametersToContext(decompilationContext.MethodContext);
-				this.context.MethodContext.GotoStatements.AddRange(decompilationContext.MethodContext.GotoStatements);
-				this.context.MethodContext.GotoLabels.AddRange<string, Statement>(decompilationContext.MethodContext.GotoLabels);
+				this.context.get_MethodContext().get_VariableDefinitionToNameMap().AddRange<VariableDefinition, string>(V_5.get_MethodContext().get_VariableDefinitionToNameMap());
+				this.context.get_MethodContext().get_VariableNamesCollection().UnionWith(V_5.get_MethodContext().get_VariableNamesCollection());
+				this.context.get_MethodContext().AddInnerMethodParametersToContext(V_5.get_MethodContext());
+				this.context.get_MethodContext().get_GotoStatements().AddRange(V_5.get_MethodContext().get_GotoStatements());
+				this.context.get_MethodContext().get_GotoLabels().AddRange<string, Statement>(V_5.get_MethodContext().get_GotoLabels());
 			}
-			ExpressionCollection expressionCollection = new ExpressionCollection();
-			bool flag = LambdaExpressionsHelper.HasAnonymousParameter(methodDefinition.get_Parameters());
-			foreach (ParameterDefinition parameter in methodDefinition.get_Parameters())
+			V_3 = new ExpressionCollection();
+			V_4 = LambdaExpressionsHelper.HasAnonymousParameter(V_0.get_Parameters());
+			V_8 = V_0.get_Parameters().GetEnumerator();
+			try
 			{
-				expressionCollection.Add(new LambdaParameterExpression(parameter, !flag, null));
+				while (V_8.MoveNext())
+				{
+					V_9 = V_8.get_Current();
+					V_3.Add(new LambdaParameterExpression(V_9, !V_4, null));
+				}
 			}
-			return new LambdaExpression(expressionCollection, blockStatement, methodDefinition.IsAsync(), methodDefinition.IsFunction(), node.Method.get_Parameters(), false, node.MappedInstructions);
+			finally
+			{
+				V_8.Dispose();
+			}
+			return new LambdaExpression(V_3, V_2, V_0.IsAsync(), V_0.IsFunction(), node.get_Method().get_Parameters(), false, node.get_MappedInstructions());
 		}
 
 		public override ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			base.VisitObjectCreationExpression(node);
-			if (node.Constructor == null)
+			dummyVar0 = this.VisitObjectCreationExpression(node);
+			if (node.get_Constructor() == null)
 			{
 				return node;
 			}
-			TypeDefinition typeDefinition = node.Constructor.get_DeclaringType().Resolve();
-			if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate" || node.Arguments.Count != 2 || node.Arguments[1].CodeNodeType != CodeNodeType.LambdaExpression)
+			V_0 = node.get_Constructor().get_DeclaringType().Resolve();
+			if (V_0 == null || V_0.get_BaseType() == null || String.op_Inequality(V_0.get_BaseType().get_FullName(), "System.MulticastDelegate") || node.get_Arguments().get_Count() != 2 || node.get_Arguments().get_Item(1).get_CodeNodeType() != 50)
 			{
 				return node;
 			}
-			(node.Arguments[1] as LambdaExpression).ExpressionType = typeDefinition;
-			Expression item = node.Arguments[0];
-			return new DelegateCreationExpression(node.ExpressionType, node.Arguments[1], item, node.MappedInstructions);
+			(node.get_Arguments().get_Item(1) as LambdaExpression).set_ExpressionType(V_0);
+			V_1 = node.get_Arguments().get_Item(0);
+			return new DelegateCreationExpression(node.get_ExpressionType(), node.get_Arguments().get_Item(1), V_1, node.get_MappedInstructions());
 		}
 	}
 }

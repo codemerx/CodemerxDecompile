@@ -91,20 +91,22 @@ namespace Telerik.JustDecompiler.Languages
 
 		public WritingInfo(IMemberDefinition member)
 		{
-			this.Member = member;
-			this.ControlFlowGraphs = new Dictionary<MethodDefinition, ControlFlowGraph>();
-			this.MethodsVariableDefinitionToNameMap = new Dictionary<MethodDefinition, Dictionary<VariableDefinition, string>>();
-			this.AutoImplementedProperties = new HashSet<PropertyDefinition>();
-			this.MemberDefinitionToFoldingPositionMap = new Dictionary<IMemberDefinition, OffsetSpan>();
+			base();
+			this.set_Member(member);
+			this.set_ControlFlowGraphs(new Dictionary<MethodDefinition, ControlFlowGraph>());
+			this.set_MethodsVariableDefinitionToNameMap(new Dictionary<MethodDefinition, Dictionary<VariableDefinition, string>>());
+			this.set_AutoImplementedProperties(new HashSet<PropertyDefinition>());
+			this.set_MemberDefinitionToFoldingPositionMap(new Dictionary<IMemberDefinition, OffsetSpan>());
 			this.ExceptionsWhileWriting = new HashSet<IMemberDefinition>();
-			this.AutoImplementedEvents = new HashSet<EventDefinition>();
-			this.MemberDeclarationToCodePostionMap = new Dictionary<IMemberDefinition, OffsetSpan>();
-			this.MemberTokenToAttributesMap = new Dictionary<uint, OffsetSpan>();
-			this.MemberTokenToDocumentationMap = new Dictionary<uint, OffsetSpan>();
-			this.MemberTokenToDecompiledCodeMap = new Dictionary<uint, OffsetSpan>();
-			this.MembersWithExceptions = new HashSet<uint>();
-			this.GeneratedFilterMethods = new List<MethodDefinition>();
-			this.CodeMappingInfo = new Telerik.JustDecompiler.Languages.CodeMappingInfo();
+			this.set_AutoImplementedEvents(new HashSet<EventDefinition>());
+			this.set_MemberDeclarationToCodePostionMap(new Dictionary<IMemberDefinition, OffsetSpan>());
+			this.set_MemberTokenToAttributesMap(new Dictionary<uint, OffsetSpan>());
+			this.set_MemberTokenToDocumentationMap(new Dictionary<uint, OffsetSpan>());
+			this.set_MemberTokenToDecompiledCodeMap(new Dictionary<uint, OffsetSpan>());
+			this.set_MembersWithExceptions(new HashSet<uint>());
+			this.set_GeneratedFilterMethods(new List<MethodDefinition>());
+			this.set_CodeMappingInfo(new Telerik.JustDecompiler.Languages.CodeMappingInfo());
+			return;
 		}
 	}
 }

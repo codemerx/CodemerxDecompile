@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Decompiler;
-using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Languages.CSharp
@@ -10,10 +9,12 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 	{
 		private readonly CSharpAssemblyAttributeWriter.CSharpAssemblyAttributeInternalWriter writer;
 
-		public CSharpAssemblyAttributeWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings) : base(language, exceptionFormatter, settings)
+		public CSharpAssemblyAttributeWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
 		{
+			base(language, exceptionFormatter, settings);
 			this.writer = new CSharpAssemblyAttributeWriter.CSharpAssemblyAttributeInternalWriter(language, formatter, exceptionFormatter, settings);
-			this.writer.ExceptionThrown += new EventHandler<Exception>(this.OnExceptionThrown);
+			this.writer.add_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
+			return;
 		}
 
 		protected override Telerik.JustDecompiler.Languages.AttributeWriter CreateAttributeWriter()
@@ -28,12 +29,14 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
 		protected override void SetAssemblyContext(AssemblySpecificContext assemblyContext)
 		{
-			this.writer.InternalAssemblyContext = assemblyContext;
+			this.writer.set_InternalAssemblyContext(assemblyContext);
+			return;
 		}
 
 		protected override void SetModuleContext(ModuleSpecificContext moduleContext)
 		{
-			this.writer.InternalModuleContext = moduleContext;
+			this.writer.set_InternalModuleContext(moduleContext);
+			return;
 		}
 
 		private class CSharpAssemblyAttributeInternalWriter : CSharpWriter
@@ -42,7 +45,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			{
 				get
 				{
-					return this.InternalAssemblyContext;
+					return this.get_InternalAssemblyContext();
 				}
 			}
 
@@ -62,7 +65,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 			{
 				get
 				{
-					return this.InternalModuleContext;
+					return this.get_InternalModuleContext();
 				}
 			}
 
@@ -74,13 +77,15 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 				}
 			}
 
-			public CSharpAssemblyAttributeInternalWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings) : base(language, formatter, exceptionFormatter, settings)
+			public CSharpAssemblyAttributeInternalWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
 			{
+				base(language, formatter, exceptionFormatter, settings);
+				return;
 			}
 
 			protected override bool IsTypeNameInCollision(string typeName)
 			{
-				return Utilities.IsTypeNameInCollisionOnAssemblyLevel(typeName, this.AssemblyContext, this.ModuleContext);
+				return Utilities.IsTypeNameInCollisionOnAssemblyLevel(typeName, this.get_AssemblyContext(), this.get_ModuleContext());
 			}
 		}
 	}

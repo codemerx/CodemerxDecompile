@@ -2,12 +2,10 @@ using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
-using Telerik.JustDecompiler.Decompiler.Inlining;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -15,36 +13,43 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		protected DecompilationContext context;
 
-		private readonly Dictionary<VariableReference, ExpressionStatement> referenceToDeclarationStatementMap = new Dictionary<VariableReference, ExpressionStatement>();
+		private readonly Dictionary<VariableReference, ExpressionStatement> referenceToDeclarationStatementMap;
 
 		private BlockStatement theBody;
 
-		private readonly HashSet<VariableReference> bannedVariables = new HashSet<VariableReference>();
+		private readonly HashSet<VariableReference> bannedVariables;
 
 		public RemoveUnusedVariablesStep()
 		{
+			this.referenceToDeclarationStatementMap = new Dictionary<VariableReference, ExpressionStatement>();
+			this.bannedVariables = new HashSet<VariableReference>();
+			base();
+			return;
 		}
 
 		protected virtual bool CanExistInStatement(Expression expression)
 		{
-			if (expression.CodeNodeType == CodeNodeType.MethodInvocationExpression || expression.CodeNodeType == CodeNodeType.DelegateInvokeExpression || expression.CodeNodeType == CodeNodeType.AwaitExpression)
+			if (expression.get_CodeNodeType() == 19 || expression.get_CodeNodeType() == 51 || expression.get_CodeNodeType() == 65)
 			{
 				return true;
 			}
-			BinaryExpression binaryExpression = null;
-			if (expression.CodeNodeType == CodeNodeType.ParenthesesExpression)
+			V_0 = null;
+			if (expression.get_CodeNodeType() != 87)
 			{
-				ParenthesesExpression parenthesesExpression = expression as ParenthesesExpression;
-				if (parenthesesExpression.Expression.CodeNodeType == CodeNodeType.BinaryExpression)
+				if (expression.get_CodeNodeType() == 24)
 				{
-					binaryExpression = parenthesesExpression.Expression as BinaryExpression;
+					V_0 = expression as BinaryExpression;
 				}
 			}
-			else if (expression.CodeNodeType == CodeNodeType.BinaryExpression)
+			else
 			{
-				binaryExpression = expression as BinaryExpression;
+				V_1 = expression as ParenthesesExpression;
+				if (V_1.get_Expression().get_CodeNodeType() == 24)
+				{
+					V_0 = V_1.get_Expression() as BinaryExpression;
+				}
 			}
-			if (binaryExpression != null && (binaryExpression.IsAssignmentExpression || binaryExpression.IsSelfAssign))
+			if (V_0 != null && V_0.get_IsAssignmentExpression() || V_0.get_IsSelfAssign())
 			{
 				return true;
 			}
@@ -53,104 +58,142 @@ namespace Telerik.JustDecompiler.Steps
 
 		public void CleanUpUnusedDeclarations()
 		{
-			foreach (KeyValuePair<VariableReference, ExpressionStatement> keyValuePair in this.referenceToDeclarationStatementMap)
+			V_1 = this.referenceToDeclarationStatementMap.GetEnumerator();
+			try
 			{
-				VariableReference key = keyValuePair.Key;
-				this.context.MethodContext.RemoveVariable(key);
-				ExpressionStatement value = keyValuePair.Value;
-				BlockStatement parent = value.Parent as BlockStatement;
-				if (!this.IsOptimisableAssignment(value))
+				while (V_1.MoveNext())
 				{
-					Expression right = (value.Expression as BinaryExpression).Right;
-					if (!this.CanExistInStatement(right))
+					V_2 = V_1.get_Current();
+					V_3 = V_2.get_Key();
+					this.context.get_MethodContext().RemoveVariable(V_3);
+					V_4 = V_2.get_Value();
+					V_5 = V_4.get_Parent() as BlockStatement;
+					if (!this.IsOptimisableAssignment(V_4))
+					{
+						V_6 = (V_4.get_Expression() as BinaryExpression).get_Right();
+						if (!this.CanExistInStatement(V_6))
+						{
+							continue;
+						}
+						if (V_6.get_CodeNodeType() == 87)
+						{
+							V_6 = (V_6 as ParenthesesExpression).get_Expression();
+						}
+						V_7 = new ExpressionStatement(V_6);
+						V_8 = V_5.get_Statements().IndexOf(V_4);
+						V_5.AddStatementAt(V_8 + 1, V_7);
+						this.TransferLabel(V_4);
+						V_5.get_Statements().RemoveAt(V_8);
+					}
+					else
+					{
+						this.TransferLabel(V_4);
+						dummyVar0 = V_5.get_Statements().Remove(V_4);
+					}
+				}
+			}
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			V_0 = new HashSet<VariableDefinition>();
+			V_9 = this.context.get_MethodContext().get_Variables().GetEnumerator();
+			try
+			{
+				while (V_9.MoveNext())
+				{
+					V_10 = V_9.get_Current();
+					if (this.bannedVariables.Contains(V_10))
 					{
 						continue;
 					}
-					if (right.CodeNodeType == CodeNodeType.ParenthesesExpression)
-					{
-						right = (right as ParenthesesExpression).Expression;
-					}
-					ExpressionStatement expressionStatement = new ExpressionStatement(right);
-					int num = parent.Statements.IndexOf(value);
-					parent.AddStatementAt(num + 1, expressionStatement);
-					this.TransferLabel(value);
-					parent.Statements.RemoveAt(num);
-				}
-				else
-				{
-					this.TransferLabel(value);
-					parent.Statements.Remove(value);
+					dummyVar1 = V_0.Add(V_10);
 				}
 			}
-			HashSet<VariableDefinition> variableDefinitions = new HashSet<VariableDefinition>();
-			foreach (VariableDefinition variable in this.context.MethodContext.Variables)
+			finally
 			{
-				if (this.bannedVariables.Contains(variable))
-				{
-					continue;
-				}
-				variableDefinitions.Add(variable);
+				V_9.Dispose();
 			}
-			foreach (VariableDefinition variableDefinition in variableDefinitions)
+			V_11 = V_0.GetEnumerator();
+			try
 			{
-				this.context.MethodContext.RemoveVariable(variableDefinition);
+				while (V_11.MoveNext())
+				{
+					V_12 = V_11.get_Current();
+					this.context.get_MethodContext().RemoveVariable(V_12);
+				}
 			}
+			finally
+			{
+				((IDisposable)V_11).Dispose();
+			}
+			return;
 		}
 
 		private bool IsLoopBody(BlockStatement blockStatement)
 		{
-			Statement parent = blockStatement.Parent;
-			if (parent == null)
+			V_0 = blockStatement.get_Parent();
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (parent.CodeNodeType == CodeNodeType.DoWhileStatement || parent.CodeNodeType == CodeNodeType.WhileStatement || parent.CodeNodeType == CodeNodeType.ForEachStatement)
+			if (V_0.get_CodeNodeType() == 8 || V_0.get_CodeNodeType() == 7 || V_0.get_CodeNodeType() == 12)
 			{
 				return true;
 			}
-			return parent.CodeNodeType == CodeNodeType.ForStatement;
+			return V_0.get_CodeNodeType() == 11;
 		}
 
 		public bool IsOptimisableAssignment(ExpressionStatement statement)
 		{
-			BinaryExpression expression = statement.Expression as BinaryExpression;
-			if (expression == null)
+			V_0 = statement.get_Expression() as BinaryExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (!expression.IsAssignmentExpression)
+			if (!V_0.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			if (expression.Right.CodeNodeType == CodeNodeType.BinaryExpression && ((expression.Right as BinaryExpression).IsAssignmentExpression || (expression.Right as BinaryExpression).IsSelfAssign))
+			if (V_0.get_Right().get_CodeNodeType() == 24 && (V_0.get_Right() as BinaryExpression).get_IsAssignmentExpression() || (V_0.get_Right() as BinaryExpression).get_IsSelfAssign())
 			{
 				return false;
 			}
-			if (!(expression.Left is VariableReferenceExpression) && !(expression.Left is VariableDeclarationExpression))
+			if (V_0.get_Left() as VariableReferenceExpression == null && V_0.get_Left() as VariableDeclarationExpression == null)
 			{
 				return false;
 			}
-			return !(new SideEffectsFinder()).HasSideEffectsRecursive(expression.Right);
+			return !(new SideEffectsFinder()).HasSideEffectsRecursive(V_0.get_Right());
 		}
 
 		private void MoveLabel(Statement destination, string theLabel)
 		{
-			if (destination.Label == String.Empty)
+			if (String.op_Equality(destination.get_Label(), String.Empty))
 			{
-				destination.Label = theLabel;
-				this.context.MethodContext.GotoLabels[theLabel] = destination;
+				destination.set_Label(theLabel);
+				this.context.get_MethodContext().get_GotoLabels().set_Item(theLabel, destination);
 				return;
 			}
-			string label = destination.Label;
-			foreach (GotoStatement gotoStatement in this.context.MethodContext.GotoStatements)
+			V_0 = destination.get_Label();
+			V_1 = this.context.get_MethodContext().get_GotoStatements().GetEnumerator();
+			try
 			{
-				if (gotoStatement.TargetLabel != theLabel)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					if (!String.op_Equality(V_2.get_TargetLabel(), theLabel))
+					{
+						continue;
+					}
+					V_2.set_TargetLabel(V_0);
 				}
-				gotoStatement.TargetLabel = label;
 			}
-			this.context.MethodContext.GotoLabels.Remove(theLabel);
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			dummyVar0 = this.context.get_MethodContext().get_GotoLabels().Remove(theLabel);
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -164,83 +207,90 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void TransferLabel(ExpressionStatement expressionStatement)
 		{
-			if (expressionStatement.Label == String.Empty)
+			if (String.op_Equality(expressionStatement.get_Label(), String.Empty))
 			{
 				return;
 			}
-			string label = expressionStatement.Label;
-			Statement parent = expressionStatement;
-			while (parent.Parent != null)
+			V_0 = expressionStatement.get_Label();
+			V_1 = expressionStatement;
+			while (V_1.get_Parent() != null)
 			{
-				BlockStatement blockStatement = parent.Parent as BlockStatement;
-				int num = blockStatement.Statements.IndexOf(parent);
-				if (num != blockStatement.Statements.Count - 1)
+				V_3 = V_1.get_Parent() as BlockStatement;
+				V_4 = V_3.get_Statements().IndexOf(V_1);
+				if (V_4 != V_3.get_Statements().get_Count() - 1)
 				{
-					Statement item = blockStatement.Statements[num + 1];
-					this.MoveLabel(item, label);
+					V_5 = V_3.get_Statements().get_Item(V_4 + 1);
+					this.MoveLabel(V_5, V_0);
 					return;
 				}
-				if (this.IsLoopBody(blockStatement))
+				if (this.IsLoopBody(V_3))
 				{
-					this.MoveLabel(blockStatement.Statements[0], label);
+					this.MoveLabel(V_3.get_Statements().get_Item(0), V_0);
 					return;
 				}
 				do
 				{
-					parent = parent.Parent;
+					V_1 = V_1.get_Parent();
 				}
-				while (parent.Parent != null && parent.Parent.CodeNodeType != CodeNodeType.BlockStatement);
+				while (V_1.get_Parent() != null && V_1.get_Parent().get_CodeNodeType() != CodeNodeType.BlockStatement);
 			}
-			EmptyStatement emptyStatement = new EmptyStatement();
-			this.theBody.Statements.Add(emptyStatement);
-			this.MoveLabel(emptyStatement, label);
+			V_2 = new EmptyStatement();
+			this.theBody.get_Statements().Add(V_2);
+			this.MoveLabel(V_2, V_0);
+			return;
 		}
 
 		public override void VisitDelegateCreationExpression(DelegateCreationExpression node)
 		{
-			if (node.MethodExpression.CodeNodeType != CodeNodeType.LambdaExpression)
+			if (node.get_MethodExpression().get_CodeNodeType() != 50)
 			{
-				base.VisitDelegateCreationExpression(node);
+				this.VisitDelegateCreationExpression(node);
 				return;
 			}
-			this.VisitLambdaExpression((LambdaExpression)node.MethodExpression);
+			this.VisitLambdaExpression((LambdaExpression)node.get_MethodExpression());
+			return;
 		}
 
 		public override void VisitExpressionStatement(ExpressionStatement node)
 		{
-			VariableReference variable = null;
-			if (node.Expression.CodeNodeType == CodeNodeType.BinaryExpression && (node.Expression as BinaryExpression).IsAssignmentExpression)
+			V_0 = null;
+			if (node.get_Expression().get_CodeNodeType() == 24 && (node.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
 			{
-				Expression left = (node.Expression as BinaryExpression).Left;
-				if (left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
+				V_1 = (node.get_Expression() as BinaryExpression).get_Left();
+				if (V_1.get_CodeNodeType() != 26)
 				{
-					variable = (left as VariableReferenceExpression).Variable;
+					if (V_1.get_CodeNodeType() == 27)
+					{
+						V_0 = (V_1 as VariableDeclarationExpression).get_Variable();
+					}
 				}
-				else if (left.CodeNodeType == CodeNodeType.VariableDeclarationExpression)
+				else
 				{
-					variable = (left as VariableDeclarationExpression).Variable;
+					V_0 = (V_1 as VariableReferenceExpression).get_Variable();
 				}
 			}
-			if (variable == null || node.Parent.CodeNodeType != CodeNodeType.BlockStatement || this.bannedVariables.Contains(variable))
+			if (V_0 == null || node.get_Parent().get_CodeNodeType() != CodeNodeType.BlockStatement || this.bannedVariables.Contains(V_0))
 			{
-				base.Visit(node.Expression);
+				this.Visit(node.get_Expression());
 				return;
 			}
-			if (this.referenceToDeclarationStatementMap.Remove(variable))
+			if (this.referenceToDeclarationStatementMap.Remove(V_0))
 			{
-				this.bannedVariables.Add(variable);
+				dummyVar0 = this.bannedVariables.Add(V_0);
 			}
 			else
 			{
-				this.referenceToDeclarationStatementMap[variable] = node;
+				this.referenceToDeclarationStatementMap.set_Item(V_0, node);
 			}
-			base.Visit((node.Expression as BinaryExpression).Right);
+			this.Visit((node.get_Expression() as BinaryExpression).get_Right());
+			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			this.referenceToDeclarationStatementMap.Remove(node.Variable);
-			this.bannedVariables.Add(node.Variable);
+			dummyVar0 = this.referenceToDeclarationStatementMap.Remove(node.get_Variable());
+			dummyVar1 = this.bannedVariables.Add(node.get_Variable());
+			return;
 		}
 	}
 }

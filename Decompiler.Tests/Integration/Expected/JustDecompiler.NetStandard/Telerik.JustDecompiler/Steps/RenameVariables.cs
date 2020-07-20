@@ -1,17 +1,13 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
-using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -19,9 +15,9 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		protected RenameVariables.State state;
 
-		protected readonly Stack<RenameVariables.ExpressionKind> expressions = new Stack<RenameVariables.ExpressionKind>();
+		protected readonly Stack<RenameVariables.ExpressionKind> expressions;
 
-		protected readonly Dictionary<VariableDefinition, RenameVariables.VariableSuggestion> variableSuggestedNames = new Dictionary<VariableDefinition, RenameVariables.VariableSuggestion>();
+		protected readonly Dictionary<VariableDefinition, RenameVariables.VariableSuggestion> variableSuggestedNames;
 
 		protected readonly HashSet<string> suggestedNames;
 
@@ -31,13 +27,18 @@ namespace Telerik.JustDecompiler.Steps
 
 		protected TypeSpecificContext typeContext;
 
-		private int forInitializerStartSymbol = 105;
+		private int forInitializerStartSymbol;
 
 		private int forInitializerNumberSuffix;
 
 		public RenameVariables()
 		{
+			this.expressions = new Stack<RenameVariables.ExpressionKind>();
+			this.variableSuggestedNames = new Dictionary<VariableDefinition, RenameVariables.VariableSuggestion>();
+			this.forInitializerStartSymbol = 105;
+			base();
 			this.suggestedNames = new HashSet<string>();
+			return;
 		}
 
 		private void AddNewSuggestion(ICollection<string> suggestedNames, string name)
@@ -46,172 +47,215 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				suggestedNames.Add(name);
 			}
+			return;
 		}
 
 		protected string Camelize(string name, RenameVariables.Conversion conversion)
 		{
-			string str = name;
-			if (name.StartsWith("I") && name.Length > 1 && Char.IsUpper(name[1]))
+			V_0 = name;
+			if (name.StartsWith("I") && name.get_Length() > 1 && Char.IsUpper(name.get_Chars(1)))
 			{
-				str = name.Substring(1);
+				V_0 = name.Substring(1);
 			}
-			str = Inflector.Camelize(this.GetSafeTypeName(str, String.Empty));
-			if (conversion == RenameVariables.Conversion.Singular)
+			V_0 = Inflector.Camelize(this.GetSafeTypeName(V_0, String.Empty));
+			if (conversion == 1)
 			{
-				str = Inflector.Singularize(str);
+				V_0 = Inflector.Singularize(V_0);
 			}
-			if (conversion == RenameVariables.Conversion.Plural)
+			if (conversion == 2)
 			{
-				str = Inflector.Pluralize(str);
+				V_0 = Inflector.Pluralize(V_0);
 			}
-			if (str == name)
+			if (String.op_Equality(V_0, name))
 			{
-				str = String.Concat("_", name);
+				V_0 = String.Concat("_", name);
 			}
-			return str;
+			return V_0;
 		}
 
 		private void ClearPendingForSuggestion()
 		{
-			foreach (KeyValuePair<VariableDefinition, RenameVariables.VariableSuggestion> variableSuggestedName in this.variableSuggestedNames)
+			V_0 = this.variableSuggestedNames.GetEnumerator();
+			try
 			{
-				variableSuggestedName.Value.IsPendingForSuggestion = false;
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					V_1.get_Value().set_IsPendingForSuggestion(false);
+				}
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+			return;
 		}
 
 		private void CollectVariableNames()
 		{
-			string name;
-			HashSet<string> strs = new HashSet<string>(this.methodContext.VariableNamesCollection, this.context.Language.IdentifierComparer);
-			foreach (VariableDefinition variable in this.methodContext.Body.get_Variables())
+			V_0 = new HashSet<string>(this.methodContext.get_VariableNamesCollection(), this.context.get_Language().get_IdentifierComparer());
+			V_1 = this.methodContext.get_Body().get_Variables().GetEnumerator();
+			try
 			{
-				if (!this.methodContext.VariableDefinitionToNameMap.TryGetValue(variable, out name))
+				while (V_1.MoveNext())
 				{
-					name = variable.get_Name();
+					V_2 = V_1.get_Current();
+					if (!this.methodContext.get_VariableDefinitionToNameMap().TryGetValue(V_2, out V_3))
+					{
+						V_3 = V_2.get_Name();
+					}
+					if (V_0.Contains(V_3))
+					{
+						continue;
+					}
+					dummyVar0 = V_0.Add(V_3);
 				}
-				if (strs.Contains(name))
-				{
-					continue;
-				}
-				strs.Add(name);
 			}
-			foreach (string value in this.methodContext.VariableDefinitionToNameMap.Values)
+			finally
 			{
-				if (strs.Contains(value))
-				{
-					continue;
-				}
-				strs.Add(value);
+				V_1.Dispose();
 			}
-			this.methodContext.VariableNamesCollection = strs;
+			V_4 = this.methodContext.get_VariableDefinitionToNameMap().get_Values().GetEnumerator();
+			try
+			{
+				while (V_4.MoveNext())
+				{
+					V_5 = V_4.get_Current();
+					if (V_0.Contains(V_5))
+					{
+						continue;
+					}
+					dummyVar1 = V_0.Add(V_5);
+				}
+			}
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+			this.methodContext.set_VariableNamesCollection(V_0);
+			return;
 		}
 
 		private string EscapeIfGlobalKeyword(string name)
 		{
-			if (!this.context.Language.IsGlobalKeyword(name))
+			if (!this.context.get_Language().IsGlobalKeyword(name))
 			{
 				return name;
 			}
-			return this.context.Language.EscapeWord(name);
+			return this.context.get_Language().EscapeWord(name);
 		}
 
 		private RenameVariables.ExpressionKind GetExpressionKind()
 		{
-			RenameVariables.ExpressionKind expressionKind;
-			RenameVariables.ExpressionKind expressionKind1 = RenameVariables.ExpressionKind.None;
-			Stack<RenameVariables.ExpressionKind>.Enumerator enumerator = this.expressions.GetEnumerator();
+			V_0 = 0;
+			V_1 = this.expressions.GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_1.MoveNext())
 				{
-					RenameVariables.ExpressionKind current = enumerator.Current;
-					if (current == RenameVariables.ExpressionKind.None)
+					V_2 = V_1.get_Current();
+					if (V_2 != RenameVariables.ExpressionKind.None)
 					{
-						expressionKind = RenameVariables.ExpressionKind.None;
-						return expressionKind;
-					}
-					else if (current != RenameVariables.ExpressionKind.RightAssignment)
-					{
-						if (current == RenameVariables.ExpressionKind.ForInitializer && expressionKind1 == RenameVariables.ExpressionKind.LeftAssignment)
+						if (V_2 != 5)
 						{
-							expressionKind1 = RenameVariables.ExpressionKind.ForInitializer;
+							if (V_2 == 1 && V_0 == 4)
+							{
+								V_0 = 1;
+							}
+							if (V_0 != RenameVariables.ExpressionKind.None)
+							{
+								continue;
+							}
+							V_0 = V_2;
 						}
-						if (expressionKind1 != RenameVariables.ExpressionKind.None)
+						else
 						{
-							continue;
+							V_3 = 5;
+							goto Label1;
 						}
-						expressionKind1 = current;
 					}
 					else
 					{
-						expressionKind = RenameVariables.ExpressionKind.RightAssignment;
-						return expressionKind;
+						V_3 = 0;
+						goto Label1;
 					}
 				}
-				return expressionKind1;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_1).Dispose();
 			}
-			return expressionKind;
+		Label1:
+			return V_3;
+		Label0:
+			return V_0;
 		}
 
 		private string GetFirstSuggestedName(ICollection<string> suggestedNames)
 		{
-			string current;
-			using (IEnumerator<string> enumerator = suggestedNames.GetEnumerator())
+			V_0 = suggestedNames.GetEnumerator();
+			try
 			{
-				if (enumerator.MoveNext())
+				if (V_0.MoveNext())
 				{
-					current = enumerator.Current;
+					V_1 = V_0.get_Current();
 				}
 				else
 				{
-					return String.Empty;
+					goto Label0;
 				}
 			}
-			return current;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return V_1;
+		Label0:
+			return String.Empty;
 		}
 
 		private string GetForInitializerName()
 		{
-			string str = Char.ConvertFromUtf32(this.forInitializerStartSymbol);
+			V_0 = Char.ConvertFromUtf32(this.forInitializerStartSymbol);
 			if (this.forInitializerNumberSuffix > 0)
 			{
-				str = String.Concat(str, this.forInitializerNumberSuffix.ToString());
+				V_0 = String.Concat(V_0, this.forInitializerNumberSuffix.ToString());
 			}
-			this.forInitializerStartSymbol++;
+			this.forInitializerStartSymbol = this.forInitializerStartSymbol + 1;
 			if (this.forInitializerStartSymbol == 122)
 			{
 				this.forInitializerStartSymbol = 97;
 			}
 			if (this.forInitializerStartSymbol == 105)
 			{
-				this.forInitializerNumberSuffix++;
+				this.forInitializerNumberSuffix = this.forInitializerNumberSuffix + 1;
 			}
-			return str;
+			return V_0;
 		}
 
 		private string GetFriendlyGenericName(TypeReference typeReference)
 		{
-			string friendlyTypeName = typeReference.GetFriendlyTypeName(null, "<", ">");
-			if (friendlyTypeName.Contains("<"))
+			V_0 = typeReference.GetFriendlyTypeName(null, "<", ">");
+			if (V_0.Contains("<"))
 			{
-				friendlyTypeName = friendlyTypeName.Substring(0, friendlyTypeName.IndexOf('<'));
+				V_0 = V_0.Substring(0, V_0.IndexOf('<'));
 			}
-			return friendlyTypeName;
+			return V_0;
 		}
 
 		protected virtual string GetFriendlyNameByType(TypeReference typeReference)
 		{
-			return this.Camelize(this.GetFriendlyGenericName(typeReference), RenameVariables.Conversion.Singular);
+			return this.Camelize(this.GetFriendlyGenericName(typeReference), 1);
 		}
 
 		private string GetNameByType(TypeReference typeReference)
 		{
-			TypeDefinition typeDefinition = typeReference.Resolve();
-			if (typeDefinition != null && typeDefinition.HasCompilerGeneratedAttribute())
+			V_0 = typeReference.Resolve();
+			if (V_0 != null && V_0.HasCompilerGeneratedAttribute())
 			{
 				return "variable";
 			}
@@ -223,65 +267,65 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (typeReference.get_GenericParameters().get_Count() != 0)
 				{
-					return this.Camelize(this.GetFriendlyGenericName(typeReference), RenameVariables.Conversion.Singular);
+					return this.Camelize(this.GetFriendlyGenericName(typeReference), 1);
 				}
-				string friendlyTypeName = typeReference.GetFriendlyTypeName(null, "<", ">");
-				return this.Camelize(friendlyTypeName, RenameVariables.Conversion.Plural);
+				V_5 = typeReference.GetFriendlyTypeName(null, "<", ">");
+				return this.Camelize(V_5, 2);
 			}
-			GenericInstanceType genericInstanceType = (GenericInstanceType)typeReference;
-			TypeReference item = genericInstanceType.get_GenericArguments().get_Item(0);
-			if (genericInstanceType.get_PostionToArgument().ContainsKey(0))
+			V_1 = (GenericInstanceType)typeReference;
+			V_2 = V_1.get_GenericArguments().get_Item(0);
+			if (V_1.get_PostionToArgument().ContainsKey(0))
 			{
-				item = genericInstanceType.get_PostionToArgument()[0];
+				V_2 = V_1.get_PostionToArgument().get_Item(0);
 			}
-			typeDefinition = item.Resolve();
-			if (typeDefinition != null && typeDefinition.HasCompilerGeneratedAttribute())
+			V_0 = V_2.Resolve();
+			if (V_0 != null && V_0.HasCompilerGeneratedAttribute())
 			{
 				return "collection";
 			}
-			return this.Camelize(this.GetFriendlyGenericName(item), RenameVariables.Conversion.Plural);
+			return this.Camelize(this.GetFriendlyGenericName(V_2), 2);
 		}
 
 		private string GetNameWithSuffix(string name, int suffix)
 		{
-			string str = name;
+			V_0 = name;
 			if (suffix >= 1)
 			{
-				str = String.Concat(str, suffix.ToString());
+				V_0 = String.Concat(V_0, suffix.ToString());
 			}
-			return str;
+			return V_0;
 		}
 
 		private string GetSafeBaseTypeName(string name, string suffix)
 		{
-			string lower = name.ToLower();
-			if (lower != null)
+			V_0 = name.ToLower();
+			if (V_0 != null)
 			{
-				if (lower == "decimal" || lower == "float" || lower == "byte" || lower == "sbyte" || lower == "short" || lower == "int" || lower == "long" || lower == "ushort" || lower == "uint" || lower == "ulong" || lower == "double" || lower == "int16" || lower == "int32" || lower == "int64" || lower == "uint16" || lower == "uint32" || lower == "uint64")
+				if (String.op_Equality(V_0, "decimal") || String.op_Equality(V_0, "float") || String.op_Equality(V_0, "byte") || String.op_Equality(V_0, "sbyte") || String.op_Equality(V_0, "short") || String.op_Equality(V_0, "int") || String.op_Equality(V_0, "long") || String.op_Equality(V_0, "ushort") || String.op_Equality(V_0, "uint") || String.op_Equality(V_0, "ulong") || String.op_Equality(V_0, "double") || String.op_Equality(V_0, "int16") || String.op_Equality(V_0, "int32") || String.op_Equality(V_0, "int64") || String.op_Equality(V_0, "uint16") || String.op_Equality(V_0, "uint32") || String.op_Equality(V_0, "uint64"))
 				{
 					return String.Concat("num", suffix);
 				}
-				if (lower == "char")
+				if (String.op_Equality(V_0, "char"))
 				{
 					return String.Concat("chr", suffix);
 				}
-				if (lower == "boolean")
+				if (String.op_Equality(V_0, "boolean"))
 				{
 					return String.Concat("flag", suffix);
 				}
-				if (lower == "bool")
+				if (String.op_Equality(V_0, "bool"))
 				{
 					return String.Concat("flag", suffix);
 				}
-				if (lower == "string")
+				if (String.op_Equality(V_0, "string"))
 				{
 					return String.Concat("str", suffix);
 				}
-				if (lower == "object")
+				if (String.op_Equality(V_0, "object"))
 				{
 					return String.Concat("obj", suffix);
 				}
-				if (lower == "int32 modopt(system.runtime.compilerservices.islong)")
+				if (String.op_Equality(V_0, "int32 modopt(system.runtime.compilerservices.islong)"))
 				{
 					return "intPtr";
 				}
@@ -311,157 +355,165 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				suffix = String.Concat(suffix, "Pointer");
 			}
-			return this.GetSafeTypeName(name.Substring(0, name.Length - 1), suffix);
+			return this.GetSafeTypeName(name.Substring(0, name.get_Length() - 1), suffix);
 		}
 
 		private bool HasArgumentWithSameName(string name)
 		{
-			bool flag;
-			Dictionary<ParameterDefinition, string>.Enumerator enumerator = this.methodContext.ParameterDefinitionToNameMap.GetEnumerator();
+			V_0 = this.methodContext.get_ParameterDefinitionToNameMap().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					KeyValuePair<ParameterDefinition, string> current = enumerator.Current;
-					if (this.context.Language.IdentifierComparer.Compare(current.Value, name) != 0)
+					V_1 = V_0.get_Current();
+					if (this.context.get_Language().get_IdentifierComparer().Compare(V_1.get_Value(), name) != 0)
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_0).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return false;
 		}
 
 		private bool HasGenericParameterWithSameName(string name)
 		{
-			bool flag;
-			if (!this.methodContext.Method.get_HasGenericParameters())
+			if (!this.methodContext.get_Method().get_HasGenericParameters())
 			{
 				return false;
 			}
-			Collection<GenericParameter>.Enumerator enumerator = this.methodContext.Method.get_GenericParameters().GetEnumerator();
+			V_0 = this.methodContext.get_Method().get_GenericParameters().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					GenericParameter current = enumerator.get_Current();
-					if (this.context.Language.IdentifierComparer.Compare(current.GetFriendlyFullName(this.context.Language), name) != 0)
+					V_1 = V_0.get_Current();
+					if (this.context.get_Language().get_IdentifierComparer().Compare(V_1.GetFriendlyFullName(this.context.get_Language()), name) != 0)
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return false;
 		}
 
 		private bool HasMethodParameterWithSameName(string name)
 		{
-			bool flag;
-			Collection<ParameterDefinition>.Enumerator enumerator = this.methodContext.Method.get_Parameters().GetEnumerator();
+			V_0 = this.methodContext.get_Method().get_Parameters().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					ParameterDefinition current = enumerator.get_Current();
-					if (this.context.Language.IdentifierComparer.Compare(current.get_Name(), name) != 0)
+					V_1 = V_0.get_Current();
+					if (this.context.get_Language().get_IdentifierComparer().Compare(V_1.get_Name(), name) != 0)
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return false;
 		}
 
 		private bool HasVariableWithSameName(string name, VariableDefinition variable)
 		{
-			bool flag;
-			Dictionary<VariableDefinition, string>.Enumerator enumerator = this.methodContext.VariableDefinitionToNameMap.GetEnumerator();
+			V_0 = this.methodContext.get_VariableDefinitionToNameMap().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					KeyValuePair<VariableDefinition, string> current = enumerator.Current;
-					if ((object)current.Key == (object)variable || this.context.Language.IdentifierComparer.Compare(current.Value, name) != 0)
+					V_1 = V_0.get_Current();
+					if ((object)V_1.get_Key() == (object)variable || this.context.get_Language().get_IdentifierComparer().Compare(V_1.get_Value(), name) != 0)
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_0).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return false;
 		}
 
 		protected bool IsCollection(TypeReference typeReference)
 		{
-			bool flag;
-			TypeDefinition typeDefinition = typeReference.Resolve();
-			if (typeDefinition != null)
+			V_0 = typeReference.Resolve();
+			if (V_0 != null)
 			{
-				Collection<TypeReference>.Enumerator enumerator = typeDefinition.get_Interfaces().GetEnumerator();
+				V_1 = V_0.get_Interfaces().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						TypeReference current = enumerator.get_Current();
-						if (!(current.get_FullName() == "System.Collections.IEnumerable") && !(current.get_FullName() == "System.Collections.IList") && !(current.get_FullName() == "System.Collections.ICollection"))
+						V_2 = V_1.get_Current();
+						if (!String.op_Equality(V_2.get_FullName(), "System.Collections.IEnumerable") && !String.op_Equality(V_2.get_FullName(), "System.Collections.IList") && !String.op_Equality(V_2.get_FullName(), "System.Collections.ICollection"))
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_3 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return flag;
+			Label1:
+				return V_3;
 			}
+		Label0:
 			return false;
 		}
 
 		private bool IsForInitializerSuggestedForVariable(VariableDefinition variable)
 		{
-			RenameVariables.VariableSuggestion variableSuggestion;
-			if (!this.variableSuggestedNames.TryGetValue(variable, out variableSuggestion))
+			if (!this.variableSuggestedNames.TryGetValue(variable, out V_0))
 			{
 				return false;
 			}
-			return variableSuggestion.IsForInitializerSuggested;
+			return V_0.get_IsForInitializerSuggested();
 		}
 
 		private bool IsTempVariable(VariableReference variable)
 		{
-			string item = this.methodContext.VariableDefinitionToNameMap[variable.Resolve()];
-			if (!item.StartsWith("CS$") && !item.StartsWith("VB$") && item.IndexOf("__init") <= 0 && !item.StartsWith("stackVariable") && !item.StartsWith("exception_"))
+			V_0 = this.methodContext.get_VariableDefinitionToNameMap().get_Item(variable.Resolve());
+			if (!V_0.StartsWith("CS$") && !V_0.StartsWith("VB$") && V_0.IndexOf("__init") <= 0 && !V_0.StartsWith("stackVariable") && !V_0.StartsWith("exception_"))
 			{
 				return false;
 			}
@@ -479,68 +531,115 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void Preprocess()
 		{
-			int num = 0;
-			Dictionary<ParameterDefinition, string> parameterDefinitions = new Dictionary<ParameterDefinition, string>();
-			foreach (KeyValuePair<ParameterDefinition, string> parameterDefinitionToNameMap in this.methodContext.ParameterDefinitionToNameMap)
+			V_0 = 0;
+			V_1 = new Dictionary<ParameterDefinition, string>();
+			V_2 = this.methodContext.get_ParameterDefinitionToNameMap().GetEnumerator();
+			try
 			{
-				ParameterDefinition key = parameterDefinitionToNameMap.Key;
-				string value = parameterDefinitionToNameMap.Value;
-				string str = value;
-				bool flag = !str.IsValidIdentifier();
-				while (flag || this.HasMethodParameterWithSameName(str))
+				while (V_2.MoveNext())
 				{
-					flag = false;
-					int num1 = num;
-					num = num1 + 1;
-					str = String.Concat("argument", num1.ToString());
+					V_3 = V_2.get_Current();
+					V_4 = V_3.get_Key();
+					V_5 = V_3.get_Value();
+					V_6 = V_5;
+					V_7 = !V_6.IsValidIdentifier();
+					while (V_7 || this.HasMethodParameterWithSameName(V_6))
+					{
+						V_7 = false;
+						stackVariable22 = V_0;
+						V_0 = stackVariable22 + 1;
+						V_8 = stackVariable22;
+						V_6 = String.Concat("argument", V_8.ToString());
+					}
+					if (!String.op_Inequality(V_6, V_5))
+					{
+						continue;
+					}
+					V_1.Add(V_4, V_6);
 				}
-				if (str == value)
+			}
+			finally
+			{
+				((IDisposable)V_2).Dispose();
+			}
+			V_2 = V_1.GetEnumerator();
+			try
+			{
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_9 = V_2.get_Current();
+					this.methodContext.get_ParameterDefinitionToNameMap().set_Item(V_9.get_Key(), V_9.get_Value());
 				}
-				parameterDefinitions.Add(key, str);
 			}
-			foreach (KeyValuePair<ParameterDefinition, string> parameterDefinition in parameterDefinitions)
+			finally
 			{
-				this.methodContext.ParameterDefinitionToNameMap[parameterDefinition.Key] = parameterDefinition.Value;
+				((IDisposable)V_2).Dispose();
 			}
-			foreach (ParameterDefinition parameter in this.methodContext.Body.get_Method().get_Parameters())
+			V_10 = this.methodContext.get_Body().get_Method().get_Parameters().GetEnumerator();
+			try
 			{
-				string name = parameter.get_Name();
-				if (String.IsNullOrEmpty(name))
+				while (V_10.MoveNext())
 				{
-					name = this.GetNameByType(parameter.get_ParameterType());
+					V_11 = V_10.get_Current();
+					V_12 = V_11.get_Name();
+					if (String.IsNullOrEmpty(V_12))
+					{
+						V_12 = this.GetNameByType(V_11.get_ParameterType());
+					}
+					this.methodContext.get_ParameterDefinitionToNameMap().Add(V_11, V_12);
 				}
-				this.methodContext.ParameterDefinitionToNameMap.Add(parameter, name);
 			}
-			if (this.methodContext.Method.get_IsSetter() && this.methodContext.Method.get_Parameters().get_Count() == 1)
+			finally
 			{
-				ParameterDefinition item = this.methodContext.Method.get_Parameters().get_Item(0);
-				this.methodContext.ParameterDefinitionToNameMap[item] = "value";
+				V_10.Dispose();
 			}
-			foreach (VariableDefinition variable in this.methodContext.Body.get_Variables())
+			if (this.methodContext.get_Method().get_IsSetter() && this.methodContext.get_Method().get_Parameters().get_Count() == 1)
 			{
-				if (!this.methodContext.ParameterDefinitionToNameMap.ContainsValue(variable.get_Name()))
+				V_13 = this.methodContext.get_Method().get_Parameters().get_Item(0);
+				this.methodContext.get_ParameterDefinitionToNameMap().set_Item(V_13, "value");
+			}
+			V_14 = this.methodContext.get_Body().get_Variables().GetEnumerator();
+			try
+			{
+				while (V_14.MoveNext())
 				{
-					continue;
+					V_15 = V_14.get_Current();
+					if (!this.methodContext.get_ParameterDefinitionToNameMap().ContainsValue(V_15.get_Name()))
+					{
+						continue;
+					}
+					dummyVar0 = this.methodContext.get_VariablesToRename().Add(V_15);
 				}
-				this.methodContext.VariablesToRename.Add(variable);
 			}
-			foreach (KeyValuePair<VariableDefinition, string> variableDefinitionToNameMap in this.methodContext.VariableDefinitionToNameMap)
+			finally
 			{
-				if (!this.methodContext.ParameterDefinitionToNameMap.ContainsValue(variableDefinitionToNameMap.Value))
-				{
-					continue;
-				}
-				this.methodContext.VariablesToRename.Add(variableDefinitionToNameMap.Key);
+				V_14.Dispose();
 			}
+			V_16 = this.methodContext.get_VariableDefinitionToNameMap().GetEnumerator();
+			try
+			{
+				while (V_16.MoveNext())
+				{
+					V_17 = V_16.get_Current();
+					if (!this.methodContext.get_ParameterDefinitionToNameMap().ContainsValue(V_17.get_Value()))
+					{
+						continue;
+					}
+					dummyVar1 = this.methodContext.get_VariablesToRename().Add(V_17.get_Key());
+				}
+			}
+			finally
+			{
+				((IDisposable)V_16).Dispose();
+			}
+			return;
 		}
 
 		public virtual BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
 			this.context = context;
-			this.methodContext = context.MethodContext;
-			this.typeContext = context.TypeContext;
+			this.methodContext = context.get_MethodContext();
+			this.typeContext = context.get_TypeContext();
 			this.Preprocess();
 			this.VisitBlockStatement(block);
 			this.ReplaceDeclarations(block);
@@ -550,34 +649,36 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void ProcessVariableDeclaration(VariableDeclarationExpression node)
 		{
-			if (!this.methodContext.VariableDefinitionToNameMap.ContainsKey(node.Variable))
+			if (!this.methodContext.get_VariableDefinitionToNameMap().ContainsKey(node.get_Variable()))
 			{
-				this.methodContext.VariableDefinitionToNameMap.Add(node.Variable, node.Variable.get_Name());
+				this.methodContext.get_VariableDefinitionToNameMap().Add(node.get_Variable(), node.get_Variable().get_Name());
 			}
 			if (this.state == RenameVariables.State.SearchForPossibleNames)
 			{
-				this.SuggestNameForVariable(node.Variable);
+				this.SuggestNameForVariable(node.get_Variable());
 				return;
 			}
-			if (this.state == RenameVariables.State.RenameVariables)
+			if (this.state == 1)
 			{
-				this.TryRenameVariable(node.Variable);
+				this.TryRenameVariable(node.get_Variable());
 			}
+			return;
 		}
 
 		private void ReplaceDeclarations(BlockStatement block)
 		{
-			this.state = RenameVariables.State.RenameVariables;
+			this.state = 1;
 			this.VisitBlockStatement(block);
-			this.state = RenameVariables.State.SearchForPossibleNames;
+			this.state = 0;
 			this.variableSuggestedNames.Clear();
 			this.forInitializerStartSymbol = 105;
 			this.forInitializerNumberSuffix = 0;
+			return;
 		}
 
 		private bool ShouldBePluralized(TypeReference typeReference)
 		{
-			if (typeReference.get_FullName() == "System.String")
+			if (String.op_Equality(typeReference.get_FullName(), "System.String"))
 			{
 				return false;
 			}
@@ -590,71 +691,82 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void SuggestNameForMethod(RenameVariables.ExpressionKind expressionKind, string methodName, int startIndex)
 		{
-			RenameVariables.Conversion conversion = RenameVariables.Conversion.None;
-			if (expressionKind == RenameVariables.ExpressionKind.ForEachExpression)
+			V_0 = 0;
+			if (expressionKind == 3)
 			{
-				conversion = RenameVariables.Conversion.Singular;
+				V_0 = 1;
 			}
 			methodName = methodName.Substring(startIndex);
-			methodName = this.Camelize(methodName, conversion);
+			methodName = this.Camelize(methodName, V_0);
 			this.SuggestNameForThePendingVariable(methodName);
+			return;
 		}
 
 		private void SuggestNameForThePendingVariable(string name)
 		{
-			foreach (KeyValuePair<VariableDefinition, RenameVariables.VariableSuggestion> variableSuggestedName in this.variableSuggestedNames)
+			V_0 = this.variableSuggestedNames.GetEnumerator();
+			try
 			{
-				if (!variableSuggestedName.Value.IsPendingForSuggestion)
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (!V_1.get_Value().get_IsPendingForSuggestion())
+					{
+						continue;
+					}
+					this.AddNewSuggestion(V_1.get_Value().get_SuggestedNames(), name);
+					V_1.get_Value().set_IsPendingForSuggestion(false);
+					goto Label0;
 				}
-				this.AddNewSuggestion(variableSuggestedName.Value.SuggestedNames, name);
-				variableSuggestedName.Value.IsPendingForSuggestion = false;
-				return;
 			}
+			finally
+			{
+				((IDisposable)V_0).Dispose();
+			}
+		Label0:
+			return;
 		}
 
 		protected virtual void SuggestNameForVariable(VariableDefinition variableDefinition)
 		{
-			RenameVariables.VariableSuggestion variableSuggestion;
 			if (this.state == RenameVariables.State.SearchForPossibleNames)
 			{
-				RenameVariables.ExpressionKind expressionKind = this.GetExpressionKind();
-				if (expressionKind == RenameVariables.ExpressionKind.ForInitializer && !this.IsForInitializerSuggestedForVariable(variableDefinition))
+				V_0 = this.GetExpressionKind();
+				if (V_0 == 1 && !this.IsForInitializerSuggestedForVariable(variableDefinition))
 				{
-					this.TryAddNewSuggestionForVariable(variableDefinition, this.GetForInitializerName()).IsForInitializerSuggested = true;
+					this.TryAddNewSuggestionForVariable(variableDefinition, this.GetForInitializerName()).set_IsForInitializerSuggested(true);
 				}
-				if (expressionKind == RenameVariables.ExpressionKind.ForEachVariable || expressionKind == RenameVariables.ExpressionKind.LeftAssignment)
+				if (V_0 == 2 || V_0 == 4)
 				{
 					this.TrySetPendingForSuggestion(variableDefinition);
-					RenameVariables.VariableSuggestion variableSuggestion1 = null;
-					this.variableSuggestedNames.TryGetValue(variableDefinition, out variableSuggestion1);
+					V_1 = null;
+					dummyVar0 = this.variableSuggestedNames.TryGetValue(variableDefinition, out V_1);
 				}
-				if (expressionKind == RenameVariables.ExpressionKind.ForEachExpression)
+				if (V_0 == 3)
 				{
-					if (this.variableSuggestedNames.TryGetValue(variableDefinition, out variableSuggestion) && variableSuggestion.SuggestedNames.Count > 0)
+					if (this.variableSuggestedNames.TryGetValue(variableDefinition, out V_2) && V_2.get_SuggestedNames().get_Count() > 0)
 					{
-						this.TrySetPendingName(this.GetFirstSuggestedName(variableSuggestion.SuggestedNames), true);
+						this.TrySetPendingName(this.GetFirstSuggestedName(V_2.get_SuggestedNames()), true);
 						return;
 					}
 					this.ClearPendingForSuggestion();
 				}
 			}
+			return;
 		}
 
 		private RenameVariables.VariableSuggestion TryAddNewSuggestionForVariable(VariableDefinition variable, string name)
 		{
-			RenameVariables.VariableSuggestion variableSuggestion;
-			if (!this.variableSuggestedNames.TryGetValue(variable, out variableSuggestion))
+			if (!this.variableSuggestedNames.TryGetValue(variable, out V_0))
 			{
-				variableSuggestion = new RenameVariables.VariableSuggestion(name);
-				this.variableSuggestedNames.Add(variable, variableSuggestion);
+				V_0 = new RenameVariables.VariableSuggestion(name);
+				this.variableSuggestedNames.Add(variable, V_0);
 			}
 			else
 			{
-				this.AddNewSuggestion(variableSuggestion.SuggestedNames, name);
+				this.AddNewSuggestion(V_0.get_SuggestedNames(), name);
 			}
-			return variableSuggestion;
+			return V_0;
 		}
 
 		private bool TryNameByGetMethod(string methodName, RenameVariables.ExpressionKind expressionKind)
@@ -663,20 +775,20 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (methodName.Length > 3)
+			if (methodName.get_Length() > 3)
 			{
-				if (Char.IsUpper(methodName[3]))
+				if (Char.IsUpper(methodName.get_Chars(3)))
 				{
-					if (methodName.Length == 3)
+					if (methodName.get_Length() == 3)
 					{
 						return false;
 					}
 					this.SuggestNameForMethod(expressionKind, methodName, 3);
 					return true;
 				}
-				if (methodName[3] == '\u005F')
+				if (methodName.get_Chars(3) == '\u005F')
 				{
-					if (methodName.Length == 4)
+					if (methodName.get_Length() == 4)
 					{
 						return false;
 					}
@@ -689,84 +801,103 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool TryNameByToMethod(string methodName, RenameVariables.ExpressionKind expressionKind)
 		{
-			for (int i = methodName.IndexOf("To", 0); i >= 0; i = methodName.IndexOf("To", i + 1))
+			V_0 = methodName.IndexOf("To", 0);
+			while (V_0 >= 0)
 			{
-				if (i + 2 < methodName.Length && Char.IsUpper(methodName[i + 2]))
+				if (V_0 + 2 < methodName.get_Length() && Char.IsUpper(methodName.get_Chars(V_0 + 2)))
 				{
-					this.SuggestNameForMethod(expressionKind, methodName, i + 2);
+					this.SuggestNameForMethod(expressionKind, methodName, V_0 + 2);
 					return true;
 				}
+				V_0 = methodName.IndexOf("To", V_0 + 1);
 			}
 			return false;
 		}
 
 		private void TryRenameUsingSuggestions(VariableDefinition variable, RenameVariables.VariableSuggestion variableSuggestion)
 		{
-			int num = 0;
+			V_0 = 0;
 			while (true)
 			{
-				foreach (string suggestedName in variableSuggestion.SuggestedNames)
+				V_2 = variableSuggestion.get_SuggestedNames().GetEnumerator();
+				try
 				{
-					if (!this.TryRenameVariable(variable, suggestedName, num))
+					while (V_2.MoveNext())
 					{
-						continue;
+						V_3 = V_2.get_Current();
+						if (!this.TryRenameVariable(variable, V_3, V_0))
+						{
+							continue;
+						}
+						goto Label1;
 					}
-					return;
 				}
-				if (this.TryRenameVariable(variable, this.GetNameByType(variable.get_VariableType()), num))
+				finally
 				{
-					return;
+					if (V_2 != null)
+					{
+						V_2.Dispose();
+					}
 				}
-				num++;
+				if (this.TryRenameVariable(variable, this.GetNameByType(variable.get_VariableType()), V_0))
+				{
+					goto Label0;
+				}
+				V_0 = V_0 + 1;
 			}
+		Label1:
+			return;
+		Label0:
+			return;
 		}
 
 		protected virtual void TryRenameVariable(VariableDefinition variable)
 		{
-			RenameVariables.VariableSuggestion variableSuggestion;
-			if (this.state == RenameVariables.State.RenameVariables)
+			if (this.state == 1)
 			{
-				if (!this.variableSuggestedNames.TryGetValue(variable, out variableSuggestion))
+				if (!this.variableSuggestedNames.TryGetValue(variable, out V_0))
 				{
-					variableSuggestion = new RenameVariables.VariableSuggestion()
-					{
-						IsRenamed = true
-					};
-					this.TryRenameUsingSuggestions(variable, variableSuggestion);
+					V_0 = new RenameVariables.VariableSuggestion();
+					V_0.set_IsRenamed(true);
+					this.TryRenameUsingSuggestions(variable, V_0);
 				}
-				else if (!variableSuggestion.IsRenamed)
+				else
 				{
-					variableSuggestion.IsRenamed = true;
-					this.TryRenameUsingSuggestions(variable, variableSuggestion);
-					return;
+					if (!V_0.get_IsRenamed())
+					{
+						V_0.set_IsRenamed(true);
+						this.TryRenameUsingSuggestions(variable, V_0);
+						return;
+					}
 				}
 			}
+			return;
 		}
 
 		private bool TryRenameVariable(VariableDefinition variable, string name, int suffix)
 		{
-			if (!this.IsTempVariable(variable) && !this.methodContext.VariablesToRename.Contains(variable))
+			if (!this.IsTempVariable(variable) && !this.methodContext.get_VariablesToRename().Contains(variable))
 			{
 				return true;
 			}
-			string nameWithSuffix = this.GetNameWithSuffix(name, suffix);
-			if (this.suggestedNames.Contains(nameWithSuffix))
+			V_0 = this.GetNameWithSuffix(name, suffix);
+			if (this.suggestedNames.Contains(V_0))
 			{
 				return false;
 			}
-			string str = nameWithSuffix;
-			if (!this.context.Language.IsValidIdentifier(nameWithSuffix))
+			V_1 = V_0;
+			if (!this.context.get_Language().IsValidIdentifier(V_0))
 			{
-				str = this.context.Language.ReplaceInvalidCharactersInIdentifier(nameWithSuffix);
+				V_1 = this.context.get_Language().ReplaceInvalidCharactersInIdentifier(V_0);
 			}
-			str = this.EscapeIfGlobalKeyword(str);
-			if (!this.IsValidNameInContext(str, variable))
+			V_1 = this.EscapeIfGlobalKeyword(V_1);
+			if (!this.IsValidNameInContext(V_1, variable))
 			{
 				return false;
 			}
-			this.methodContext.VariableDefinitionToNameMap[variable] = str;
-			this.methodContext.VariablesToRename.Remove(variable);
-			this.suggestedNames.Add(str);
+			this.methodContext.get_VariableDefinitionToNameMap().set_Item(variable, V_1);
+			dummyVar0 = this.methodContext.get_VariablesToRename().Remove(variable);
+			dummyVar1 = this.suggestedNames.Add(V_1);
 			return true;
 		}
 
@@ -776,26 +907,33 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			RenameVariables.ExpressionKind expressionKind = this.GetExpressionKind();
-			if (expressionKind != RenameVariables.ExpressionKind.RightAssignment && expressionKind != RenameVariables.ExpressionKind.ForEachExpression)
+			V_0 = this.GetExpressionKind();
+			if (V_0 != 5 && V_0 != 3)
 			{
 				return;
 			}
-			if (!(methodExpression is MethodReferenceExpression))
+			if (methodExpression as MethodReferenceExpression == null)
 			{
 				return;
 			}
-			MethodReference method = ((MethodReferenceExpression)methodExpression).Method;
-			string name = method.get_Name() ?? method.get_FullName();
-			if (name.Contains("`"))
+			V_1 = ((MethodReferenceExpression)methodExpression).get_Method();
+			stackVariable12 = V_1.get_Name();
+			if (stackVariable12 == null)
 			{
-				name = name.Substring(0, name.IndexOf('\u0060'));
+				dummyVar0 = stackVariable12;
+				stackVariable12 = V_1.get_FullName();
 			}
-			if (this.TryNameByGetMethod(name, expressionKind))
+			V_2 = stackVariable12;
+			if (V_2.Contains("`"))
+			{
+				V_2 = V_2.Substring(0, V_2.IndexOf('\u0060'));
+			}
+			if (this.TryNameByGetMethod(V_2, V_0))
 			{
 				return;
 			}
-			this.TryNameByToMethod(name, expressionKind);
+			dummyVar1 = this.TryNameByToMethod(V_2, V_0);
+			return;
 		}
 
 		private void TrySetObjectCreationPendingName(TypeReference typeReference)
@@ -804,25 +942,24 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			if (this.GetExpressionKind() == RenameVariables.ExpressionKind.RightAssignment)
+			if (this.GetExpressionKind() == 5)
 			{
 				this.SuggestNameForThePendingVariable(this.GetNameByType(typeReference));
 			}
+			return;
 		}
 
 		private void TrySetPendingForSuggestion(VariableDefinition variable)
 		{
-			RenameVariables.VariableSuggestion variableSuggestion;
-			if (this.variableSuggestedNames.TryGetValue(variable, out variableSuggestion))
+			if (this.variableSuggestedNames.TryGetValue(variable, out V_0))
 			{
-				variableSuggestion.IsPendingForSuggestion = true;
+				V_0.set_IsPendingForSuggestion(true);
 				return;
 			}
-			variableSuggestion = new RenameVariables.VariableSuggestion()
-			{
-				IsPendingForSuggestion = true
-			};
-			this.variableSuggestedNames.Add(variable, variableSuggestion);
+			V_0 = new RenameVariables.VariableSuggestion();
+			V_0.set_IsPendingForSuggestion(true);
+			this.variableSuggestedNames.Add(variable, V_0);
+			return;
 		}
 
 		private void TrySetPendingName(string name, bool suggestSameName)
@@ -831,21 +968,29 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			RenameVariables.ExpressionKind expressionKind = this.GetExpressionKind();
-			if (expressionKind == RenameVariables.ExpressionKind.ForEachExpression || expressionKind == RenameVariables.ExpressionKind.RightAssignment)
+			V_0 = this.GetExpressionKind();
+			if (V_0 == 3 || V_0 == 5)
 			{
-				RenameVariables.Conversion conversion = (expressionKind == RenameVariables.ExpressionKind.ForEachExpression ? RenameVariables.Conversion.Singular : RenameVariables.Conversion.None);
+				if (V_0 == 3)
+				{
+					stackVariable8 = 1;
+				}
+				else
+				{
+					stackVariable8 = 0;
+				}
+				V_1 = stackVariable8;
 				if (String.IsNullOrEmpty(name))
 				{
 					this.ClearPendingForSuggestion();
 					return;
 				}
-				string str = this.Camelize(name, conversion);
-				if (str != String.Concat("_", name))
+				V_2 = this.Camelize(name, V_1);
+				if (String.op_Inequality(V_2, String.Concat("_", name)))
 				{
-					if (suggestSameName || name != str)
+					if (suggestSameName || String.op_Inequality(name, V_2))
 					{
-						this.SuggestNameForThePendingVariable(str);
+						this.SuggestNameForThePendingVariable(V_2);
 					}
 					this.ClearPendingForSuggestion();
 					return;
@@ -855,166 +1000,189 @@ namespace Telerik.JustDecompiler.Steps
 					this.ClearPendingForSuggestion();
 				}
 			}
+			return;
 		}
 
 		public override void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpression node)
 		{
-			if (node.Constructor != null)
+			if (node.get_Constructor() != null)
 			{
-				this.TrySetObjectCreationPendingName(node.Constructor.get_DeclaringType());
+				this.TrySetObjectCreationPendingName(node.get_Constructor().get_DeclaringType());
 			}
 			this.ClearPendingForSuggestion();
-			base.VisitAnonymousObjectCreationExpression(node);
+			this.VisitAnonymousObjectCreationExpression(node);
+			return;
 		}
 
 		public override void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 		{
-			this.TrySetPendingName(node.Parameter.get_Name(), false);
-			base.VisitArgumentReferenceExpression(node);
+			this.TrySetPendingName(node.get_Parameter().get_Name(), false);
+			this.VisitArgumentReferenceExpression(node);
+			return;
 		}
 
 		public override void VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			this.expressions.Push(RenameVariables.ExpressionKind.None);
-			this.Visit(node.Dimensions);
-			this.expressions.Pop();
-			this.Visit(node.Initializer);
+			this.expressions.Push(0);
+			this.Visit(node.get_Dimensions());
+			dummyVar0 = this.expressions.Pop();
+			this.Visit(node.get_Initializer());
+			return;
 		}
 
 		public override void VisitArrayIndexerExpression(ArrayIndexerExpression node)
 		{
-			this.Visit(node.Target);
-			this.expressions.Push(RenameVariables.ExpressionKind.None);
-			this.Visit(node.Indices);
-			this.expressions.Pop();
+			this.Visit(node.get_Target());
+			this.expressions.Push(0);
+			this.Visit(node.get_Indices());
+			dummyVar0 = this.expressions.Pop();
+			return;
 		}
 
 		public override void VisitArrayLengthExpression(ArrayLengthExpression node)
 		{
 			this.TrySetPendingName("Length", true);
-			base.VisitArrayLengthExpression(node);
+			this.VisitArrayLengthExpression(node);
+			return;
 		}
 
 		private ICodeNode VisitAssignExpression(BinaryExpression node)
 		{
-			this.expressions.Push(RenameVariables.ExpressionKind.LeftAssignment);
-			this.Visit(node.Left);
-			this.expressions.Pop();
-			this.expressions.Push(RenameVariables.ExpressionKind.RightAssignment);
-			this.Visit(node.Right);
-			this.expressions.Pop();
+			this.expressions.Push(4);
+			this.Visit(node.get_Left());
+			dummyVar0 = this.expressions.Pop();
+			this.expressions.Push(5);
+			this.Visit(node.get_Right());
+			dummyVar1 = this.expressions.Pop();
 			this.ClearPendingForSuggestion();
 			return node;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			if (!node.IsAssignmentExpression && (!node.IsSelfAssign || node.IsEventHandlerAddOrRemove))
+			if (!node.get_IsAssignmentExpression() && !node.get_IsSelfAssign() || node.get_IsEventHandlerAddOrRemove())
 			{
-				base.VisitBinaryExpression(node);
+				this.VisitBinaryExpression(node);
 				return;
 			}
-			this.VisitAssignExpression(node);
+			dummyVar0 = this.VisitAssignExpression(node);
+			return;
 		}
 
 		public override void VisitConditionExpression(ConditionExpression node)
 		{
-			this.expressions.Push(RenameVariables.ExpressionKind.None);
-			base.VisitConditionExpression(node);
-			this.expressions.Pop();
+			this.expressions.Push(0);
+			this.VisitConditionExpression(node);
+			dummyVar0 = this.expressions.Pop();
+			return;
 		}
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			string str;
-			if (node.Target is TypeReferenceExpression)
+			if (node.get_Target() as TypeReferenceExpression != null)
 			{
-				TypeReference type = ((TypeReferenceExpression)node.Target).Type;
-				if (type is TypeDefinition && ((TypeDefinition)type).get_IsEnum())
+				V_2 = ((TypeReferenceExpression)node.get_Target()).get_Type();
+				if (V_2 as TypeDefinition != null && ((TypeDefinition)V_2).get_IsEnum())
 				{
-					base.VisitFieldReferenceExpression(node);
+					this.VisitFieldReferenceExpression(node);
 					return;
 				}
 			}
-			FieldDefinition fieldDefinition = node.Field.Resolve();
-			str = (fieldDefinition == null || !this.typeContext.BackingFieldToNameMap.ContainsKey(fieldDefinition) ? node.Field.get_Name() : this.typeContext.BackingFieldToNameMap[fieldDefinition]);
-			this.TrySetPendingName(str, true);
-			base.VisitFieldReferenceExpression(node);
+			V_0 = node.get_Field().Resolve();
+			if (V_0 == null || !this.typeContext.get_BackingFieldToNameMap().ContainsKey(V_0))
+			{
+				V_1 = node.get_Field().get_Name();
+			}
+			else
+			{
+				V_1 = this.typeContext.get_BackingFieldToNameMap().get_Item(V_0);
+			}
+			this.TrySetPendingName(V_1, true);
+			this.VisitFieldReferenceExpression(node);
+			return;
 		}
 
 		public override void VisitForEachStatement(ForEachStatement node)
 		{
-			this.expressions.Push(RenameVariables.ExpressionKind.ForEachVariable);
-			this.Visit(node.Variable);
-			this.expressions.Pop();
-			this.expressions.Push(RenameVariables.ExpressionKind.ForEachExpression);
-			this.Visit(node.Collection);
-			this.expressions.Pop();
+			this.expressions.Push(2);
+			this.Visit(node.get_Variable());
+			dummyVar0 = this.expressions.Pop();
+			this.expressions.Push(3);
+			this.Visit(node.get_Collection());
+			dummyVar1 = this.expressions.Pop();
 			this.ClearPendingForSuggestion();
-			this.Visit(node.Body);
+			this.Visit(node.get_Body());
+			return;
 		}
 
 		public override void VisitForStatement(ForStatement node)
 		{
-			this.expressions.Push(RenameVariables.ExpressionKind.ForInitializer);
-			this.Visit(node.Initializer);
-			this.expressions.Pop();
-			this.Visit(node.Condition);
-			this.Visit(node.Increment);
-			this.Visit(node.Body);
+			this.expressions.Push(1);
+			this.Visit(node.get_Initializer());
+			dummyVar0 = this.expressions.Pop();
+			this.Visit(node.get_Condition());
+			this.Visit(node.get_Increment());
+			this.Visit(node.get_Body());
+			return;
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			this.TrySetMethodInvocationPendingName(node.MethodExpression);
+			this.TrySetMethodInvocationPendingName(node.get_MethodExpression());
 			this.ClearPendingForSuggestion();
-			base.VisitMethodInvocationExpression(node);
+			this.VisitMethodInvocationExpression(node);
+			return;
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			if (node.Constructor != null)
+			if (node.get_Constructor() != null)
 			{
-				this.TrySetObjectCreationPendingName(node.Constructor.get_DeclaringType());
+				this.TrySetObjectCreationPendingName(node.get_Constructor().get_DeclaringType());
 			}
 			this.ClearPendingForSuggestion();
-			base.VisitObjectCreationExpression(node);
+			this.VisitObjectCreationExpression(node);
+			return;
 		}
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.TrySetPendingName(node.Property.get_Name(), true);
-			base.VisitPropertyReferenceExpression(node);
+			this.TrySetPendingName(node.get_Property().get_Name(), true);
+			this.VisitPropertyReferenceExpression(node);
+			return;
 		}
 
 		public override void VisitRefVariableDeclarationExpression(RefVariableDeclarationExpression node)
 		{
 			this.ProcessVariableDeclaration(node);
-			base.VisitRefVariableDeclarationExpression(node);
+			this.VisitRefVariableDeclarationExpression(node);
+			return;
 		}
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
 			this.ProcessVariableDeclaration(node);
-			base.VisitVariableDeclarationExpression(node);
+			this.VisitVariableDeclarationExpression(node);
+			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			VariableDefinition name = node.Variable.Resolve();
-			if (!this.methodContext.VariableDefinitionToNameMap.ContainsKey(name))
+			V_0 = node.get_Variable().Resolve();
+			if (!this.methodContext.get_VariableDefinitionToNameMap().ContainsKey(V_0))
 			{
-				this.methodContext.VariableDefinitionToNameMap[name] = name.get_Name();
+				this.methodContext.get_VariableDefinitionToNameMap().set_Item(V_0, V_0.get_Name());
 			}
 			if (this.state == RenameVariables.State.SearchForPossibleNames)
 			{
-				this.SuggestNameForVariable(name);
+				this.SuggestNameForVariable(V_0);
 			}
-			if (this.state == RenameVariables.State.RenameVariables && this.methodContext.UndeclaredLinqVariables.Remove(name))
+			if (this.state == 1 && this.methodContext.get_UndeclaredLinqVariables().Remove(V_0))
 			{
-				this.TryRenameVariable(name);
+				this.TryRenameVariable(V_0);
 			}
-			base.VisitVariableReferenceExpression(node);
+			this.VisitVariableReferenceExpression(node);
+			return;
 		}
 
 		protected enum Conversion
@@ -1068,12 +1236,16 @@ namespace Telerik.JustDecompiler.Steps
 
 			public VariableSuggestion()
 			{
-				this.SuggestedNames = new List<string>();
+				base();
+				this.set_SuggestedNames(new List<string>());
+				return;
 			}
 
-			public VariableSuggestion(string suggestedName) : this()
+			public VariableSuggestion(string suggestedName)
 			{
-				this.SuggestedNames.Add(suggestedName);
+				this();
+				this.get_SuggestedNames().Add(suggestedName);
+				return;
 			}
 		}
 	}

@@ -76,63 +76,72 @@ namespace Telerik.JustDecompiler.Steps
 			Inflector.AddUncountable("fish");
 			Inflector.AddUncountable("sheep");
 			Inflector.AddUncountable("news");
+			return;
 		}
 
 		private static void AddIrregular(string singular, string plural)
 		{
-			String[] str = new String[] { "(", null, null, null, null };
-			char chr = singular[0];
-			str[1] = chr.ToString();
-			str[2] = ")";
-			str[3] = singular.Substring(1);
-			str[4] = "$";
-			Inflector.AddPlural(String.Concat(str), String.Concat("$1", plural.Substring(1)));
-			String[] strArrays = new String[] { "(", null, null, null, null };
-			chr = plural[0];
-			strArrays[1] = chr.ToString();
-			strArrays[2] = ")";
-			strArrays[3] = plural.Substring(1);
-			strArrays[4] = "$";
-			Inflector.AddSingular(String.Concat(strArrays), String.Concat("$1", singular.Substring(1)));
+			stackVariable1 = new String[5];
+			stackVariable1[0] = "(";
+			V_0 = singular.get_Chars(0);
+			stackVariable1[1] = V_0.ToString();
+			stackVariable1[2] = ")";
+			stackVariable1[3] = singular.Substring(1);
+			stackVariable1[4] = "$";
+			Inflector.AddPlural(String.Concat(stackVariable1), String.Concat("$1", plural.Substring(1)));
+			stackVariable25 = new String[5];
+			stackVariable25[0] = "(";
+			V_0 = plural.get_Chars(0);
+			stackVariable25[1] = V_0.ToString();
+			stackVariable25[2] = ")";
+			stackVariable25[3] = plural.Substring(1);
+			stackVariable25[4] = "$";
+			Inflector.AddSingular(String.Concat(stackVariable25), String.Concat("$1", singular.Substring(1)));
+			return;
 		}
 
 		private static void AddPlural(string rule, string replacement)
 		{
 			Inflector._plurals.Add(new Inflector.Rule(rule, replacement));
+			return;
 		}
 
 		private static void AddSingular(string rule, string replacement)
 		{
 			Inflector._singulars.Add(new Inflector.Rule(rule, replacement));
+			return;
 		}
 
 		private static void AddUncountable(string word)
 		{
 			Inflector._uncountables.Add(word.ToLower());
+			return;
 		}
 
 		private static string ApplyRules(List<Inflector.Rule> rules, string word)
 		{
-			string str = word;
+			V_0 = word;
 			if (!Inflector._uncountables.Contains(word.ToLower()))
 			{
 				if (Inflector._reservedWords.ContainsKey(word.ToLower()))
 				{
-					return Inflector._reservedWords[word.ToLower()].ToString();
+					return Inflector._reservedWords.get_Item(word.ToLower()).ToString();
 				}
-				for (int i = rules.Count - 1; i >= 0; i--)
+				V_1 = rules.get_Count() - 1;
+				while (V_1 >= 0)
 				{
-					string str1 = rules[i].Apply(word);
-					str = str1;
-					if (str1 != null)
+					stackVariable22 = rules.get_Item(V_1).Apply(word);
+					V_0 = stackVariable22;
+					if (stackVariable22 != null)
 					{
 						break;
 					}
+					V_1 = V_1 - 1;
 				}
 			}
-			if (str != null)
+			if (V_0 != null)
 			{
-				return str;
+				return V_0;
 			}
 			return word;
 		}
@@ -143,17 +152,19 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return lowercaseAndUnderscoredWord;
 			}
-			StringBuilder stringBuilder = new StringBuilder(lowercaseAndUnderscoredWord);
-			for (int i = 1; i < stringBuilder.Length - 1; i++)
+			V_0 = new StringBuilder(lowercaseAndUnderscoredWord);
+			V_1 = 1;
+			while (V_1 < V_0.get_Length() - 1)
 			{
-				if (stringBuilder[i] == '\u005F')
+				if (V_0.get_Chars(V_1) == '\u005F')
 				{
-					stringBuilder[i] = Char.ToUpper(stringBuilder[i + 1]);
-					stringBuilder.Remove(i + 1, 1);
+					V_0.set_Chars(V_1, Char.ToUpper(V_0.get_Chars(V_1 + 1)));
+					dummyVar0 = V_0.Remove(V_1 + 1, 1);
 				}
+				V_1 = V_1 + 1;
 			}
-			stringBuilder[0] = Char.ToLower(stringBuilder[0]);
-			return stringBuilder.ToString();
+			V_0.set_Chars(0, Char.ToLower(V_0.get_Chars(0)));
+			return V_0.ToString();
 		}
 
 		public static string Pluralize(string word)
@@ -174,20 +185,24 @@ namespace Telerik.JustDecompiler.Steps
 
 			public Rule(string pattern, string replacement)
 			{
-				this._regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+				base();
+				this._regex = new Regex(pattern, 9);
 				this._replacement = replacement;
+				return;
 			}
 
 			public Rule(string pattern, string replacment, bool ncaseSensitive)
 			{
+				base();
 				if (ncaseSensitive)
 				{
-					this._regex = new Regex(pattern, RegexOptions.Compiled);
+					this._regex = new Regex(pattern, 8);
 					this._replacement = replacment;
 					return;
 				}
-				this._regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+				this._regex = new Regex(pattern, 9);
 				this._replacement = replacment;
+				return;
 			}
 
 			public string Apply(string word)

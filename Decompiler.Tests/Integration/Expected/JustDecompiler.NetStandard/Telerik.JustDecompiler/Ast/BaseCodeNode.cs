@@ -37,49 +37,84 @@ namespace Telerik.JustDecompiler.Ast
 
 		protected BaseCodeNode()
 		{
+			base();
+			return;
 		}
 
 		private IEnumerable<IEnumerable<Instruction>> GetInstructionEnumerables()
 		{
-			BaseCodeNode baseCodeNode = null;
-			Queue<ICodeNode> codeNodes = new Queue<ICodeNode>();
-			codeNodes.Enqueue(baseCodeNode);
-			while (codeNodes.Count > 0)
-			{
-				BaseCodeNode baseCodeNode1 = codeNodes.Dequeue() as BaseCodeNode;
-				yield return baseCodeNode1.GetOwnInstructions();
-				foreach (ICodeNode child in baseCodeNode1.Children)
-				{
-					codeNodes.Enqueue(child);
-				}
-				baseCodeNode1 = null;
-			}
+			stackVariable1 = new BaseCodeNode.u003cGetInstructionEnumerablesu003ed__8(-2);
+			stackVariable1.u003cu003e4__this = this;
+			return stackVariable1;
 		}
 
 		protected abstract IEnumerable<Instruction> GetOwnInstructions();
 
 		private ICollection<int> MergeSearchableEnumerables(IEnumerable<IEnumerable<Instruction>> enumerables)
 		{
-			HashSet<int> nums = new HashSet<int>();
-			foreach (IEnumerable<Instruction> enumerable in enumerables)
+			V_0 = new HashSet<int>();
+			V_1 = enumerables.GetEnumerator();
+			try
 			{
-				foreach (Instruction instruction in enumerable)
+				while (V_1.MoveNext())
 				{
-					nums.Add(instruction.get_Offset());
+					V_2 = V_1.get_Current().GetEnumerator();
+					try
+					{
+						while (V_2.MoveNext())
+						{
+							V_3 = V_2.get_Current();
+							dummyVar0 = V_0.Add(V_3.get_Offset());
+						}
+					}
+					finally
+					{
+						if (V_2 != null)
+						{
+							V_2.Dispose();
+						}
+					}
 				}
 			}
-			return nums;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		protected IEnumerable<Instruction> MergeSortedEnumerables(IEnumerable<IEnumerable<Instruction>> enumerables)
 		{
-			List<Instruction> instructions = new List<Instruction>();
-			foreach (IEnumerable<Instruction> enumerable in enumerables)
+			V_0 = new List<Instruction>();
+			V_1 = enumerables.GetEnumerator();
+			try
 			{
-				instructions.AddRange(enumerable);
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.AddRange(V_2);
+				}
 			}
-			instructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
-			return instructions;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			stackVariable9 = V_0;
+			stackVariable10 = BaseCodeNode.u003cu003ec.u003cu003e9__6_0;
+			if (stackVariable10 == null)
+			{
+				dummyVar0 = stackVariable10;
+				stackVariable10 = new Comparison<Instruction>(BaseCodeNode.u003cu003ec.u003cu003e9.u003cMergeSortedEnumerablesu003eb__6_0);
+				BaseCodeNode.u003cu003ec.u003cu003e9__6_0 = stackVariable10;
+			}
+			stackVariable9.Sort(stackVariable10);
+			return V_0;
 		}
 	}
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions;
 
@@ -10,150 +9,166 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 	{
 		public static ISingleEntrySubGraph FindFirstCommonParent(IEnumerable<ISingleEntrySubGraph> blocks)
 		{
-			Queue<ISingleEntrySubGraph> singleEntrySubGraphs = new Queue<ISingleEntrySubGraph>();
-			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs1 = new HashSet<ISingleEntrySubGraph>();
-			foreach (ISingleEntrySubGraph block in blocks)
+			V_0 = new Queue<ISingleEntrySubGraph>();
+			V_1 = new HashSet<ISingleEntrySubGraph>();
+			V_2 = blocks.GetEnumerator();
+			try
 			{
-				if (singleEntrySubGraphs.Count != 0)
+				while (V_2.MoveNext())
 				{
-					ISingleEntrySubGraph parent = block;
-					while (!singleEntrySubGraphs1.Contains(parent))
+					V_3 = V_2.get_Current();
+					if (V_0.get_Count() != 0)
 					{
-						parent = parent.Parent;
+						V_5 = V_3;
+						while (!V_1.Contains(V_5))
+						{
+							V_5 = V_5.get_Parent();
+						}
+						if (!V_1.Contains(V_5))
+						{
+							continue;
+						}
+						while (V_0.Peek() != V_5)
+						{
+							dummyVar1 = V_1.Remove(V_0.Dequeue());
+						}
 					}
-					if (!singleEntrySubGraphs1.Contains(parent))
+					else
 					{
-						continue;
-					}
-					while (singleEntrySubGraphs.Peek() != parent)
-					{
-						singleEntrySubGraphs1.Remove(singleEntrySubGraphs.Dequeue());
-					}
-				}
-				else
-				{
-					for (ISingleEntrySubGraph i = block; i != null; i = i.Parent)
-					{
-						singleEntrySubGraphs.Enqueue(i);
-						singleEntrySubGraphs1.Add(i);
+						V_4 = V_3;
+						while (V_4 != null)
+						{
+							V_0.Enqueue(V_4);
+							dummyVar0 = V_1.Add(V_4);
+							V_4 = V_4.get_Parent();
+						}
 					}
 				}
 			}
-			return singleEntrySubGraphs.Peek();
+			finally
+			{
+				if (V_2 != null)
+				{
+					V_2.Dispose();
+				}
+			}
+			return V_0.Peek();
 		}
 
 		public static BlockLogicalConstruct GetNearestGuardedBlock(ILogicalConstruct start)
 		{
-			ILogicalConstruct parent = start;
-			while (parent != null && !(parent is ExceptionHandlingLogicalConstruct))
+			V_0 = start;
+			while (V_0 != null && V_0 as ExceptionHandlingLogicalConstruct == null)
 			{
-				parent = (ILogicalConstruct)parent.Parent;
+				V_0 = (ILogicalConstruct)V_0.get_Parent();
 			}
-			if (parent == null)
+			if (V_0 == null)
 			{
 				return null;
 			}
-			if ((parent as ExceptionHandlingLogicalConstruct).Try.CFGBlocks.Contains(start.FirstBlock))
+			if ((V_0 as ExceptionHandlingLogicalConstruct).get_Try().get_CFGBlocks().Contains(start.get_FirstBlock()))
 			{
-				return (parent as ExceptionHandlingLogicalConstruct).Try;
+				return (V_0 as ExceptionHandlingLogicalConstruct).get_Try();
 			}
-			if (!(parent is TryCatchFilterLogicalConstruct))
+			if (V_0 as TryCatchFilterLogicalConstruct == null)
 			{
-				if (parent is TryFinallyLogicalConstruct)
+				if (V_0 as TryFinallyLogicalConstruct != null)
 				{
-					return (parent as TryFinallyLogicalConstruct).Finally;
+					return (V_0 as TryFinallyLogicalConstruct).get_Finally();
 				}
-				if (!(parent is TryFaultLogicalConstruct))
+				if (V_0 as TryFaultLogicalConstruct == null)
 				{
 					throw new Exception("Unknown type of exception handling logical construct encountered.");
 				}
-				return (parent as TryFaultLogicalConstruct).Fault;
+				return (V_0 as TryFaultLogicalConstruct).get_Fault();
 			}
-			IFilteringExceptionHandler[] handlers = (parent as TryCatchFilterLogicalConstruct).Handlers;
-			for (int i = 0; i < (int)handlers.Length; i++)
+			V_1 = (V_0 as TryCatchFilterLogicalConstruct).get_Handlers();
+			V_2 = 0;
+			while (V_2 < (int)V_1.Length)
 			{
-				IFilteringExceptionHandler filteringExceptionHandler = handlers[i];
-				if (filteringExceptionHandler.HandlerType == FilteringExceptionHandlerType.Filter)
+				V_3 = V_1[V_2];
+				if (V_3.get_HandlerType() == 1)
 				{
-					if ((filteringExceptionHandler as ExceptionHandlingBlockFilter).Filter.CFGBlocks.Contains(start.FirstBlock))
+					if ((V_3 as ExceptionHandlingBlockFilter).get_Filter().get_CFGBlocks().Contains(start.get_FirstBlock()))
 					{
-						return (filteringExceptionHandler as ExceptionHandlingBlockFilter).Filter;
+						return (V_3 as ExceptionHandlingBlockFilter).get_Filter();
 					}
-					return (filteringExceptionHandler as ExceptionHandlingBlockFilter).Handler;
+					return (V_3 as ExceptionHandlingBlockFilter).get_Handler();
 				}
-				if (filteringExceptionHandler.HandlerType == FilteringExceptionHandlerType.Catch)
+				if (V_3.get_HandlerType() == FilteringExceptionHandlerType.Catch)
 				{
-					return filteringExceptionHandler as ExceptionHandlingBlockCatch;
+					return V_3 as ExceptionHandlingBlockCatch;
 				}
+				V_2 = V_2 + 1;
 			}
 			return null;
 		}
 
 		public static ICollection<ISingleEntrySubGraph> GetTraversablePredecessors(ISingleEntrySubGraph construct)
 		{
-			List<ISingleEntrySubGraph> singleEntrySubGraphs = new List<ISingleEntrySubGraph>(construct.SameParentPredecessors);
-			singleEntrySubGraphs.Sort();
-			return singleEntrySubGraphs;
+			stackVariable2 = new List<ISingleEntrySubGraph>(construct.get_SameParentPredecessors());
+			stackVariable2.Sort();
+			return stackVariable2;
 		}
 
 		public static ICollection<ISingleEntrySubGraph> GetTraversableSuccessors(ISingleEntrySubGraph construct)
 		{
-			List<ISingleEntrySubGraph> singleEntrySubGraphs = new List<ISingleEntrySubGraph>(construct.SameParentSuccessors);
-			singleEntrySubGraphs.Sort();
-			return singleEntrySubGraphs;
+			stackVariable2 = new List<ISingleEntrySubGraph>(construct.get_SameParentSuccessors());
+			stackVariable2.Sort();
+			return stackVariable2;
 		}
 
 		public static KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct> SplitCFGBlockAt(LogicalFlowBuilderContext logicalContext, CFGBlockLogicalConstruct cfgBlock, int expressionIndex)
 		{
-			List<Expression> logicalConstructExpressions = cfgBlock.LogicalConstructExpressions;
-			if (logicalConstructExpressions == null)
+			V_0 = cfgBlock.get_LogicalConstructExpressions();
+			if (V_0 == null)
 			{
 				throw new ArgumentNullException("blockExpressions");
 			}
-			if (expressionIndex <= 0 || expressionIndex >= logicalConstructExpressions.Count)
+			if (expressionIndex <= 0 || expressionIndex >= V_0.get_Count())
 			{
 				throw new ArgumentOutOfRangeException("expressionIndex");
 			}
-			CFGBlockLogicalConstruct[] item = logicalContext.CFGBlockToLogicalConstructMap[cfgBlock.TheBlock];
-			int length = (int)item.Length;
-			int num = 0;
-			while (num < length && cfgBlock != item[num])
+			V_1 = logicalContext.get_CFGBlockToLogicalConstructMap().get_Item(cfgBlock.get_TheBlock());
+			V_2 = (int)V_1.Length;
+			V_3 = 0;
+			while (V_3 < V_2 && cfgBlock != V_1[V_3])
 			{
-				num++;
+				V_3 = V_3 + 1;
 			}
-			if (num == length)
+			if (V_3 == V_2)
 			{
 				throw new ArgumentException("cfgBlock");
 			}
-			List<Expression> range = cfgBlock.LogicalConstructExpressions.GetRange(0, expressionIndex);
-			PartialCFGBlockLogicalConstruct partialCFGBlockLogicalConstruct = new PartialCFGBlockLogicalConstruct(cfgBlock, range);
-			partialCFGBlockLogicalConstruct.RedirectPredecessors();
-			List<Expression> expressions = cfgBlock.LogicalConstructExpressions.GetRange(expressionIndex, logicalConstructExpressions.Count - expressionIndex);
-			PartialCFGBlockLogicalConstruct partialCFGBlockLogicalConstruct1 = new PartialCFGBlockLogicalConstruct(cfgBlock, expressions);
-			partialCFGBlockLogicalConstruct1.RedirectSuccessors();
-			partialCFGBlockLogicalConstruct.AddToSuccessors(partialCFGBlockLogicalConstruct1);
-			partialCFGBlockLogicalConstruct1.AddToPredecessors(partialCFGBlockLogicalConstruct);
-			CFGBlockLogicalConstruct[] cFGBlockLogicalConstructArray = new CFGBlockLogicalConstruct[length + 1];
-			int num1 = 0;
-			int num2 = 0;
-			while (num1 < length)
+			V_4 = cfgBlock.get_LogicalConstructExpressions().GetRange(0, expressionIndex);
+			V_5 = new PartialCFGBlockLogicalConstruct(cfgBlock, V_4);
+			V_5.RedirectPredecessors();
+			V_6 = cfgBlock.get_LogicalConstructExpressions().GetRange(expressionIndex, V_0.get_Count() - expressionIndex);
+			V_7 = new PartialCFGBlockLogicalConstruct(cfgBlock, V_6);
+			V_7.RedirectSuccessors();
+			V_5.AddToSuccessors(V_7);
+			V_7.AddToPredecessors(V_5);
+			V_8 = new CFGBlockLogicalConstruct[V_2 + 1];
+			V_9 = 0;
+			V_10 = 0;
+			while (V_9 < V_2)
 			{
-				if (num1 == num)
+				if (V_9 == V_3)
 				{
-					cFGBlockLogicalConstructArray[num2] = partialCFGBlockLogicalConstruct;
-					int num3 = num2 + 1;
-					num2 = num3;
-					cFGBlockLogicalConstructArray[num3] = partialCFGBlockLogicalConstruct1;
+					V_8[V_10] = V_5;
+					stackVariable68 = V_10 + 1;
+					V_10 = stackVariable68;
+					V_8[stackVariable68] = V_7;
 				}
 				else
 				{
-					cFGBlockLogicalConstructArray[num2] = item[num1];
+					V_8[V_10] = V_1[V_9];
 				}
-				num1++;
-				num2++;
+				V_9 = V_9 + 1;
+				V_10 = V_10 + 1;
 			}
-			logicalContext.CFGBlockToLogicalConstructMap[cfgBlock.TheBlock] = cFGBlockLogicalConstructArray;
-			return new KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct>(partialCFGBlockLogicalConstruct, partialCFGBlockLogicalConstruct1);
+			logicalContext.get_CFGBlockToLogicalConstructMap().set_Item(cfgBlock.get_TheBlock(), V_8);
+			return new KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct>(V_5, V_7);
 		}
 
 		public static bool TryGetParentConstructWithGivenParent(ILogicalConstruct initialNode, ILogicalConstruct parent, out ILogicalConstruct desiredNode)
@@ -164,13 +179,13 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 				return false;
 			}
 			desiredNode = initialNode;
-			while (desiredNode.Parent != null)
+			while (desiredNode.get_Parent() != null)
 			{
-				if (desiredNode.Parent == parent)
+				if (desiredNode.get_Parent() == parent)
 				{
 					return true;
 				}
-				desiredNode = desiredNode.Parent as ILogicalConstruct;
+				desiredNode = desiredNode.get_Parent() as ILogicalConstruct;
 			}
 			desiredNode = null;
 			return false;

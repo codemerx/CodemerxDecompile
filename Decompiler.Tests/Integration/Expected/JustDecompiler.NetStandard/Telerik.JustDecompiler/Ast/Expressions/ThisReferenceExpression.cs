@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new ThisReferenceExpression.u003cget_Childrenu003ed__6(-2);
 			}
 		}
 
@@ -22,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ThisReferenceExpression;
+				return 28;
 			}
 		}
 
@@ -30,7 +31,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.TargetType;
+				return this.get_TargetType();
 			}
 			set
 			{
@@ -44,28 +45,30 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			private set;
 		}
 
-		public ThisReferenceExpression(TypeReference targetType, IEnumerable<Instruction> instructions) : base(instructions)
+		public ThisReferenceExpression(TypeReference targetType, IEnumerable<Instruction> instructions)
 		{
-			this.TargetType = targetType;
+			base(instructions);
+			this.set_TargetType(targetType);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new ThisReferenceExpression(this.TargetType, this.instructions);
+			return new ThisReferenceExpression(this.get_TargetType(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ThisReferenceExpression(this.TargetType, null);
+			return new ThisReferenceExpression(this.get_TargetType(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is ThisReferenceExpression))
+			if (other as ThisReferenceExpression == null)
 			{
 				return false;
 			}
-			return this.TargetType.get_FullName() == (other as ThisReferenceExpression).TargetType.get_FullName();
+			return String.op_Equality(this.get_TargetType().get_FullName(), (other as ThisReferenceExpression).get_TargetType().get_FullName());
 		}
 	}
 }

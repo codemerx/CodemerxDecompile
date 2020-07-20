@@ -1,7 +1,6 @@
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -10,45 +9,48 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 {
 	internal class ObjectInitialisationPattern : BaseInitialisationPattern
 	{
-		public ObjectInitialisationPattern(CodePatternsContext patternsContext, TypeSystem typeSystem) : base(patternsContext, typeSystem)
+		public ObjectInitialisationPattern(CodePatternsContext patternsContext, TypeSystem typeSystem)
 		{
+			base(patternsContext, typeSystem);
+			return;
 		}
 
 		private string GetName(Expression initializer)
 		{
-			CodeNodeType codeNodeType = initializer.CodeNodeType;
-			if (codeNodeType == CodeNodeType.PropertyInitializerExpression)
+			V_0 = initializer.get_CodeNodeType();
+			if (V_0 == 85)
 			{
-				return (initializer as PropertyInitializerExpression).Property.get_Name();
+				return (initializer as PropertyInitializerExpression).get_Property().get_Name();
 			}
-			if (codeNodeType != CodeNodeType.FieldInitializerExpression)
+			if (V_0 != 86)
 			{
 				throw new ArgumentException("Expected field or property");
 			}
-			return (initializer as FieldInitializerExpression).Field.get_Name();
+			return (initializer as FieldInitializerExpression).get_Field().get_Name();
 		}
 
 		private bool IsObjectPropertyOrFieldAssignment(BinaryExpression assignment, Expression assignee)
 		{
-			if (assignment == null || !assignment.IsAssignmentExpression)
+			if (assignment == null || !assignment.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			CodeNodeType codeNodeType = assignment.Left.CodeNodeType;
-			if (codeNodeType == CodeNodeType.FieldReferenceExpression)
+			V_2 = assignment.get_Left().get_CodeNodeType();
+			if (V_2 == 30)
 			{
-				return base.CompareTargets(assignee, (assignment.Left as FieldReferenceExpression).Target);
+				V_1 = assignment.get_Left() as FieldReferenceExpression;
+				return this.CompareTargets(assignee, V_1.get_Target());
 			}
-			if (codeNodeType != CodeNodeType.PropertyReferenceExpression)
-			{
-				return false;
-			}
-			PropertyReferenceExpression left = assignment.Left as PropertyReferenceExpression;
-			if (!base.CompareTargets(assignee, left.Target))
+			if (V_2 != 42)
 			{
 				return false;
 			}
-			if (left.IsSetter && !left.IsIndexer)
+			V_0 = assignment.get_Left() as PropertyReferenceExpression;
+			if (!this.CompareTargets(assignee, V_0.get_Target()))
+			{
+				return false;
+			}
+			if (V_0.get_IsSetter() && !V_0.get_IsIndexer())
 			{
 				return true;
 			}
@@ -57,79 +59,103 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		protected override bool TryMatchInternal(StatementCollection statements, int startIndex, out Statement result, out int replacedStatementsCount)
 		{
-			ObjectCreationExpression objectCreationExpression;
-			Expression expression;
-			Expression expression1;
 			result = null;
 			replacedStatementsCount = 0;
-			if (!base.TryGetObjectCreation(statements, startIndex, out objectCreationExpression, out expression))
+			if (!this.TryGetObjectCreation(statements, startIndex, out V_0, out V_1))
 			{
 				return false;
 			}
-			ExpressionCollection expressionCollection = new ExpressionCollection();
-			HashSet<string> strs = new HashSet<string>();
-			if (objectCreationExpression.Initializer != null)
+			V_2 = new ExpressionCollection();
+			V_3 = new HashSet<string>();
+			if (V_0.get_Initializer() != null)
 			{
-				if (objectCreationExpression.Initializer.InitializerType != InitializerType.ObjectInitializer)
+				if (V_0.get_Initializer().get_InitializerType() != 1)
 				{
 					return false;
 				}
-				foreach (Expression expression2 in objectCreationExpression.Initializer.Expressions)
+				V_4 = V_0.get_Initializer().get_Expressions().GetEnumerator();
+				try
 				{
-					string name = this.GetName((expression2 as BinaryExpression).Left);
-					strs.Add(name);
+					while (V_4.MoveNext())
+					{
+						V_5 = V_4.get_Current();
+						V_6 = this.GetName((V_5 as BinaryExpression).get_Left());
+						dummyVar0 = V_3.Add(V_6);
+					}
+				}
+				finally
+				{
+					if (V_4 != null)
+					{
+						V_4.Dispose();
+					}
 				}
 			}
-			for (int i = startIndex + 1; i < statements.Count && base.TryGetNextExpression(statements[i], out expression1); i++)
+			V_7 = startIndex + 1;
+			while (V_7 < statements.get_Count() && this.TryGetNextExpression(statements.get_Item(V_7), out V_8))
 			{
-				BinaryExpression binaryExpression = expression1 as BinaryExpression;
-				if (!this.IsObjectPropertyOrFieldAssignment(binaryExpression, expression))
+				V_9 = V_8 as BinaryExpression;
+				if (!this.IsObjectPropertyOrFieldAssignment(V_9, V_1))
 				{
 					break;
 				}
-				Expression propertyInitializerExpression = null;
-				if (binaryExpression.Left.CodeNodeType == CodeNodeType.PropertyReferenceExpression)
+				V_10 = null;
+				if (V_9.get_Left().get_CodeNodeType() != 42)
 				{
-					PropertyDefinition property = (binaryExpression.Left as PropertyReferenceExpression).Property;
-					if (!this.Visit(property.get_Name(), strs))
+					if (V_9.get_Left().get_CodeNodeType() == 30)
+					{
+						V_13 = (V_9.get_Left() as FieldReferenceExpression).get_Field().Resolve();
+						if (!this.Visit(V_13.get_Name(), V_3))
+						{
+							break;
+						}
+						V_10 = new FieldInitializerExpression(V_13, V_13.get_FieldType(), V_9.get_Left().get_UnderlyingSameMethodInstructions());
+					}
+				}
+				else
+				{
+					V_12 = (V_9.get_Left() as PropertyReferenceExpression).get_Property();
+					if (!this.Visit(V_12.get_Name(), V_3))
 					{
 						break;
 					}
-					propertyInitializerExpression = new PropertyInitializerExpression(property, property.get_PropertyType(), binaryExpression.Left.UnderlyingSameMethodInstructions);
+					V_10 = new PropertyInitializerExpression(V_12, V_12.get_PropertyType(), V_9.get_Left().get_UnderlyingSameMethodInstructions());
 				}
-				else if (binaryExpression.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
-				{
-					FieldDefinition fieldDefinition = (binaryExpression.Left as FieldReferenceExpression).Field.Resolve();
-					if (!this.Visit(fieldDefinition.get_Name(), strs))
-					{
-						break;
-					}
-					propertyInitializerExpression = new FieldInitializerExpression(fieldDefinition, fieldDefinition.get_FieldType(), binaryExpression.Left.UnderlyingSameMethodInstructions);
-				}
-				BinaryExpression binaryExpression1 = new BinaryExpression(BinaryOperator.Assign, propertyInitializerExpression, binaryExpression.Right.Clone(), this.typeSystem, null, false);
-				expressionCollection.Add(binaryExpression1);
+				V_11 = new BinaryExpression(26, V_10, V_9.get_Right().Clone(), this.typeSystem, null, false);
+				V_2.Add(V_11);
+				V_7 = V_7 + 1;
 			}
-			if (expressionCollection.Count == 0)
+			if (V_2.get_Count() == 0)
 			{
 				return false;
 			}
-			if (objectCreationExpression.Initializer != null)
+			if (V_0.get_Initializer() != null)
 			{
-				foreach (Expression expression3 in expressionCollection)
+				V_4 = V_2.GetEnumerator();
+				try
 				{
-					objectCreationExpression.Initializer.Expressions.Add(expression3);
+					while (V_4.MoveNext())
+					{
+						V_15 = V_4.get_Current();
+						V_0.get_Initializer().get_Expressions().Add(V_15);
+					}
+				}
+				finally
+				{
+					if (V_4 != null)
+					{
+						V_4.Dispose();
+					}
 				}
 			}
 			else
 			{
-				InitializerExpression initializerExpression = new InitializerExpression(expressionCollection, InitializerType.ObjectInitializer)
-				{
-					IsMultiLine = true
-				};
-				objectCreationExpression.Initializer = initializerExpression;
+				V_14 = new InitializerExpression(V_2, 1);
+				V_14.set_IsMultiLine(true);
+				V_0.set_Initializer(V_14);
 			}
-			result = statements[startIndex];
-			replacedStatementsCount = expressionCollection.Count + 1;
+			result = statements.get_Item(startIndex);
+			replacedStatementsCount = V_2.get_Count() + 1;
 			return true;
 		}
 

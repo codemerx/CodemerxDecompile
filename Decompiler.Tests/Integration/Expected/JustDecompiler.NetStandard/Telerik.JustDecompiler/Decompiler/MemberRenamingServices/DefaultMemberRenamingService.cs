@@ -1,8 +1,6 @@
 using Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
-using System.Collections.Generic;
-using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
@@ -15,16 +13,28 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		public DefaultMemberRenamingService(ILanguage language, bool renameInvalidMembers)
 		{
+			base();
 			this.language = language;
 			this.renameInvalidMembers = renameInvalidMembers;
+			return;
 		}
 
 		private void DoInitialRenamingAndEscaping(ModuleDefinition module, MemberRenamingData memberRenamingData)
 		{
-			foreach (TypeDefinition type in module.get_Types())
+			V_0 = module.get_Types().GetEnumerator();
+			try
 			{
-				this.ProcessType(type, memberRenamingData);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.ProcessType(V_1, memberRenamingData);
+				}
 			}
+			finally
+			{
+				V_0.Dispose();
+			}
+			return;
 		}
 
 		protected virtual string GetActualTypeName(string typeName)
@@ -34,15 +44,15 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		private IMemberDefinition GetExplicitMemberDefinition(MemberReference member)
 		{
-			if (member is MethodDefinition)
+			if (member as MethodDefinition != null)
 			{
 				return member as MethodDefinition;
 			}
-			if (member is PropertyDefinition)
+			if (member as PropertyDefinition != null)
 			{
 				return member as PropertyDefinition;
 			}
-			if (!(member is EventDefinition))
+			if (member as EventDefinition == null)
 			{
 				return null;
 			}
@@ -51,9 +61,9 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		public MemberRenamingData GetMemberRenamingData(ModuleDefinition module)
 		{
-			MemberRenamingData memberRenamingDatum = new MemberRenamingData();
-			this.DoInitialRenamingAndEscaping(module, memberRenamingDatum);
-			return memberRenamingDatum;
+			V_0 = new MemberRenamingData();
+			this.DoInitialRenamingAndEscaping(module, V_0);
+			return V_0;
 		}
 
 		protected void ProcessType(TypeDefinition type, MemberRenamingData memberRenamingData)
@@ -62,87 +72,136 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 			this.ProcessTypeMembers(type, memberRenamingData);
 			if (type.get_HasNestedTypes())
 			{
-				foreach (TypeDefinition nestedType in type.get_NestedTypes())
+				V_0 = type.get_NestedTypes().GetEnumerator();
+				try
 				{
-					this.ProcessType(nestedType, memberRenamingData);
+					while (V_0.MoveNext())
+					{
+						V_1 = V_0.get_Current();
+						this.ProcessType(V_1, memberRenamingData);
+					}
+				}
+				finally
+				{
+					V_0.Dispose();
 				}
 			}
+			return;
 		}
 
 		private void ProcessTypeMembers(TypeDefinition type, MemberRenamingData memberRenamingData)
 		{
 			if (type.get_HasMethods())
 			{
-				foreach (MethodDefinition method in type.get_Methods())
+				V_0 = type.get_Methods().GetEnumerator();
+				try
 				{
-					this.RenameMember(method, memberRenamingData);
+					while (V_0.MoveNext())
+					{
+						V_1 = V_0.get_Current();
+						this.RenameMember(V_1, memberRenamingData);
+					}
+				}
+				finally
+				{
+					V_0.Dispose();
 				}
 			}
 			if (type.get_HasProperties())
 			{
-				foreach (PropertyDefinition property in type.get_Properties())
+				V_2 = type.get_Properties().GetEnumerator();
+				try
 				{
-					this.RenameMember(property, memberRenamingData);
+					while (V_2.MoveNext())
+					{
+						V_3 = V_2.get_Current();
+						this.RenameMember(V_3, memberRenamingData);
+					}
+				}
+				finally
+				{
+					V_2.Dispose();
 				}
 			}
 			if (type.get_HasFields())
 			{
-				foreach (FieldDefinition field in type.get_Fields())
+				V_4 = type.get_Fields().GetEnumerator();
+				try
 				{
-					this.RenameMember(field, memberRenamingData);
+					while (V_4.MoveNext())
+					{
+						V_5 = V_4.get_Current();
+						this.RenameMember(V_5, memberRenamingData);
+					}
+				}
+				finally
+				{
+					V_4.Dispose();
 				}
 			}
 			if (type.get_HasEvents())
 			{
-				foreach (EventDefinition @event in type.get_Events())
+				V_6 = type.get_Events().GetEnumerator();
+				try
 				{
-					this.RenameMember(@event, memberRenamingData);
+					while (V_6.MoveNext())
+					{
+						V_7 = V_6.get_Current();
+						this.RenameMember(V_7, memberRenamingData);
+					}
+				}
+				finally
+				{
+					V_6.Dispose();
 				}
 			}
+			return;
 		}
 
 		private void RenameMember(MemberReference member, MemberRenamingData memberRenamingData)
 		{
-			uint num = member.get_MetadataToken().ToUInt32();
-			IMemberDefinition explicitMemberDefinition = this.GetExplicitMemberDefinition(member);
-			if (explicitMemberDefinition != null && Utilities.IsExplicitInterfaceImplementataion(explicitMemberDefinition))
+			V_0 = member.get_MetadataToken().ToUInt32();
+			V_1 = this.GetExplicitMemberDefinition(member);
+			if (V_1 != null && Utilities.IsExplicitInterfaceImplementataion(V_1))
 			{
-				string explicitName = this.language.GetExplicitName(explicitMemberDefinition);
-				memberRenamingData.RenamedMembersMap[num] = Utilities.EscapeNameIfNeeded(explicitName, this.language);
+				V_3 = this.language.GetExplicitName(V_1);
+				memberRenamingData.get_RenamedMembersMap().set_Item(V_0, Utilities.EscapeNameIfNeeded(V_3, this.language));
 				return;
 			}
-			string nonGenericName = GenericHelper.GetNonGenericName(member.get_Name());
-			string str = nonGenericName;
-			if (this.renameInvalidMembers && !this.language.IsValidIdentifier(str))
+			stackVariable10 = GenericHelper.GetNonGenericName(member.get_Name());
+			V_4 = stackVariable10;
+			if (this.renameInvalidMembers && !this.language.IsValidIdentifier(V_4))
 			{
-				str = this.language.ReplaceInvalidCharactersInIdentifier(str);
+				V_4 = this.language.ReplaceInvalidCharactersInIdentifier(V_4);
 			}
-			if (nonGenericName != str)
+			if (String.op_Inequality(stackVariable10, V_4))
 			{
-				memberRenamingData.RenamedMembers.Add(num);
+				dummyVar0 = memberRenamingData.get_RenamedMembers().Add(V_0);
 			}
-			str = Utilities.EscapeNameIfNeeded(str, this.language);
-			memberRenamingData.RenamedMembersMap[num] = str;
+			V_4 = Utilities.EscapeNameIfNeeded(V_4, this.language);
+			memberRenamingData.get_RenamedMembersMap().set_Item(V_0, V_4);
+			return;
 		}
 
 		protected void RenameType(TypeDefinition type, MemberRenamingData memberRenamingData)
 		{
-			string actualTypeName = this.GetActualTypeName(type.get_Name());
-			string str = actualTypeName;
-			if (this.renameInvalidMembers && !this.language.IsValidIdentifier(str))
+			stackVariable3 = this.GetActualTypeName(type.get_Name());
+			V_0 = stackVariable3;
+			if (this.renameInvalidMembers && !this.language.IsValidIdentifier(V_0))
 			{
-				str = this.language.ReplaceInvalidCharactersInIdentifier(str);
+				V_0 = this.language.ReplaceInvalidCharactersInIdentifier(V_0);
 			}
-			uint num = type.get_MetadataToken().ToUInt32();
-			if (actualTypeName != str)
+			V_1 = type.get_MetadataToken().ToUInt32();
+			if (String.op_Inequality(stackVariable3, V_0))
 			{
-				memberRenamingData.RenamedMembers.Add(num);
+				dummyVar0 = memberRenamingData.get_RenamedMembers().Add(V_1);
 			}
-			if (this.language.IsGlobalKeyword(str))
+			if (this.language.IsGlobalKeyword(V_0))
 			{
-				str = this.language.EscapeWord(str);
+				V_0 = this.language.EscapeWord(V_0);
 			}
-			memberRenamingData.RenamedMembersMap[num] = str;
+			memberRenamingData.get_RenamedMembersMap().set_Item(V_1, V_0);
+			return;
 		}
 	}
 }

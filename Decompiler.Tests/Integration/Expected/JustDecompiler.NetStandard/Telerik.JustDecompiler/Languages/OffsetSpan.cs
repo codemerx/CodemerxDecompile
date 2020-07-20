@@ -12,6 +12,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.StartOffset = start;
 			this.EndOffset = end;
+			return;
 		}
 	}
 }

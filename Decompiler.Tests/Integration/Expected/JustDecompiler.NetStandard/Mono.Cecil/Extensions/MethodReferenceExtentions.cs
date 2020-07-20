@@ -2,7 +2,6 @@ using Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Mono.Cecil.Extensions
@@ -13,155 +12,167 @@ namespace Mono.Cecil.Extensions
 
 		static MethodReferenceExtentions()
 		{
-			MethodReferenceExtentions.compilerGeneratedAttributeName = typeof(CompilerGeneratedAttribute).FullName;
-		}
+			MethodReferenceExtentions.compilerGeneratedAttributeName = Type.GetTypeFromHandle(// 
+			// Current member / type: System.Void Mono.Cecil.Extensions.MethodReferenceExtentions::.cctor()
+			// Exception in: System.Void .cctor()
+			// Specified method is not supported.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		private static bool FilterParameter(IList<ParameterDefinition> source, IList<ParameterDefinition> desitnation)
 		{
-			bool flag = true;
-			if (source.Count != desitnation.Count)
+			V_0 = true;
+			if (source.get_Count() != desitnation.get_Count())
 			{
-				flag = false;
+				V_0 = false;
 			}
 			else
 			{
-				int num = 0;
-				while (num < source.Count)
+				V_1 = 0;
+				while (V_1 < source.get_Count())
 				{
-					if (source[num].get_ParameterType().get_Name() == desitnation[num].get_ParameterType().get_Name())
+					if (!String.op_Inequality(source.get_Item(V_1).get_ParameterType().get_Name(), desitnation.get_Item(V_1).get_ParameterType().get_Name()))
 					{
-						num++;
+						V_1 = V_1 + 1;
 					}
 					else
 					{
-						flag = false;
-						return flag;
+						V_0 = false;
+						goto Label0;
 					}
 				}
 			}
-			return flag;
+		Label0:
+			return V_0;
 		}
 
-		private static MethodReference GetExplicitlyImplementedMethodFromInterface(this MethodReference method, TypeDefinition @interface)
+		private static MethodReference GetExplicitlyImplementedMethodFromInterface(this MethodReference method, TypeDefinition interface)
 		{
-			MethodReference methodReference;
-			if (@interface == null)
+			if (interface == null)
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.get_IsInterface())
+			if (!interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
+			if (String.op_Equality(method.get_DeclaringType().get_FullName(), interface.get_FullName()))
 			{
 				return method;
 			}
-			MethodDefinition methodDefinition = method.Resolve();
-			if (methodDefinition == null)
+			V_0 = method.Resolve();
+			if (V_0 == null)
 			{
 				return null;
 			}
-			if (methodDefinition.get_HasOverrides())
+			if (V_0.get_HasOverrides())
 			{
-				Collection<MethodDefinition>.Enumerator enumerator = @interface.get_Methods().GetEnumerator();
+				V_1 = interface.get_Methods().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						MethodDefinition current = enumerator.get_Current();
-						Collection<MethodReference>.Enumerator enumerator1 = methodDefinition.get_Overrides().GetEnumerator();
+						V_2 = V_1.get_Current();
+						V_3 = V_0.get_Overrides().GetEnumerator();
 						try
 						{
-							while (enumerator1.MoveNext())
+							while (V_3.MoveNext())
 							{
-								if (enumerator1.get_Current().Resolve().get_FullName() != current.get_FullName())
+								if (!String.op_Equality(V_3.get_Current().Resolve().get_FullName(), V_2.get_FullName()))
 								{
 									continue;
 								}
-								methodReference = current;
-								return methodReference;
+								V_4 = V_2;
+								goto Label1;
 							}
 						}
 						finally
 						{
-							enumerator1.Dispose();
+							V_3.Dispose();
 						}
 					}
-					return null;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return methodReference;
+			Label1:
+				return V_4;
 			}
+		Label0:
 			return null;
 		}
 
 		public static ICollection<ImplementedMember> GetExplicitlyImplementedMethods(this MethodDefinition method)
 		{
-			HashSet<ImplementedMember> implementedMembers = new HashSet<ImplementedMember>();
+			V_0 = new HashSet<ImplementedMember>();
 			if (!method.IsExplicitImplementation())
 			{
-				return implementedMembers;
+				return V_0;
 			}
-			foreach (TypeReference @interface in method.get_DeclaringType().get_Interfaces())
+			V_1 = method.get_DeclaringType().get_Interfaces().GetEnumerator();
+			try
 			{
-				TypeDefinition typeDefinition = @interface.Resolve();
-				if (typeDefinition == null)
+				while (V_1.MoveNext())
 				{
-					continue;
+					V_2 = V_1.get_Current();
+					V_3 = V_2.Resolve();
+					if (V_3 == null)
+					{
+						continue;
+					}
+					V_4 = method.GetExplicitlyImplementedMethodFromInterface(V_3);
+					if (V_4 == null)
+					{
+						continue;
+					}
+					V_5 = new ImplementedMember(V_2, V_4);
+					if (V_0.Contains(V_5))
+					{
+						continue;
+					}
+					dummyVar0 = V_0.Add(V_5);
 				}
-				MethodReference explicitlyImplementedMethodFromInterface = method.GetExplicitlyImplementedMethodFromInterface(typeDefinition);
-				if (explicitlyImplementedMethodFromInterface == null)
-				{
-					continue;
-				}
-				ImplementedMember implementedMember = new ImplementedMember(@interface, explicitlyImplementedMethodFromInterface);
-				if (implementedMembers.Contains(implementedMember))
-				{
-					continue;
-				}
-				implementedMembers.Add(implementedMember);
 			}
-			return implementedMembers.ToList<ImplementedMember>();
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0.ToList<ImplementedMember>();
 		}
 
 		private static MethodDefinition GetImplementedMethodFromGenericInstanceType(this MethodDefinition self, GenericInstanceType type)
 		{
-			MethodDefinition current;
-			TypeReference typeReference;
-			TypeReference typeReference1;
-			MethodDefinition methodDefinition;
-			TypeDefinition typeDefinition = type.Resolve();
-			if (typeDefinition == null)
+			V_0 = type.Resolve();
+			if (V_0 == null)
 			{
 				return null;
 			}
-			Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.get_Methods().GetEnumerator();
+			V_1 = V_0.get_Methods().GetEnumerator();
 			try
 			{
 				do
 				{
 				Label2:
-					if (enumerator.MoveNext())
+					if (V_1.MoveNext())
 					{
-						current = enumerator.get_Current();
-						if (current.get_Name() == self.get_Name())
+						V_2 = V_1.get_Current();
+						if (String.op_Equality(V_2.get_Name(), self.get_Name()))
 						{
-							if (!current.get_HasParameters() || !self.get_HasParameters() || current.get_Parameters().get_Count() != self.get_Parameters().get_Count())
+							if (!V_2.get_HasParameters() || !self.get_HasParameters() || V_2.get_Parameters().get_Count() != self.get_Parameters().get_Count())
 							{
 								goto Label1;
 							}
-							if (!current.get_ReturnType().get_IsGenericParameter())
+							if (!V_2.get_ReturnType().get_IsGenericParameter())
 							{
 								continue;
 							}
-							int position = (current.get_ReturnType() as GenericParameter).get_Position();
-							if (type.get_PostionToArgument().TryGetValue(position, out typeReference))
+							V_3 = (V_2.get_ReturnType() as GenericParameter).get_Position();
+							if (type.get_PostionToArgument().TryGetValue(V_3, out V_4))
 							{
-								if (typeReference.get_FullName() == self.get_ReturnType().get_FullName())
+								if (!String.op_Inequality(V_4.get_FullName(), self.get_ReturnType().get_FullName()))
 								{
 									break;
 								}
@@ -179,233 +190,283 @@ namespace Mono.Cecil.Extensions
 					}
 					else
 					{
-						return null;
+						goto Label0;
 					}
 				}
-				while (current.get_ReturnType().get_FullName() != self.get_ReturnType().get_FullName());
-				for (int i = 0; i < current.get_Parameters().get_Count(); i++)
+				while (String.op_Inequality(V_2.get_ReturnType().get_FullName(), self.get_ReturnType().get_FullName()));
+				V_5 = 0;
+				while (V_5 < V_2.get_Parameters().get_Count())
 				{
-					TypeReference parameterType = current.get_Parameters().get_Item(i).get_ParameterType();
-					if (!parameterType.get_IsGenericParameter())
+					V_6 = V_2.get_Parameters().get_Item(V_5).get_ParameterType();
+					if (!V_6.get_IsGenericParameter())
 					{
-						bool fullName = parameterType.get_FullName() != self.get_Parameters().get_Item(i).get_ParameterType().get_FullName();
+						dummyVar0 = String.op_Inequality(V_6.get_FullName(), self.get_Parameters().get_Item(V_5).get_ParameterType().get_FullName());
 					}
 					else
 					{
-						int num = (parameterType as GenericParameter).get_Position();
-						if (type.get_PostionToArgument().TryGetValue(num, out typeReference1) && typeReference1.get_FullName() != self.get_Parameters().get_Item(i).get_ParameterType().get_FullName())
+						V_7 = (V_6 as GenericParameter).get_Position();
+						if (type.get_PostionToArgument().TryGetValue(V_7, out V_8) && String.op_Inequality(V_8.get_FullName(), self.get_Parameters().get_Item(V_5).get_ParameterType().get_FullName()))
 						{
 						}
 					}
+					V_5 = V_5 + 1;
 				}
 			Label1:
-				methodDefinition = current;
+				V_9 = V_2;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_1.Dispose();
 			}
-			return methodDefinition;
+			return V_9;
+		Label0:
+			return null;
 		}
 
-		private static MethodReference GetImplementedMethodFromInterface(this MethodReference method, TypeDefinition @interface)
+		private static MethodReference GetImplementedMethodFromInterface(this MethodReference method, TypeDefinition interface)
 		{
-			MethodReference methodReference;
-			if (@interface == null)
+			if (interface == null)
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.get_IsInterface())
+			if (!interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
-			if (typeDefinition == null)
+			V_0 = method.get_DeclaringType().Resolve();
+			if (V_0 == null)
 			{
 				return null;
 			}
-			bool flag = false;
-			foreach (TypeDefinition baseType in typeDefinition.GetBaseTypes())
-			{
-				if (baseType.get_FullName() != @interface.get_FullName())
-				{
-					continue;
-				}
-				flag = true;
-				goto Label0;
-			}
-		Label0:
-			if (!flag)
-			{
-				return null;
-			}
-			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
-			{
-				return method;
-			}
-			MethodReference explicitlyImplementedMethodFromInterface = method.GetExplicitlyImplementedMethodFromInterface(@interface);
-			if (explicitlyImplementedMethodFromInterface != null)
-			{
-				return explicitlyImplementedMethodFromInterface;
-			}
-			Collection<MethodDefinition>.Enumerator enumerator = @interface.get_Methods().GetEnumerator();
+			V_1 = false;
+			V_3 = V_0.GetBaseTypes().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_3.MoveNext())
 				{
-					MethodDefinition current = enumerator.get_Current();
-					if (!method.HasSameSignatureWith(current))
+					if (!String.op_Equality(V_3.get_Current().get_FullName(), interface.get_FullName()))
 					{
 						continue;
 					}
-					methodReference = current;
-					return methodReference;
+					V_1 = true;
+					goto Label0;
 				}
-				return null;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				((IDisposable)V_3).Dispose();
 			}
-			return methodReference;
+		Label0:
+			if (!V_1)
+			{
+				return null;
+			}
+			if (String.op_Equality(method.get_DeclaringType().get_FullName(), interface.get_FullName()))
+			{
+				return method;
+			}
+			V_2 = method.GetExplicitlyImplementedMethodFromInterface(interface);
+			if (V_2 != null)
+			{
+				return V_2;
+			}
+			V_4 = interface.get_Methods().GetEnumerator();
+			try
+			{
+				while (V_4.MoveNext())
+				{
+					V_5 = V_4.get_Current();
+					if (!method.HasSameSignatureWith(V_5))
+					{
+						continue;
+					}
+					V_6 = V_5;
+					goto Label2;
+				}
+				goto Label1;
+			}
+			finally
+			{
+				V_4.Dispose();
+			}
+		Label2:
+			return V_6;
+		Label1:
+			return null;
 		}
 
 		public static ICollection<ImplementedMember> GetImplementedMethods(this MethodDefinition method)
 		{
-			HashSet<ImplementedMember> implementedMembers = new HashSet<ImplementedMember>();
-			foreach (TypeReference @interface in method.get_DeclaringType().get_Interfaces())
+			V_0 = new HashSet<ImplementedMember>();
+			V_1 = method.get_DeclaringType().get_Interfaces().GetEnumerator();
+			try
 			{
-				if (@interface is GenericInstanceType)
+				while (V_1.MoveNext())
 				{
-					MethodReference implementedMethodFromGenericInstanceType = method.GetImplementedMethodFromGenericInstanceType(@interface as GenericInstanceType);
-					if (implementedMethodFromGenericInstanceType != null)
+					V_2 = V_1.get_Current();
+					if (V_2 as GenericInstanceType != null)
 					{
-						ImplementedMember implementedMember = new ImplementedMember(@interface, implementedMethodFromGenericInstanceType);
-						if (!implementedMembers.Contains(implementedMember))
+						V_5 = method.GetImplementedMethodFromGenericInstanceType(V_2 as GenericInstanceType);
+						if (V_5 != null)
 						{
-							implementedMembers.Add(implementedMember);
-							continue;
+							V_6 = new ImplementedMember(V_2, V_5);
+							if (!V_0.Contains(V_6))
+							{
+								dummyVar0 = V_0.Add(V_6);
+								continue;
+							}
 						}
 					}
+					V_3 = V_2.Resolve();
+					if (V_3 == null)
+					{
+						continue;
+					}
+					V_7 = method.GetImplementedMethodFromInterface(V_3);
+					if (V_7 == null)
+					{
+						continue;
+					}
+					V_8 = new ImplementedMember(V_2, V_7);
+					if (V_0.Contains(V_8))
+					{
+						continue;
+					}
+					dummyVar1 = V_0.Add(V_8);
 				}
-				TypeDefinition typeDefinition = @interface.Resolve();
-				if (typeDefinition == null)
-				{
-					continue;
-				}
-				MethodReference implementedMethodFromInterface = method.GetImplementedMethodFromInterface(typeDefinition);
-				if (implementedMethodFromInterface == null)
-				{
-					continue;
-				}
-				ImplementedMember implementedMember1 = new ImplementedMember(@interface, implementedMethodFromInterface);
-				if (implementedMembers.Contains(implementedMember1))
-				{
-					continue;
-				}
-				implementedMembers.Add(implementedMember1);
 			}
-			return implementedMembers.ToList<ImplementedMember>();
+			finally
+			{
+				V_1.Dispose();
+			}
+			return V_0.ToList<ImplementedMember>();
 		}
 
 		private static string GetMethodSignature(this MethodReference method)
 		{
-			string fullName = method.get_FullName();
-			return fullName.Substring(fullName.IndexOf("::"));
+			stackVariable1 = method.get_FullName();
+			return stackVariable1.Substring(stackVariable1.IndexOf("::"));
 		}
 
 		public static ICollection<MethodDefinition> GetOverridenAndImplementedMethods(this MethodDefinition method)
 		{
-			TypeReference baseType = null;
-			HashSet<MethodDefinition> methodDefinitions = new HashSet<MethodDefinition>();
-			methodDefinitions.Add(method);
-			foreach (ImplementedMember implementedMethod in method.GetImplementedMethods())
+			V_0 = new HashSet<MethodDefinition>();
+			dummyVar0 = V_0.Add(method);
+			V_2 = method.GetImplementedMethods().GetEnumerator();
+			try
 			{
-				if (!(implementedMethod.Member is MethodReference))
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_3 = V_2.get_Current();
+					if (V_3.get_Member() as MethodReference == null)
+					{
+						continue;
+					}
+					V_4 = (V_3.get_Member() as MethodReference).Resolve();
+					if (V_4 == null)
+					{
+						continue;
+					}
+					dummyVar1 = V_0.Add(V_4);
 				}
-				MethodDefinition methodDefinition = (implementedMethod.Member as MethodReference).Resolve();
-				if (methodDefinition == null)
-				{
-					continue;
-				}
-				methodDefinitions.Add(methodDefinition);
 			}
-			for (TypeReference i = method.get_DeclaringType().get_BaseType(); i != null; i = baseType)
+			finally
 			{
-				TypeDefinition typeDefinition = i.Resolve();
-				if (i is GenericInstanceType)
+				if (V_2 != null)
 				{
-					MethodDefinition implementedMethodFromGenericInstanceType = method.GetImplementedMethodFromGenericInstanceType(i as GenericInstanceType);
-					if (!methodDefinitions.Contains(implementedMethodFromGenericInstanceType))
-					{
-						methodDefinitions.Add(implementedMethodFromGenericInstanceType);
-					}
+					V_2.Dispose();
 				}
-				else if (typeDefinition != null && typeDefinition.get_HasMethods())
+			}
+			V_1 = method.get_DeclaringType().get_BaseType();
+			while (V_1 != null)
+			{
+				V_5 = V_1.Resolve();
+				if (V_1 as GenericInstanceType == null)
 				{
-					foreach (MethodDefinition methodDefinition1 in typeDefinition.get_Methods())
+					if (V_5 != null && V_5.get_HasMethods())
 					{
-						if (!method.HasSameSignatureWith(methodDefinition1) || methodDefinitions.Contains(methodDefinition1))
+						V_7 = V_5.get_Methods().GetEnumerator();
+						try
 						{
-							continue;
+							while (V_7.MoveNext())
+							{
+								V_8 = V_7.get_Current();
+								if (!method.HasSameSignatureWith(V_8) || V_0.Contains(V_8))
+								{
+									continue;
+								}
+								dummyVar3 = V_0.Add(V_8);
+							}
 						}
-						methodDefinitions.Add(methodDefinition1);
+						finally
+						{
+							V_7.Dispose();
+						}
 					}
-				}
-				if (typeDefinition == null || typeDefinition.get_BaseType() == null)
-				{
-					baseType = null;
 				}
 				else
 				{
-					baseType = typeDefinition.get_BaseType();
+					V_6 = method.GetImplementedMethodFromGenericInstanceType(V_1 as GenericInstanceType);
+					if (!V_0.Contains(V_6))
+					{
+						dummyVar2 = V_0.Add(V_6);
+					}
 				}
+				if (V_5 == null || V_5.get_BaseType() == null)
+				{
+					stackVariable32 = null;
+				}
+				else
+				{
+					stackVariable32 = V_5.get_BaseType();
+				}
+				V_1 = stackVariable32;
 			}
-			return methodDefinitions.ToList<MethodDefinition>();
+			return V_0.ToList<MethodDefinition>();
 		}
 
 		public static bool HasCompilerGeneratedAttribute(this ICustomAttributeProvider attributeProvider)
 		{
-			bool flag;
 			if (attributeProvider.get_CustomAttributes() == null)
 			{
 				return false;
 			}
-			Collection<CustomAttribute>.Enumerator enumerator = attributeProvider.get_CustomAttributes().GetEnumerator();
+			V_0 = attributeProvider.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					CustomAttribute current = enumerator.get_Current();
-					if (current.get_Constructor() == null || current.get_AttributeType() == null || !(current.get_AttributeType().get_FullName() == MethodReferenceExtentions.compilerGeneratedAttributeName))
+					V_1 = V_0.get_Current();
+					if (V_1.get_Constructor() == null || V_1.get_AttributeType() == null || !String.op_Equality(V_1.get_AttributeType().get_FullName(), MethodReferenceExtentions.compilerGeneratedAttributeName))
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_2 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			return false;
 		}
 
 		public static bool HasSameSignatureWith(this MethodReference self, MethodReference other)
 		{
-			if (self.GetMethodSignature() != other.GetMethodSignature())
+			if (!String.op_Equality(self.GetMethodSignature(), other.GetMethodSignature()))
 			{
 				return false;
 			}
-			if (self.get_ReturnType().get_FullName() == other.get_ReturnType().get_FullName())
+			if (!String.op_Inequality(self.get_ReturnType().get_FullName(), other.get_ReturnType().get_FullName()))
 			{
 				return true;
 			}
-			if (self.get_ReturnType() is GenericParameter && other.get_ReturnType() is GenericParameter && (self.get_ReturnType() as GenericParameter).get_Position() == (other.get_ReturnType() as GenericParameter).get_Position())
+			if (self.get_ReturnType() as GenericParameter != null && other.get_ReturnType() as GenericParameter != null && (self.get_ReturnType() as GenericParameter).get_Position() == (other.get_ReturnType() as GenericParameter).get_Position())
 			{
 				return true;
 			}
@@ -414,151 +475,162 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsCompilerGenerated(this MethodReference method, bool isAssemblyResolverChacheEnabled = true)
 		{
-			MethodDefinition methodDefinition = method as MethodDefinition ?? method.ResolveDefinition(isAssemblyResolverChacheEnabled);
-			if (methodDefinition == null)
+			V_0 = method as MethodDefinition;
+			if (V_0 == null)
+			{
+				V_0 = method.ResolveDefinition(isAssemblyResolverChacheEnabled);
+			}
+			if (V_0 == null)
 			{
 				return false;
 			}
-			return methodDefinition.HasCompilerGeneratedAttribute();
+			return V_0.HasCompilerGeneratedAttribute();
 		}
 
 		public static bool IsExplicitImplementation(this MethodReference method)
 		{
-			MethodDefinition methodDefinition = method.Resolve();
-			if (methodDefinition == null)
+			V_0 = method.Resolve();
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (!methodDefinition.get_IsPrivate())
+			if (!V_0.get_IsPrivate())
 			{
 				return false;
 			}
-			return methodDefinition.get_HasOverrides();
+			return V_0.get_HasOverrides();
 		}
 
-		public static bool IsExplicitImplementationOf(this MethodReference method, TypeDefinition @interface)
+		public static bool IsExplicitImplementationOf(this MethodReference method, TypeDefinition interface)
 		{
-			bool flag;
-			if (@interface == null)
+			if (interface == null)
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.get_IsInterface())
+			if (!interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
+			if (String.op_Equality(method.get_DeclaringType().get_FullName(), interface.get_FullName()))
 			{
 				return true;
 			}
-			MethodDefinition methodDefinition = method.Resolve();
-			if (methodDefinition == null)
+			V_0 = method.Resolve();
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (methodDefinition.get_HasOverrides())
+			if (V_0.get_HasOverrides())
 			{
-				Collection<MethodReference>.Enumerator enumerator = methodDefinition.get_Overrides().GetEnumerator();
+				V_1 = V_0.get_Overrides().GetEnumerator();
 				try
 				{
-					while (enumerator.MoveNext())
+					while (V_1.MoveNext())
 					{
-						MethodDefinition methodDefinition1 = enumerator.get_Current().Resolve();
-						if (!@interface.get_Methods().Contains(methodDefinition1))
+						V_2 = V_1.get_Current().Resolve();
+						if (!interface.get_Methods().Contains(V_2))
 						{
 							continue;
 						}
-						flag = true;
-						return flag;
+						V_3 = true;
+						goto Label1;
 					}
-					return false;
+					goto Label0;
 				}
 				finally
 				{
-					enumerator.Dispose();
+					V_1.Dispose();
 				}
-				return flag;
+			Label1:
+				return V_3;
 			}
+		Label0:
 			return false;
 		}
 
-		public static bool IsImplementationOf(this MethodReference method, TypeDefinition @interface)
+		public static bool IsImplementationOf(this MethodReference method, TypeDefinition interface)
 		{
-			bool flag;
-			if (@interface == null)
+			if (interface == null)
 			{
 				throw new ArgumentNullException("@interface can not be null.");
 			}
-			if (!@interface.get_IsInterface())
+			if (!interface.get_IsInterface())
 			{
 				throw new ArgumentOutOfRangeException("The @interface argument is not an interface definition.");
 			}
-			if (method.get_DeclaringType().get_FullName() == @interface.get_FullName())
+			if (String.op_Equality(method.get_DeclaringType().get_FullName(), interface.get_FullName()))
 			{
 				return true;
 			}
-			if (method.IsExplicitImplementationOf(@interface))
+			if (method.IsExplicitImplementationOf(interface))
 			{
 				return true;
 			}
-			bool flag1 = false;
-			string methodSignature = method.GetMethodSignature();
-			foreach (MethodDefinition methodDefinition in @interface.get_Methods())
-			{
-				if (methodDefinition.GetMethodSignature() != methodSignature)
-				{
-					continue;
-				}
-				flag1 = true;
-			}
-			if (!flag1)
-			{
-				return false;
-			}
-			TypeDefinition typeDefinition = method.get_DeclaringType().Resolve();
-			if (typeDefinition == null)
-			{
-				return false;
-			}
-			List<TypeDefinition>.Enumerator enumerator = typeDefinition.GetBaseTypes().GetEnumerator();
+			V_0 = false;
+			V_1 = method.GetMethodSignature();
+			V_3 = interface.get_Methods().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_3.MoveNext())
 				{
-					if (enumerator.Current.get_FullName() != @interface.get_FullName())
+					if (!String.op_Equality(V_3.get_Current().GetMethodSignature(), V_1))
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_0 = true;
 				}
-				return false;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				V_3.Dispose();
 			}
-			return flag;
+			if (!V_0)
+			{
+				return false;
+			}
+			V_2 = method.get_DeclaringType().Resolve();
+			if (V_2 == null)
+			{
+				return false;
+			}
+			V_4 = V_2.GetBaseTypes().GetEnumerator();
+			try
+			{
+				while (V_4.MoveNext())
+				{
+					if (!String.op_Equality(V_4.get_Current().get_FullName(), interface.get_FullName()))
+					{
+						continue;
+					}
+					V_5 = true;
+					goto Label1;
+				}
+				goto Label0;
+			}
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+		Label1:
+			return V_5;
+		Label0:
+			return false;
 		}
 
 		public static MethodDefinition ResolveDefinition(this MethodReference refernece, bool isAssemblyResolverChacheEnabled = true)
 		{
-			TypeDefinition declaringType = refernece.get_DeclaringType() as TypeDefinition;
-			if (declaringType == null && refernece.get_DeclaringType() != null)
+			V_0 = new MethodReferenceExtentions.u003cu003ec__DisplayClass1_0();
+			V_0.refernece = refernece;
+			V_1 = V_0.refernece.get_DeclaringType() as TypeDefinition;
+			if (V_1 == null && V_0.refernece.get_DeclaringType() != null)
 			{
-				declaringType = refernece.get_DeclaringType().Resolve();
+				V_1 = V_0.refernece.get_DeclaringType().Resolve();
 			}
-			if (declaringType == null)
+			if (V_1 == null)
 			{
 				return null;
 			}
-			return declaringType.get_Methods().FirstOrDefault<MethodDefinition>((MethodDefinition x) => {
-				if (x.get_Name() != refernece.get_Name())
-				{
-					return false;
-				}
-				return MethodReferenceExtentions.FilterParameter(x.get_Parameters(), refernece.get_Parameters());
-			});
+			return V_1.get_Methods().FirstOrDefault<MethodDefinition>(new Func<MethodDefinition, bool>(V_0.u003cResolveDefinitionu003eb__0));
 		}
 	}
 }

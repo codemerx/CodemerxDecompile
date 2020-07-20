@@ -2,7 +2,6 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -12,7 +11,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 {
 	public class SwitchStatement : ConditionStatement
 	{
-		private SwitchCaseCollection cases = new SwitchCaseCollection();
+		private SwitchCaseCollection cases;
 
 		private SwitchCase[] casesAsArray;
 
@@ -26,13 +25,25 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			{
 				if (this.needsRefreshing)
 				{
-					this.casesAsArray = new SwitchCase[this.cases.Count];
-					int num = 0;
-					foreach (SwitchCase @case in this.cases)
+					this.casesAsArray = new SwitchCase[this.cases.get_Count()];
+					V_0 = 0;
+					V_1 = this.cases.GetEnumerator();
+					try
 					{
-						int num1 = num;
-						num = num1 + 1;
-						this.casesAsArray[num1] = @case;
+						while (V_1.MoveNext())
+						{
+							V_2 = V_1.get_Current();
+							stackVariable19 = V_0;
+							V_0 = stackVariable19 + 1;
+							this.casesAsArray[stackVariable19] = V_2;
+						}
+					}
+					finally
+					{
+						if (V_1 != null)
+						{
+							V_1.Dispose();
+						}
 					}
 					this.needsRefreshing = false;
 				}
@@ -41,11 +52,24 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			set
 			{
 				this.cases = new SwitchCaseCollection();
-				foreach (SwitchCase switchCase in value)
+				V_0 = value.GetEnumerator();
+				try
 				{
-					this.AddCase(switchCase);
+					while (V_0.MoveNext())
+					{
+						V_1 = V_0.get_Current();
+						this.AddCase(V_1);
+					}
+				}
+				finally
+				{
+					if (V_0 != null)
+					{
+						V_0.Dispose();
+					}
 				}
 				this.needsRefreshing = true;
+				return;
 			}
 		}
 
@@ -53,12 +77,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				SwitchStatement switchStatement = null;
-				yield return switchStatement.Condition;
-				foreach (SwitchCase @case in switchStatement.Cases)
-				{
-					yield return @case;
-				}
+				stackVariable1 = new SwitchStatement.u003cget_Childrenu003ed__9(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -66,7 +87,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.SwitchStatement;
+				return 15;
 			}
 		}
 
@@ -78,17 +99,21 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			}
 		}
 
-		public SwitchStatement(Expression condition, Instruction instruction) : base(condition)
+		public SwitchStatement(Expression condition, Instruction instruction)
 		{
+			this.cases = new SwitchCaseCollection();
+			base(condition);
 			this.needsRefreshing = true;
 			this.switchInstruction = instruction;
+			return;
 		}
 
-		public void AddCase(SwitchCase @case)
+		public void AddCase(SwitchCase case)
 		{
-			this.cases.Add(@case);
-			@case.Parent = this;
+			this.cases.Add(case);
+			case.set_Parent(this);
 			this.needsRefreshing = true;
+			return;
 		}
 
 		public override Statement Clone()
@@ -98,13 +123,42 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		private Statement CloneStatement(bool copyInstructions)
 		{
-			SwitchStatement switchStatement = (copyInstructions ? new SwitchStatement(base.Condition.Clone(), this.switchInstruction) : new SwitchStatement(base.Condition.CloneExpressionOnly(), null));
-			foreach (SwitchCase @case in this.cases)
+			if (copyInstructions)
 			{
-				switchStatement.AddCase((SwitchCase)((copyInstructions ? @case.Clone() : @case.CloneStatementOnly())));
+				stackVariable6 = new SwitchStatement(this.get_Condition().Clone(), this.switchInstruction);
 			}
-			base.CopyParentAndLabel(switchStatement);
-			return switchStatement;
+			else
+			{
+				stackVariable6 = new SwitchStatement(this.get_Condition().CloneExpressionOnly(), null);
+			}
+			V_0 = stackVariable6;
+			V_1 = this.cases.GetEnumerator();
+			try
+			{
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					stackVariable14 = V_0;
+					if (copyInstructions)
+					{
+						stackVariable17 = V_2.Clone();
+					}
+					else
+					{
+						stackVariable17 = V_2.CloneStatementOnly();
+					}
+					stackVariable14.AddCase((SwitchCase)stackVariable17);
+				}
+			}
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 
 		public override Statement CloneStatementOnly()
@@ -114,11 +168,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			SwitchStatement switchStatement = null;
-			if (switchStatement.switchInstruction != null)
-			{
-				yield return switchStatement.switchInstruction;
-			}
+			stackVariable1 = new SwitchStatement.u003cGetOwnInstructionsu003ed__7(-2);
+			stackVariable1.u003cu003e4__this = this;
+			return stackVariable1;
 		}
 	}
 }

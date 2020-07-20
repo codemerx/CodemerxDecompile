@@ -1,5 +1,4 @@
 using Mono.Cecil;
-using Mono.Cecil.Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
@@ -10,57 +9,74 @@ namespace Telerik.JustDecompiler.Common
 	{
 		public EnumValueToFieldCombinationMatcher()
 		{
+			base();
+			return;
 		}
 
 		public static List<FieldDefinition> GetEnumFieldDefinitionByValue(Collection<FieldDefinition> fieldDefinitions, object value, Collection<CustomAttribute> customAttributes)
 		{
-			long num;
-			bool flag = false;
-			foreach (CustomAttribute customAttribute in customAttributes)
+			V_0 = false;
+			V_3 = customAttributes.GetEnumerator();
+			try
 			{
-				if (customAttribute.get_AttributeType().get_FullName() != "System.FlagsAttribute")
+				while (V_3.MoveNext())
 				{
-					continue;
-				}
-				flag = true;
-			}
-			if (!(value is String))
-			{
-				num = Convert.ToInt64(value);
-			}
-			else if (!Int64.TryParse((String)value, out num))
-			{
-				num = (long)0;
-			}
-			List<FieldDefinition> fieldDefinitions1 = new List<FieldDefinition>();
-			for (int i = 1; i < fieldDefinitions.get_Count(); i++)
-			{
-				if (fieldDefinitions.get_Item(i).get_Constant() != null && fieldDefinitions.get_Item(i).get_Constant().get_Value() != null)
-				{
-					if (fieldDefinitions.get_Item(i).get_Constant().get_Value().Equals(value))
+					if (!String.op_Equality(V_3.get_Current().get_AttributeType().get_FullName(), "System.FlagsAttribute"))
 					{
-						fieldDefinitions1.Clear();
-						fieldDefinitions1.Add(fieldDefinitions.get_Item(i));
-						return fieldDefinitions1;
+						continue;
 					}
-					if (flag)
+					V_0 = true;
+				}
+			}
+			finally
+			{
+				V_3.Dispose();
+			}
+			if (value as String == null)
+			{
+				V_1 = Convert.ToInt64(value);
+			}
+			else
+			{
+				if (!Int64.TryParse((String)value, out V_1))
+				{
+					V_1 = (long)0;
+				}
+			}
+			V_2 = new List<FieldDefinition>();
+			V_4 = 1;
+			while (V_4 < fieldDefinitions.get_Count())
+			{
+				if (fieldDefinitions.get_Item(V_4).get_Constant() != null && fieldDefinitions.get_Item(V_4).get_Constant().get_Value() != null)
+				{
+					if (fieldDefinitions.get_Item(V_4).get_Constant().get_Value().Equals(value))
 					{
-						long num1 = Convert.ToInt64(fieldDefinitions.get_Item(i).get_Constant().get_Value());
-						if (num1 != 0)
+						V_2.Clear();
+						V_2.Add(fieldDefinitions.get_Item(V_4));
+						return V_2;
+					}
+					if (V_0)
+					{
+						V_5 = Convert.ToInt64(fieldDefinitions.get_Item(V_4).get_Constant().get_Value());
+						if (V_5 == 0)
 						{
-							if ((num1 & num) == num1)
+							if (V_1 == 0)
 							{
-								fieldDefinitions1.Add(fieldDefinitions.get_Item(i));
+								V_2.Add(fieldDefinitions.get_Item(V_4));
 							}
 						}
-						else if (num == 0)
+						else
 						{
-							fieldDefinitions1.Add(fieldDefinitions.get_Item(i));
+							if (V_5 & V_1 == V_5)
+							{
+								V_2.Add(fieldDefinitions.get_Item(V_4));
+							}
 						}
 					}
 				}
+				V_4 = V_4 + 1;
 			}
-			return fieldDefinitions1;
+			return V_2;
 		}
 	}
 }

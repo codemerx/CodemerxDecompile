@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 
@@ -33,9 +32,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				BinaryExpression binaryExpression = null;
-				yield return binaryExpression.left;
-				yield return binaryExpression.right;
+				stackVariable1 = new BinaryExpression.u003cget_Childrenu003ed__18(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -43,7 +42,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.BinaryExpression;
+				return 24;
 			}
 		}
 
@@ -61,6 +60,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				this.typeSet = true;
 				this.type = value;
+				return;
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Operator == BinaryOperator.Assign;
+				return this.get_Operator() == 26;
 			}
 		}
 
@@ -94,8 +94,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				BinaryOperator @operator = this.Operator;
-				if ((int)@operator - (int)BinaryOperator.ValueEquality > (int)BinaryOperator.Add && (int)@operator - (int)BinaryOperator.LessThan > (int)BinaryOperator.Subtract)
+				V_0 = this.get_Operator();
+				if (V_0 - 9 > 1 && V_0 - 13 > 3)
 				{
 					return false;
 				}
@@ -107,11 +107,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (this.Operator != BinaryOperator.AddAssign && this.Operator != BinaryOperator.SubtractAssign)
+				if (this.get_Operator() != 2 && this.get_Operator() != 4)
 				{
 					return false;
 				}
-				return this.Left.CodeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.EventReferenceExpression;
+				return this.get_Left().get_CodeNodeType() == 48;
 			}
 		}
 
@@ -119,11 +119,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (this.Operator == BinaryOperator.LogicalAnd)
+				if (this.get_Operator() == 12)
 				{
 					return true;
 				}
-				return this.Operator == BinaryOperator.LogicalOr;
+				return this.get_Operator() == 11;
 			}
 		}
 
@@ -131,54 +131,62 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (!this.isObjectComparison.HasValue)
+				if (!this.isObjectComparison.get_HasValue())
 				{
-					if (!this.IsComparisonExpression || this.Operator != BinaryOperator.ValueEquality && this.Operator != BinaryOperator.ValueInequality)
+					if (!this.get_IsComparisonExpression() || this.get_Operator() != 9 && this.get_Operator() != 10)
 					{
 						this.isObjectComparison = new bool?(false);
-					}
-					else if (!this.IsValidObjectComparisonNode(this.Left.CodeNodeType) || !this.IsValidObjectComparisonNode(this.Right.CodeNodeType))
-					{
-						this.isObjectComparison = new bool?(false);
-					}
-					else if (this.Left.ExpressionType is ArrayType || this.Right.ExpressionType is ArrayType)
-					{
-						this.isObjectComparison = new bool?(false);
-					}
-					else if (!this.instructions.Any<Instruction>((Instruction i) => {
-						if (i.get_OpCode().get_Name() != "call")
-						{
-							return false;
-						}
-						if ((i.get_Operand() as MethodReference).get_Name() == "op_Equality")
-						{
-							return true;
-						}
-						return (i.get_Operand() as MethodReference).get_Name() == "op_Inequality";
-					}))
-					{
-						bool isValueType = !this.Left.ExpressionType.get_IsValueType();
-						bool flag = !this.Right.ExpressionType.get_IsValueType();
-						if (this.Left.ExpressionType.get_IsRequiredModifier() || this.Left.ExpressionType.get_IsOptionalModifier())
-						{
-							isValueType = !this.Left.ExpressionType.Resolve().get_IsValueType();
-						}
-						if (this.Right.ExpressionType.get_IsRequiredModifier() || this.Right.ExpressionType.get_IsOptionalModifier())
-						{
-							flag = !this.Right.ExpressionType.Resolve().get_IsValueType();
-						}
-						this.isObjectComparison = new bool?(isValueType & flag);
 					}
 					else
 					{
-						this.isObjectComparison = new bool?(false);
+						if (!this.IsValidObjectComparisonNode(this.get_Left().get_CodeNodeType()) || !this.IsValidObjectComparisonNode(this.get_Right().get_CodeNodeType()))
+						{
+							this.isObjectComparison = new bool?(false);
+						}
+						else
+						{
+							if (this.get_Left().get_ExpressionType() as ArrayType != null || this.get_Right().get_ExpressionType() as ArrayType != null)
+							{
+								this.isObjectComparison = new bool?(false);
+							}
+							else
+							{
+								stackVariable39 = this.instructions;
+								stackVariable40 = BinaryExpression.u003cu003ec.u003cu003e9__51_0;
+								if (stackVariable40 == null)
+								{
+									dummyVar0 = stackVariable40;
+									stackVariable40 = new Func<Instruction, bool>(BinaryExpression.u003cu003ec.u003cu003e9.u003cget_IsObjectComparisonu003eb__51_0);
+									BinaryExpression.u003cu003ec.u003cu003e9__51_0 = stackVariable40;
+								}
+								if (!stackVariable39.Any<Instruction>(stackVariable40))
+								{
+									V_0 = !this.get_Left().get_ExpressionType().get_IsValueType();
+									V_1 = !this.get_Right().get_ExpressionType().get_IsValueType();
+									if (this.get_Left().get_ExpressionType().get_IsRequiredModifier() || this.get_Left().get_ExpressionType().get_IsOptionalModifier())
+									{
+										V_0 = !this.get_Left().get_ExpressionType().Resolve().get_IsValueType();
+									}
+									if (this.get_Right().get_ExpressionType().get_IsRequiredModifier() || this.get_Right().get_ExpressionType().get_IsOptionalModifier())
+									{
+										V_1 = !this.get_Right().get_ExpressionType().Resolve().get_IsValueType();
+									}
+									this.isObjectComparison = new bool?(V_0 & V_1);
+								}
+								else
+								{
+									this.isObjectComparison = new bool?(false);
+								}
+							}
+						}
 					}
 				}
-				return this.isObjectComparison.Value;
+				return this.isObjectComparison.get_Value();
 			}
 			internal set
 			{
 				this.isObjectComparison = new bool?(value);
+				return;
 			}
 		}
 
@@ -192,11 +200,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (this.Operator == BinaryOperator.AddAssign || this.Operator == BinaryOperator.SubtractAssign || this.Operator == BinaryOperator.DivideAssign || this.Operator == BinaryOperator.MultiplyAssign || this.Operator == BinaryOperator.LeftShiftAssign || this.Operator == BinaryOperator.ModuloAssign || this.Operator == BinaryOperator.OrAssign || this.Operator == BinaryOperator.RightShiftAssign || this.Operator == BinaryOperator.AndAssign)
+				if (this.get_Operator() == 2 || this.get_Operator() == 4 || this.get_Operator() == 8 || this.get_Operator() == 6 || this.get_Operator() == 18 || this.get_Operator() == 25 || this.get_Operator() == 29 || this.get_Operator() == 20 || this.get_Operator() == 28)
 				{
 					return true;
 				}
-				return this.Operator == BinaryOperator.XorAssign;
+				return this.get_Operator() == 30;
 			}
 		}
 
@@ -213,6 +221,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				{
 					this.UpdateType();
 				}
+				return;
 			}
 		}
 
@@ -226,14 +235,24 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				lock (BinaryExpression.locker)
+				V_0 = BinaryExpression.locker;
+				V_1 = false;
+				try
 				{
+					Monitor.Enter(V_0, ref V_1);
 					if (BinaryExpression.operatorsPriority == null)
 					{
 						BinaryExpression.InitializeOperatorsPrecedence();
 					}
 				}
-				return BinaryExpression.operatorsPriority[this.Operator];
+				finally
+				{
+					if (V_1)
+					{
+						Monitor.Exit(V_0);
+					}
+				}
+				return BinaryExpression.operatorsPriority.get_Item(this.get_Operator());
 			}
 		}
 
@@ -250,122 +269,148 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				{
 					this.UpdateType();
 				}
+				return;
 			}
 		}
 
 		static BinaryExpression()
 		{
 			BinaryExpression.locker = new Object();
+			return;
 		}
 
-		private BinaryExpression(BinaryOperator @operator, Expression left, Expression right, bool isChecked, IEnumerable<Instruction> instructions, bool isOverridenOperation) : base(instructions)
+		private BinaryExpression(BinaryOperator operator, Expression left, Expression right, bool isChecked, IEnumerable<Instruction> instructions, bool isOverridenOperation)
 		{
-			this.Operator = @operator;
+			base(instructions);
+			this.set_Operator(operator);
 			this.left = left;
 			this.right = right;
-			this.IsOverridenOperation = isOverridenOperation;
-			this.IsChecked = isChecked;
+			this.set_IsOverridenOperation(isOverridenOperation);
+			this.set_IsChecked(isChecked);
 			this.FixIfNullComparison();
+			return;
 		}
 
-		public BinaryExpression(BinaryOperator @operator, Expression left, Expression right, TypeReference expressionType, TypeSystem typeSystem, IEnumerable<Instruction> instructions, bool isOverridenOperation = false) : this(@operator, left, right, BinaryExpression.DetermineIsChecked(instructions), instructions, isOverridenOperation)
+		public BinaryExpression(BinaryOperator operator, Expression left, Expression right, TypeReference expressionType, TypeSystem typeSystem, IEnumerable<Instruction> instructions, bool isOverridenOperation = false)
 		{
-			this.ExpressionType = expressionType;
+			this(operator, left, right, BinaryExpression.DetermineIsChecked(instructions), instructions, isOverridenOperation);
+			this.set_ExpressionType(expressionType);
 			this.typeSystem = typeSystem;
+			return;
 		}
 
-		public BinaryExpression(BinaryOperator @operator, Expression left, Expression right, TypeSystem typeSystem, IEnumerable<Instruction> instructions, bool isOverridenOperation = false) : this(@operator, left, right, typeSystem, BinaryExpression.DetermineIsChecked(instructions), instructions, isOverridenOperation)
+		public BinaryExpression(BinaryOperator operator, Expression left, Expression right, TypeSystem typeSystem, IEnumerable<Instruction> instructions, bool isOverridenOperation = false)
 		{
+			this(operator, left, right, typeSystem, BinaryExpression.DetermineIsChecked(instructions), instructions, isOverridenOperation);
+			return;
 		}
 
-		public BinaryExpression(BinaryOperator @operator, Expression left, Expression right, TypeSystem typeSystem, bool isChecked, IEnumerable<Instruction> instructions, bool isOverridenOperation) : this(@operator, left, right, isChecked, instructions, isOverridenOperation)
+		public BinaryExpression(BinaryOperator operator, Expression left, Expression right, TypeSystem typeSystem, bool isChecked, IEnumerable<Instruction> instructions, bool isOverridenOperation)
 		{
+			this(operator, left, right, isChecked, instructions, isOverridenOperation);
 			this.typeSystem = typeSystem;
 			this.UpdateType();
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new BinaryExpression(this.Operator, this.Left.Clone(), this.Right.Clone(), this.ExpressionType, this.typeSystem, this.instructions, false)
-			{
-				IsChecked = this.IsChecked,
-				IsOverridenOperation = this.IsOverridenOperation,
-				IsObjectComparison = this.IsObjectComparison
-			};
+			stackVariable15 = new BinaryExpression(this.get_Operator(), this.get_Left().Clone(), this.get_Right().Clone(), this.get_ExpressionType(), this.typeSystem, this.instructions, false);
+			stackVariable15.set_IsChecked(this.get_IsChecked());
+			stackVariable15.set_IsOverridenOperation(this.get_IsOverridenOperation());
+			stackVariable15.set_IsObjectComparison(this.get_IsObjectComparison());
+			return stackVariable15;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new BinaryExpression(this.Operator, this.Left.CloneExpressionOnly(), this.Right.CloneExpressionOnly(), this.ExpressionType, this.typeSystem, null, false)
-			{
-				IsChecked = this.IsChecked,
-				IsOverridenOperation = this.IsOverridenOperation,
-				IsObjectComparison = this.IsObjectComparison
-			};
+			stackVariable14 = new BinaryExpression(this.get_Operator(), this.get_Left().CloneExpressionOnly(), this.get_Right().CloneExpressionOnly(), this.get_ExpressionType(), this.typeSystem, null, false);
+			stackVariable14.set_IsChecked(this.get_IsChecked());
+			stackVariable14.set_IsOverridenOperation(this.get_IsOverridenOperation());
+			stackVariable14.set_IsObjectComparison(this.get_IsObjectComparison());
+			return stackVariable14;
 		}
 
 		public int CompareOperators(BinaryExpression other)
 		{
-			return this.OperatorPriority.CompareTo(other.OperatorPriority);
+			V_0 = this.get_OperatorPriority();
+			return V_0.CompareTo(other.get_OperatorPriority());
 		}
 
 		private static bool DetermineIsChecked(IEnumerable<Instruction> instructions)
 		{
-			bool flag;
 			if (instructions == null)
 			{
 				return false;
 			}
-			using (IEnumerator<Instruction> enumerator = instructions.GetEnumerator())
+			V_0 = instructions.GetEnumerator();
+			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					if (enumerator.Current.get_OpCode().get_Code() - 180 > 5)
+					if (V_0.get_Current().get_OpCode().get_Code() - 180 > 5)
 					{
 						continue;
 					}
-					flag = true;
-					return flag;
+					V_3 = true;
+					goto Label1;
 				}
-				return false;
+				goto Label0;
 			}
-			return flag;
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+		Label1:
+			return V_3;
+		Label0:
+			return false;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is BinaryExpression))
+			if (other as BinaryExpression == null)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression = other as BinaryExpression;
-			if (this.Operator != binaryExpression.Operator)
+			V_0 = other as BinaryExpression;
+			if (this.get_Operator() != V_0.get_Operator())
 			{
 				return false;
 			}
-			if (!this.Left.Equals(binaryExpression.Left))
+			if (!this.get_Left().Equals(V_0.get_Left()))
 			{
 				return false;
 			}
-			return this.right.Equals(binaryExpression.Right);
+			return this.right.Equals(V_0.get_Right());
 		}
 
 		private void FixIfNullComparison()
 		{
-			if (!this.IsComparisonExpression || this.Operator == BinaryOperator.ValueEquality || this.Operator == BinaryOperator.ValueInequality)
+			if (!this.get_IsComparisonExpression() || this.get_Operator() == 9 || this.get_Operator() == 10)
 			{
 				return;
 			}
-			if (this.left.CodeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.LiteralExpression && (this.left as LiteralExpression).Value == null || this.right.CodeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.LiteralExpression && (this.right as LiteralExpression).Value == null)
+			if (this.left.get_CodeNodeType() == 22 && (this.left as LiteralExpression).get_Value() == null || this.right.get_CodeNodeType() == 22 && (this.right as LiteralExpression).get_Value() == null)
 			{
-				this.Operator = (this.Operator == BinaryOperator.LessThan || this.Operator == BinaryOperator.GreaterThan ? BinaryOperator.ValueInequality : BinaryOperator.ValueEquality);
+				if (this.get_Operator() == 13 || this.get_Operator() == 15)
+				{
+					stackVariable24 = 10;
+				}
+				else
+				{
+					stackVariable24 = 9;
+				}
+				this.set_Operator(stackVariable24);
 			}
+			return;
 		}
 
 		private TypeReference GetContainingType(TypeDefinition leftType, TypeDefinition rightType)
 		{
-			int? nullable;
-			int? nullable1;
 			if ((object)leftType == (object)rightType)
 			{
 				return rightType;
@@ -378,81 +423,110 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return leftType;
 			}
-			int? typeIndex = this.GetTypeIndex(leftType);
-			int? typeIndex1 = this.GetTypeIndex(rightType);
-			if (typeIndex.HasValue && typeIndex1.HasValue)
+			V_0 = this.GetTypeIndex(leftType);
+			V_1 = this.GetTypeIndex(rightType);
+			if (V_0.get_HasValue() && V_1.get_HasValue())
 			{
-				nullable1 = typeIndex;
-				nullable = typeIndex1;
-				if (nullable1.GetValueOrDefault() > nullable.GetValueOrDefault() & nullable1.HasValue & nullable.HasValue)
+				V_5 = V_0;
+				V_4 = V_1;
+				if (V_5.GetValueOrDefault() > V_4.GetValueOrDefault() & V_5.get_HasValue() & V_4.get_HasValue())
 				{
 					return leftType;
 				}
 				return rightType;
 			}
-			nullable = typeIndex;
-			nullable1 = typeIndex1;
-			if (!(nullable.GetValueOrDefault() == nullable1.GetValueOrDefault() & nullable.HasValue == nullable1.HasValue) || !(leftType.get_FullName() == rightType.get_FullName()))
+			V_4 = V_0;
+			V_5 = V_1;
+			if (!V_4.GetValueOrDefault() == V_5.GetValueOrDefault() & V_4.get_HasValue() == V_5.get_HasValue() || !String.op_Equality(leftType.get_FullName(), rightType.get_FullName()))
 			{
-				string str = (typeIndex.HasValue ? "" : leftType.get_FullName());
-				string str1 = (typeIndex1.HasValue ? "" : rightType.get_FullName());
-				throw new Exception(String.Concat(new String[] { "Operation on type(s) of unknown size: ", str, " ", str1, ". Result size is platform dependent and cannot be determined at decompile time." }));
+				if (V_0.get_HasValue())
+				{
+					stackVariable27 = "";
+				}
+				else
+				{
+					stackVariable27 = leftType.get_FullName();
+				}
+				V_2 = stackVariable27;
+				if (V_1.get_HasValue())
+				{
+					stackVariable30 = "";
+				}
+				else
+				{
+					stackVariable30 = rightType.get_FullName();
+				}
+				V_3 = stackVariable30;
+				stackVariable32 = new String[5];
+				stackVariable32[0] = "Operation on type(s) of unknown size: ";
+				stackVariable32[1] = V_2;
+				stackVariable32[2] = " ";
+				stackVariable32[3] = V_3;
+				stackVariable32[4] = ". Result size is platform dependent and cannot be determined at decompile time.";
+				throw new Exception(String.Concat(stackVariable32));
 			}
 			return leftType;
 		}
 
 		private void GetExpressionType()
 		{
-			TypeReference containingType = this.InferForPointers(this.Left.ExpressionType, this.Right.ExpressionType);
-			if (containingType != null)
+			V_0 = this.InferForPointers(this.get_Left().get_ExpressionType(), this.get_Right().get_ExpressionType());
+			if (V_0 != null)
 			{
-				this.ExpressionType = containingType;
+				this.set_ExpressionType(V_0);
 				return;
 			}
-			TypeDefinition expressionTypeDefinition = this.GetExpressionTypeDefinition(this.Left);
-			TypeDefinition typeDefinition = this.GetExpressionTypeDefinition(this.Right);
-			if (expressionTypeDefinition == null || typeDefinition == null)
-			{
-				return;
-			}
-			if (expressionTypeDefinition.get_FullName() == typeDefinition.get_FullName())
-			{
-				this.ExpressionType = expressionTypeDefinition;
-				return;
-			}
-			if (this.HandleDateTime(expressionTypeDefinition, typeDefinition))
+			V_1 = this.GetExpressionTypeDefinition(this.get_Left());
+			V_2 = this.GetExpressionTypeDefinition(this.get_Right());
+			if (V_1 == null || V_2 == null)
 			{
 				return;
 			}
-			if (!(expressionTypeDefinition.get_IsEnum() ^ typeDefinition.get_IsEnum()))
+			if (String.op_Equality(V_1.get_FullName(), V_2.get_FullName()))
 			{
-				containingType = this.GetContainingType(expressionTypeDefinition, typeDefinition);
-				this.ExpressionType = containingType;
+				this.set_ExpressionType(V_1);
 				return;
 			}
-			if (expressionTypeDefinition.get_IsEnum())
+			if (this.HandleDateTime(V_1, V_2))
 			{
-				this.ExpressionType = expressionTypeDefinition;
 				return;
 			}
-			this.ExpressionType = typeDefinition;
+			if (!V_1.get_IsEnum() ^ V_2.get_IsEnum())
+			{
+				V_0 = this.GetContainingType(V_1, V_2);
+				this.set_ExpressionType(V_0);
+				return;
+			}
+			if (V_1.get_IsEnum())
+			{
+				this.set_ExpressionType(V_1);
+				return;
+			}
+			this.set_ExpressionType(V_2);
+			return;
 		}
 
 		private TypeDefinition GetExpressionTypeDefinition(Expression ex)
 		{
-			TypeDefinition typeDefinition;
-			TypeReference expressionType = ex.ExpressionType;
-			if (expressionType == null)
+			V_0 = ex.get_ExpressionType();
+			if (V_0 == null)
 			{
 				return null;
 			}
-			typeDefinition = (!expressionType.get_IsPointer() ? expressionType.Resolve() : this.typeSystem.get_IntPtr().Resolve());
-			return typeDefinition;
+			if (!V_0.get_IsPointer())
+			{
+				V_1 = V_0.Resolve();
+			}
+			else
+			{
+				V_1 = this.typeSystem.get_IntPtr().Resolve();
+			}
+			return V_1;
 		}
 
 		private int? GetTypeIndex(TypeDefinition type)
 		{
-			if (type.get_FullName() == "System.UIntPtr" || type.get_FullName() == "System.IntPtr")
+			if (String.op_Equality(type.get_FullName(), "System.UIntPtr") || String.op_Equality(type.get_FullName(), "System.IntPtr"))
 			{
 				if (type.get_Module().get_Architecture() == null || type.get_Module().get_Architecture() == 4)
 				{
@@ -464,72 +538,82 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 				}
 				if (type.get_Module().get_Architecture() == 3)
 				{
-					return null;
+					V_0 = null;
+					return V_0;
 				}
 			}
 			if (type.get_IsEnum())
 			{
-				FieldDefinition fieldDefinition = null;
-				foreach (FieldDefinition field in type.get_Fields())
+				V_1 = null;
+				V_2 = type.get_Fields().GetEnumerator();
+				try
 				{
-					if (field.get_Name() != "value__")
+					while (V_2.MoveNext())
 					{
-						continue;
+						V_3 = V_2.get_Current();
+						if (!String.op_Equality(V_3.get_Name(), "value__"))
+						{
+							continue;
+						}
+						V_1 = V_3;
+						goto Label0;
 					}
-					fieldDefinition = field;
-					goto Label0;
+				}
+				finally
+				{
+					V_2.Dispose();
 				}
 			Label0:
-				type = fieldDefinition.get_FieldType().Resolve();
+				type = V_1.get_FieldType().Resolve();
 			}
-			string fullName = type.get_FullName();
-			if (fullName != null)
+			V_4 = type.get_FullName();
+			if (V_4 != null)
 			{
-				if (fullName == "System.Boolean")
+				if (String.op_Equality(V_4, "System.Boolean"))
 				{
 					return new int?(0);
 				}
-				if (fullName == "System.SByte" || fullName == "System.Byte")
+				if (String.op_Equality(V_4, "System.SByte") || String.op_Equality(V_4, "System.Byte"))
 				{
 					return new int?(1);
 				}
-				if (fullName == "System.Char")
+				if (String.op_Equality(V_4, "System.Char"))
 				{
 					return new int?(2);
 				}
-				if (fullName == "System.Int16")
+				if (String.op_Equality(V_4, "System.Int16"))
 				{
 					return new int?(3);
 				}
-				if (fullName == "System.UInt16")
+				if (String.op_Equality(V_4, "System.UInt16"))
 				{
 					return new int?(4);
 				}
-				if (fullName == "System.Int32")
+				if (String.op_Equality(V_4, "System.Int32"))
 				{
 					return new int?(5);
 				}
-				if (fullName == "System.UInt32")
+				if (String.op_Equality(V_4, "System.UInt32"))
 				{
 					return new int?(6);
 				}
-				if (fullName == "System.Int64")
+				if (String.op_Equality(V_4, "System.Int64"))
 				{
 					return new int?(7);
 				}
-				if (fullName == "System.UInt64")
+				if (String.op_Equality(V_4, "System.UInt64"))
 				{
 					return new int?(8);
 				}
-				if (fullName == "System.Single")
+				if (String.op_Equality(V_4, "System.Single"))
 				{
 					return new int?(9);
 				}
-				if (fullName == "System.Double")
+				if (String.op_Equality(V_4, "System.Double"))
 				{
 					return new int?(10);
 				}
-				if (fullName == "System.Decimal")
+				if (String.op_Equality(V_4, "System.Decimal"))
 				{
 					return new int?(11);
 				}
@@ -539,16 +623,16 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		private bool HandleDateTime(TypeReference firstType, TypeReference secondType)
 		{
-			if (firstType.get_FullName() == "System.DateTime" && secondType.get_FullName() == "System.TimeSpan")
+			if (String.op_Equality(firstType.get_FullName(), "System.DateTime") && String.op_Equality(secondType.get_FullName(), "System.TimeSpan"))
 			{
-				this.ExpressionType = firstType;
+				this.set_ExpressionType(firstType);
 				return true;
 			}
-			if (!(secondType.get_FullName() == "System.DateTime") || !(firstType.get_FullName() == "System.TimeSpan"))
+			if (!String.op_Equality(secondType.get_FullName(), "System.DateTime") || !String.op_Equality(firstType.get_FullName(), "System.TimeSpan"))
 			{
 				return false;
 			}
-			this.ExpressionType = secondType;
+			this.set_ExpressionType(secondType);
 			return true;
 		}
 
@@ -558,7 +642,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return null;
 			}
-			if ((firstType.get_IsPointer() || firstType.get_IsPinned() || firstType.get_IsByReference()) && this.IsIntegerType(secondType))
+			if (firstType.get_IsPointer() || firstType.get_IsPinned() || firstType.get_IsByReference() && this.IsIntegerType(secondType))
 			{
 				return firstType;
 			}
@@ -571,45 +655,44 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		private static void InitializeOperatorsPrecedence()
 		{
-			BinaryExpression.operatorsPriority = new Dictionary<BinaryOperator, int>()
-			{
-				{ BinaryOperator.Multiply, 1 },
-				{ BinaryOperator.Divide, 1 },
-				{ BinaryOperator.Modulo, 1 },
-				{ BinaryOperator.Add, 2 },
-				{ BinaryOperator.Subtract, 2 },
-				{ BinaryOperator.LeftShift, 3 },
-				{ BinaryOperator.RightShift, 3 },
-				{ BinaryOperator.LessThan, 4 },
-				{ BinaryOperator.LessThanOrEqual, 4 },
-				{ BinaryOperator.GreaterThan, 4 },
-				{ BinaryOperator.GreaterThanOrEqual, 4 },
-				{ BinaryOperator.ValueEquality, 5 },
-				{ BinaryOperator.ValueInequality, 5 },
-				{ BinaryOperator.BitwiseAnd, 6 },
-				{ BinaryOperator.BitwiseXor, 7 },
-				{ BinaryOperator.BitwiseOr, 8 },
-				{ BinaryOperator.LogicalAnd, 9 },
-				{ BinaryOperator.LogicalOr, 10 },
-				{ BinaryOperator.NullCoalesce, 11 },
-				{ BinaryOperator.Assign, 12 },
-				{ BinaryOperator.AddAssign, 12 },
-				{ BinaryOperator.SubtractAssign, 12 },
-				{ BinaryOperator.MultiplyAssign, 12 },
-				{ BinaryOperator.DivideAssign, 12 },
-				{ BinaryOperator.LeftShiftAssign, 12 },
-				{ BinaryOperator.RightShiftAssign, 12 },
-				{ BinaryOperator.OrAssign, 12 },
-				{ BinaryOperator.AndAssign, 12 },
-				{ BinaryOperator.XorAssign, 12 },
-				{ BinaryOperator.ModuloAssign, 12 },
-				{ BinaryOperator.None, 13 }
-			};
+			BinaryExpression.operatorsPriority = new Dictionary<BinaryOperator, int>();
+			BinaryExpression.operatorsPriority.Add(5, 1);
+			BinaryExpression.operatorsPriority.Add(7, 1);
+			BinaryExpression.operatorsPriority.Add(24, 1);
+			BinaryExpression.operatorsPriority.Add(1, 2);
+			BinaryExpression.operatorsPriority.Add(3, 2);
+			BinaryExpression.operatorsPriority.Add(17, 3);
+			BinaryExpression.operatorsPriority.Add(19, 3);
+			BinaryExpression.operatorsPriority.Add(13, 4);
+			BinaryExpression.operatorsPriority.Add(14, 4);
+			BinaryExpression.operatorsPriority.Add(15, 4);
+			BinaryExpression.operatorsPriority.Add(16, 4);
+			BinaryExpression.operatorsPriority.Add(9, 5);
+			BinaryExpression.operatorsPriority.Add(10, 5);
+			BinaryExpression.operatorsPriority.Add(22, 6);
+			BinaryExpression.operatorsPriority.Add(23, 7);
+			BinaryExpression.operatorsPriority.Add(21, 8);
+			BinaryExpression.operatorsPriority.Add(12, 9);
+			BinaryExpression.operatorsPriority.Add(11, 10);
+			BinaryExpression.operatorsPriority.Add(27, 11);
+			BinaryExpression.operatorsPriority.Add(26, 12);
+			BinaryExpression.operatorsPriority.Add(2, 12);
+			BinaryExpression.operatorsPriority.Add(4, 12);
+			BinaryExpression.operatorsPriority.Add(6, 12);
+			BinaryExpression.operatorsPriority.Add(8, 12);
+			BinaryExpression.operatorsPriority.Add(18, 12);
+			BinaryExpression.operatorsPriority.Add(20, 12);
+			BinaryExpression.operatorsPriority.Add(29, 12);
+			BinaryExpression.operatorsPriority.Add(28, 12);
+			BinaryExpression.operatorsPriority.Add(30, 12);
+			BinaryExpression.operatorsPriority.Add(25, 12);
+			BinaryExpression.operatorsPriority.Add(0, 13);
+			return;
 		}
 
 		private bool IsIntegerType(TypeReference type)
 		{
-			if (!(type.get_FullName() == "System.Int32") && !(type.get_FullName() == "System.UInt32") && !(type.get_FullName() == "System.Byte") && !(type.get_FullName() == "System.SByte") && !(type.get_FullName() == "System.Int16") && !(type.get_FullName() == "System.UInt16") && !(type.get_FullName() == "System.Int64") && !(type.get_FullName() == "System.UInt64"))
+			if (!String.op_Equality(type.get_FullName(), "System.Int32") && !String.op_Equality(type.get_FullName(), "System.UInt32") && !String.op_Equality(type.get_FullName(), "System.Byte") && !String.op_Equality(type.get_FullName(), "System.SByte") && !String.op_Equality(type.get_FullName(), "System.Int16") && !String.op_Equality(type.get_FullName(), "System.UInt16") && !String.op_Equality(type.get_FullName(), "System.Int64") && !String.op_Equality(type.get_FullName(), "System.UInt64"))
 			{
 				return false;
 			}
@@ -618,45 +701,46 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		private static bool IsPointerType(TypeDefinition type)
 		{
-			if (type.get_FullName() == "System.UIntPtr")
+			if (String.op_Equality(type.get_FullName(), "System.UIntPtr"))
 			{
 				return true;
 			}
-			return type.get_FullName() == "System.IntPtr";
+			return String.op_Equality(type.get_FullName(), "System.IntPtr");
 		}
 
 		private bool IsValidObjectComparisonNode(Telerik.JustDecompiler.Ast.CodeNodeType codeNodeType)
 		{
-			if (codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.AnonymousObjectCreationExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.ArgumentReferenceExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.FieldReferenceExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.LiteralExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.MethodInvocationExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.ObjectCreationExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.PropertyReferenceExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.VariableReferenceExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.ThisReferenceExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.ArrayCreationExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.ArrayIndexerExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.LambdaExpression || codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.LinqQueryExpression)
+			if (codeNodeType == 72 || codeNodeType == 25 || codeNodeType == 30 || codeNodeType == 22 || codeNodeType == 19 || codeNodeType == 40 || codeNodeType == 42 || codeNodeType == 26 || codeNodeType == 28 || codeNodeType == 38 || codeNodeType == 39 || codeNodeType == 50 || codeNodeType == 81)
 			{
 				return true;
 			}
-			return codeNodeType == Telerik.JustDecompiler.Ast.CodeNodeType.UnaryExpression;
+			return codeNodeType == 23;
 		}
 
 		public void UpdateType()
 		{
-			if (this.Operator == BinaryOperator.NullCoalesce)
+			if (this.get_Operator() == 27)
 			{
-				this.ExpressionType = this.Left.ExpressionType;
+				this.set_ExpressionType(this.get_Left().get_ExpressionType());
 				return;
 			}
-			if (this.IsLogicalExpression || this.IsComparisonExpression)
+			if (this.get_IsLogicalExpression() || this.get_IsComparisonExpression())
 			{
 				this.type = this.typeSystem.get_Boolean();
 				return;
 			}
-			if (this.Left.HasType && this.Right.HasType && this.Left.ExpressionType.get_FullName() == this.Right.ExpressionType.get_FullName())
+			if (this.get_Left().get_HasType() && this.get_Right().get_HasType() && String.op_Equality(this.get_Left().get_ExpressionType().get_FullName(), this.get_Right().get_ExpressionType().get_FullName()))
 			{
-				this.type = this.Left.ExpressionType;
+				this.type = this.get_Left().get_ExpressionType();
 				return;
 			}
-			if (!this.IsAssignmentExpression && (!this.IsSelfAssign || this.IsEventHandlerAddOrRemove))
+			if (!this.get_IsAssignmentExpression() && !this.get_IsSelfAssign() || this.get_IsEventHandlerAddOrRemove())
 			{
 				this.GetExpressionType();
 				return;
 			}
-			this.type = this.left.ExpressionType;
+			this.type = this.left.get_ExpressionType();
+			return;
 		}
 	}
 }

@@ -3,7 +3,6 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -22,12 +21,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				DelegateInvokeExpression delegateInvokeExpression = null;
-				yield return delegateInvokeExpression.Target;
-				foreach (ICodeNode argument in delegateInvokeExpression.Arguments)
-				{
-					yield return argument;
-				}
+				stackVariable1 = new DelegateInvokeExpression.u003cget_Childrenu003ed__2(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -35,7 +31,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.DelegateInvokeExpression;
+				return 51;
 			}
 		}
 
@@ -43,7 +39,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.InvokeMethodReference.get_FixedReturnType();
+				return this.get_InvokeMethodReference().get_FixedReturnType();
 			}
 			set
 			{
@@ -63,42 +59,47 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public DelegateInvokeExpression(Expression target, ExpressionCollection arguments, MethodReference invokeMethodReference, IEnumerable<Instruction> instructions) : base(instructions)
+		public DelegateInvokeExpression(Expression target, ExpressionCollection arguments, MethodReference invokeMethodReference, IEnumerable<Instruction> instructions)
 		{
-			this.Target = target;
-			this.Arguments = arguments;
-			this.InvokeMethodReference = invokeMethodReference;
+			base(instructions);
+			this.set_Target(target);
+			this.set_Arguments(arguments);
+			this.set_InvokeMethodReference(invokeMethodReference);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new DelegateInvokeExpression(this.Target.Clone(), this.Arguments.Clone(), this.InvokeMethodReference, this.instructions);
+			return new DelegateInvokeExpression(this.get_Target().Clone(), this.get_Arguments().Clone(), this.get_InvokeMethodReference(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new DelegateInvokeExpression(this.Target.CloneExpressionOnly(), this.Arguments.CloneExpressionsOnly(), this.InvokeMethodReference, null);
+			return new DelegateInvokeExpression(this.get_Target().CloneExpressionOnly(), this.get_Arguments().CloneExpressionsOnly(), this.get_InvokeMethodReference(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is DelegateInvokeExpression))
+			if (other as DelegateInvokeExpression == null)
 			{
 				return false;
 			}
-			DelegateInvokeExpression delegateInvokeExpression = other as DelegateInvokeExpression;
-			if (this.Target == null)
+			V_0 = other as DelegateInvokeExpression;
+			if (this.get_Target() != null)
 			{
-				if (delegateInvokeExpression.Target != null)
+				if (!this.get_Target().Equals(V_0.get_Target()))
 				{
 					return false;
 				}
 			}
-			else if (!this.Target.Equals(delegateInvokeExpression.Target))
+			else
 			{
-				return false;
+				if (V_0.get_Target() != null)
+				{
+					return false;
+				}
 			}
-			return this.Arguments.Equals(delegateInvokeExpression.Arguments);
+			return this.get_Arguments().Equals(V_0.get_Arguments());
 		}
 	}
 }

@@ -6,7 +6,7 @@ namespace Telerik.JustDecompiler.Pattern
 {
 	public class MatchContext
 	{
-		private bool success = true;
+		private bool success;
 
 		private Dictionary<string, object> datas;
 
@@ -14,7 +14,7 @@ namespace Telerik.JustDecompiler.Pattern
 		{
 			get
 			{
-				return this.Store[name];
+				return this.get_Store().get_Item(name);
 			}
 		}
 
@@ -39,16 +39,21 @@ namespace Telerik.JustDecompiler.Pattern
 			set
 			{
 				this.success = value;
+				return;
 			}
 		}
 
 		public MatchContext()
 		{
+			this.success = true;
+			base();
+			return;
 		}
 
 		public void AddData(MatchData data)
 		{
-			this.Store[data.Name] = data.Value;
+			this.get_Store().set_Item(data.Name, data.Value);
+			return;
 		}
 
 		public bool TryGetData(string name, out object value)
@@ -58,7 +63,7 @@ namespace Telerik.JustDecompiler.Pattern
 				value = null;
 				return false;
 			}
-			return this.Store.TryGetValue(name, out value);
+			return this.get_Store().TryGetValue(name, out value);
 		}
 	}
 }

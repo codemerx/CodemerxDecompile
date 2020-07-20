@@ -21,8 +21,10 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public InitializationAssignment(MethodDefinition assignmentMethod, Expression assignmentExpression)
 		{
-			this.AssignmentMethod = assignmentMethod;
-			this.AssignmentExpression = assignmentExpression;
+			base();
+			this.set_AssignmentMethod(assignmentMethod);
+			this.set_AssignmentExpression(assignmentExpression);
+			return;
 		}
 	}
 }

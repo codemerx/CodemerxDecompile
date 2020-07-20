@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Telerik.JustDecompiler.Ast.Expressions;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 {
@@ -16,9 +14,11 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			}
 		}
 
-		public EmptyBlockLogicalConstruct(int index) : base(null, new List<Expression>())
+		public EmptyBlockLogicalConstruct(int index)
 		{
+			base(null, new List<Expression>());
 			this.index = index;
+			return;
 		}
 	}
 }

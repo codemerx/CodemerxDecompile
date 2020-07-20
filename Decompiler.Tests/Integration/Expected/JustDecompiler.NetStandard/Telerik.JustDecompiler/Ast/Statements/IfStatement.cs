@@ -12,22 +12,15 @@ namespace Telerik.JustDecompiler.Ast.Statements
 	{
 		private BlockStatement then;
 
-		private BlockStatement @else;
+		private BlockStatement else;
 
 		public override IEnumerable<ICodeNode> Children
 		{
 			get
 			{
-				IfStatement ifStatement = null;
-				yield return ifStatement.Condition;
-				if (ifStatement.Then != null)
-				{
-					yield return ifStatement.Then;
-				}
-				if (ifStatement.Else != null)
-				{
-					yield return ifStatement.Else;
-				}
+				stackVariable1 = new IfStatement.u003cget_Childrenu003ed__4(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -35,7 +28,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.IfStatement;
+				return 3;
 			}
 		}
 
@@ -43,15 +36,16 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return this.@else;
+				return this.else;
 			}
 			set
 			{
-				this.@else = value;
-				if (this.@else != null)
+				this.else = value;
+				if (this.else != null)
 				{
-					this.@else.Parent = this;
+					this.else.set_Parent(this);
 				}
+				return;
 			}
 		}
 
@@ -66,59 +60,60 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.then = value;
 				if (this.then != null)
 				{
-					this.then.Parent = this;
+					this.then.set_Parent(this);
 				}
+				return;
 			}
 		}
 
-		public IfStatement(Expression condition, BlockStatement then, BlockStatement @else) : base(condition)
+		public IfStatement(Expression condition, BlockStatement then, BlockStatement else)
 		{
-			this.Then = then;
-			this.Else = @else;
+			base(condition);
+			this.set_Then(then);
+			this.set_Else(else);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			BlockStatement blockStatement = null;
+			V_0 = null;
 			if (this.then != null)
 			{
-				blockStatement = this.then.Clone() as BlockStatement;
+				V_0 = this.then.Clone() as BlockStatement;
 			}
-			BlockStatement blockStatement1 = null;
-			if (this.@else != null)
+			V_1 = null;
+			if (this.else != null)
 			{
-				blockStatement1 = this.@else.Clone() as BlockStatement;
+				V_1 = this.else.Clone() as BlockStatement;
 			}
-			IfStatement ifStatement = new IfStatement(base.Condition.Clone(), blockStatement, blockStatement1);
-			base.CopyParentAndLabel(ifStatement);
-			return ifStatement;
+			V_2 = new IfStatement(this.get_Condition().Clone(), V_0, V_1);
+			this.CopyParentAndLabel(V_2);
+			return V_2;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			BlockStatement blockStatement;
-			BlockStatement blockStatement1;
 			if (this.then != null)
 			{
-				blockStatement = this.then.CloneStatementOnly() as BlockStatement;
+				stackVariable5 = this.then.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			BlockStatement blockStatement2 = blockStatement;
-			if (this.@else != null)
+			V_0 = stackVariable5;
+			if (this.else != null)
 			{
-				blockStatement1 = this.@else.CloneStatementOnly() as BlockStatement;
+				stackVariable11 = this.else.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				blockStatement1 = null;
+				stackVariable11 = null;
 			}
-			BlockStatement blockStatement3 = blockStatement1;
-			IfStatement ifStatement = new IfStatement(base.Condition.CloneExpressionOnly(), blockStatement2, blockStatement3);
-			base.CopyParentAndLabel(ifStatement);
-			return ifStatement;
+			V_1 = stackVariable11;
+			V_2 = new IfStatement(this.get_Condition().CloneExpressionOnly(), V_0, V_1);
+			this.CopyParentAndLabel(V_2);
+			return V_2;
 		}
 	}
 }

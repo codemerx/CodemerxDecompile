@@ -1,5 +1,4 @@
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -24,94 +23,110 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public DependsOnAnalysisVisitor(HashSet<TypeReference> typesDependingOn, HashSet<ExplicitCastExpression> ambiguousCastsToObject)
 		{
-			this.TypesDependingOn = typesDependingOn;
-			this.AmbiguousCastsToObject = ambiguousCastsToObject;
+			base();
+			this.set_TypesDependingOn(typesDependingOn);
+			this.set_AmbiguousCastsToObject(ambiguousCastsToObject);
+			return;
 		}
 
 		public override void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
-			base.VisitAnonymousObjectCreationExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
+			this.VisitAnonymousObjectCreationExpression(node);
+			return;
 		}
 
 		public override void VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ElementType));
-			base.VisitArrayCreationExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ElementType()));
+			this.VisitArrayCreationExpression(node);
+			return;
 		}
 
 		public override void VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			this.Visit(node.Arguments);
+			this.Visit(node.get_Arguments());
+			return;
 		}
 
 		public override void VisitCanCastExpression(CanCastExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.TargetType));
-			base.VisitCanCastExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_TargetType()));
+			this.VisitCanCastExpression(node);
+			return;
 		}
 
 		public override void VisitEnumExpression(EnumExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
-			base.VisitEnumExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
+			this.VisitEnumExpression(node);
+			return;
 		}
 
 		public override void VisitExplicitCastExpression(ExplicitCastExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
-			if (node.UnresolvedReferenceForAmbiguousCastToObject != null)
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
+			if (node.get_UnresolvedReferenceForAmbiguousCastToObject() != null)
 			{
-				this.AmbiguousCastsToObject.Add(node);
+				dummyVar0 = this.get_AmbiguousCastsToObject().Add(node);
 			}
-			base.VisitExplicitCastExpression(node);
+			this.VisitExplicitCastExpression(node);
+			return;
 		}
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Field.get_DeclaringType()));
-			base.VisitFieldReferenceExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Field().get_DeclaringType()));
+			this.VisitFieldReferenceExpression(node);
+			return;
 		}
 
 		public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Method.get_DeclaringType()));
-			this.Visit(node.Target);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Method().get_DeclaringType()));
+			this.Visit(node.get_Target());
+			return;
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
-			base.VisitObjectCreationExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
+			this.VisitObjectCreationExpression(node);
+			return;
 		}
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Property.get_DeclaringType()));
-			base.VisitPropertyReferenceExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Property().get_DeclaringType()));
+			this.VisitPropertyReferenceExpression(node);
+			return;
 		}
 
 		public override void VisitSafeCastExpression(SafeCastExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
-			base.VisitSafeCastExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
+			this.VisitSafeCastExpression(node);
+			return;
 		}
 
 		public override void VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			this.Visit(node.Arguments);
+			this.Visit(node.get_Arguments());
+			return;
 		}
 
 		public override void VisitTypeOfExpression(TypeOfExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Type));
-			base.VisitTypeOfExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Type()));
+			this.VisitTypeOfExpression(node);
+			return;
 		}
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Variable.get_VariableType()));
-			base.VisitVariableDeclarationExpression(node);
+			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Variable().get_VariableType()));
+			this.VisitVariableDeclarationExpression(node);
+			return;
 		}
 	}
 }

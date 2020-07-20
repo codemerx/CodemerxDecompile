@@ -17,6 +17,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new TypeOfExpression.u003cget_Childrenu003ed__3(-2);
 			}
 		}
 
@@ -24,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.TypeOfExpression;
+				return 35;
 			}
 		}
 
@@ -50,29 +51,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public TypeOfExpression(TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public TypeOfExpression(TypeReference type, IEnumerable<Instruction> instructions)
 		{
-			this.Type = type;
-			this.typeReference = new TypeReference("System", "Type", this.Type.get_Module().get_TypeSystem().get_Boolean().get_Module(), this.Type.get_Module().get_TypeSystem().get_Boolean().get_Scope());
+			base(instructions);
+			this.set_Type(type);
+			this.typeReference = new TypeReference("System", "Type", this.get_Type().get_Module().get_TypeSystem().get_Boolean().get_Module(), this.get_Type().get_Module().get_TypeSystem().get_Boolean().get_Scope());
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new TypeOfExpression(this.Type, this.instructions);
+			return new TypeOfExpression(this.get_Type(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new TypeOfExpression(this.Type, null);
+			return new TypeOfExpression(this.get_Type(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is TypeOfExpression))
+			if (other as TypeOfExpression == null)
 			{
 				return false;
 			}
-			return this.Type.get_FullName() == (other as TypeOfExpression).Type.get_FullName();
+			return String.op_Equality(this.get_Type().get_FullName(), (other as TypeOfExpression).get_Type().get_FullName());
 		}
 	}
 }

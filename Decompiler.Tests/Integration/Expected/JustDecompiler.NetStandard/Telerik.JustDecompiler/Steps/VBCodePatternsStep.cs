@@ -6,16 +6,17 @@ namespace Telerik.JustDecompiler.Steps
 {
 	internal class VBCodePatternsStep : CodePatternsStep
 	{
-		public VBCodePatternsStep(bool isAggressive) : base(isAggressive)
+		public VBCodePatternsStep(bool isAggressive)
 		{
+			base(isAggressive);
+			return;
 		}
 
 		protected override IEnumerable<ICodePattern> GetCodePatterns()
 		{
-			return new List<ICodePattern>(base.GetCodePatterns())
-			{
-				new RaiseEventPattern()
-			};
+			stackVariable2 = new List<ICodePattern>(this.GetCodePatterns());
+			stackVariable2.Add(new RaiseEventPattern());
+			return stackVariable2;
 		}
 	}
 }

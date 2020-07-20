@@ -20,22 +20,31 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public CompilerOptimizedSwitchByStringData()
 		{
-			this.SwitchBlocksStartInstructions = new List<int>();
-			this.SwitchBlocksToCasesMap = new Dictionary<int, List<int>>();
+			base();
+			this.set_SwitchBlocksStartInstructions(new List<int>());
+			this.set_SwitchBlocksToCasesMap(new Dictionary<int, List<int>>());
+			return;
 		}
 
 		public object Clone()
 		{
-			CompilerOptimizedSwitchByStringData compilerOptimizedSwitchByStringDatum = new CompilerOptimizedSwitchByStringData()
+			V_0 = new CompilerOptimizedSwitchByStringData();
+			V_0.set_SwitchBlocksStartInstructions(new List<int>(this.get_SwitchBlocksStartInstructions()));
+			V_0.set_SwitchBlocksToCasesMap(new Dictionary<int, List<int>>());
+			V_1 = this.get_SwitchBlocksToCasesMap().GetEnumerator();
+			try
 			{
-				SwitchBlocksStartInstructions = new List<int>(this.SwitchBlocksStartInstructions),
-				SwitchBlocksToCasesMap = new Dictionary<int, List<int>>()
-			};
-			foreach (KeyValuePair<int, List<int>> switchBlocksToCasesMap in this.SwitchBlocksToCasesMap)
-			{
-				compilerOptimizedSwitchByStringDatum.SwitchBlocksToCasesMap.Add(switchBlocksToCasesMap.Key, new List<int>(switchBlocksToCasesMap.Value));
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0.get_SwitchBlocksToCasesMap().Add(V_2.get_Key(), new List<int>(V_2.get_Value()));
+				}
 			}
-			return compilerOptimizedSwitchByStringDatum;
+			finally
+			{
+				((IDisposable)V_1).Dispose();
+			}
+			return V_0;
 		}
 	}
 }

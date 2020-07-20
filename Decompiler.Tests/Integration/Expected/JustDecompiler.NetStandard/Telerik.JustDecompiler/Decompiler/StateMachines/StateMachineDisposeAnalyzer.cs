@@ -1,6 +1,5 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
@@ -11,9 +10,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 {
 	internal class StateMachineDisposeAnalyzer
 	{
-		private readonly List<YieldExceptionHandlerInfo> yieldsExceptionData = new List<YieldExceptionHandlerInfo>();
+		private readonly List<YieldExceptionHandlerInfo> yieldsExceptionData;
 
-		private readonly Dictionary<ExceptionHandler, HashSet<int>> handlerToStatesMap = new Dictionary<ExceptionHandler, HashSet<int>>();
+		private readonly Dictionary<ExceptionHandler, HashSet<int>> handlerToStatesMap;
 
 		private readonly MethodDefinition moveNextMethodDefinition;
 
@@ -49,86 +48,102 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		public StateMachineDisposeAnalyzer(MethodDefinition moveNextMethodDefinition)
 		{
+			this.yieldsExceptionData = new List<YieldExceptionHandlerInfo>();
+			this.handlerToStatesMap = new Dictionary<ExceptionHandler, HashSet<int>>();
+			base();
 			this.moveNextMethodDefinition = moveNextMethodDefinition;
+			return;
 		}
 
 		private bool CheckAndSaveStateField(FieldReference foundStateField)
 		{
-			FieldDefinition fieldDefinition = foundStateField.Resolve();
-			if (this.stateField == null)
+			V_0 = foundStateField.Resolve();
+			if (this.stateField != null)
 			{
-				this.stateField = fieldDefinition;
+				if ((object)this.stateField != (object)V_0)
+				{
+					return false;
+				}
 			}
-			else if ((object)this.stateField != (object)fieldDefinition)
+			else
 			{
-				return false;
+				this.stateField = V_0;
 			}
 			return true;
 		}
 
 		private void DetermineExceptionHandlingStatesFromCFGBlocks()
 		{
-			int num;
-			ExceptionHandler exceptionHandler;
-			InstructionBlock[] blocks = this.theDisposeCFG.Blocks;
-			for (int i = 0; i < (int)blocks.Length; i++)
+			V_0 = this.theDisposeCFG.get_Blocks();
+			V_1 = 0;
+			while (V_1 < (int)V_0.Length)
 			{
-				InstructionBlock instructionBlocks = blocks[i];
-				if ((this.IsBeqInstruction(instructionBlocks.Last) || this.IsBneUnInstruction(instructionBlocks.Last)) && StateMachineUtilities.TryGetOperandOfLdc(instructionBlocks.Last.get_Previous(), out num))
+				V_2 = V_0[V_1];
+				if (this.IsBeqInstruction(V_2.get_Last()) || this.IsBneUnInstruction(V_2.get_Last()) && StateMachineUtilities.TryGetOperandOfLdc(V_2.get_Last().get_Previous(), out V_3))
 				{
-					Instruction instruction = null;
-					instruction = (!this.IsBeqInstruction(instructionBlocks.Last) ? instructionBlocks.Last.get_Next() : instructionBlocks.Last.get_Operand() as Instruction);
-					if (instruction == null)
+					V_4 = null;
+					if (!this.IsBeqInstruction(V_2.get_Last()))
+					{
+						V_4 = V_2.get_Last().get_Next();
+					}
+					else
+					{
+						V_4 = V_2.get_Last().get_Operand() as Instruction;
+					}
+					if (V_4 == null)
 					{
 						throw new Exception("branchTargetInstruction cannot be null.");
 					}
-					if (this.TryGetExceptionHandler(StateMachineDisposeAnalyzer.SkipSingleNopInstructionBlock(this.theDisposeCFG.InstructionToBlockMapping[instruction.get_Offset()]), out exceptionHandler))
+					if (this.TryGetExceptionHandler(StateMachineDisposeAnalyzer.SkipSingleNopInstructionBlock(this.theDisposeCFG.get_InstructionToBlockMapping().get_Item(V_4.get_Offset())), out V_6))
 					{
-						if (!this.handlerToStatesMap.ContainsKey(exceptionHandler))
+						if (!this.handlerToStatesMap.ContainsKey(V_6))
 						{
-							this.handlerToStatesMap.Add(exceptionHandler, new HashSet<int>());
+							this.handlerToStatesMap.Add(V_6, new HashSet<int>());
 						}
-						this.handlerToStatesMap[exceptionHandler].Add(num);
+						dummyVar0 = this.handlerToStatesMap.get_Item(V_6).Add(V_3);
 					}
 				}
+				V_1 = V_1 + 1;
 			}
+			return;
 		}
 
 		private bool DetermineExceptionHandlingStatesFromSwitchData(SwitchData switchBlockInfo)
 		{
-			ExceptionHandler exceptionHandler;
-			int num = 0;
-			Instruction previous = switchBlockInfo.SwitchBlock.Last.get_Previous();
-			if (previous.get_OpCode().get_Code() == 88)
+			V_0 = 0;
+			V_1 = switchBlockInfo.get_SwitchBlock().get_Last().get_Previous();
+			if (V_1.get_OpCode().get_Code() == 88)
 			{
-				previous = previous.get_Previous();
-				if (!StateMachineUtilities.TryGetOperandOfLdc(previous, out num))
+				V_1 = V_1.get_Previous();
+				if (!StateMachineUtilities.TryGetOperandOfLdc(V_1, out V_0))
 				{
 					return false;
 				}
-				previous = previous.get_Previous();
+				V_1 = V_1.get_Previous();
 			}
-			InstructionBlock[] orderedCasesArray = switchBlockInfo.OrderedCasesArray;
-			for (int i = 0; i < (int)orderedCasesArray.Length; i++)
+			V_2 = switchBlockInfo.get_OrderedCasesArray();
+			V_4 = 0;
+			while (V_4 < (int)V_2.Length)
 			{
-				if (this.TryGetExceptionHandler(this.GetActualCase(orderedCasesArray[i]), out exceptionHandler))
+				if (this.TryGetExceptionHandler(this.GetActualCase(V_2[V_4]), out V_6))
 				{
-					if (!this.handlerToStatesMap.ContainsKey(exceptionHandler))
+					if (!this.handlerToStatesMap.ContainsKey(V_6))
 					{
-						this.handlerToStatesMap.Add(exceptionHandler, new HashSet<int>());
+						this.handlerToStatesMap.Add(V_6, new HashSet<int>());
 					}
-					this.handlerToStatesMap[exceptionHandler].Add(i + num);
+					dummyVar0 = this.handlerToStatesMap.get_Item(V_6).Add(V_4 + V_0);
 				}
+				V_4 = V_4 + 1;
 			}
 			return true;
 		}
 
 		private InstructionBlock GetActualCase(InstructionBlock theBlock)
 		{
-			while ((object)theBlock.First == (object)theBlock.Last && (theBlock.First.get_OpCode().get_Code() == 55 || theBlock.First.get_OpCode().get_Code() == 42))
+			while ((object)theBlock.get_First() == (object)theBlock.get_Last() && theBlock.get_First().get_OpCode().get_Code() == 55 || theBlock.get_First().get_OpCode().get_Code() == 42)
 			{
-				Instruction operand = theBlock.First.get_Operand() as Instruction;
-				theBlock = this.theDisposeCFG.InstructionToBlockMapping[operand.get_Offset()];
+				V_0 = theBlock.get_First().get_Operand() as Instruction;
+				theBlock = this.theDisposeCFG.get_InstructionToBlockMapping().get_Item(V_0.get_Offset());
 			}
 			theBlock = StateMachineDisposeAnalyzer.SkipSingleNopInstructionBlock(theBlock);
 			return theBlock;
@@ -136,77 +151,93 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private bool GetDisposeMethodCFG()
 		{
-			string str = "System.Void System.IDisposable.Dispose()";
-			MethodDefinition methodDefinition = null;
-			foreach (MethodDefinition method in this.moveNextMethodDefinition.get_DeclaringType().get_Methods())
+			V_0 = "System.Void System.IDisposable.Dispose()";
+			V_1 = null;
+			V_2 = this.moveNextMethodDefinition.get_DeclaringType().get_Methods().GetEnumerator();
+			try
 			{
-				if (method.GetFullMemberName(null) != str)
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_3 = V_2.get_Current();
+					if (!String.op_Equality(V_3.GetFullMemberName(null), V_0))
+					{
+						continue;
+					}
+					V_1 = V_3;
+					goto Label0;
 				}
-				methodDefinition = method;
-				if (methodDefinition == null)
-				{
-					return false;
-				}
-				this.theDisposeCFG = (new ControlFlowGraphBuilder(methodDefinition)).CreateGraph();
-				return true;
 			}
-			if (methodDefinition == null)
+			finally
+			{
+				V_2.Dispose();
+			}
+		Label0:
+			if (V_1 == null)
 			{
 				return false;
 			}
-			this.theDisposeCFG = (new ControlFlowGraphBuilder(methodDefinition)).CreateGraph();
+			this.theDisposeCFG = (new ControlFlowGraphBuilder(V_1)).CreateGraph();
 			return true;
 		}
 
 		private bool GetYieldExceptionData()
 		{
-			bool flag;
-			if ((int)this.theDisposeCFG.Blocks.Length == 1)
+			if ((int)this.theDisposeCFG.get_Blocks().Length == 1)
 			{
 				return true;
 			}
-			Instruction item = this.theDisposeCFG.OffsetToInstruction[0];
-			if (item.get_OpCode().get_Code() != 2)
+			V_0 = this.theDisposeCFG.get_OffsetToInstruction().get_Item(0);
+			if (V_0.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			item = this.theDisposeCFG.OffsetToInstruction[1];
-			if (item.get_OpCode().get_Code() != 120 || !(item.get_Operand() is FieldReference) || !this.CheckAndSaveStateField(item.get_Operand() as FieldReference))
+			V_0 = this.theDisposeCFG.get_OffsetToInstruction().get_Item(1);
+			if (V_0.get_OpCode().get_Code() != 120 || V_0.get_Operand() as FieldReference == null || !this.CheckAndSaveStateField(V_0.get_Operand() as FieldReference))
 			{
 				return false;
 			}
-			foreach (SwitchData value in this.theDisposeCFG.SwitchBlocksInformation.Values)
-			{
-				if (this.DetermineExceptionHandlingStatesFromSwitchData(value))
-				{
-					continue;
-				}
-				flag = false;
-				return flag;
-			}
-			this.DetermineExceptionHandlingStatesFromCFGBlocks();
-			Dictionary<ExceptionHandler, HashSet<int>>.Enumerator enumerator = this.handlerToStatesMap.GetEnumerator();
+			V_2 = this.theDisposeCFG.get_SwitchBlocksInformation().get_Values().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_2.MoveNext())
 				{
-					KeyValuePair<ExceptionHandler, HashSet<int>> current = enumerator.Current;
-					if (this.TryCreateYieldExceptionHandler(current.Value, current.Key))
+					V_3 = V_2.get_Current();
+					if (this.DetermineExceptionHandlingStatesFromSwitchData(V_3))
 					{
 						continue;
 					}
-					flag = false;
-					return flag;
+					V_4 = false;
+					goto Label0;
 				}
-				return true;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_2).Dispose();
 			}
-			return flag;
+			this.DetermineExceptionHandlingStatesFromCFGBlocks();
+			V_5 = this.handlerToStatesMap.GetEnumerator();
+			try
+			{
+				while (V_5.MoveNext())
+				{
+					V_6 = V_5.get_Current();
+					if (this.TryCreateYieldExceptionHandler(V_6.get_Value(), V_6.get_Key()))
+					{
+						continue;
+					}
+					V_4 = false;
+					goto Label0;
+				}
+				goto Label1;
+			}
+			finally
+			{
+				((IDisposable)V_5).Dispose();
+			}
+		Label0:
+			return V_4;
+		Label1:
+			return true;
 		}
 
 		protected bool IsBeqInstruction(Instruction theInstruction)
@@ -229,104 +260,100 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private bool IsVersion2Disposer(InstructionBlock theBlock)
 		{
-			Instruction first = theBlock.First;
-			if (first.get_OpCode().get_Code() != 2)
+			V_0 = theBlock.get_First();
+			if (V_0.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 23)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 122 || !(first.get_Operand() is FieldReference))
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 122 || V_0.get_Operand() as FieldReference == null)
 			{
 				return false;
 			}
-			this.disposingField = ((FieldReference)first.get_Operand()).Resolve();
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 2)
+			this.disposingField = ((FieldReference)V_0.get_Operand()).Resolve();
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 39 || !(first.get_Operand() is MethodReference) || (object)(first.get_Operand() as MethodReference).Resolve() != (object)this.moveNextMethodDefinition)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 39 || V_0.get_Operand() as MethodReference == null || (object)(V_0.get_Operand() as MethodReference).Resolve() != (object)this.moveNextMethodDefinition)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 37)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 37)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 2)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 2)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 21)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 21)
 			{
 				return false;
 			}
-			first = first.get_Next();
-			if (first.get_OpCode().get_Code() != 122 || !(first.get_Operand() is FieldReference))
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 122 || V_0.get_Operand() as FieldReference == null)
 			{
 				return false;
 			}
-			this.stateField = ((FieldReference)first.get_Operand()).Resolve();
-			OpCode opCode = first.get_Next().get_OpCode();
-			return opCode.get_Code() == 41;
+			this.stateField = ((FieldReference)V_0.get_Operand()).Resolve();
+			V_1 = V_0.get_Next().get_OpCode();
+			return V_1.get_Code() == 41;
 		}
 
 		public YieldStateMachineVersion ProcessDisposeMethod()
 		{
 			if (this.GetDisposeMethodCFG())
 			{
-				if (this.theDisposeCFG.SwitchBlocksInformation.Count == 0 && (int)this.theDisposeCFG.Blocks.Length == 1 && this.IsVersion2Disposer(this.theDisposeCFG.Blocks[0]))
+				if (this.theDisposeCFG.get_SwitchBlocksInformation().get_Count() == 0 && (int)this.theDisposeCFG.get_Blocks().Length == 1 && this.IsVersion2Disposer(this.theDisposeCFG.get_Blocks()[0]))
 				{
-					return YieldStateMachineVersion.V2;
+					return 2;
 				}
 				if (this.GetYieldExceptionData())
 				{
-					return YieldStateMachineVersion.V1;
+					return 1;
 				}
 			}
-			return YieldStateMachineVersion.None;
+			return 0;
 		}
 
 		private static InstructionBlock SkipSingleNopInstructionBlock(InstructionBlock theBlock)
 		{
-			InstructionBlock successors = theBlock;
-			if ((object)theBlock.First == (object)theBlock.Last && theBlock.First.get_OpCode().get_Code() == null && (int)theBlock.Successors.Length == 1)
+			V_0 = theBlock;
+			if ((object)theBlock.get_First() == (object)theBlock.get_Last() && theBlock.get_First().get_OpCode().get_Code() == null && (int)theBlock.get_Successors().Length == 1)
 			{
-				successors = theBlock.Successors[0];
+				V_0 = theBlock.get_Successors()[0];
 			}
-			return successors;
+			return V_0;
 		}
 
 		private bool TryCreateYieldExceptionHandler(HashSet<int> tryStates, ExceptionHandler handler)
 		{
-			MethodDefinition methodDefinition;
-			int num;
-			FieldReference fieldReference;
-			FieldReference fieldReference1;
 			if (handler.get_HandlerType() != 2)
 			{
 				return false;
 			}
-			if (!this.TryGetFinallyMethodDefinition(handler, out methodDefinition))
+			if (!this.TryGetFinallyMethodDefinition(handler, out V_0))
 			{
-				if (!this.TryGetDisposableConditionData(handler, out num, out fieldReference, out fieldReference1))
+				if (!this.TryGetDisposableConditionData(handler, out V_1, out V_2, out V_3))
 				{
 					return false;
 				}
-				this.yieldsExceptionData.Add(new YieldExceptionHandlerInfo(tryStates, num, fieldReference, fieldReference1));
+				this.yieldsExceptionData.Add(new YieldExceptionHandlerInfo(tryStates, V_1, V_2, V_3));
 			}
 			else
 			{
-				this.yieldsExceptionData.Add(new YieldExceptionHandlerInfo(tryStates, methodDefinition));
+				this.yieldsExceptionData.Add(new YieldExceptionHandlerInfo(tryStates, V_0));
 			}
 			return true;
 		}
@@ -336,52 +363,55 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 			nextState = -1;
 			enumeratorField = null;
 			disposableField = null;
-			Instruction handlerStart = handler.get_HandlerStart();
-			handlerStart = handlerStart.get_Next();
-			if (handlerStart == null || !StateMachineUtilities.TryGetOperandOfLdc(handlerStart, out nextState))
+			V_0 = handler.get_HandlerStart();
+			V_0 = V_0.get_Next();
+			if (V_0 == null || !StateMachineUtilities.TryGetOperandOfLdc(V_0, out nextState))
 			{
 				return false;
 			}
-			handlerStart = handlerStart.get_Next();
-			if (handlerStart.get_OpCode().get_Code() != 122 || (object)((FieldReference)handlerStart.get_Operand()).Resolve() != (object)this.stateField)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 122 || (object)((FieldReference)V_0.get_Operand()).Resolve() != (object)this.stateField)
 			{
 				return false;
 			}
-			handlerStart = handlerStart.get_Next();
-			handlerStart = handlerStart.get_Next();
-			if (handlerStart.get_OpCode().get_Code() != 120)
+			V_0 = V_0.get_Next();
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 120)
 			{
-				handlerStart = handlerStart.get_Next();
-				if (handlerStart.get_OpCode().get_Code() != 120)
+				V_0 = V_0.get_Next();
+				if (V_0.get_OpCode().get_Code() != 120)
 				{
 					return false;
 				}
 			}
-			else if (handlerStart.get_Next().get_OpCode().get_Code() != 43)
+			else
 			{
-				return false;
+				if (V_0.get_Next().get_OpCode().get_Code() != 43)
+				{
+					return false;
+				}
 			}
-			enumeratorField = (FieldReference)handlerStart.get_Operand();
-			if (handlerStart.get_Next().get_OpCode().get_Code() != 43)
+			enumeratorField = (FieldReference)V_0.get_Operand();
+			if (V_0.get_Next().get_OpCode().get_Code() != 43)
 			{
-				handlerStart = handlerStart.get_Next();
-				if (handlerStart.get_OpCode().get_Code() != 116 || ((TypeReference)handlerStart.get_Operand()).get_Name() != "IDisposable")
+				V_0 = V_0.get_Next();
+				if (V_0.get_OpCode().get_Code() != 116 || String.op_Inequality(((TypeReference)V_0.get_Operand()).get_Name(), "IDisposable"))
 				{
 					return false;
 				}
-				handlerStart = handlerStart.get_Next();
-				if (handlerStart.get_OpCode().get_Code() != 122)
+				V_0 = V_0.get_Next();
+				if (V_0.get_OpCode().get_Code() != 122)
 				{
 					return false;
 				}
-				disposableField = (FieldReference)handlerStart.get_Operand();
-				handlerStart = handlerStart.get_Next();
-				if (handlerStart == null)
+				disposableField = (FieldReference)V_0.get_Operand();
+				V_0 = V_0.get_Next();
+				if (V_0 == null)
 				{
 					return false;
 				}
-				handlerStart = handlerStart.get_Next();
-				if (handlerStart == null || handlerStart.get_OpCode().get_Code() != 120 || handlerStart.get_Operand() != disposableField)
+				V_0 = V_0.get_Next();
+				if (V_0 == null || V_0.get_OpCode().get_Code() != 120 || V_0.get_Operand() != disposableField)
 				{
 					return false;
 				}
@@ -391,23 +421,23 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 				disposableField = enumeratorField;
 				enumeratorField = null;
 			}
-			handlerStart = handlerStart.get_Next();
-			if (handlerStart.get_OpCode().get_Code() != 43 || ((Instruction)handlerStart.get_Operand()).get_OpCode().get_Code() != 186)
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 43 || ((Instruction)V_0.get_Operand()).get_OpCode().get_Code() != 186)
 			{
 				return false;
 			}
-			handlerStart = handlerStart.get_Next();
-			handlerStart = handlerStart.get_Next();
-			if (handlerStart.get_OpCode().get_Code() != 120 || handlerStart.get_Operand() != disposableField)
+			V_0 = V_0.get_Next();
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 120 || V_0.get_Operand() != disposableField)
 			{
 				return false;
 			}
-			handlerStart = handlerStart.get_Next();
-			if (handlerStart.get_OpCode().get_Code() != 110 || ((MethodReference)handlerStart.get_Operand()).get_Name() != "Dispose")
+			V_0 = V_0.get_Next();
+			if (V_0.get_OpCode().get_Code() != 110 || String.op_Inequality(((MethodReference)V_0.get_Operand()).get_Name(), "Dispose"))
 			{
 				return false;
 			}
-			if (handlerStart.get_Next().get_OpCode().get_Code() != 186)
+			if (V_0.get_Next().get_OpCode().get_Code() != 186)
 			{
 				return false;
 			}
@@ -416,42 +446,44 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private bool TryGetExceptionHandler(InstructionBlock theBlock, out ExceptionHandler theHandler)
 		{
-			bool flag;
-			Collection<ExceptionHandler>.Enumerator enumerator = this.theDisposeCFG.RawExceptionHandlers.GetEnumerator();
+			V_0 = this.theDisposeCFG.get_RawExceptionHandlers().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					ExceptionHandler current = enumerator.get_Current();
-					if ((object)current.get_TryStart() != (object)theBlock.First)
+					V_1 = V_0.get_Current();
+					if ((object)V_1.get_TryStart() != (object)theBlock.get_First())
 					{
 						continue;
 					}
-					theHandler = current;
-					flag = true;
-					return flag;
+					theHandler = V_1;
+					V_2 = true;
+					goto Label1;
 				}
-				theHandler = null;
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_2;
+		Label0:
+			theHandler = null;
+			return false;
 		}
 
 		private bool TryGetFinallyMethodDefinition(ExceptionHandler theHandler, out MethodDefinition methodDef)
 		{
-			Instruction next = theHandler.get_HandlerStart().get_Next();
-			if (next.get_OpCode().get_Code() == 39)
+			V_0 = theHandler.get_HandlerStart().get_Next();
+			if (V_0.get_OpCode().get_Code() == 39)
 			{
-				methodDef = ((MethodReference)next.get_Operand()).Resolve();
-				while (next.get_Next().get_OpCode().get_Code() == null)
+				methodDef = ((MethodReference)V_0.get_Operand()).Resolve();
+				while (V_0.get_Next().get_OpCode().get_Code() == null)
 				{
-					next = next.get_Next();
+					V_0 = V_0.get_Next();
 				}
-				if (next.get_Next().get_OpCode().get_Code() == 186 && (object)next.get_Next().get_Next() == (object)theHandler.get_HandlerEnd())
+				if (V_0.get_Next().get_OpCode().get_Code() == 186 && (object)V_0.get_Next().get_Next() == (object)theHandler.get_HandlerEnd())
 				{
 					return true;
 				}

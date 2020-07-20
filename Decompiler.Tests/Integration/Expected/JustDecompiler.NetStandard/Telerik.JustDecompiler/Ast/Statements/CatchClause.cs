@@ -21,19 +21,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				CatchClause catchClause = null;
-				if (catchClause.Variable != null)
-				{
-					yield return catchClause.Variable;
-				}
-				if (catchClause.Filter != null)
-				{
-					yield return catchClause.Filter;
-				}
-				if (catchClause.Body != null)
-				{
-					yield return catchClause.Body;
-				}
+				stackVariable1 = new CatchClause.u003cget_Childrenu003ed__19(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -41,7 +31,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.CatchClause;
+				return 16;
 			}
 		}
 
@@ -65,80 +55,78 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public CatchClause()
 		{
+			base();
+			return;
 		}
 
 		public CatchClause(BlockStatement body, TypeReference type, VariableDeclarationExpression variable, Statement filter = null)
 		{
-			this.Body = body;
-			this.Type = type;
-			this.Variable = variable;
-			this.Filter = filter;
+			base();
+			this.set_Body(body);
+			this.set_Type(type);
+			this.set_Variable(variable);
+			this.set_Filter(filter);
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			VariableDeclarationExpression variableDeclarationExpression;
-			Statement statement;
-			BlockStatement blockStatement;
-			if (this.Body != null)
+			if (this.get_Body() != null)
 			{
-				blockStatement = (BlockStatement)this.Body.Clone();
+				stackVariable5 = (BlockStatement)this.get_Body().Clone();
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			if (this.Variable != null)
+			if (this.get_Variable() != null)
 			{
-				variableDeclarationExpression = (VariableDeclarationExpression)this.Variable.Clone();
+				stackVariable11 = (VariableDeclarationExpression)this.get_Variable().Clone();
 			}
 			else
 			{
-				variableDeclarationExpression = null;
+				stackVariable11 = null;
 			}
-			VariableDeclarationExpression variableDeclarationExpression1 = variableDeclarationExpression;
-			if (this.Filter != null)
+			V_0 = stackVariable11;
+			if (this.get_Filter() != null)
 			{
-				statement = this.Filter.Clone();
+				stackVariable16 = this.get_Filter().Clone();
 			}
 			else
 			{
-				statement = null;
+				stackVariable16 = null;
 			}
-			return new CatchClause(blockStatement, this.Type, variableDeclarationExpression1, statement);
+			return new CatchClause(stackVariable5, this.get_Type(), V_0, stackVariable16);
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			VariableDeclarationExpression variableDeclarationExpression;
-			Statement statement;
-			BlockStatement blockStatement;
-			if (this.Body != null)
+			if (this.get_Body() != null)
 			{
-				blockStatement = (BlockStatement)this.Body.CloneStatementOnly();
+				stackVariable5 = (BlockStatement)this.get_Body().CloneStatementOnly();
 			}
 			else
 			{
-				blockStatement = null;
+				stackVariable5 = null;
 			}
-			if (this.Variable != null)
+			if (this.get_Variable() != null)
 			{
-				variableDeclarationExpression = (VariableDeclarationExpression)this.Variable.CloneExpressionOnly();
+				stackVariable11 = (VariableDeclarationExpression)this.get_Variable().CloneExpressionOnly();
 			}
 			else
 			{
-				variableDeclarationExpression = null;
+				stackVariable11 = null;
 			}
-			VariableDeclarationExpression variableDeclarationExpression1 = variableDeclarationExpression;
-			if (this.Filter != null)
+			V_0 = stackVariable11;
+			if (this.get_Filter() != null)
 			{
-				statement = this.Filter.CloneStatementOnly();
+				stackVariable16 = this.get_Filter().CloneStatementOnly();
 			}
 			else
 			{
-				statement = null;
+				stackVariable16 = null;
 			}
-			return new CatchClause(blockStatement, this.Type, variableDeclarationExpression1, statement);
+			return new CatchClause(stackVariable5, this.get_Type(), V_0, stackVariable16);
 		}
 	}
 }

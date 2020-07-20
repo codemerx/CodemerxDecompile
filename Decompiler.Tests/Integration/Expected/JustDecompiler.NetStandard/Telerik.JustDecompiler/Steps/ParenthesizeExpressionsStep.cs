@@ -1,4 +1,3 @@
-using Mono.Cecil;
 using System;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -11,6 +10,8 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public ParenthesizeExpressionsStep()
 		{
+			base();
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -22,86 +23,106 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			public Parenthesizer()
 			{
+				base();
+				return;
 			}
 
-			private bool IsCommutative(BinaryOperator @operator)
+			private bool IsCommutative(BinaryOperator operator)
 			{
-				if (@operator == BinaryOperator.Add || @operator == BinaryOperator.BitwiseAnd || @operator == BinaryOperator.BitwiseOr || @operator == BinaryOperator.BitwiseXor || @operator == BinaryOperator.LogicalAnd || @operator == BinaryOperator.LogicalOr || @operator == BinaryOperator.Multiply || @operator == BinaryOperator.ValueEquality || @operator == BinaryOperator.ValueInequality)
+				if (operator == 1 || operator == 22 || operator == 21 || operator == 23 || operator == 12 || operator == 11 || operator == 5 || operator == 9 || operator == 10)
 				{
 					return true;
 				}
-				return @operator == BinaryOperator.Assign;
+				return operator == 26;
 			}
 
 			public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 			{
-				bool flag = false;
-				if (node.Left.CodeNodeType == CodeNodeType.BinaryExpression)
+				V_0 = false;
+				if (node.get_Left().get_CodeNodeType() == 24)
 				{
-					BinaryExpression left = node.Left as BinaryExpression;
-					if (left.CompareOperators(node) > 0)
+					V_2 = node.get_Left() as BinaryExpression;
+					if (V_2.CompareOperators(node) <= 0)
 					{
-						flag = true;
-					}
-					else if (left.IsOverridenOperation)
-					{
-						flag = true;
-					}
-				}
-				if (flag)
-				{
-					node.Left = new ParenthesesExpression(node.Left);
-				}
-				bool flag1 = false;
-				if (node.Right.CodeNodeType == CodeNodeType.BinaryExpression)
-				{
-					BinaryExpression right = node.Right as BinaryExpression;
-					int num = right.CompareOperators(node);
-					if (num > 0)
-					{
-						flag1 = true;
-					}
-					else if (num != 0)
-					{
-						if (!node.IsAssignmentExpression && right.IsOverridenOperation)
+						if (V_2.get_IsOverridenOperation())
 						{
-							flag1 = true;
+							V_0 = true;
 						}
 					}
-					else if (node.Operator != right.Operator)
+					else
 					{
-						flag1 = true;
-					}
-					else if (!this.IsCommutative(node.Operator))
-					{
-						flag1 = true;
-					}
-					else if ((object)right.ExpressionType == (object)right.ExpressionType.get_Module().get_TypeSystem().get_Single() || (object)right.ExpressionType == (object)right.ExpressionType.get_Module().get_TypeSystem().get_Double())
-					{
-						flag1 = true;
+						V_0 = true;
 					}
 				}
-				if (flag1)
+				if (V_0)
 				{
-					node.Right = new ParenthesesExpression(node.Right);
+					node.set_Left(new ParenthesesExpression(node.get_Left()));
 				}
-				return base.VisitBinaryExpression(node);
+				V_1 = false;
+				if (node.get_Right().get_CodeNodeType() == 24)
+				{
+					V_3 = node.get_Right() as BinaryExpression;
+					V_4 = V_3.CompareOperators(node);
+					if (V_4 <= 0)
+					{
+						if (V_4 != 0)
+						{
+							if (!node.get_IsAssignmentExpression() && V_3.get_IsOverridenOperation())
+							{
+								V_1 = true;
+							}
+						}
+						else
+						{
+							if (node.get_Operator() == V_3.get_Operator())
+							{
+								if (this.IsCommutative(node.get_Operator()))
+								{
+									if ((object)V_3.get_ExpressionType() == (object)V_3.get_ExpressionType().get_Module().get_TypeSystem().get_Single() || (object)V_3.get_ExpressionType() == (object)V_3.get_ExpressionType().get_Module().get_TypeSystem().get_Double())
+									{
+										V_1 = true;
+									}
+								}
+								else
+								{
+									V_1 = true;
+								}
+							}
+							else
+							{
+								V_1 = true;
+							}
+						}
+					}
+					else
+					{
+						V_1 = true;
+					}
+				}
+				if (V_1)
+				{
+					node.set_Right(new ParenthesesExpression(node.get_Right()));
+				}
+				return this.VisitBinaryExpression(node);
 			}
 
 			public override ICodeNode VisitUnaryExpression(UnaryExpression node)
 			{
-				if (node.Operator == UnaryOperator.AddressDereference)
+				if (node.get_Operator() != 8)
 				{
-					if (node.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression && node.Operand.CodeNodeType != CodeNodeType.ArgumentReferenceExpression && node.Operand.CodeNodeType != CodeNodeType.ExplicitCastExpression)
+					if (node.get_Operator() != 11 && node.get_Operand().get_CodeNodeType() == 24)
 					{
-						node.Operand = new ParenthesesExpression(node.Operand);
+						node.set_Operand(new ParenthesesExpression(node.get_Operand()));
 					}
 				}
-				else if (node.Operator != UnaryOperator.None && node.Operand.CodeNodeType == CodeNodeType.BinaryExpression)
+				else
 				{
-					node.Operand = new ParenthesesExpression(node.Operand);
+					if (node.get_Operand().get_CodeNodeType() != 26 && node.get_Operand().get_CodeNodeType() != 25 && node.get_Operand().get_CodeNodeType() != 31)
+					{
+						node.set_Operand(new ParenthesesExpression(node.get_Operand()));
+					}
 				}
-				return base.VisitUnaryExpression(node);
+				return this.VisitUnaryExpression(node);
 			}
 		}
 	}

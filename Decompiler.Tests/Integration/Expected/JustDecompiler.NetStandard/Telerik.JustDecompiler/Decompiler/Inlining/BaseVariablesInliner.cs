@@ -8,9 +8,9 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 {
 	internal abstract class BaseVariablesInliner
 	{
-		protected readonly HashSet<VariableDefinition> variablesToNotInline = new HashSet<VariableDefinition>();
+		protected readonly HashSet<VariableDefinition> variablesToNotInline;
 
-		protected readonly HashSet<VariableDefinition> variablesToInline = new HashSet<VariableDefinition>();
+		protected readonly HashSet<VariableDefinition> variablesToInline;
 
 		protected readonly MethodSpecificContext methodContext;
 
@@ -20,37 +20,44 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public BaseVariablesInliner(MethodSpecificContext methodContext, IVariableInliner inliner, IVariablesToNotInlineFinder finder)
 		{
+			this.variablesToNotInline = new HashSet<VariableDefinition>();
+			this.variablesToInline = new HashSet<VariableDefinition>();
+			base();
 			this.methodContext = methodContext;
 			this.inliner = inliner;
 			this.finder = finder;
+			return;
 		}
 
 		protected void FastRemoveExpressions(IList<Expression> blockExpressions, bool[] isInlined)
 		{
-			int i;
-			int num = 0;
-			for (i = 0; i < blockExpressions.Count; i++)
+			V_0 = 0;
+			V_1 = 0;
+			while (V_1 < blockExpressions.get_Count())
 			{
-				if (!isInlined[i])
+				if (!isInlined[V_1])
 				{
-					int item = num;
-					num = item + 1;
-					blockExpressions[item] = blockExpressions[i];
+					stackVariable12 = V_0;
+					V_0 = stackVariable12 + 1;
+					blockExpressions.set_Item(stackVariable12, blockExpressions.get_Item(V_1));
 				}
+				V_1 = V_1 + 1;
 			}
-			while (num < i)
+			while (V_0 < V_1)
 			{
-				int num1 = i - 1;
-				i = num1;
-				blockExpressions.RemoveAt(num1);
+				stackVariable23 = V_1 - 1;
+				V_1 = stackVariable23;
+				blockExpressions.RemoveAt(stackVariable23);
 			}
+			return;
 		}
 
 		protected abstract void FindSingleDefineSingleUseVariables();
 
 		private void FindVariablesToNotInline()
 		{
-			this.variablesToNotInline.UnionWith(this.finder.Find(this.methodContext.Expressions.BlockExpressions));
+			this.variablesToNotInline.UnionWith(this.finder.Find(this.methodContext.get_Expressions().get_BlockExpressions()));
+			return;
 		}
 
 		protected abstract void InlineInBlocks();
@@ -60,6 +67,7 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 			this.FindVariablesToNotInline();
 			this.FindSingleDefineSingleUseVariables();
 			this.InlineInBlocks();
+			return;
 		}
 	}
 }

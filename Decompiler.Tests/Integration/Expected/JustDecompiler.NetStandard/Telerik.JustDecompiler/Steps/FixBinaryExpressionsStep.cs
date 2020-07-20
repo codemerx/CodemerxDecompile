@@ -1,15 +1,11 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
-using Telerik.JustDecompiler.Cil;
-using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
@@ -20,128 +16,150 @@ namespace Telerik.JustDecompiler.Steps
 
 		public FixBinaryExpressionsStep(TypeSystem typeSystem)
 		{
+			base();
 			this.typeSystem = typeSystem;
+			return;
 		}
 
 		private bool CheckForOverloadedEqualityOperators(Expression expression, out TypeReference unresolvedReference)
 		{
-			TypeReference typeReference;
 			unresolvedReference = null;
-			bool? overloadedEqualityOperator = Telerik.JustDecompiler.Common.Extensions.ResolveToOverloadedEqualityOperator(expression.ExpressionType, out typeReference);
-			if (overloadedEqualityOperator.HasValue)
+			V_1 = Extensions.ResolveToOverloadedEqualityOperator(expression.get_ExpressionType(), out V_0);
+			if (V_1.get_HasValue())
 			{
-				return overloadedEqualityOperator.Value;
+				return V_1.get_Value();
 			}
-			unresolvedReference = typeReference;
+			unresolvedReference = V_0;
 			return true;
 		}
 
 		private ICodeNode FixBranchingExpression(Expression expression, Instruction branch)
 		{
-			BinaryExpression binaryExpression;
-			Expression expression1;
-			Expression unaryExpression;
-			bool flag = (branch.get_OpCode().get_Code() == 57 ? true : branch.get_OpCode().get_Code() == 44);
-			TypeReference expressionType = expression.ExpressionType;
-			BinaryOperator binaryOperator = BinaryOperator.ValueEquality;
-			Instruction[] instructionArray = new Instruction[] { branch };
-			if (flag)
+			if (branch.get_OpCode().get_Code() == 57)
 			{
-				binaryOperator = BinaryOperator.ValueInequality;
-			}
-			if (expressionType.get_Name() == "Boolean" || expressionType.get_Name().Contains("Boolean "))
-			{
-				expression1 = (flag ? expression : Negator.Negate(expression, this.typeSystem));
-				if (!(expression is SafeCastExpression))
-				{
-					unaryExpression = new UnaryExpression(UnaryOperator.None, expression1, instructionArray);
-				}
-				else
-				{
-					unaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(false, null), this.typeSystem, instructionArray, false);
-				}
-				return unaryExpression;
-			}
-			if (expressionType.get_Name() == "Char")
-			{
-				binaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression('\0', null), this.typeSystem, instructionArray, false)
-				{
-					ExpressionType = this.typeSystem.get_Boolean()
-				};
-			}
-			if (expressionType.get_IsPrimitive())
-			{
-				binaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(0, null), this.typeSystem, instructionArray, false)
-				{
-					ExpressionType = this.typeSystem.get_Boolean()
-				};
+				stackVariable5 = true;
 			}
 			else
 			{
-				TypeDefinition typeDefinition = expressionType.Resolve();
-				if (typeDefinition == null || !typeDefinition.get_IsEnum() || expressionType.get_IsArray())
+				V_5 = branch.get_OpCode();
+				stackVariable5 = V_5.get_Code() == 44;
+			}
+			V_0 = stackVariable5;
+			V_1 = expression.get_ExpressionType();
+			V_3 = 9;
+			stackVariable10 = new Instruction[1];
+			stackVariable10[0] = branch;
+			V_4 = stackVariable10;
+			if (V_0)
+			{
+				V_3 = 10;
+			}
+			if (String.op_Equality(V_1.get_Name(), "Boolean") || V_1.get_Name().Contains("Boolean "))
+			{
+				if (V_0)
 				{
-					binaryExpression = new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(null, null), this.typeSystem, instructionArray, false)
-					{
-						ExpressionType = this.typeSystem.get_Boolean()
-					};
+					V_6 = expression;
 				}
 				else
 				{
-					FieldDefinition fieldDefinition = null;
-					foreach (FieldDefinition field in typeDefinition.get_Fields())
+					V_6 = Negator.Negate(expression, this.typeSystem);
+				}
+				if (expression as SafeCastExpression == null)
+				{
+					V_7 = new UnaryExpression(11, V_6, V_4);
+				}
+				else
+				{
+					V_7 = new BinaryExpression(V_3, expression, this.GetLiteralExpression(false, null), this.typeSystem, V_4, false);
+				}
+				return V_7;
+			}
+			if (String.op_Equality(V_1.get_Name(), "Char"))
+			{
+				V_2 = new BinaryExpression(V_3, expression, this.GetLiteralExpression('\0', null), this.typeSystem, V_4, false);
+				V_2.set_ExpressionType(this.typeSystem.get_Boolean());
+			}
+			if (V_1.get_IsPrimitive())
+			{
+				V_2 = new BinaryExpression(V_3, expression, this.GetLiteralExpression(0, null), this.typeSystem, V_4, false);
+				V_2.set_ExpressionType(this.typeSystem.get_Boolean());
+			}
+			else
+			{
+				V_8 = V_1.Resolve();
+				if (V_8 == null || !V_8.get_IsEnum() || V_1.get_IsArray())
+				{
+					V_2 = new BinaryExpression(V_3, expression, this.GetLiteralExpression(null, null), this.typeSystem, V_4, false);
+					V_2.set_ExpressionType(this.typeSystem.get_Boolean());
+				}
+				else
+				{
+					V_9 = null;
+					V_10 = V_8.get_Fields().GetEnumerator();
+					try
 					{
-						if (field.get_Constant() == null || field.get_Constant().get_Value() == null || !field.get_Constant().get_Value().Equals(0))
+						while (V_10.MoveNext())
 						{
-							continue;
+							V_11 = V_10.get_Current();
+							if (V_11.get_Constant() == null || V_11.get_Constant().get_Value() == null || !V_11.get_Constant().get_Value().Equals(0))
+							{
+								continue;
+							}
+							V_9 = V_11;
+							goto Label0;
 						}
-						fieldDefinition = field;
-						goto Label0;
+					}
+					finally
+					{
+						V_10.Dispose();
 					}
 				Label0:
-					binaryExpression = (fieldDefinition != null ? new BinaryExpression(binaryOperator, expression, new EnumExpression(fieldDefinition, null), this.typeSystem, instructionArray, false)
+					if (V_9 != null)
 					{
-						ExpressionType = this.typeSystem.get_Boolean()
-					} : new BinaryExpression(binaryOperator, expression, this.GetLiteralExpression(0, null), this.typeSystem, instructionArray, false)
+						V_2 = new BinaryExpression(V_3, expression, new EnumExpression(V_9, null), this.typeSystem, V_4, false);
+						V_2.set_ExpressionType(this.typeSystem.get_Boolean());
+					}
+					else
 					{
-						ExpressionType = this.typeSystem.get_Boolean()
-					});
+						V_2 = new BinaryExpression(V_3, expression, this.GetLiteralExpression(0, null), this.typeSystem, V_4, false);
+						V_2.set_ExpressionType(this.typeSystem.get_Boolean());
+					}
 				}
 			}
-			return binaryExpression;
+			return V_2;
 		}
 
 		private ICodeNode FixEqualityComparisonExpression(BinaryExpression expression)
 		{
-			if (!(expression.Right is LiteralExpression))
+			if (expression.get_Right() as LiteralExpression == null)
 			{
 				return expression;
 			}
-			TypeReference elementType = this.GetElementType(expression.Left.ExpressionType);
-			if (elementType.get_FullName() != this.typeSystem.get_Boolean().get_FullName())
+			V_0 = this.GetElementType(expression.get_Left().get_ExpressionType());
+			if (String.op_Inequality(V_0.get_FullName(), this.typeSystem.get_Boolean().get_FullName()))
 			{
-				TypeDefinition typeDefinition = elementType.Resolve();
-				if (elementType != null && !elementType.get_IsPrimitive() && typeDefinition != null && !typeDefinition.get_IsEnum())
+				V_2 = V_0.Resolve();
+				if (V_0 != null && !V_0.get_IsPrimitive() && V_2 != null && !V_2.get_IsEnum())
 				{
-					expression.Right = this.GetLiteralExpression(null, null);
+					expression.set_Right(this.GetLiteralExpression(null, null));
 				}
 				return expression;
 			}
-			LiteralExpression right = expression.Right as LiteralExpression;
-			if (!right.Value.Equals(0) && !right.Value.Equals(null))
+			V_1 = expression.get_Right() as LiteralExpression;
+			if (!V_1.get_Value().Equals(0) && !V_1.get_Value().Equals(null))
 			{
-				return expression.Left;
+				return expression.get_Left();
 			}
-			return new UnaryExpression(UnaryOperator.LogicalNot, expression.Left, null);
+			return new UnaryExpression(1, expression.get_Left(), null);
 		}
 
 		private TypeReference GetElementType(TypeReference type)
 		{
-			if (type is IModifierType)
+			if (type as IModifierType != null)
 			{
 				return (type as IModifierType).get_ElementType();
 			}
-			if (!(type is ByReferenceType))
+			if (type as ByReferenceType == null)
 			{
 				return type;
 			}
@@ -153,32 +171,32 @@ namespace Telerik.JustDecompiler.Steps
 			return new LiteralExpression(value, this.typeSystem, instructions);
 		}
 
-		private bool IsArithmeticOperator(BinaryOperator @operator)
+		private bool IsArithmeticOperator(BinaryOperator operator)
 		{
-			if (@operator == BinaryOperator.Add || @operator == BinaryOperator.Subtract || @operator == BinaryOperator.Multiply)
+			if (operator == 1 || operator == 3 || operator == 5)
 			{
 				return true;
 			}
-			return @operator == BinaryOperator.Divide;
+			return operator == 7;
 		}
 
-		private bool IsBooleanAssignmentOperator(BinaryOperator @operator)
+		private bool IsBooleanAssignmentOperator(BinaryOperator operator)
 		{
-			if (@operator == BinaryOperator.Assign || @operator == BinaryOperator.AndAssign || @operator == BinaryOperator.OrAssign)
+			if (operator == 26 || operator == 28 || operator == 29)
 			{
 				return true;
 			}
-			return @operator == BinaryOperator.XorAssign;
+			return operator == 30;
 		}
 
 		private bool IsFalse(Expression expression)
 		{
-			LiteralExpression literalExpression = expression as LiteralExpression;
-			if (literalExpression == null)
+			V_0 = expression as LiteralExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (!literalExpression.Value.Equals(false) && !literalExpression.Value.Equals(0))
+			if (!V_0.get_Value().Equals(false) && !V_0.get_Value().Equals(0))
 			{
 				return false;
 			}
@@ -187,169 +205,192 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool NeedsPointerCast(BinaryExpression expression)
 		{
-			if (!expression.Left.ExpressionType.get_IsPointer() && !expression.Left.ExpressionType.get_IsByReference())
+			if (!expression.get_Left().get_ExpressionType().get_IsPointer() && !expression.get_Left().get_ExpressionType().get_IsByReference())
 			{
 				return false;
 			}
-			return expression.Left.ExpressionType.GetElementType().get_FullName() != expression.Right.ExpressionType.GetElementType().get_FullName();
+			return String.op_Inequality(expression.get_Left().get_ExpressionType().GetElementType().get_FullName(), expression.get_Right().get_ExpressionType().GetElementType().get_FullName());
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			MethodSpecificContext methodContext = context.MethodContext;
-			foreach (int key in methodContext.Expressions.BlockExpressions.Keys)
+			V_0 = context.get_MethodContext();
+			V_1 = V_0.get_Expressions().get_BlockExpressions().get_Keys().GetEnumerator();
+			try
 			{
-				IList<Expression> item = methodContext.Expressions.BlockExpressions[key];
-				OpCode opCode = methodContext.ControlFlowGraph.InstructionToBlockMapping[key].Last.get_OpCode();
-				Code code = opCode.get_Code();
-				bool flag = (code == 57 || code == 44 || code == 56 ? true : code == 43);
-				for (int i = 0; i < item.Count; i++)
+				while (V_1.MoveNext())
 				{
-					item[i] = (Expression)this.Visit(item[i]);
+					V_2 = V_1.get_Current();
+					V_3 = V_0.get_Expressions().get_BlockExpressions().get_Item(V_2);
+					V_6 = V_0.get_ControlFlowGraph().get_InstructionToBlockMapping().get_Item(V_2).get_Last().get_OpCode();
+					V_4 = V_6.get_Code();
+					if (V_4 == 57 || V_4 == 44 || V_4 == 56)
+					{
+						stackVariable27 = true;
+					}
+					else
+					{
+						stackVariable27 = V_4 == 43;
+					}
+					V_5 = stackVariable27;
+					V_7 = 0;
+					while (V_7 < V_3.get_Count())
+					{
+						V_3.set_Item(V_7, (Expression)this.Visit(V_3.get_Item(V_7)));
+						V_7 = V_7 + 1;
+					}
+					if (!V_5)
+					{
+						continue;
+					}
+					V_3.set_Item(V_3.get_Count() - 1, (Expression)this.FixBranchingExpression(V_3.get_Item(V_3.get_Count() - 1), V_0.get_ControlFlowGraph().get_InstructionToBlockMapping().get_Item(V_2).get_Last()));
 				}
-				if (!flag)
-				{
-					continue;
-				}
-				item[item.Count - 1] = (Expression)this.FixBranchingExpression(item[item.Count - 1], methodContext.ControlFlowGraph.InstructionToBlockMapping[key].Last);
+			}
+			finally
+			{
+				((IDisposable)V_1).Dispose();
 			}
 			return body;
 		}
 
 		private Expression SimplifyBooleanComparison(BinaryExpression expression)
 		{
-			bool flag = this.IsFalse(expression.Right);
-			if ((!flag || expression.Operator != BinaryOperator.ValueEquality) && (flag || expression.Operator != BinaryOperator.ValueInequality))
+			V_0 = this.IsFalse(expression.get_Right());
+			if (!V_0 || expression.get_Operator() != 9 && V_0 || expression.get_Operator() != 10)
 			{
 				return expression;
 			}
-			List<Instruction> instructions = new List<Instruction>(expression.MappedInstructions);
-			instructions.AddRange(expression.Right.UnderlyingSameMethodInstructions);
-			return Negator.Negate(expression.Left, this.typeSystem).CloneAndAttachInstructions(instructions);
+			V_1 = new List<Instruction>(expression.get_MappedInstructions());
+			V_1.AddRange(expression.get_Right().get_UnderlyingSameMethodInstructions());
+			return Negator.Negate(expression.get_Left(), this.typeSystem).CloneAndAttachInstructions(V_1);
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression expression)
 		{
-			TypeReference typeReference;
-			TypeReference typeReference1;
-			expression.Left = (Expression)this.Visit(expression.Left);
-			expression.Right = (Expression)this.Visit(expression.Right);
-			TypeReference expressionType = expression.Left.ExpressionType;
-			expressionType = this.GetElementType(expressionType);
-			if (expressionType != null)
+			expression.set_Left((Expression)this.Visit(expression.get_Left()));
+			expression.set_Right((Expression)this.Visit(expression.get_Right()));
+			V_0 = expression.get_Left().get_ExpressionType();
+			V_0 = this.GetElementType(V_0);
+			if (V_0 != null)
 			{
-				if (expressionType.get_FullName() == this.typeSystem.get_Char().get_FullName())
+				if (String.op_Equality(V_0.get_FullName(), this.typeSystem.get_Char().get_FullName()))
 				{
-					if (expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
+					if (expression.get_Right().get_CodeNodeType() == 22)
 					{
-						if (this.IsArithmeticOperator(expression.Operator))
+						if (this.IsArithmeticOperator(expression.get_Operator()))
 						{
-							expression.ExpressionType = this.typeSystem.get_Char();
+							expression.set_ExpressionType(this.typeSystem.get_Char());
 							return expression;
 						}
-						if (expression.Right.HasType)
+						if (expression.get_Right().get_HasType())
 						{
-							TypeReference elementType = this.GetElementType(expression.Right.ExpressionType);
-							if (expressionType.get_FullName() == elementType.get_FullName())
+							V_2 = this.GetElementType(expression.get_Right().get_ExpressionType());
+							if (String.op_Equality(V_0.get_FullName(), V_2.get_FullName()))
 							{
 								return expression;
 							}
 						}
-						LiteralExpression right = expression.Right as LiteralExpression;
-						expression.Right = this.GetLiteralExpression((char)((Int32)right.Value), right.MappedInstructions);
+						V_1 = expression.get_Right() as LiteralExpression;
+						expression.set_Right(this.GetLiteralExpression((char)((Int32)V_1.get_Value()), V_1.get_MappedInstructions()));
 					}
-					if (this.GetElementType(expression.Right.ExpressionType).get_FullName() != this.typeSystem.get_Char().get_FullName())
+					if (String.op_Inequality(this.GetElementType(expression.get_Right().get_ExpressionType()).get_FullName(), this.typeSystem.get_Char().get_FullName()))
 					{
-						if (expression.Right.CodeNodeType != CodeNodeType.ExplicitCastExpression || !(expression.Right.ExpressionType.get_FullName() == this.typeSystem.get_UInt16().get_FullName()))
+						if (expression.get_Right().get_CodeNodeType() != 31 || !String.op_Equality(expression.get_Right().get_ExpressionType().get_FullName(), this.typeSystem.get_UInt16().get_FullName()))
 						{
-							expression.Right = new ExplicitCastExpression(expression.Right, this.typeSystem.get_Char(), null);
+							expression.set_Right(new ExplicitCastExpression(expression.get_Right(), this.typeSystem.get_Char(), null));
 						}
 						else
 						{
-							((ExplicitCastExpression)expression.Right).TargetType = this.typeSystem.get_Char();
+							((ExplicitCastExpression)expression.get_Right()).set_TargetType(this.typeSystem.get_Char());
 						}
 					}
 				}
-				if (expressionType.get_FullName() == this.typeSystem.get_Boolean().get_FullName() && expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
+				if (String.op_Equality(V_0.get_FullName(), this.typeSystem.get_Boolean().get_FullName()) && expression.get_Right().get_CodeNodeType() == 22)
 				{
-					if (expression.Operator == BinaryOperator.ValueEquality || expression.Operator == BinaryOperator.ValueInequality || this.IsBooleanAssignmentOperator(expression.Operator))
+					if (expression.get_Operator() == 9 || expression.get_Operator() == 10 || this.IsBooleanAssignmentOperator(expression.get_Operator()))
 					{
-						LiteralExpression literalExpression = expression.Right as LiteralExpression;
-						bool flag = true;
-						if (literalExpression.Value == null || literalExpression.Value.Equals(0) || literalExpression.Value.Equals(false) || literalExpression.Value.Equals(null))
+						V_3 = expression.get_Right() as LiteralExpression;
+						V_4 = true;
+						if (V_3.get_Value() == null || V_3.get_Value().Equals(0) || V_3.get_Value().Equals(false) || V_3.get_Value().Equals(null))
 						{
-							flag = false;
+							V_4 = false;
 						}
-						expression.Right = this.GetLiteralExpression(flag, literalExpression.MappedInstructions);
+						expression.set_Right(this.GetLiteralExpression(V_4, V_3.get_MappedInstructions()));
 					}
-					if (expression.Operator == BinaryOperator.ValueEquality || expression.Operator == BinaryOperator.ValueInequality)
+					if (expression.get_Operator() == 9 || expression.get_Operator() == 10)
 					{
 						return this.SimplifyBooleanComparison(expression);
 					}
 				}
 			}
-			if (expression.Operator == BinaryOperator.ValueEquality || expression.Operator == BinaryOperator.ValueInequality)
+			if (expression.get_Operator() == 9 || expression.get_Operator() == 10)
 			{
-				TypeReference elementType1 = this.GetElementType(expression.Right.ExpressionType);
-				if (elementType1 != null && expressionType != null && elementType1.get_FullName() != expressionType.get_FullName())
+				V_5 = this.GetElementType(expression.get_Right().get_ExpressionType());
+				if (V_5 != null && V_0 != null && String.op_Inequality(V_5.get_FullName(), V_0.get_FullName()))
 				{
 					return this.FixEqualityComparisonExpression(expression);
 				}
 			}
-			if (expression.IsAssignmentExpression)
+			if (expression.get_IsAssignmentExpression())
 			{
-				if (this.NeedsPointerCast(expression))
+				if (!this.NeedsPointerCast(expression))
 				{
-					if (expression.Right.CodeNodeType != CodeNodeType.StackAllocExpression)
+					if (expression.get_Left().get_HasType() && expression.get_Left().get_ExpressionType().get_IsByReference() || expression.get_Left().get_ExpressionType().get_IsPointer() || expression.get_Left().get_ExpressionType().get_IsArray() || !expression.get_Left().get_ExpressionType().get_IsPrimitive())
 					{
-						expression.Right = new ExplicitCastExpression(expression.Right, expression.Left.ExpressionType, null);
-					}
-					else
-					{
-						expression.Right.ExpressionType = expression.Left.ExpressionType;
-					}
-				}
-				else if (expression.Left.HasType && (expression.Left.ExpressionType.get_IsByReference() || expression.Left.ExpressionType.get_IsPointer() || expression.Left.ExpressionType.get_IsArray() || !expression.Left.ExpressionType.get_IsPrimitive()))
-				{
-					TypeDefinition typeDefinition = expression.Left.ExpressionType.Resolve();
-					if (typeDefinition != null && !typeDefinition.get_IsEnum() && expression.Right is LiteralExpression)
-					{
-						LiteralExpression right1 = expression.Right as LiteralExpression;
-						if (right1.Value != null && right1.Value.Equals(0))
+						V_6 = expression.get_Left().get_ExpressionType().Resolve();
+						if (V_6 != null && !V_6.get_IsEnum() && expression.get_Right() as LiteralExpression != null)
 						{
-							expression.Right = new LiteralExpression(null, this.typeSystem, expression.Right.UnderlyingSameMethodInstructions);
+							V_7 = expression.get_Right() as LiteralExpression;
+							if (V_7.get_Value() != null && V_7.get_Value().Equals(0))
+							{
+								expression.set_Right(new LiteralExpression(null, this.typeSystem, expression.get_Right().get_UnderlyingSameMethodInstructions()));
+							}
 						}
 					}
 				}
-			}
-			if (expression.Operator == BinaryOperator.GreaterThan && expression.MappedInstructions.Count<Instruction>() == 1 && expression.MappedInstructions.First<Instruction>().get_OpCode().get_Code() == 194)
-			{
-				LiteralExpression literalExpression1 = null;
-				if (expression.Right.CodeNodeType == CodeNodeType.LiteralExpression)
+				else
 				{
-					literalExpression1 = expression.Right as LiteralExpression;
-				}
-				else if (expression.Right.CodeNodeType == CodeNodeType.ExplicitCastExpression)
-				{
-					ExplicitCastExpression explicitCastExpression = expression.Right as ExplicitCastExpression;
-					if (explicitCastExpression.Expression.CodeNodeType == CodeNodeType.LiteralExpression)
+					if (expression.get_Right().get_CodeNodeType() != 45)
 					{
-						literalExpression1 = explicitCastExpression.Expression as LiteralExpression;
+						expression.set_Right(new ExplicitCastExpression(expression.get_Right(), expression.get_Left().get_ExpressionType(), null));
+					}
+					else
+					{
+						expression.get_Right().set_ExpressionType(expression.get_Left().get_ExpressionType());
 					}
 				}
-				if (literalExpression1 != null && (literalExpression1.Value == null || literalExpression1.Value.Equals(0)))
+			}
+			if (expression.get_Operator() == 15 && expression.get_MappedInstructions().Count<Instruction>() == 1 && expression.get_MappedInstructions().First<Instruction>().get_OpCode().get_Code() == 194)
+			{
+				V_9 = null;
+				if (expression.get_Right().get_CodeNodeType() != 22)
 				{
-					expression.Operator = BinaryOperator.ValueInequality;
+					if (expression.get_Right().get_CodeNodeType() == 31)
+					{
+						V_10 = expression.get_Right() as ExplicitCastExpression;
+						if (V_10.get_Expression().get_CodeNodeType() == 22)
+						{
+							V_9 = V_10.get_Expression() as LiteralExpression;
+						}
+					}
+				}
+				else
+				{
+					V_9 = expression.get_Right() as LiteralExpression;
+				}
+				if (V_9 != null && V_9.get_Value() == null || V_9.get_Value().Equals(0))
+				{
+					expression.set_Operator(10);
 				}
 			}
-			if (expression.IsObjectComparison)
+			if (expression.get_IsObjectComparison())
 			{
-				Expression left = expression.Left;
-				Expression expression1 = expression.Right;
-				if (this.CheckForOverloadedEqualityOperators(expression.Left, out typeReference) && this.CheckForOverloadedEqualityOperators(expression.Right, out typeReference1))
+				V_11 = expression.get_Left();
+				V_12 = expression.get_Right();
+				if (this.CheckForOverloadedEqualityOperators(expression.get_Left(), out V_13) && this.CheckForOverloadedEqualityOperators(expression.get_Right(), out V_14))
 				{
-					expression.Left = new ExplicitCastExpression(left, left.ExpressionType.get_Module().get_TypeSystem().get_Object(), null, typeReference);
-					expression.Right = new ExplicitCastExpression(expression1, expression1.ExpressionType.get_Module().get_TypeSystem().get_Object(), null, typeReference1);
+					expression.set_Left(new ExplicitCastExpression(V_11, V_11.get_ExpressionType().get_Module().get_TypeSystem().get_Object(), null, V_13));
+					expression.set_Right(new ExplicitCastExpression(V_12, V_12.get_ExpressionType().get_Module().get_TypeSystem().get_Object(), null, V_14));
 				}
 			}
 			return expression;

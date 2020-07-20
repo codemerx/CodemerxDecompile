@@ -22,38 +22,47 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		public ContinueAndBreakFinder()
 		{
-			this.Breaks = new List<BreakStatement>();
-			this.Continues = new List<ContinueStatement>();
+			base();
+			this.set_Breaks(new List<BreakStatement>());
+			this.set_Continues(new List<ContinueStatement>());
+			return;
 		}
 
 		public override void VisitBreakStatement(BreakStatement node)
 		{
-			this.Breaks.Add(node);
+			this.get_Breaks().Add(node);
+			return;
 		}
 
 		public override void VisitContinueStatement(ContinueStatement node)
 		{
-			this.Continues.Add(node);
+			this.get_Continues().Add(node);
+			return;
 		}
 
 		public override void VisitDoWhileStatement(DoWhileStatement node)
 		{
+			return;
 		}
 
 		public override void VisitForEachStatement(ForEachStatement node)
 		{
+			return;
 		}
 
 		public override void VisitForStatement(ForStatement node)
 		{
+			return;
 		}
 
 		public override void VisitSwitchStatement(SwitchStatement node)
 		{
+			return;
 		}
 
 		public override void VisitWhileStatement(WhileStatement node)
 		{
+			return;
 		}
 	}
 }

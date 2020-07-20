@@ -17,8 +17,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				AwaitExpression awaitExpression = null;
-				yield return awaitExpression.expression;
+				stackVariable1 = new AwaitExpression.u003cget_Childrenu003ed__11(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -26,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.AwaitExpression;
+				return 65;
 			}
 		}
 
@@ -43,32 +44,35 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 					throw new ArgumentNullException("expression");
 				}
 				this.expression = value;
+				return;
 			}
 		}
 
-		public AwaitExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public AwaitExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference type, IEnumerable<Instruction> instructions)
 		{
+			base(instructions);
 			if (expression == null)
 			{
 				throw new ArgumentNullException("expression");
 			}
 			this.expression = expression;
-			this.ExpressionType = type;
+			this.set_ExpressionType(type);
+			return;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new AwaitExpression(this.Expression.Clone(), this.ExpressionType, this.instructions);
+			return new AwaitExpression(this.get_Expression().Clone(), this.get_ExpressionType(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new AwaitExpression(this.Expression.CloneExpressionOnly(), this.ExpressionType, null);
+			return new AwaitExpression(this.get_Expression().CloneExpressionOnly(), this.get_ExpressionType(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (other.CodeNodeType != Telerik.JustDecompiler.Ast.CodeNodeType.AwaitExpression)
+			if (other.get_CodeNodeType() != 65)
 			{
 				return false;
 			}

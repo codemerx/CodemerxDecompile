@@ -1,11 +1,7 @@
 using Mono.Cecil;
-using Mono.Cecil.Extensions;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 
@@ -35,24 +31,26 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		public SwitchByStringMatcher()
 		{
+			base();
+			return;
 		}
 
 		private bool CheckDictionaryAdd(Statement statement, VariableReferenceExpression localDictionaryVariable)
 		{
-			if (!(statement is ExpressionStatement))
+			if (statement as ExpressionStatement == null)
 			{
 				return false;
 			}
-			MethodInvocationExpression expression = (statement as ExpressionStatement).Expression as MethodInvocationExpression;
-			if (expression == null)
+			V_0 = (statement as ExpressionStatement).get_Expression() as MethodInvocationExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (expression.MethodExpression.Target == null || !expression.MethodExpression.Target.Equals(localDictionaryVariable))
+			if (V_0.get_MethodExpression().get_Target() == null || !V_0.get_MethodExpression().get_Target().Equals(localDictionaryVariable))
 			{
 				return false;
 			}
-			if (!this.IsAddMethod(expression.MethodExpression.Method))
+			if (!this.IsAddMethod(V_0.get_MethodExpression().get_Method()))
 			{
 				return false;
 			}
@@ -62,167 +60,168 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 		private bool CheckDictionaryCreation(Statement firstStatement, out VariableReferenceExpression localDictionaryVariable)
 		{
 			localDictionaryVariable = null;
-			if (!(firstStatement is ExpressionStatement))
+			if (firstStatement as ExpressionStatement == null)
 			{
 				return false;
 			}
-			BinaryExpression expression = (firstStatement as ExpressionStatement).Expression as BinaryExpression;
-			if (expression == null)
+			V_0 = (firstStatement as ExpressionStatement).get_Expression() as BinaryExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (expression.Operator != BinaryOperator.Assign)
+			if (V_0.get_Operator() != 26)
 			{
 				return false;
 			}
-			if (!(expression.Right is ObjectCreationExpression))
+			if (V_0.get_Right() as ObjectCreationExpression == null)
 			{
 				return false;
 			}
-			if ((expression.Right as ObjectCreationExpression).ExpressionType.get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if (String.op_Inequality((V_0.get_Right() as ObjectCreationExpression).get_ExpressionType().get_FullName(), "System.Collections.Generic.Dictionary`2<System.String,System.Int32>"))
 			{
 				return false;
 			}
-			if (!(expression.Left is VariableReferenceExpression))
+			if (V_0.get_Left() as VariableReferenceExpression == null)
 			{
 				return false;
 			}
-			localDictionaryVariable = expression.Left as VariableReferenceExpression;
+			localDictionaryVariable = V_0.get_Left() as VariableReferenceExpression;
 			return true;
 		}
 
 		private bool CheckDictionaryFieldAssignExpression(Statement statement, VariableReferenceExpression localDictionaryVariable)
 		{
-			if (!(statement is ExpressionStatement))
+			if (statement as ExpressionStatement == null)
 			{
 				return false;
 			}
-			BinaryExpression expression = (statement as ExpressionStatement).Expression as BinaryExpression;
-			if (expression == null || expression.Operator != BinaryOperator.Assign)
+			V_0 = (statement as ExpressionStatement).get_Expression() as BinaryExpression;
+			if (V_0 == null || V_0.get_Operator() != 26)
 			{
 				return false;
 			}
-			if (!expression.Left.Equals(this.DictionaryField))
+			if (!V_0.get_Left().Equals(this.get_DictionaryField()))
 			{
 				return false;
 			}
-			return expression.Right.Equals(localDictionaryVariable);
+			return V_0.get_Right().Equals(localDictionaryVariable);
 		}
 
 		private bool CheckDictionaryIf(IfStatement dictionaryIf)
 		{
-			if (dictionaryIf.Else != null)
+			if (dictionaryIf.get_Else() != null)
 			{
 				return false;
 			}
-			if (!this.CheckDictionaryIfCondition(dictionaryIf.Condition))
+			if (!this.CheckDictionaryIfCondition(dictionaryIf.get_Condition()))
 			{
 				return false;
 			}
-			if (this.DictionaryField == null)
+			if (this.get_DictionaryField() == null)
 			{
 				return false;
 			}
-			return this.CheckDictionaryIfBody(dictionaryIf.Then);
+			return this.CheckDictionaryIfBody(dictionaryIf.get_Then());
 		}
 
 		private bool CheckDictionaryIfBody(BlockStatement then)
 		{
-			VariableReferenceExpression variableReferenceExpression;
-			if (then.Statements.Count < 1)
+			if (then.get_Statements().get_Count() < 1)
 			{
 				return false;
 			}
-			if (!this.CheckDictionaryCreation(then.Statements[0], out variableReferenceExpression))
+			if (!this.CheckDictionaryCreation(then.get_Statements().get_Item(0), out V_0))
 			{
 				return false;
 			}
-			if (variableReferenceExpression == null)
+			if (V_0 == null)
 			{
 				return false;
 			}
-			for (int i = 1; i < then.Statements.Count - 1; i++)
+			V_1 = 1;
+			while (V_1 < then.get_Statements().get_Count() - 1)
 			{
-				if (!this.CheckDictionaryAdd(then.Statements[i], variableReferenceExpression))
+				if (!this.CheckDictionaryAdd(then.get_Statements().get_Item(V_1), V_0))
 				{
 					return false;
 				}
+				V_1 = V_1 + 1;
 			}
-			return this.CheckDictionaryFieldAssignExpression(then.Statements[then.Statements.Count - 1], variableReferenceExpression);
+			return this.CheckDictionaryFieldAssignExpression(then.get_Statements().get_Item(then.get_Statements().get_Count() - 1), V_0);
 		}
 
 		private bool CheckDictionaryIfCondition(Expression condition)
 		{
-			if (!(condition is BinaryExpression))
+			if (condition as BinaryExpression == null)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression = condition as BinaryExpression;
-			if (!(binaryExpression.Right is LiteralExpression) || (binaryExpression.Right as LiteralExpression).Value != null)
+			V_0 = condition as BinaryExpression;
+			if (V_0.get_Right() as LiteralExpression == null || (V_0.get_Right() as LiteralExpression).get_Value() != null)
 			{
 				return false;
 			}
-			if (binaryExpression.Operator != BinaryOperator.ValueEquality)
+			if (V_0.get_Operator() != 9)
 			{
 				return false;
 			}
-			if (!(binaryExpression.Left is FieldReferenceExpression))
+			if (V_0.get_Left() as FieldReferenceExpression == null)
 			{
 				return false;
 			}
-			FieldReferenceExpression left = binaryExpression.Left as FieldReferenceExpression;
-			if (left.ExpressionType.get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			V_1 = V_0.get_Left() as FieldReferenceExpression;
+			if (String.op_Inequality(V_1.get_ExpressionType().get_FullName(), "System.Collections.Generic.Dictionary`2<System.String,System.Int32>"))
 			{
 				return false;
 			}
-			if (left.Field.get_DeclaringType().get_FullName().IndexOf("<PrivateImplementationDetails>") != 0 || left.Field.get_Name().IndexOf("$$method") != 0)
+			if (V_1.get_Field().get_DeclaringType().get_FullName().IndexOf("<PrivateImplementationDetails>") != 0 || V_1.get_Field().get_Name().IndexOf("$$method") != 0)
 			{
 				return false;
 			}
-			this.DictionaryField = left;
+			this.set_DictionaryField(V_1);
 			return true;
 		}
 
 		private bool CheckIrregularSwitchCaseCondition(BinaryExpression theCondition)
 		{
-			if (theCondition.Operator == BinaryOperator.ValueEquality)
+			if (theCondition.get_Operator() == 9)
 			{
-				if (!theCondition.Left.Equals(this.IntVariable) || !(theCondition.Right is LiteralExpression))
+				if (!theCondition.get_Left().Equals(this.get_IntVariable()) || theCondition.get_Right() as LiteralExpression == null)
 				{
 					return false;
 				}
-				return theCondition.Right.ExpressionType.get_FullName() == "System.Int32";
+				return String.op_Equality(theCondition.get_Right().get_ExpressionType().get_FullName(), "System.Int32");
 			}
-			if (theCondition.Operator != BinaryOperator.LogicalOr)
+			if (theCondition.get_Operator() != 11)
 			{
 				return false;
 			}
-			BinaryExpression left = theCondition.Left as BinaryExpression;
-			BinaryExpression right = theCondition.Right as BinaryExpression;
-			if (left == null || right == null)
+			V_0 = theCondition.get_Left() as BinaryExpression;
+			V_1 = theCondition.get_Right() as BinaryExpression;
+			if (V_0 == null || V_1 == null)
 			{
 				return false;
 			}
-			if (!this.CheckIrregularSwitchCaseCondition(left))
+			if (!this.CheckIrregularSwitchCaseCondition(V_0))
 			{
 				return false;
 			}
-			return this.CheckIrregularSwitchCaseCondition(right);
+			return this.CheckIrregularSwitchCaseCondition(V_1);
 		}
 
 		private bool CheckOuterIfBody(BlockStatement then)
 		{
-			if (then.Statements.Count != 2)
+			if (then.get_Statements().get_Count() != 2)
 			{
 				return false;
 			}
-			IfStatement item = then.Statements[0] as IfStatement;
-			if (item == null || !this.CheckDictionaryIf(item))
+			V_0 = then.get_Statements().get_Item(0) as IfStatement;
+			if (V_0 == null || !this.CheckDictionaryIf(V_0))
 			{
 				return false;
 			}
-			IfStatement ifStatement = then.Statements[1] as IfStatement;
-			if (ifStatement != null && this.CheckSwitchingIf(ifStatement))
+			V_1 = then.get_Statements().get_Item(1) as IfStatement;
+			if (V_1 != null && this.CheckSwitchingIf(V_1))
 			{
 				return true;
 			}
@@ -231,102 +230,105 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		private bool CheckSwitchingIf(IfStatement secondIfStatement)
 		{
-			if (!this.CheckSwitchingIfCondition(secondIfStatement.Condition))
+			if (!this.CheckSwitchingIfCondition(secondIfStatement.get_Condition()))
 			{
 				return false;
 			}
-			return this.CheckSwitcingIfBody(secondIfStatement.Then);
+			return this.CheckSwitcingIfBody(secondIfStatement.get_Then());
 		}
 
 		private bool CheckSwitchingIfCondition(Expression condition)
 		{
-			UnaryExpression unaryExpression = condition as UnaryExpression;
-			if (unaryExpression == null || unaryExpression.Operator != UnaryOperator.None)
+			V_0 = condition as UnaryExpression;
+			if (V_0 == null || V_0.get_Operator() != 11)
 			{
 				return false;
 			}
-			MethodInvocationExpression operand = unaryExpression.Operand as MethodInvocationExpression;
-			if (operand == null)
+			V_1 = V_0.get_Operand() as MethodInvocationExpression;
+			if (V_1 == null)
 			{
 				return false;
 			}
-			if (operand.MethodExpression.Target == null || !operand.MethodExpression.Target.Equals(this.DictionaryField))
+			if (V_1.get_MethodExpression().get_Target() == null || !V_1.get_MethodExpression().get_Target().Equals(this.get_DictionaryField()))
 			{
 				return false;
 			}
-			if (!this.IsTryGetMethod(operand.MethodExpression.Method))
+			if (!this.IsTryGetMethod(V_1.get_MethodExpression().get_Method()))
 			{
 				return false;
 			}
-			VariableReferenceExpression item = operand.Arguments[0] as VariableReferenceExpression;
-			if (item == null || item.ExpressionType.get_FullName() != "System.String")
+			V_2 = V_1.get_Arguments().get_Item(0) as VariableReferenceExpression;
+			if (V_2 == null || String.op_Inequality(V_2.get_ExpressionType().get_FullName(), "System.String"))
 			{
 				return false;
 			}
-			UnaryExpression item1 = operand.Arguments[1] as UnaryExpression;
-			if (item1 == null || item1.Operator != UnaryOperator.AddressReference)
+			V_3 = V_1.get_Arguments().get_Item(1) as UnaryExpression;
+			if (V_3 == null || V_3.get_Operator() != 7)
 			{
 				return false;
 			}
-			VariableReferenceExpression variableReferenceExpression = item1.Operand as VariableReferenceExpression;
-			if (variableReferenceExpression == null || variableReferenceExpression.ExpressionType.get_FullName() != "System.Int32")
+			V_4 = V_3.get_Operand() as VariableReferenceExpression;
+			if (V_4 == null || String.op_Inequality(V_4.get_ExpressionType().get_FullName(), "System.Int32"))
 			{
 				return false;
 			}
-			this.StringVariable = item;
-			this.IntVariable = variableReferenceExpression;
+			this.set_StringVariable(V_2);
+			this.set_IntVariable(V_4);
 			return true;
 		}
 
 		private bool CheckSwitcingIfBody(BlockStatement body)
 		{
-			bool flag;
-			if (body.Statements.Count < 1)
+			if (body.get_Statements().get_Count() < 1)
 			{
 				return false;
 			}
-			Statement item = body.Statements[0];
-			if (item is SwitchStatement)
+			V_0 = body.get_Statements().get_Item(0);
+			if (V_0 as SwitchStatement != null)
 			{
-				if ((item as SwitchStatement).Condition.Equals(this.IntVariable))
+				if ((V_0 as SwitchStatement).get_Condition().Equals(this.get_IntVariable()))
 				{
 					return true;
 				}
 				return false;
 			}
-			if (!(item is IfElseIfStatement))
+			if (V_0 as IfElseIfStatement == null)
 			{
 				return false;
 			}
-			List<KeyValuePair<Expression, BlockStatement>>.Enumerator enumerator = (item as IfElseIfStatement).ConditionBlocks.GetEnumerator();
+			V_1 = (V_0 as IfElseIfStatement).get_ConditionBlocks().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_1.MoveNext())
 				{
-					BinaryExpression key = enumerator.Current.Key as BinaryExpression;
-					if (key != null && this.CheckIrregularSwitchCaseCondition(key))
+					V_2 = V_1.get_Current();
+					V_3 = V_2.get_Key() as BinaryExpression;
+					if (V_3 != null && this.CheckIrregularSwitchCaseCondition(V_3))
 					{
 						continue;
 					}
-					flag = false;
-					return flag;
+					V_4 = false;
+					goto Label1;
 				}
-				return true;
+				goto Label0;
 			}
 			finally
 			{
-				((IDisposable)enumerator).Dispose();
+				((IDisposable)V_1).Dispose();
 			}
-			return flag;
+		Label1:
+			return V_4;
+		Label0:
+			return true;
 		}
 
 		private bool IsAddMethod(MethodReference method)
 		{
-			if (method.get_DeclaringType().get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if (String.op_Inequality(method.get_DeclaringType().get_FullName(), "System.Collections.Generic.Dictionary`2<System.String,System.Int32>"))
 			{
 				return false;
 			}
-			if (method.get_Name() != "Add")
+			if (String.op_Inequality(method.get_Name(), "Add"))
 			{
 				return false;
 			}
@@ -334,11 +336,11 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 			{
 				return false;
 			}
-			if (method.get_Parameters().get_Item(0).ResolveParameterType(method).get_FullName() != "System.String")
+			if (String.op_Inequality(method.get_Parameters().get_Item(0).ResolveParameterType(method).get_FullName(), "System.String"))
 			{
 				return false;
 			}
-			if (method.get_Parameters().get_Item(1).ResolveParameterType(method).get_FullName() != "System.Int32")
+			if (String.op_Inequality(method.get_Parameters().get_Item(1).ResolveParameterType(method).get_FullName(), "System.Int32"))
 			{
 				return false;
 			}
@@ -347,12 +349,12 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		private bool IsNullCheck(Expression condition)
 		{
-			if (!(condition is BinaryExpression))
+			if (condition as BinaryExpression == null)
 			{
 				return false;
 			}
-			BinaryExpression binaryExpression = condition as BinaryExpression;
-			if (binaryExpression.Operator == BinaryOperator.ValueInequality && binaryExpression.Right is LiteralExpression && (binaryExpression.Right as LiteralExpression).Value == null)
+			V_0 = condition as BinaryExpression;
+			if (V_0.get_Operator() == 10 && V_0.get_Right() as LiteralExpression != null && (V_0.get_Right() as LiteralExpression).get_Value() == null)
 			{
 				return true;
 			}
@@ -361,11 +363,11 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		private bool IsTryGetMethod(MethodReference method)
 		{
-			if (method.get_DeclaringType().get_FullName() != "System.Collections.Generic.Dictionary`2<System.String,System.Int32>")
+			if (String.op_Inequality(method.get_DeclaringType().get_FullName(), "System.Collections.Generic.Dictionary`2<System.String,System.Int32>"))
 			{
 				return false;
 			}
-			if (method.get_Name() != "TryGetValue")
+			if (String.op_Inequality(method.get_Name(), "TryGetValue"))
 			{
 				return false;
 			}
@@ -373,11 +375,11 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 			{
 				return false;
 			}
-			if (method.get_Parameters().get_Item(0).ResolveParameterType(method).get_FullName() != "System.String")
+			if (String.op_Inequality(method.get_Parameters().get_Item(0).ResolveParameterType(method).get_FullName(), "System.String"))
 			{
 				return false;
 			}
-			if (method.get_Parameters().get_Item(1).ResolveParameterType(method).get_FullName() != "System.Int32&")
+			if (String.op_Inequality(method.get_Parameters().get_Item(1).ResolveParameterType(method).get_FullName(), "System.Int32&"))
 			{
 				return false;
 			}
@@ -386,10 +388,10 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 
 		public bool TryMatch(IfStatement node)
 		{
-			this.DictionaryField = null;
-			this.StringVariable = null;
-			this.IntVariable = null;
-			if (!this.IsNullCheck(node.Condition) && node.Else != null || !this.CheckOuterIfBody(node.Then))
+			this.set_DictionaryField(null);
+			this.set_StringVariable(null);
+			this.set_IntVariable(null);
+			if (!this.IsNullCheck(node.get_Condition()) && node.get_Else() != null || !this.CheckOuterIfBody(node.get_Then()))
 			{
 				return false;
 			}

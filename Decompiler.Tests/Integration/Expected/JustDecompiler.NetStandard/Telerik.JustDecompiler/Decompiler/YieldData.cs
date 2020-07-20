@@ -19,24 +19,26 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			get
 			{
-				return JustDecompileGenerated_get_FieldAssignmentData();
+				return get_FieldAssignmentData();
 			}
 			set
 			{
-				JustDecompileGenerated_set_FieldAssignmentData(value);
+				set_FieldAssignmentData(value);
 			}
 		}
 
-		private Dictionary<FieldDefinition, AssignmentType> JustDecompileGenerated_FieldAssignmentData_k__BackingField;
+		// <FieldAssignmentData>k__BackingField
+		private Dictionary<FieldDefinition, AssignmentType> u003cFieldAssignmentDatau003ek__BackingField;
 
-		public Dictionary<FieldDefinition, AssignmentType> JustDecompileGenerated_get_FieldAssignmentData()
+		public Dictionary<FieldDefinition, AssignmentType> get_FieldAssignmentData()
 		{
-			return this.JustDecompileGenerated_FieldAssignmentData_k__BackingField;
+			return this.u003cFieldAssignmentDatau003ek__BackingField;
 		}
 
-		public void JustDecompileGenerated_set_FieldAssignmentData(Dictionary<FieldDefinition, AssignmentType> value)
+		public void set_FieldAssignmentData(Dictionary<FieldDefinition, AssignmentType> value)
 		{
-			this.JustDecompileGenerated_FieldAssignmentData_k__BackingField = value;
+			this.u003cFieldAssignmentDatau003ek__BackingField = value;
+			return;
 		}
 
 		public YieldFieldsInformation FieldsInfo
@@ -65,12 +67,14 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public YieldData(YieldStateMachineVersion stateMachineVersion, HashSet<InstructionBlock> yieldReturns, HashSet<InstructionBlock> yieldBreaks, YieldFieldsInformation fieldsInfo, List<YieldExceptionHandlerInfo> exceptionHandlers)
 		{
-			this.StateMachineVersion = stateMachineVersion;
-			this.YieldReturns = yieldReturns;
-			this.YieldBreaks = yieldBreaks;
-			this.FieldsInfo = fieldsInfo;
-			this.ExceptionHandlers = exceptionHandlers.ToArray();
-			this.FieldAssignmentData = new Dictionary<FieldDefinition, AssignmentType>();
+			base();
+			this.set_StateMachineVersion(stateMachineVersion);
+			this.set_YieldReturns(yieldReturns);
+			this.set_YieldBreaks(yieldBreaks);
+			this.set_FieldsInfo(fieldsInfo);
+			this.set_ExceptionHandlers(exceptionHandlers.ToArray());
+			this.set_FieldAssignmentData(new Dictionary<FieldDefinition, AssignmentType>());
+			return;
 		}
 	}
 }

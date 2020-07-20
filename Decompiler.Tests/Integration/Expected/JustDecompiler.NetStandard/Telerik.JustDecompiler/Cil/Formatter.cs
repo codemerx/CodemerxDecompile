@@ -2,7 +2,6 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
-using System.Globalization;
 using System.IO;
 
 namespace Telerik.JustDecompiler.Cil
@@ -11,15 +10,15 @@ namespace Telerik.JustDecompiler.Cil
 	{
 		public static string FormatInstruction(Instruction instruction)
 		{
-			StringWriter stringWriter = new StringWriter();
-			Formatter.WriteInstruction(stringWriter, instruction);
-			return stringWriter.ToString();
+			stackVariable0 = new StringWriter();
+			Formatter.WriteInstruction(stackVariable0, instruction);
+			return stackVariable0.ToString();
 		}
 
 		private static string FormatLabel(int offset)
 		{
-			string str = String.Concat("000", offset.ToString("x"));
-			return String.Concat("IL_", str.Substring(str.Length - 4));
+			V_0 = String.Concat("000", offset.ToString("x"));
+			return String.Concat("IL_", V_0.Substring(V_0.get_Length() - 4));
 		}
 
 		public static string FormatTypeReference(TypeReference type)
@@ -31,31 +30,31 @@ namespace Telerik.JustDecompiler.Cil
 		{
 			if (typeName != null)
 			{
-				if (typeName == "System.Void")
+				if (String.op_Equality(typeName, "System.Void"))
 				{
 					return "void";
 				}
-				if (typeName == "System.String")
+				if (String.op_Equality(typeName, "System.String"))
 				{
 					return "string";
 				}
-				if (typeName == "System.Int32")
+				if (String.op_Equality(typeName, "System.Int32"))
 				{
 					return "int32";
 				}
-				if (typeName == "System.Long")
+				if (String.op_Equality(typeName, "System.Long"))
 				{
 					return "int64";
 				}
-				if (typeName == "System.Boolean")
+				if (String.op_Equality(typeName, "System.Boolean"))
 				{
 					return "bool";
 				}
-				if (typeName == "System.Single")
+				if (String.op_Equality(typeName, "System.Single"))
 				{
 					return "float32";
 				}
-				if (typeName == "System.Double")
+				if (String.op_Equality(typeName, "System.Double"))
 				{
 					return "float64";
 				}
@@ -65,12 +64,12 @@ namespace Telerik.JustDecompiler.Cil
 
 		public static string ToInvariantCultureString(object value)
 		{
-			IConvertible convertible = value as IConvertible;
-			if (convertible == null)
+			V_0 = value as IConvertible;
+			if (V_0 == null)
 			{
 				return value.ToString();
 			}
-			return convertible.ToString(CultureInfo.InvariantCulture);
+			return V_0.ToString(CultureInfo.get_InvariantCulture());
 		}
 
 		public static void WriteInstruction(TextWriter writer, Instruction instruction)
@@ -83,20 +82,24 @@ namespace Telerik.JustDecompiler.Cil
 				writer.Write(' ');
 				Formatter.WriteOperand(writer, instruction.get_Operand());
 			}
+			return;
 		}
 
 		private static void WriteLabelList(TextWriter writer, Instruction[] instructions)
 		{
 			writer.Write("(");
-			for (int i = 0; i < (int)instructions.Length; i++)
+			V_0 = 0;
+			while (V_0 < (int)instructions.Length)
 			{
-				if (i != 0)
+				if (V_0 != 0)
 				{
 					writer.Write(", ");
 				}
-				writer.Write(Formatter.FormatLabel(instructions[i].get_Offset()));
+				writer.Write(Formatter.FormatLabel(instructions[V_0].get_Offset()));
+				V_0 = V_0 + 1;
 			}
 			writer.Write(")");
+			return;
 		}
 
 		private static void WriteMethodReference(TextWriter writer, MethodReference method)
@@ -110,16 +113,19 @@ namespace Telerik.JustDecompiler.Cil
 			writer.Write("::");
 			writer.Write(method.get_Name());
 			writer.Write("(");
-			Collection<ParameterDefinition> parameters = method.get_Parameters();
-			for (int i = 0; i < parameters.get_Count(); i++)
+			V_0 = method.get_Parameters();
+			V_1 = 0;
+			while (V_1 < V_0.get_Count())
 			{
-				if (i > 0)
+				if (V_1 > 0)
 				{
 					writer.Write(", ");
 				}
-				writer.Write(Formatter.FormatTypeReference(parameters.get_Item(i).get_ParameterType()));
+				writer.Write(Formatter.FormatTypeReference(V_0.get_Item(V_1).get_ParameterType()));
+				V_1 = V_1 + 1;
 			}
 			writer.Write(")");
+			return;
 		}
 
 		private static void WriteOperand(TextWriter writer, object operand)
@@ -128,38 +134,39 @@ namespace Telerik.JustDecompiler.Cil
 			{
 				throw new ArgumentNullException("operand");
 			}
-			Instruction instruction = operand as Instruction;
-			if (instruction != null)
+			V_0 = operand as Instruction;
+			if (V_0 != null)
 			{
-				writer.Write(Formatter.FormatLabel(instruction.get_Offset()));
+				writer.Write(Formatter.FormatLabel(V_0.get_Offset()));
 				return;
 			}
-			Instruction[] instructionArray = operand as Instruction[];
-			if (instructionArray != null)
+			V_1 = operand as Instruction[];
+			if (V_1 != null)
 			{
-				Formatter.WriteLabelList(writer, instructionArray);
+				Formatter.WriteLabelList(writer, V_1);
 				return;
 			}
-			VariableReference variableReference = operand as VariableReference;
-			if (variableReference != null)
+			V_2 = operand as VariableReference;
+			if (V_2 != null)
 			{
-				writer.Write(variableReference.get_Index().ToString());
+				writer.Write(V_2.get_Index().ToString());
 				return;
 			}
-			MethodReference methodReference = operand as MethodReference;
-			if (methodReference != null)
+			V_3 = operand as MethodReference;
+			if (V_3 != null)
 			{
-				Formatter.WriteMethodReference(writer, methodReference);
+				Formatter.WriteMethodReference(writer, V_3);
 				return;
 			}
-			string invariantCultureString = operand as String;
-			if (invariantCultureString != null)
+			V_4 = operand as String;
+			if (V_4 != null)
 			{
-				writer.Write(String.Concat("\"", invariantCultureString, "\""));
+				writer.Write(String.Concat("\"", V_4, "\""));
 				return;
 			}
-			invariantCultureString = Formatter.ToInvariantCultureString(operand);
-			writer.Write(invariantCultureString);
+			V_4 = Formatter.ToInvariantCultureString(operand);
+			writer.Write(V_4);
+			return;
 		}
 	}
 }

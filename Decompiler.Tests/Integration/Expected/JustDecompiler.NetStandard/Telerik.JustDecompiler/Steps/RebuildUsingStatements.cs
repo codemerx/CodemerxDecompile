@@ -1,9 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -18,6 +16,8 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildUsingStatements()
 		{
+			base();
+			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -29,39 +29,64 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void ProcessBlock(BlockStatement node)
 		{
-			for (int i = 0; i < node.Statements.Count - 1; i++)
+			V_0 = 0;
+			while (V_0 < node.get_Statements().get_Count() - 1)
 			{
-				RebuildUsingStatements.UsingMatcher usingMatcher = new RebuildUsingStatements.UsingMatcher(node.Statements[i], node.Statements[i + 1]);
-				if (usingMatcher.Match())
+				V_1 = new RebuildUsingStatements.UsingMatcher(node.get_Statements().get_Item(V_0), node.get_Statements().get_Item(V_0 + 1));
+				if (V_1.Match())
 				{
-					if (usingMatcher.VariableReference != null)
+					if (V_1.get_VariableReference() != null)
 					{
-						this.context.MethodContext.RemoveVariable(usingMatcher.VariableReference);
+						this.context.get_MethodContext().RemoveVariable(V_1.get_VariableReference());
 					}
-					if (!usingMatcher.RemoveExpression)
+					if (!V_1.get_RemoveExpression())
 					{
-						int num = i + (usingMatcher.HasExpression ? 1 : 0);
-						node.Statements.RemoveAt(num);
-						node.AddStatementAt(num, usingMatcher.Using);
+						stackVariable27 = V_0;
+						if (V_1.get_HasExpression())
+						{
+							stackVariable30 = 1;
+						}
+						else
+						{
+							stackVariable30 = 0;
+						}
+						V_2 = stackVariable27 + stackVariable30;
+						node.get_Statements().RemoveAt(V_2);
+						node.AddStatementAt(V_2, V_1.get_Using());
 					}
 					else
 					{
-						node.Statements.RemoveAt(i);
-						node.Statements.RemoveAt(i);
-						node.AddStatementAt(i, usingMatcher.Using);
+						node.get_Statements().RemoveAt(V_0);
+						node.get_Statements().RemoveAt(V_0);
+						node.AddStatementAt(V_0, V_1.get_Using());
 					}
-					this.ProcessBlock(usingMatcher.Using.Body);
+					this.ProcessBlock(V_1.get_Using().get_Body());
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
 			this.ProcessBlock(node);
-			foreach (Statement statement in node.Statements)
+			V_0 = node.get_Statements().GetEnumerator();
+			try
 			{
-				this.Visit(statement);
+				while (V_0.MoveNext())
+				{
+					V_1 = V_0.get_Current();
+					this.Visit(V_1);
+				}
 			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return;
 		}
 
 		private class UsingMatcher
@@ -70,7 +95,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			private readonly Statement nextStatement;
 
-			private UsingStatement @using;
+			private UsingStatement using;
 
 			private readonly BlockStatement blockStatement;
 
@@ -104,8 +129,14 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				get
 				{
-					this.@using = this.@using ?? new UsingStatement(this.expression.CloneExpressionOnly(), this.blockStatement, this.theTry.Finally.UnderlyingSameMethodInstructions);
-					return this.@using;
+					stackVariable2 = this.using;
+					if (stackVariable2 == null)
+					{
+						dummyVar0 = stackVariable2;
+						stackVariable2 = new UsingStatement(this.expression.CloneExpressionOnly(), this.blockStatement, this.theTry.get_Finally().get_UnderlyingSameMethodInstructions());
+					}
+					this.using = stackVariable2;
+					return this.using;
 				}
 			}
 
@@ -119,32 +150,35 @@ namespace Telerik.JustDecompiler.Steps
 
 			public UsingMatcher(Statement statement, Statement nextStatement)
 			{
+				this.blockStatement = new BlockStatement();
+				base();
 				this.statement = statement;
 				this.nextStatement = nextStatement;
+				return;
 			}
 
-			private bool CheckStandardUsingBlock(IfStatement ifStatement, TryStatement @try, ExpressionStatement expressionStatement)
+			private bool CheckStandardUsingBlock(IfStatement ifStatement, TryStatement try, ExpressionStatement expressionStatement)
 			{
-				if (ifStatement.Condition.CodeNodeType != CodeNodeType.BinaryExpression)
+				if (ifStatement.get_Condition().get_CodeNodeType() != 24)
 				{
 					return false;
 				}
-				BinaryExpression condition = (BinaryExpression)ifStatement.Condition;
-				MethodReferenceExpression disposeMethodReference = this.GetDisposeMethodReference(ifStatement, condition);
-				if (disposeMethodReference == null)
+				V_0 = (BinaryExpression)ifStatement.get_Condition();
+				V_1 = this.GetDisposeMethodReference(ifStatement, V_0);
+				if (V_1 == null)
 				{
 					return false;
 				}
-				Expression target = disposeMethodReference.Target;
-				if (target != null && target.CodeNodeType == CodeNodeType.ExplicitCastExpression && (target as ExplicitCastExpression).TargetType.get_FullName() == "System.IDisposable")
+				V_2 = V_1.get_Target();
+				if (V_2 != null && V_2.get_CodeNodeType() == 31 && String.op_Equality((V_2 as ExplicitCastExpression).get_TargetType().get_FullName(), "System.IDisposable"))
 				{
-					target = (target as ExplicitCastExpression).Expression;
+					V_2 = (V_2 as ExplicitCastExpression).get_Expression();
 				}
-				if (!condition.Left.CheckInnerReferenceExpressions(target))
+				if (!V_0.get_Left().CheckInnerReferenceExpressions(V_2))
 				{
 					return false;
 				}
-				this.PrepareUsingBlock(condition, @try, expressionStatement);
+				this.PrepareUsingBlock(V_0, try, expressionStatement);
 				return true;
 			}
 
@@ -154,23 +188,24 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return;
 				}
-				VariableFinder variableFinder = new VariableFinder(this.variableReference);
-				BinaryExpression binaryExpression = this.expression as BinaryExpression;
-				if (binaryExpression.Right.IsReferenceExpression() && !variableFinder.FindVariable(this.theTry.Try))
+				V_0 = new VariableFinder(this.variableReference);
+				V_1 = this.expression as BinaryExpression;
+				if (V_1.get_Right().IsReferenceExpression() && !V_0.FindVariable(this.theTry.get_Try()))
 				{
-					List<Instruction> instructions = new List<Instruction>(binaryExpression.Left.UnderlyingSameMethodInstructions);
-					instructions.AddRange(binaryExpression.MappedInstructions);
-					this.expression = binaryExpression.Right.CloneAndAttachInstructions(instructions);
+					V_2 = new List<Instruction>(V_1.get_Left().get_UnderlyingSameMethodInstructions());
+					V_2.AddRange(V_1.get_MappedInstructions());
+					this.expression = V_1.get_Right().CloneAndAttachInstructions(V_2);
 				}
+				return;
 			}
 
 			private MethodReferenceExpression GetDisposeMethodReference(IfStatement ifStatement, BinaryExpression binaryExpression)
 			{
-				if (binaryExpression.Operator != BinaryOperator.ValueInequality)
+				if (binaryExpression.get_Operator() != 10)
 				{
 					return null;
 				}
-				if (!binaryExpression.Left.IsReferenceExpression() || !RebuildUsingStatements.UsingMatcher.IsNullLiteralExpression(binaryExpression.Right))
+				if (!binaryExpression.get_Left().IsReferenceExpression() || !RebuildUsingStatements.UsingMatcher.IsNullLiteralExpression(binaryExpression.get_Right()))
 				{
 					return null;
 				}
@@ -179,87 +214,86 @@ namespace Telerik.JustDecompiler.Steps
 
 			private MethodReferenceExpression GetDisposeMethodReference(IfStatement ifStatement)
 			{
-				if (ifStatement.Else != null)
+				if (ifStatement.get_Else() != null)
 				{
 					return null;
 				}
-				if (ifStatement.Then.Statements.Count != 1)
+				if (ifStatement.get_Then().get_Statements().get_Count() != 1)
 				{
 					return null;
 				}
-				Statement item = ifStatement.Then.Statements[0];
-				if (!(item is ExpressionStatement))
+				V_0 = ifStatement.get_Then().get_Statements().get_Item(0);
+				if (V_0 as ExpressionStatement == null)
 				{
 					return null;
 				}
-				return this.GetDisposeMethodReference(item);
+				return this.GetDisposeMethodReference(V_0);
 			}
 
 			private MethodReferenceExpression GetDisposeMethodReference(Statement stmt)
 			{
-				ExpressionStatement expressionStatement = (ExpressionStatement)stmt;
-				if (!(expressionStatement.Expression is MethodInvocationExpression))
+				V_0 = (ExpressionStatement)stmt;
+				if (V_0.get_Expression() as MethodInvocationExpression == null)
 				{
 					return null;
 				}
-				MethodInvocationExpression expression = (MethodInvocationExpression)expressionStatement.Expression;
-				if (expression.Arguments.Count != 0)
+				V_1 = (MethodInvocationExpression)V_0.get_Expression();
+				if (V_1.get_Arguments().get_Count() != 0)
 				{
 					return null;
 				}
-				if (expression.MethodExpression == null)
+				if (V_1.get_MethodExpression() == null)
 				{
 					return null;
 				}
-				MethodReferenceExpression methodExpression = expression.MethodExpression;
-				TypeReference declaringType = expression.MethodExpression.Method.get_DeclaringType();
-				if (declaringType == null)
+				V_2 = V_1.get_MethodExpression();
+				V_3 = V_1.get_MethodExpression().get_Method().get_DeclaringType();
+				if (V_3 == null)
 				{
 					return null;
 				}
-				TypeDefinition typeDefinition = Utilities.GetCorlibTypeReference(typeof(IDisposable), declaringType.get_Module()).Resolve();
-				if (typeDefinition == null)
-				{
-					return null;
-				}
-				if (methodExpression.Method.IsImplementationOf(typeDefinition))
-				{
-					return methodExpression;
-				}
-				return null;
-			}
+				V_4 = Utilities.GetCorlibTypeReference(Type.GetTypeFromHandle(// 
+				// Current member / type: Telerik.JustDecompiler.Ast.Expressions.MethodReferenceExpression Telerik.JustDecompiler.Steps.RebuildUsingStatements/UsingMatcher::GetDisposeMethodReference(Telerik.JustDecompiler.Ast.Statements.Statement)
+				// Exception in: Telerik.JustDecompiler.Ast.Expressions.MethodReferenceExpression GetDisposeMethodReference(Telerik.JustDecompiler.Ast.Statements.Statement)
+				// Specified method is not supported.
+				// 
+				// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 			private static bool IsNullLiteralExpression(Expression expression)
 			{
-				if (!(expression is LiteralExpression))
+				if (expression as LiteralExpression == null)
 				{
 					return false;
 				}
-				return (object)((LiteralExpression)expression).Value == (object)null;
+				return (object)((LiteralExpression)expression).get_Value() == (object)null;
 			}
 
-			private bool IsTryFinallyStatement(TryStatement @try)
+			private bool IsTryFinallyStatement(TryStatement try)
 			{
-				if (@try.CatchClauses.Count != 0)
+				if (try.get_CatchClauses().get_Count() != 0)
 				{
 					return false;
 				}
-				return @try.Finally != null;
+				return try.get_Finally() != null;
 			}
 
 			internal bool Match()
 			{
-				ExpressionStatement expressionStatement = null;
+				V_0 = null;
 				this.theTry = null;
-				if (this.statement.CodeNodeType == CodeNodeType.TryStatement)
+				if (this.statement.get_CodeNodeType() != 17)
+				{
+					if (this.nextStatement.get_CodeNodeType() == 17)
+					{
+						this.theTry = this.nextStatement as TryStatement;
+						V_0 = this.statement as ExpressionStatement;
+						this.hasExpression = true;
+					}
+				}
+				else
 				{
 					this.theTry = this.statement as TryStatement;
-				}
-				else if (this.nextStatement.CodeNodeType == CodeNodeType.TryStatement)
-				{
-					this.theTry = this.nextStatement as TryStatement;
-					expressionStatement = this.statement as ExpressionStatement;
-					this.hasExpression = true;
 				}
 				if (this.theTry == null)
 				{
@@ -269,16 +303,16 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				if (this.theTry.Finally.Body.Statements.Count != 1)
+				if (this.theTry.get_Finally().get_Body().get_Statements().get_Count() != 1)
 				{
 					return false;
 				}
-				Statement item = this.theTry.Finally.Body.Statements[0];
-				if (item.CodeNodeType != CodeNodeType.IfStatement)
+				V_1 = this.theTry.get_Finally().get_Body().get_Statements().get_Item(0);
+				if (V_1.get_CodeNodeType() != 3)
 				{
 					return false;
 				}
-				if (!this.CheckStandardUsingBlock((IfStatement)item, this.theTry, expressionStatement))
+				if (!this.CheckStandardUsingBlock((IfStatement)V_1, this.theTry, V_0))
 				{
 					return false;
 				}
@@ -286,37 +320,42 @@ namespace Telerik.JustDecompiler.Steps
 				return true;
 			}
 
-			private void PrepareUsingBlock(BinaryExpression binaryExpression, TryStatement @try, ExpressionStatement expressionStatement)
+			private void PrepareUsingBlock(BinaryExpression binaryExpression, TryStatement try, ExpressionStatement expressionStatement)
 			{
-				this.expression = binaryExpression.Left;
-				for (int i = 0; i < @try.Try.Statements.Count; i++)
+				this.expression = binaryExpression.get_Left();
+				V_0 = 0;
+				while (V_0 < try.get_Try().get_Statements().get_Count())
 				{
-					this.blockStatement.AddStatement(@try.Try.Statements[i]);
+					this.blockStatement.AddStatement(try.get_Try().get_Statements().get_Item(V_0));
+					V_0 = V_0 + 1;
 				}
 				if (expressionStatement != null)
 				{
 					this.VisitAssignExpression(expressionStatement);
 				}
+				return;
 			}
 
 			private void VisitAssignExpression(ExpressionStatement expressionStatement)
 			{
-				if (expressionStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expressionStatement.Expression as BinaryExpression).IsAssignmentExpression)
+				if (expressionStatement.get_Expression().get_CodeNodeType() != 24 || !(expressionStatement.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
 				{
 					return;
 				}
-				BinaryExpression expression = (BinaryExpression)expressionStatement.Expression;
-				this.expression = expression;
-				this.VisitVariableReference(expression);
+				V_0 = (BinaryExpression)expressionStatement.get_Expression();
+				this.expression = V_0;
+				this.VisitVariableReference(V_0);
+				return;
 			}
 
 			private void VisitVariableReference(BinaryExpression assingExpression)
 			{
-				if (assingExpression.Left is VariableReferenceExpression)
+				if (assingExpression.get_Left() as VariableReferenceExpression != null)
 				{
-					this.variableReference = ((VariableReferenceExpression)assingExpression.Left).Variable;
+					this.variableReference = ((VariableReferenceExpression)assingExpression.get_Left()).get_Variable();
 					this.removeExpression = true;
 				}
+				return;
 			}
 		}
 	}

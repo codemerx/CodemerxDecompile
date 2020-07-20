@@ -3,7 +3,6 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -22,12 +21,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				MethodInvocationExpression methodInvocationExpression = null;
-				yield return methodInvocationExpression.MethodExpression;
-				foreach (ICodeNode argument in methodInvocationExpression.Arguments)
-				{
-					yield return argument;
-				}
+				stackVariable1 = new MethodInvocationExpression.u003cget_Childrenu003ed__20(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -35,7 +31,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.MethodInvocationExpression;
+				return 19;
 			}
 		}
 
@@ -49,7 +45,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.MethodExpression.ExpressionType;
+				return this.get_MethodExpression().get_ExpressionType();
 			}
 			set
 			{
@@ -69,9 +65,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				List<Instruction> instructions = new List<Instruction>(this.instructions);
-				instructions.AddRange(this.MethodExpression.MappedInstructions);
-				return instructions;
+				stackVariable2 = new List<Instruction>(this.instructions);
+				stackVariable2.AddRange(this.get_MethodExpression().get_MappedInstructions());
+				return stackVariable2;
 			}
 		}
 
@@ -79,7 +75,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.MethodExpression.Method.get_ReturnType().get_IsByReference();
+				return this.get_MethodExpression().get_Method().get_ReturnType().get_IsByReference();
 			}
 		}
 
@@ -87,7 +83,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.ConstraintType != (object)null;
+				return (object)this.get_ConstraintType() != (object)null;
 			}
 		}
 
@@ -103,61 +99,61 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public MethodInvocationExpression(MethodReferenceExpression method, IEnumerable<Instruction> instructions) : base(instructions)
+		public MethodInvocationExpression(MethodReferenceExpression method, IEnumerable<Instruction> instructions)
 		{
-			this.MethodExpression = method;
-			this.Arguments = new ExpressionCollection();
+			base(instructions);
+			this.set_MethodExpression(method);
+			this.set_Arguments(new ExpressionCollection());
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new MethodInvocationExpression(this.MethodExpression.Clone() as MethodReferenceExpression, this.instructions)
-			{
-				Arguments = this.Arguments.Clone(),
-				VirtualCall = this.VirtualCall,
-				ConstraintType = this.ConstraintType
-			};
+			stackVariable6 = new MethodInvocationExpression(this.get_MethodExpression().Clone() as MethodReferenceExpression, this.instructions);
+			stackVariable6.set_Arguments(this.get_Arguments().Clone());
+			stackVariable6.set_VirtualCall(this.get_VirtualCall());
+			stackVariable6.set_ConstraintType(this.get_ConstraintType());
+			return stackVariable6;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new MethodInvocationExpression(this.MethodExpression.CloneExpressionOnly() as MethodReferenceExpression, null)
-			{
-				Arguments = this.Arguments.CloneExpressionsOnly(),
-				VirtualCall = this.VirtualCall,
-				ConstraintType = this.ConstraintType
-			};
+			stackVariable5 = new MethodInvocationExpression(this.get_MethodExpression().CloneExpressionOnly() as MethodReferenceExpression, null);
+			stackVariable5.set_Arguments(this.get_Arguments().CloneExpressionsOnly());
+			stackVariable5.set_VirtualCall(this.get_VirtualCall());
+			stackVariable5.set_ConstraintType(this.get_ConstraintType());
+			return stackVariable5;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is MethodInvocationExpression))
+			if (other as MethodInvocationExpression == null)
 			{
 				return false;
 			}
-			MethodInvocationExpression methodInvocationExpression = other as MethodInvocationExpression;
-			if (!this.MethodExpression.Equals(methodInvocationExpression.MethodExpression))
+			V_0 = other as MethodInvocationExpression;
+			if (!this.get_MethodExpression().Equals(V_0.get_MethodExpression()))
 			{
 				return false;
 			}
-			if (this.VirtualCall != methodInvocationExpression.VirtualCall || !this.Arguments.Equals(methodInvocationExpression.Arguments))
+			if (this.get_VirtualCall() != V_0.get_VirtualCall() || !this.get_Arguments().Equals(V_0.get_Arguments()))
 			{
 				return false;
 			}
-			return (object)this.ConstraintType == (object)methodInvocationExpression.ConstraintType;
+			return (object)this.get_ConstraintType() == (object)V_0.get_ConstraintType();
 		}
 
 		public Expression GetTarget()
 		{
-			if (this.MethodExpression.MethodDefinition == null || !this.MethodExpression.MethodDefinition.get_IsExtensionMethod())
+			if (this.get_MethodExpression().get_MethodDefinition() == null || !this.get_MethodExpression().get_MethodDefinition().get_IsExtensionMethod())
 			{
-				return this.MethodExpression.Target;
+				return this.get_MethodExpression().get_Target();
 			}
-			if (this.Arguments.Count < 1)
+			if (this.get_Arguments().get_Count() < 1)
 			{
 				throw new Exception("Extension methods invocations should have at least 1 argument.");
 			}
-			return this.Arguments[0];
+			return this.get_Arguments().get_Item(0);
 		}
 	}
 }

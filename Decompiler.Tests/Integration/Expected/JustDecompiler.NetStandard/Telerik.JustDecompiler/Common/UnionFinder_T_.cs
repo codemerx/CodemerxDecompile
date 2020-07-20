@@ -9,16 +9,18 @@ namespace Telerik.JustDecompiler.Common
 
 		public UnionFinder()
 		{
+			this.elementToNodeMap = new Dictionary<T, UnionFinder<T>.UnionNode>();
+			base();
+			return;
 		}
 
 		public T Find(T element)
 		{
-			UnionFinder<T>.UnionNode unionNode;
-			if (!this.elementToNodeMap.TryGetValue(element, out unionNode))
+			if (!this.elementToNodeMap.TryGetValue(element, out V_0))
 			{
 				return element;
 			}
-			return this.FindNode(unionNode).element;
+			return this.FindNode(V_0).element;
 		}
 
 		private UnionFinder<T>.UnionNode FindNode(UnionFinder<T>.UnionNode initialNode)
@@ -27,53 +29,54 @@ namespace Telerik.JustDecompiler.Common
 			{
 				return initialNode;
 			}
-			UnionFinder<T>.UnionNode unionNode = initialNode.parent;
-			while (unionNode.parent != null)
+			V_0 = initialNode.parent;
+			while (V_0.parent != null)
 			{
-				unionNode = unionNode.parent;
+				V_0 = V_0.parent;
 			}
-			UnionFinder<T>.UnionNode unionNode1 = unionNode;
-			unionNode = initialNode;
-			while (unionNode.parent != unionNode1)
+			V_1 = V_0;
+			V_0 = initialNode;
+			while (V_0.parent != V_1)
 			{
-				UnionFinder<T>.UnionNode unionNode2 = unionNode;
-				unionNode = unionNode.parent;
-				unionNode2.parent = unionNode1;
+				V_2 = V_0;
+				V_0 = V_0.parent;
+				V_2.parent = V_1;
 			}
-			return unionNode1;
+			return V_1;
 		}
 
 		private UnionFinder<T>.UnionNode GetNode(T element)
 		{
-			UnionFinder<T>.UnionNode unionNode;
-			if (!this.elementToNodeMap.TryGetValue(element, out unionNode))
+			if (!this.elementToNodeMap.TryGetValue(element, out V_0))
 			{
-				unionNode = new UnionFinder<T>.UnionNode(element);
-				this.elementToNodeMap.Add(element, unionNode);
+				V_0 = new UnionFinder<T>.UnionNode(element);
+				this.elementToNodeMap.Add(element, V_0);
 			}
-			return unionNode;
+			return V_0;
 		}
 
 		public void Union(T firstElement, T secondElement)
 		{
-			UnionFinder<T>.UnionNode unionNode = this.FindNode(this.GetNode(firstElement));
-			UnionFinder<T>.UnionNode unionNode1 = this.FindNode(this.GetNode(secondElement));
-			if (unionNode == unionNode1)
+			V_0 = this.FindNode(this.GetNode(firstElement));
+			V_1 = this.FindNode(this.GetNode(secondElement));
+			if (V_0 == V_1)
 			{
 				return;
 			}
-			if (unionNode.rank < unionNode1.rank)
+			if (V_0.rank < V_1.rank)
 			{
-				unionNode.parent = unionNode1;
+				V_0.parent = V_1;
 				return;
 			}
-			if (unionNode.rank > unionNode1.rank)
+			if (V_0.rank > V_1.rank)
 			{
-				unionNode1.parent = unionNode;
+				V_1.parent = V_0;
 				return;
 			}
-			unionNode1.parent = unionNode;
-			unionNode.rank++;
+			V_1.parent = V_0;
+			stackVariable22 = V_0;
+			stackVariable22.rank = stackVariable22.rank + 1;
+			return;
 		}
 
 		private class UnionNode
@@ -86,9 +89,11 @@ namespace Telerik.JustDecompiler.Common
 
 			public UnionNode(T element)
 			{
+				base();
 				this.element = element;
 				this.parent = null;
 				this.rank = 0;
+				return;
 			}
 		}
 	}

@@ -32,27 +32,30 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public Binary()
 		{
+			base();
+			return;
 		}
 
 		protected override bool OnMatch(MatchContext context, BinaryExpression node)
 		{
-			if (!this.Left.TryMatch(context, node.Left))
+			if (!this.get_Left().TryMatch(context, node.get_Left()))
 			{
 				return false;
 			}
-			if (!this.Operator.TryMatch(context, node.Operator))
+			if (!this.get_Operator().TryMatch(context, node.get_Operator()))
 			{
 				return false;
 			}
-			if (!this.Right.TryMatch(context, node.Right))
+			if (!this.get_Right().TryMatch(context, node.get_Right()))
 			{
 				return false;
 			}
-			if (!this.IsChecked.HasValue)
+			if (!this.get_IsChecked().get_HasValue())
 			{
 				return true;
 			}
-			return this.IsChecked.Value == node.IsChecked;
+			V_0 = this.get_IsChecked();
+			return V_0.get_Value() == node.get_IsChecked();
 		}
 	}
 }

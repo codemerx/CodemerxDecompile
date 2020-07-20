@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -27,7 +25,7 @@ namespace Telerik.JustDecompiler.Languages
 			get
 			{
 				this.writer.Flush();
-				return this.writer.GetStringBuilder().Length;
+				return this.writer.GetStringBuilder().get_Length();
 			}
 		}
 
@@ -35,53 +33,61 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.writer.NewLine;
+				return this.writer.get_NewLine();
 			}
 		}
 
 		public PlainTextFormatter(StringWriter writer)
 		{
+			base();
 			this.writer = writer;
 			this.writeCommentsOnly = false;
 			this.preservedIndents = new Dictionary<IMemberDefinition, int>();
+			return;
 		}
 
 		public void EndWritingComment()
 		{
 			this.writeCommentsOnly = false;
+			return;
 		}
 
 		public virtual void Indent()
 		{
-			this.indent++;
+			this.indent = this.indent + 1;
+			return;
 		}
 
 		protected void OnFirstNonWhiteSpaceCharacterOnLineWritten()
 		{
-			EventHandler<int> eventHandler = this.FirstNonWhiteSpaceCharacterOnLineWritten;
-			if (eventHandler != null)
+			V_0 = this.FirstNonWhiteSpaceCharacterOnLineWritten;
+			if (V_0 != null)
 			{
-				eventHandler(this, this.CurrentPosition);
+				V_0.Invoke(this, this.get_CurrentPosition());
 			}
+			return;
 		}
 
 		protected void OnNewLineWritten()
 		{
-			EventHandler eventHandler = this.NewLineWritten;
-			if (eventHandler != null)
+			V_0 = this.NewLineWritten;
+			if (V_0 != null)
 			{
-				eventHandler(this, EventArgs.Empty);
+				V_0.Invoke(this, EventArgs.Empty);
 			}
+			return;
 		}
 
 		public virtual void Outdent()
 		{
-			this.indent--;
+			this.indent = this.indent - 1;
+			return;
 		}
 
 		public void PreserveIndent(IMemberDefinition member)
 		{
 			this.preservedIndents.Add(member, this.indent);
+			return;
 		}
 
 		public void RemovePreservedIndent(IMemberDefinition member)
@@ -90,22 +96,24 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				throw new Exception("MemberName not found in preserved indents cache.");
 			}
-			this.preservedIndents.Remove(member);
+			dummyVar0 = this.preservedIndents.Remove(member);
+			return;
 		}
 
 		public void RestoreIndent(IMemberDefinition member)
 		{
-			int num;
-			if (!this.preservedIndents.TryGetValue(member, out num))
+			if (!this.preservedIndents.TryGetValue(member, out V_0))
 			{
 				throw new Exception("Member not found in preserved indents cache.");
 			}
-			this.indent = num;
+			this.indent = V_0;
+			return;
 		}
 
 		public void StartWritingComment()
 		{
 			this.writeCommentsOnly = true;
+			return;
 		}
 
 		public override string ToString()
@@ -117,54 +125,66 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.WriteIndent();
 			this.writer.Write(str);
+			return;
 		}
 
 		public virtual void WriteComment(string comment)
 		{
 			this.Write(comment);
+			return;
 		}
 
 		public virtual void WriteDefinition(string value, object definition)
 		{
 			this.Write(value);
+			return;
 		}
 
 		public virtual void WriteDocumentationStartBlock()
 		{
+			return;
 		}
 
 		public virtual void WriteDocumentationTag(string tag)
 		{
 			this.Write(tag);
+			return;
 		}
 
 		public virtual void WriteEndBlock()
 		{
+			return;
 		}
 
 		public virtual void WriteEndUsagesBlock()
 		{
+			return;
 		}
 
 		public virtual void WriteException(string[] exceptionLines)
 		{
-			string[] strArray = exceptionLines;
-			for (int i = 0; i < (int)strArray.Length; i++)
+			V_0 = exceptionLines;
+			V_1 = 0;
+			while (V_1 < (int)V_0.Length)
 			{
-				this.Write(strArray[i]);
+				this.Write(V_0[V_1]);
 				this.WriteLine();
+				V_1 = V_1 + 1;
 			}
+			return;
 		}
 
 		public virtual void WriteExceptionMailToLink(string mailToMessage, string[] exceptionLines)
 		{
 			this.Write(mailToMessage);
 			this.WriteLine();
+			return;
 		}
 
 		public virtual void WriteIdentifier(string value, object identifier)
 		{
 			this.Write(value);
+			return;
 		}
 
 		protected virtual void WriteIndent()
@@ -173,17 +193,21 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return;
 			}
-			for (int i = 0; i < this.indent; i++)
+			V_0 = 0;
+			while (V_0 < this.indent)
 			{
 				this.WriteTab();
+				V_0 = V_0 + 1;
 			}
 			this.write_indent = false;
 			this.OnFirstNonWhiteSpaceCharacterOnLineWritten();
+			return;
 		}
 
 		public virtual void WriteKeyword(string keyword)
 		{
 			this.Write(keyword);
+			return;
 		}
 
 		public virtual void WriteLine()
@@ -191,56 +215,68 @@ namespace Telerik.JustDecompiler.Languages
 			this.writer.WriteLine();
 			this.write_indent = true;
 			this.OnNewLineWritten();
+			return;
 		}
 
 		public virtual void WriteLiteral(string literal)
 		{
 			this.Write(literal);
+			return;
 		}
 
 		public virtual void WriteMemberDeclaration(IMemberDefinition member)
 		{
+			return;
 		}
 
 		public virtual void WriteNamespaceEndBlock()
 		{
+			return;
 		}
 
 		public virtual void WriteNamespaceStartBlock()
 		{
+			return;
 		}
 
 		public virtual void WriteNotResolvedReference(string value, MemberReference memberReference, string errorMessage)
 		{
 			this.Write(value);
+			return;
 		}
 
 		public virtual void WriteReference(string value, object reference)
 		{
 			this.Write(value);
+			return;
 		}
 
 		public virtual void WriteSpace()
 		{
 			this.Write(" ");
+			return;
 		}
 
 		public virtual void WriteStartBlock()
 		{
+			return;
 		}
 
 		public virtual void WriteStartUsagesBlock()
 		{
+			return;
 		}
 
 		protected virtual void WriteTab()
 		{
 			this.writer.Write("\t");
+			return;
 		}
 
 		public virtual void WriteToken(string token)
 		{
 			this.Write(token);
+			return;
 		}
 
 		public event EventHandler<int> FirstNonWhiteSpaceCharacterOnLineWritten;

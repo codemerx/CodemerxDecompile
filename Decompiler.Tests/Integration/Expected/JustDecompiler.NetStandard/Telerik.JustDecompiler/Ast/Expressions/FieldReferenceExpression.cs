@@ -15,11 +15,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				FieldReferenceExpression fieldReferenceExpression = null;
-				if (fieldReferenceExpression.Target != null)
-				{
-					yield return fieldReferenceExpression.Target;
-				}
+				stackVariable1 = new FieldReferenceExpression.u003cget_Childrenu003ed__6(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -27,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.FieldReferenceExpression;
+				return 30;
 			}
 		}
 
@@ -35,7 +33,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Field.get_FieldType();
+				return this.get_Field().get_FieldType();
 			}
 			set
 			{
@@ -67,7 +65,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Target == null;
+				return this.get_Target() == null;
 			}
 		}
 
@@ -77,65 +75,66 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public FieldReferenceExpression(Expression target, FieldReference field, IEnumerable<Instruction> instructions) : base(instructions)
+		public FieldReferenceExpression(Expression target, FieldReference field, IEnumerable<Instruction> instructions)
 		{
-			this.Target = target;
-			this.Field = field;
+			base(instructions);
+			this.set_Target(target);
+			this.set_Field(field);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			Expression expression;
-			if (this.Target != null)
+			if (this.get_Target() != null)
 			{
-				expression = this.Target.Clone();
+				stackVariable4 = this.get_Target().Clone();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new FieldReferenceExpression(expression, this.Field, this.instructions)
-			{
-				IsSimpleStore = this.IsSimpleStore
-			};
+			stackVariable9 = new FieldReferenceExpression(stackVariable4, this.get_Field(), this.instructions);
+			stackVariable9.set_IsSimpleStore(this.get_IsSimpleStore());
+			return stackVariable9;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			Expression expression;
-			if (this.Target != null)
+			if (this.get_Target() != null)
 			{
-				expression = this.Target.CloneExpressionOnly();
+				stackVariable4 = this.get_Target().CloneExpressionOnly();
 			}
 			else
 			{
-				expression = null;
+				stackVariable4 = null;
 			}
-			return new FieldReferenceExpression(expression, this.Field, null)
-			{
-				IsSimpleStore = this.IsSimpleStore
-			};
+			stackVariable8 = new FieldReferenceExpression(stackVariable4, this.get_Field(), null);
+			stackVariable8.set_IsSimpleStore(this.get_IsSimpleStore());
+			return stackVariable8;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is FieldReferenceExpression))
+			if (other as FieldReferenceExpression == null)
 			{
 				return false;
 			}
-			FieldReferenceExpression fieldReferenceExpression = other as FieldReferenceExpression;
-			if (this.Target == null)
+			V_0 = other as FieldReferenceExpression;
+			if (this.get_Target() != null)
 			{
-				if (fieldReferenceExpression.Target != null)
+				if (!this.get_Target().Equals(V_0.get_Target()))
 				{
 					return false;
 				}
 			}
-			else if (!this.Target.Equals(fieldReferenceExpression.Target))
+			else
 			{
-				return false;
+				if (V_0.get_Target() != null)
+				{
+					return false;
+				}
 			}
-			return this.Field.get_FullName() == fieldReferenceExpression.Field.get_FullName();
+			return String.op_Equality(this.get_Field().get_FullName(), V_0.get_Field().get_FullName());
 		}
 	}
 }

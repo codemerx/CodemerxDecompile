@@ -16,6 +16,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
+				return new ContinueStatement.u003cget_Childrenu003ed__3(-2);
 			}
 		}
 
@@ -23,44 +24,49 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.ContinueStatement;
+				return 10;
 			}
 		}
 
 		public ContinueStatement(ICollection<Instruction> jumps)
 		{
+			base();
 			this.continueJumps = new List<Instruction>();
 			if (jumps != null)
 			{
 				this.continueJumps.AddRange(jumps);
-				this.continueJumps.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
+				stackVariable8 = this.continueJumps;
+				stackVariable9 = ContinueStatement.u003cu003ec.u003cu003e9__1_0;
+				if (stackVariable9 == null)
+				{
+					dummyVar0 = stackVariable9;
+					stackVariable9 = new Comparison<Instruction>(ContinueStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__1_0);
+					ContinueStatement.u003cu003ec.u003cu003e9__1_0 = stackVariable9;
+				}
+				stackVariable8.Sort(stackVariable9);
 			}
+			return;
 		}
 
 		public override Statement Clone()
 		{
-			ContinueStatement continueStatement = new ContinueStatement(this.continueJumps);
-			base.CopyParentAndLabel(continueStatement);
-			return continueStatement;
+			V_0 = new ContinueStatement(this.continueJumps);
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			ContinueStatement continueStatement = new ContinueStatement(null);
-			base.CopyParentAndLabel(continueStatement);
-			return continueStatement;
+			V_0 = new ContinueStatement(null);
+			this.CopyParentAndLabel(V_0);
+			return V_0;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			ContinueStatement continueStatement = null;
-			if (continueStatement.continueJumps != null)
-			{
-				foreach (Instruction continueJump in continueStatement.continueJumps)
-				{
-					yield return continueJump;
-				}
-			}
+			stackVariable1 = new ContinueStatement.u003cGetOwnInstructionsu003ed__4(-2);
+			stackVariable1.u003cu003e4__this = this;
+			return stackVariable1;
 		}
 	}
 }

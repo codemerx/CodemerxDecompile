@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new DefaultObjectExpression.u003cget_Childrenu003ed__2(-2);
 			}
 		}
 
@@ -22,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.DefaultObjectExpression;
+				return 41;
 			}
 		}
 
@@ -30,7 +31,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Type;
+				return this.get_Type();
 			}
 			set
 			{
@@ -42,7 +43,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.Type != (object)null;
+				return (object)this.get_Type() != (object)null;
 			}
 		}
 
@@ -52,28 +53,30 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public DefaultObjectExpression(TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public DefaultObjectExpression(TypeReference type, IEnumerable<Instruction> instructions)
 		{
-			this.Type = type;
+			base(instructions);
+			this.set_Type(type);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new DefaultObjectExpression(this.Type, this.instructions);
+			return new DefaultObjectExpression(this.get_Type(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new DefaultObjectExpression(this.Type, null);
+			return new DefaultObjectExpression(this.get_Type(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is DefaultObjectExpression))
+			if (other as DefaultObjectExpression == null)
 			{
 				return false;
 			}
-			return this.Type.get_FullName() == (other as DefaultObjectExpression).Type.get_FullName();
+			return String.op_Equality(this.get_Type().get_FullName(), (other as DefaultObjectExpression).get_Type().get_FullName());
 		}
 	}
 }

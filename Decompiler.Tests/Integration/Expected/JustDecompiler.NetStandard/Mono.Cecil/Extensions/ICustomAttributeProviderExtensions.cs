@@ -1,7 +1,6 @@
 using Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +10,6 @@ namespace Mono.Cecil.Extensions
 	{
 		public static bool HasCustomAttribute(this ICustomAttributeProvider attributeProvider, IEnumerable<string> attributeTypes)
 		{
-			bool flag;
 			if (attributeProvider == null || attributeTypes == null)
 			{
 				return false;
@@ -20,33 +18,44 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			Collection<CustomAttribute>.Enumerator enumerator = attributeProvider.get_CustomAttributes().GetEnumerator();
+			V_0 = attributeProvider.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (enumerator.MoveNext())
+				while (V_0.MoveNext())
 				{
-					CustomAttribute current = enumerator.get_Current();
-					using (IEnumerator<string> enumerator1 = attributeTypes.GetEnumerator())
+					V_1 = V_0.get_Current();
+					V_2 = attributeTypes.GetEnumerator();
+					try
 					{
-						while (enumerator1.MoveNext())
+						while (V_2.MoveNext())
 						{
-							string str = enumerator1.Current;
-							if (current.get_AttributeType().get_FullName() != str)
+							V_3 = V_2.get_Current();
+							if (!String.op_Equality(V_1.get_AttributeType().get_FullName(), V_3))
 							{
 								continue;
 							}
-							flag = true;
-							return flag;
+							V_4 = true;
+							goto Label1;
+						}
+					}
+					finally
+					{
+						if (V_2 != null)
+						{
+							V_2.Dispose();
 						}
 					}
 				}
-				return false;
+				goto Label0;
 			}
 			finally
 			{
-				enumerator.Dispose();
+				V_0.Dispose();
 			}
-			return flag;
+		Label1:
+			return V_4;
+		Label0:
+			return false;
 		}
 	}
 }

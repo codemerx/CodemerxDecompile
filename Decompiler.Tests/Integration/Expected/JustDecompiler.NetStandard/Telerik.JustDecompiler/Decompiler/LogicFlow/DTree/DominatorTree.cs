@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Cil;
-using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DTree
 {
@@ -18,108 +17,151 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DTree
 
 		internal DominatorTree(Dictionary<ISingleEntrySubGraph, DTNode> constructToNodeMap, ISingleEntrySubGraph rootConstruct)
 		{
+			base();
 			this.constructToNodeMap = constructToNodeMap;
-			this.RootConstruct = rootConstruct;
+			this.set_RootConstruct(rootConstruct);
+			return;
 		}
 
 		public HashSet<ISingleEntrySubGraph> GetDominanceFrontier(ISingleEntrySubGraph construct)
 		{
-			DTNode dTNode;
-			if (!this.constructToNodeMap.TryGetValue(construct, out dTNode))
+			if (!this.constructToNodeMap.TryGetValue(construct, out V_0))
 			{
 				return null;
 			}
-			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
-			foreach (DTNode dominanceFrontier in dTNode.DominanceFrontier)
+			V_1 = new HashSet<ISingleEntrySubGraph>();
+			V_2 = V_0.get_DominanceFrontier().GetEnumerator();
+			try
 			{
-				singleEntrySubGraphs.Add(dominanceFrontier.Construct);
+				while (V_2.MoveNext())
+				{
+					V_3 = V_2.get_Current();
+					dummyVar0 = V_1.Add(V_3.get_Construct());
+				}
 			}
-			return singleEntrySubGraphs;
+			finally
+			{
+				((IDisposable)V_2).Dispose();
+			}
+			return V_1;
 		}
 
 		public HashSet<ISingleEntrySubGraph> GetDominatedNodes(ISingleEntrySubGraph construct)
 		{
-			DTNode dTNode;
-			if (!this.constructToNodeMap.TryGetValue(construct, out dTNode))
+			if (!this.constructToNodeMap.TryGetValue(construct, out V_0))
 			{
 				return null;
 			}
-			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
-			Queue<DTNode> dTNodes = new Queue<DTNode>();
-			dTNodes.Enqueue(dTNode);
-			while (dTNodes.Count > 0)
+			V_1 = new HashSet<ISingleEntrySubGraph>();
+			V_2 = new Queue<DTNode>();
+			V_2.Enqueue(V_0);
+			while (V_2.get_Count() > 0)
 			{
-				DTNode dTNode1 = dTNodes.Dequeue();
-				singleEntrySubGraphs.Add(dTNode1.Construct);
-				foreach (DTNode treeEdgeSuccessor in dTNode1.TreeEdgeSuccessors)
+				V_3 = V_2.Dequeue();
+				dummyVar0 = V_1.Add(V_3.get_Construct());
+				V_4 = V_3.get_TreeEdgeSuccessors().GetEnumerator();
+				try
 				{
-					dTNodes.Enqueue(treeEdgeSuccessor);
+					while (V_4.MoveNext())
+					{
+						V_5 = (DTNode)V_4.get_Current();
+						V_2.Enqueue(V_5);
+					}
+				}
+				finally
+				{
+					((IDisposable)V_4).Dispose();
 				}
 			}
-			return singleEntrySubGraphs;
+			return V_1;
 		}
 
 		public HashSet<ISingleEntrySubGraph> GetDominators(ISingleEntrySubGraph construct)
 		{
-			DTNode dTNode;
-			if (!this.constructToNodeMap.TryGetValue(construct, out dTNode))
+			if (!this.constructToNodeMap.TryGetValue(construct, out V_0))
 			{
 				return null;
 			}
-			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
-			foreach (DTNode dominator in dTNode.Dominators)
+			V_1 = new HashSet<ISingleEntrySubGraph>();
+			V_2 = V_0.get_Dominators().GetEnumerator();
+			try
 			{
-				singleEntrySubGraphs.Add(dominator.Construct);
+				while (V_2.MoveNext())
+				{
+					V_3 = V_2.get_Current();
+					dummyVar0 = V_1.Add(V_3.get_Construct());
+				}
 			}
-			return singleEntrySubGraphs;
+			finally
+			{
+				((IDisposable)V_2).Dispose();
+			}
+			return V_1;
 		}
 
 		public ISingleEntrySubGraph GetImmediateDominator(ISingleEntrySubGraph construct)
 		{
-			DTNode dTNode;
-			if (!this.constructToNodeMap.TryGetValue(construct, out dTNode) || dTNode.Predecessor == null)
+			if (!this.constructToNodeMap.TryGetValue(construct, out V_0) || V_0.get_Predecessor() == null)
 			{
 				return null;
 			}
-			return dTNode.Predecessor.Construct;
+			return V_0.get_Predecessor().get_Construct();
 		}
 
 		public void MergeNodes(HashSet<ISingleEntrySubGraph> constructs, ISingleEntrySubGraph originalEntry, ISingleEntrySubGraph newConstruct)
 		{
-			DTNode item = this.constructToNodeMap[originalEntry];
-			DTNode dTNode = new DTNode(newConstruct)
+			V_0 = this.constructToNodeMap.get_Item(originalEntry);
+			stackVariable5 = new DTNode(newConstruct);
+			stackVariable5.set_Predecessor(V_0.get_Predecessor());
+			V_1 = stackVariable5;
+			V_1.get_DominanceFrontier().UnionWith(V_0.get_DominanceFrontier());
+			dummyVar0 = V_1.get_DominanceFrontier().Remove(V_0);
+			if (V_1.get_Predecessor() != null)
 			{
-				Predecessor = item.Predecessor
-			};
-			dTNode.DominanceFrontier.UnionWith(item.DominanceFrontier);
-			dTNode.DominanceFrontier.Remove(item);
-			if (dTNode.Predecessor != null)
-			{
-				dTNode.Predecessor.TreeEdgeSuccessors.Remove(item);
-				dTNode.Predecessor.TreeEdgeSuccessors.Add(dTNode);
+				dummyVar1 = V_1.get_Predecessor().get_TreeEdgeSuccessors().Remove(V_0);
+				dummyVar2 = V_1.get_Predecessor().get_TreeEdgeSuccessors().Add(V_1);
 			}
-			foreach (ISingleEntrySubGraph construct in constructs)
+			V_2 = constructs.GetEnumerator();
+			try
 			{
-				this.constructToNodeMap.Remove(construct);
-			}
-			foreach (KeyValuePair<ISingleEntrySubGraph, DTNode> keyValuePair in this.constructToNodeMap)
-			{
-				if (keyValuePair.Value.Predecessor != null && constructs.Contains(keyValuePair.Value.Predecessor.Construct))
+				while (V_2.MoveNext())
 				{
-					keyValuePair.Value.Predecessor = dTNode;
-					dTNode.TreeEdgeSuccessors.Add(keyValuePair.Value);
+					V_3 = V_2.get_Current();
+					dummyVar3 = this.constructToNodeMap.Remove(V_3);
 				}
-				if (!keyValuePair.Value.DominanceFrontier.Remove(item))
-				{
-					continue;
-				}
-				keyValuePair.Value.DominanceFrontier.Add(dTNode);
 			}
-			if (this.RootConstruct == originalEntry)
+			finally
 			{
-				this.RootConstruct = newConstruct;
+				((IDisposable)V_2).Dispose();
 			}
-			this.constructToNodeMap.Add(newConstruct, dTNode);
+			V_4 = this.constructToNodeMap.GetEnumerator();
+			try
+			{
+				while (V_4.MoveNext())
+				{
+					V_5 = V_4.get_Current();
+					if (V_5.get_Value().get_Predecessor() != null && constructs.Contains(V_5.get_Value().get_Predecessor().get_Construct()))
+					{
+						V_5.get_Value().set_Predecessor(V_1);
+						dummyVar4 = V_1.get_TreeEdgeSuccessors().Add(V_5.get_Value());
+					}
+					if (!V_5.get_Value().get_DominanceFrontier().Remove(V_0))
+					{
+						continue;
+					}
+					dummyVar5 = V_5.get_Value().get_DominanceFrontier().Add(V_1);
+				}
+			}
+			finally
+			{
+				((IDisposable)V_4).Dispose();
+			}
+			if (this.get_RootConstruct() == originalEntry)
+			{
+				this.set_RootConstruct(newConstruct);
+			}
+			this.constructToNodeMap.Add(newConstruct, V_1);
+			return;
 		}
 	}
 }

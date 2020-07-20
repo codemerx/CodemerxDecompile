@@ -13,54 +13,61 @@ namespace Telerik.JustDecompiler.Steps
 
 		public TransformCatchClausesFilterExpressionStep()
 		{
+			base();
+			return;
 		}
 
 		private static BinaryExpression GetBinaryExpression(bool isNestedBinaryInUnary, Expression binaryAsExpression)
 		{
-			BinaryExpression binaryExpression;
-			binaryExpression = (!isNestedBinaryInUnary ? binaryAsExpression as BinaryExpression : (binaryAsExpression as UnaryExpression).Operand as BinaryExpression);
-			return binaryExpression;
+			if (!isNestedBinaryInUnary)
+			{
+				V_0 = binaryAsExpression as BinaryExpression;
+			}
+			else
+			{
+				V_0 = (binaryAsExpression as UnaryExpression).get_Operand() as BinaryExpression;
+			}
+			return V_0;
 		}
 
 		private static Expression GetResultExpression(bool isNestedBinaryInUnary, Expression binaryAsExpression, BinaryExpression newBinaryExpression)
 		{
-			Expression expression;
 			if (!isNestedBinaryInUnary)
 			{
-				expression = newBinaryExpression;
+				V_0 = newBinaryExpression;
 			}
 			else
 			{
-				UnaryExpression unaryExpression = binaryAsExpression as UnaryExpression;
-				unaryExpression.Operand = newBinaryExpression;
-				expression = unaryExpression;
+				stackVariable4 = binaryAsExpression as UnaryExpression;
+				stackVariable4.set_Operand(newBinaryExpression);
+				V_0 = stackVariable4;
 			}
-			return expression;
+			return V_0;
 		}
 
 		private bool IsBinaryExpression(Expression expression, out Expression binaryExpression, out bool isWrappedInUnary)
 		{
 			binaryExpression = null;
 			isWrappedInUnary = false;
-			BinaryExpression binaryExpression1 = expression as BinaryExpression;
-			UnaryExpression unaryExpression = expression as UnaryExpression;
-			if (binaryExpression1 != null)
+			V_0 = expression as BinaryExpression;
+			V_1 = expression as UnaryExpression;
+			if (V_0 != null)
 			{
-				binaryExpression = binaryExpression1;
+				binaryExpression = V_0;
 				return true;
 			}
-			if (unaryExpression == null || unaryExpression.Operator != UnaryOperator.None && unaryExpression.Operator != UnaryOperator.LogicalNot || !(unaryExpression.Operand is BinaryExpression))
+			if (V_1 == null || V_1.get_Operator() != 11 && V_1.get_Operator() != 1 || V_1.get_Operand() as BinaryExpression == null)
 			{
 				return false;
 			}
-			if (unaryExpression.Operator != UnaryOperator.LogicalNot)
+			if (V_1.get_Operator() != 1)
 			{
-				binaryExpression = unaryExpression.Operand;
+				binaryExpression = V_1.get_Operand();
 			}
 			else
 			{
-				binaryExpression = Negator.Negate(unaryExpression.Operand, this.typeSystem);
-				if (!(binaryExpression is BinaryExpression))
+				binaryExpression = Negator.Negate(V_1.get_Operand(), this.typeSystem);
+				if (binaryExpression as BinaryExpression == null)
 				{
 					isWrappedInUnary = true;
 				}
@@ -70,275 +77,307 @@ namespace Telerik.JustDecompiler.Steps
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
+			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
 			return (BlockStatement)this.Visit(body);
 		}
 
 		private Expression Transform(Expression expression)
 		{
-			Expression resultExpression = null;
-			ConditionExpression conditionExpression = expression as ConditionExpression;
-			Expression expression1 = null;
-			bool flag = false;
-			bool flag1 = false;
-			if (this.IsBinaryExpression(expression, out expression1, out flag))
+			V_0 = null;
+			V_1 = expression as ConditionExpression;
+			V_2 = null;
+			V_3 = false;
+			V_4 = false;
+			if (!this.IsBinaryExpression(expression, out V_2, out V_3))
 			{
-				BinaryExpression binaryExpression = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(flag, expression1);
-				if (this.TryTransformBinary(binaryExpression))
+				if (V_1 != null && this.TryTransformTernary(V_1, out V_0))
 				{
-					resultExpression = TransformCatchClausesFilterExpressionStep.GetResultExpression(flag, expression1, binaryExpression);
-					flag1 = true;
+					V_4 = true;
 				}
 			}
-			else if (conditionExpression != null && this.TryTransformTernary(conditionExpression, out resultExpression))
+			else
 			{
-				flag1 = true;
+				V_5 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(V_3, V_2);
+				if (this.TryTransformBinary(V_5))
+				{
+					V_0 = TransformCatchClausesFilterExpressionStep.GetResultExpression(V_3, V_2, V_5);
+					V_4 = true;
+				}
 			}
-			if (!flag1)
+			if (!V_4)
 			{
-				resultExpression = expression;
+				V_0 = expression;
 			}
-			return resultExpression;
+			return V_0;
 		}
 
 		private bool TryTransform(BinaryExpression node)
 		{
-			Expression expression;
-			Expression expression1;
-			if (!node.IsAssignmentExpression)
+			if (!node.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			if (node.ExpressionType.get_FullName() != "System.Boolean")
+			if (String.op_Inequality(node.get_ExpressionType().get_FullName(), "System.Boolean"))
 			{
 				return false;
 			}
-			if (!(node.Left is VariableReferenceExpression))
+			if (node.get_Left() as VariableReferenceExpression == null)
 			{
 				return false;
 			}
-			BinaryExpression right = node.Right as BinaryExpression;
-			if (right == null)
+			V_0 = node.get_Right() as BinaryExpression;
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (right.Operator != BinaryOperator.ValueInequality)
+			if (V_0.get_Operator() != 10)
 			{
 				return false;
 			}
-			LiteralExpression literalExpression = right.Right as LiteralExpression;
-			if (literalExpression == null || !(literalExpression.Value is Int32) || (Int32)literalExpression.Value != 0)
+			V_1 = V_0.get_Right() as LiteralExpression;
+			if (V_1 == null || V_1.get_Value() as Int32 == 0 || (Int32)V_1.get_Value() != 0)
 			{
 				return false;
 			}
-			bool flag = false;
-			if (this.IsBinaryExpression(right.Left, out expression, out flag))
+			V_3 = false;
+			if (this.IsBinaryExpression(V_0.get_Left(), out V_2, out V_3))
 			{
-				BinaryExpression binaryExpression = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(flag, expression);
-				if (this.TryTransformBinary(binaryExpression))
+				V_5 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(V_3, V_2);
+				if (this.TryTransformBinary(V_5))
 				{
-					node.Right = TransformCatchClausesFilterExpressionStep.GetResultExpression(flag, expression, binaryExpression);
+					node.set_Right(TransformCatchClausesFilterExpressionStep.GetResultExpression(V_3, V_2, V_5));
 					return true;
 				}
 			}
-			ConditionExpression left = right.Left as ConditionExpression;
-			if (left != null && this.TryTransformTernary(left, out expression1))
+			V_4 = V_0.get_Left() as ConditionExpression;
+			if (V_4 != null && this.TryTransformTernary(V_4, out V_6))
 			{
-				node.Right = expression1;
+				node.set_Right(V_6);
 				return true;
 			}
-			if (right.Left.ExpressionType.get_FullName() != "System.Boolean")
+			if (!String.op_Equality(V_0.get_Left().get_ExpressionType().get_FullName(), "System.Boolean"))
 			{
 				return false;
 			}
-			node.Right = right.Left;
+			node.set_Right(V_0.get_Left());
 			return true;
 		}
 
 		private bool TryTransformBinary(BinaryExpression binaryExpression)
 		{
-			Expression expression;
-			Expression expression1;
-			Expression expression2;
-			Expression expression3;
-			bool flag = false;
-			if (binaryExpression.Left.ExpressionType.get_FullName() != "System.Boolean" || binaryExpression.Right.ExpressionType.get_FullName() != "System.Boolean")
+			V_0 = false;
+			if (String.op_Inequality(binaryExpression.get_Left().get_ExpressionType().get_FullName(), "System.Boolean") || String.op_Inequality(binaryExpression.get_Right().get_ExpressionType().get_FullName(), "System.Boolean"))
 			{
 				return false;
 			}
-			bool flag1 = false;
-			if (this.IsBinaryExpression(binaryExpression.Left, out expression, out flag1))
+			V_1 = false;
+			if (this.IsBinaryExpression(binaryExpression.get_Left(), out V_2, out V_1))
 			{
-				BinaryExpression binaryExpression1 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(flag1, expression);
-				if (this.TryTransformBinary(binaryExpression1))
+				V_8 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(V_1, V_2);
+				if (this.TryTransformBinary(V_8))
 				{
-					binaryExpression.Left = TransformCatchClausesFilterExpressionStep.GetResultExpression(flag1, expression, binaryExpression1);
-					flag = true;
+					binaryExpression.set_Left(TransformCatchClausesFilterExpressionStep.GetResultExpression(V_1, V_2, V_8));
+					V_0 = true;
 				}
 			}
-			flag1 = false;
-			if (this.IsBinaryExpression(binaryExpression.Right, out expression1, out flag1))
+			V_1 = false;
+			if (this.IsBinaryExpression(binaryExpression.get_Right(), out V_3, out V_1))
 			{
-				BinaryExpression binaryExpression2 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(flag1, expression1);
-				if (this.TryTransformBinary(binaryExpression2))
+				V_9 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(V_1, V_3);
+				if (this.TryTransformBinary(V_9))
 				{
-					binaryExpression.Right = TransformCatchClausesFilterExpressionStep.GetResultExpression(flag1, expression1, binaryExpression2);
-					flag = true;
+					binaryExpression.set_Right(TransformCatchClausesFilterExpressionStep.GetResultExpression(V_1, V_3, V_9));
+					V_0 = true;
 				}
 			}
-			ConditionExpression left = binaryExpression.Left as ConditionExpression;
-			if (left != null && this.TryTransformTernary(left, out expression2))
+			V_4 = binaryExpression.get_Left() as ConditionExpression;
+			if (V_4 != null && this.TryTransformTernary(V_4, out V_5))
 			{
-				binaryExpression.Left = expression2;
-				flag = true;
+				binaryExpression.set_Left(V_5);
+				V_0 = true;
 			}
-			ConditionExpression right = binaryExpression.Right as ConditionExpression;
-			if (right != null && this.TryTransformTernary(right, out expression3))
+			V_6 = binaryExpression.get_Right() as ConditionExpression;
+			if (V_6 != null && this.TryTransformTernary(V_6, out V_7))
 			{
-				binaryExpression.Right = expression3;
-				flag = true;
+				binaryExpression.set_Right(V_7);
+				V_0 = true;
 			}
-			return flag;
+			return V_0;
 		}
 
 		private bool TryTransformTernary(ConditionExpression ternary, out Expression transformed)
 		{
-			LiteralExpression literalExpression;
-			bool flag;
-			bool value;
-			BinaryOperator binaryOperator;
-			Expression expression;
 			transformed = null;
-			LiteralExpression then = ternary.Then as LiteralExpression;
-			LiteralExpression @else = ternary.Else as LiteralExpression;
-			if (then != null && @else != null)
+			V_2 = ternary.get_Then() as LiteralExpression;
+			V_3 = ternary.get_Else() as LiteralExpression;
+			if (V_2 != null && V_3 != null)
 			{
-				bool flag1 = false;
-				bool flag2 = false;
-				if (then.ExpressionType.get_FullName() == "System.Int32" && @else.ExpressionType.get_FullName() == "System.Int32")
+				V_14 = false;
+				V_15 = false;
+				if (!String.op_Equality(V_2.get_ExpressionType().get_FullName(), "System.Int32") || !String.op_Equality(V_3.get_ExpressionType().get_FullName(), "System.Int32"))
 				{
-					int num = (Int32)then.Value;
-					int value1 = (Int32)@else.Value;
-					if (num == 0 && value1 == 1 || num == 1 && value1 == 0)
+					if (String.op_Equality(V_2.get_ExpressionType().get_FullName(), "System.Boolean") && String.op_Equality(V_3.get_ExpressionType().get_FullName(), "System.Boolean"))
 					{
-						flag1 = true;
-						if (num == 0 && value1 == 1)
+						V_18 = (Boolean)V_2.get_Value();
+						V_19 = (Boolean)V_3.get_Value();
+						if (!V_18 && V_19 || V_18 && !V_19)
 						{
-							flag2 = true;
+							V_14 = true;
+							if (!V_18 && V_19)
+							{
+								V_15 = true;
+							}
 						}
 					}
 				}
-				else if (then.ExpressionType.get_FullName() == "System.Boolean" && @else.ExpressionType.get_FullName() == "System.Boolean")
+				else
 				{
-					bool value2 = (Boolean)then.Value;
-					bool value3 = (Boolean)@else.Value;
-					if (!value2 && value3 || value2 && !value3)
+					V_16 = (Int32)V_2.get_Value();
+					V_17 = (Int32)V_3.get_Value();
+					if (V_16 == 0 && V_17 == 1 || V_16 == 1 && V_17 == 0)
 					{
-						flag1 = true;
-						if (!value2 && value3)
+						V_14 = true;
+						if (V_16 == 0 && V_17 == 1)
 						{
-							flag2 = true;
+							V_15 = true;
 						}
 					}
 				}
-				if (flag1)
+				if (V_14)
 				{
-					if (!flag2)
+					if (!V_15)
 					{
-						transformed = this.Transform(ternary.Condition);
+						transformed = this.Transform(ternary.get_Condition());
 					}
 					else
 					{
-						transformed = this.Transform(Negator.Negate(ternary.Condition, this.typeSystem));
+						transformed = this.Transform(Negator.Negate(ternary.get_Condition(), this.typeSystem));
 					}
 					return true;
 				}
 			}
-			if (then == null)
+			if (V_2 == null)
 			{
-				if (@else == null)
+				if (V_3 == null)
 				{
-					ExplicitCastExpression explicitCastExpression = ternary.Then as ExplicitCastExpression;
-					ExplicitCastExpression else1 = ternary.Else as ExplicitCastExpression;
-					if (explicitCastExpression == null || else1 == null || !(explicitCastExpression.TargetType.get_FullName() == "System.Int32") || !(explicitCastExpression.Expression.ExpressionType.get_FullName() == "System.Boolean") || !(else1.TargetType.get_FullName() == "System.Int32") || !(else1.Expression.ExpressionType.get_FullName() == "System.Boolean"))
+					V_20 = ternary.get_Then() as ExplicitCastExpression;
+					V_21 = ternary.get_Else() as ExplicitCastExpression;
+					if (V_20 == null || V_21 == null || !String.op_Equality(V_20.get_TargetType().get_FullName(), "System.Int32") || !String.op_Equality(V_20.get_Expression().get_ExpressionType().get_FullName(), "System.Boolean") || !String.op_Equality(V_21.get_TargetType().get_FullName(), "System.Int32") || !String.op_Equality(V_21.get_Expression().get_ExpressionType().get_FullName(), "System.Boolean"))
 					{
 						return false;
 					}
-					ternary.Then = explicitCastExpression.Expression;
-					ternary.Else = else1.Expression;
+					ternary.set_Then(V_20.get_Expression());
+					ternary.set_Else(V_21.get_Expression());
 					transformed = ternary;
 					return true;
 				}
-				literalExpression = @else;
-				flag = false;
+				V_0 = V_3;
+				V_1 = false;
 			}
 			else
 			{
-				literalExpression = then;
-				flag = true;
+				V_0 = V_2;
+				V_1 = true;
 			}
-			if (literalExpression.ExpressionType.get_FullName() != "System.Int32")
+			if (!String.op_Equality(V_0.get_ExpressionType().get_FullName(), "System.Int32"))
 			{
-				if (literalExpression.ExpressionType.get_FullName() != "System.Boolean")
+				if (!String.op_Equality(V_0.get_ExpressionType().get_FullName(), "System.Boolean"))
 				{
 					return false;
 				}
-				value = (Boolean)literalExpression.Value;
+				V_4 = (Boolean)V_0.get_Value();
 			}
 			else
 			{
-				value = ((Int32)literalExpression.Value != 0 ? true : false);
+				if ((Int32)V_0.get_Value() != 0)
+				{
+					stackVariable163 = true;
+				}
+				else
+				{
+					stackVariable163 = false;
+				}
+				V_4 = stackVariable163;
 			}
-			Expression expression1 = null;
-			Expression resultExpression = null;
-			expression1 = this.Transform(ternary.Condition);
-			expression = (!flag ? ternary.Then : ternary.Else);
-			ConditionExpression conditionExpression = expression as ConditionExpression;
-			ExplicitCastExpression explicitCastExpression1 = expression as ExplicitCastExpression;
-			Expression expression2 = null;
-			bool flag3 = false;
-			if (conditionExpression == null && (explicitCastExpression1 == null || explicitCastExpression1.TargetType.get_FullName() != "System.Int32" || explicitCastExpression1.Expression.ExpressionType.get_FullName() != "System.Boolean") && !this.IsBinaryExpression(expression, out expression2, out flag3) && expression.ExpressionType.get_FullName() != "System.Boolean")
+			V_6 = null;
+			V_7 = null;
+			V_6 = this.Transform(ternary.get_Condition());
+			if (!V_1)
+			{
+				V_8 = ternary.get_Then();
+			}
+			else
+			{
+				V_8 = ternary.get_Else();
+			}
+			V_9 = V_8 as ConditionExpression;
+			V_10 = V_8 as ExplicitCastExpression;
+			V_11 = null;
+			V_12 = false;
+			if (V_9 == null && V_10 == null || String.op_Inequality(V_10.get_TargetType().get_FullName(), "System.Int32") || String.op_Inequality(V_10.get_Expression().get_ExpressionType().get_FullName(), "System.Boolean") && !this.IsBinaryExpression(V_8, out V_11, out V_12) && String.op_Inequality(V_8.get_ExpressionType().get_FullName(), "System.Boolean"))
 			{
 				return false;
 			}
-			bool flag4 = false;
-			if (explicitCastExpression1 != null)
+			V_13 = false;
+			if (V_10 == null)
 			{
-				resultExpression = explicitCastExpression1.Expression;
-				flag4 = true;
-			}
-			else if (expression2 != null)
-			{
-				BinaryExpression binaryExpression = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(flag3, expression2);
-				if (this.TryTransformBinary(binaryExpression))
+				if (V_11 == null)
 				{
-					resultExpression = TransformCatchClausesFilterExpressionStep.GetResultExpression(flag3, expression2, binaryExpression);
-					flag4 = true;
+					if (V_9 != null && this.TryTransformTernary(V_9, out V_7))
+					{
+						V_13 = true;
+					}
+				}
+				else
+				{
+					V_22 = TransformCatchClausesFilterExpressionStep.GetBinaryExpression(V_12, V_11);
+					if (this.TryTransformBinary(V_22))
+					{
+						V_7 = TransformCatchClausesFilterExpressionStep.GetResultExpression(V_12, V_11, V_22);
+						V_13 = true;
+					}
 				}
 			}
-			else if (conditionExpression != null && this.TryTransformTernary(conditionExpression, out resultExpression))
+			else
 			{
-				flag4 = true;
+				V_7 = V_10.get_Expression();
+				V_13 = true;
 			}
-			if (!flag4)
+			if (!V_13)
 			{
-				resultExpression = expression;
+				V_7 = V_8;
 			}
-			if (expression1 == null || resultExpression == null)
+			if (V_6 == null || V_7 == null)
 			{
 				return false;
 			}
-			if (!value)
+			if (!V_4)
 			{
-				binaryOperator = BinaryOperator.LogicalAnd;
-				expression1 = (flag ? Negator.Negate(expression1, this.typeSystem) : expression1);
+				V_5 = 12;
+				if (V_1)
+				{
+					stackVariable97 = Negator.Negate(V_6, this.typeSystem);
+				}
+				else
+				{
+					stackVariable97 = V_6;
+				}
+				V_6 = stackVariable97;
 			}
 			else
 			{
-				binaryOperator = BinaryOperator.LogicalOr;
-				expression1 = (flag ? expression1 : Negator.Negate(expression1, this.typeSystem));
+				V_5 = 11;
+				if (V_1)
+				{
+					stackVariable111 = V_6;
+				}
+				else
+				{
+					stackVariable111 = Negator.Negate(V_6, this.typeSystem);
+				}
+				V_6 = stackVariable111;
 			}
-			transformed = new BinaryExpression(binaryOperator, expression1, resultExpression, this.typeSystem, ternary.MappedInstructions, false);
+			transformed = new BinaryExpression(V_5, V_6, V_7, this.typeSystem, ternary.get_MappedInstructions(), false);
 			return true;
 		}
 
@@ -348,7 +387,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			return base.VisitBinaryExpression(node);
+			return this.VisitBinaryExpression(node);
 		}
 	}
 }

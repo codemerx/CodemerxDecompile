@@ -6,8 +6,10 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 {
 	internal class TernaryConditionPatternAgressive : TernaryConditionPattern
 	{
-		public TernaryConditionPatternAgressive(CodePatternsContext patternsContext, TypeSystem typeSystem) : base(patternsContext, typeSystem)
+		public TernaryConditionPatternAgressive(CodePatternsContext patternsContext, TypeSystem typeSystem)
 		{
+			base(patternsContext, typeSystem);
+			return;
 		}
 
 		protected override bool ShouldInlineExpressions(BinaryExpression thenAssignExpression, BinaryExpression elseAssignExpression)

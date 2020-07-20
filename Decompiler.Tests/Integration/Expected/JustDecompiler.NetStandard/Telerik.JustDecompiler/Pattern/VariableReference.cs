@@ -14,11 +14,13 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public VariableReference()
 		{
+			base();
+			return;
 		}
 
 		protected override bool OnMatch(MatchContext context, VariableReferenceExpression node)
 		{
-			return this.Variable.TryMatch(context, node.Variable);
+			return this.get_Variable().TryMatch(context, node.get_Variable());
 		}
 	}
 }

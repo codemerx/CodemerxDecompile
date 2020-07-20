@@ -15,6 +15,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new TypeReferenceExpression.u003cget_Childrenu003ed__6(-2);
 			}
 		}
 
@@ -22,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.TypeReferenceExpression;
+				return 43;
 			}
 		}
 
@@ -30,11 +31,12 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Type;
+				return this.get_Type();
 			}
 			set
 			{
-				this.Type = value;
+				this.set_Type(value);
+				return;
 			}
 		}
 
@@ -42,7 +44,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.Type != (object)null;
+				return (object)this.get_Type() != (object)null;
 			}
 		}
 
@@ -52,29 +54,31 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public TypeReferenceExpression(TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
+		public TypeReferenceExpression(TypeReference type, IEnumerable<Instruction> instructions)
 		{
-			this.Type = type;
+			base(instructions);
+			this.set_Type(type);
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new TypeReferenceExpression(this.Type, this.instructions);
+			return new TypeReferenceExpression(this.get_Type(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new TypeReferenceExpression(this.Type, null);
+			return new TypeReferenceExpression(this.get_Type(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is TypeReferenceExpression))
+			if (other as TypeReferenceExpression == null)
 			{
 				return false;
 			}
-			TypeReferenceExpression typeReferenceExpression = other as TypeReferenceExpression;
-			return this.Type.get_FullName() == typeReferenceExpression.Type.get_FullName();
+			V_0 = other as TypeReferenceExpression;
+			return String.op_Equality(this.get_Type().get_FullName(), V_0.get_Type().get_FullName());
 		}
 	}
 }

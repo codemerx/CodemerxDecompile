@@ -7,6 +7,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 	{
 		public CatchClauseCollection()
 		{
+			base();
+			return;
 		}
 	}
 }

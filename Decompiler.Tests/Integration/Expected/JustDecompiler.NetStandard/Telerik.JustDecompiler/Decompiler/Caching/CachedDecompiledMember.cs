@@ -21,18 +21,24 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		public CachedDecompiledMember(DecompiledMember decompiledMember)
 		{
-			this.Member = decompiledMember;
-			this.FieldAssignmentData = new Dictionary<string, InitializationAssignment>();
+			base();
+			this.set_Member(decompiledMember);
+			this.set_FieldAssignmentData(new Dictionary<string, InitializationAssignment>());
+			return;
 		}
 
 		public CachedDecompiledMember(DecompiledMember decompiledMember, Dictionary<string, InitializationAssignment> fieldToAssignedExpression)
 		{
-			this.Member = decompiledMember;
-			this.FieldAssignmentData = fieldToAssignedExpression;
+			base();
+			this.set_Member(decompiledMember);
+			this.set_FieldAssignmentData(fieldToAssignedExpression);
+			return;
 		}
 
-		public CachedDecompiledMember(DecompiledMember decompiledMember, TypeSpecificContext typeContext) : this(decompiledMember, typeContext.AssignmentData)
+		public CachedDecompiledMember(DecompiledMember decompiledMember, TypeSpecificContext typeContext)
 		{
+			this(decompiledMember, typeContext.get_AssignmentData());
+			return;
 		}
 	}
 }

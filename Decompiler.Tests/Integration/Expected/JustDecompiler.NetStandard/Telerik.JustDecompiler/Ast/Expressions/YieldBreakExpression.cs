@@ -14,6 +14,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
+				return new YieldBreakExpression.u003cget_Childrenu003ed__2(-2);
 			}
 		}
 
@@ -21,12 +22,14 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.YieldBreakExpression;
+				return 55;
 			}
 		}
 
-		public YieldBreakExpression(IEnumerable<Instruction> instructions) : base(instructions)
+		public YieldBreakExpression(IEnumerable<Instruction> instructions)
 		{
+			base(instructions);
+			return;
 		}
 
 		public override Expression Clone()
@@ -41,7 +44,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 
 		public override bool Equals(Expression other)
 		{
-			return other is YieldBreakExpression;
+			return other as YieldBreakExpression != null;
 		}
 	}
 }

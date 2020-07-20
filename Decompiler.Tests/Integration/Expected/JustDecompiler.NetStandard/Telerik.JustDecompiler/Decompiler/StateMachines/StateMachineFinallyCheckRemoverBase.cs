@@ -9,7 +9,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 {
 	internal abstract class StateMachineFinallyCheckRemoverBase
 	{
-		private readonly HashSet<InstructionBlock> toBeRemoved = new HashSet<InstructionBlock>();
+		private readonly HashSet<InstructionBlock> toBeRemoved;
 
 		protected readonly ControlFlowGraph theCFG;
 
@@ -25,8 +25,11 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		public StateMachineFinallyCheckRemoverBase(MethodSpecificContext methodContext)
 		{
-			this.methodVariables = methodContext.Body.get_Variables();
-			this.theCFG = methodContext.ControlFlowGraph;
+			this.toBeRemoved = new HashSet<InstructionBlock>();
+			base();
+			this.methodVariables = methodContext.get_Body().get_Variables();
+			this.theCFG = methodContext.get_ControlFlowGraph();
+			return;
 		}
 
 		protected abstract bool IsFinallyCheckBlock(InstructionBlock finallyEntry);
@@ -35,16 +38,25 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		protected void MarkFinallyConditionsForRemovalInternal()
 		{
-			InstructionBlock instructionBlocks;
-			foreach (ExceptionHandler rawExceptionHandler in this.theCFG.RawExceptionHandlers)
+			V_0 = this.theCFG.get_RawExceptionHandlers().GetEnumerator();
+			try
 			{
-				if (rawExceptionHandler.get_HandlerType() != 2 || !this.theCFG.InstructionToBlockMapping.TryGetValue(rawExceptionHandler.get_HandlerStart().get_Offset(), out instructionBlocks) || !this.IsFinallyCheckBlock(instructionBlocks))
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (V_1.get_HandlerType() != 2 || !this.theCFG.get_InstructionToBlockMapping().TryGetValue(V_1.get_HandlerStart().get_Offset(), out V_2) || !this.IsFinallyCheckBlock(V_2))
+					{
+						continue;
+					}
+					dummyVar0 = this.toBeRemoved.Add(V_2);
+					V_2.set_Successors(new InstructionBlock[0]);
 				}
-				this.toBeRemoved.Add(instructionBlocks);
-				instructionBlocks.Successors = new InstructionBlock[0];
 			}
+			finally
+			{
+				V_0.Dispose();
+			}
+			return;
 		}
 	}
 }

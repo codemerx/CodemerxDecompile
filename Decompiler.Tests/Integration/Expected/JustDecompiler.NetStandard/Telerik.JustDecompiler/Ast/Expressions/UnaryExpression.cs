@@ -17,8 +17,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				UnaryExpression unaryExpression = null;
-				yield return unaryExpression.Operand;
+				stackVariable1 = new UnaryExpression.u003cget_Childrenu003ed__11(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -26,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.UnaryExpression;
+				return 23;
 			}
 		}
 
@@ -50,7 +51,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.Operand.HasType;
+				return this.get_Operand().get_HasType();
 			}
 		}
 
@@ -66,96 +67,97 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public UnaryExpression(UnaryOperator @operator, Expression operand, IEnumerable<Instruction> instructions) : base(instructions)
+		public UnaryExpression(UnaryOperator operator, Expression operand, IEnumerable<Instruction> instructions)
 		{
-			this.Operator = @operator;
-			this.Operand = operand;
-			if (operand is UnaryExpression && @operator == UnaryOperator.None)
+			base(instructions);
+			this.set_Operator(operator);
+			this.set_Operand(operand);
+			if (operand as UnaryExpression != null && operator == 11)
 			{
-				this.Operand = (operand as UnaryExpression).Operand;
-				this.Operator = (operand as UnaryExpression).Operator;
+				this.set_Operand((operand as UnaryExpression).get_Operand());
+				this.set_Operator((operand as UnaryExpression).get_Operator());
 				this.instructions.AddRange((operand as UnaryExpression).instructions);
 			}
+			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new UnaryExpression(this.Operator, this.Operand.Clone(), this.instructions)
-			{
-				expressionType = this.expressionType
-			};
+			stackVariable7 = new UnaryExpression(this.get_Operator(), this.get_Operand().Clone(), this.instructions);
+			stackVariable7.expressionType = this.expressionType;
+			return stackVariable7;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new UnaryExpression(this.Operator, this.Operand.CloneExpressionOnly(), new Instruction[0])
-			{
-				expressionType = this.expressionType
-			};
+			stackVariable7 = new UnaryExpression(this.get_Operator(), this.get_Operand().CloneExpressionOnly(), new Instruction[0]);
+			stackVariable7.expressionType = this.expressionType;
+			return stackVariable7;
 		}
 
 		public void DecideExpressionType()
 		{
-			if (this.Operand.ExpressionType == null)
+			if (this.get_Operand().get_ExpressionType() == null)
 			{
 				this.expressionType = null;
 				return;
 			}
-			if (this.Operator != UnaryOperator.AddressDereference)
+			if (this.get_Operator() != 8)
 			{
-				if (this.Operator == UnaryOperator.AddressOf)
+				if (this.get_Operator() == 9)
 				{
-					this.expressionType = new PointerType(this.Operand.ExpressionType);
+					this.expressionType = new PointerType(this.get_Operand().get_ExpressionType());
 					return;
 				}
-				if (this.Operator != UnaryOperator.AddressReference)
+				if (this.get_Operator() != 7)
 				{
-					this.expressionType = this.Operand.ExpressionType;
+					this.expressionType = this.get_Operand().get_ExpressionType();
 					return;
 				}
-				this.expressionType = new ByReferenceType(this.Operand.ExpressionType);
+				this.expressionType = new ByReferenceType(this.get_Operand().get_ExpressionType());
 				return;
 			}
-			TypeReference expressionType = this.Operand.ExpressionType;
-			if (expressionType == null)
+			V_0 = this.get_Operand().get_ExpressionType();
+			if (V_0 == null)
 			{
 				this.expressionType = null;
 				return;
 			}
-			while (expressionType.get_IsOptionalModifier() || expressionType.get_IsRequiredModifier())
+			while (V_0.get_IsOptionalModifier() || V_0.get_IsRequiredModifier())
 			{
-				expressionType = (expressionType as TypeSpecification).get_ElementType();
+				V_0 = (V_0 as TypeSpecification).get_ElementType();
 			}
-			if (expressionType.get_IsPointer())
+			if (V_0.get_IsPointer())
 			{
-				this.expressionType = (expressionType as PointerType).get_ElementType();
+				this.expressionType = (V_0 as PointerType).get_ElementType();
 				return;
 			}
-			if (expressionType.get_IsByReference())
+			if (V_0.get_IsByReference())
 			{
-				this.expressionType = (expressionType as ByReferenceType).get_ElementType();
+				this.expressionType = (V_0 as ByReferenceType).get_ElementType();
 				return;
 			}
-			if (!expressionType.get_IsPinned())
+			if (!V_0.get_IsPinned())
 			{
-				this.expressionType = expressionType;
+				this.expressionType = V_0;
 				return;
 			}
-			this.expressionType = ((expressionType as PinnedType).get_ElementType() as ByReferenceType).get_ElementType();
+			this.expressionType = ((V_0 as PinnedType).get_ElementType() as ByReferenceType).get_ElementType();
+			return;
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (!(other is UnaryExpression))
+			if (other as UnaryExpression == null)
 			{
 				return false;
 			}
-			UnaryExpression unaryExpression = other as UnaryExpression;
-			if (this.Operator != unaryExpression.Operator)
+			V_0 = other as UnaryExpression;
+			if (this.get_Operator() != V_0.get_Operator())
 			{
 				return false;
 			}
-			return this.Operand.Equals(unaryExpression.Operand);
+			return this.get_Operand().Equals(V_0.get_Operand());
 		}
 	}
 }

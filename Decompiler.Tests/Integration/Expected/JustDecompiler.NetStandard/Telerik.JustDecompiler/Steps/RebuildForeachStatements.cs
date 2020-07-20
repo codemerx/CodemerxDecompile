@@ -1,9 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -30,7 +28,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private TryStatement theTry;
 
-		private ForEachStatement @foreach;
+		private ForEachStatement foreach;
 
 		private TypeReference foreachVariableType;
 
@@ -42,19 +40,24 @@ namespace Telerik.JustDecompiler.Steps
 
 		private MethodSpecificContext methodContext;
 
-		private readonly HashSet<VariableDefinition> foreachVariables = new HashSet<VariableDefinition>();
+		private readonly HashSet<VariableDefinition> foreachVariables;
 
-		private readonly List<Instruction> foreachVariableInstructions = new List<Instruction>();
+		private readonly List<Instruction> foreachVariableInstructions;
 
-		private readonly List<Instruction> foreachCollectionInstructions = new List<Instruction>();
+		private readonly List<Instruction> foreachCollectionInstructions;
 
 		private IEnumerable<Instruction> foreachConditionInstructions;
 
 		public RebuildForeachStatements()
 		{
+			this.foreachVariables = new HashSet<VariableDefinition>();
+			this.foreachVariableInstructions = new List<Instruction>();
+			this.foreachCollectionInstructions = new List<Instruction>();
+			base();
 			this.insideTry = false;
 			this.foundEnumeratorAssignment = false;
 			this.foundWhile = false;
+			return;
 		}
 
 		private void AttachForeach()
@@ -62,40 +65,42 @@ namespace Telerik.JustDecompiler.Steps
 			this.GenerateForeachStatement();
 			if (!this.isEnumeratorUsedInsideForEach)
 			{
-				BlockStatement parent = this.theTry.Parent as BlockStatement;
-				parent.Statements.Remove(this.enumeratorAssignmentStatement);
-				int num = parent.Statements.IndexOf(this.theTry);
-				parent.Statements.RemoveAt(num);
-				parent.AddStatementAt(num, this.@foreach);
-				(new RebuildForeachStatements.YieldStateMachineCodeRemover(this.@foreach, this.theEnumerator)).ProcessForEachStatement();
+				V_0 = this.theTry.get_Parent() as BlockStatement;
+				dummyVar0 = V_0.get_Statements().Remove(this.enumeratorAssignmentStatement);
+				V_1 = V_0.get_Statements().IndexOf(this.theTry);
+				V_0.get_Statements().RemoveAt(V_1);
+				V_0.AddStatementAt(V_1, this.foreach);
+				(new RebuildForeachStatements.YieldStateMachineCodeRemover(this.foreach, this.theEnumerator)).ProcessForEachStatement();
 				this.CopyLabel();
 				this.CheckVariable();
 				this.ClearState();
-				this.VisitForEachStatement(parent.Statements[num] as ForEachStatement);
+				this.VisitForEachStatement(V_0.get_Statements().get_Item(V_1) as ForEachStatement);
 			}
+			return;
 		}
 
 		private bool CanContainForeach(TryStatement tryStatement)
 		{
-			if (tryStatement.CatchClauses.Count != 0 || tryStatement.Try.Statements.Count != 1 || tryStatement.Finally == null || tryStatement.Finally.Body.Statements.Count != 1 && tryStatement.Finally.Body.Statements.Count != 2)
+			if (tryStatement.get_CatchClauses().get_Count() != 0 || tryStatement.get_Try().get_Statements().get_Count() != 1 || tryStatement.get_Finally() == null || tryStatement.get_Finally().get_Body().get_Statements().get_Count() != 1 && tryStatement.get_Finally().get_Body().get_Statements().get_Count() != 2)
 			{
 				return false;
 			}
-			return this.IsValidFinally(tryStatement.Finally.Body);
+			return this.IsValidFinally(tryStatement.get_Finally().get_Body());
 		}
 
 		private void CheckVariable()
 		{
 			if (this.foreachVariables.Contains(this.foreachVariable))
 			{
-				VariableDefinition variableDefinition = this.foreachVariable;
-				this.foreachVariable = new VariableDefinition(this.foreachVariable.get_VariableType(), this.methodContext.Method);
+				stackVariable11 = this.foreachVariable;
+				this.foreachVariable = new VariableDefinition(this.foreachVariable.get_VariableType(), this.methodContext.get_Method());
 				this.foreachVariableInstructions.Clear();
-				this.methodContext.Variables.Add(this.foreachVariable);
-				this.methodContext.VariablesToRename.Add(this.foreachVariable);
-				(new RebuildForeachStatements.ForeachVariableChanger(variableDefinition, this.foreachVariable)).Visit(this.@foreach);
+				this.methodContext.get_Variables().Add(this.foreachVariable);
+				dummyVar0 = this.methodContext.get_VariablesToRename().Add(this.foreachVariable);
+				(new RebuildForeachStatements.ForeachVariableChanger(stackVariable11, this.foreachVariable)).Visit(this.foreach);
 			}
-			this.foreachVariables.Add(this.foreachVariable);
+			dummyVar1 = this.foreachVariables.Add(this.foreachVariable);
+			return;
 		}
 
 		private void ClearState()
@@ -110,74 +115,77 @@ namespace Telerik.JustDecompiler.Steps
 			this.foreachBody = new BlockStatement();
 			this.theEnumerator = null;
 			this.theTry = null;
-			this.@foreach = null;
+			this.foreach = null;
 			this.enumeratorAssignmentStatement = null;
 			this.foreachVariableType = null;
 			this.isEnumeratorUsedInsideForEach = false;
 			this.foreachConditionInstructions = null;
+			return;
 		}
 
 		private void CopyLabel()
 		{
-			if (this.theTry.Label != String.Empty)
+			if (String.op_Inequality(this.theTry.get_Label(), String.Empty))
 			{
-				this.@foreach.Label = this.theTry.Label;
+				this.foreach.set_Label(this.theTry.get_Label());
 				return;
 			}
-			if (this.theTry.Try.Label != String.Empty)
+			if (String.op_Inequality(this.theTry.get_Try().get_Label(), String.Empty))
 			{
-				this.@foreach.Label = this.theTry.Try.Label;
+				this.foreach.set_Label(this.theTry.get_Try().get_Label());
 				return;
 			}
-			if (this.theTry.Try.Statements[0].Label != String.Empty)
+			if (String.op_Inequality(this.theTry.get_Try().get_Statements().get_Item(0).get_Label(), String.Empty))
 			{
-				this.@foreach.Label = this.theTry.Try.Statements[0].Label;
+				this.foreach.set_Label(this.theTry.get_Try().get_Statements().get_Item(0).get_Label());
 			}
+			return;
 		}
 
 		private void GenerateForeachStatement()
 		{
 			if (this.foreachVariable == null)
 			{
-				this.foreachVariable = new VariableDefinition(this.foreachVariableType, this.methodContext.Method);
+				this.foreachVariable = new VariableDefinition(this.foreachVariableType, this.methodContext.get_Method());
 				this.foreachVariableInstructions.Clear();
-				this.methodContext.VariablesToRename.Add(this.foreachVariable);
+				dummyVar0 = this.methodContext.get_VariablesToRename().Add(this.foreachVariable);
 			}
-			VariableDeclarationExpression variableDeclarationExpression = new VariableDeclarationExpression(this.foreachVariable, this.foreachVariableInstructions);
-			Expression thisReferenceExpression = this.foreachCollection.CloneAndAttachInstructions(this.foreachCollectionInstructions);
-			if (thisReferenceExpression is BaseReferenceExpression)
+			V_0 = new VariableDeclarationExpression(this.foreachVariable, this.foreachVariableInstructions);
+			V_1 = this.foreachCollection.CloneAndAttachInstructions(this.foreachCollectionInstructions);
+			if (V_1 as BaseReferenceExpression != null)
 			{
-				thisReferenceExpression = new ThisReferenceExpression(this.methodContext.Method.get_DeclaringType(), thisReferenceExpression.UnderlyingSameMethodInstructions);
+				V_1 = new ThisReferenceExpression(this.methodContext.get_Method().get_DeclaringType(), V_1.get_UnderlyingSameMethodInstructions());
 			}
-			this.@foreach = new ForEachStatement(variableDeclarationExpression, thisReferenceExpression, this.foreachBody, this.foreachConditionInstructions, this.theTry.Finally.UnderlyingSameMethodInstructions);
-			(new RebuildForeachStatements.GetCurrentFixer(this.theEnumerator, this.foreachVariable)).Visit(this.@foreach);
-			RebuildForeachStatements.IsEnumeratorUsedVisitor isEnumeratorUsedVisitor = new RebuildForeachStatements.IsEnumeratorUsedVisitor(this.theEnumerator);
-			isEnumeratorUsedVisitor.Visit(this.@foreach);
-			this.isEnumeratorUsedInsideForEach = isEnumeratorUsedVisitor.IsEnumeratorUsed;
+			this.foreach = new ForEachStatement(V_0, V_1, this.foreachBody, this.foreachConditionInstructions, this.theTry.get_Finally().get_UnderlyingSameMethodInstructions());
+			dummyVar1 = (new RebuildForeachStatements.GetCurrentFixer(this.theEnumerator, this.foreachVariable)).Visit(this.foreach);
+			V_2 = new RebuildForeachStatements.IsEnumeratorUsedVisitor(this.theEnumerator);
+			V_2.Visit(this.foreach);
+			this.isEnumeratorUsedInsideForEach = V_2.get_IsEnumeratorUsed();
+			return;
 		}
 
 		private bool IsEnumeratorAssignment(Expression expression)
 		{
-			BinaryExpression binaryExpression = expression as BinaryExpression;
-			if (binaryExpression == null || !binaryExpression.IsAssignmentExpression)
+			V_0 = expression as BinaryExpression;
+			if (V_0 == null || !V_0.get_IsAssignmentExpression())
 			{
 				return false;
 			}
-			Expression right = binaryExpression.Right;
-			if (right is MethodInvocationExpression)
+			V_1 = V_0.get_Right();
+			if (V_1 as MethodInvocationExpression != null)
 			{
-				MethodInvocationExpression methodInvocationExpression = right as MethodInvocationExpression;
-				if (this.IsGetEnumerator(methodInvocationExpression))
+				V_2 = V_1 as MethodInvocationExpression;
+				if (this.IsGetEnumerator(V_2))
 				{
-					if (!(binaryExpression.Left is VariableReferenceExpression))
+					if (V_0.get_Left() as VariableReferenceExpression == null)
 					{
 						return false;
 					}
 					this.foreachCollectionInstructions.Clear();
-					this.foreachCollectionInstructions.AddRange(binaryExpression.Left.UnderlyingSameMethodInstructions);
-					this.foreachCollectionInstructions.AddRange(binaryExpression.MappedInstructions);
-					this.foreachCollectionInstructions.AddRange(methodInvocationExpression.InvocationInstructions);
-					this.theEnumerator = (binaryExpression.Left as VariableReferenceExpression).Variable;
+					this.foreachCollectionInstructions.AddRange(V_0.get_Left().get_UnderlyingSameMethodInstructions());
+					this.foreachCollectionInstructions.AddRange(V_0.get_MappedInstructions());
+					this.foreachCollectionInstructions.AddRange(V_2.get_InvocationInstructions());
+					this.theEnumerator = (V_0.get_Left() as VariableReferenceExpression).get_Variable();
 					return true;
 				}
 			}
@@ -190,7 +198,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (methodInvocationExpression.MethodExpression.Method.get_Name() == "Dispose")
+			if (String.op_Equality(methodInvocationExpression.get_MethodExpression().get_Method().get_Name(), "Dispose"))
 			{
 				return true;
 			}
@@ -199,12 +207,12 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsForeach(WhileStatement node)
 		{
-			if (node.Condition is UnaryExpression)
+			if (node.get_Condition() as UnaryExpression != null)
 			{
-				UnaryExpression condition = node.Condition as UnaryExpression;
-				if (condition.Operator == UnaryOperator.None && condition.Operand is MethodInvocationExpression)
+				V_0 = node.get_Condition() as UnaryExpression;
+				if (V_0.get_Operator() == 11 && V_0.get_Operand() as MethodInvocationExpression != null)
 				{
-					return this.IsMoveNextCall(condition.Operand as MethodInvocationExpression);
+					return this.IsMoveNextCall(V_0.get_Operand() as MethodInvocationExpression);
 				}
 			}
 			return false;
@@ -212,55 +220,54 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsForeachVariableAssignment(BinaryExpression assignment)
 		{
-			Expression right;
 			if (assignment == null)
 			{
 				return false;
 			}
-			if (!(assignment.Right is ExplicitCastExpression))
+			if (assignment.get_Right() as ExplicitCastExpression == null)
 			{
-				if (!(assignment.Right is MethodInvocationExpression) && !(assignment.Right is PropertyReferenceExpression))
+				if (assignment.get_Right() as MethodInvocationExpression == null && assignment.get_Right() as PropertyReferenceExpression == null)
 				{
 					return false;
 				}
-				right = assignment.Right;
+				V_0 = assignment.get_Right();
 			}
 			else
 			{
-				right = (assignment.Right as ExplicitCastExpression).Expression;
+				V_0 = (assignment.get_Right() as ExplicitCastExpression).get_Expression();
 			}
-			if (!this.IsGetCurrent(right))
+			if (!this.IsGetCurrent(V_0))
 			{
 				return false;
 			}
-			VariableReferenceExpression left = assignment.Left as VariableReferenceExpression;
-			if (left == null)
+			V_1 = assignment.get_Left() as VariableReferenceExpression;
+			if (V_1 == null)
 			{
 				return false;
 			}
-			this.foreachVariable = left.Variable.Resolve();
-			this.foreachVariableInstructions.AddRange(assignment.UnderlyingSameMethodInstructions);
-			this.foreachVariableType = assignment.Right.ExpressionType;
+			this.foreachVariable = V_1.get_Variable().Resolve();
+			this.foreachVariableInstructions.AddRange(assignment.get_UnderlyingSameMethodInstructions());
+			this.foreachVariableType = assignment.get_Right().get_ExpressionType();
 			return true;
 		}
 
 		private bool IsGetCurrent(Expression expression)
 		{
-			MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
-			if (methodInvocationExpression == null)
+			V_0 = expression as MethodInvocationExpression;
+			if (V_0 == null)
 			{
-				PropertyReferenceExpression propertyReferenceExpression = expression as PropertyReferenceExpression;
-				if (propertyReferenceExpression == null)
+				V_1 = expression as PropertyReferenceExpression;
+				if (V_1 == null)
 				{
 					return false;
 				}
-				return propertyReferenceExpression.Property.get_Name() == "Current";
+				return String.op_Equality(V_1.get_Property().get_Name(), "Current");
 			}
-			if (!(methodInvocationExpression.MethodExpression.Target is VariableReferenceExpression) || methodInvocationExpression.MethodExpression.Method.get_Name() != "get_Current")
+			if (V_0.get_MethodExpression().get_Target() as VariableReferenceExpression == null || String.op_Inequality(V_0.get_MethodExpression().get_Method().get_Name(), "get_Current"))
 			{
 				return false;
 			}
-			if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)this.theEnumerator)
+			if ((object)(V_0.get_MethodExpression().get_Target() as VariableReferenceExpression).get_Variable() != (object)this.theEnumerator)
 			{
 				return false;
 			}
@@ -269,15 +276,15 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsGetEnumerator(MethodInvocationExpression supposedGetEnumerator)
 		{
-			if (supposedGetEnumerator.MethodExpression.Method.get_Name() != "GetEnumerator")
+			if (String.op_Inequality(supposedGetEnumerator.get_MethodExpression().get_Method().get_Name(), "GetEnumerator"))
 			{
 				return false;
 			}
-			if (supposedGetEnumerator.MethodExpression.Target == null)
+			if (supposedGetEnumerator.get_MethodExpression().get_Target() == null)
 			{
 				return false;
 			}
-			this.foreachCollection = supposedGetEnumerator.MethodExpression.Target;
+			this.foreachCollection = supposedGetEnumerator.get_MethodExpression().get_Target();
 			return true;
 		}
 
@@ -287,10 +294,10 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (invocation.MethodExpression.Method.get_Name() == "MoveNext")
+			if (String.op_Equality(invocation.get_MethodExpression().get_Method().get_Name(), "MoveNext"))
 			{
-				VariableReferenceExpression target = invocation.MethodExpression.Target as VariableReferenceExpression;
-				if (target != null && (object)target.Variable == (object)this.theEnumerator)
+				V_0 = invocation.get_MethodExpression().get_Target() as VariableReferenceExpression;
+				if (V_0 != null && (object)V_0.get_Variable() == (object)this.theEnumerator)
 				{
 					return true;
 				}
@@ -300,43 +307,42 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsValidFinally(BlockStatement blockStatement)
 		{
-			IfStatement item;
-			if (blockStatement.Statements.Count != 1)
+			if (blockStatement.get_Statements().get_Count() != 1)
 			{
-				item = blockStatement.Statements[1] as IfStatement;
+				V_0 = blockStatement.get_Statements().get_Item(1) as IfStatement;
 			}
 			else
 			{
-				item = blockStatement.Statements[0] as IfStatement;
-				if (item == null)
+				V_0 = blockStatement.get_Statements().get_Item(0) as IfStatement;
+				if (V_0 == null)
 				{
-					ExpressionStatement expressionStatement = blockStatement.Statements[0] as ExpressionStatement;
-					if (expressionStatement == null)
+					V_1 = blockStatement.get_Statements().get_Item(0) as ExpressionStatement;
+					if (V_1 == null)
 					{
 						return false;
 					}
-					return this.IsEnumeratorDispose(expressionStatement.Expression as MethodInvocationExpression);
+					return this.IsEnumeratorDispose(V_1.get_Expression() as MethodInvocationExpression);
 				}
 			}
-			if (item == null)
+			if (V_0 == null)
 			{
 				return false;
 			}
-			if (item.Then.Statements.Count != 1)
+			if (V_0.get_Then().get_Statements().get_Count() != 1)
 			{
 				return false;
 			}
-			ExpressionStatement item1 = item.Then.Statements[0] as ExpressionStatement;
-			if (item1 == null)
+			V_2 = V_0.get_Then().get_Statements().get_Item(0) as ExpressionStatement;
+			if (V_2 == null)
 			{
 				return false;
 			}
-			return this.IsEnumeratorDispose(item1.Expression as MethodInvocationExpression);
+			return this.IsEnumeratorDispose(V_2.get_Expression() as MethodInvocationExpression);
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.MethodContext;
+			this.methodContext = context.get_MethodContext();
 			this.ClearState();
 			this.foreachBody = new BlockStatement();
 			this.Visit(body);
@@ -345,95 +351,115 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
-			for (int i = 0; i < node.Statements.Count; i++)
+			V_0 = 0;
+			while (V_0 < node.get_Statements().get_Count())
 			{
-				int count = node.Statements.Count;
-				this.Visit(node.Statements[i]);
-				int num = node.Statements.Count;
-				if (count > num)
+				V_1 = node.get_Statements().get_Count();
+				this.Visit(node.get_Statements().get_Item(V_0));
+				V_2 = node.get_Statements().get_Count();
+				if (V_1 > V_2)
 				{
-					i = i - (count - num);
+					V_0 = V_0 - V_1 - V_2;
 				}
+				V_0 = V_0 + 1;
 			}
+			return;
 		}
 
 		public override void VisitExpressionStatement(ExpressionStatement node)
 		{
-			if (!this.foundWhile)
+			if (this.foundWhile)
 			{
-				if (this.IsEnumeratorAssignment(node.Expression))
+				if (node.get_Expression() as BinaryExpression == null)
+				{
+					if (node.get_Expression() as MethodInvocationExpression != null || node.get_Expression() as PropertyReferenceExpression != null)
+					{
+						if (this.IsGetCurrent(node.get_Expression()))
+						{
+							this.foreachVariableType = node.get_Expression().get_ExpressionType();
+							return;
+						}
+						if (this.shouldAdd)
+						{
+							this.foreachBody.AddStatement(node);
+							return;
+						}
+					}
+					else
+					{
+						if (node.get_Expression() as ExplicitCastExpression == null)
+						{
+							if (node.get_Expression() as BoxExpression == null)
+							{
+								if (this.shouldAdd)
+								{
+									this.foreachBody.AddStatement(node);
+								}
+							}
+							else
+							{
+								V_1 = node.get_Expression() as BoxExpression;
+								if (this.IsGetCurrent(V_1.get_BoxedExpression()))
+								{
+									this.foreachVariableType = V_1.get_BoxedAs();
+									return;
+								}
+								if (this.shouldAdd)
+								{
+									this.foreachBody.AddStatement(node);
+									return;
+								}
+							}
+						}
+						else
+						{
+							V_0 = node.get_Expression() as ExplicitCastExpression;
+							if (this.IsGetCurrent(V_0.get_Expression()))
+							{
+								this.foreachVariableType = V_0.get_ExpressionType();
+								return;
+							}
+							if (this.shouldAdd)
+							{
+								this.foreachBody.AddStatement(node);
+								return;
+							}
+						}
+					}
+				}
+				else
+				{
+					if (!this.IsForeachVariableAssignment(node.get_Expression() as BinaryExpression) && this.shouldAdd)
+					{
+						this.foreachBody.AddStatement(node);
+						return;
+					}
+				}
+			}
+			else
+			{
+				if (this.IsEnumeratorAssignment(node.get_Expression()))
 				{
 					this.foundEnumeratorAssignment = true;
 					this.enumeratorAssignmentStatement = node;
 					return;
 				}
 			}
-			else if (node.Expression is BinaryExpression)
-			{
-				if (!this.IsForeachVariableAssignment(node.Expression as BinaryExpression) && this.shouldAdd)
-				{
-					this.foreachBody.AddStatement(node);
-					return;
-				}
-			}
-			else if (node.Expression is MethodInvocationExpression || node.Expression is PropertyReferenceExpression)
-			{
-				if (this.IsGetCurrent(node.Expression))
-				{
-					this.foreachVariableType = node.Expression.ExpressionType;
-					return;
-				}
-				if (this.shouldAdd)
-				{
-					this.foreachBody.AddStatement(node);
-					return;
-				}
-			}
-			else if (node.Expression is ExplicitCastExpression)
-			{
-				ExplicitCastExpression expression = node.Expression as ExplicitCastExpression;
-				if (this.IsGetCurrent(expression.Expression))
-				{
-					this.foreachVariableType = expression.ExpressionType;
-					return;
-				}
-				if (this.shouldAdd)
-				{
-					this.foreachBody.AddStatement(node);
-					return;
-				}
-			}
-			else if (node.Expression is BoxExpression)
-			{
-				BoxExpression boxExpression = node.Expression as BoxExpression;
-				if (this.IsGetCurrent(boxExpression.BoxedExpression))
-				{
-					this.foreachVariableType = boxExpression.BoxedAs;
-					return;
-				}
-				if (this.shouldAdd)
-				{
-					this.foreachBody.AddStatement(node);
-					return;
-				}
-			}
-			else if (this.shouldAdd)
-			{
-				this.foreachBody.AddStatement(node);
-			}
+			return;
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			if (!this.foundWhile && (this.IsGetCurrent(node) || this.IsMoveNextCall(node)))
+			if (!this.foundWhile && this.IsGetCurrent(node) || this.IsMoveNextCall(node))
 			{
 				this.ClearState();
 				return;
 			}
 			if (this.IsGetCurrent(node))
 			{
-				this.foreachVariableType = node.ExpressionType;
+				this.foreachVariableType = node.get_ExpressionType();
 			}
+			return;
 		}
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
@@ -445,8 +471,9 @@ namespace Telerik.JustDecompiler.Steps
 			}
 			if (this.IsGetCurrent(node))
 			{
-				this.foreachVariableType = node.ExpressionType;
+				this.foreachVariableType = node.get_ExpressionType();
 			}
+			return;
 		}
 
 		public override void VisitTryStatement(TryStatement node)
@@ -454,74 +481,88 @@ namespace Telerik.JustDecompiler.Steps
 			if (!this.foundEnumeratorAssignment)
 			{
 				this.insideTry = false;
-				base.VisitTryStatement(node);
+				this.VisitTryStatement(node);
 				return;
 			}
 			if (this.CanContainForeach(node))
 			{
 				this.insideTry = true;
 				this.theTry = node;
-				base.VisitTryStatement(node);
+				this.VisitTryStatement(node);
 			}
 			this.insideTry = false;
+			return;
 		}
 
 		public override void VisitWhileStatement(WhileStatement node)
 		{
 			if (!this.foundEnumeratorAssignment || !this.insideTry)
 			{
-				base.VisitWhileStatement(node);
+				this.VisitWhileStatement(node);
 			}
 			else
 			{
 				if (!this.IsForeach(node))
 				{
 					this.ClearState();
-					base.VisitWhileStatement(node);
+					this.VisitWhileStatement(node);
 					return;
 				}
-				BlockStatement parent = this.theTry.Parent as BlockStatement;
-				if (parent == null || parent != this.enumeratorAssignmentStatement.Parent || parent.Statements.IndexOf(this.enumeratorAssignmentStatement) + 1 != parent.Statements.IndexOf(this.theTry))
+				V_0 = this.theTry.get_Parent() as BlockStatement;
+				if (V_0 == null || V_0 != this.enumeratorAssignmentStatement.get_Parent() || V_0.get_Statements().IndexOf(this.enumeratorAssignmentStatement) + 1 != V_0.get_Statements().IndexOf(this.theTry))
 				{
 					this.ClearState();
-					base.VisitWhileStatement(node);
+					this.VisitWhileStatement(node);
 					return;
 				}
-				this.foreachConditionInstructions = node.Condition.UnderlyingSameMethodInstructions;
+				this.foreachConditionInstructions = node.get_Condition().get_UnderlyingSameMethodInstructions();
 				this.foundWhile = true;
 				this.shouldAdd = true;
-				foreach (Statement statement in node.Body.Statements)
+				V_1 = node.get_Body().get_Statements().GetEnumerator();
+				try
 				{
-					if (statement is ExpressionStatement)
+					while (V_1.MoveNext())
 					{
-						this.VisitExpressionStatement(statement as ExpressionStatement);
+						V_2 = V_1.get_Current();
+						if (V_2 as ExpressionStatement != null)
+						{
+							this.VisitExpressionStatement(V_2 as ExpressionStatement);
+						}
+						else
+						{
+							this.foreachBody.AddStatement(V_2);
+						}
+						if (this.foreachVariableType != null)
+						{
+							continue;
+						}
+						V_3 = new RebuildForeachStatements.ForeachElementTypeFinder(this.theEnumerator);
+						V_3.Visit(V_2);
+						this.foreachVariableType = V_3.get_ResultingType();
 					}
-					else
+				}
+				finally
+				{
+					if (V_1 != null)
 					{
-						this.foreachBody.AddStatement(statement);
+						V_1.Dispose();
 					}
-					if (this.foreachVariableType != null)
-					{
-						continue;
-					}
-					RebuildForeachStatements.ForeachElementTypeFinder foreachElementTypeFinder = new RebuildForeachStatements.ForeachElementTypeFinder(this.theEnumerator);
-					foreachElementTypeFinder.Visit(statement);
-					this.foreachVariableType = foreachElementTypeFinder.ResultingType;
 				}
 				if (this.foreachVariableType == null)
 				{
 					this.ClearState();
-					base.VisitWhileStatement(node);
+					this.VisitWhileStatement(node);
 					return;
 				}
 				this.AttachForeach();
 				if (this.isEnumeratorUsedInsideForEach)
 				{
 					this.ClearState();
-					base.VisitWhileStatement(node);
+					this.VisitWhileStatement(node);
 					return;
 				}
 			}
+			return;
 		}
 
 		private class ForeachElementTypeFinder : BaseCodeVisitor
@@ -536,26 +577,28 @@ namespace Telerik.JustDecompiler.Steps
 
 			public ForeachElementTypeFinder(VariableReference theEnumerator)
 			{
+				base();
 				this.theEnumerator = theEnumerator;
+				return;
 			}
 
 			private bool IsGetCurrent(Expression expression)
 			{
-				MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
-				if (methodInvocationExpression == null)
+				V_0 = expression as MethodInvocationExpression;
+				if (V_0 == null)
 				{
-					PropertyReferenceExpression propertyReferenceExpression = expression as PropertyReferenceExpression;
-					if (propertyReferenceExpression == null)
+					V_1 = expression as PropertyReferenceExpression;
+					if (V_1 == null)
 					{
 						return false;
 					}
-					return propertyReferenceExpression.Property.get_Name() == "Current";
+					return String.op_Equality(V_1.get_Property().get_Name(), "Current");
 				}
-				if (!(methodInvocationExpression.MethodExpression.Target is VariableReferenceExpression) || methodInvocationExpression.MethodExpression.Method.get_Name() != "get_Current")
+				if (V_0.get_MethodExpression().get_Target() as VariableReferenceExpression == null || String.op_Inequality(V_0.get_MethodExpression().get_Method().get_Name(), "get_Current"))
 				{
 					return false;
 				}
-				if ((object)(methodInvocationExpression.MethodExpression.Target as VariableReferenceExpression).Variable != (object)this.theEnumerator)
+				if ((object)(V_0.get_MethodExpression().get_Target() as VariableReferenceExpression).get_Variable() != (object)this.theEnumerator)
 				{
 					return false;
 				}
@@ -566,22 +609,25 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (this.IsGetCurrent(node))
 				{
-					this.ResultingType = node.ExpressionType;
+					this.set_ResultingType(node.get_ExpressionType());
 				}
-				base.VisitMethodInvocationExpression(node);
+				this.VisitMethodInvocationExpression(node);
+				return;
 			}
 
 			public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 			{
 				if (this.IsGetCurrent(node))
 				{
-					this.ResultingType = node.ExpressionType;
+					this.set_ResultingType(node.get_ExpressionType());
 				}
-				base.VisitPropertyReferenceExpression(node);
+				this.VisitPropertyReferenceExpression(node);
+				return;
 			}
 
 			public override void VisitTryStatement(TryStatement node)
 			{
+				return;
 			}
 		}
 
@@ -593,24 +639,28 @@ namespace Telerik.JustDecompiler.Steps
 
 			public ForeachVariableChanger(VariableDefinition oldVariable, VariableDefinition newVariable)
 			{
+				base();
 				this.oldVariable = oldVariable;
 				this.newVariable = newVariable;
+				return;
 			}
 
 			public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 			{
-				if ((object)node.Variable == (object)this.oldVariable)
+				if ((object)node.get_Variable() == (object)this.oldVariable)
 				{
-					node.Variable = this.newVariable;
+					node.set_Variable(this.newVariable);
 				}
+				return;
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if (node.Variable == this.oldVariable)
+				if (node.get_Variable() == this.oldVariable)
 				{
-					node.Variable = this.newVariable;
+					node.set_Variable(this.newVariable);
 				}
+				return;
 			}
 		}
 
@@ -622,30 +672,32 @@ namespace Telerik.JustDecompiler.Steps
 
 			public GetCurrentFixer(VariableReference enumerator, VariableReference foreachVariable)
 			{
+				base();
 				this.enumerator = enumerator;
 				this.foreachVariable = foreachVariable;
+				return;
 			}
 
 			public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				if (!(node.MethodExpression.Target is VariableReferenceExpression) || (object)(node.MethodExpression.Target as VariableReferenceExpression).Variable != (object)this.enumerator || !(node.MethodExpression.Method.get_Name() == "get_Current"))
+				if (node.get_MethodExpression().get_Target() as VariableReferenceExpression == null || (object)(node.get_MethodExpression().get_Target() as VariableReferenceExpression).get_Variable() != (object)this.enumerator || !String.op_Equality(node.get_MethodExpression().get_Method().get_Name(), "get_Current"))
 				{
-					return base.VisitMethodInvocationExpression(node);
+					return this.VisitMethodInvocationExpression(node);
 				}
 				return new VariableReferenceExpression(this.foreachVariable, null);
 			}
 
 			public override ICodeNode VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 			{
-				if (node.Property.get_Name() == "Current")
+				if (String.op_Equality(node.get_Property().get_Name(), "Current"))
 				{
-					VariableReferenceExpression target = node.Target as VariableReferenceExpression;
-					if (target != null && (object)target.Variable == (object)this.enumerator)
+					V_0 = node.get_Target() as VariableReferenceExpression;
+					if (V_0 != null && (object)V_0.get_Variable() == (object)this.enumerator)
 					{
 						return new VariableReferenceExpression(this.foreachVariable, null);
 					}
 				}
-				return base.VisitPropertyReferenceExpression(node);
+				return this.VisitPropertyReferenceExpression(node);
 			}
 		}
 
@@ -661,139 +713,150 @@ namespace Telerik.JustDecompiler.Steps
 
 			public IsEnumeratorUsedVisitor(VariableReference enumerator)
 			{
+				base();
 				this.enumerator = enumerator;
-				this.IsEnumeratorUsed = false;
+				this.set_IsEnumeratorUsed(false);
+				return;
 			}
 
 			public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				if (node.MethodExpression.Target is VariableReferenceExpression && (object)(node.MethodExpression.Target as VariableReferenceExpression).Variable == (object)this.enumerator && node.MethodExpression.Method.get_Name() != "get_Current")
+				if (node.get_MethodExpression().get_Target() as VariableReferenceExpression != null && (object)(node.get_MethodExpression().get_Target() as VariableReferenceExpression).get_Variable() == (object)this.enumerator && String.op_Inequality(node.get_MethodExpression().get_Method().get_Name(), "get_Current"))
 				{
-					this.IsEnumeratorUsed = true;
+					this.set_IsEnumeratorUsed(true);
 				}
-				base.VisitMethodInvocationExpression(node);
+				this.VisitMethodInvocationExpression(node);
+				return;
 			}
 
 			public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 			{
-				if (node.Property.get_Name() != "Current")
+				if (String.op_Inequality(node.get_Property().get_Name(), "Current"))
 				{
-					VariableReferenceExpression target = node.Target as VariableReferenceExpression;
-					if (target != null && (object)target.Variable == (object)this.enumerator)
+					V_0 = node.get_Target() as VariableReferenceExpression;
+					if (V_0 != null && (object)V_0.get_Variable() == (object)this.enumerator)
 					{
-						this.IsEnumeratorUsed = true;
+						this.set_IsEnumeratorUsed(true);
 					}
 				}
-				base.VisitPropertyReferenceExpression(node);
+				this.VisitPropertyReferenceExpression(node);
+				return;
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if ((object)node.Variable == (object)this.enumerator)
+				if ((object)node.get_Variable() == (object)this.enumerator)
 				{
-					this.IsEnumeratorUsed = true;
+					this.set_IsEnumeratorUsed(true);
 				}
-				base.VisitVariableReferenceExpression(node);
+				this.VisitVariableReferenceExpression(node);
+				return;
 			}
 		}
 
 		private class YieldStateMachineCodeRemover
 		{
-			private ForEachStatement @foreach;
+			private ForEachStatement foreach;
 
 			private VariableReference enumeratorVariable;
 
-			public YieldStateMachineCodeRemover(ForEachStatement @foreach, VariableReference enumeratorVariable)
+			public YieldStateMachineCodeRemover(ForEachStatement foreach, VariableReference enumeratorVariable)
 			{
-				this.@foreach = @foreach;
+				base();
+				this.foreach = foreach;
 				this.enumeratorVariable = enumeratorVariable;
+				return;
 			}
 
 			public void ProcessForEachStatement()
 			{
 				this.RemoveLastForeachStatementIfNeeded();
 				this.RemoveFirstSuccessorIfNeeded();
+				return;
 			}
 
 			private void RemoveFirstSuccessorIfNeeded()
 			{
-				BlockStatement parent = this.@foreach.Parent as BlockStatement;
-				int num = parent.Statements.IndexOf(this.@foreach);
-				if (parent.Statements.Count <= num + 1)
+				V_0 = this.foreach.get_Parent() as BlockStatement;
+				V_1 = V_0.get_Statements().IndexOf(this.foreach);
+				if (V_0.get_Statements().get_Count() <= V_1 + 1)
 				{
 					return;
 				}
-				ExpressionStatement item = parent.Statements[num + 1] as ExpressionStatement;
-				if (item == null)
+				V_2 = V_0.get_Statements().get_Item(V_1 + 1) as ExpressionStatement;
+				if (V_2 == null)
 				{
 					return;
 				}
-				BinaryExpression expression = item.Expression as BinaryExpression;
-				if (expression == null)
+				V_3 = V_2.get_Expression() as BinaryExpression;
+				if (V_3 == null)
 				{
 					return;
 				}
-				VariableReferenceExpression left = expression.Left as VariableReferenceExpression;
-				if (left == null)
+				V_4 = V_3.get_Left() as VariableReferenceExpression;
+				if (V_4 == null)
 				{
 					return;
 				}
-				if ((object)left.Variable != (object)this.enumeratorVariable)
+				if ((object)V_4.get_Variable() != (object)this.enumeratorVariable)
 				{
 					return;
 				}
-				LiteralExpression right = expression.Right as LiteralExpression;
-				if (right != null && right.Value == null)
+				V_5 = V_3.get_Right() as LiteralExpression;
+				if (V_5 != null && V_5.get_Value() == null)
 				{
-					this.RemoveStatement(parent.Statements, item);
+					this.RemoveStatement(V_0.get_Statements(), V_2);
 				}
-				if (expression.Right is ObjectCreationExpression)
+				if (V_3.get_Right() as ObjectCreationExpression != null)
 				{
-					this.RemoveStatement(parent.Statements, item);
+					this.RemoveStatement(V_0.get_Statements(), V_2);
 				}
+				return;
 			}
 
 			private void RemoveLastForeachStatementIfNeeded()
 			{
-				if (this.@foreach.Body.Statements.Count == 0)
+				if (this.foreach.get_Body().get_Statements().get_Count() == 0)
 				{
 					return;
 				}
-				ExpressionStatement expressionStatement = this.@foreach.Body.Statements.Last<Statement>() as ExpressionStatement;
-				if (expressionStatement == null)
+				V_0 = this.foreach.get_Body().get_Statements().Last<Statement>() as ExpressionStatement;
+				if (V_0 == null)
 				{
 					return;
 				}
-				BinaryExpression expression = expressionStatement.Expression as BinaryExpression;
-				if (expression == null)
+				V_1 = V_0.get_Expression() as BinaryExpression;
+				if (V_1 == null)
 				{
 					return;
 				}
-				if (!expression.IsAssignmentExpression)
+				if (!V_1.get_IsAssignmentExpression())
 				{
 					return;
 				}
-				VariableReferenceExpression left = expression.Left as VariableReferenceExpression;
-				if (left == null || left.Variable != this.@foreach.Variable.Variable)
+				V_2 = V_1.get_Left() as VariableReferenceExpression;
+				if (V_2 == null || V_2.get_Variable() != this.foreach.get_Variable().get_Variable())
 				{
 					return;
 				}
-				LiteralExpression right = expression.Right as LiteralExpression;
-				if (right != null && right.Value == null)
+				V_3 = V_1.get_Right() as LiteralExpression;
+				if (V_3 != null && V_3.get_Value() == null)
 				{
-					this.RemoveStatement(this.@foreach.Body.Statements, expressionStatement);
+					this.RemoveStatement(this.foreach.get_Body().get_Statements(), V_0);
 					return;
 				}
-				if (!(expression.Right is DefaultObjectExpression))
+				if (V_1.get_Right() as DefaultObjectExpression == null)
 				{
 					return;
 				}
-				this.RemoveStatement(this.@foreach.Body.Statements, expressionStatement);
+				this.RemoveStatement(this.foreach.get_Body().get_Statements(), V_0);
+				return;
 			}
 
 			private void RemoveStatement(StatementCollection collection, Statement statement)
 			{
-				collection.Remove(statement);
+				dummyVar0 = collection.Remove(statement);
+				return;
 			}
 		}
 	}

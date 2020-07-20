@@ -1,9 +1,6 @@
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
-using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
@@ -20,83 +17,106 @@ namespace Telerik.JustDecompiler.Steps
 
 		public FixSwitchConditionStep(DecompilationContext context)
 		{
+			base();
 			this.context = context;
+			return;
 		}
 
 		private void ChangeCasesLabel()
 		{
-			foreach (SwitchCase @case in this.theSwitch.Cases)
+			V_0 = this.theSwitch.get_Cases().GetEnumerator();
+			try
 			{
-				if (@case.CodeNodeType != CodeNodeType.ConditionCase)
+				while (V_0.MoveNext())
 				{
-					continue;
+					V_1 = V_0.get_Current();
+					if (V_1.get_CodeNodeType() != 13)
+					{
+						continue;
+					}
+					V_2 = V_1 as ConditionCase;
+					V_3 = V_2.get_Condition() as LiteralExpression;
+					if (V_3 == null || V_3.get_Value() as String != null)
+					{
+						continue;
+					}
+					V_2.set_Condition(this.FixCaseLiteralValue(V_3));
 				}
-				ConditionCase conditionCase = @case as ConditionCase;
-				LiteralExpression condition = conditionCase.Condition as LiteralExpression;
-				if (condition == null || condition.Value is String)
-				{
-					continue;
-				}
-				conditionCase.Condition = this.FixCaseLiteralValue(condition);
 			}
+			finally
+			{
+				if (V_0 != null)
+				{
+					V_0.Dispose();
+				}
+			}
+			return;
 		}
 
 		private bool CheckAndModifyCondition()
 		{
 			this.conditionOffset = 0;
-			if (this.theSwitch.Condition.CodeNodeType != CodeNodeType.BinaryExpression)
+			if (this.theSwitch.get_Condition().get_CodeNodeType() != 24)
 			{
 				return false;
 			}
-			BinaryExpression condition = this.theSwitch.Condition as BinaryExpression;
-			if (condition.Operator != BinaryOperator.Add && condition.Operator != BinaryOperator.Subtract || condition.Right.CodeNodeType != CodeNodeType.LiteralExpression)
+			V_0 = this.theSwitch.get_Condition() as BinaryExpression;
+			if (V_0.get_Operator() != 1 && V_0.get_Operator() != 3 || V_0.get_Right().get_CodeNodeType() != 22)
 			{
 				return false;
 			}
-			LiteralExpression right = condition.Right as LiteralExpression;
-			this.conditionOffset = Convert.ToInt32(right.Value);
-			this.conditionOffset = (condition.Operator == BinaryOperator.Subtract ? this.conditionOffset : -this.conditionOffset);
-			List<Instruction> instructions = new List<Instruction>(condition.Right.UnderlyingSameMethodInstructions);
-			instructions.AddRange(condition.MappedInstructions);
-			this.theSwitch.Condition = condition.Left.CloneAndAttachInstructions(instructions);
+			V_1 = V_0.get_Right() as LiteralExpression;
+			this.conditionOffset = Convert.ToInt32(V_1.get_Value());
+			if (V_0.get_Operator() == 3)
+			{
+				stackVariable30 = this.conditionOffset;
+			}
+			else
+			{
+				stackVariable30 = -this.conditionOffset;
+			}
+			this.conditionOffset = stackVariable30;
+			V_2 = new List<Instruction>(V_0.get_Right().get_UnderlyingSameMethodInstructions());
+			V_2.AddRange(V_0.get_MappedInstructions());
+			this.theSwitch.set_Condition(V_0.get_Left().CloneAndAttachInstructions(V_2));
 			return true;
 		}
 
 		private Expression FixCaseLiteralValue(LiteralExpression literalCondition)
 		{
-			TypeReference expressionType = this.theSwitch.Condition.ExpressionType;
-			int num = Convert.ToInt32(literalCondition.Value) + this.conditionOffset;
-			literalCondition.Value = num;
-			TypeSystem typeSystem = this.context.MethodContext.Method.get_Module().get_TypeSystem();
-			if (expressionType.get_Name() == "System.Nullable`1" && expressionType.get_HasGenericParameters())
+			V_0 = this.theSwitch.get_Condition().get_ExpressionType();
+			V_1 = Convert.ToInt32(literalCondition.get_Value()) + this.conditionOffset;
+			literalCondition.set_Value(V_1);
+			V_2 = this.context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			if (String.op_Equality(V_0.get_Name(), "System.Nullable`1") && V_0.get_HasGenericParameters())
 			{
-				expressionType = expressionType.get_GenericParameters().get_Item(0);
+				V_0 = V_0.get_GenericParameters().get_Item(0);
 			}
-			if (expressionType.get_FullName() == typeSystem.get_Char().get_FullName())
+			if (String.op_Equality(V_0.get_FullName(), V_2.get_Char().get_FullName()))
 			{
-				return new LiteralExpression((object)Convert.ToChar(num), typeSystem, null);
+				return new LiteralExpression((object)Convert.ToChar(V_1), V_2, null);
 			}
-			if (expressionType.get_FullName() == typeSystem.get_Boolean().get_FullName())
+			if (String.op_Equality(V_0.get_FullName(), V_2.get_Boolean().get_FullName()))
 			{
-				return new LiteralExpression((object)Convert.ToBoolean(num), typeSystem, null);
+				return new LiteralExpression((object)Convert.ToBoolean(V_1), V_2, null);
 			}
-			TypeDefinition typeDefinition = expressionType.Resolve();
-			if (typeDefinition == null || !typeDefinition.get_IsEnum())
+			V_3 = V_0.Resolve();
+			if (V_3 == null || !V_3.get_IsEnum())
 			{
 				return literalCondition;
 			}
-			Expression enumExpression = EnumHelper.GetEnumExpression(typeDefinition, literalCondition, typeSystem);
-			if (enumExpression is LiteralExpression)
+			V_4 = EnumHelper.GetEnumExpression(V_3, literalCondition, V_2);
+			if (V_4 as LiteralExpression != null)
 			{
-				enumExpression = new ExplicitCastExpression(enumExpression, typeDefinition, null);
+				V_4 = new ExplicitCastExpression(V_4, V_3, null);
 			}
-			return enumExpression;
+			return V_4;
 		}
 
 		public SwitchStatement VisitSwitchStatement(SwitchStatement node)
 		{
 			this.theSwitch = node;
-			this.CheckAndModifyCondition();
+			dummyVar0 = this.CheckAndModifyCondition();
 			this.ChangeCasesLabel();
 			return node;
 		}

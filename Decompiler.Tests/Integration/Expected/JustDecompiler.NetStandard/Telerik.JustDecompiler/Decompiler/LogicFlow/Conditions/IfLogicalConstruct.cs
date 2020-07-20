@@ -26,7 +26,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 		{
 			get
 			{
-				return this.Condition;
+				return this.get_Condition();
 			}
 		}
 
@@ -38,25 +38,25 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private IfLogicalConstruct(ConditionLogicalConstruct condition, BlockLogicalConstruct thenBlock, BlockLogicalConstruct elseBlock)
 		{
-			condition.LogicalContainer = this;
-			this.Condition = condition;
-			this.Then = thenBlock;
-			this.Else = elseBlock;
-			base.RedirectChildrenToNewParent(this.GetIfBody());
+			base();
+			condition.set_LogicalContainer(this);
+			this.set_Condition(condition);
+			this.set_Then(thenBlock);
+			this.set_Else(elseBlock);
+			this.RedirectChildrenToNewParent(this.GetIfBody());
+			return;
 		}
 
 		private ICollection<ILogicalConstruct> GetIfBody()
 		{
-			List<ILogicalConstruct> logicalConstructs = new List<ILogicalConstruct>()
+			V_0 = new List<ILogicalConstruct>();
+			V_0.Add(this.get_Condition());
+			V_0.Add(this.get_Then());
+			if (this.get_Else() != null)
 			{
-				this.Condition,
-				this.Then
-			};
-			if (this.Else != null)
-			{
-				logicalConstructs.Add(this.Else);
+				V_0.Add(this.get_Else());
 			}
-			return logicalConstructs;
+			return V_0;
 		}
 
 		public static IfLogicalConstruct GroupInIfConstruct(ConditionLogicalConstruct condition, BlockLogicalConstruct theThenBlock, BlockLogicalConstruct theElseBlock)
@@ -66,35 +66,41 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		public void Negate(TypeSystem typeSystem)
 		{
-			this.Condition.Negate(typeSystem);
-			BlockLogicalConstruct then = this.Then;
-			this.Then = this.Else;
-			this.Else = then;
+			this.get_Condition().Negate(typeSystem);
+			V_0 = this.get_Then();
+			this.set_Then(this.get_Else());
+			this.set_Else(V_0);
+			return;
 		}
 
 		protected override string ToString(string constructName, HashSet<CFGBlockLogicalConstruct> printedBlocks, LogicalFlowBuilderContext context)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.AppendLine("IfLogicalConstruct");
-			stringBuilder.AppendLine("{");
-			StringBuilder stringBuilder1 = new StringBuilder();
-			stringBuilder1.Append((this.Entry as ConditionLogicalConstruct).ToString(context));
-			stringBuilder1.Append(this.Then.ToString(context));
-			if (this.Else != null)
+			V_0 = new StringBuilder();
+			dummyVar0 = V_0.AppendLine("IfLogicalConstruct");
+			dummyVar1 = V_0.AppendLine("{");
+			V_1 = new StringBuilder();
+			dummyVar2 = V_1.Append((this.get_Entry() as ConditionLogicalConstruct).ToString(context));
+			dummyVar3 = V_1.Append(this.get_Then().ToString(context));
+			if (this.get_Else() != null)
 			{
-				stringBuilder1.Append(this.Else.ToString(context));
+				dummyVar4 = V_1.Append(this.get_Else().ToString(context));
 			}
-			string[] strArray = stringBuilder1.ToString().Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-			for (int i = 0; i < (int)strArray.Length; i++)
+			stackVariable24 = V_1.ToString();
+			stackVariable26 = new String[1];
+			stackVariable26[0] = Environment.get_NewLine();
+			V_3 = stackVariable24.Split(stackVariable26, 1);
+			V_4 = 0;
+			while (V_4 < (int)V_3.Length)
 			{
-				string str = strArray[i];
-				stringBuilder.AppendLine(String.Format("\t{0}", str));
+				V_5 = V_3[V_4];
+				dummyVar5 = V_0.AppendLine(String.Format("\t{0}", V_5));
+				V_4 = V_4 + 1;
 			}
-			string str1 = String.Format("\tFollowNode: {0}", base.NodeILOffset(context, base.CFGFollowNode));
-			stringBuilder.AppendLine(str1);
-			stringBuilder.AppendLine("}");
-			printedBlocks.UnionWith(this.CFGBlocks);
-			return stringBuilder.ToString();
+			V_2 = String.Format("\tFollowNode: {0}", this.NodeILOffset(context, this.get_CFGFollowNode()));
+			dummyVar6 = V_0.AppendLine(V_2);
+			dummyVar7 = V_0.AppendLine("}");
+			printedBlocks.UnionWith(this.get_CFGBlocks());
+			return V_0.ToString();
 		}
 	}
 }

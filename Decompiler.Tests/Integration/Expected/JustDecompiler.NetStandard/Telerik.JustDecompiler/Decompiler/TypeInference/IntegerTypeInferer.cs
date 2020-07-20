@@ -1,6 +1,5 @@
 using Mono.Cecil.Cil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Decompiler;
@@ -9,217 +8,346 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 {
 	internal class IntegerTypeInferer : TypeInferer
 	{
-		public IntegerTypeInferer(DecompilationContext context, Dictionary<int, Expression> offsetToExpression) : base(context, offsetToExpression)
+		public IntegerTypeInferer(DecompilationContext context, Dictionary<int, Expression> offsetToExpression)
 		{
+			base(context, offsetToExpression);
+			return;
 		}
 
 		private ClassHierarchyNode FindGreatestCommonDescendant(ICollection<ClassHierarchyNode> typeNodes)
 		{
-			ClassHierarchyNode classHierarchyNode = null;
-			int num = 0x7fffffff;
-			foreach (ClassHierarchyNode typeNode in typeNodes)
+			V_0 = null;
+			V_1 = 0x7fffffff;
+			V_2 = typeNodes.GetEnumerator();
+			try
 			{
-				int typeIndex = ExpressionTypeInferer.GetTypeIndex(typeNode.NodeType);
-				if (typeIndex >= num)
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_3 = V_2.get_Current();
+					V_4 = ExpressionTypeInferer.GetTypeIndex(V_3.get_NodeType());
+					if (V_4 >= V_1)
+					{
+						continue;
+					}
+					V_1 = V_4;
+					V_0 = V_3;
 				}
-				num = typeIndex;
-				classHierarchyNode = typeNode;
 			}
-			return classHierarchyNode;
+			finally
+			{
+				if (V_2 != null)
+				{
+					V_2.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		protected override ClassHierarchyNode FindLowestCommonAncestor(ICollection<ClassHierarchyNode> typeNodes)
 		{
-			ClassHierarchyNode classHierarchyNode = null;
-			int num = -2147483648;
-			foreach (ClassHierarchyNode typeNode in typeNodes)
+			V_0 = null;
+			V_1 = -2147483648;
+			V_2 = typeNodes.GetEnumerator();
+			try
 			{
-				int typeIndex = ExpressionTypeInferer.GetTypeIndex(typeNode.NodeType);
-				if (typeIndex <= num)
+				while (V_2.MoveNext())
 				{
-					continue;
+					V_3 = V_2.get_Current();
+					V_4 = ExpressionTypeInferer.GetTypeIndex(V_3.get_NodeType());
+					if (V_4 <= V_1)
+					{
+						continue;
+					}
+					V_1 = V_4;
+					V_0 = V_3;
 				}
-				num = typeIndex;
-				classHierarchyNode = typeNode;
 			}
-			return classHierarchyNode;
+			finally
+			{
+				if (V_2 != null)
+				{
+					V_2.Dispose();
+				}
+			}
+			return V_0;
 		}
 
 		internal void InferIntegerTypes(HashSet<VariableReference> resolved)
 		{
-			IntegerTypesHierarchyBuilder integerTypesHierarchyBuilder = new IntegerTypesHierarchyBuilder(this.offsetToExpression, this.context);
-			this.inferenceGraph = integerTypesHierarchyBuilder.BuildHierarchy(resolved);
+			V_0 = new IntegerTypesHierarchyBuilder(this.offsetToExpression, this.context);
+			this.inferenceGraph = V_0.BuildHierarchy(resolved);
 			try
 			{
-				base.MergeConnectedComponents();
+				this.MergeConnectedComponents();
 				this.ReplaceMultipleParentDependencies();
 				this.ReplaceMultipleChildConstraints();
 				this.MergeWithSingleParent();
 				this.MergeWithSingleChild();
 			}
-			catch (InvalidCastException invalidCastException)
+			catch (InvalidCastException exception_0)
 			{
-				if (invalidCastException.Message != "Cannot infer types.")
+				if (String.op_Inequality(exception_0.get_Message(), "Cannot infer types."))
 				{
 					throw;
 				}
 			}
+			return;
 		}
 
 		private void MergeWithSingleChild()
 		{
-			bool flag = false;
+			V_0 = false;
 			do
 			{
-				ICollection<ClassHierarchyNode> classHierarchyNodes = null;
-				foreach (ClassHierarchyNode classHierarchyNode in this.inferenceGraph)
+				V_1 = null;
+				V_2 = this.inferenceGraph.GetEnumerator();
+				try
 				{
-					if (classHierarchyNode.IsHardNode || classHierarchyNode.CanAssignTo.Count != 1 || classHierarchyNode.SubTypes.Count != 0)
+					while (V_2.MoveNext())
 					{
-						continue;
-					}
-					ClassHierarchyNode current = null;
-					using (IEnumerator<ClassHierarchyNode> enumerator = classHierarchyNode.CanAssignTo.GetEnumerator())
-					{
-						if (enumerator.MoveNext())
+						V_3 = V_2.get_Current();
+						if (V_3.get_IsHardNode() || V_3.get_CanAssignTo().get_Count() != 1 || V_3.get_SubTypes().get_Count() != 0)
 						{
-							current = enumerator.Current;
+							continue;
 						}
+						V_4 = null;
+						V_5 = V_3.get_CanAssignTo().GetEnumerator();
+						try
+						{
+							if (V_5.MoveNext())
+							{
+								V_4 = V_5.get_Current();
+							}
+						}
+						finally
+						{
+							if (V_5 != null)
+							{
+								V_5.Dispose();
+							}
+						}
+						stackVariable27 = new ClassHierarchyNode[2];
+						stackVariable27[0] = V_3;
+						stackVariable27[1] = V_4;
+						V_1 = (ICollection<ClassHierarchyNode>)stackVariable27;
+						V_0 = true;
+						goto Label0;
 					}
-					classHierarchyNodes = (ICollection<ClassHierarchyNode>)(new ClassHierarchyNode[] { classHierarchyNode, current });
-					flag = true;
-					goto Label0;
+				}
+				finally
+				{
+					if (V_2 != null)
+					{
+						V_2.Dispose();
+					}
 				}
 			Label0:
-				if (!flag)
+				if (!V_0)
 				{
 					continue;
 				}
-				base.MergeNodes(classHierarchyNodes);
+				this.MergeNodes(V_1);
 			}
-			while (flag);
+			while (V_0);
+			return;
 		}
 
 		private void MergeWithSingleParent()
 		{
-			bool flag = false;
+			V_0 = false;
 			do
 			{
-				ICollection<ClassHierarchyNode> classHierarchyNodes = null;
-				foreach (ClassHierarchyNode classHierarchyNode in this.inferenceGraph)
+				V_1 = null;
+				V_2 = this.inferenceGraph.GetEnumerator();
+				try
 				{
-					if (classHierarchyNode.IsHardNode || classHierarchyNode.SubTypes.Count != 1 || classHierarchyNode.CanAssignTo.Count != 0)
+					while (V_2.MoveNext())
 					{
-						continue;
-					}
-					ClassHierarchyNode current = null;
-					using (IEnumerator<ClassHierarchyNode> enumerator = classHierarchyNode.SubTypes.GetEnumerator())
-					{
-						if (enumerator.MoveNext())
+						V_3 = V_2.get_Current();
+						if (V_3.get_IsHardNode() || V_3.get_SubTypes().get_Count() != 1 || V_3.get_CanAssignTo().get_Count() != 0)
 						{
-							current = enumerator.Current;
+							continue;
 						}
+						V_4 = null;
+						V_5 = V_3.get_SubTypes().GetEnumerator();
+						try
+						{
+							if (V_5.MoveNext())
+							{
+								V_4 = V_5.get_Current();
+							}
+						}
+						finally
+						{
+							if (V_5 != null)
+							{
+								V_5.Dispose();
+							}
+						}
+						stackVariable27 = new ClassHierarchyNode[2];
+						stackVariable27[0] = V_3;
+						stackVariable27[1] = V_4;
+						V_1 = (ICollection<ClassHierarchyNode>)stackVariable27;
+						V_0 = true;
+						goto Label0;
 					}
-					classHierarchyNodes = (ICollection<ClassHierarchyNode>)(new ClassHierarchyNode[] { classHierarchyNode, current });
-					flag = true;
-					goto Label0;
+				}
+				finally
+				{
+					if (V_2 != null)
+					{
+						V_2.Dispose();
+					}
 				}
 			Label0:
-				if (!flag)
+				if (!V_0)
 				{
 					continue;
 				}
-				base.MergeNodes(classHierarchyNodes);
+				this.MergeNodes(V_1);
 			}
-			while (flag);
+			while (V_0);
+			return;
 		}
 
 		private void ReplaceMultipleChildConstraints()
 		{
-			bool flag = false;
+			V_0 = false;
 			do
 			{
-				flag = false;
-				ICollection<ClassHierarchyNode> classHierarchyNodes = null;
-				foreach (ClassHierarchyNode classHierarchyNode in this.inferenceGraph)
+				V_0 = false;
+				V_1 = null;
+				V_2 = this.inferenceGraph.GetEnumerator();
+				try
 				{
-					if (classHierarchyNode.IsHardNode)
+					while (V_2.MoveNext())
 					{
-						continue;
-					}
-					bool flag1 = true;
-					foreach (ClassHierarchyNode canAssignTo in classHierarchyNode.CanAssignTo)
-					{
-						if (canAssignTo.IsHardNode)
+						V_3 = V_2.get_Current();
+						if (V_3.get_IsHardNode())
 						{
 							continue;
 						}
-						flag1 = false;
-						goto Label1;
+						V_4 = true;
+						V_6 = V_3.get_CanAssignTo().GetEnumerator();
+						try
+						{
+							while (V_6.MoveNext())
+							{
+								if (V_6.get_Current().get_IsHardNode())
+								{
+									continue;
+								}
+								V_4 = false;
+								goto Label1;
+							}
+						}
+						finally
+						{
+							if (V_6 != null)
+							{
+								V_6.Dispose();
+							}
+						}
+					Label1:
+						if (!V_4 || V_3.get_CanAssignTo().get_Count() == 0)
+						{
+							continue;
+						}
+						V_0 = true;
+						V_5 = this.FindGreatestCommonDescendant(V_3.get_CanAssignTo());
+						stackVariable32 = new ClassHierarchyNode[2];
+						stackVariable32[0] = V_3;
+						stackVariable32[1] = V_5;
+						V_1 = (ICollection<ClassHierarchyNode>)stackVariable32;
+						goto Label0;
 					}
-				Label1:
-					if (!flag1 || classHierarchyNode.CanAssignTo.Count == 0)
+				}
+				finally
+				{
+					if (V_2 != null)
 					{
-						continue;
+						V_2.Dispose();
 					}
-					flag = true;
-					ClassHierarchyNode classHierarchyNode1 = this.FindGreatestCommonDescendant(classHierarchyNode.CanAssignTo);
-					classHierarchyNodes = (ICollection<ClassHierarchyNode>)(new ClassHierarchyNode[] { classHierarchyNode, classHierarchyNode1 });
-					goto Label0;
 				}
 			Label0:
-				if (!flag)
+				if (!V_0)
 				{
 					continue;
 				}
-				base.MergeNodes(classHierarchyNodes);
+				this.MergeNodes(V_1);
 			}
-			while (flag);
+			while (V_0);
+			return;
 		}
 
 		private void ReplaceMultipleParentDependencies()
 		{
-			bool flag = false;
+			V_0 = false;
 			do
 			{
-				flag = false;
-				ICollection<ClassHierarchyNode> classHierarchyNodes = null;
-				foreach (ClassHierarchyNode classHierarchyNode in this.inferenceGraph)
+				V_0 = false;
+				V_1 = null;
+				V_2 = this.inferenceGraph.GetEnumerator();
+				try
 				{
-					bool flag1 = true;
-					if (classHierarchyNode.IsHardNode)
+					while (V_2.MoveNext())
 					{
-						continue;
-					}
-					foreach (ClassHierarchyNode subType in classHierarchyNode.SubTypes)
-					{
-						if (subType.IsHardNode)
+						V_3 = V_2.get_Current();
+						V_4 = true;
+						if (V_3.get_IsHardNode())
 						{
 							continue;
 						}
-						flag1 = false;
-						goto Label1;
+						V_6 = V_3.get_SubTypes().GetEnumerator();
+						try
+						{
+							while (V_6.MoveNext())
+							{
+								if (V_6.get_Current().get_IsHardNode())
+								{
+									continue;
+								}
+								V_4 = false;
+								goto Label1;
+							}
+						}
+						finally
+						{
+							if (V_6 != null)
+							{
+								V_6.Dispose();
+							}
+						}
+					Label1:
+						if (!V_4 || V_3.get_SubTypes().get_Count() == 0)
+						{
+							continue;
+						}
+						V_0 = true;
+						V_5 = this.FindLowestCommonAncestor(V_3.get_SubTypes());
+						stackVariable32 = new ClassHierarchyNode[2];
+						stackVariable32[0] = V_3;
+						stackVariable32[1] = V_5;
+						V_1 = (ICollection<ClassHierarchyNode>)stackVariable32;
+						goto Label0;
 					}
-				Label1:
-					if (!flag1 || classHierarchyNode.SubTypes.Count == 0)
+				}
+				finally
+				{
+					if (V_2 != null)
 					{
-						continue;
+						V_2.Dispose();
 					}
-					flag = true;
-					ClassHierarchyNode classHierarchyNode1 = this.FindLowestCommonAncestor(classHierarchyNode.SubTypes);
-					classHierarchyNodes = (ICollection<ClassHierarchyNode>)(new ClassHierarchyNode[] { classHierarchyNode, classHierarchyNode1 });
-					goto Label0;
 				}
 			Label0:
-				if (!flag)
+				if (!V_0)
 				{
 					continue;
 				}
-				base.MergeNodes(classHierarchyNodes);
+				this.MergeNodes(V_1);
 			}
-			while (flag);
+			while (V_0);
+			return;
 		}
 	}
 }

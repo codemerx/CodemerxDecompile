@@ -17,8 +17,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				CanCastExpression canCastExpression = null;
-				yield return canCastExpression.Expression;
+				stackVariable1 = new CanCastExpression.u003cget_Childrenu003ed__3(-2);
+				stackVariable1.u003cu003e4__this = this;
+				return stackVariable1;
 			}
 		}
 
@@ -26,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return Telerik.JustDecompiler.Ast.CodeNodeType.CanCastExpression;
+				return 34;
 			}
 		}
 
@@ -39,6 +40,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set
 			{
 				this.expression = value;
+				return;
 			}
 		}
 
@@ -46,7 +48,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.TargetType.get_Module().get_TypeSystem().get_Boolean();
+				return this.get_TargetType().get_Module().get_TypeSystem().get_Boolean();
 			}
 			set
 			{
@@ -68,34 +70,36 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public CanCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IList<Instruction> instructions) : base(instructions)
+		public CanCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IList<Instruction> instructions)
 		{
-			this.Expression = expression;
-			this.TargetType = targetType;
+			base(instructions);
+			this.set_Expression(expression);
+			this.set_TargetType(targetType);
+			return;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new CanCastExpression(this.Expression.Clone(), this.TargetType, this.instructions);
+			return new CanCastExpression(this.get_Expression().Clone(), this.get_TargetType(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new CanCastExpression(this.Expression.CloneExpressionOnly(), this.TargetType, null);
+			return new CanCastExpression(this.get_Expression().CloneExpressionOnly(), this.get_TargetType(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (!(other is CanCastExpression))
+			if (other as CanCastExpression == null)
 			{
 				return false;
 			}
-			CanCastExpression canCastExpression = other as CanCastExpression;
-			if (this.TargetType.get_FullName() != canCastExpression.TargetType.get_FullName())
+			V_0 = other as CanCastExpression;
+			if (!String.op_Equality(this.get_TargetType().get_FullName(), V_0.get_TargetType().get_FullName()))
 			{
 				return false;
 			}
-			return this.Expression.Equals(canCastExpression.Expression);
+			return this.get_Expression().Equals(V_0.get_Expression());
 		}
 	}
 }

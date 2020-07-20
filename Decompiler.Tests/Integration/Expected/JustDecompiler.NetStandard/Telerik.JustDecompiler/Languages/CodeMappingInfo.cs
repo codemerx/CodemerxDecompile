@@ -1,6 +1,5 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -29,7 +28,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.nodeToCodeMap[node];
+				return this.nodeToCodeMap.get_Item(node);
 			}
 		}
 
@@ -37,37 +36,43 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.InstructionToCodeMap[instruction];
+				return this.get_InstructionToCodeMap().get_Item(instruction);
 			}
 		}
 
 		public CodeMappingInfo()
 		{
+			base();
 			this.nodeToCodeMap = new Dictionary<ICodeNode, OffsetSpan>();
-			this.InstructionToCodeMap = new Dictionary<Instruction, OffsetSpan>(new CodeMappingInfo.InstructionEqualityComparer());
+			this.set_InstructionToCodeMap(new Dictionary<Instruction, OffsetSpan>(new CodeMappingInfo.InstructionEqualityComparer()));
 			this.fieldConstantValueToCodeMap = new Dictionary<IMemberDefinition, OffsetSpan>();
 			this.variableToCodeMap = new Dictionary<VariableDefinition, OffsetSpan>(new CodeMappingInfo.VariableDefinitionEqualityComparer());
 			this.parameterToCodeMap = new Dictionary<IMemberDefinition, Dictionary<int, OffsetSpan>>();
+			return;
 		}
 
 		public void Add(ICodeNode node, OffsetSpan span)
 		{
 			this.nodeToCodeMap.Add(node, span);
+			return;
 		}
 
 		public void Add(Instruction instruction, OffsetSpan span)
 		{
-			this.InstructionToCodeMap.Add(instruction, span);
+			this.get_InstructionToCodeMap().Add(instruction, span);
+			return;
 		}
 
 		public void Add(FieldDefinition field, OffsetSpan span)
 		{
 			this.fieldConstantValueToCodeMap.Add(field, span);
+			return;
 		}
 
 		public void Add(VariableDefinition variable, OffsetSpan span)
 		{
 			this.variableToCodeMap.Add(variable, span);
+			return;
 		}
 
 		public void Add(IMemberDefinition member, int index, OffsetSpan span)
@@ -76,7 +81,8 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				this.parameterToCodeMap.Add(member, new Dictionary<int, OffsetSpan>());
 			}
-			this.parameterToCodeMap[member].Add(index, span);
+			this.parameterToCodeMap.get_Item(member).Add(index, span);
+			return;
 		}
 
 		public bool ContainsKey(ICodeNode node)
@@ -86,12 +92,12 @@ namespace Telerik.JustDecompiler.Languages
 
 		public bool ContainsKey(Instruction instruction)
 		{
-			return this.InstructionToCodeMap.ContainsKey(instruction);
+			return this.get_InstructionToCodeMap().ContainsKey(instruction);
 		}
 
 		public bool TryGetValue(Instruction instruction, out OffsetSpan span)
 		{
-			return this.InstructionToCodeMap.TryGetValue(instruction, out span);
+			return this.get_InstructionToCodeMap().TryGetValue(instruction, out span);
 		}
 
 		public bool TryGetValue(IMemberDefinition field, out OffsetSpan span)
@@ -106,24 +112,25 @@ namespace Telerik.JustDecompiler.Languages
 
 		public bool TryGetValue(IMemberDefinition member, int parameterIndex, out OffsetSpan span)
 		{
-			Dictionary<int, OffsetSpan> nums;
 			span = new OffsetSpan();
-			if (!this.parameterToCodeMap.TryGetValue(member, out nums))
+			if (!this.parameterToCodeMap.TryGetValue(member, out V_0))
 			{
 				return false;
 			}
-			return nums.TryGetValue(parameterIndex, out span);
+			return V_0.TryGetValue(parameterIndex, out span);
 		}
 
 		private class InstructionEqualityComparer : IEqualityComparer<Instruction>
 		{
 			public InstructionEqualityComparer()
 			{
+				base();
+				return;
 			}
 
 			public bool Equals(Instruction x, Instruction y)
 			{
-				if (x.get_Offset() != y.get_Offset() || !(x.get_ContainingMethod().get_FullName() == y.get_ContainingMethod().get_FullName()))
+				if (x.get_Offset() != y.get_Offset() || !String.op_Equality(x.get_ContainingMethod().get_FullName(), y.get_ContainingMethod().get_FullName()))
 				{
 					return false;
 				}
@@ -132,10 +139,10 @@ namespace Telerik.JustDecompiler.Languages
 
 			public int GetHashCode(Instruction obj)
 			{
-				string str = obj.get_Offset().ToString();
-				string fullName = obj.get_ContainingMethod().get_FullName();
-				int count = obj.get_ContainingMethod().get_GenericParameters().get_Count();
-				return String.Concat(str, fullName, count.ToString()).GetHashCode();
+				stackVariable3 = obj.get_Offset().ToString();
+				stackVariable6 = obj.get_ContainingMethod().get_FullName();
+				V_0 = obj.get_ContainingMethod().get_GenericParameters().get_Count();
+				return String.Concat(stackVariable3, stackVariable6, V_0.ToString()).GetHashCode();
 			}
 		}
 
@@ -143,20 +150,22 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			public VariableDefinitionEqualityComparer()
 			{
+				base();
+				return;
 			}
 
 			public bool Equals(VariableDefinition x, VariableDefinition y)
 			{
-				bool index = x.get_Index() != -1;
-				if (index != y.get_Index() != -1)
+				V_0 = x.get_Index() != -1;
+				if (V_0 != y.get_Index() != -1)
 				{
 					return false;
 				}
-				if (!index)
+				if (!V_0)
 				{
 					return x.Equals(y);
 				}
-				if (x.get_Index() != y.get_Index() || !(x.get_ContainingMethod().get_FullName() == y.get_ContainingMethod().get_FullName()))
+				if (x.get_Index() != y.get_Index() || !String.op_Equality(x.get_ContainingMethod().get_FullName(), y.get_ContainingMethod().get_FullName()))
 				{
 					return false;
 				}
@@ -169,10 +178,10 @@ namespace Telerik.JustDecompiler.Languages
 				{
 					return obj.GetHashCode();
 				}
-				string str = obj.get_Index().ToString();
-				string fullName = obj.get_ContainingMethod().get_FullName();
-				int count = obj.get_ContainingMethod().get_GenericParameters().get_Count();
-				return String.Concat(str, fullName, count.ToString()).GetHashCode();
+				stackVariable11 = obj.get_Index().ToString();
+				stackVariable14 = obj.get_ContainingMethod().get_FullName();
+				V_0 = obj.get_ContainingMethod().get_GenericParameters().get_Count();
+				return String.Concat(stackVariable11, stackVariable14, V_0.ToString()).GetHashCode();
 			}
 		}
 	}

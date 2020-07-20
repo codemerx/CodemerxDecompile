@@ -25,52 +25,80 @@ namespace Telerik.JustDecompiler
 
 		public TwoDimensionalString(string theString, string newLine, bool isZeroIndexed)
 		{
-			this.TheString = theString;
-			this.NewLine = newLine;
+			base();
+			this.set_TheString(theString);
+			this.set_NewLine(newLine);
 			this.isZeroIndexed = isZeroIndexed;
 			this.FindNewLineOffsets();
+			return;
 		}
 
 		private void FindNewLineOffsets()
 		{
 			this.newLineOffsets = new List<int>();
-			for (int i = this.TheString.IndexOf(this.NewLine); i != -1; i = this.TheString.IndexOf(this.NewLine, i + this.NewLine.Length))
+			V_0 = this.get_TheString().IndexOf(this.get_NewLine());
+			while (V_0 != -1)
 			{
-				this.newLineOffsets.Add(i);
+				this.newLineOffsets.Add(V_0);
+				V_0 = this.get_TheString().IndexOf(this.get_NewLine(), V_0 + this.get_NewLine().get_Length());
 			}
+			return;
 		}
 
 		public CodePosition GetTwoDimensionalCordinatesFor(int stringOffset)
 		{
-			CodePosition codePosition;
-			int num = this.newLineOffsets.BinarySearch(stringOffset);
-			if (num >= 0)
+			V_1 = this.newLineOffsets.BinarySearch(stringOffset);
+			if (V_1 >= 0)
 			{
-				codePosition = (!this.isZeroIndexed ? new CodePosition(num + 1, -1) : new CodePosition(num, -1));
+				if (!this.isZeroIndexed)
+				{
+					V_0 = new CodePosition(V_1 + 1, -1);
+				}
+				else
+				{
+					V_0 = new CodePosition(V_1, -1);
+				}
 			}
 			else
 			{
-				int num1 = ~num;
-				int item = 0;
-				if (num1 != 0)
+				V_2 = ~V_1;
+				V_3 = 0;
+				if (V_2 != 0)
 				{
-					item = this.newLineOffsets[num1 - 1] + this.NewLine.Length;
+					V_3 = this.newLineOffsets.get_Item(V_2 - 1) + this.get_NewLine().get_Length();
 				}
-				int num2 = stringOffset - item;
-				codePosition = (!this.isZeroIndexed ? new CodePosition(num1 + 1, num2 + 1) : new CodePosition(num1, num2));
+				V_4 = stringOffset - V_3;
+				if (!this.isZeroIndexed)
+				{
+					V_0 = new CodePosition(V_2 + 1, V_4 + 1);
+				}
+				else
+				{
+					V_0 = new CodePosition(V_2, V_4);
+				}
 			}
-			return codePosition;
+			return V_0;
 		}
 
 		public OffsetSpan TrimStart(OffsetSpan position)
 		{
-			int num = (position.EndOffset < this.TheString.Length ? position.EndOffset : this.TheString.Length - 1);
-			for (int i = position.StartOffset; i <= num; i++)
+			if (position.EndOffset < this.get_TheString().get_Length())
 			{
-				if (!Char.IsWhiteSpace(this.TheString[i]))
+				stackVariable6 = position.EndOffset;
+			}
+			else
+			{
+				stackVariable6 = this.get_TheString().get_Length() - 1;
+			}
+			V_0 = stackVariable6;
+			V_1 = position.StartOffset;
+			while (V_1 <= V_0)
+			{
+				if (!Char.IsWhiteSpace(this.get_TheString().get_Chars(V_1)))
 				{
-					return new OffsetSpan(i, position.EndOffset);
+					return new OffsetSpan(V_1, position.EndOffset);
 				}
+				V_1 = V_1 + 1;
 			}
 			throw new Exception("The span contains only whitespaces.");
 		}

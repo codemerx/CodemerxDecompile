@@ -7,45 +7,89 @@ namespace Telerik.JustDecompiler
 {
 	public class ThreadSafeWeakAssemblyResolver : WeakAssemblyResolver
 	{
-		private object resolvedAssembliesAccessLock = new Object();
+		private object resolvedAssembliesAccessLock;
 
-		public ThreadSafeWeakAssemblyResolver(AssemblyPathResolverCache cache) : base(cache)
+		public ThreadSafeWeakAssemblyResolver(AssemblyPathResolverCache cache)
 		{
+			this.resolvedAssembliesAccessLock = new Object();
+			base(cache);
+			return;
 		}
 
 		protected override void AddToResolvedAssembliesInternal(AssemblyStrongNameExtended assemblyKey, List<AssemblyDefinition> assemblyList)
 		{
-			lock (this.resolvedAssembliesAccessLock)
+			V_0 = this.resolvedAssembliesAccessLock;
+			V_1 = false;
+			try
 			{
-				base.AddToResolvedAssembliesInternal(assemblyKey, assemblyList);
+				Monitor.Enter(V_0, ref V_1);
+				this.AddToResolvedAssembliesInternal(assemblyKey, assemblyList);
 			}
+			finally
+			{
+				if (V_1)
+				{
+					Monitor.Exit(V_0);
+				}
+			}
+			return;
 		}
 
 		protected override void ClearResolvedAssembliesCache()
 		{
-			lock (this.resolvedAssembliesAccessLock)
+			V_0 = this.resolvedAssembliesAccessLock;
+			V_1 = false;
+			try
 			{
-				base.ClearResolvedAssembliesCache();
+				Monitor.Enter(V_0, ref V_1);
+				this.ClearResolvedAssembliesCache();
 			}
+			finally
+			{
+				if (V_1)
+				{
+					Monitor.Exit(V_0);
+				}
+			}
+			return;
 		}
 
 		protected override void RemoveFromResolvedAssemblies(AssemblyStrongNameExtended assemblyKey)
 		{
-			lock (this.resolvedAssembliesAccessLock)
+			V_0 = this.resolvedAssembliesAccessLock;
+			V_1 = false;
+			try
 			{
-				base.RemoveFromResolvedAssemblies(assemblyKey);
+				Monitor.Enter(V_0, ref V_1);
+				this.RemoveFromResolvedAssemblies(assemblyKey);
 			}
+			finally
+			{
+				if (V_1)
+				{
+					Monitor.Exit(V_0);
+				}
+			}
+			return;
 		}
 
 		protected override bool TryGetResolvedAssembly(AssemblyStrongNameExtended assemblyKey, out List<AssemblyDefinition> assemblyList)
 		{
-			assemblyList = null;
-			bool flag;
-			lock (this.resolvedAssembliesAccessLock)
+			V_0 = this.resolvedAssembliesAccessLock;
+			V_1 = false;
+			try
 			{
-				flag = base.TryGetResolvedAssembly(assemblyKey, ref assemblyList);
+				Monitor.Enter(V_0, ref V_1);
+				V_2 = this.TryGetResolvedAssembly(assemblyKey, ref assemblyList);
 			}
-			return flag;
+			finally
+			{
+				if (V_1)
+				{
+					Monitor.Exit(V_0);
+				}
+			}
+			return V_2;
 		}
 	}
 }

@@ -21,21 +21,26 @@ namespace Telerik.JustDecompiler.Languages
 
 		public TestCaseExceptionFormatter()
 		{
+			base();
+			return;
 		}
 
 		public string[] Format(Exception exception, string memberName, string filePath)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
+			V_0 = new StringBuilder();
 			if (memberName != null)
 			{
-				stringBuilder.Append(Environment.NewLine).Append("Current member / type: ").Append(memberName).Append(Environment.NewLine);
+				dummyVar0 = V_0.Append(Environment.get_NewLine()).Append("Current member / type: ").Append(memberName).Append(Environment.get_NewLine());
 			}
-			stringBuilder.Append(exception.Message).Append(Environment.NewLine);
-			if (exception.InnerException != null)
+			dummyVar1 = V_0.Append(exception.get_Message()).Append(Environment.get_NewLine());
+			if (exception.get_InnerException() != null)
 			{
-				stringBuilder.Append(exception.InnerException.Message).Append(Environment.NewLine);
+				dummyVar2 = V_0.Append(exception.get_InnerException().get_Message()).Append(Environment.get_NewLine());
 			}
-			return stringBuilder.ToString().Split(new String[] { Environment.NewLine }, StringSplitOptions.None);
+			stackVariable11 = V_0.ToString();
+			stackVariable13 = new String[1];
+			stackVariable13[0] = Environment.get_NewLine();
+			return stackVariable11.Split(stackVariable13, 0);
 		}
 	}
 }

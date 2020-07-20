@@ -1,7 +1,6 @@
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
@@ -13,119 +12,157 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RemovePrivateImplementationDetailsStep(TypeSystem typeSystem)
 		{
+			base();
 			this.typeSystem = typeSystem;
+			return;
 		}
 
 		private bool CheckElementsCount(ExpressionCollection elements, ExpressionCollection dimensions)
 		{
-			int value = 1;
-			foreach (Expression dimension in dimensions)
+			V_0 = 1;
+			V_1 = dimensions.GetEnumerator();
+			try
 			{
-				value *= (Int32)(dimension as LiteralExpression).Value;
+				while (V_1.MoveNext())
+				{
+					V_2 = V_1.get_Current();
+					V_0 = V_0 * (Int32)(V_2 as LiteralExpression).get_Value();
+				}
 			}
-			return value == elements.Count;
+			finally
+			{
+				if (V_1 != null)
+				{
+					V_1.Dispose();
+				}
+			}
+			return V_0 == elements.get_Count();
 		}
 
 		private ExpressionCollection ConvertInitialValues(byte[] initialValues, string typeName)
 		{
-			ExpressionCollection expressionCollection = new ExpressionCollection();
+			V_0 = new ExpressionCollection();
 			if (typeName != null)
 			{
-				if (typeName == "Boolean")
+				if (String.op_Equality(typeName, "Boolean"))
 				{
-					for (int i = 0; i < (int)initialValues.Length; i++)
+					V_2 = 0;
+					while (V_2 < (int)initialValues.Length)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(initialValues[i] != 0));
+						V_0.Add(this.GetLiteralExpression(initialValues[V_2] != 0));
+						V_2 = V_2 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "SByte")
+				if (String.op_Equality(typeName, "SByte"))
 				{
-					for (int j = 0; j < (int)initialValues.Length; j++)
+					V_3 = 0;
+					while (V_3 < (int)initialValues.Length)
 					{
-						expressionCollection.Add(this.GetLiteralExpression((sbyte)initialValues[j]));
+						V_0.Add(this.GetLiteralExpression((sbyte)initialValues[V_3]));
+						V_3 = V_3 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Byte")
+				if (String.op_Equality(typeName, "Byte"))
 				{
-					for (int k = 0; k < (int)initialValues.Length; k++)
+					V_4 = 0;
+					while (V_4 < (int)initialValues.Length)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(initialValues[k]));
+						V_0.Add(this.GetLiteralExpression(initialValues[V_4]));
+						V_4 = V_4 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Char")
+				if (String.op_Equality(typeName, "Char"))
 				{
-					for (int l = 0; l < (int)initialValues.Length / 2; l++)
+					V_5 = 0;
+					while (V_5 < (int)initialValues.Length / 2)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToChar(initialValues, l * 2)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToChar(initialValues, V_5 * 2)));
+						V_5 = V_5 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Int16")
+				if (String.op_Equality(typeName, "Int16"))
 				{
-					for (int m = 0; m < (int)initialValues.Length / 2; m++)
+					V_6 = 0;
+					while (V_6 < (int)initialValues.Length / 2)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToInt16(initialValues, m * 2)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToInt16(initialValues, V_6 * 2)));
+						V_6 = V_6 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "UInt16")
+				if (String.op_Equality(typeName, "UInt16"))
 				{
-					for (int n = 0; n < (int)initialValues.Length / 2; n++)
+					V_7 = 0;
+					while (V_7 < (int)initialValues.Length / 2)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToUInt16(initialValues, n * 2)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToUInt16(initialValues, V_7 * 2)));
+						V_7 = V_7 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Int32")
+				if (String.op_Equality(typeName, "Int32"))
 				{
-					for (int o = 0; o < (int)initialValues.Length / 4; o++)
+					V_8 = 0;
+					while (V_8 < (int)initialValues.Length / 4)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToInt32(initialValues, o * 4)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToInt32(initialValues, V_8 * 4)));
+						V_8 = V_8 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "UInt32")
+				if (String.op_Equality(typeName, "UInt32"))
 				{
-					for (int p = 0; p < (int)initialValues.Length / 4; p++)
+					V_9 = 0;
+					while (V_9 < (int)initialValues.Length / 4)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToUInt32(initialValues, p * 4)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToUInt32(initialValues, V_9 * 4)));
+						V_9 = V_9 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Int64")
+				if (String.op_Equality(typeName, "Int64"))
 				{
-					for (int q = 0; q < (int)initialValues.Length / 8; q++)
+					V_10 = 0;
+					while (V_10 < (int)initialValues.Length / 8)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToInt64(initialValues, q * 8)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToInt64(initialValues, V_10 * 8)));
+						V_10 = V_10 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "UInt64")
+				if (String.op_Equality(typeName, "UInt64"))
 				{
-					for (int r = 0; r < (int)initialValues.Length / 8; r++)
+					V_11 = 0;
+					while (V_11 < (int)initialValues.Length / 8)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToUInt64(initialValues, r * 8)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToUInt64(initialValues, V_11 * 8)));
+						V_11 = V_11 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Single")
+				if (String.op_Equality(typeName, "Single"))
 				{
-					for (int s = 0; s < (int)initialValues.Length / 4; s++)
+					V_12 = 0;
+					while (V_12 < (int)initialValues.Length / 4)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToSingle(initialValues, s * 4)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToSingle(initialValues, V_12 * 4)));
+						V_12 = V_12 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
-				if (typeName == "Double")
+				if (String.op_Equality(typeName, "Double"))
 				{
-					for (int t = 0; t < (int)initialValues.Length / 8; t++)
+					V_13 = 0;
+					while (V_13 < (int)initialValues.Length / 8)
 					{
-						expressionCollection.Add(this.GetLiteralExpression(BitConverter.ToDouble(initialValues, t * 8)));
+						V_0.Add(this.GetLiteralExpression(BitConverter.ToDouble(initialValues, V_13 * 8)));
+						V_13 = V_13 + 1;
 					}
-					return expressionCollection;
+					return V_0;
 				}
 			}
 			return null;
@@ -138,56 +175,61 @@ namespace Telerik.JustDecompiler.Steps
 
 		public void RebuildDimensions(ref ExpressionCollection elements, ExpressionCollection dimensions)
 		{
-			int count = elements.Count;
-			for (int i = dimensions.Count - 1; i > 0; i--)
+			V_0 = elements.get_Count();
+			V_1 = dimensions.get_Count() - 1;
+			while (V_1 > 0)
 			{
-				ExpressionCollection expressionCollection = new ExpressionCollection();
-				int value = (Int32)(dimensions[i] as LiteralExpression).Value;
-				for (int j = 0; j < count; j += value)
+				V_2 = new ExpressionCollection();
+				V_3 = (Int32)(dimensions.get_Item(V_1) as LiteralExpression).get_Value();
+				V_4 = 0;
+				while (V_4 < V_0)
 				{
-					BlockExpression blockExpression = new BlockExpression(null)
+					V_5 = new BlockExpression(null);
+					V_5.set_Expressions(new ExpressionCollection());
+					V_6 = 0;
+					while (V_6 < V_3)
 					{
-						Expressions = new ExpressionCollection()
-					};
-					for (int k = 0; k < value; k++)
-					{
-						blockExpression.Expressions.Add(elements[j + k]);
+						V_5.get_Expressions().Add(elements.get_Item(V_4 + V_6));
+						V_6 = V_6 + 1;
 					}
-					expressionCollection.Add(blockExpression);
+					V_2.Add(V_5);
+					V_4 = V_4 + V_3;
 				}
-				elements = expressionCollection;
-				count /= value;
+				elements = V_2;
+				V_0 = V_0 / V_3;
+				V_1 = V_1 - 1;
 			}
+			return;
 		}
 
 		private bool TryFillInitializer(ArrayCreationExpression expression, MemberHandleExpression values)
 		{
-			if (!(values.MemberReference is FieldDefinition))
+			if (values.get_MemberReference() as FieldDefinition == null)
 			{
 				return false;
 			}
-			ExpressionCollection expressionCollection = this.ConvertInitialValues((values.MemberReference as FieldDefinition).get_InitialValue(), expression.ElementType.get_Name());
-			if (expressionCollection == null || !this.CheckElementsCount(expressionCollection, expression.Dimensions))
+			V_0 = this.ConvertInitialValues((values.get_MemberReference() as FieldDefinition).get_InitialValue(), expression.get_ElementType().get_Name());
+			if (V_0 == null || !this.CheckElementsCount(V_0, expression.get_Dimensions()))
 			{
 				return false;
 			}
-			this.RebuildDimensions(ref expressionCollection, expression.Dimensions);
-			expression.Initializer.Expressions = expressionCollection;
+			this.RebuildDimensions(ref V_0, expression.get_Dimensions());
+			expression.get_Initializer().set_Expressions(V_0);
 			return true;
 		}
 
 		public ICodeNode VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			if (node.Initializer == null || node.Initializer.Expressions == null || node.Initializer.Expressions.Count != 1)
+			if (node.get_Initializer() == null || node.get_Initializer().get_Expressions() == null || node.get_Initializer().get_Expressions().get_Count() != 1)
 			{
 				return null;
 			}
-			MemberHandleExpression item = node.Initializer.Expressions[0] as MemberHandleExpression;
-			if (item == null)
+			V_0 = node.get_Initializer().get_Expressions().get_Item(0) as MemberHandleExpression;
+			if (V_0 == null)
 			{
 				return null;
 			}
-			if (!this.TryFillInitializer(node, item))
+			if (!this.TryFillInitializer(node, V_0))
 			{
 				return null;
 			}

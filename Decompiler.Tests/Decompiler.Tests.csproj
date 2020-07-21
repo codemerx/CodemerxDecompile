@@ -9,18 +9,21 @@
   <ItemGroup>
     <Compile Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
     <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\**" />
+    <Compile Remove="Integration\Expected\Mix.Cms.Lib\**" />
     <Compile Remove="Integration\Expected\Mono.Cecil\**" />
     <Compile Remove="Integration\Expected\OrchardCore\**" />
     <Compile Remove="Integration\Expected\Properties\**" />
     <Compile Remove="Integration\Expected\Telerik.JustDecompiler\**" />
     <EmbeddedResource Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
     <EmbeddedResource Remove="Integration\Expected\JustDecompiler.NetStandard\**" />
+    <EmbeddedResource Remove="Integration\Expected\Mix.Cms.Lib\**" />
     <EmbeddedResource Remove="Integration\Expected\Mono.Cecil\**" />
     <EmbeddedResource Remove="Integration\Expected\OrchardCore\**" />
     <EmbeddedResource Remove="Integration\Expected\Properties\**" />
     <EmbeddedResource Remove="Integration\Expected\Telerik.JustDecompiler\**" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard\**" />
+    <None Remove="Integration\Expected\Mix.Cms.Lib\**" />
     <None Remove="Integration\Expected\Mono.Cecil\**" />
     <None Remove="Integration\Expected\OrchardCore\**" />
     <None Remove="Integration\Expected\Properties\**" />
@@ -32,6 +35,7 @@
     <None Remove="Integration\Expected\JustDecompiler.NetStandard.csproj.error" />
     <None Remove="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.dll" />
     <None Remove="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.pdb" />
+    <None Remove="Integration\Resources\Mix.Cms.Lib\Mix.Cms.Lib.dll" />
     <None Remove="Integration\Resources\OrchardCore\OrchardCore.dll" />
   </ItemGroup>
 
@@ -57,6 +61,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Integration\Resources\JustDecompiler.NetStandard\JustDecompiler.NetStandard.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Resources\Mix.Cms.Lib\Mix.Cms.Lib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Integration\Resources\OrchardCore\OrchardCore.dll">

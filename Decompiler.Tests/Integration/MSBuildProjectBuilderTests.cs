@@ -8,21 +8,26 @@ using Xunit;
 
 namespace Decompiler.Tests.Integration
 {
-    public class ProjectGenerationTests
+    public class MSBuildProjectBuilderTests
     {
+        private const string TargetFolderTemplate = @"Integration/Resources/{0}/{1}.dll";
+        private const string OutputFolderTemplate = @"Result/{0}";
+        private const string ExpectedFolderTemplate = @"../../../Integration/Expected/{0}";
 
-        [Fact]
-        public void CmdShel_ShouldGenerateCorrectOutput()
+        [Theory]
+        [InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard")]
+        public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName)
         {
             // Arrange
-            string outputFolder = @"result";
-            string targetFolder = @"Integration/Actual/JustDecompiler.NetStandard.dll";
+            string targetFolder = string.Format(TargetFolderTemplate, assemblyFolder, assemblyName);
+            string outputFolder = string.Format(OutputFolderTemplate, assemblyFolder);
+            string expectedFolder = string.Format(ExpectedFolderTemplate, assemblyFolder);
 
             // Act
             this.BuildProject(targetFolder, outputFolder);
 
             // Assert
-            TestHelper.AssertFoldersDiffRecursively(@"../../../Integration/Expected/JustDecompiler.NetStandard", outputFolder);
+            TestHelper.AssertFoldersDiffRecursively(expectedFolder, outputFolder);
         }
 
         private void BuildProject(string target, string output)

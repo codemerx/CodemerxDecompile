@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Integration\Actual\JustDecompiler.NetStandard.dll" />
+    <None Remove="Integration\Resources\JustDecompiler.NetStandard.dll" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard.csproj.error" />
   </ItemGroup>
 
@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Integration\Actual\JustDecompiler.NetStandard.dll">
+    <EmbeddedResource Include="Integration\Resources\JustDecompiler.NetStandard\JustDecompiler.NetStandard.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

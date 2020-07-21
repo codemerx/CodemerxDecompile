@@ -12,6 +12,7 @@
     <Compile Remove="Integration\Expected\Mix.Cms.Lib\**" />
     <Compile Remove="Integration\Expected\Mono.Cecil\**" />
     <Compile Remove="Integration\Expected\OrchardCore\**" />
+    <Compile Remove="Integration\Expected\Piranha\**" />
     <Compile Remove="Integration\Expected\Properties\**" />
     <Compile Remove="Integration\Expected\Telerik.JustDecompiler\**" />
     <EmbeddedResource Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
@@ -19,6 +20,7 @@
     <EmbeddedResource Remove="Integration\Expected\Mix.Cms.Lib\**" />
     <EmbeddedResource Remove="Integration\Expected\Mono.Cecil\**" />
     <EmbeddedResource Remove="Integration\Expected\OrchardCore\**" />
+    <EmbeddedResource Remove="Integration\Expected\Piranha\**" />
     <EmbeddedResource Remove="Integration\Expected\Properties\**" />
     <EmbeddedResource Remove="Integration\Expected\Telerik.JustDecompiler\**" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
@@ -26,6 +28,7 @@
     <None Remove="Integration\Expected\Mix.Cms.Lib\**" />
     <None Remove="Integration\Expected\Mono.Cecil\**" />
     <None Remove="Integration\Expected\OrchardCore\**" />
+    <None Remove="Integration\Expected\Piranha\**" />
     <None Remove="Integration\Expected\Properties\**" />
     <None Remove="Integration\Expected\Telerik.JustDecompiler\**" />
   </ItemGroup>
@@ -37,6 +40,7 @@
     <None Remove="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.pdb" />
     <None Remove="Integration\Resources\Mix.Cms.Lib\Mix.Cms.Lib.dll" />
     <None Remove="Integration\Resources\OrchardCore\OrchardCore.dll" />
+    <None Remove="Integration\Resources\Piranha\Piranha.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +71,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Integration\Resources\OrchardCore\OrchardCore.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Resources\Piranha\Piranha.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

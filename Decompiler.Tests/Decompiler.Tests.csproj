@@ -7,14 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
     <Compile Remove="Integration\Expected\JustDecompiler.NetStandard\**" />
     <Compile Remove="Integration\Expected\Mono.Cecil\**" />
     <Compile Remove="Integration\Expected\Properties\**" />
     <Compile Remove="Integration\Expected\Telerik.JustDecompiler\**" />
+    <EmbeddedResource Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
     <EmbeddedResource Remove="Integration\Expected\JustDecompiler.NetStandard\**" />
     <EmbeddedResource Remove="Integration\Expected\Mono.Cecil\**" />
     <EmbeddedResource Remove="Integration\Expected\Properties\**" />
     <EmbeddedResource Remove="Integration\Expected\Telerik.JustDecompiler\**" />
+    <None Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard\**" />
     <None Remove="Integration\Expected\Mono.Cecil\**" />
     <None Remove="Integration\Expected\Properties\**" />
@@ -24,6 +27,8 @@
   <ItemGroup>
     <None Remove="Integration\Resources\JustDecompiler.NetStandard.dll" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard.csproj.error" />
+    <None Remove="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.dll" />
+    <None Remove="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.pdb" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +46,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Resources\JustDecompiler.NetStandard.Pdb\JustDecompiler.NetStandard.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Integration\Resources\JustDecompiler.NetStandard\JustDecompiler.NetStandard.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

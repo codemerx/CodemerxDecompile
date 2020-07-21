@@ -17,6 +17,7 @@ namespace Decompiler.Tests.Integration
         [Theory]
         [InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard")]
         [InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard")]
+        [InlineData("OrchardCore", "OrchardCore")]
         public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName)
         {
             // Arrange

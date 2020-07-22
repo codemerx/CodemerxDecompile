@@ -1,4 +1,4 @@
-# CodemerxDecompileEngine
+# CodemerxDecompile
 
 ## Overview 
 
@@ -6,4 +6,4 @@ This is a continuation of [JustDecompile Engine](https://github.com/telerik/Just
 
 ## License
 
-This project is [AGPL](https://github.com/codemerx/CodemerxDecompileEngine/blob/master/COPYING) licensed. It includes [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine) and [Mono.Cecil](https://github.com/jbevain/cecil) libraries which are Apache 2.0 and MIT licensed respectively. It also includes [VS Code](https://github.com/microsoft/vscode) which is MIT licensed.
+This project is [AGPL](https://github.com/codemerx/CodemerxDecompile/blob/master/COPYING) licensed. It includes [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine) and [Mono.Cecil](https://github.com/jbevain/cecil) libraries which are Apache 2.0 and MIT licensed respectively. It also includes [VS Code](https://github.com/microsoft/vscode) which is MIT licensed.

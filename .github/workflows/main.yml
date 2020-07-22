@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: Build Solution
-      run: dotnet build CodemerxDecompileEngine.sln -c Release
+      run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
 
     - name: Run Tests
-      run: dotnet test Decompiler.Tests -c Release
+      run: dotnet test engine/Decompiler.Tests -c Release

@@ -196,3 +196,8 @@ FakesAssemblies/
 *.opt
 
 *.snk
+
+!Decompiler.Tests/Integration/Expected/**/*
+!Decompiler.Tests/Integration/Resources/**/*
+!Mono.Cecil.Pdb.Shared/Microsoft.Cci.Pdb
+!Mono.Cecil.Pdb.Shared/Mono.Cecil.Pdb/

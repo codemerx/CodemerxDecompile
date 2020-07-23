@@ -1,5 +1,25 @@
-﻿using System;
+﻿//    This file is part of CodemerxDecompile.
+
+//    CodemerxDecompile is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+
+//    CodemerxDecompile is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU General Public License for more details.
+
+//    You should have received a copy of the GNU General Public License
+//    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
+//    To use a different set of GPL versions, you would modify the end of the first long paragraph.For instance, to license under version 2 or later, you would replace “3” with “2”.
+
+//    This statement should go near the beginning of every source file, close to the copyright notices. When using the Lesser GPL, insert the word “Lesser” before “General” in all three places.When using the GNU AGPL, insert the word “Affero” before “General” in all three places.
+
+using Microsoft.XmlDiffPatch;
+using System;
 using System.IO;
+using System.Xml;
 using Xunit;
 
 namespace Decompiler.Tests.Helpers
@@ -25,21 +45,10 @@ namespace Decompiler.Tests.Helpers
                     continue;
                 }
 
-                string expectedFileContent = GetFileContent(expectedFileName);
-
                 string actualFileName = actualFileNames[i];
-                string actualFileContent = GetFileContent(actualFileName);
-
                 Assert.Equal(GetRelativeFilePath(expectedFileName, expectedFolderPath), GetRelativeFilePath(actualFileName, actualFolderPath));
 
-                try
-                {
-                    Assert.Equal(expectedFileContent, actualFileContent);
-                }
-                catch (Exception e)
-                {
-                    throw new ContentAssertException($"Content assert failed for file: {GetRelativeFilePath(actualFileName, actualFolderPath)}", e);
-                }
+                AssertFileContent(expectedFileName, actualFileName, actualFolderPath);
             }
 
             string[] expectdeSubFolderNames = Directory.GetDirectories(expectedFolderPath);
@@ -56,27 +65,56 @@ namespace Decompiler.Tests.Helpers
             }
         }
 
-        private static string GetFileContent(string fileName)
+        private static void AssertFileContent(string expectedFileName, string actualFileName, string actualFolderPath)
         {
-            if (fileName.EndsWith(".csproj") || fileName.EndsWith(".sln"))
+            if (actualFileName.EndsWith(".sln"))
             {
-                // TODO Ignore ProjectGuid from file content comparison.
-                //XmlDocument doc = new XmlDocument();
-                //doc.Load(fileName);
-
-                //for (int i = 0; i < doc.GetElementsByTagName("ProjectGuid").Count; i++)
-                //{
-                //    XmlNode projectElementNode = doc.GetElementsByTagName("ProjectGuid").Item(i);
-                //    projectElementNode.InnerText = string.Empty;
-                //}
-
-                // TODO Add handling for .csproj and .sln files to compare the file content regardless of the lines order.
-                return string.Empty;
+                // TODO Handle .sln files with different Guids
+                return;
             }
-            else
+
+            try
             {
-                return File.ReadAllText(fileName);
+                if (actualFileName.EndsWith(".csproj"))
+                {
+                    XmlDocument expectedDocument = LoadXml(expectedFileName);
+                    XmlDocument actualDocument = LoadXml(actualFileName);
+
+                    XmlDiff xmldiff = new XmlDiff(XmlDiffOptions.IgnoreChildOrder |
+                                        XmlDiffOptions.IgnoreNamespaces |
+                                        XmlDiffOptions.IgnorePrefixes);
+
+                    Assert.True(xmldiff.Compare(expectedDocument, actualDocument));
+                }
+                else
+                {
+                    string expectedFileText = File.ReadAllText(expectedFileName);
+                    string actualFileText = File.ReadAllText(actualFileName);
+
+                    Assert.Equal(expectedFileText, actualFileText);
+                }
             }
+            catch (Exception e)
+            {
+                throw new ContentAssertException($"Content assert failed for file: {GetRelativeFilePath(actualFileName, actualFolderPath)}", e);
+            }
+        }
+
+        private static XmlDocument LoadXml(string fileName, bool skipGuid = true)
+        {
+            XmlDocument document = new XmlDocument();
+            document.Load(fileName);
+
+            if (skipGuid)
+            {
+                for (int i = 0; i < document.GetElementsByTagName("ProjectGuid").Count; i++)
+                {
+                    XmlNode projectElementNode = document.GetElementsByTagName("ProjectGuid").Item(i);
+                    projectElementNode.InnerText = string.Empty;
+                }
+            }
+
+            return document;
         }
 
         private static string GetRelativeFilePath(string fullPath, string rootFolder)

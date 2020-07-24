@@ -607,9 +607,9 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 						case 'scm':
 							viewletId = 'workbench.view.scm';
 							break;
-						case 'search':
-							viewletId = 'workbench.view.search';
-							break;
+						// case 'search':
+						// 	viewletId = 'workbench.view.search';
+						// 	break;
 						case 'extensions':
 							viewletId = 'workbench.view.extensions';
 							break;
@@ -1780,7 +1780,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			type: 'leaf',
 			data: { type: Parts.SIDEBAR_PART },
 			size: sideBarSize,
-			visible: !this.state.sideBar.hidden
+			visible: false
 		};
 
 		const editorNode: ISerializedLeafNode = {
@@ -1796,7 +1796,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			type: 'leaf',
 			data: { type: Parts.PANEL_PART },
 			size: panelSize,
-			visible: !this.state.panel.hidden
+			visible: false
 		};
 
 		const editorSectionNode = this.arrangeEditorNodes(editorNode, panelNode, editorSectionWidth);
@@ -1825,7 +1825,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 						type: 'leaf',
 						data: { type: Parts.STATUSBAR_PART },
 						size: statusBarHeight,
-						visible: !this.state.statusBar.hidden
+						visible: false
 					}
 				]
 			},

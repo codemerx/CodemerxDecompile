@@ -502,19 +502,19 @@ class ShowAllSymbolsAction extends Action {
 	}
 }
 
-const viewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
-	id: VIEWLET_ID,
-	name: nls.localize('name', "Search"),
-	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [VIEWLET_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
-	hideIfEmpty: true,
-	icon: searchViewIcon.classNames,
-	order: 1
-}, ViewContainerLocation.Sidebar);
+// const viewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
+// 	id: VIEWLET_ID,
+// 	name: nls.localize('name', "Search"),
+// 	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [VIEWLET_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
+// 	hideIfEmpty: true,
+// 	icon: searchViewIcon.classNames,
+// 	order: 1
+// }, ViewContainerLocation.Sidebar);
 
 const viewDescriptor = { id: VIEW_ID, containerIcon: 'codicon-search', name: nls.localize('search', "Search"), ctorDescriptor: new SyncDescriptor(SearchView), canToggleVisibility: false, canMoveView: true };
 
-// Register search default location to sidebar
-Registry.as<IViewsRegistry>(ViewExtensions.ViewsRegistry).registerViews([viewDescriptor], viewContainer);
+// // Register search default location to sidebar
+// Registry.as<IViewsRegistry>(ViewExtensions.ViewsRegistry).registerViews([viewDescriptor], viewContainer);
 
 
 // Migrate search location setting to new model

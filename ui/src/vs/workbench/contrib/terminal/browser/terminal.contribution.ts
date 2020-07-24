@@ -60,25 +60,25 @@ const configurationRegistry = Registry.as<IConfigurationRegistry>(Extensions.Con
 configurationRegistry.registerConfiguration(terminalConfiguration);
 
 // Register views
-const VIEW_CONTAINER = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
-	id: TERMINAL_VIEW_ID,
-	name: nls.localize('terminal', "Terminal"),
-	icon: 'codicon-terminal',
-	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [TERMINAL_VIEW_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
-	storageId: TERMINAL_VIEW_ID,
-	focusCommand: { id: TERMINAL_COMMAND_ID.FOCUS },
-	hideIfEmpty: true,
-	order: 3
-}, ViewContainerLocation.Panel);
+// const VIEW_CONTAINER = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
+// 	id: TERMINAL_VIEW_ID,
+// 	name: nls.localize('terminal', "Terminal"),
+// 	icon: 'codicon-terminal',
+// 	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [TERMINAL_VIEW_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
+// 	storageId: TERMINAL_VIEW_ID,
+// 	focusCommand: { id: TERMINAL_COMMAND_ID.FOCUS },
+// 	hideIfEmpty: true,
+// 	order: 3
+// }, ViewContainerLocation.Panel);
 Registry.as<panel.PanelRegistry>(panel.Extensions.Panels).setDefaultPanelId(TERMINAL_VIEW_ID);
-Registry.as<IViewsRegistry>(ViewContainerExtensions.ViewsRegistry).registerViews([{
-	id: TERMINAL_VIEW_ID,
-	name: nls.localize('terminal', "Terminal"),
-	containerIcon: 'codicon-terminal',
-	canToggleVisibility: false,
-	canMoveView: true,
-	ctorDescriptor: new SyncDescriptor(TerminalViewPane)
-}], VIEW_CONTAINER);
+// Registry.as<IViewsRegistry>(ViewContainerExtensions.ViewsRegistry).registerViews([{
+// 	id: TERMINAL_VIEW_ID,
+// 	name: nls.localize('terminal', "Terminal"),
+// 	containerIcon: 'codicon-terminal',
+// 	canToggleVisibility: false,
+// 	canMoveView: true,
+// 	ctorDescriptor: new SyncDescriptor(TerminalViewPane)
+// }], VIEW_CONTAINER);
 
 // Register actions
 const actionRegistry = Registry.as<IWorkbenchActionRegistry>(ActionExtensions.WorkbenchActions);

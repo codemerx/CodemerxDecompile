@@ -49,16 +49,16 @@ ModesRegistry.registerLanguage({
 Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench)
 	.registerWorkbenchContribution(DirtyDiffWorkbenchController, LifecyclePhase.Restored);
 
-const viewContainer = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
-	id: VIEWLET_ID,
-	name: localize('source control', "Source Control"),
-	ctorDescriptor: new SyncDescriptor(SCMViewPaneContainer),
-	storageId: 'workbench.scm.views.state',
-	icon: Codicon.sourceControl.classNames,
-	alwaysUseContainerInfo: true,
-	order: 2,
-	hideIfEmpty: true
-}, ViewContainerLocation.Sidebar);
+// const viewContainer = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
+// 	id: VIEWLET_ID,
+// 	name: localize('source control', "Source Control"),
+// 	ctorDescriptor: new SyncDescriptor(SCMViewPaneContainer),
+// 	storageId: 'workbench.scm.views.state',
+// 	icon: Codicon.sourceControl.classNames,
+// 	alwaysUseContainerInfo: true,
+// 	order: 2,
+// 	hideIfEmpty: true
+// }, ViewContainerLocation.Sidebar);
 
 const viewsRegistry = Registry.as<IViewsRegistry>(ViewContainerExtensions.ViewsRegistry);
 
@@ -67,14 +67,14 @@ viewsRegistry.registerViewWelcomeContent(VIEW_PANE_ID, {
 	when: 'default'
 });
 
-viewsRegistry.registerViews([{
-	id: VIEW_PANE_ID,
-	name: localize('source control', "Source Control"),
-	ctorDescriptor: new SyncDescriptor(SCMViewPane),
-	canToggleVisibility: true,
-	workspace: true,
-	canMoveView: true
-}], viewContainer);
+// viewsRegistry.registerViews([{
+// 	id: VIEW_PANE_ID,
+// 	name: localize('source control', "Source Control"),
+// 	ctorDescriptor: new SyncDescriptor(SCMViewPane),
+// 	canToggleVisibility: true,
+// 	workspace: true,
+// 	canMoveView: true,
+// }], viewContainer);
 
 Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench)
 	.registerWorkbenchContribution(SCMStatusController, LifecyclePhase.Restored);

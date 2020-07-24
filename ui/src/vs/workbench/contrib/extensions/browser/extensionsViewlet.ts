@@ -25,19 +25,19 @@ import {
 	EnableAutoUpdateAction, DisableAutoUpdateAction, ShowBuiltInExtensionsAction, InstallVSIXAction
 } from 'vs/workbench/contrib/extensions/browser/extensionsActions';
 import { IExtensionManagementService } from 'vs/platform/extensionManagement/common/extensionManagement';
-import { IWorkbenchExtensionEnablementService, IExtensionManagementServerService, IExtensionManagementServer } from 'vs/workbench/services/extensionManagement/common/extensionManagement';
+import { IWorkbenchExtensionEnablementService } from 'vs/workbench/services/extensionManagement/common/extensionManagement';
 import { ExtensionsInput } from 'vs/workbench/contrib/extensions/common/extensionsInput';
-import { ExtensionsListView, EnabledExtensionsView, DisabledExtensionsView, RecommendedExtensionsView, WorkspaceRecommendedExtensionsView, BuiltInExtensionsView, BuiltInThemesExtensionsView, BuiltInBasicsExtensionsView, ServerExtensionsView, DefaultRecommendedExtensionsView } from 'vs/workbench/contrib/extensions/browser/extensionsViews';
+import { ExtensionsListView } from 'vs/workbench/contrib/extensions/browser/extensionsViews';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import Severity from 'vs/base/common/severity';
 import { IActivityService, NumberBadge } from 'vs/workbench/services/activity/common/activity';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IViewsRegistry, IViewDescriptor, Extensions, ViewContainer, IViewDescriptorService, IAddedViewDescriptorRef } from 'vs/workbench/common/views';
+import { IViewDescriptorService, IAddedViewDescriptorRef } from 'vs/workbench/common/views';
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
-import { IContextKeyService, ContextKeyExpr, RawContextKey, IContextKey } from 'vs/platform/contextkey/common/contextkey';
+import { IContextKeyService, RawContextKey, IContextKey } from 'vs/platform/contextkey/common/contextkey';
 import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
 import { getMaliciousExtensionsSet } from 'vs/platform/extensionManagement/common/extensionManagementUtil';
 import { ILogService } from 'vs/platform/log/common/log';
@@ -51,11 +51,7 @@ import { alert } from 'vs/base/browser/ui/aria/aria';
 import { createErrorWithActions } from 'vs/base/common/errorsWithActions';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
 import { ExtensionType } from 'vs/platform/extensions/common/extensions';
-import { Registry } from 'vs/platform/registry/common/platform';
-import { RemoteNameContext } from 'vs/workbench/browser/contextkeys';
-import { ILabelService } from 'vs/platform/label/common/label';
 import { MementoObject } from 'vs/workbench/common/memento';
-import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { IPreferencesService } from 'vs/workbench/services/preferences/common/preferences';
 import { DragAndDropObserver } from 'vs/workbench/browser/dnd';
 import { URI } from 'vs/base/common/uri';
@@ -90,234 +86,10 @@ const viewIdNameMappings: { [id: string]: string } = {
 
 export class ExtensionsViewletViewsContribution implements IWorkbenchContribution {
 
-	private readonly container: ViewContainer;
 
 	constructor(
-		@IExtensionManagementServerService private readonly extensionManagementServerService: IExtensionManagementServerService,
-		@ILabelService private readonly labelService: ILabelService,
-		@IViewDescriptorService viewDescriptorService: IViewDescriptorService
 	) {
-		this.container = viewDescriptorService.getViewContainerById(VIEWLET_ID)!;
-		this.registerViews();
 	}
-
-	private registerViews(): void {
-		let viewDescriptors: IViewDescriptor[] = [];
-		viewDescriptors.push(this.createMarketPlaceExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createDefaultEnabledExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createDefaultDisabledExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createDefaultPopularExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createEnabledExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createDisabledExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createBuiltInExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createBuiltInBasicsExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createBuiltInThemesExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createDefaultRecommendedExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createOtherRecommendedExtensionsListViewDescriptor());
-		viewDescriptors.push(this.createWorkspaceRecommendedExtensionsListViewDescriptor());
-
-		if (this.extensionManagementServerService.localExtensionManagementServer) {
-			viewDescriptors.push(...this.createExtensionsViewDescriptorsForServer(this.extensionManagementServerService.localExtensionManagementServer));
-		}
-		if (this.extensionManagementServerService.remoteExtensionManagementServer) {
-			viewDescriptors.push(...this.createExtensionsViewDescriptorsForServer(this.extensionManagementServerService.remoteExtensionManagementServer));
-		}
-
-		Registry.as<IViewsRegistry>(Extensions.ViewsRegistry).registerViews(viewDescriptors, this.container);
-	}
-
-	// View used for any kind of searching
-	private createMarketPlaceExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.listView';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(ExtensionsListView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('searchMarketplaceExtensions')),
-			weight: 100
-		};
-	}
-
-	// Separate view for enabled extensions required as we need to show enabled, disabled and recommended sections
-	// in the default view when there is no search text, but user has installed extensions.
-	private createDefaultEnabledExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.enabledExtensionList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(EnabledExtensionsView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('defaultExtensionViews'), ContextKeyExpr.has('hasInstalledExtensions'), RemoteNameContext.isEqualTo('')),
-			weight: 40,
-			canToggleVisibility: true,
-			order: 1
-		};
-	}
-
-	// Separate view for disabled extensions required as we need to show enabled, disabled and recommended sections
-	// in the default view when there is no search text, but user has installed extensions.
-	private createDefaultDisabledExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.disabledExtensionList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(DisabledExtensionsView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('defaultExtensionViews'), ContextKeyExpr.has('hasInstalledExtensions'), RemoteNameContext.isEqualTo('')),
-			weight: 10,
-			canToggleVisibility: true,
-			order: 3,
-			collapsed: true
-		};
-	}
-
-	// Separate view for popular extensions required as we need to show popular and recommended sections
-	// in the default view when there is no search text, and user has no installed extensions.
-	private createDefaultPopularExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.popularExtensionsList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(ExtensionsListView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('defaultExtensionViews'), ContextKeyExpr.not('hasInstalledExtensions')),
-			weight: 60,
-			order: 1
-		};
-	}
-
-	private createExtensionsViewDescriptorsForServer(server: IExtensionManagementServer): IViewDescriptor[] {
-		const getViewName = (viewTitle: string, server: IExtensionManagementServer): string => {
-			const serverLabel = server.label;
-			if (viewTitle && this.extensionManagementServerService.localExtensionManagementServer && this.extensionManagementServerService.remoteExtensionManagementServer) {
-				return `${serverLabel} - ${viewTitle}`;
-			}
-			return viewTitle ? viewTitle : serverLabel;
-		};
-		const getInstalledViewName = (): string => getViewName(localize('installed', "Installed"), server);
-		const getOutdatedViewName = (): string => getViewName(localize('outdated', "Outdated"), server);
-		const onDidChangeServerLabel: EventOf<void> = EventOf.map(this.labelService.onDidChangeFormatters, () => undefined);
-		return [{
-			id: `extensions.${server.id}.installed`,
-			get name() { return getInstalledViewName(); },
-			ctorDescriptor: new SyncDescriptor(ServerExtensionsView, [server, EventOf.map<void, string>(onDidChangeServerLabel, () => getInstalledViewName())]),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('searchInstalledExtensions')),
-			weight: 100
-		}, {
-			id: `extensions.${server.id}.outdated`,
-			get name() { return getOutdatedViewName(); },
-			ctorDescriptor: new SyncDescriptor(ServerExtensionsView, [server, EventOf.map<void, string>(onDidChangeServerLabel, () => getOutdatedViewName())]),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('searchOutdatedExtensions')),
-			weight: 100
-		}, {
-			id: `extensions.${server.id}.default`,
-			get name() { return getInstalledViewName(); },
-			ctorDescriptor: new SyncDescriptor(ServerExtensionsView, [server, EventOf.map<void, string>(onDidChangeServerLabel, () => getInstalledViewName())]),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('defaultExtensionViews'), ContextKeyExpr.has('hasInstalledExtensions'), RemoteNameContext.notEqualsTo('')),
-			weight: 40,
-			order: 1
-		}];
-	}
-
-	// Separate view for recommended extensions required as we need to show it along with other views when there is no search text.
-	// When user has installed extensions, this is shown along with the views for enabled & disabled extensions
-	// When user has no installed extensions, this is shown along with the view for popular extensions
-	private createDefaultRecommendedExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.recommendedList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(DefaultRecommendedExtensionsView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('defaultExtensionViews'), ContextKeyExpr.has('defaultRecommendedExtensions')),
-			weight: 40,
-			order: 2,
-			canToggleVisibility: true
-		};
-	}
-
-	// Separate view for recommedations that are not workspace recommendations.
-	// Shown along with view for workspace recommendations, when using the command that shows recommendations
-	private createOtherRecommendedExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.otherrecommendedList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(RecommendedExtensionsView),
-			when: ContextKeyExpr.has('recommendedExtensions'),
-			weight: 50,
-			order: 2
-		};
-	}
-
-	// Separate view for workspace recommendations.
-	// Shown along with view for other recommendations, when using the command that shows recommendations
-	private createWorkspaceRecommendedExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.workspaceRecommendedList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(WorkspaceRecommendedExtensionsView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('recommendedExtensions'), ContextKeyExpr.has('nonEmptyWorkspace')),
-			weight: 50,
-			order: 1
-		};
-	}
-
-	private createEnabledExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.enabledExtensionList2';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(EnabledExtensionsView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('searchEnabledExtensions')),
-			weight: 40,
-			order: 1
-		};
-	}
-
-	private createDisabledExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.disabledExtensionList2';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(DisabledExtensionsView),
-			when: ContextKeyExpr.and(ContextKeyExpr.has('searchDisabledExtensions')),
-			weight: 10,
-			order: 3,
-			collapsed: true
-		};
-	}
-
-	private createBuiltInExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.builtInExtensionsList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(BuiltInExtensionsView),
-			when: ContextKeyExpr.has('searchBuiltInExtensions'),
-			weight: 100
-		};
-	}
-
-	private createBuiltInThemesExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.builtInThemesExtensionsList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(BuiltInThemesExtensionsView),
-			when: ContextKeyExpr.has('searchBuiltInExtensions'),
-			weight: 100
-		};
-	}
-
-	private createBuiltInBasicsExtensionsListViewDescriptor(): IViewDescriptor {
-		const id = 'extensions.builtInBasicsExtensionsList';
-		return {
-			id,
-			name: viewIdNameMappings[id],
-			ctorDescriptor: new SyncDescriptor(BuiltInBasicsExtensionsView),
-			when: ContextKeyExpr.has('searchBuiltInExtensions'),
-			weight: 100
-		};
-	}
-
 }
 
 export class ExtensionsViewPaneContainer extends ViewPaneContainer implements IExtensionsViewPaneContainer {
@@ -440,7 +212,7 @@ export class ExtensionsViewPaneContainer extends ViewPaneContainer implements IE
 
 		// Register DragAndDrop support
 		this._register(new DragAndDropObserver(this.root, {
-			onDragEnd: (e: DragEvent) => undefined,
+			onDragEnd: () => undefined,
 			onDragEnter: (e: DragEvent) => {
 				if (this.isSupportedDragElement(e)) {
 					show(overlay);

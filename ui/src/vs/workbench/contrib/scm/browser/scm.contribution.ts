@@ -23,12 +23,8 @@ import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/co
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { SCMService } from 'vs/workbench/contrib/scm/common/scmService';
-import { IViewContainersRegistry, ViewContainerLocation, Extensions as ViewContainerExtensions, IViewsRegistry } from 'vs/workbench/common/views';
-import { SCMViewPaneContainer } from 'vs/workbench/contrib/scm/browser/scmViewPaneContainer';
-import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
+import { Extensions as ViewContainerExtensions, IViewsRegistry } from 'vs/workbench/common/views';
 import { ModesRegistry } from 'vs/editor/common/modes/modesRegistry';
-import { Codicon } from 'vs/base/common/codicons';
-import { SCMViewPane } from 'vs/workbench/contrib/scm/browser/scmViewPane';
 
 class OpenSCMViewletAction extends ShowViewletAction {
 

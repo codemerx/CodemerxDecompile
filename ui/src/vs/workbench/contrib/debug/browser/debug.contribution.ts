@@ -7,71 +7,36 @@ import 'vs/css!./media/debug.contribution';
 import 'vs/css!./media/debugHover';
 import * as nls from 'vs/nls';
 import { Color } from 'vs/base/common/color';
-import { KeyMod, KeyCode } from 'vs/base/common/keyCodes';
-import { SyncActionDescriptor, MenuRegistry, MenuId } from 'vs/platform/actions/common/actions';
+import { MenuRegistry, MenuId } from 'vs/platform/actions/common/actions';
 import { Registry } from 'vs/platform/registry/common/platform';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
-import { IKeybindings } from 'vs/platform/keybinding/common/keybindingsRegistry';
 import { IConfigurationRegistry, Extensions as ConfigurationExtensions } from 'vs/platform/configuration/common/configurationRegistry';
-import { IWorkbenchActionRegistry, Extensions as WorkbenchActionRegistryExtensions } from 'vs/workbench/common/actions';
-import { ShowViewletAction } from 'vs/workbench/browser/viewlet';
-import { BreakpointsView } from 'vs/workbench/contrib/debug/browser/breakpointsView';
-import { CallStackView } from 'vs/workbench/contrib/debug/browser/callStackView';
 import { Extensions as WorkbenchExtensions, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
 import {
-	IDebugService, VIEWLET_ID, DEBUG_PANEL_ID, CONTEXT_IN_DEBUG_MODE, INTERNAL_CONSOLE_OPTIONS_SCHEMA,
-	CONTEXT_DEBUG_STATE, VARIABLES_VIEW_ID, CALLSTACK_VIEW_ID, WATCH_VIEW_ID, BREAKPOINTS_VIEW_ID, LOADED_SCRIPTS_VIEW_ID, CONTEXT_LOADED_SCRIPTS_SUPPORTED, CONTEXT_FOCUSED_SESSION_IS_ATTACH, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_CALLSTACK_ITEM_TYPE, CONTEXT_RESTART_FRAME_SUPPORTED, CONTEXT_JUMP_TO_CURSOR_SUPPORTED, CONTEXT_DEBUG_UX, BREAKPOINT_EDITOR_CONTRIBUTION_ID, REPL_VIEW_ID, CONTEXT_BREAKPOINTS_EXIST,
+	IDebugService, VIEWLET_ID, CONTEXT_IN_DEBUG_MODE, INTERNAL_CONSOLE_OPTIONS_SCHEMA,
+	CONTEXT_DEBUG_STATE, CONTEXT_FOCUSED_SESSION_IS_ATTACH, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_CALLSTACK_ITEM_TYPE, CONTEXT_RESTART_FRAME_SUPPORTED, CONTEXT_JUMP_TO_CURSOR_SUPPORTED, BREAKPOINT_EDITOR_CONTRIBUTION_ID,
 } from 'vs/workbench/contrib/debug/common/debug';
-import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
-import { StartAction, AddFunctionBreakpointAction, ConfigureAction, DisableAllBreakpointsAction, EnableAllBreakpointsAction, RemoveAllBreakpointsAction, RunAction, ReapplyBreakpointsAction, SelectAndStartAction } from 'vs/workbench/contrib/debug/browser/debugActions';
-import { DebugToolBar } from 'vs/workbench/contrib/debug/browser/debugToolBar';
+import { StartAction, AddFunctionBreakpointAction, ConfigureAction, DisableAllBreakpointsAction, EnableAllBreakpointsAction, RemoveAllBreakpointsAction, RunAction } from 'vs/workbench/contrib/debug/browser/debugActions';
 import * as service from 'vs/workbench/contrib/debug/browser/debugService';
-import { IViewletService } from 'vs/workbench/services/viewlet/browser/viewlet';
 import { registerCommands, ADD_CONFIGURATION_ID, TOGGLE_INLINE_BREAKPOINT_ID, COPY_STACK_TRACE_ID, REVERSE_CONTINUE_ID, STEP_BACK_ID, RESTART_SESSION_ID, TERMINATE_THREAD_ID, STEP_OVER_ID, STEP_INTO_ID, STEP_OUT_ID, PAUSE_ID, DISCONNECT_ID, STOP_ID, RESTART_FRAME_ID, CONTINUE_ID, FOCUS_REPL_ID, JUMP_TO_CURSOR_ID, RESTART_LABEL, STEP_INTO_LABEL, STEP_OVER_LABEL, STEP_OUT_LABEL, PAUSE_LABEL, DISCONNECT_LABEL, STOP_LABEL, CONTINUE_LABEL } from 'vs/workbench/contrib/debug/browser/debugCommands';
-import { StatusBarColorProvider } from 'vs/workbench/contrib/debug/browser/statusbarColorProvider';
-import { IViewsRegistry, Extensions as ViewExtensions, IViewContainersRegistry, ViewContainerLocation, ViewContainer } from 'vs/workbench/common/views';
 import { isMacintosh, isWeb } from 'vs/base/common/platform';
 import { ContextKeyExpr, ContextKeyExpression } from 'vs/platform/contextkey/common/contextkey';
 import { URI } from 'vs/base/common/uri';
 import { DebugStatusContribution } from 'vs/workbench/contrib/debug/browser/debugStatus';
 import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { launchSchemaId } from 'vs/workbench/services/configuration/common/configuration';
-import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
-import { LoadedScriptsView } from 'vs/workbench/contrib/debug/browser/loadedScriptsView';
 import { ADD_LOG_POINT_ID, TOGGLE_CONDITIONAL_BREAKPOINT_ID, TOGGLE_BREAKPOINT_ID, RunToCursorAction } from 'vs/workbench/contrib/debug/browser/debugEditorActions';
-import { WatchExpressionsView } from 'vs/workbench/contrib/debug/browser/watchExpressionsView';
-import { VariablesView } from 'vs/workbench/contrib/debug/browser/variablesView';
-import { ClearReplAction, Repl } from 'vs/workbench/contrib/debug/browser/repl';
-import { DebugContentProvider } from 'vs/workbench/contrib/debug/common/debugContentProvider';
-import { WelcomeView } from 'vs/workbench/contrib/debug/browser/welcomeView';
 import { ThemeIcon, registerThemingParticipant } from 'vs/platform/theme/common/themeService';
 import { registerColor, foreground, badgeBackground, badgeForeground, listDeemphasizedForeground, contrastBorder, inputBorder, editorWarningForeground, errorForeground, editorInfoForeground } from 'vs/platform/theme/common/colorRegistry';
-import { DebugViewPaneContainer, OpenDebugConsoleAction } from 'vs/workbench/contrib/debug/browser/debugViewlet';
+import { OpenDebugConsoleAction } from 'vs/workbench/contrib/debug/browser/debugViewlet';
 import { registerEditorContribution } from 'vs/editor/browser/editorExtensions';
 import { CallStackEditorContribution } from 'vs/workbench/contrib/debug/browser/callStackEditorContribution';
 import { BreakpointEditorContribution } from 'vs/workbench/contrib/debug/browser/breakpointEditorContribution';
-import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
-import { ViewPaneContainer } from 'vs/workbench/browser/parts/views/viewPaneContainer';
 import { IQuickAccessRegistry, Extensions as QuickAccessExtensions } from 'vs/platform/quickinput/common/quickAccess';
 import { StartDebugQuickAccessProvider } from 'vs/workbench/contrib/debug/browser/debugQuickAccess';
 import { DebugProgressContribution } from 'vs/workbench/contrib/debug/browser/debugProgress';
 import { DebugTitleContribution } from 'vs/workbench/contrib/debug/browser/debugTitle';
-import { Codicon } from 'vs/base/common/codicons';
 
-class OpenDebugViewletAction extends ShowViewletAction {
-	public static readonly ID = VIEWLET_ID;
-	public static readonly LABEL = nls.localize('toggleDebugViewlet', "Show Run and Debug");
-
-	constructor(
-		id: string,
-		label: string,
-		@IViewletService viewletService: IViewletService,
-		@IEditorGroupsService editorGroupService: IEditorGroupsService,
-		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService
-	) {
-		super(id, label, VIEWLET_ID, viewletService, editorGroupService, layoutService);
-	}
-}
 
 // const viewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
 // 	id: VIEWLET_ID,
@@ -82,12 +47,12 @@ class OpenDebugViewletAction extends ShowViewletAction {
 // 	order: 2
 // }, ViewContainerLocation.Sidebar);
 
-const openViewletKb: IKeybindings = {
-	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_D
-};
-const openPanelKb: IKeybindings = {
-	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_Y
-};
+// const openViewletKb: IKeybindings = {
+// 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_D
+// };
+// const openPanelKb: IKeybindings = {
+// 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_Y
+// };
 
 // register repl panel
 

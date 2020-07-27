@@ -4,16 +4,16 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as nls from 'vs/nls';
-import { illegalArgument, onUnexpectedError } from 'vs/base/common/errors';
-import { KeyMod, KeyCode } from 'vs/base/common/keyCodes';
+import { onUnexpectedError } from 'vs/base/common/errors';
+import { KeyCode } from 'vs/base/common/keyCodes';
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { IEditorProgressService } from 'vs/platform/progress/common/progress';
-import { registerEditorAction, registerEditorContribution, ServicesAccessor, EditorAction, EditorCommand, registerEditorCommand, registerDefaultLanguageCommand } from 'vs/editor/browser/editorExtensions';
+import { ServicesAccessor, EditorAction } from 'vs/editor/browser/editorExtensions';
 import { IEditorContribution } from 'vs/editor/common/editorCommon';
 import { ITextModel } from 'vs/editor/common/model';
 import { EditorContextKeys } from 'vs/editor/common/editorContextKeys';
 import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
-import { RenameInputField, CONTEXT_RENAME_INPUT_VISIBLE } from './renameInputField';
+import { RenameInputField } from './renameInputField';
 import { WorkspaceEdit, RenameProviderRegistry, RenameProvider, RenameLocation, Rejection } from 'vs/editor/common/modes';
 import { Position, IPosition } from 'vs/editor/common/core/position';
 import { alert } from 'vs/base/browser/ui/aria/aria';
@@ -30,8 +30,6 @@ import { DisposableStore } from 'vs/base/common/lifecycle';
 import { IdleValue, raceCancellation } from 'vs/base/common/async';
 import { ILogService } from 'vs/platform/log/common/log';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
-import { Registry } from 'vs/platform/registry/common/platform';
-import { IConfigurationRegistry, ConfigurationScope, Extensions } from 'vs/platform/configuration/common/configurationRegistry';
 import { ITextResourceConfigurationService } from 'vs/editor/common/services/textResourceConfigurationService';
 
 class RenameSkeleton {
@@ -309,65 +307,65 @@ export class RenameAction extends EditorAction {
 	}
 }
 
-registerEditorContribution(RenameController.ID, RenameController);
-registerEditorAction(RenameAction);
+// registerEditorContribution(RenameController.ID, RenameController);
+// registerEditorAction(RenameAction);
 
-const RenameCommand = EditorCommand.bindToContribution<RenameController>(RenameController.get);
+// const RenameCommand = EditorCommand.bindToContribution<RenameController>(RenameController.get);
 
-registerEditorCommand(new RenameCommand({
-	id: 'acceptRenameInput',
-	precondition: CONTEXT_RENAME_INPUT_VISIBLE,
-	handler: x => x.acceptRenameInput(false),
-	kbOpts: {
-		weight: KeybindingWeight.EditorContrib + 99,
-		kbExpr: EditorContextKeys.focus,
-		primary: KeyCode.Enter
-	}
-}));
+// registerEditorCommand(new RenameCommand({
+// 	id: 'acceptRenameInput',
+// 	precondition: CONTEXT_RENAME_INPUT_VISIBLE,
+// 	handler: x => x.acceptRenameInput(false),
+// 	kbOpts: {
+// 		weight: KeybindingWeight.EditorContrib + 99,
+// 		kbExpr: EditorContextKeys.focus,
+// 		primary: KeyCode.Enter
+// 	}
+// }));
 
-registerEditorCommand(new RenameCommand({
-	id: 'acceptRenameInputWithPreview',
-	precondition: ContextKeyExpr.and(CONTEXT_RENAME_INPUT_VISIBLE, ContextKeyExpr.has('config.editor.rename.enablePreview')),
-	handler: x => x.acceptRenameInput(true),
-	kbOpts: {
-		weight: KeybindingWeight.EditorContrib + 99,
-		kbExpr: EditorContextKeys.focus,
-		primary: KeyMod.Shift + KeyCode.Enter
-	}
-}));
+// registerEditorCommand(new RenameCommand({
+// 	id: 'acceptRenameInputWithPreview',
+// 	precondition: ContextKeyExpr.and(CONTEXT_RENAME_INPUT_VISIBLE, ContextKeyExpr.has('config.editor.rename.enablePreview')),
+// 	handler: x => x.acceptRenameInput(true),
+// 	kbOpts: {
+// 		weight: KeybindingWeight.EditorContrib + 99,
+// 		kbExpr: EditorContextKeys.focus,
+// 		primary: KeyMod.Shift + KeyCode.Enter
+// 	}
+// }));
 
-registerEditorCommand(new RenameCommand({
-	id: 'cancelRenameInput',
-	precondition: CONTEXT_RENAME_INPUT_VISIBLE,
-	handler: x => x.cancelRenameInput(),
-	kbOpts: {
-		weight: KeybindingWeight.EditorContrib + 99,
-		kbExpr: EditorContextKeys.focus,
-		primary: KeyCode.Escape,
-		secondary: [KeyMod.Shift | KeyCode.Escape]
-	}
-}));
+// registerEditorCommand(new RenameCommand({
+// 	id: 'cancelRenameInput',
+// 	precondition: CONTEXT_RENAME_INPUT_VISIBLE,
+// 	handler: x => x.cancelRenameInput(),
+// 	kbOpts: {
+// 		weight: KeybindingWeight.EditorContrib + 99,
+// 		kbExpr: EditorContextKeys.focus,
+// 		primary: KeyCode.Escape,
+// 		secondary: [KeyMod.Shift | KeyCode.Escape]
+// 	}
+// }));
 
 // ---- api bridge command
 
-registerDefaultLanguageCommand('_executeDocumentRenameProvider', function (model, position, args) {
-	let { newName } = args;
-	if (typeof newName !== 'string') {
-		throw illegalArgument('newName');
-	}
-	return rename(model, position, newName);
-});
+// registerDefaultLanguageCommand('_executeDocumentRenameProvider', function (model, position, args) {
+// 	let { newName } = args;
+// 	if (typeof newName !== 'string') {
+// 		throw illegalArgument('newName');
+// 	}
+// 	return rename(model, position, newName);
+// });
 
 
 //todo@joh use editor options world
-Registry.as<IConfigurationRegistry>(Extensions.Configuration).registerConfiguration({
-	id: 'editor',
-	properties: {
-		'editor.rename.enablePreview': {
-			scope: ConfigurationScope.LANGUAGE_OVERRIDABLE,
-			description: nls.localize('enablePreview', "Enable/disable the ability to preview changes before renaming"),
-			default: true,
-			type: 'boolean'
-		}
-	}
-});
+// Registry.as<IConfigurationRegistry>(Extensions.Configuration).registerConfiguration({
+// 	id: 'editor',
+// 	properties: {
+// 		'editor.rename.enablePreview': {
+// 			scope: ConfigurationScope.LANGUAGE_OVERRIDABLE,
+// 			description: nls.localize('enablePreview', "Enable/disable the ability to preview changes before renaming"),
+// 			default: true,
+// 			type: 'boolean'
+// 		}
+// 	}
+// });

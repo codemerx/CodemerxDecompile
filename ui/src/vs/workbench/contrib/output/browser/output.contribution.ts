@@ -21,8 +21,7 @@ import { IWorkbenchContributionsRegistry, Extensions as WorkbenchExtensions, IWo
 import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { IInstantiationService, ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { ITextModelService } from 'vs/editor/common/services/resolverService';
-import { ViewContainer, IViewContainersRegistry, ViewContainerLocation, Extensions as ViewContainerExtensions, IViewsRegistry, IViewsService, IViewDescriptorService } from 'vs/workbench/common/views';
-import { ViewPaneContainer } from 'vs/workbench/browser/parts/views/viewPaneContainer';
+import { IViewsService, IViewDescriptorService } from 'vs/workbench/common/views';
 import { IConfigurationRegistry, Extensions as ConfigurationExtensions, ConfigurationScope } from 'vs/platform/configuration/common/configurationRegistry';
 import { KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
 import { IQuickPickItem, IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
@@ -32,7 +31,6 @@ import { assertIsDefined } from 'vs/base/common/types';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { ContextKeyEqualsExpr, ContextKeyExpr, IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
 import { ToggleViewAction } from 'vs/workbench/browser/actions/layoutActions';
-import { Codicon } from 'vs/base/common/codicons';
 
 // Register Service
 registerSingleton(IOutputService, OutputService);
@@ -59,25 +57,6 @@ const toggleOutputActionKeybindings = {
 		primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyMod.CtrlCmd | KeyCode.KEY_H)  // On Ubuntu Ctrl+Shift+U is taken by some global OS command
 	}
 };
-const VIEW_CONTAINER: ViewContainer = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
-	id: OUTPUT_VIEW_ID,
-	name: nls.localize('output', "Output"),
-	icon: Codicon.output.classNames,
-	order: 1,
-	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [OUTPUT_VIEW_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
-	storageId: OUTPUT_VIEW_ID,
-	hideIfEmpty: true,
-	focusCommand: { id: toggleOutputAcitonId, keybindings: toggleOutputActionKeybindings }
-}, ViewContainerLocation.Panel);
-
-Registry.as<IViewsRegistry>(ViewContainerExtensions.ViewsRegistry).registerViews([{
-	id: OUTPUT_VIEW_ID,
-	name: nls.localize('output', "Output"),
-	containerIcon: Codicon.output.classNames,
-	canMoveView: true,
-	canToggleVisibility: false,
-	ctorDescriptor: new SyncDescriptor(OutputViewPane),
-}], VIEW_CONTAINER);
 
 Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(

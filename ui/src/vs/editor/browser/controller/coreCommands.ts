@@ -1918,5 +1918,5 @@ registerOverwritableCommand(Handler.Type, {
 registerOverwritableCommand(Handler.ReplacePreviousChar);
 registerOverwritableCommand(Handler.CompositionStart);
 registerOverwritableCommand(Handler.CompositionEnd);
-registerOverwritableCommand(Handler.Paste);
-registerOverwritableCommand(Handler.Cut);
+// registerOverwritableCommand(Handler.Paste);
+// registerOverwritableCommand(Handler.Cut);

@@ -7,7 +7,7 @@ import * as nls from 'vs/nls';
 import { KeyCode, KeyMod } from 'vs/base/common/keyCodes';
 import { Disposable } from 'vs/base/common/lifecycle';
 import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
-import { EditorAction, ServicesAccessor, registerEditorAction, registerEditorContribution } from 'vs/editor/browser/editorExtensions';
+import { EditorAction, ServicesAccessor } from 'vs/editor/browser/editorExtensions';
 import { Selection } from 'vs/editor/common/core/selection';
 import { IEditorContribution } from 'vs/editor/common/editorCommon';
 import { EditorContextKeys } from 'vs/editor/common/editorContextKeys';
@@ -65,11 +65,11 @@ export class CursorUndoRedoController extends Disposable implements IEditorContr
 		this._undoStack = [];
 		this._redoStack = [];
 
-		this._register(editor.onDidChangeModel((e) => {
+		this._register(editor.onDidChangeModel(() => {
 			this._undoStack = [];
 			this._redoStack = [];
 		}));
-		this._register(editor.onDidChangeModelContent((e) => {
+		this._register(editor.onDidChangeModelContent(() => {
 			this._undoStack = [];
 			this._redoStack = [];
 		}));
@@ -160,6 +160,6 @@ export class CursorRedo extends EditorAction {
 	}
 }
 
-registerEditorContribution(CursorUndoRedoController.ID, CursorUndoRedoController);
-registerEditorAction(CursorUndo);
-registerEditorAction(CursorRedo);
+// registerEditorContribution(CursorUndoRedoController.ID, CursorUndoRedoController);
+// registerEditorAction(CursorUndo);
+// registerEditorAction(CursorRedo);

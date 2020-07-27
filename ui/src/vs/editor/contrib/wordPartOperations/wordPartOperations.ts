@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { KeyCode, KeyMod } from 'vs/base/common/keyCodes';
-import { registerEditorCommand } from 'vs/editor/browser/editorExtensions';
 import { WordNavigationType, WordPartOperations } from 'vs/editor/common/controller/cursorWordOperations';
 import { WordCharacterClassifier } from 'vs/editor/common/controller/wordCharacterClassifier';
 import { Position } from 'vs/editor/common/core/position';
@@ -150,9 +149,9 @@ export class CursorWordPartRightSelect extends WordPartRightCommand {
 }
 
 
-registerEditorCommand(new DeleteWordPartLeft());
-registerEditorCommand(new DeleteWordPartRight());
-registerEditorCommand(new CursorWordPartLeft());
-registerEditorCommand(new CursorWordPartLeftSelect());
-registerEditorCommand(new CursorWordPartRight());
-registerEditorCommand(new CursorWordPartRightSelect());
+// registerEditorCommand(new DeleteWordPartLeft());
+// registerEditorCommand(new DeleteWordPartRight());
+// registerEditorCommand(new CursorWordPartLeft());
+// registerEditorCommand(new CursorWordPartLeftSelect());
+// registerEditorCommand(new CursorWordPartRight());
+// registerEditorCommand(new CursorWordPartRightSelect());

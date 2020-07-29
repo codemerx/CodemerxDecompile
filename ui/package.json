@@ -42,9 +42,12 @@
     "eslint": "eslint -c .eslintrc.json --rulesdir ./build/lib/eslint --ext .ts --ext .js ./src/vs ./extensions"
   },
   "dependencies": {
+    "@types/google-protobuf": "^3.7.2",
     "applicationinsights": "1.0.8",
     "chokidar": "3.2.3",
+    "google-protobuf": "3.12.2",
     "graceful-fs": "4.2.3",
+    "grpc-web": "1.2.0",
     "http-proxy-agent": "^2.1.0",
     "https-proxy-agent": "^2.2.3",
     "iconv-lite-umd": "0.6.7",

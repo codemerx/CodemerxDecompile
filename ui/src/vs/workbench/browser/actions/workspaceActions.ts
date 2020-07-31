@@ -9,18 +9,11 @@ import { ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
 import { IWorkspaceContextService, WorkbenchState, IWorkspaceFolder } from 'vs/platform/workspace/common/workspace';
 import { IWorkspaceEditingService } from 'vs/workbench/services/workspaces/common/workspaceEditing';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
-import { ICommandService, CommandsRegistry } from 'vs/platform/commands/common/commands';
+import { ICommandService } from 'vs/platform/commands/common/commands';
 import { ADD_ROOT_FOLDER_COMMAND_ID, ADD_ROOT_FOLDER_LABEL, PICK_WORKSPACE_FOLDER_COMMAND_ID } from 'vs/workbench/browser/actions/workspaceCommands';
 import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
-import { MenuRegistry, MenuId, SyncActionDescriptor } from 'vs/platform/actions/common/actions';
-import { WorkbenchStateContext, WorkspaceFolderCountContext } from 'vs/workbench/browser/contextkeys';
-import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
-import { Registry } from 'vs/platform/registry/common/platform';
-import { IWorkbenchActionRegistry, Extensions } from 'vs/workbench/common/actions';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IHostService } from 'vs/workbench/services/host/browser/host';
-import { KeyChord, KeyCode, KeyMod } from 'vs/base/common/keyCodes';
-import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
 import { IWorkspacesService, hasWorkspaceFileExtension } from 'vs/platform/workspaces/common/workspaces';
 
@@ -252,64 +245,64 @@ export class DuplicateWorkspaceInNewWindowAction extends Action {
 
 // --- Actions Registration
 
-const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
-const workspacesCategory = nls.localize('workspaces', "Workspaces");
+// const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
+// const workspacesCategory = nls.localize('workspaces', "Workspaces");
 
-registry.registerWorkbenchAction(SyncActionDescriptor.from(AddRootFolderAction), 'Workspaces: Add Folder to Workspace...', workspacesCategory);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(GlobalRemoveRootFolderAction), 'Workspaces: Remove Folder from Workspace...', workspacesCategory);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_F) }), 'Workspaces: Close Workspace', workspacesCategory);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(SaveWorkspaceAsAction), 'Workspaces: Save Workspace As...', workspacesCategory);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(DuplicateWorkspaceInNewWindowAction), 'Workspaces: Duplicate Workspace in New Window', workspacesCategory);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(AddRootFolderAction), 'Workspaces: Add Folder to Workspace...', workspacesCategory);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(GlobalRemoveRootFolderAction), 'Workspaces: Remove Folder from Workspace...', workspacesCategory);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_F) }), 'Workspaces: Close Workspace', workspacesCategory);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(SaveWorkspaceAsAction), 'Workspaces: Save Workspace As...', workspacesCategory);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(DuplicateWorkspaceInNewWindowAction), 'Workspaces: Duplicate Workspace in New Window', workspacesCategory);
 
 // --- Menu Registration
 
-CommandsRegistry.registerCommand(OpenWorkspaceConfigFileAction.ID, serviceAccessor => {
-	serviceAccessor.get(IInstantiationService).createInstance(OpenWorkspaceConfigFileAction, OpenWorkspaceConfigFileAction.ID, OpenWorkspaceConfigFileAction.LABEL).run();
-});
+// CommandsRegistry.registerCommand(OpenWorkspaceConfigFileAction.ID, serviceAccessor => {
+// 	serviceAccessor.get(IInstantiationService).createInstance(OpenWorkspaceConfigFileAction, OpenWorkspaceConfigFileAction.ID, OpenWorkspaceConfigFileAction.LABEL).run();
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '3_workspace',
-	command: {
-		id: ADD_ROOT_FOLDER_COMMAND_ID,
-		title: nls.localize({ key: 'miAddFolderToWorkspace', comment: ['&& denotes a mnemonic'] }, "A&&dd Folder to Workspace...")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	group: '3_workspace',
+// 	command: {
+// 		id: ADD_ROOT_FOLDER_COMMAND_ID,
+// 		title: nls.localize({ key: 'miAddFolderToWorkspace', comment: ['&& denotes a mnemonic'] }, "A&&dd Folder to Workspace...")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '3_workspace',
-	command: {
-		id: SaveWorkspaceAsAction.ID,
-		title: nls.localize('miSaveWorkspaceAs', "Save Workspace As...")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	group: '3_workspace',
+// 	command: {
+// 		id: SaveWorkspaceAsAction.ID,
+// 		title: nls.localize('miSaveWorkspaceAs', "Save Workspace As...")
+// 	},
+// 	order: 2
+// });
 
-MenuRegistry.appendMenuItem(MenuId.CommandPalette, {
-	command: {
-		id: OpenWorkspaceConfigFileAction.ID,
-		title: { value: `${workspacesCategory}: ${OpenWorkspaceConfigFileAction.LABEL}`, original: 'Workspaces: Open Workspace Configuration File' },
-	},
-	when: WorkbenchStateContext.isEqualTo('workspace')
-});
+// MenuRegistry.appendMenuItem(MenuId.CommandPalette, {
+// 	command: {
+// 		id: OpenWorkspaceConfigFileAction.ID,
+// 		title: { value: `${workspacesCategory}: ${OpenWorkspaceConfigFileAction.LABEL}`, original: 'Workspaces: Open Workspace Configuration File' },
+// 	},
+// 	when: WorkbenchStateContext.isEqualTo('workspace')
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '6_close',
-	command: {
-		id: CloseWorkspaceAction.ID,
-		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Close &&Folder"),
-		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
-	},
-	order: 3,
-	when: WorkbenchStateContext.notEqualsTo('workspace')
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	group: '6_close',
+// 	command: {
+// 		id: CloseWorkspaceAction.ID,
+// 		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Close &&Folder"),
+// 		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
+// 	},
+// 	order: 3,
+// 	when: WorkbenchStateContext.notEqualsTo('workspace')
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '6_close',
-	command: {
-		id: CloseWorkspaceAction.ID,
-		title: nls.localize({ key: 'miCloseWorkspace', comment: ['&& denotes a mnemonic'] }, "Close &&Workspace")
-	},
-	order: 3,
-	when: ContextKeyExpr.and(WorkbenchStateContext.isEqualTo('workspace'))
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	group: '6_close',
+// 	command: {
+// 		id: CloseWorkspaceAction.ID,
+// 		title: nls.localize({ key: 'miCloseWorkspace', comment: ['&& denotes a mnemonic'] }, "Close &&Workspace")
+// 	},
+// 	order: 3,
+// 	when: ContextKeyExpr.and(WorkbenchStateContext.isEqualTo('workspace'))
+// });

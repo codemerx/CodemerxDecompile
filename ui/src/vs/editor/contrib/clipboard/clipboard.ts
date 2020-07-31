@@ -192,9 +192,9 @@ function registerExecCommandImpl(target: MultiCommand | undefined, browserComman
 	});
 }
 
-registerExecCommandImpl(CutAction, 'cut');
+// registerExecCommandImpl(CutAction, 'cut');
 registerExecCommandImpl(CopyAction, 'copy');
-registerExecCommandImpl(PasteAction, 'paste');
+// registerExecCommandImpl(PasteAction, 'paste');
 
 if (supportsCopyWithSyntaxHighlighting) {
 	registerEditorAction(ExecCommandCopyWithSyntaxHighlightingAction);

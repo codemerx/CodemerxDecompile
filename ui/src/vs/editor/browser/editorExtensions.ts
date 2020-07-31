@@ -566,7 +566,7 @@ export const UndoCommand = registerCommand(new MultiCommand({
 	}]
 }));
 
-registerCommand(new ProxyCommand(UndoCommand, { id: 'default:undo', precondition: undefined }));
+// registerCommand(new ProxyCommand(UndoCommand, { id: 'default:undo', precondition: undefined }));
 
 export const RedoCommand = registerCommand(new MultiCommand({
 	id: 'redo',
@@ -590,7 +590,7 @@ export const RedoCommand = registerCommand(new MultiCommand({
 	}]
 }));
 
-registerCommand(new ProxyCommand(RedoCommand, { id: 'default:redo', precondition: undefined }));
+// registerCommand(new ProxyCommand(RedoCommand, { id: 'default:redo', precondition: undefined }));
 
 export const SelectAllCommand = registerCommand(new MultiCommand({
 	id: 'editor.action.selectAll',

@@ -12,6 +12,10 @@ namespace SystemInformationHelpers
         v4_6_1,
         v4_6_2,
         v4_7,
-		v4_7_1
+		v4_7_1,
+        /* AGPL */
+        v4_7_2,
+        v4_8
+        /* End AGPL */
     }
 }

@@ -189,6 +189,14 @@ namespace Telerik.JustDecompiler.Common
 				case FrameworkVersion.v4_7_1:
 					result = "4.7.1";
 					break;
+                /* AGPL */
+                case FrameworkVersion.v4_7_2:
+                    result = "4.7.2";
+                    break;
+                case FrameworkVersion.v4_8:
+                    result = "4.8";
+                    break;
+                /* End AGPL */
                 case FrameworkVersion.NetPortableV4_0:
                     result = ".NETPortable v4.0";
                     break;
@@ -210,7 +218,18 @@ namespace Telerik.JustDecompiler.Common
                 case FrameworkVersion.UWP:
                     result = "UWP";
                     break;
-				case FrameworkVersion.NetCoreV2_1:
+                /* AGPL */
+                case FrameworkVersion.NetCoreV3_1:
+                    result = "netcoreapp3.1";
+                    break;
+                case FrameworkVersion.NetCoreV3_0:
+                    result = "netcoreapp3.0";
+                    break;
+                case FrameworkVersion.NetCoreV2_2:
+                    result = "netcoreapp2.2";
+                    break;
+                /* End AGPL */
+                case FrameworkVersion.NetCoreV2_1:
 					result = "netcoreapp2.1";
 					break;
 				case FrameworkVersion.NetCoreV2_0:

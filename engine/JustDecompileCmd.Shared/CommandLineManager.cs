@@ -42,8 +42,12 @@ namespace JustDecompileCmdShell
                 { "/net4.6.1", FrameworkVersion.v4_6_1 },
                 { "/net4.6.2", FrameworkVersion.v4_6_2 },
                 { "/net4.7", FrameworkVersion.v4_7 },
-				{ "/net4.7.1", FrameworkVersion.v4_7_1 }
-			};
+				{ "/net4.7.1", FrameworkVersion.v4_7_1 },
+                /* AGPL */
+				{ "/net4.7.2", FrameworkVersion.v4_7_2 },
+				{ "/net4.8", FrameworkVersion.v4_8 }
+                /* End AGPL */
+            };
         }
 
         internal static void WriteLineColor(ConsoleColor consoleColor, string description)
@@ -409,7 +413,9 @@ namespace JustDecompileCmdShell
             WriteLine();
             SetForegroundColor(ConsoleColor.White);
             WriteLine("JustDecompile /target: /out: [/lang:] [/vs:] [/net4.0] [/net4.5] [/net4.5.1]");
-            WriteLine("[/net4.5.2] [/net4.6] [/net4.6.1] [/net4.6.2] [/net4.7] [/net4.7.1] [/nodoc] [/norename]");
+            /* AGPL */
+            WriteLine("[/net4.5.2] [/net4.6] [/net4.6.1] [/net4.6.2] [/net4.7] [/net4.7.1] [/net4.7.2] [/net4.8] [/nodoc] [/norename]");
+            /* End AGPL */
             WriteLine("[/nohex] [/decompileDangerousResources] [/?]");
             WriteLine();
 
@@ -427,7 +433,9 @@ namespace JustDecompileCmdShell
             Console.CursorLeft = 12;
             WriteLine("Supported Visual Studio(r) versions: 2010 and later.");
 
-            WriteLine("[/net4.0 /net4.5 /net4.5.1 /net4.5.2 /net4.6 /net4.6.1 /net4.6.2 /net4.7 /net4.7.1]");
+            /* AGPL */
+            WriteLine("[/net4.0 /net4.5 /net4.5.1 /net4.5.2 /net4.6 /net4.6.1 /net4.6.2 /net4.7 /net4.7.1 /net4.7.2 /net4.8]");
+            /* End AGPL */
             Console.CursorLeft = 12;
             WriteLine("Fallback .NET Framework version of the generated project. This");
             Console.CursorLeft = 12;

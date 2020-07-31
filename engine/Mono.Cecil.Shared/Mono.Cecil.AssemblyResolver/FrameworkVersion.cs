@@ -21,7 +21,11 @@ namespace Mono.Cecil.AssemblyResolver
         v4_6_2,
         v4_7,
         v4_7_1,
-		Silverlight,
+        /* AGPL */
+        v4_7_2,
+        v4_8,
+        /* End AGPL */
+        Silverlight,
         WindowsPhone,
         WindowsCE,
         NetPortableV4_0,
@@ -32,8 +36,13 @@ namespace Mono.Cecil.AssemblyResolver
         WinRT_4_5_1,
         UWP,
 		WinRT_System,
+        /* AGPL */
+		NetCoreV3_1,
+		NetCoreV3_0,
+		NetCoreV2_2,
+        /* End AGPL */
 		NetCoreV2_1,
-		NetCoreV2_0,
+        NetCoreV2_0,
 		NetCoreV1_1,
 		NetCoreV1_0,
 		XamarinAndroid,

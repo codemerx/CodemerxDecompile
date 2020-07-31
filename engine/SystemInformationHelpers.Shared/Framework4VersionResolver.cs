@@ -112,9 +112,10 @@ namespace SystemInformationHelpers
                         }
                         else
                         {
-                            throw new NotSupportedException("Assembly type is not supported on this OS.");
+                            return FrameworkVersion.Unknown;
                         }
 #endif
+                        /* End AGPL */
 
                         using (ndpKey)
                         {

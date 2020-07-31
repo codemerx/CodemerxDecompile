@@ -325,14 +325,14 @@ MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 	order: 2
 });
 
-MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
-	group: '2_keybindings',
-	command: {
-		id: ShowRecommendedKeymapExtensionsAction.ID,
-		title: localize('miOpenKeymapExtensions2', "Keymaps")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
+// 	group: '2_keybindings',
+// 	command: {
+// 		id: ShowRecommendedKeymapExtensionsAction.ID,
+// 		title: localize('miOpenKeymapExtensions2', "Keymaps")
+// 	},
+// 	order: 2
+// });
 
 MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 	group: '1_settings',
@@ -356,14 +356,14 @@ MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
 
 // Global Activity Menu
 
-MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
-	group: '2_configuration',
-	command: {
-		id: VIEWLET_ID,
-		title: localize('showExtensions', "Extensions")
-	},
-	order: 3
-});
+// MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
+// 	group: '2_configuration',
+// 	command: {
+// 		id: VIEWLET_ID,
+// 		title: localize('showExtensions', "Extensions")
+// 	},
+// 	order: 3
+// });
 
 // Extension Context Menu
 

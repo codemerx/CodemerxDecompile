@@ -3,18 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { localize } from 'vs/nls';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { IViewDescriptor } from 'vs/workbench/common/views';
 import { ITimelineService, TimelinePaneId } from 'vs/workbench/contrib/timeline/common/timeline';
 import { TimelineService } from 'vs/workbench/contrib/timeline/common/timelineService';
 import { TimelinePane } from './timelinePane';
-import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
-import { MenuId, MenuRegistry } from 'vs/platform/actions/common/actions';
-import { ICommandHandler } from 'vs/platform/commands/common/commands';
-import { ExplorerFolderContext } from 'vs/workbench/contrib/files/common/files';
-import { ResourceContextKey } from 'vs/workbench/common/resources';
 
 export class TimelinePaneDescriptor implements IViewDescriptor {
 	readonly id = TimelinePaneId;
@@ -62,30 +56,30 @@ export class TimelinePaneDescriptor implements IViewDescriptor {
 
 // Registry.as<IViewsRegistry>(ViewExtensions.ViewsRegistry).registerViews([new TimelinePaneDescriptor()], VIEW_CONTAINER);
 
-namespace OpenTimelineAction {
+// namespace OpenTimelineAction {
 
-	export const ID = 'files.openTimeline';
-	export const LABEL = localize('files.openTimeline', "Open Timeline");
+// 	export const ID = 'files.openTimeline';
+// 	export const LABEL = localize('files.openTimeline', "Open Timeline");
 
-	export function handler(): ICommandHandler {
-		return (accessor, arg) => {
-			const service = accessor.get(ITimelineService);
-			return service.setUri(arg);
-		};
-	}
-}
+// 	export function handler(): ICommandHandler {
+// 		return (accessor, arg) => {
+// 			const service = accessor.get(ITimelineService);
+// 			return service.setUri(arg);
+// 		};
+// 	}
+// }
 
 // CommandsRegistry.registerCommand(OpenTimelineAction.ID, OpenTimelineAction.handler());
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, ({
-	group: '4_timeline',
-	order: 1,
-	command: {
-		id: OpenTimelineAction.ID,
-		title: OpenTimelineAction.LABEL,
-		icon: { id: 'codicon/history' }
-	},
-	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource)
-}));
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, ({
+// 	group: '4_timeline',
+// 	order: 1,
+// 	command: {
+// 		id: OpenTimelineAction.ID,
+// 		title: OpenTimelineAction.LABEL,
+// 		icon: { id: 'codicon/history' }
+// 	},
+// 	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource)
+// }));
 
 registerSingleton(ITimelineService, TimelineService, true);

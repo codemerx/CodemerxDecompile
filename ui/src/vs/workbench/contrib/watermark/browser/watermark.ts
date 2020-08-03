@@ -5,7 +5,6 @@
 
 import 'vs/css!./watermark';
 import { Disposable, DisposableStore } from 'vs/base/common/lifecycle';
-import { assign } from 'vs/base/common/objects';
 import { isMacintosh, OS } from 'vs/base/common/platform';
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
 import * as nls from 'vs/nls';
@@ -16,18 +15,13 @@ import { IWorkbenchContribution, IWorkbenchContributionsRegistry, Extensions as 
 import { ILifecycleService, LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { OpenFolderAction, OpenFileFolderAction, OpenFileAction } from 'vs/workbench/browser/actions/workspaceActions';
-import { ShowAllCommandsAction } from 'vs/workbench/contrib/quickaccess/browser/commandsQuickAccess';
 import { Parts, IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
-import { StartAction } from 'vs/workbench/contrib/debug/browser/debugActions';
-import { FindInFilesActionId } from 'vs/workbench/contrib/search/common/constants';
 import * as dom from 'vs/base/browser/dom';
 import { KeybindingLabel } from 'vs/base/browser/ui/keybindingLabel/keybindingLabel';
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import { CommandsRegistry } from 'vs/platform/commands/common/commands';
-import { TERMINAL_COMMAND_ID } from 'vs/workbench/contrib/terminal/common/terminal';
 import { assertIsDefined } from 'vs/base/common/types';
 import { workbenchConfigurationNodeBase } from 'vs/workbench/common/configuration';
-import { NEW_UNTITLED_FILE_COMMAND_ID } from 'vs/workbench/contrib/files/browser/fileCommands';
 
 const $ = dom.$;
 
@@ -37,33 +31,33 @@ interface WatermarkEntry {
 	mac?: boolean;
 }
 
-const showCommands: WatermarkEntry = { text: nls.localize('watermark.showCommands', "Show All Commands"), id: ShowAllCommandsAction.ID };
+// const showCommands: WatermarkEntry = { text: nls.localize('watermark.showCommands', "Show All Commands"), id: ShowAllCommandsAction.ID };
 const quickAccess: WatermarkEntry = { text: nls.localize('watermark.quickAccess', "Go to File"), id: 'workbench.action.quickOpen' };
 const openFileNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFile', "Open File"), id: OpenFileAction.ID, mac: false };
 const openFolderNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFolder', "Open Folder"), id: OpenFolderAction.ID, mac: false };
 const openFileOrFolderMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFileFolder', "Open File or Folder"), id: OpenFileFolderAction.ID, mac: true };
 const openRecent: WatermarkEntry = { text: nls.localize('watermark.openRecent', "Open Recent"), id: 'workbench.action.openRecent' };
-const newUntitledFile: WatermarkEntry = { text: nls.localize('watermark.newUntitledFile', "New Untitled File"), id: NEW_UNTITLED_FILE_COMMAND_ID };
-const newUntitledFileMacOnly: WatermarkEntry = assign({ mac: true }, newUntitledFile);
-const toggleTerminal: WatermarkEntry = { text: nls.localize({ key: 'watermark.toggleTerminal', comment: ['toggle is a verb here'] }, "Toggle Terminal"), id: TERMINAL_COMMAND_ID.TOGGLE };
-const findInFiles: WatermarkEntry = { text: nls.localize('watermark.findInFiles', "Find in Files"), id: FindInFilesActionId };
-const startDebugging: WatermarkEntry = { text: nls.localize('watermark.startDebugging', "Start Debugging"), id: StartAction.ID };
+// const newUntitledFile: WatermarkEntry = { text: nls.localize('watermark.newUntitledFile', "New Untitled File"), id: NEW_UNTITLED_FILE_COMMAND_ID };
+// const newUntitledFileMacOnly: WatermarkEntry = assign({ mac: true }, newUntitledFile);
+// const toggleTerminal: WatermarkEntry = { text: nls.localize({ key: 'watermark.toggleTerminal', comment: ['toggle is a verb here'] }, "Toggle Terminal"), id: TERMINAL_COMMAND_ID.TOGGLE };
+// const findInFiles: WatermarkEntry = { text: nls.localize('watermark.findInFiles', "Find in Files"), id: FindInFilesActionId };
+// const startDebugging: WatermarkEntry = { text: nls.localize('watermark.startDebugging', "Start Debugging"), id: StartAction.ID };
 
 const noFolderEntries = [
-	showCommands,
+	// showCommands,
 	openFileNonMacOnly,
 	openFolderNonMacOnly,
 	openFileOrFolderMacOnly,
 	openRecent,
-	newUntitledFileMacOnly
+	// newUntitledFileMacOnly
 ];
 
 const folderEntries = [
-	showCommands,
+	// showCommands,
 	quickAccess,
-	findInFiles,
-	startDebugging,
-	toggleTerminal
+	// findInFiles,
+	// startDebugging,
+	// toggleTerminal
 ];
 
 const WORKBENCH_TIPS_ENABLED_KEY = 'workbench.tips.enabled';
@@ -111,7 +105,7 @@ export class WatermarkContribution extends Disposable implements IWorkbenchContr
 			}
 		}));
 
-		this._register(this.contextService.onDidChangeWorkbenchState(e => {
+		this._register(this.contextService.onDidChangeWorkbenchState(() => {
 			const previousWorkbenchState = this.workbenchState;
 			this.workbenchState = this.contextService.getWorkbenchState();
 

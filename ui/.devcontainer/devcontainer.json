@@ -1,5 +1,5 @@
 {
-	"name": "Code - OSS",
+	"name": "Codemerx Decompile",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {

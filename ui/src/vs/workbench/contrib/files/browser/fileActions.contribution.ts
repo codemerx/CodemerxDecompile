@@ -5,7 +5,7 @@
 
 import * as nls from 'vs/nls';
 import { Registry } from 'vs/platform/registry/common/platform';
-import { FocusFilesExplorer, GlobalCompareResourcesAction, ShowActiveFileInExplorer, CollapseExplorerView, RefreshExplorerView, CompareWithClipboardAction, COPY_FILE_LABEL, copyFileHandler, openFilePreserveFocusHandler, ShowOpenedFileInNewWindow } from 'vs/workbench/contrib/files/browser/fileActions';
+import { GlobalCompareResourcesAction, ShowActiveFileInExplorer, CompareWithClipboardAction, COPY_FILE_LABEL, copyFileHandler, openFilePreserveFocusHandler, ShowOpenedFileInNewWindow } from 'vs/workbench/contrib/files/browser/fileActions';
 import { revertLocalChangesCommand, acceptLocalChangesCommand, CONFLICT_RESOLUTION_CONTEXT } from 'vs/workbench/contrib/files/browser/editors/textFileSaveErrorHandler';
 import { SyncActionDescriptor, MenuId, MenuRegistry, ILocalizedString } from 'vs/platform/actions/common/actions';
 import { IWorkbenchActionRegistry, Extensions as ActionExtensions } from 'vs/workbench/common/actions';
@@ -29,10 +29,10 @@ const category = { value: nls.localize('filesCategory', "File"), original: 'File
 const registry = Registry.as<IWorkbenchActionRegistry>(ActionExtensions.WorkbenchActions);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(SaveAllAction, { primary: undefined, mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_S }, win: { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_S) } }), 'File: Save All', category.value);
 registry.registerWorkbenchAction(SyncActionDescriptor.from(GlobalCompareResourcesAction), 'File: Compare Active File With...', category.value);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(FocusFilesExplorer), 'File: Focus on Files Explorer', category.value);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(FocusFilesExplorer), 'File: Focus on Files Explorer', category.value);
 registry.registerWorkbenchAction(SyncActionDescriptor.from(ShowActiveFileInExplorer), 'File: Reveal Active File in Side Bar', category.value);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(CollapseExplorerView), 'File: Collapse Folders in Explorer', category.value);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(RefreshExplorerView), 'File: Refresh Explorer', category.value);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(CollapseExplorerView), 'File: Collapse Folders in Explorer', category.value);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(RefreshExplorerView), 'File: Refresh Explorer', category.value);
 registry.registerWorkbenchAction(SyncActionDescriptor.from(CompareWithClipboardAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_C) }), 'File: Compare Active File with Clipboard', category.value);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleAutoSaveAction), 'File: Toggle Auto Save', category.value);
 registry.registerWorkbenchAction(SyncActionDescriptor.from(ShowOpenedFileInNewWindow, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_O) }), 'File: Open Active File in New Window', category.value);

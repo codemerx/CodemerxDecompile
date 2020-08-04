@@ -13,25 +13,20 @@ import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { IConfigurationRegistry, Extensions as ConfigurationExtensions } from 'vs/platform/configuration/common/configurationRegistry';
 import { Extensions as WorkbenchExtensions, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
 import {
-	IDebugService, VIEWLET_ID, CONTEXT_IN_DEBUG_MODE, INTERNAL_CONSOLE_OPTIONS_SCHEMA,
-	CONTEXT_DEBUG_STATE, CONTEXT_FOCUSED_SESSION_IS_ATTACH, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_CALLSTACK_ITEM_TYPE, CONTEXT_RESTART_FRAME_SUPPORTED, CONTEXT_JUMP_TO_CURSOR_SUPPORTED, BREAKPOINT_EDITOR_CONTRIBUTION_ID,
+	IDebugService, CONTEXT_IN_DEBUG_MODE, INTERNAL_CONSOLE_OPTIONS_SCHEMA,
+	CONTEXT_DEBUG_STATE,
 } from 'vs/workbench/contrib/debug/common/debug';
-import { StartAction, AddFunctionBreakpointAction, ConfigureAction, DisableAllBreakpointsAction, EnableAllBreakpointsAction, RemoveAllBreakpointsAction, RunAction } from 'vs/workbench/contrib/debug/browser/debugActions';
+import { StartAction, RunAction } from 'vs/workbench/contrib/debug/browser/debugActions';
 import * as service from 'vs/workbench/contrib/debug/browser/debugService';
-import { registerCommands, ADD_CONFIGURATION_ID, TOGGLE_INLINE_BREAKPOINT_ID, COPY_STACK_TRACE_ID, REVERSE_CONTINUE_ID, STEP_BACK_ID, RESTART_SESSION_ID, TERMINATE_THREAD_ID, STEP_OVER_ID, STEP_INTO_ID, STEP_OUT_ID, PAUSE_ID, DISCONNECT_ID, STOP_ID, RESTART_FRAME_ID, CONTINUE_ID, FOCUS_REPL_ID, JUMP_TO_CURSOR_ID, RESTART_LABEL, STEP_INTO_LABEL, STEP_OVER_LABEL, STEP_OUT_LABEL, PAUSE_LABEL, DISCONNECT_LABEL, STOP_LABEL, CONTINUE_LABEL } from 'vs/workbench/contrib/debug/browser/debugCommands';
+import { registerCommands, RESTART_SESSION_ID, STEP_OVER_ID, STEP_INTO_ID, STEP_OUT_ID, PAUSE_ID, STOP_ID, CONTINUE_ID, RESTART_LABEL, STEP_INTO_LABEL, STEP_OVER_LABEL, STEP_OUT_LABEL, PAUSE_LABEL, STOP_LABEL, CONTINUE_LABEL } from 'vs/workbench/contrib/debug/browser/debugCommands';
 import { isMacintosh, isWeb } from 'vs/base/common/platform';
 import { ContextKeyExpr, ContextKeyExpression } from 'vs/platform/contextkey/common/contextkey';
 import { URI } from 'vs/base/common/uri';
 import { DebugStatusContribution } from 'vs/workbench/contrib/debug/browser/debugStatus';
 import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { launchSchemaId } from 'vs/workbench/services/configuration/common/configuration';
-import { ADD_LOG_POINT_ID, TOGGLE_CONDITIONAL_BREAKPOINT_ID, TOGGLE_BREAKPOINT_ID, RunToCursorAction } from 'vs/workbench/contrib/debug/browser/debugEditorActions';
-import { ThemeIcon, registerThemingParticipant } from 'vs/platform/theme/common/themeService';
+import { registerThemingParticipant } from 'vs/platform/theme/common/themeService';
 import { registerColor, foreground, badgeBackground, badgeForeground, listDeemphasizedForeground, contrastBorder, inputBorder, editorWarningForeground, errorForeground, editorInfoForeground } from 'vs/platform/theme/common/colorRegistry';
-import { OpenDebugConsoleAction } from 'vs/workbench/contrib/debug/browser/debugViewlet';
-import { registerEditorContribution } from 'vs/editor/browser/editorExtensions';
-import { CallStackEditorContribution } from 'vs/workbench/contrib/debug/browser/callStackEditorContribution';
-import { BreakpointEditorContribution } from 'vs/workbench/contrib/debug/browser/breakpointEditorContribution';
 import { IQuickAccessRegistry, Extensions as QuickAccessExtensions } from 'vs/platform/quickinput/common/quickAccess';
 import { StartDebugQuickAccessProvider } from 'vs/workbench/contrib/debug/browser/debugQuickAccess';
 import { DebugProgressContribution } from 'vs/workbench/contrib/debug/browser/debugProgress';
@@ -113,31 +108,21 @@ registerCommands();
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(SelectAndStartAction), 'Debug: Select and Start Debugging', debugCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(ClearReplAction), 'Debug: Clear Console', debugCategory);
 
-const registerDebugCommandPaletteItem = (id: string, title: string, when?: ContextKeyExpression, precondition?: ContextKeyExpression) => {
-	MenuRegistry.appendMenuItem(MenuId.CommandPalette, {
-		when,
-		command: {
-			id,
-			title: `Debug: ${title}`,
-			precondition
-		}
-	});
-};
 
-registerDebugCommandPaletteItem(RESTART_SESSION_ID, RESTART_LABEL);
-registerDebugCommandPaletteItem(TERMINATE_THREAD_ID, nls.localize('terminateThread', "Terminate Thread"), CONTEXT_IN_DEBUG_MODE);
-registerDebugCommandPaletteItem(STEP_OVER_ID, STEP_OVER_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCommandPaletteItem(STEP_INTO_ID, STEP_INTO_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCommandPaletteItem(STEP_OUT_ID, STEP_OUT_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCommandPaletteItem(PAUSE_ID, PAUSE_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('running'));
-registerDebugCommandPaletteItem(DISCONNECT_ID, DISCONNECT_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_FOCUSED_SESSION_IS_ATTACH);
-registerDebugCommandPaletteItem(STOP_ID, STOP_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_FOCUSED_SESSION_IS_ATTACH.toNegated());
-registerDebugCommandPaletteItem(CONTINUE_ID, CONTINUE_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCommandPaletteItem(FOCUS_REPL_ID, nls.localize({ comment: ['Debug is a noun in this context, not a verb.'], key: 'debugFocusConsole' }, 'Focus on Debug Console View'));
-registerDebugCommandPaletteItem(JUMP_TO_CURSOR_ID, nls.localize('jumpToCursor', "Jump to Cursor"), CONTEXT_JUMP_TO_CURSOR_SUPPORTED);
-registerDebugCommandPaletteItem(JUMP_TO_CURSOR_ID, nls.localize('SetNextStatement', "Set Next Statement"), CONTEXT_JUMP_TO_CURSOR_SUPPORTED);
-registerDebugCommandPaletteItem(RunToCursorAction.ID, RunToCursorAction.LABEL, ContextKeyExpr.and(CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped')));
-registerDebugCommandPaletteItem(TOGGLE_INLINE_BREAKPOINT_ID, nls.localize('inlineBreakpoint', "Inline Breakpoint"));
+// registerDebugCommandPaletteItem(RESTART_SESSION_ID, RESTART_LABEL);
+// registerDebugCommandPaletteItem(TERMINATE_THREAD_ID, nls.localize('terminateThread', "Terminate Thread"), CONTEXT_IN_DEBUG_MODE);
+// registerDebugCommandPaletteItem(STEP_OVER_ID, STEP_OVER_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCommandPaletteItem(STEP_INTO_ID, STEP_INTO_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCommandPaletteItem(STEP_OUT_ID, STEP_OUT_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCommandPaletteItem(PAUSE_ID, PAUSE_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('running'));
+// registerDebugCommandPaletteItem(DISCONNECT_ID, DISCONNECT_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_FOCUSED_SESSION_IS_ATTACH);
+// registerDebugCommandPaletteItem(STOP_ID, STOP_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_FOCUSED_SESSION_IS_ATTACH.toNegated());
+// registerDebugCommandPaletteItem(CONTINUE_ID, CONTINUE_LABEL, CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCommandPaletteItem(FOCUS_REPL_ID, nls.localize({ comment: ['Debug is a noun in this context, not a verb.'], key: 'debugFocusConsole' }, 'Focus on Debug Console View'));
+// registerDebugCommandPaletteItem(JUMP_TO_CURSOR_ID, nls.localize('jumpToCursor', "Jump to Cursor"), CONTEXT_JUMP_TO_CURSOR_SUPPORTED);
+// registerDebugCommandPaletteItem(JUMP_TO_CURSOR_ID, nls.localize('SetNextStatement', "Set Next Statement"), CONTEXT_JUMP_TO_CURSOR_SUPPORTED);
+// registerDebugCommandPaletteItem(RunToCursorAction.ID, RunToCursorAction.LABEL, ContextKeyExpr.and(CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped')));
+// registerDebugCommandPaletteItem(TOGGLE_INLINE_BREAKPOINT_ID, nls.localize('inlineBreakpoint', "Inline Breakpoint"));
 
 
 // Register Quick Access
@@ -266,270 +251,245 @@ if (isWeb) {
 
 // Debug toolbar
 
-const registerDebugToolBarItem = (id: string, title: string, order: number, icon: { light?: URI, dark?: URI } | ThemeIcon, when?: ContextKeyExpression, precondition?: ContextKeyExpression) => {
-	MenuRegistry.appendMenuItem(MenuId.DebugToolBar, {
-		group: 'navigation',
-		when,
-		order,
-		command: {
-			id,
-			title,
-			icon,
-			precondition
-		}
-	});
-};
 
-registerDebugToolBarItem(CONTINUE_ID, CONTINUE_LABEL, 10, { id: 'codicon/debug-continue' }, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugToolBarItem(PAUSE_ID, PAUSE_LABEL, 10, { id: 'codicon/debug-pause' }, CONTEXT_DEBUG_STATE.notEqualsTo('stopped'));
-registerDebugToolBarItem(STOP_ID, STOP_LABEL, 70, { id: 'codicon/debug-stop' }, CONTEXT_FOCUSED_SESSION_IS_ATTACH.toNegated());
-registerDebugToolBarItem(DISCONNECT_ID, DISCONNECT_LABEL, 70, { id: 'codicon/debug-disconnect' }, CONTEXT_FOCUSED_SESSION_IS_ATTACH);
-registerDebugToolBarItem(STEP_OVER_ID, STEP_OVER_LABEL, 20, { id: 'codicon/debug-step-over' }, undefined, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugToolBarItem(STEP_INTO_ID, STEP_INTO_LABEL, 30, { id: 'codicon/debug-step-into' }, undefined, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugToolBarItem(STEP_OUT_ID, STEP_OUT_LABEL, 40, { id: 'codicon/debug-step-out' }, undefined, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugToolBarItem(RESTART_SESSION_ID, RESTART_LABEL, 60, { id: 'codicon/debug-restart' });
-registerDebugToolBarItem(STEP_BACK_ID, nls.localize('stepBackDebug', "Step Back"), 50, { id: 'codicon/debug-step-back' }, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugToolBarItem(REVERSE_CONTINUE_ID, nls.localize('reverseContinue', "Reverse"), 60, { id: 'codicon/debug-reverse-continue' }, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugToolBarItem(CONTINUE_ID, CONTINUE_LABEL, 10, { id: 'codicon/debug-continue' }, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugToolBarItem(PAUSE_ID, PAUSE_LABEL, 10, { id: 'codicon/debug-pause' }, CONTEXT_DEBUG_STATE.notEqualsTo('stopped'));
+// registerDebugToolBarItem(STOP_ID, STOP_LABEL, 70, { id: 'codicon/debug-stop' }, CONTEXT_FOCUSED_SESSION_IS_ATTACH.toNegated());
+// registerDebugToolBarItem(DISCONNECT_ID, DISCONNECT_LABEL, 70, { id: 'codicon/debug-disconnect' }, CONTEXT_FOCUSED_SESSION_IS_ATTACH);
+// registerDebugToolBarItem(STEP_OVER_ID, STEP_OVER_LABEL, 20, { id: 'codicon/debug-step-over' }, undefined, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugToolBarItem(STEP_INTO_ID, STEP_INTO_LABEL, 30, { id: 'codicon/debug-step-into' }, undefined, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugToolBarItem(STEP_OUT_ID, STEP_OUT_LABEL, 40, { id: 'codicon/debug-step-out' }, undefined, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugToolBarItem(RESTART_SESSION_ID, RESTART_LABEL, 60, { id: 'codicon/debug-restart' });
+// registerDebugToolBarItem(STEP_BACK_ID, nls.localize('stepBackDebug', "Step Back"), 50, { id: 'codicon/debug-step-back' }, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugToolBarItem(REVERSE_CONTINUE_ID, nls.localize('reverseContinue', "Reverse"), 60, { id: 'codicon/debug-reverse-continue' }, CONTEXT_STEP_BACK_SUPPORTED, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
 
 // Debug callstack context menu
-const registerDebugCallstackItem = (id: string, title: string, order: number, when?: ContextKeyExpression, precondition?: ContextKeyExpression, group = 'navigation') => {
-	MenuRegistry.appendMenuItem(MenuId.DebugCallStackContext, {
-		group,
-		when,
-		order,
-		command: {
-			id,
-			title,
-			precondition
-		}
-	});
-};
-registerDebugCallstackItem(RESTART_SESSION_ID, RESTART_LABEL, 10, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('session'));
-registerDebugCallstackItem(STOP_ID, STOP_LABEL, 20, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('session'));
-registerDebugCallstackItem(PAUSE_ID, PAUSE_LABEL, 10, ContextKeyExpr.and(CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('running')));
-registerDebugCallstackItem(CONTINUE_ID, CONTINUE_LABEL, 10, ContextKeyExpr.and(CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped')));
-registerDebugCallstackItem(STEP_OVER_ID, STEP_OVER_LABEL, 20, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCallstackItem(STEP_INTO_ID, STEP_INTO_LABEL, 30, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCallstackItem(STEP_OUT_ID, STEP_OUT_LABEL, 40, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
-registerDebugCallstackItem(TERMINATE_THREAD_ID, nls.localize('terminateThread', "Terminate Thread"), 10, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), undefined, 'termination');
-registerDebugCallstackItem(RESTART_FRAME_ID, nls.localize('restartFrame', "Restart Frame"), 10, ContextKeyExpr.and(CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('stackFrame'), CONTEXT_RESTART_FRAME_SUPPORTED));
-registerDebugCallstackItem(COPY_STACK_TRACE_ID, nls.localize('copyStackTrace', "Copy Call Stack"), 20, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('stackFrame'));
+// registerDebugCallstackItem(RESTART_SESSION_ID, RESTART_LABEL, 10, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('session'));
+// registerDebugCallstackItem(STOP_ID, STOP_LABEL, 20, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('session'));
+// registerDebugCallstackItem(PAUSE_ID, PAUSE_LABEL, 10, ContextKeyExpr.and(CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('running')));
+// registerDebugCallstackItem(CONTINUE_ID, CONTINUE_LABEL, 10, ContextKeyExpr.and(CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped')));
+// registerDebugCallstackItem(STEP_OVER_ID, STEP_OVER_LABEL, 20, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCallstackItem(STEP_INTO_ID, STEP_INTO_LABEL, 30, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCallstackItem(STEP_OUT_ID, STEP_OUT_LABEL, 40, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
+// registerDebugCallstackItem(TERMINATE_THREAD_ID, nls.localize('terminateThread', "Terminate Thread"), 10, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('thread'), undefined, 'termination');
+// registerDebugCallstackItem(RESTART_FRAME_ID, nls.localize('restartFrame', "Restart Frame"), 10, ContextKeyExpr.and(CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('stackFrame'), CONTEXT_RESTART_FRAME_SUPPORTED));
+// registerDebugCallstackItem(COPY_STACK_TRACE_ID, nls.localize('copyStackTrace', "Copy Call Stack"), 20, CONTEXT_CALLSTACK_ITEM_TYPE.isEqualTo('stackFrame'));
 
 // Editor contributions
 
-registerEditorContribution('editor.contrib.callStack', CallStackEditorContribution);
-registerEditorContribution(BREAKPOINT_EDITOR_CONTRIBUTION_ID, BreakpointEditorContribution);
+// registerEditorContribution('editor.contrib.callStack', CallStackEditorContribution);
+// registerEditorContribution(BREAKPOINT_EDITOR_CONTRIBUTION_ID, BreakpointEditorContribution);
 
 // View menu
 
-MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
-	group: '3_views',
-	command: {
-		id: VIEWLET_ID,
-		title: nls.localize({ key: 'miViewRun', comment: ['&& denotes a mnemonic'] }, "&&Run")
-	},
-	order: 4
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
+// 	group: '3_views',
+// 	command: {
+// 		id: VIEWLET_ID,
+// 		title: nls.localize({ key: 'miViewRun', comment: ['&& denotes a mnemonic'] }, "&&Run")
+// 	},
+// 	order: 4
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
-	group: '4_panels',
-	command: {
-		id: OpenDebugConsoleAction.ID,
-		title: nls.localize({ key: 'miToggleDebugConsole', comment: ['&& denotes a mnemonic'] }, "De&&bug Console")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
+// 	group: '4_panels',
+// 	command: {
+// 		id: OpenDebugConsoleAction.ID,
+// 		title: nls.localize({ key: 'miToggleDebugConsole', comment: ['&& denotes a mnemonic'] }, "De&&bug Console")
+// 	},
+// 	order: 2
+// });
 
-// Debug menu
+// // Debug menu
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '1_debug',
-	command: {
-		id: StartAction.ID,
-		title: nls.localize({ key: 'miStartDebugging', comment: ['&& denotes a mnemonic'] }, "&&Start Debugging")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '1_debug',
+// 	command: {
+// 		id: StartAction.ID,
+// 		title: nls.localize({ key: 'miStartDebugging', comment: ['&& denotes a mnemonic'] }, "&&Start Debugging")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '1_debug',
-	command: {
-		id: RunAction.ID,
-		title: nls.localize({ key: 'miRun', comment: ['&& denotes a mnemonic'] }, "Run &&Without Debugging")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '1_debug',
+// 	command: {
+// 		id: RunAction.ID,
+// 		title: nls.localize({ key: 'miRun', comment: ['&& denotes a mnemonic'] }, "Run &&Without Debugging")
+// 	},
+// 	order: 2
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '1_debug',
-	command: {
-		id: STOP_ID,
-		title: nls.localize({ key: 'miStopDebugging', comment: ['&& denotes a mnemonic'] }, "&&Stop Debugging"),
-		precondition: CONTEXT_IN_DEBUG_MODE
-	},
-	order: 3
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '1_debug',
+// 	command: {
+// 		id: STOP_ID,
+// 		title: nls.localize({ key: 'miStopDebugging', comment: ['&& denotes a mnemonic'] }, "&&Stop Debugging"),
+// 		precondition: CONTEXT_IN_DEBUG_MODE
+// 	},
+// 	order: 3
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '1_debug',
-	command: {
-		id: RESTART_SESSION_ID,
-		title: nls.localize({ key: 'miRestart Debugging', comment: ['&& denotes a mnemonic'] }, "&&Restart Debugging"),
-		precondition: CONTEXT_IN_DEBUG_MODE
-	},
-	order: 4
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '1_debug',
+// 	command: {
+// 		id: RESTART_SESSION_ID,
+// 		title: nls.localize({ key: 'miRestart Debugging', comment: ['&& denotes a mnemonic'] }, "&&Restart Debugging"),
+// 		precondition: CONTEXT_IN_DEBUG_MODE
+// 	},
+// 	order: 4
+// });
 
 // Configuration
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '2_configuration',
-	command: {
-		id: ConfigureAction.ID,
-		title: nls.localize({ key: 'miOpenConfigurations', comment: ['&& denotes a mnemonic'] }, "Open &&Configurations")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '2_configuration',
+// 	command: {
+// 		id: ConfigureAction.ID,
+// 		title: nls.localize({ key: 'miOpenConfigurations', comment: ['&& denotes a mnemonic'] }, "Open &&Configurations")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '2_configuration',
-	command: {
-		id: ADD_CONFIGURATION_ID,
-		title: nls.localize({ key: 'miAddConfiguration', comment: ['&& denotes a mnemonic'] }, "A&&dd Configuration...")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '2_configuration',
+// 	command: {
+// 		id: ADD_CONFIGURATION_ID,
+// 		title: nls.localize({ key: 'miAddConfiguration', comment: ['&& denotes a mnemonic'] }, "A&&dd Configuration...")
+// 	},
+// 	order: 2
+// });
 
-// Step Commands
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '3_step',
-	command: {
-		id: STEP_OVER_ID,
-		title: nls.localize({ key: 'miStepOver', comment: ['&& denotes a mnemonic'] }, "Step &&Over"),
-		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
-	},
-	order: 1
-});
+// // Step Commands
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '3_step',
+// 	command: {
+// 		id: STEP_OVER_ID,
+// 		title: nls.localize({ key: 'miStepOver', comment: ['&& denotes a mnemonic'] }, "Step &&Over"),
+// 		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '3_step',
-	command: {
-		id: STEP_INTO_ID,
-		title: nls.localize({ key: 'miStepInto', comment: ['&& denotes a mnemonic'] }, "Step &&Into"),
-		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '3_step',
+// 	command: {
+// 		id: STEP_INTO_ID,
+// 		title: nls.localize({ key: 'miStepInto', comment: ['&& denotes a mnemonic'] }, "Step &&Into"),
+// 		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
+// 	},
+// 	order: 2
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '3_step',
-	command: {
-		id: STEP_OUT_ID,
-		title: nls.localize({ key: 'miStepOut', comment: ['&& denotes a mnemonic'] }, "Step O&&ut"),
-		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
-	},
-	order: 3
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '3_step',
+// 	command: {
+// 		id: STEP_OUT_ID,
+// 		title: nls.localize({ key: 'miStepOut', comment: ['&& denotes a mnemonic'] }, "Step O&&ut"),
+// 		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
+// 	},
+// 	order: 3
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '3_step',
-	command: {
-		id: CONTINUE_ID,
-		title: nls.localize({ key: 'miContinue', comment: ['&& denotes a mnemonic'] }, "&&Continue"),
-		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
-	},
-	order: 4
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '3_step',
+// 	command: {
+// 		id: CONTINUE_ID,
+// 		title: nls.localize({ key: 'miContinue', comment: ['&& denotes a mnemonic'] }, "&&Continue"),
+// 		precondition: CONTEXT_DEBUG_STATE.isEqualTo('stopped')
+// 	},
+// 	order: 4
+// });
 
-// New Breakpoints
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '4_new_breakpoint',
-	command: {
-		id: TOGGLE_BREAKPOINT_ID,
-		title: nls.localize({ key: 'miToggleBreakpoint', comment: ['&& denotes a mnemonic'] }, "Toggle &&Breakpoint")
-	},
-	order: 1
-});
+// // New Breakpoints
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '4_new_breakpoint',
+// 	command: {
+// 		id: TOGGLE_BREAKPOINT_ID,
+// 		title: nls.localize({ key: 'miToggleBreakpoint', comment: ['&& denotes a mnemonic'] }, "Toggle &&Breakpoint")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
-	group: '1_breakpoints',
-	command: {
-		id: TOGGLE_CONDITIONAL_BREAKPOINT_ID,
-		title: nls.localize({ key: 'miConditionalBreakpoint', comment: ['&& denotes a mnemonic'] }, "&&Conditional Breakpoint...")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
+// 	group: '1_breakpoints',
+// 	command: {
+// 		id: TOGGLE_CONDITIONAL_BREAKPOINT_ID,
+// 		title: nls.localize({ key: 'miConditionalBreakpoint', comment: ['&& denotes a mnemonic'] }, "&&Conditional Breakpoint...")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
-	group: '1_breakpoints',
-	command: {
-		id: TOGGLE_INLINE_BREAKPOINT_ID,
-		title: nls.localize({ key: 'miInlineBreakpoint', comment: ['&& denotes a mnemonic'] }, "Inline Breakp&&oint")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
+// 	group: '1_breakpoints',
+// 	command: {
+// 		id: TOGGLE_INLINE_BREAKPOINT_ID,
+// 		title: nls.localize({ key: 'miInlineBreakpoint', comment: ['&& denotes a mnemonic'] }, "Inline Breakp&&oint")
+// 	},
+// 	order: 2
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
-	group: '1_breakpoints',
-	command: {
-		id: AddFunctionBreakpointAction.ID,
-		title: nls.localize({ key: 'miFunctionBreakpoint', comment: ['&& denotes a mnemonic'] }, "&&Function Breakpoint...")
-	},
-	order: 3
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
+// 	group: '1_breakpoints',
+// 	command: {
+// 		id: AddFunctionBreakpointAction.ID,
+// 		title: nls.localize({ key: 'miFunctionBreakpoint', comment: ['&& denotes a mnemonic'] }, "&&Function Breakpoint...")
+// 	},
+// 	order: 3
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
-	group: '1_breakpoints',
-	command: {
-		id: ADD_LOG_POINT_ID,
-		title: nls.localize({ key: 'miLogPoint', comment: ['&& denotes a mnemonic'] }, "&&Logpoint...")
-	},
-	order: 4
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarNewBreakpointMenu, {
+// 	group: '1_breakpoints',
+// 	command: {
+// 		id: ADD_LOG_POINT_ID,
+// 		title: nls.localize({ key: 'miLogPoint', comment: ['&& denotes a mnemonic'] }, "&&Logpoint...")
+// 	},
+// 	order: 4
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '4_new_breakpoint',
-	title: nls.localize({ key: 'miNewBreakpoint', comment: ['&& denotes a mnemonic'] }, "&&New Breakpoint"),
-	submenu: MenuId.MenubarNewBreakpointMenu,
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '4_new_breakpoint',
+// 	title: nls.localize({ key: 'miNewBreakpoint', comment: ['&& denotes a mnemonic'] }, "&&New Breakpoint"),
+// 	submenu: MenuId.MenubarNewBreakpointMenu,
+// 	order: 2
+// });
 
-// Modify Breakpoints
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '5_breakpoints',
-	command: {
-		id: EnableAllBreakpointsAction.ID,
-		title: nls.localize({ key: 'miEnableAllBreakpoints', comment: ['&& denotes a mnemonic'] }, "&&Enable All Breakpoints")
-	},
-	order: 1
-});
+// // Modify Breakpoints
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '5_breakpoints',
+// 	command: {
+// 		id: EnableAllBreakpointsAction.ID,
+// 		title: nls.localize({ key: 'miEnableAllBreakpoints', comment: ['&& denotes a mnemonic'] }, "&&Enable All Breakpoints")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '5_breakpoints',
-	command: {
-		id: DisableAllBreakpointsAction.ID,
-		title: nls.localize({ key: 'miDisableAllBreakpoints', comment: ['&& denotes a mnemonic'] }, "Disable A&&ll Breakpoints")
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '5_breakpoints',
+// 	command: {
+// 		id: DisableAllBreakpointsAction.ID,
+// 		title: nls.localize({ key: 'miDisableAllBreakpoints', comment: ['&& denotes a mnemonic'] }, "Disable A&&ll Breakpoints")
+// 	},
+// 	order: 2
+// });
 
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: '5_breakpoints',
-	command: {
-		id: RemoveAllBreakpointsAction.ID,
-		title: nls.localize({ key: 'miRemoveAllBreakpoints', comment: ['&& denotes a mnemonic'] }, "Remove &&All Breakpoints")
-	},
-	order: 3
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: '5_breakpoints',
+// 	command: {
+// 		id: RemoveAllBreakpointsAction.ID,
+// 		title: nls.localize({ key: 'miRemoveAllBreakpoints', comment: ['&& denotes a mnemonic'] }, "Remove &&All Breakpoints")
+// 	},
+// 	order: 3
+// });
 
-// Install Debuggers
-MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
-	group: 'z_install',
-	command: {
-		id: 'debug.installAdditionalDebuggers',
-		title: nls.localize({ key: 'miInstallAdditionalDebuggers', comment: ['&& denotes a mnemonic'] }, "&&Install Additional Debuggers...")
-	},
-	order: 1
-});
+// // Install Debuggers
+// MenuRegistry.appendMenuItem(MenuId.MenubarDebugMenu, {
+// 	group: 'z_install',
+// 	command: {
+// 		id: 'debug.installAdditionalDebuggers',
+// 		title: nls.localize({ key: 'miInstallAdditionalDebuggers', comment: ['&& denotes a mnemonic'] }, "&&Install Additional Debuggers...")
+// 	},
+// 	order: 1
+// });
 
 // Touch Bar
 if (isMacintosh) {

@@ -15,4 +15,8 @@
     <PackageReference Include="Grpc.AspNetCore.Web" Version="2.30.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tools.MSBuildProjectBuilder.NetStandard\Tools.MSBuildProjectBuilder.NetStandard.csproj" />
+  </ItemGroup>
+
 </Project>

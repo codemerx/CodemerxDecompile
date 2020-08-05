@@ -39,6 +39,8 @@ import { Extensions as ConfigurationExtensions, IConfigurationRegistry } from 'v
 import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/workingCopyService';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
+import { decompileType } from 'vs/cd/services/decompiler';
+import { VSBuffer } from 'vs/base/common/buffer';
 
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
@@ -523,6 +525,17 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup): Promise<ITextEditorPane | undefined>;
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
 	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, group?: OpenInEditorGroup): Promise<IEditorPane | undefined> {
+		const resourceEditorInput = editor as IResourceEditorInput;
+		if (resourceEditorInput) {
+			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
+			const str = fileContent.value.toString();
+			const parts = str.split('-');
+			if (parts.length == 3 && parts[0] === 'CodemerxDecompile') {
+				const sourceCode = await decompileType(parts[1], parts[2]);
+				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
+			}
+		}
+
 		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, group);
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
@@ -1275,13 +1288,25 @@ export class DelegatingEditorService implements IEditorService {
 
 	constructor(
 		private editorOpenHandler: IEditorOpenHandler,
-		@IEditorService private editorService: EditorService
+		@IEditorService private editorService: EditorService,
+		@IFileService private fileService: IFileService
 	) { }
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
 	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup): Promise<ITextEditorPane | undefined>;
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
 	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, group?: OpenInEditorGroup): Promise<IEditorPane | undefined> {
+		const resourceEditorInput = editor as IResourceEditorInput;
+		if (resourceEditorInput) {
+			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
+			const str = fileContent.value.toString();
+			const parts = str.split('-');
+			if (parts.length == 3 && parts[0] === 'CodemerxDecompile') {
+				const sourceCode = await decompileType(parts[1], parts[2]);
+				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
+			}
+		}
+
 		const result = this.editorService.doResolveEditorOpenRequest(editor, optionsOrGroup, group);
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;

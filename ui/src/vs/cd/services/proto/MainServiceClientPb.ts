@@ -14,8 +14,10 @@
 import * as grpcWeb from 'grpc-web';
 
 import {
-  HelloReply,
-  HelloRequest} from './main_pb';
+  DecompileTypeRequest,
+  DecompileTypeResponse,
+  GetAllTypeFilePathsRequest,
+  GetAllTypeFilePathsResponse} from './main_pb';
 
 export class RpcDecompilerClient {
   client_: grpcWeb.AbstractClientBase;
@@ -36,43 +38,82 @@ export class RpcDecompilerClient {
     this.options_ = options;
   }
 
-  methodInfoSayHello = new grpcWeb.AbstractClientBase.MethodInfo(
-    HelloReply,
-    (request: HelloRequest) => {
+  methodInfoGetAllTypeFilePaths = new grpcWeb.AbstractClientBase.MethodInfo(
+    GetAllTypeFilePathsResponse,
+    (request: GetAllTypeFilePathsRequest) => {
       return request.serializeBinary();
     },
-    HelloReply.deserializeBinary
+    GetAllTypeFilePathsResponse.deserializeBinary
   );
 
-  sayHello(
-    request: HelloRequest,
-    metadata: grpcWeb.Metadata | null): Promise<HelloReply>;
+  getAllTypeFilePaths(
+    request: GetAllTypeFilePathsRequest,
+    metadata: grpcWeb.Metadata | null): Promise<GetAllTypeFilePathsResponse>;
 
-  sayHello(
-    request: HelloRequest,
+  getAllTypeFilePaths(
+    request: GetAllTypeFilePathsRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: HelloReply) => void): grpcWeb.ClientReadableStream<HelloReply>;
+               response: GetAllTypeFilePathsResponse) => void): grpcWeb.ClientReadableStream<GetAllTypeFilePathsResponse>;
 
-  sayHello(
-    request: HelloRequest,
+  getAllTypeFilePaths(
+    request: GetAllTypeFilePathsRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: HelloReply) => void) {
+               response: GetAllTypeFilePathsResponse) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
-        new URL('/RpcDecompiler/SayHello', this.hostname_).toString(),
+        new URL('/RpcDecompiler/GetAllTypeFilePaths', this.hostname_).toString(),
         request,
         metadata || {},
-        this.methodInfoSayHello,
+        this.methodInfoGetAllTypeFilePaths,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/RpcDecompiler/SayHello',
+      '/RpcDecompiler/GetAllTypeFilePaths',
     request,
     metadata || {},
-    this.methodInfoSayHello);
+    this.methodInfoGetAllTypeFilePaths);
+  }
+
+  methodInfoDecompileType = new grpcWeb.AbstractClientBase.MethodInfo(
+    DecompileTypeResponse,
+    (request: DecompileTypeRequest) => {
+      return request.serializeBinary();
+    },
+    DecompileTypeResponse.deserializeBinary
+  );
+
+  decompileType(
+    request: DecompileTypeRequest,
+    metadata: grpcWeb.Metadata | null): Promise<DecompileTypeResponse>;
+
+  decompileType(
+    request: DecompileTypeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: DecompileTypeResponse) => void): grpcWeb.ClientReadableStream<DecompileTypeResponse>;
+
+  decompileType(
+    request: DecompileTypeRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: DecompileTypeResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        new URL('/RpcDecompiler/DecompileType', this.hostname_).toString(),
+        request,
+        metadata || {},
+        this.methodInfoDecompileType,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/RpcDecompiler/DecompileType',
+    request,
+    metadata || {},
+    this.methodInfoDecompileType);
   }
 
 }

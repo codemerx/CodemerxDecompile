@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option csharp_namespace = "CodemerxDecompile.Service";
+
+service RpcDecompiler {
+  rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
+  rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
+}
+
+message GetAllTypeFilePathsRequest {
+  string assemblyPath = 1;
+  string targetPath = 2;
+}
+
+message GetAllTypeFilePathsResponse {
+  repeated TypeFilePath typeFilePaths = 1;
+}
+
+message TypeFilePath {
+  string typeFullName = 1;
+  string relativeFilePath = 2;
+}
+
+message DecompileTypeRequest {
+  string assemblyPath = 1;
+  string typeFullName = 2;
+}
+
+message DecompileTypeResponse {
+  string sourceCode = 1;
+}

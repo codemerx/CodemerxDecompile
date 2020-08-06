@@ -18,7 +18,7 @@
 	"win32AppUserModelId": "Codemerx.Decompile",
 	"win32ShellNameShort": "Codemerx Decompile",
 	"darwinBundleIdentifier": "com.codemerx.codemerx-decompile",
-	"linuxIconName": "com.codemerx.codemerx-decompile",
+	"linuxIconName": "codemerx-logo-512x512",
 	"licenseFileName": "COPYING",
 	"reportIssueUrl": "https://github.com/codemerx/CodemerxDecompile/issues/new",
 	"urlProtocol": "code-oss",

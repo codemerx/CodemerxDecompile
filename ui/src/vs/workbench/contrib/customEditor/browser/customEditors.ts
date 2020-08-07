@@ -10,7 +10,6 @@ import { Disposable, IDisposable, toDisposable } from 'vs/base/common/lifecycle'
 import { basename, extname, isEqual } from 'vs/base/common/resources';
 import { URI } from 'vs/base/common/uri';
 import { generateUuid } from 'vs/base/common/uuid';
-import { RedoCommand, UndoCommand } from 'vs/editor/browser/editorExtensions';
 import * as nls from 'vs/nls';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IContextKey, IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
@@ -81,14 +80,13 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 			}
 		}));
 
-		const PRIORITY = 105;
-		this._register(UndoCommand.addImplementation(PRIORITY, () => {
-			return this.withActiveCustomEditor(editor => editor.undo());
-		}));
-		this._register(RedoCommand.addImplementation(PRIORITY, () => {
-			return this.withActiveCustomEditor(editor => editor.redo());
-		}));
-
+		// const PRIORITY = 105;
+		// this._register(UndoCommand.addImplementation(PRIORITY, () => {
+		// 	return this.withActiveCustomEditor(editor => editor.undo());
+		// }));
+		// this._register(RedoCommand.addImplementation(PRIORITY, () => {
+		// 	return this.withActiveCustomEditor(editor => editor.redo());
+		// }));
 		this.updateContexts();
 	}
 
@@ -96,14 +94,14 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 		return [...this._contributedEditors];
 	}
 
-	private withActiveCustomEditor(f: (editor: CustomEditorInput) => void): boolean {
-		const activeEditor = this.editorService.activeEditor;
-		if (activeEditor instanceof CustomEditorInput) {
-			f(activeEditor);
-			return true;
-		}
-		return false;
-	}
+	// private withActiveCustomEditor(f: (editor: CustomEditorInput) => void): boolean {
+	// 	const activeEditor = this.editorService.activeEditor;
+	// 	if (activeEditor instanceof CustomEditorInput) {
+	// 		f(activeEditor);
+	// 		return true;
+	// 	}
+	// 	return false;
+	// }
 
 	public get models() { return this._models; }
 

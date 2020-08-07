@@ -7,7 +7,7 @@ import * as nls from 'vs/nls';
 import { KeyCode, KeyMod } from 'vs/base/common/keyCodes';
 import * as types from 'vs/base/common/types';
 import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
-import { Command, EditorCommand, ICommandOptions, registerEditorCommand, MultiCommand, UndoCommand, RedoCommand, SelectAllCommand } from 'vs/editor/browser/editorExtensions';
+import { Command, EditorCommand, ICommandOptions, registerEditorCommand, MultiCommand, SelectAllCommand } from 'vs/editor/browser/editorExtensions';
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { ColumnSelection, IColumnSelectResult } from 'vs/editor/common/controller/cursorColumnSelection';
 import { CursorState, EditOperationType, IColumnSelectData, PartialCursorState } from 'vs/editor/common/controller/cursorCommon';
@@ -24,7 +24,7 @@ import { ICommandHandlerDescription } from 'vs/platform/commands/common/commands
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { KeybindingWeight, KeybindingsRegistry } from 'vs/platform/keybinding/common/keybindingsRegistry';
-import { EditorOption } from 'vs/editor/common/config/editorOptions';
+// import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 
 const CORE_WEIGHT = KeybindingWeight.EditorCore;
@@ -1838,35 +1838,35 @@ export namespace CoreEditingCommands {
 		}
 	});
 
-	export const Undo = new class extends EditorOrNativeTextInputCommand {
-		constructor() {
-			super(UndoCommand);
-		}
-		public runDOMCommand(): void {
-			document.execCommand('undo');
-		}
-		public runEditorCommand(accessor: ServicesAccessor | null, editor: ICodeEditor, args: any): void {
-			if (!editor.hasModel() || editor.getOption(EditorOption.readOnly) === true) {
-				return;
-			}
-			editor.getModel().undo();
-		}
-	}();
+	// export const Undo = new class extends EditorOrNativeTextInputCommand {
+	// 	constructor() {
+	// 		super(UndoCommand);
+	// 	}
+	// 	public runDOMCommand(): void {
+	// 		document.execCommand('undo');
+	// 	}
+	// 	public runEditorCommand(accessor: ServicesAccessor | null, editor: ICodeEditor, args: any): void {
+	// 		if (!editor.hasModel() || editor.getOption(EditorOption.readOnly) === true) {
+	// 			return;
+	// 		}
+	// 		editor.getModel().undo();
+	// 	}
+	// }();
 
-	export const Redo = new class extends EditorOrNativeTextInputCommand {
-		constructor() {
-			super(RedoCommand);
-		}
-		public runDOMCommand(): void {
-			document.execCommand('redo');
-		}
-		public runEditorCommand(accessor: ServicesAccessor | null, editor: ICodeEditor, args: any): void {
-			if (!editor.hasModel() || editor.getOption(EditorOption.readOnly) === true) {
-				return;
-			}
-			editor.getModel().redo();
-		}
-	}();
+	// export const Redo = new class extends EditorOrNativeTextInputCommand {
+	// 	constructor() {
+	// 		super(RedoCommand);
+	// 	}
+	// 	public runDOMCommand(): void {
+	// 		document.execCommand('redo');
+	// 	}
+	// 	public runEditorCommand(accessor: ServicesAccessor | null, editor: ICodeEditor, args: any): void {
+	// 		if (!editor.hasModel() || editor.getOption(EditorOption.readOnly) === true) {
+	// 			return;
+	// 		}
+	// 		editor.getModel().redo();
+	// 	}
+	// }();
 }
 
 /**

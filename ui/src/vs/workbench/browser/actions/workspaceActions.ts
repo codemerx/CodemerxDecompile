@@ -16,6 +16,11 @@ import { INotificationService } from 'vs/platform/notification/common/notificati
 import { IHostService } from 'vs/workbench/services/host/browser/host';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
 import { IWorkspacesService, hasWorkspaceFileExtension } from 'vs/platform/workspaces/common/workspaces';
+import { MenuRegistry, MenuId, SyncActionDescriptor } from 'vs/platform/actions/common/actions';
+import { WorkspaceFolderCountContext, WorkbenchStateContext } from 'vs/workbench/browser/contextkeys';
+import { Registry } from 'vs/platform/registry/common/platform';
+import { IWorkbenchActionRegistry, Extensions } from 'vs/workbench/common/actions';
+import { KeyChord, KeyMod, KeyCode } from 'vs/base/common/keyCodes';
 
 export class OpenFileAction extends Action {
 
@@ -245,12 +250,12 @@ export class DuplicateWorkspaceInNewWindowAction extends Action {
 
 // --- Actions Registration
 
-// const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
-// const workspacesCategory = nls.localize('workspaces', "Workspaces");
+const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
+const workspacesCategory = nls.localize('workspaces', "Workspaces");
 
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(AddRootFolderAction), 'Workspaces: Add Folder to Workspace...', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(GlobalRemoveRootFolderAction), 'Workspaces: Remove Folder from Workspace...', workspacesCategory);
-// registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_F) }), 'Workspaces: Close Workspace', workspacesCategory);
+registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_F) }), 'Workspaces: Close Workspace', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(SaveWorkspaceAsAction), 'Workspaces: Save Workspace As...', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(DuplicateWorkspaceInNewWindowAction), 'Workspaces: Duplicate Workspace in New Window', workspacesCategory);
 
@@ -286,16 +291,16 @@ export class DuplicateWorkspaceInNewWindowAction extends Action {
 // 	when: WorkbenchStateContext.isEqualTo('workspace')
 // });
 
-// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-// 	group: '6_close',
-// 	command: {
-// 		id: CloseWorkspaceAction.ID,
-// 		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Close &&Folder"),
-// 		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
-// 	},
-// 	order: 3,
-// 	when: WorkbenchStateContext.notEqualsTo('workspace')
-// });
+MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+	group: '6_close',
+	command: {
+		id: CloseWorkspaceAction.ID,
+		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Close &&Folder"),
+		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
+	},
+	order: 3,
+	when: WorkbenchStateContext.notEqualsTo('workspace')
+});
 
 // MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 // 	group: '6_close',

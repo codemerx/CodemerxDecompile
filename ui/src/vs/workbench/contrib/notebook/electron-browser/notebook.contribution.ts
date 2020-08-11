@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { isMacintosh } from 'vs/base/common/platform';
-import { CopyAction, CutAction, PasteAction } from 'vs/editor/contrib/clipboard/clipboard';
+import { CopyAction } from 'vs/editor/contrib/clipboard/clipboard';
 import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { getActiveNotebookEditor } from 'vs/workbench/contrib/notebook/browser/contrib/coreActions';
 import { ElectronWebviewBasedWebview } from 'vs/workbench/contrib/webview/electron-browser/webviewElement';
@@ -48,11 +48,11 @@ if (isMacintosh) {
 		return withWebview(accessor, webview => webview.copy());
 	});
 
-	PasteAction?.addImplementation(PRIORITY, accessor => {
-		return withWebview(accessor, webview => webview.paste());
-	});
+	// PasteAction?.addImplementation(PRIORITY, accessor => {
+	// 	return withWebview(accessor, webview => webview.paste());
+	// });
 
-	CutAction?.addImplementation(PRIORITY, accessor => {
-		return withWebview(accessor, webview => webview.cut());
-	});
+	// CutAction?.addImplementation(PRIORITY, accessor => {
+	// 	return withWebview(accessor, webview => webview.cut());
+	// });
 }

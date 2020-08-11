@@ -71,7 +71,7 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 			this.updateContexts();
 			this._onDidChangeViewTypes.fire();
 		}));
-		this._register(this.editorService.registerCustomEditorViewTypesHandler('Custom Editor', this));
+		this._register(this.editorService.registerCustomEditorViewTypesHandler('Custom Code Viewer', this));
 		this._register(this.editorService.onDidActiveEditorChange(() => this.updateContexts()));
 
 		this._register(fileService.onDidRunOperation(e => {

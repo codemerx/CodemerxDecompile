@@ -463,7 +463,7 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.gotoLine'
 		};
 
-		this.updateElement(this.selectionElement, props, 'status.editor.selection', nls.localize('status.editor.selection', "Editor Selection"), StatusbarAlignment.RIGHT, 100.5);
+		this.updateElement(this.selectionElement, props, 'status.editor.selection', nls.localize('status.editor.selection', "Code Viewer Selection"), StatusbarAlignment.RIGHT, 100.5);
 	}
 
 	private updateIndentationElement(text: string | undefined): void {
@@ -479,7 +479,7 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'changeEditorIndentation'
 		};
 
-		this.updateElement(this.indentationElement, props, 'status.editor.indentation', nls.localize('status.editor.indentation', "Editor Indentation"), StatusbarAlignment.RIGHT, 100.4);
+		this.updateElement(this.indentationElement, props, 'status.editor.indentation', nls.localize('status.editor.indentation', "Code Viewer Indentation"), StatusbarAlignment.RIGHT, 100.4);
 	}
 
 	private updateEncodingElement(text: string | undefined): void {
@@ -499,7 +499,7 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.editor.changeEncoding'
 		};
 
-		this.updateElement(this.encodingElement, props, 'status.editor.encoding', nls.localize('status.editor.encoding', "Editor Encoding"), StatusbarAlignment.RIGHT, 100.3);
+		this.updateElement(this.encodingElement, props, 'status.editor.encoding', nls.localize('status.editor.encoding', "Code Viewer Encoding"), StatusbarAlignment.RIGHT, 100.3);
 	}
 
 	private updateEOLElement(text: string | undefined): void {
@@ -515,7 +515,7 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.editor.changeEOL'
 		};
 
-		this.updateElement(this.eolElement, props, 'status.editor.eol', nls.localize('status.editor.eol', "Editor End of Line"), StatusbarAlignment.RIGHT, 100.2);
+		this.updateElement(this.eolElement, props, 'status.editor.eol', nls.localize('status.editor.eol', "Code Viewer End of Line"), StatusbarAlignment.RIGHT, 100.2);
 	}
 
 	private updateModeElement(text: string | undefined): void {
@@ -531,7 +531,7 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.editor.changeLanguageMode'
 		};
 
-		this.updateElement(this.modeElement, props, 'status.editor.mode', nls.localize('status.editor.mode', "Editor Language"), StatusbarAlignment.RIGHT, 100.1);
+		this.updateElement(this.modeElement, props, 'status.editor.mode', nls.localize('status.editor.mode', "Code Viewer Language"), StatusbarAlignment.RIGHT, 100.1);
 	}
 
 	private updateMetadataElement(text: string | undefined): void {

@@ -60,7 +60,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		PreferencesEditor,
 		PreferencesEditor.ID,
-		nls.localize('defaultPreferencesEditor', "Default Preferences Editor")
+		nls.localize('defaultPreferencesEditor', "Default Preferences Code Viewer")
 	),
 	[
 		new SyncDescriptor(PreferencesEditorInput)
@@ -71,7 +71,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		SettingsEditor2,
 		SettingsEditor2.ID,
-		nls.localize('settingsEditor2', "Settings Editor 2")
+		nls.localize('settingsEditor2', "Settings Code Viewer 2")
 	),
 	[
 		new SyncDescriptor(SettingsEditor2Input)
@@ -82,7 +82,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		KeybindingsEditor,
 		KeybindingsEditor.ID,
-		nls.localize('keybindingsEditor', "Keybindings Editor")
+		nls.localize('keybindingsEditor', "Keybindings Code Viewer")
 	),
 	[
 		new SyncDescriptor(KeybindingsEditorInput)

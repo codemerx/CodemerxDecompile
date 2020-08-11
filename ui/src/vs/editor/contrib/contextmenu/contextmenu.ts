@@ -255,8 +255,8 @@ class ShowContextMenu extends EditorAction {
 	constructor() {
 		super({
 			id: 'editor.action.showContextMenu',
-			label: nls.localize('action.showContextMenu.label', "Show Editor Context Menu"),
-			alias: 'Show Editor Context Menu',
+			label: nls.localize('action.showContextMenu.label', "Show Code Viewer Context Menu"),
+			alias: 'Show Code Viewer Context Menu',
 			precondition: undefined,
 			kbOpts: {
 				kbExpr: EditorContextKeys.textInputFocus,

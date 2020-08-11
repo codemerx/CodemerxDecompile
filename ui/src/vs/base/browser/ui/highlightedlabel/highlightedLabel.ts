@@ -49,7 +49,8 @@ export class HighlightedLabel {
 		}
 
 		this.text = text;
-		this.title = title;
+		this.title = this.text;
+
 		this.highlights = highlights;
 		this.render();
 	}

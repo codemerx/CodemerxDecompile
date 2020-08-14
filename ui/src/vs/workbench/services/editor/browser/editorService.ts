@@ -39,8 +39,8 @@ import { Extensions as ConfigurationExtensions, IConfigurationRegistry } from 'v
 import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/workingCopyService';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
-import { decompileType } from 'vs/cd/services/decompiler';
 import { VSBuffer } from 'vs/base/common/buffer';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
@@ -79,7 +79,8 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 		@IConfigurationService private readonly configurationService: IConfigurationService,
 		@IWorkspaceContextService private readonly contextService: IWorkspaceContextService,
 		@IWorkingCopyService private readonly workingCopyService: IWorkingCopyService,
-		@IUriIdentityService private readonly uriIdentityService: IUriIdentityService
+		@IUriIdentityService private readonly uriIdentityService: IUriIdentityService,
+		@IDecompilationService private readonly decompilationService: IDecompilationService
 	) {
 		super();
 
@@ -531,7 +532,7 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 			const str = fileContent.value.toString();
 			const parts = str.split('-');
 			if (parts.length == 3 && parts[0] === 'CodemerxDecompile') {
-				const sourceCode = await decompileType(parts[1], parts[2]);
+				const sourceCode = await this.decompilationService.decompileType(parts[1], parts[2]);
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
 		}
@@ -1289,7 +1290,8 @@ export class DelegatingEditorService implements IEditorService {
 	constructor(
 		private editorOpenHandler: IEditorOpenHandler,
 		@IEditorService private editorService: EditorService,
-		@IFileService private fileService: IFileService
+		@IFileService private fileService: IFileService,
+		@IDecompilationService private decompilationService: IDecompilationService
 	) { }
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
@@ -1302,7 +1304,7 @@ export class DelegatingEditorService implements IEditorService {
 			const str = fileContent.value.toString();
 			const parts = str.split('-');
 			if (parts.length == 3 && parts[0] === 'CodemerxDecompile') {
-				const sourceCode = await decompileType(parts[1], parts[2]);
+				const sourceCode = await this.decompilationService.decompileType(parts[1], parts[2]);
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
 		}

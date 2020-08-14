@@ -65,8 +65,8 @@ import { INativeWorkbenchEnvironmentService } from 'vs/workbench/services/enviro
 import { clearAllFontInfos } from 'vs/editor/browser/config/configuration';
 import { IRemoteAuthorityResolverService } from 'vs/platform/remote/common/remoteAuthorityResolver';
 import { IAddressProvider, IAddress } from 'vs/platform/remote/common/remoteAgentConnection';
-import { getAllTypeFilePaths } from 'vs/cd/services/decompiler';
 import { VSBuffer } from 'vs/base/common/buffer';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 
 export class NativeWindow extends Disposable {
 
@@ -113,6 +113,7 @@ export class NativeWindow extends Disposable {
 		@IProductService private readonly productService: IProductService,
 		@IRemoteAuthorityResolverService private readonly remoteAuthorityResolverService: IRemoteAuthorityResolverService,
 		@IHostService private readonly hostService: IHostService,
+		@IDecompilationService private readonly decompilationService: IDecompilationService
 	) {
 		super();
 
@@ -627,7 +628,7 @@ export class NativeWindow extends Disposable {
 			request.filesToOpenOrCreate[0].fileUri?.path) {
 			const uri = URI.revive(request.filesToOpenOrCreate[0].fileUri);
 			const tempDir = 'C:\\Users\\User\\AppData\\Local\\Temp\\CD';
-			const typeFilePaths = await getAllTypeFilePaths(uri.fsPath, tempDir);
+			const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath, tempDir);
 
 			for (const typeFilePath of typeFilePaths) {
 				await this.fileService.createFile(URI.file(`${tempDir}\\${typeFilePath.relativeFilePath}`), VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`));

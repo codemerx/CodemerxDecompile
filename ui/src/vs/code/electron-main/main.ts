@@ -50,6 +50,7 @@ import { IStorageKeysSyncRegistryService, StorageKeysSyncRegistryService } from 
 import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IProductService } from 'vs/platform/product/common/productService';
+import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 
 class ExpectedError extends Error {
 	readonly isExpected = true;
@@ -108,9 +109,10 @@ class CodeMain {
 			await instantiationService.invokeFunction(async accessor => {
 				const configurationService = accessor.get(IConfigurationService);
 				const stateService = accessor.get(IStateService);
+				const grpcService = accessor.get(IGrpcMainService);
 
 				try {
-					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService);
+					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService, grpcService as GrpcMainService);
 				} catch (error) {
 
 					// Show a dialog for errors that can be resolved by the user
@@ -168,10 +170,12 @@ class CodeMain {
 		services.set(IProductService, { _serviceBrand: undefined, ...product });
 		services.set(ITunnelService, new SyncDescriptor(TunnelService));
 
+		services.set(IGrpcMainService, new GrpcMainService());
+
 		return [new InstantiationService(services, true), instanceEnvironment, environmentService];
 	}
 
-	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService): Promise<unknown> {
+	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService, grpcService: GrpcMainService): Promise<unknown> {
 
 		// Environment service (paths)
 		const environmentServiceInitialization = Promise.all<void | undefined>([
@@ -189,7 +193,10 @@ class CodeMain {
 		// State service
 		const stateServiceInitialization = stateService.init();
 
-		return Promise.all([environmentServiceInitialization, configurationServiceInitialization, stateServiceInitialization]);
+		// GRPC service
+		const grpcServiceInitialization = grpcService.initialize();
+
+		return Promise.all([environmentServiceInitialization, configurationServiceInitialization, stateServiceInitialization, grpcServiceInitialization]);
 	}
 
 	private patchEnvironment(environmentService: INativeEnvironmentService): IProcessEnvironment {

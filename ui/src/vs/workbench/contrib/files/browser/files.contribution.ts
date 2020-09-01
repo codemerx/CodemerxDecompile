@@ -442,7 +442,7 @@ configurationRegistry.registerConfiguration({
 		'explorer.compactFolders': {
 			'type': 'boolean',
 			'description': nls.localize('compressSingleChildFolders', "Controls whether the explorer should render folders in a compact form. In such a form, single child folders will be compressed in a combined tree element. Useful for Java package structures, for example."),
-			'default': true
+			'default': false
 		},
 	}
 });

@@ -138,7 +138,7 @@ export class ExplorerViewletViewsContribution extends Disposable implements IWor
 	private createExplorerViewDescriptor(): IViewDescriptor {
 		return {
 			id: VIEW_ID,
-			name: localize('folders', "Folders"),
+			name: localize('assemblies', "Assemblies"),
 			containerIcon: Codicon.files.classNames,
 			ctorDescriptor: new SyncDescriptor(ExplorerView),
 			order: 1,

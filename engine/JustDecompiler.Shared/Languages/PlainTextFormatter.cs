@@ -56,6 +56,8 @@ namespace Telerik.JustDecompiler.Languages
             this.writer = writer;
             writeCommentsOnly = false;
             this.preservedIndents = new Dictionary<IMemberDefinition, int>();
+            this.CurrentLineNumber = 0;
+            this.CurrentColumnIndex = 0;
         }
 
         /// <summary>
@@ -69,6 +71,10 @@ namespace Telerik.JustDecompiler.Languages
                 return writer.GetStringBuilder().Length;
             }
         }
+
+        public int CurrentLineNumber { get; set; }
+
+        public int CurrentColumnIndex { get; set; }
 
         /// <summary>
         /// Gets the new line delimiter used by this formatter instance.
@@ -114,18 +120,33 @@ namespace Telerik.JustDecompiler.Languages
         protected virtual void WriteTab()
         {
             writer.Write("\t");
+            this.CurrentColumnIndex += "\t".Length;
         }
 
         public virtual void Write(string str)
         {
             WriteIndent();
             writer.Write(str);
+
+            int newlineIndex = str.IndexOf(Environment.NewLine);
+            if (newlineIndex != -1)
+            {
+                this.CurrentLineNumber++;
+                this.CurrentColumnIndex = 0;
+            }
+            else
+            {
+                this.CurrentColumnIndex += str.Length;
+            }
         }
 
         public virtual void WriteLine()
         {
             writer.WriteLine();
             write_indent = true;
+
+            this.CurrentLineNumber++;
+            this.CurrentColumnIndex = 0;
 
             OnNewLineWritten();
         }

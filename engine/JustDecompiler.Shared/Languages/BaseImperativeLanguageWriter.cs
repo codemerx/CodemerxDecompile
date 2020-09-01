@@ -172,8 +172,9 @@ namespace Telerik.JustDecompiler.Languages
 			WriteSpace();
 
 			int startPosition = this.formatter.CurrentPosition;
-			WriteGenericName(type);
+			CodeSpan codeSpan = this.Write(() => WriteGenericName(type));
 			int endPosition = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[type] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[type] = new OffsetSpan(startPosition, endPosition);
 
 			if (!type.IsDefaultEnum && type.IsEnum)
@@ -347,6 +348,16 @@ namespace Telerik.JustDecompiler.Languages
 					WriteMethodVisibilityAndSpace(currentMethod);
 				}
 			}
+		}
+
+		private CodeSpan SaveEntityPosition(Action saveEntity)
+		{
+			int startLine = this.formatter.CurrentLineNumber;
+			int startColumn = this.formatter.CurrentColumnIndex;
+
+			saveEntity();
+
+			return new CodeSpan(new CodePosition(startLine, startColumn), new CodePosition(this.formatter.CurrentLineNumber, this.formatter.CurrentColumnIndex));
 		}
 
 		private string GetCollidingTypeName(TypeReference typeReference)
@@ -1465,8 +1476,9 @@ namespace Telerik.JustDecompiler.Languages
 			WriteMoreRestrictiveMethodVisibility(property.SetMethod, property.GetMethod);
 
 			int startIndex = this.formatter.CurrentPosition;
-			WriteKeyword(KeyWordWriter.Set);
+			CodeSpan codeSpan = this.Write(() => WriteKeyword(KeyWordWriter.Set));
 			int endIndex = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[property.SetMethod] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property.SetMethod] = new OffsetSpan(startIndex, endIndex);
 
 			if (KeyWordWriter.ByVal != null)
@@ -1512,8 +1524,9 @@ namespace Telerik.JustDecompiler.Languages
 
 			WriteMoreRestrictiveMethodVisibility(property.GetMethod, property.SetMethod);
 			int startIndex = this.formatter.CurrentPosition;
-			WriteKeyword(KeyWordWriter.Get);
+			CodeSpan codeSpan = this.Write(() => WriteKeyword(KeyWordWriter.Get));
 			int endIndex = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[property.GetMethod] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property.GetMethod] = new OffsetSpan(startIndex, endIndex);
 			if (property.GetMethod.Body == null || SupportsAutoProperties && isAutoImplemented)
 			{
@@ -1632,7 +1645,7 @@ namespace Telerik.JustDecompiler.Languages
 
         protected abstract bool TypeSupportsExplicitStaticMembers(TypeDefinition type);
 
-        private bool IsMethodHiding(MethodDefinition method)
+		private bool IsMethodHiding(MethodDefinition method)
 		{
 			TypeDefinition baseType = method.DeclaringType.BaseType != null ? method.DeclaringType.BaseType.Resolve() : null;
 
@@ -1748,8 +1761,9 @@ namespace Telerik.JustDecompiler.Languages
 			WriteKeyword(KeyWordWriter.Operator);
 			WriteSpace();
 			int startIndex = this.formatter.CurrentPosition;
-			WriteReference(operatorName, method);
+			CodeSpan codeSpan = this.Write(() => WriteReference(operatorName, method));
 			int endIndex = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startIndex, endIndex);
 			return true;
 		}
@@ -1768,8 +1782,9 @@ namespace Telerik.JustDecompiler.Languages
 				WriteSpace();
 			}
 			int startIndex = this.formatter.CurrentPosition;
-			WriteGenericName(method);
+			CodeSpan codeSpan = this.Write(() => WriteGenericName(method));
 			int endIndex = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startIndex, endIndex);
 		}
 
@@ -1819,8 +1834,9 @@ namespace Telerik.JustDecompiler.Languages
 			}
 
 			int startPosition = this.formatter.CurrentPosition;
-			WriteReference(constructorName, method);
+			CodeSpan codeSpan = this.Write(() => WriteReference(constructorName, method));
 			int endPosition = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startPosition, endPosition);
 		}
 
@@ -4326,9 +4342,13 @@ namespace Telerik.JustDecompiler.Languages
 
 			WriteMoreRestrictiveMethodVisibility(@event.AddMethod, @event.RemoveMethod);
 			int startIndex = this.formatter.CurrentPosition;
-			WriteKeyword(KeyWordWriter.AddOn);
-			WriteEventAddOnParameters(@event);
+			CodeSpan codeSpan = this.Write(() =>
+			{
+				WriteKeyword(KeyWordWriter.AddOn);
+				WriteEventAddOnParameters(@event);
+			});
 			int endIndex = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[@event.AddMethod] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.AddMethod] = new OffsetSpan(startIndex, endIndex);
 
 			WriteLine();
@@ -4358,9 +4378,13 @@ namespace Telerik.JustDecompiler.Languages
 
 			WriteMoreRestrictiveMethodVisibility(@event.RemoveMethod, @event.AddMethod);
 			int startIndex = this.formatter.CurrentPosition;
-			WriteKeyword(KeyWordWriter.RemoveOn);
-			WriteEventRemoveOnParameters(@event);
+			CodeSpan codeSpan = this.Write(() =>
+			{
+				WriteKeyword(KeyWordWriter.RemoveOn);
+				WriteEventRemoveOnParameters(@event);
+			});
 			int endIndex = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[@event.RemoveMethod] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.RemoveMethod] = new OffsetSpan(startIndex, endIndex);
 
 			WriteLine();
@@ -4389,8 +4413,9 @@ namespace Telerik.JustDecompiler.Languages
 			WriteMethodVisibilityAndSpace(@event.InvokeMethod);
 
 			int startIndex = this.formatter.CurrentPosition;
-			WriteKeyword(KeyWordWriter.Fire);
+			CodeSpan codeSpan = this.Write(() => WriteKeyword(KeyWordWriter.Fire));
 			int endIndex = this.formatter.CurrentPosition;
+			this.currentWritingInfo.MemberDeclarationToCodeSpan[@event.InvokeMethod] = codeSpan;
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.InvokeMethod] = new OffsetSpan(startIndex, endIndex);
 
 			WriteToken("(");

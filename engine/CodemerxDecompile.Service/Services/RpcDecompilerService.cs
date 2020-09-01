@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
+using CodemerxDecompile.Service.Interfaces;
+using CodemerxDecompile.Service.Services;
 using Grpc.Core;
 
 using JustDecompile.Tools.MSBuildProjectBuilder;
@@ -13,6 +14,7 @@ using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
+using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
 
@@ -20,6 +22,13 @@ namespace CodemerxDecompile.Service
 {
     public class RpcDecompilerService : RpcDecompiler.RpcDecompilerBase
     {
+        private readonly IDecompilationContext decompilationContext;
+
+        public RpcDecompilerService(IDecompilationContext decompilationContext)
+        {
+            this.decompilationContext = decompilationContext;
+        }
+
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
@@ -36,10 +45,10 @@ namespace CodemerxDecompile.Service
                 Utilities.GetMaxRelativePathLength(request.TargetPath),
                 true);
 
-            Dictionary<TypeDefinition, string> typeToFilePathMap = filePathsService.GetTypesToFilePathsMap();
+            this.decompilationContext.TypeToFilePathMap = filePathsService.GetTypesToFilePathsMap();
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
-            response.TypeFilePaths.AddRange(typeToFilePathMap.Select(pair =>
+            response.TypeFilePaths.AddRange(this.decompilationContext.TypeToFilePathMap.Select(pair =>
             {
                 TypeFilePath result = new TypeFilePath();
                 result.TypeFullName = pair.Key.FullName;
@@ -51,6 +60,76 @@ namespace CodemerxDecompile.Service
             return Task.FromResult(response);
         }
 
+        public override Task<GetMemberDefinitionResponse> GetMemberDefinition(GetMemberDefinitionRequest request, ServerCallContext context)
+        {
+            GetMemberDefinitionResponse response = new GetMemberDefinitionResponse();
+
+            if (!this.decompilationContext.CodeSpanToMemberReference.ContainsKey(request.FilePath))
+            {
+                return Task.FromResult(response);
+            }
+
+            KeyValuePair<CodeSpan, MemberReference> entry = this.decompilationContext.CodeSpanToMemberReference[request.FilePath]
+                .FirstOrDefault(kvp => kvp.Key.Start.Line <= request.LineNumber && kvp.Key.End.Line >= request.LineNumber &&
+                    kvp.Key.Start.Column < request.ColumnIndex && kvp.Key.End.Column > request.ColumnIndex);
+
+            if (entry.Value == null)
+            {
+                return Task.FromResult(response);
+            }
+
+            MemberReference reference = entry.Value;
+            TypeReference typeDef = reference.DeclaringType;
+            string typeDefFullName = string.Empty;
+
+            if (typeDef != null)
+            {
+                while (typeDef.DeclaringType != null)
+                {
+                    typeDef = typeDef.DeclaringType;
+                }
+
+                typeDefFullName = typeDef.FullName;
+            }
+            else
+            {
+                typeDefFullName = reference.FullName;
+            }
+
+            KeyValuePair<TypeDefinition, string> typeDefKvp = this.decompilationContext.TypeToFilePathMap.FirstOrDefault(kvp => kvp.Key.FullName == typeDefFullName);
+            string typeDefinitionFilePath = typeDefKvp.Value;
+
+            response.Filepath = typeDefinitionFilePath;
+            response.MemberFullName = reference.FullName;
+
+            return Task.FromResult(response);
+        }
+
+        public override Task<Selection> GetMemberDefinitionPosition(GetMemberDefinitionPositionRequest request, ServerCallContext context)
+        {
+            Selection selection = new Selection();
+
+            if (!this.decompilationContext.MemberDeclarationToCodeSpan.ContainsKey(request.Filepath))
+            {
+                return Task.FromResult(selection);
+            }
+
+            KeyValuePair<IMemberDefinition, CodeSpan> entry = this.decompilationContext.MemberDeclarationToCodeSpan[request.Filepath].FirstOrDefault(kvp => kvp.Key.FullName == request.MemberFullName);
+            if (entry.Key == null)
+            {
+                return Task.FromResult(selection);
+            }
+            else
+            {
+                selection.StartLineNumber = entry.Value.Start.Line + 1;
+                selection.StartColumnIndex = entry.Value.Start.Column + 1;
+                selection.EndLineNumber = entry.Value.End.Line + 1;
+                selection.EndColumnIndex = entry.Value.End.Column + 1;
+
+                return Task.FromResult(selection);
+            }
+        }
+
         public override Task<DecompileTypeResponse> DecompileType(DecompileTypeRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
@@ -58,7 +137,7 @@ namespace CodemerxDecompile.Service
             IExceptionFormatter exceptionFormatter = SimpleExceptionFormatter.Instance;
             ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             StringWriter theWriter = new StringWriter();
-            IFormatter formatter = new PlainTextFormatter(theWriter);
+            CodeFormatter formatter = new CodeFormatter(theWriter);
             IWriterSettings settings = new WriterSettings(writeExceptionsAsComments: true,
                                                           writeFullyQualifiedNames: true,
                                                           writeDocumentation: true,
@@ -70,7 +149,22 @@ namespace CodemerxDecompile.Service
 
             try
             {
-                (writer as INamespaceLanguageWriter).WriteTypeAndNamespaces(type, writerContextService);
+                List<WritingInfo> infos = (writer as INamespaceLanguageWriter).WriteTypeAndNamespaces(type, writerContextService);
+
+                Dictionary<IMemberDefinition, CodeSpan> mapping = new Dictionary<IMemberDefinition, CodeSpan>();
+
+                foreach (WritingInfo info in infos)
+                {
+                    this.AddRange(mapping, info.MemberDeclarationToCodeSpan);
+                }
+
+                KeyValuePair<TypeDefinition, string> kvp = this.decompilationContext.TypeToFilePathMap.Where(kvp => kvp.Key.FullName == type.FullName).FirstOrDefault();
+
+                if (kvp.Value != null)
+                {
+                    this.decompilationContext.MemberDeclarationToCodeSpan.Add(kvp.Value, mapping);
+                    this.decompilationContext.CodeSpanToMemberReference.Add(kvp.Value, formatter.CodeSpanToMemberReference);
+                }
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = theWriter.ToString() });
             }
@@ -83,5 +177,13 @@ namespace CodemerxDecompile.Service
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = commentedExceptionMessage });
             }
 		}
+
+        private void AddRange(Dictionary<IMemberDefinition, CodeSpan> source, Dictionary<IMemberDefinition, CodeSpan> target)
+        {
+            foreach (var item in target)
+            {
+                source[item.Key] = item.Value;
+            }
+        }
     }
 }

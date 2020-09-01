@@ -93,8 +93,9 @@ namespace Telerik.JustDecompiler.Languages.IL
             WriteTypeReference(@event.EventType, ILNameSyntax.TypeName);
             WriteSpace();
             int startIndex = this.formatter.CurrentPosition;
-            WriteReference(ILHelpers.Escape(@event.Name), @event);
+            CodeSpan codeSpan = this.Write(() => WriteReference(ILHelpers.Escape(@event.Name), @event));
             int endIndex = this.formatter.CurrentPosition - 1;
+            this.currentWritingInfo.MemberDeclarationToCodeSpan[@event] = codeSpan;
             this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event] = new OffsetSpan(startIndex, endIndex);
         }
 
@@ -149,8 +150,9 @@ namespace Telerik.JustDecompiler.Languages.IL
             WriteSpace();
 
             int startIndex = this.formatter.CurrentPosition;
-            WriteReference(ILHelpers.Escape(property.Name), property);
+            CodeSpan codeSpan = this.Write(() => WriteReference(ILHelpers.Escape(property.Name), property));
             int endIndex = this.formatter.CurrentPosition - 1;
+            this.currentWritingInfo.MemberDeclarationToCodeSpan[property] = codeSpan;
             this.currentWritingInfo.MemberDeclarationToCodePostionMap[property] = new OffsetSpan(startIndex, endIndex);
 
             WriteToken("(");
@@ -184,8 +186,9 @@ namespace Telerik.JustDecompiler.Languages.IL
             flagsWriter.WriteTypeAttributes(type);
 
             int startIndex = this.formatter.CurrentPosition;
-            WriteReference(ILHelpers.Escape(type.DeclaringType != null ? type.Name : type.FullName), type);
+            CodeSpan codeSpan = this.Write(() => WriteReference(ILHelpers.Escape(type.DeclaringType != null ? type.Name : type.FullName), type));
             int endIndex = this.formatter.CurrentPosition - 1;
+            this.currentWritingInfo.MemberDeclarationToCodeSpan[type] = codeSpan;
             this.currentWritingInfo.MemberDeclarationToCodePostionMap[type] = new OffsetSpan(startIndex, endIndex);
             WriteTypeParameters(type);
             WriteLine();
@@ -305,15 +308,18 @@ namespace Telerik.JustDecompiler.Languages.IL
             WriteMethodReference(method, false);
 
             int startFoldingIndex = formatter.CurrentPosition;
+            CodeSpan codeSpan = this.Write(() =>
+            {
+                WriteStartBlock();
 
-            WriteStartBlock();
+                WriteMethodBody(method);
 
-            WriteMethodBody(method);
-
-            WriteEndBlock();
+                WriteEndBlock();
+            });
 
             currentWritingInfo.MemberDefinitionToFoldingPositionMap[method] = new OffsetSpan(startFoldingIndex, formatter.CurrentPosition - 1);
 
+            currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
             currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startFoldingIndex, formatter.CurrentPosition - 1);
         }
 
@@ -335,8 +341,9 @@ namespace Telerik.JustDecompiler.Languages.IL
             WriteTypeReference(field.FieldType);
             WriteSpace();
             int startOffset = this.formatter.CurrentPosition;
-            WriteReference(ILHelpers.Escape(field.Name), field);
+            CodeSpan codeSpan = this.Write(() => WriteReference(ILHelpers.Escape(field.Name), field));
             int endIndex = this.formatter.CurrentPosition - 1;
+            this.currentWritingInfo.MemberDeclarationToCodeSpan[field] = codeSpan;
             this.currentWritingInfo.MemberDeclarationToCodePostionMap[field] = new OffsetSpan(startOffset, endIndex);
             if ((field.Attributes & FieldAttributes.HasFieldRVA) == FieldAttributes.HasFieldRVA)
             {
@@ -446,8 +453,9 @@ namespace Telerik.JustDecompiler.Languages.IL
             }
 
             int startIndex = this.formatter.CurrentPosition;
-            WriteMethodName(method);
+            CodeSpan codeSpan = this.Write(() => WriteMethodName(method));
             int endIndex = this.formatter.CurrentPosition - 1;
+            this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
             this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startIndex, endIndex);
 
             WriteTypeParameters(method);

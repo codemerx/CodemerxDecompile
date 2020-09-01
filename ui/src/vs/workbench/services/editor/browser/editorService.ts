@@ -39,11 +39,15 @@ import { Extensions as ConfigurationExtensions, IConfigurationRegistry } from 'v
 import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/workingCopyService';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
-import { decompileType } from 'vs/cd/services/decompiler';
+import { decompileType, getMemberDefinitionPosition } from 'vs/cd/services/decompiler';
 import { VSBuffer } from 'vs/base/common/buffer';
 
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
+interface NavigationOptions {
+	memberFullName: string;
+	filePath: string;
+};
 
 export class EditorService extends Disposable implements EditorServiceImpl {
 
@@ -522,9 +526,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	//#region openEditor()
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup): Promise<ITextEditorPane | undefined>;
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, navigationOptions?: any): Promise<ITextEditorPane | undefined>;
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, group?: OpenInEditorGroup): Promise<IEditorPane | undefined> {
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrNavigationOptions?: OpenInEditorGroup | NavigationOptions): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
 			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
@@ -534,9 +538,25 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 				const sourceCode = await decompileType(parts[1], parts[2]);
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
+
+			const navigationOptions = (groupOrNavigationOptions as NavigationOptions);
+
+			if (navigationOptions.memberFullName && navigationOptions.filePath) {
+				const selection = await getMemberDefinitionPosition(navigationOptions.memberFullName, navigationOptions.filePath);
+
+				resourceEditorInput.options = {
+					...resourceEditorInput.options,
+					selection: {
+						startLineNumber: selection.getStartlinenumber(),
+						startColumn: selection.getStartcolumnindex(),
+						endLineNumber: selection.getEndlinenumber(),
+						endColumn: selection.getEndcolumnindex()
+					}
+				}
+			}
 		}
 
-		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, group);
+		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrNavigationOptions as OpenInEditorGroup);
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
 

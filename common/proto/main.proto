@@ -5,11 +5,36 @@ option csharp_namespace = "CodemerxDecompile.Service";
 service RpcDecompiler {
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
+  rpc GetMemberDefinition (GetMemberDefinitionRequest) returns (GetMemberDefinitionResponse);
+  rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
+}
+
+message GetMemberDefinitionPositionRequest {
+  string filepath = 1;
+  string memberFullName = 2;
 }
 
 message GetAllTypeFilePathsRequest {
   string assemblyPath = 1;
   string targetPath = 2;
+}
+
+message GetMemberDefinitionRequest {
+	string filePath = 1;
+	int32 lineNumber = 2;
+	int32 columnIndex = 3;
+}
+
+message Selection {
+	int32 startLineNumber = 1;
+	int32 startColumnIndex = 2;
+	int32 endLineNumber = 3;
+	int32 endColumnIndex = 4;
+}
+
+message GetMemberDefinitionResponse {
+  string filepath = 1;
+  string memberFullName = 2;
 }
 
 message GetAllTypeFilePathsResponse {

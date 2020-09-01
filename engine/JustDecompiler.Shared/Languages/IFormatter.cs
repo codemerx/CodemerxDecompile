@@ -29,6 +29,8 @@ using Mono.Cecil;
 namespace Telerik.JustDecompiler.Languages {
 
 	public interface IFormatter {
+		int CurrentLineNumber { get; }
+		int CurrentColumnIndex { get; }
 		void Write (string str);
 		void WriteLine ();
 		void WriteSpace ();

@@ -90,13 +90,18 @@ Global
 		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{4d460b44-5552-4fb6-ac35-725e4d1bd9f8}*SharedItemsImports = 13
 		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{4f6e327d-4d0a-485c-9eda-67c52d593aa2}*SharedItemsImports = 13
 		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{53602c83-eea3-467d-8938-b05bf90aff0f}*SharedItemsImports = 5
+		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{63e6915c-7ea4-4d76-ab28-0d7191eea626}*SharedItemsImports = 4
 		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{655dbed7-0875-49d6-b3c5-43cba8f73e79}*SharedItemsImports = 5
 		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{66b438a6-b3c6-49e9-b2f0-0a1ad1cd92c3}*SharedItemsImports = 5
 		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{75c8d888-eb42-401e-9cd4-6303fbe4194c}*SharedItemsImports = 5
+		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{8559dd7f-a16f-46d0-a05a-9139faeba8fd}*SharedItemsImports = 4
 		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{952f860a-d311-49c6-9b1d-7f1fe1c0d85c}*SharedItemsImports = 13
 		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{af96d2a3-bbec-473f-ab8b-875b724d0919}*SharedItemsImports = 13
+		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{ced63f54-9464-4cc0-9f3f-d42014c85ac6}*SharedItemsImports = 4
 		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{d5409b23-4a84-4999-aa11-898f46f30954}*SharedItemsImports = 5
+		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{d68133bd-1e63-496e-9ede-4fbdbf77b486}*SharedItemsImports = 4
 		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{e6b1469d-911c-4afc-a0f8-1ed00886910b}*SharedItemsImports = 4
+		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{ed1be103-1699-4116-a732-616beb142eb2}*SharedItemsImports = 4
 		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{f7bbb403-7142-4f8d-8e65-5aba94502d3d}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

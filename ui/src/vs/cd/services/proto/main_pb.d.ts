@@ -1,4 +1,28 @@
-import * as jspb from "google-protobuf"
+import * as jspb from 'google-protobuf'
+
+
+
+export class GetMemberDefinitionPositionRequest extends jspb.Message {
+  getFilepath(): string;
+  setFilepath(value: string): GetMemberDefinitionPositionRequest;
+
+  getMemberfullname(): string;
+  setMemberfullname(value: string): GetMemberDefinitionPositionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetMemberDefinitionPositionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetMemberDefinitionPositionRequest): GetMemberDefinitionPositionRequest.AsObject;
+  static serializeBinaryToWriter(message: GetMemberDefinitionPositionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetMemberDefinitionPositionRequest;
+  static deserializeBinaryFromReader(message: GetMemberDefinitionPositionRequest, reader: jspb.BinaryReader): GetMemberDefinitionPositionRequest;
+}
+
+export namespace GetMemberDefinitionPositionRequest {
+  export type AsObject = {
+    filepath: string,
+    memberfullname: string,
+  }
+}
 
 export class GetAllTypeFilePathsRequest extends jspb.Message {
   getAssemblypath(): string;
@@ -19,6 +43,84 @@ export namespace GetAllTypeFilePathsRequest {
   export type AsObject = {
     assemblypath: string,
     targetpath: string,
+  }
+}
+
+export class GetMemberDefinitionRequest extends jspb.Message {
+  getFilepath(): string;
+  setFilepath(value: string): GetMemberDefinitionRequest;
+
+  getLinenumber(): number;
+  setLinenumber(value: number): GetMemberDefinitionRequest;
+
+  getColumnindex(): number;
+  setColumnindex(value: number): GetMemberDefinitionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetMemberDefinitionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetMemberDefinitionRequest): GetMemberDefinitionRequest.AsObject;
+  static serializeBinaryToWriter(message: GetMemberDefinitionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetMemberDefinitionRequest;
+  static deserializeBinaryFromReader(message: GetMemberDefinitionRequest, reader: jspb.BinaryReader): GetMemberDefinitionRequest;
+}
+
+export namespace GetMemberDefinitionRequest {
+  export type AsObject = {
+    filepath: string,
+    linenumber: number,
+    columnindex: number,
+  }
+}
+
+export class Selection extends jspb.Message {
+  getStartlinenumber(): number;
+  setStartlinenumber(value: number): Selection;
+
+  getStartcolumnindex(): number;
+  setStartcolumnindex(value: number): Selection;
+
+  getEndlinenumber(): number;
+  setEndlinenumber(value: number): Selection;
+
+  getEndcolumnindex(): number;
+  setEndcolumnindex(value: number): Selection;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Selection.AsObject;
+  static toObject(includeInstance: boolean, msg: Selection): Selection.AsObject;
+  static serializeBinaryToWriter(message: Selection, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Selection;
+  static deserializeBinaryFromReader(message: Selection, reader: jspb.BinaryReader): Selection;
+}
+
+export namespace Selection {
+  export type AsObject = {
+    startlinenumber: number,
+    startcolumnindex: number,
+    endlinenumber: number,
+    endcolumnindex: number,
+  }
+}
+
+export class GetMemberDefinitionResponse extends jspb.Message {
+  getFilepath(): string;
+  setFilepath(value: string): GetMemberDefinitionResponse;
+
+  getMemberfullname(): string;
+  setMemberfullname(value: string): GetMemberDefinitionResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetMemberDefinitionResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetMemberDefinitionResponse): GetMemberDefinitionResponse.AsObject;
+  static serializeBinaryToWriter(message: GetMemberDefinitionResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetMemberDefinitionResponse;
+  static deserializeBinaryFromReader(message: GetMemberDefinitionResponse, reader: jspb.BinaryReader): GetMemberDefinitionResponse;
+}
+
+export namespace GetMemberDefinitionResponse {
+  export type AsObject = {
+    filepath: string,
+    memberfullname: string,
   }
 }
 

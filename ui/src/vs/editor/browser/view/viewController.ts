@@ -14,6 +14,9 @@ import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 import { IMouseWheelEvent } from 'vs/base/browser/mouseEvent';
 import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import * as platform from 'vs/base/common/platform';
+import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
+import { URI } from 'vs/base/common/uri';
+import { getMemberDefinition } from 'vs/cd/services/decompiler';
 
 export interface IMouseDispatchData {
 	position: Position;
@@ -49,17 +52,20 @@ export class ViewController {
 	private readonly viewModel: IViewModel;
 	private readonly userInputEvents: ViewUserInputEvents;
 	private readonly commandDelegate: ICommandDelegate;
+	private readonly codeEditorService: ICodeEditorService;
 
 	constructor(
 		configuration: IConfiguration,
 		viewModel: IViewModel,
 		userInputEvents: ViewUserInputEvents,
-		commandDelegate: ICommandDelegate
+		commandDelegate: ICommandDelegate,
+		codeEditorService: ICodeEditorService
 	) {
 		this.configuration = configuration;
 		this.viewModel = viewModel;
 		this.userInputEvents = userInputEvents;
 		this.commandDelegate = commandDelegate;
+		this.codeEditorService = codeEditorService;
 	}
 
 	public paste(text: string, pasteOnNewLine: boolean, multicursorText: string[] | null, mode: string | null): void {
@@ -198,7 +204,25 @@ export class ViewController {
 						}
 					}
 				} else {
-					this.moveTo(data.position);
+					const relativePath = this.viewModel.model.uri.fsPath.replace(/C:\\Users\\User\\AppData\\Local\\Temp\\CD\\/ig, '');
+					getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1)
+						.then(memberDefinitionResponse => {
+							if (memberDefinitionResponse.getFilepath()) {
+								const path = 'C:\\Users\\User\\AppData\\Local\\Temp\\CD\\' + memberDefinitionResponse.getFilepath();
+
+								this.codeEditorService.openCodeEditor({
+									resource: URI.file(path)
+								}, null, undefined, {
+									memberFullName: memberDefinitionResponse.getMemberfullname(),
+									filePath: memberDefinitionResponse.getFilepath()
+								});
+							} else {
+								this.moveTo(data.position);
+							}
+						})
+						.catch(() => {
+							this.moveTo(data.position);
+						});
 				}
 			}
 		}

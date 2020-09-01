@@ -280,6 +280,16 @@ namespace Telerik.JustDecompiler.Languages
 			throw new NotSupportedException("Unexpected member type.");
 		}
 
+        protected CodeSpan Write(Action writeEntity)
+        {
+            int startLine = this.formatter.CurrentLineNumber;
+            int startColumn = this.formatter.CurrentColumnIndex;
+
+            writeEntity();
+
+            return new CodeSpan(new CodePosition(startLine, startColumn), new CodePosition(this.formatter.CurrentLineNumber, this.formatter.CurrentColumnIndex));
+        }
+
         internal virtual void WriteToken(string token)
         {
             formatter.WriteToken(token);
@@ -805,9 +815,10 @@ namespace Telerik.JustDecompiler.Languages
 
 				string fieldName = GetFieldName(fieldDefinition);
 
-                WriteReference(fieldName, fieldDefinition);
+                CodeSpan codeSpan = this.Write(() => WriteReference(fieldName, fieldDefinition));
 
                 int endIndex = this.formatter.CurrentPosition - 1;
+                this.currentWritingInfo.MemberDeclarationToCodeSpan[fieldDefinition] = codeSpan;
                 this.currentWritingInfo.MemberDeclarationToCodePostionMap[fieldDefinition] = new OffsetSpan(startIndex, endIndex);
                 if (!fieldDefinition.DeclaringType.IsDefaultEnumConstants)
                 {

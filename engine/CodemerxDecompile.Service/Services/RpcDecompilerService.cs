@@ -60,7 +60,7 @@ namespace CodemerxDecompile.Service
             StringWriter theWriter = new StringWriter();
             IFormatter formatter = new PlainTextFormatter(theWriter);
             IWriterSettings settings = new WriterSettings(writeExceptionsAsComments: true,
-                                                          writeFullyQualifiedNames: true,
+                                                          writeFullyQualifiedNames: false,
                                                           writeDocumentation: true,
                                                           showCompilerGeneratedMembers: false,
                                                           writeLargeNumbersInHex: false);

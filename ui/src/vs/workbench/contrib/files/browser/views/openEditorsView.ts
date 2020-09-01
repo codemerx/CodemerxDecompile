@@ -55,7 +55,7 @@ export class OpenEditorsView extends ViewPane {
 
 	private static readonly DEFAULT_VISIBLE_OPEN_EDITORS = 9;
 	static readonly ID = 'workbench.explorer.openEditorsView';
-	static readonly NAME = nls.localize({ key: 'openEditors', comment: ['Open is an adjective'] }, "Open Types");
+	static readonly NAME = nls.localize({ key: 'openTypes', comment: ['Open is an adjective'] }, "Open Types");
 
 	private dirtyCountElement!: HTMLElement;
 	private listRefreshScheduler: RunOnceScheduler;
@@ -697,7 +697,7 @@ class OpenEditorsDragAndDrop implements IListDragAndDrop<OpenEditor | IEditorGro
 class OpenEditorsAccessibilityProvider implements IListAccessibilityProvider<OpenEditor | IEditorGroup> {
 
 	getWidgetAriaLabel(): string {
-		return nls.localize('openEditors', "Open Types");
+		return nls.localize('openTypes', "Open Types");
 	}
 
 	getAriaLabel(element: OpenEditor | IEditorGroup): string | null {

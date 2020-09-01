@@ -17,7 +17,9 @@ import {
   DecompileTypeRequest,
   DecompileTypeResponse,
   GetAllTypeFilePathsRequest,
-  GetAllTypeFilePathsResponse} from './main_pb';
+  GetAllTypeFilePathsResponse,
+  GetAssemblyMetadataRequest,
+  GetAssemblyMetadataResponse} from './main_pb';
 
 export class RpcDecompilerClient {
   client_: grpcWeb.AbstractClientBase;
@@ -36,6 +38,45 @@ export class RpcDecompilerClient {
     this.hostname_ = hostname;
     this.credentials_ = credentials;
     this.options_ = options;
+  }
+
+  methodInfoGetAssemblyMetadata = new grpcWeb.AbstractClientBase.MethodInfo(
+    GetAssemblyMetadataResponse,
+    (request: GetAssemblyMetadataRequest) => {
+      return request.serializeBinary();
+    },
+    GetAssemblyMetadataResponse.deserializeBinary
+  );
+
+  getAssemblyMetadata(
+    request: GetAssemblyMetadataRequest,
+    metadata: grpcWeb.Metadata | null): Promise<GetAssemblyMetadataResponse>;
+
+  getAssemblyMetadata(
+    request: GetAssemblyMetadataRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: GetAssemblyMetadataResponse) => void): grpcWeb.ClientReadableStream<GetAssemblyMetadataResponse>;
+
+  getAssemblyMetadata(
+    request: GetAssemblyMetadataRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: GetAssemblyMetadataResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        new URL('/RpcDecompiler/GetAssemblyMetadata', this.hostname_).toString(),
+        request,
+        metadata || {},
+        this.methodInfoGetAssemblyMetadata,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/RpcDecompiler/GetAssemblyMetadata',
+    request,
+    metadata || {},
+    this.methodInfoGetAssemblyMetadata);
   }
 
   methodInfoGetAllTypeFilePaths = new grpcWeb.AbstractClientBase.MethodInfo(

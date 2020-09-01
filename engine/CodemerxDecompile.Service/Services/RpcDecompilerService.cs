@@ -20,6 +20,17 @@ namespace CodemerxDecompile.Service
 {
     public class RpcDecompilerService : RpcDecompiler.RpcDecompilerBase
     {
+        public override Task<GetAssemblyMetadataResponse> GetAssemblyMetadata(GetAssemblyMetadataRequest request, ServerCallContext context)
+        {
+            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
+
+            GetAssemblyMetadataResponse response = new GetAssemblyMetadataResponse();
+            response.StrongName = assembly.FullName;
+            response.MainModuleName = assembly.MainModule.Name;
+
+            return Task.FromResult(response);
+        }
+
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);

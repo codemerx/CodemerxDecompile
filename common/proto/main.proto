@@ -3,8 +3,18 @@ syntax = "proto3";
 option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
+  rpc GetAssemblyMetadata (GetAssemblyMetadataRequest) returns (GetAssemblyMetadataResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
+}
+
+message GetAssemblyMetadataRequest {
+  string assemblyPath = 1;
+}
+
+message GetAssemblyMetadataResponse {
+  string strongName = 1;
+  string mainModuleName = 2;
 }
 
 message GetAllTypeFilePathsRequest {

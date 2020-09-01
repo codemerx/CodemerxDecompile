@@ -1,7 +1,8 @@
 import { RpcDecompilerClient } from './proto/MainServiceClientPb';
 import {
 	GetAllTypeFilePathsRequest,
-	DecompileTypeRequest
+	DecompileTypeRequest,
+	GetAssemblyMetadataRequest
 } from './proto/main_pb';
 import { IGrpcService } from 'vs/cd/workbench/GrpcService';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
@@ -11,6 +12,7 @@ export const IDecompilationService = createDecorator<IDecompilationService>('IDe
 export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
+	getAssemblyMetadata(assembllyPath: string) : Promise<AssemblyMetadata>;
 	getAllTypeFilePaths(assemblyPath: string, targetPath: string) : Promise<TypeFilePath[]>;
 	decompileType(assemblyPath: string, typeFullName: string) : Promise<string>;
 }
@@ -23,6 +25,25 @@ export class DecompilationService implements IDecompilationService {
 	constructor(@IGrpcService grpcService: IGrpcService) {
 		grpcService.getServiceUrl().then(url => {
 			this.client = new RpcDecompilerClient(url);
+		});
+	}
+
+	getAssemblyMetadata(assembllyPath: string) : Promise<AssemblyMetadata> {
+		const request = new GetAssemblyMetadataRequest();
+		request.setAssemblypath(assembllyPath);
+
+		return new Promise<AssemblyMetadata>((resolve, reject) => {
+			this.client?.getAssemblyMetadata(request, null, (err, response) => {
+				if (err) {
+					reject(`getAssemblyMetadata failed. Error: ${err}`);
+					return;
+				}
+
+				resolve({
+					strongName: response.getStrongname(),
+					mainModuleName: response.getMainmodulename()
+				});
+			});
 		});
 	}
 
@@ -66,6 +87,11 @@ export class DecompilationService implements IDecompilationService {
 			});
 		});
 	}
+}
+
+export interface AssemblyMetadata {
+	strongName: string;
+	mainModuleName: string;
 }
 
 export interface TypeFilePath {

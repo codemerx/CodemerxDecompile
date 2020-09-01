@@ -57,7 +57,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		SearchEditor,
 		SearchEditor.ID,
-		localize('searchEditor', "Search Editor")
+		localize('searchEditor', "Search Code Viewer")
 	),
 	[
 		new SyncDescriptor(SearchEditorInput)
@@ -211,13 +211,13 @@ CommandsRegistry.registerCommand(
 //#endregion
 
 //#region Actions
-const category = localize('search', "Search Editor");
+const category = localize('search', "Search Code Viewer");
 
 export type OpenSearchEditorArgs = Partial<SearchConfiguration & { triggerSearch: boolean, focusResults: boolean }>;
 const openArgDescription = {
 	description: 'Open a new search editor. Arguments passed can include variables like ${relativeFileDirname}.',
 	args: [{
-		name: 'Open new Search Editor args',
+		name: 'Open new Search Code Viewer args',
 		schema: {
 			properties: {
 				query: { type: 'string' },
@@ -240,7 +240,7 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: SearchEditorConstants.OpenNewEditorCommandId,
-			title: localize('search.openNewSearchEditor', "Open new Search Editor"),
+			title: localize('search.openNewSearchEditor', "Open new Search Code Viewer"),
 			category,
 			f1: true,
 			description: openArgDescription
@@ -255,7 +255,7 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: OpenNewEditorToSideCommandId,
-			title: localize('search.openNewEditorToSide', "Open new Search Editor to the Side"),
+			title: localize('search.openNewEditorToSide', "Open new Search Code Viewer to the Side"),
 			category,
 			f1: true,
 			description: openArgDescription
@@ -270,7 +270,7 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: OpenInEditorCommandId,
-			title: localize('search.openResultsInEditor', "Open Results in Editor"),
+			title: localize('search.openResultsInEditor', "Open Results in Code Viewer"),
 			category,
 			f1: true,
 			keybinding: {
@@ -329,7 +329,7 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: FocusQueryEditorWidgetCommandId,
-			title: localize('search.action.focusQueryEditorWidget', "Focus Search Editor Input"),
+			title: localize('search.action.focusQueryEditorWidget', "Focus Search Code Viewer Input"),
 			category,
 			menu: {
 				id: MenuId.CommandPalette,

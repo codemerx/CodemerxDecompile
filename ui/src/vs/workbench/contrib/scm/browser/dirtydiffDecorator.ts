@@ -815,19 +815,19 @@ export const editorGutterModifiedBackground = registerColor('editorGutter.modifi
 	dark: new Color(new RGBA(12, 125, 157)),
 	light: new Color(new RGBA(102, 175, 224)),
 	hc: new Color(new RGBA(0, 155, 249))
-}, nls.localize('editorGutterModifiedBackground', "Editor gutter background color for lines that are modified."));
+}, nls.localize('editorGutterModifiedBackground', "Code Viewer gutter background color for lines that are modified."));
 
 export const editorGutterAddedBackground = registerColor('editorGutter.addedBackground', {
 	dark: new Color(new RGBA(88, 124, 12)),
 	light: new Color(new RGBA(129, 184, 139)),
 	hc: new Color(new RGBA(51, 171, 78))
-}, nls.localize('editorGutterAddedBackground', "Editor gutter background color for lines that are added."));
+}, nls.localize('editorGutterAddedBackground', "Code Viewer gutter background color for lines that are added."));
 
 export const editorGutterDeletedBackground = registerColor('editorGutter.deletedBackground', {
 	dark: new Color(new RGBA(148, 21, 27)),
 	light: new Color(new RGBA(202, 75, 81)),
 	hc: new Color(new RGBA(252, 93, 109))
-}, nls.localize('editorGutterDeletedBackground', "Editor gutter background color for lines that are deleted."));
+}, nls.localize('editorGutterDeletedBackground', "Code Viewer gutter background color for lines that are deleted."));
 
 export const minimapGutterModifiedBackground = registerColor('minimapGutter.modifiedBackground', {
 	dark: new Color(new RGBA(12, 125, 157)),

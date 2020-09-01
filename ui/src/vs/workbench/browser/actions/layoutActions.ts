@@ -134,7 +134,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarAppearanceMenu, {
 export class ToggleEditorLayoutAction extends Action {
 
 	static readonly ID = 'workbench.action.toggleEditorGroupLayout';
-	static readonly LABEL = nls.localize('flipLayout', "Toggle Vertical/Horizontal Editor Layout");
+	static readonly LABEL = nls.localize('flipLayout', "Toggle Vertical/Horizontal Code Viewer Layout");
 
 	private readonly toDispose = this._register(new DisposableStore());
 
@@ -167,7 +167,7 @@ export class ToggleEditorLayoutAction extends Action {
 }
 
 const group = viewCategory;
-registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleEditorLayoutAction, { primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_0, mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_0 } }), 'View: Toggle Vertical/Horizontal Editor Layout', group);
+registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleEditorLayoutAction, { primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_0, mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_0 } }), 'View: Toggle Vertical/Horizontal Code Viewer Layout', group);
 
 MenuRegistry.appendMenuItem(MenuId.MenubarLayoutMenu, {
 	group: 'z_flip',
@@ -236,7 +236,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarAppearanceMenu, {
 
 export class ToggleEditorVisibilityAction extends Action {
 	static readonly ID = 'workbench.action.toggleEditorVisibility';
-	static readonly LABEL = nls.localize('toggleEditor', "Toggle Editor Area Visibility");
+	static readonly LABEL = nls.localize('toggleEditor', "Toggle Code Viewer Area Visibility");
 
 	constructor(
 		id: string,
@@ -253,13 +253,13 @@ export class ToggleEditorVisibilityAction extends Action {
 	}
 }
 
-registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleEditorVisibilityAction), 'View: Toggle Editor Area Visibility', viewCategory);
+registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleEditorVisibilityAction), 'View: Toggle Code Viewer Area Visibility', viewCategory);
 
 MenuRegistry.appendMenuItem(MenuId.MenubarAppearanceMenu, {
 	group: '2_workbench_layout',
 	command: {
 		id: ToggleEditorVisibilityAction.ID,
-		title: nls.localize({ key: 'miShowEditorArea', comment: ['&& denotes a mnemonic'] }, "Show &&Editor Area"),
+		title: nls.localize({ key: 'miShowEditorArea', comment: ['&& denotes a mnemonic'] }, "Show &&Code Viewer Area"),
 		toggled: EditorAreaVisibleContext
 	},
 	order: 5

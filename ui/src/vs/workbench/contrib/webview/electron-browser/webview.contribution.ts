@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { MultiCommand, RedoCommand, SelectAllCommand, UndoCommand } from 'vs/editor/browser/editorExtensions';
+import { MultiCommand, SelectAllCommand } from 'vs/editor/browser/editorExtensions';
 import { CopyAction, CutAction, PasteAction } from 'vs/editor/contrib/clipboard/clipboard';
 import { SyncActionDescriptor } from 'vs/platform/actions/common/actions';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
@@ -66,8 +66,8 @@ function overrideCommandForWebview(command: MultiCommand | undefined, f: (webvie
 	});
 }
 
-overrideCommandForWebview(UndoCommand, webview => webview.undo());
-overrideCommandForWebview(RedoCommand, webview => webview.redo());
+// overrideCommandForWebview(UndoCommand, webview => webview.undo());
+// overrideCommandForWebview(RedoCommand, webview => webview.redo());
 overrideCommandForWebview(SelectAllCommand, webview => webview.selectAll());
 overrideCommandForWebview(CopyAction, webview => webview.copy());
 overrideCommandForWebview(PasteAction, webview => webview.paste());

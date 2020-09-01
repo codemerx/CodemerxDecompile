@@ -121,7 +121,7 @@ const builtinProviderDisplayName = nls.localize('builtinProviderDisplayName', "B
 
 export const defaultEditorOverrideEntry = Object.freeze({
 	id: DEFAULT_EDITOR_ID,
-	label: nls.localize('promptOpenWith.defaultEditor.displayName', "Text Editor"),
+	label: nls.localize('promptOpenWith.defaultEditor.displayName', "Text Code Viewer"),
 	detail: builtinProviderDisplayName
 });
 
@@ -209,7 +209,7 @@ export const editorAssociationsConfigurationNode: IConfigurationNode = {
 
 export const DEFAULT_CUSTOM_EDITOR: ICustomEditorInfo = {
 	id: 'default',
-	displayName: nls.localize('promptOpenWith.defaultEditor.displayName', "Text Editor"),
+	displayName: nls.localize('promptOpenWith.defaultEditor.displayName', "Text Code Viewer"),
 	providerDisplayName: builtinProviderDisplayName
 };
 

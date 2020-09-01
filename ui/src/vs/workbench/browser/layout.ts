@@ -1780,7 +1780,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			type: 'leaf',
 			data: { type: Parts.SIDEBAR_PART },
 			size: sideBarSize,
-			visible: false
+			visible: !this.state.sideBar.hidden
 		};
 
 		const editorNode: ISerializedLeafNode = {

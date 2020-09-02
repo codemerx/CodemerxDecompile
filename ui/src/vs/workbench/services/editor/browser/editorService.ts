@@ -6,7 +6,7 @@
 import * as nls from 'vs/nls';
 import { IInstantiationService, ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { IResourceEditorInput, ITextEditorOptions, IEditorOptions, EditorActivation } from 'vs/platform/editor/common/editor';
-import { SideBySideEditor, IEditorInput, IEditorPane, GroupIdentifier, IFileEditorInput, IUntitledTextResourceEditorInput, IResourceDiffEditorInput, IEditorInputFactoryRegistry, Extensions as EditorExtensions, EditorInput, SideBySideEditorInput, IEditorInputWithOptions, isEditorInputWithOptions, EditorOptions, TextEditorOptions, IEditorIdentifier, IEditorCloseEvent, ITextEditorPane, ITextDiffEditorPane, IRevertOptions, SaveReason, EditorsOrder, isTextEditorPane, IWorkbenchEditorConfiguration, toResource, IVisibleEditorPane } from 'vs/workbench/common/editor';
+import { SideBySideEditor, IEditorInput, IEditorPane, GroupIdentifier, IFileEditorInput, IUntitledTextResourceEditorInput, IResourceDiffEditorInput, IEditorInputFactoryRegistry, Extensions as EditorExtensions, EditorInput, SideBySideEditorInput, IEditorInputWithOptions, isEditorInputWithOptions, EditorOptions, TextEditorOptions, IEditorIdentifier, IEditorCloseEvent, ITextEditorPane, ITextDiffEditorPane, IRevertOptions, SaveReason, EditorsOrder, isTextEditorPane, IWorkbenchEditorConfiguration, toResource, IVisibleEditorPane, /* AGPL */NavigationOptions/* End AGPL */ } from 'vs/workbench/common/editor';
 import { ResourceEditorInput } from 'vs/workbench/common/editor/resourceEditorInput';
 import { Registry } from 'vs/platform/registry/common/platform';
 import { ResourceMap } from 'vs/base/common/map';
@@ -39,15 +39,13 @@ import { Extensions as ConfigurationExtensions, IConfigurationRegistry } from 'v
 import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/workingCopyService';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
+/* AGPL */
 import { decompileType, getMemberDefinitionPosition } from 'vs/cd/services/decompiler';
+/* End AGPL */
 import { VSBuffer } from 'vs/base/common/buffer';
 
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
-interface NavigationOptions {
-	memberFullName: string;
-	filePath: string;
-};
 
 export class EditorService extends Disposable implements EditorServiceImpl {
 
@@ -526,9 +524,10 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	//#region openEditor()
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, navigationOptions?: any): Promise<ITextEditorPane | undefined>;
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, /* AGPL */navigationOptions?: NavigationOptions/* End AGPL */): Promise<ITextEditorPane | undefined>;
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrNavigationOptions?: OpenInEditorGroup | NavigationOptions): Promise<IEditorPane | undefined> {
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, /* AGPL */groupOrNavigationOptions?: OpenInEditorGroup | NavigationOptions/* End AGPL */): Promise<IEditorPane | undefined> {
+		/* AGPL */
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
 			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
@@ -555,8 +554,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 				}
 			}
 		}
+		/* End AGPL */
 
-		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrNavigationOptions as OpenInEditorGroup);
+		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, /* AGPL */groupOrNavigationOptions as OpenInEditorGroup/* End AGPL */);
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
 

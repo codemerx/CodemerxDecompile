@@ -14,9 +14,11 @@ import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 import { IMouseWheelEvent } from 'vs/base/browser/mouseEvent';
 import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import * as platform from 'vs/base/common/platform';
+/* AGPL */
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { URI } from 'vs/base/common/uri';
 import { getMemberDefinition } from 'vs/cd/services/decompiler';
+/* End AGPL */
 
 export interface IMouseDispatchData {
 	position: Position;
@@ -52,20 +54,26 @@ export class ViewController {
 	private readonly viewModel: IViewModel;
 	private readonly userInputEvents: ViewUserInputEvents;
 	private readonly commandDelegate: ICommandDelegate;
+	/* AGPL */
 	private readonly codeEditorService: ICodeEditorService;
+	/* End AGPL */
 
 	constructor(
 		configuration: IConfiguration,
 		viewModel: IViewModel,
 		userInputEvents: ViewUserInputEvents,
 		commandDelegate: ICommandDelegate,
+		/* AGPL */
 		codeEditorService: ICodeEditorService
+		/* End AGPL */
 	) {
 		this.configuration = configuration;
 		this.viewModel = viewModel;
 		this.userInputEvents = userInputEvents;
 		this.commandDelegate = commandDelegate;
+		/* AGPL */
 		this.codeEditorService = codeEditorService;
+		/* End AGPL */
 	}
 
 	public paste(text: string, pasteOnNewLine: boolean, multicursorText: string[] | null, mode: string | null): void {
@@ -204,6 +212,7 @@ export class ViewController {
 						}
 					}
 				} else {
+					/* AGPL */
 					const relativePath = this.viewModel.model.uri.fsPath.replace(/C:\\Users\\User\\AppData\\Local\\Temp\\CD\\/ig, '');
 					getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1)
 						.then(memberDefinitionResponse => {
@@ -223,6 +232,7 @@ export class ViewController {
 						.catch(() => {
 							this.moveTo(data.position);
 						});
+					/* End AGPL */
 				}
 			}
 		}

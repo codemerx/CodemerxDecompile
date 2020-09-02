@@ -20,7 +20,9 @@ namespace Telerik.JustDecompiler.Languages
 			this.ExceptionsWhileWriting = new HashSet<IMemberDefinition>();
 			this.AutoImplementedEvents = new HashSet<EventDefinition>();
 			this.MemberDeclarationToCodePostionMap = new Dictionary<IMemberDefinition, OffsetSpan>();
+			/* AGPL */
 			this.MemberDeclarationToCodeSpan = new Dictionary<IMemberDefinition, CodeSpan>();
+			/* End AGPL */
 			this.MemberTokenToAttributesMap = new Dictionary<uint, OffsetSpan>();
 			this.MemberTokenToDocumentationMap = new Dictionary<uint, OffsetSpan>();
 			this.MemberTokenToDecompiledCodeMap = new Dictionary<uint, OffsetSpan>();
@@ -39,7 +41,9 @@ namespace Telerik.JustDecompiler.Languages
 		/// the start offset is after the modifiers (i.e. after "public", "virtual", "readonly" and so on).
 		/// </summary>
 		public Dictionary<IMemberDefinition, OffsetSpan> MemberDeclarationToCodePostionMap { get; private set; }
+		/* AGPL */
 		public Dictionary<IMemberDefinition, CodeSpan> MemberDeclarationToCodeSpan { get; private set; }
+		/* End AGPL */
 		public Dictionary<IMemberDefinition, OffsetSpan> MemberDefinitionToFoldingPositionMap { get; set; }
 		public Dictionary<uint, OffsetSpan> MemberTokenToDocumentationMap { get; private set; }
 		public Dictionary<uint, OffsetSpan> MemberTokenToAttributesMap { get; private set; }

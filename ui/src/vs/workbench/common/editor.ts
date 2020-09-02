@@ -1175,6 +1175,13 @@ export interface IWorkbenchEditorConfiguration {
 	};
 }
 
+/* AGPL */
+export interface NavigationOptions {
+	memberFullName: string;
+	filePath: string;
+}
+/* End AGPL */
+
 interface IEditorPartConfiguration {
 	showTabs?: boolean;
 	scrollToSwitchTabs?: boolean;

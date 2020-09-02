@@ -172,9 +172,13 @@ namespace Telerik.JustDecompiler.Languages
 			WriteSpace();
 
 			int startPosition = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteGenericName(type));
+			/* End AGPL */
 			int endPosition = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[type] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[type] = new OffsetSpan(startPosition, endPosition);
 
 			if (!type.IsDefaultEnum && type.IsEnum)
@@ -348,16 +352,6 @@ namespace Telerik.JustDecompiler.Languages
 					WriteMethodVisibilityAndSpace(currentMethod);
 				}
 			}
-		}
-
-		private CodeSpan SaveEntityPosition(Action saveEntity)
-		{
-			int startLine = this.formatter.CurrentLineNumber;
-			int startColumn = this.formatter.CurrentColumnIndex;
-
-			saveEntity();
-
-			return new CodeSpan(new CodePosition(startLine, startColumn), new CodePosition(this.formatter.CurrentLineNumber, this.formatter.CurrentColumnIndex));
 		}
 
 		private string GetCollidingTypeName(TypeReference typeReference)
@@ -1476,9 +1470,13 @@ namespace Telerik.JustDecompiler.Languages
 			WriteMoreRestrictiveMethodVisibility(property.SetMethod, property.GetMethod);
 
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteKeyword(KeyWordWriter.Set));
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[property.SetMethod] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property.SetMethod] = new OffsetSpan(startIndex, endIndex);
 
 			if (KeyWordWriter.ByVal != null)
@@ -1524,9 +1522,13 @@ namespace Telerik.JustDecompiler.Languages
 
 			WriteMoreRestrictiveMethodVisibility(property.GetMethod, property.SetMethod);
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteKeyword(KeyWordWriter.Get));
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[property.GetMethod] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property.GetMethod] = new OffsetSpan(startIndex, endIndex);
 			if (property.GetMethod.Body == null || SupportsAutoProperties && isAutoImplemented)
 			{
@@ -1761,9 +1763,13 @@ namespace Telerik.JustDecompiler.Languages
 			WriteKeyword(KeyWordWriter.Operator);
 			WriteSpace();
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteReference(operatorName, method));
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startIndex, endIndex);
 			return true;
 		}
@@ -1782,9 +1788,13 @@ namespace Telerik.JustDecompiler.Languages
 				WriteSpace();
 			}
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteGenericName(method));
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startIndex, endIndex);
 		}
 
@@ -1834,9 +1844,13 @@ namespace Telerik.JustDecompiler.Languages
 			}
 
 			int startPosition = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteReference(constructorName, method));
+			/* End AGPL */
 			int endPosition = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[method] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[method] = new OffsetSpan(startPosition, endPosition);
 		}
 
@@ -4342,13 +4356,17 @@ namespace Telerik.JustDecompiler.Languages
 
 			WriteMoreRestrictiveMethodVisibility(@event.AddMethod, @event.RemoveMethod);
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() =>
 			{
 				WriteKeyword(KeyWordWriter.AddOn);
 				WriteEventAddOnParameters(@event);
 			});
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[@event.AddMethod] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.AddMethod] = new OffsetSpan(startIndex, endIndex);
 
 			WriteLine();
@@ -4378,13 +4396,17 @@ namespace Telerik.JustDecompiler.Languages
 
 			WriteMoreRestrictiveMethodVisibility(@event.RemoveMethod, @event.AddMethod);
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() =>
 			{
 				WriteKeyword(KeyWordWriter.RemoveOn);
 				WriteEventRemoveOnParameters(@event);
 			});
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition - 1;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[@event.RemoveMethod] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.RemoveMethod] = new OffsetSpan(startIndex, endIndex);
 
 			WriteLine();
@@ -4413,9 +4435,13 @@ namespace Telerik.JustDecompiler.Languages
 			WriteMethodVisibilityAndSpace(@event.InvokeMethod);
 
 			int startIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => WriteKeyword(KeyWordWriter.Fire));
+			/* End AGPL */
 			int endIndex = this.formatter.CurrentPosition;
+			/* AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodeSpan[@event.InvokeMethod] = codeSpan;
+			/* End AGPL */
 			this.currentWritingInfo.MemberDeclarationToCodePostionMap[@event.InvokeMethod] = new OffsetSpan(startIndex, endIndex);
 
 			WriteToken("(");

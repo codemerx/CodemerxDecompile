@@ -276,11 +276,15 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             WriteReferenceAndNamespaceIfInCollision(typeReference);
             WriteSpace();
             int startIndex = this.formatter.CurrentPosition;
+            /* AGPL */
             CodeSpan codeSpan = this.Write(() => WriteReference(name, reference));
+            /* End AGPL */
             if (reference is IMemberDefinition)
             {
                 int endIndex = this.formatter.CurrentPosition - 1;
+                /* AGPL */
                 this.currentWritingInfo.MemberDeclarationToCodeSpan[(IMemberDefinition)reference] = codeSpan;
+                /* End AGPL */
                 this.currentWritingInfo.MemberDeclarationToCodePostionMap[(IMemberDefinition)reference] = new OffsetSpan(startIndex, endIndex);
             }
         }
@@ -337,9 +341,13 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                 WriteDynamicType(fieldType, dynamicAttribute);
                 WriteSpace();
                 int startIndex = this.formatter.CurrentPosition;
+                /* AGPL */
                 CodeSpan codeSpan = this.Write(() => WriteReference(fieldName, field));
+                /* End AGPL */
                 int endIndex = this.formatter.CurrentPosition - 1;
+                /* AGPL */
                 this.currentWritingInfo.MemberDeclarationToCodeSpan[field] = codeSpan;
+                /* End AGPL */
                 this.currentWritingInfo.MemberDeclarationToCodePostionMap[field] = new OffsetSpan(startIndex, endIndex);
             }
             else

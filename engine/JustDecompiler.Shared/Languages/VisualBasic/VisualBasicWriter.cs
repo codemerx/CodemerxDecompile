@@ -373,11 +373,15 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
         protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference)
         {
             int startIndex = this.formatter.CurrentPosition;
+            /* AGPL */
             CodeSpan codeSpan = this.Write(() => WriteReference(name, reference));
+            /* End AGPL */
             if (reference is IMemberDefinition)
             {
                 int endIndex = this.formatter.CurrentPosition - 1;
+                /* AGPL */
                 this.currentWritingInfo.MemberDeclarationToCodeSpan[(IMemberDefinition)reference] = codeSpan;
+                /* End AGPL */
                 this.currentWritingInfo.MemberDeclarationToCodePostionMap[(IMemberDefinition)reference] = new OffsetSpan(startIndex, endIndex);
             }
             WriteAsBetweenSpaces();
@@ -465,11 +469,14 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			int startIndex = this.formatter.CurrentPosition;
 
 			string name = GetPropertyName(property);
+            /* AGPL */
             CodeSpan codeSpan = this.Write(() => WriteReference(name, property));
-
-			int endIndex = this.formatter.CurrentPosition - 1;
-			this.currentWritingInfo.MemberDeclarationToCodeSpan[property] = codeSpan;
-			this.currentWritingInfo.MemberDeclarationToCodePostionMap[property] = new OffsetSpan(startIndex, endIndex);
+            /* End AGPL */
+            int endIndex = this.formatter.CurrentPosition - 1;
+            /* AGPL */
+            this.currentWritingInfo.MemberDeclarationToCodeSpan[property] = codeSpan;
+            /* End AGPL */
+            this.currentWritingInfo.MemberDeclarationToCodePostionMap[property] = new OffsetSpan(startIndex, endIndex);
 
 			if (HasArguments(property))
 			{

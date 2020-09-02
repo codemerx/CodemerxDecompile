@@ -1,9 +1,9 @@
 {
-  "name": "code-oss-dev",
+  "name": "codemerx-decompile",
   "version": "1.47.2",
   "distro": "1c45ca75fd18ee8dc55738baac0c49bc64d356e6",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "Codemerx"
   },
   "license": "MIT",
   "main": "./out/main",
@@ -42,9 +42,12 @@
     "eslint": "eslint -c .eslintrc.json --rulesdir ./build/lib/eslint --ext .ts --ext .js ./src/vs ./extensions"
   },
   "dependencies": {
+    "@types/google-protobuf": "^3.7.2",
     "applicationinsights": "1.0.8",
     "chokidar": "3.2.3",
+    "google-protobuf": "3.12.2",
     "graceful-fs": "4.2.3",
+    "grpc-web": "1.2.0",
     "http-proxy-agent": "^2.1.0",
     "https-proxy-agent": "^2.2.3",
     "iconv-lite-umd": "0.6.7",
@@ -174,10 +177,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode.git"
+    "url": "https://github.com/codemerx/CodemerxDecompile.git"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode/issues"
+    "url": "https://github.com/codemerx/CodemerxDecompile/issues"
   },
   "optionalDependencies": {
     "vscode-windows-ca-certs": "0.2.0",

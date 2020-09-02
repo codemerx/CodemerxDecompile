@@ -52,7 +52,7 @@ function prepareDebPackage(arch) {
 			.pipe(replace('@@LICENSE@@', product.licenseName))
 			.pipe(rename('usr/share/appdata/' + product.applicationName + '.appdata.xml'));
 
-		const icon = gulp.src('resources/linux/code.png', { base: '.' })
+		const icon = gulp.src('resources/linux/codemerx-logo-512x512.png', { base: '.' })
 			.pipe(rename('usr/share/pixmaps/' + product.linuxIconName + '.png'));
 
 		const bash_completion = gulp.src('resources/completions/bash/code')
@@ -143,7 +143,7 @@ function prepareRpmPackage(arch) {
 			.pipe(replace('@@LICENSE@@', product.licenseName))
 			.pipe(rename('usr/share/appdata/' + product.applicationName + '.appdata.xml'));
 
-		const icon = gulp.src('resources/linux/code.png', { base: '.' })
+		const icon = gulp.src('resources/linux/codemerx-logo-512x512.png', { base: '.' })
 			.pipe(rename('BUILD/usr/share/pixmaps/' + product.linuxIconName + '.png'));
 
 		const bash_completion = gulp.src('resources/completions/bash/code')
@@ -218,7 +218,7 @@ function prepareSnapPackage(arch) {
 			.pipe(replace('@@URLPROTOCOL@@', product.urlProtocol));
 
 		// An icon that is placed in snap/gui will be placed into meta/gui verbatim.
-		const icon = gulp.src('resources/linux/code.png', { base: '.' })
+		const icon = gulp.src('resources/linux/codemerx-logo-512x512.png', { base: '.' })
 			.pipe(rename(`snap/gui/${product.linuxIconName}.png`));
 
 		const code = gulp.src(binaryDir + '/**/*', { base: binaryDir })

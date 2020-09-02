@@ -11,8 +11,8 @@ import * as DOM from 'vs/base/browser/dom';
 import { Separator } from 'vs/base/browser/ui/actionbar/actionbar';
 import { IAction } from 'vs/base/common/actions';
 import { IFileService } from 'vs/platform/files/common/files';
-import { toResource, IUntitledTextResourceEditorInput, SideBySideEditor, pathsToEditors } from 'vs/workbench/common/editor';
-import { IEditorService, IResourceEditorInputType } from 'vs/workbench/services/editor/common/editorService';
+import { toResource, SideBySideEditor } from 'vs/workbench/common/editor';
+import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { ITelemetryService, crashReporterIdStorageKey } from 'vs/platform/telemetry/common/telemetry';
 import { IWindowSettings, IOpenFileRequest, IWindowsConfiguration, getTitleBarStyle, IAddFoldersRequest } from 'vs/platform/windows/common/windows';
 import { IRunActionInWindowRequest, IRunKeybindingInWindowRequest, INativeOpenFileRequest } from 'vs/platform/windows/node/window';
@@ -20,7 +20,6 @@ import { ITitleService } from 'vs/workbench/services/title/common/titleService';
 import { IWorkbenchThemeService, VS_HC_THEME } from 'vs/workbench/services/themes/common/workbenchThemeService';
 import * as browser from 'vs/base/browser/browser';
 import { ICommandService, CommandsRegistry } from 'vs/platform/commands/common/commands';
-import { IResourceEditorInput } from 'vs/platform/editor/common/editor';
 import { KeyboardMapperFactory } from 'vs/workbench/services/keybinding/electron-browser/nativeKeymapService';
 import { CrashReporterStartOptions } from 'vs/base/parts/sandbox/common/electronTypes';
 import { crashReporter, ipcRenderer, webFrame } from 'vs/base/parts/sandbox/electron-sandbox/globals';
@@ -66,6 +65,9 @@ import { INativeWorkbenchEnvironmentService } from 'vs/workbench/services/enviro
 import { clearAllFontInfos } from 'vs/editor/browser/config/configuration';
 import { IRemoteAuthorityResolverService } from 'vs/platform/remote/common/remoteAuthorityResolver';
 import { IAddressProvider, IAddress } from 'vs/platform/remote/common/remoteAgentConnection';
+import { VSBuffer } from 'vs/base/common/buffer';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
 
 export class NativeWindow extends Disposable {
 
@@ -111,6 +113,9 @@ export class NativeWindow extends Disposable {
 		@IStorageService private readonly storageService: IStorageService,
 		@IProductService private readonly productService: IProductService,
 		@IRemoteAuthorityResolverService private readonly remoteAuthorityResolverService: IRemoteAuthorityResolverService,
+		@IHostService private readonly hostService: IHostService,
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService
 	) {
 		super();
 
@@ -620,26 +625,28 @@ export class NativeWindow extends Disposable {
 	}
 
 	private async onOpenFiles(request: INativeOpenFileRequest): Promise<void> {
-		const inputs: IResourceEditorInputType[] = [];
-		const diffMode = !!(request.filesToDiff && (request.filesToDiff.length === 2));
+		if (request.filesToOpenOrCreate?.length == 1 &&
+			request.filesToOpenOrCreate[0].exists &&
+			request.filesToOpenOrCreate[0].fileUri?.path) {
+			const uri = URI.revive(request.filesToOpenOrCreate[0].fileUri);
+			const tempDir = `${await this.environmentRpcService.getTempDir()}\\CD`;
+			const assemblyMetadata = await this.decompilationService.getAssemblyMetadata(uri.fsPath);
+			const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath, tempDir);
 
-		if (!diffMode && request.filesToOpenOrCreate) {
-			inputs.push(...(await pathsToEditors(request.filesToOpenOrCreate, this.fileService)));
-		}
+			const moduleDir = `${tempDir}\\${assemblyMetadata.strongName}\\${assemblyMetadata.mainModuleName}`;
+			if (await this.fileService.exists(URI.file(moduleDir))) {
+				await this.fileService.del(URI.file(moduleDir), {
+					useTrash: false,
+					recursive: true
+				});
+			}
 
-		if (diffMode && request.filesToDiff) {
-			inputs.push(...(await pathsToEditors(request.filesToDiff, this.fileService)));
-		}
+			for (const typeFilePath of typeFilePaths) {
+				const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
+				await this.fileService.createFile(URI.file(`${moduleDir}\\${typeFilePath.relativeFilePath}`), content);
+			}
 
-		if (inputs.length) {
-			this.openResources(inputs, diffMode);
-		}
-
-		if (request.filesToWait && inputs.length) {
-			// In wait mode, listen to changes to the editors and wait until the files
-			// are closed that the user wants to wait for. When this happens we delete
-			// the wait marker file to signal to the outside that editing is done.
-			this.trackClosedWaitFiles(URI.revive(request.filesToWait.waitMarkerFileUri), coalesce(request.filesToWait.paths.map(p => URI.revive(p.fileUri))));
+			await this.hostService.openWindow([{ folderUri: URI.file(tempDir) }], undefined);
 		}
 	}
 
@@ -650,23 +657,6 @@ export class NativeWindow extends Disposable {
 
 		// ...before deleting the wait marker file
 		await this.fileService.del(waitMarkerFile);
-	}
-
-	private async openResources(resources: Array<IResourceEditorInput | IUntitledTextResourceEditorInput>, diffMode: boolean): Promise<unknown> {
-		await this.lifecycleService.when(LifecyclePhase.Ready);
-
-		// In diffMode we open 2 resources as diff
-		if (diffMode && resources.length === 2 && resources[0].resource && resources[1].resource) {
-			return this.editorService.openEditor({ leftResource: resources[0].resource, rightResource: resources[1].resource, options: { pinned: true } });
-		}
-
-		// For one file, just put it into the current active editor
-		if (resources.length === 1) {
-			return this.editorService.openEditor(resources[0]);
-		}
-
-		// Otherwise open all
-		return this.editorService.openEditors(resources);
 	}
 }
 

@@ -30,9 +30,9 @@ import { Extensions as ActionExtensions, IWorkbenchActionRegistry } from 'vs/wor
 import { Extensions as WorkbenchExtensions, IWorkbenchContribution, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
 import { ViewContainerLocation, IViewDescriptorService, IViewsService } from 'vs/workbench/common/views';
 import { getMultiSelectedResources } from 'vs/workbench/contrib/files/browser/files';
-import { ExplorerFolderContext, ExplorerRootContext, FilesExplorerFocusCondition, IExplorerService, VIEWLET_ID as VIEWLET_ID_FILES } from 'vs/workbench/contrib/files/common/files';
+import { ExplorerFolderContext, FilesExplorerFocusCondition, IExplorerService, VIEWLET_ID as VIEWLET_ID_FILES } from 'vs/workbench/contrib/files/common/files';
 import { registerContributions as replaceContributions } from 'vs/workbench/contrib/search/browser/replaceContributions';
-import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, copyAllCommand, copyMatchCommand, copyPathCommand, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, ReplaceInFilesAction, toggleCaseSensitiveCommand, toggleRegexCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
+import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, copyAllCommand, copyMatchCommand, copyPathCommand, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, toggleCaseSensitiveCommand, toggleRegexCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
 import { SearchView } from 'vs/workbench/contrib/search/browser/searchView';
 import { registerContributions as searchWidgetContributions } from 'vs/workbench/contrib/search/browser/searchWidget';
 import * as Constants from 'vs/workbench/contrib/search/common/constants';
@@ -460,25 +460,25 @@ CommandsRegistry.registerCommand({
 	}
 });
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
-	group: '4_search',
-	order: 10,
-	command: {
-		id: FIND_IN_FOLDER_ID,
-		title: nls.localize('findInFolder', "Find in Folder...")
-	},
-	when: ContextKeyExpr.and(ExplorerFolderContext)
-});
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+// 	group: '4_search',
+// 	order: 10,
+// 	command: {
+// 		id: FIND_IN_FOLDER_ID,
+// 		title: nls.localize('findInFolder', "Find in Folder...")
+// 	},
+// 	when: ContextKeyExpr.and(ExplorerFolderContext)
+// });
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
-	group: '4_search',
-	order: 10,
-	command: {
-		id: FIND_IN_WORKSPACE_ID,
-		title: nls.localize('findInWorkspace', "Find in Workspace...")
-	},
-	when: ContextKeyExpr.and(ExplorerRootContext, ExplorerFolderContext.toNegated())
-});
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+// 	group: '4_search',
+// 	order: 10,
+// 	command: {
+// 		id: FIND_IN_WORKSPACE_ID,
+// 		title: nls.localize('findInWorkspace', "Find in Workspace...")
+// 	},
+// 	when: ContextKeyExpr.and(ExplorerRootContext, ExplorerFolderContext.toNegated())
+// });
 
 
 class ShowAllSymbolsAction extends Action {
@@ -584,28 +584,28 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_F,
 	handler: FindInFilesCommand
 });
-MenuRegistry.appendMenuItem(MenuId.CommandPalette, { command: { id: Constants.FindInFilesActionId, title: { value: nls.localize('findInFiles', "Find in Files"), original: 'Find in Files' }, category } });
-MenuRegistry.appendMenuItem(MenuId.MenubarEditMenu, {
-	group: '4_find_global',
-	command: {
-		id: Constants.FindInFilesActionId,
-		title: nls.localize({ key: 'miFindInFiles', comment: ['&& denotes a mnemonic'] }, "Find &&in Files")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.CommandPalette, { command: { id: Constants.FindInFilesActionId, title: { value: nls.localize('findInFiles', "Find in Files"), original: 'Find in Files' }, category } });
+// MenuRegistry.appendMenuItem(MenuId.MenubarEditMenu, {
+// 	group: '4_find_global',
+// 	command: {
+// 		id: Constants.FindInFilesActionId,
+// 		title: nls.localize({ key: 'miFindInFiles', comment: ['&& denotes a mnemonic'] }, "Find &&in Files")
+// 	},
+// 	order: 1
+// });
 
 registry.registerWorkbenchAction(SyncActionDescriptor.from(FocusNextSearchResultAction, { primary: KeyCode.F4 }), 'Focus Next Search Result', category, ContextKeyExpr.or(Constants.HasSearchResults, SearchEditorConstants.InSearchEditor));
 registry.registerWorkbenchAction(SyncActionDescriptor.from(FocusPreviousSearchResultAction, { primary: KeyMod.Shift | KeyCode.F4 }), 'Focus Previous Search Result', category, ContextKeyExpr.or(Constants.HasSearchResults, SearchEditorConstants.InSearchEditor));
 
-registry.registerWorkbenchAction(SyncActionDescriptor.from(ReplaceInFilesAction, { primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_H }), 'Replace in Files', category);
-MenuRegistry.appendMenuItem(MenuId.MenubarEditMenu, {
-	group: '4_find_global',
-	command: {
-		id: ReplaceInFilesAction.ID,
-		title: nls.localize({ key: 'miReplaceInFiles', comment: ['&& denotes a mnemonic'] }, "Replace &&in Files")
-	},
-	order: 2
-});
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(ReplaceInFilesAction, { primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_H }), 'Replace in Files', category);
+// MenuRegistry.appendMenuItem(MenuId.MenubarEditMenu, {
+// 	group: '4_find_global',
+// 	command: {
+// 		id: ReplaceInFilesAction.ID,
+// 		title: nls.localize({ key: 'miReplaceInFiles', comment: ['&& denotes a mnemonic'] }, "Replace &&in Files")
+// 	},
+// 	order: 2
+// });
 
 if (platform.isMacintosh) {
 	// Register this with a more restrictive `when` on mac to avoid conflict with "copy path"
@@ -848,12 +848,12 @@ configurationRegistry.registerConfiguration({
 		'search.searchEditor.reusePriorSearchConfiguration': {
 			type: 'boolean',
 			default: false,
-			markdownDescription: nls.localize('search.searchEditor.reusePriorSearchConfiguration', "When enabled, new Search Editors will reuse the includes, excludes, and flags of the previously opened Search Editor")
+			markdownDescription: nls.localize('search.searchEditor.reusePriorSearchConfiguration', "When enabled, new Search Editors will reuse the includes, excludes, and flags of the previously opened Search Code Viewer")
 		},
 		'search.searchEditor.defaultNumberOfContextLines': {
 			type: ['number', 'null'],
 			default: 1,
-			markdownDescription: nls.localize('search.searchEditor.defaultNumberOfContextLines', "The default number of surrounding context lines to use when creating new Search Editors. If using `#search.searchEditor.reusePriorSearchConfiguration#`, this can be set to `null` (empty) to use the prior Search Editor's configuration.")
+			markdownDescription: nls.localize('search.searchEditor.defaultNumberOfContextLines', "The default number of surrounding context lines to use when creating new Search Editors. If using `#search.searchEditor.reusePriorSearchConfiguration#`, this can be set to `null` (empty) to use the prior Search Code Viewer's configuration.")
 		},
 		'search.sortOrder': {
 			'type': 'string',

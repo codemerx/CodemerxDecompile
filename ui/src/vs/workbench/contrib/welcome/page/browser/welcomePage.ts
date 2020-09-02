@@ -64,7 +64,7 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService,
 		@ICommandService private readonly commandService: ICommandService,
 	) {
-		const enabled = isWelcomePageEnabled(configurationService, contextService);
+		const enabled = false;// isWelcomePageEnabled(configurationService, contextService);
 		if (enabled && lifecycleService.startupKind !== StartupKind.ReloadedWindow) {
 			backupFileService.hasBackups().then(hasBackups => {
 				// Open the welcome even if we opened a set of default editors

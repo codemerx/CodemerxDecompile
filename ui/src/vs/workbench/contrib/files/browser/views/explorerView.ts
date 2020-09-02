@@ -191,7 +191,7 @@ export class ExplorerView extends ViewPane {
 	}
 
 	get name(): string {
-		return this.labelService.getWorkspaceLabel(this.contextService.getWorkspace());
+		return nls.localize('assemblies', "Assemblies");
 	}
 
 	get title(): string {

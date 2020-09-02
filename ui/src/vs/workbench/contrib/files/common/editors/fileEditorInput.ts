@@ -138,10 +138,6 @@ export class FileEditorInput extends AbstractTextResourceEditorInput implements 
 			return localize('orphanedFile', "{0} (deleted)", label);
 		}
 
-		if (readonly) {
-			return localize('readonlyFile', "{0} (read-only)", label);
-		}
-
 		return label;
 	}
 

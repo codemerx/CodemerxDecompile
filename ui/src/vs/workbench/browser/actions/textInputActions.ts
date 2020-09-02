@@ -5,7 +5,6 @@
 
 import { IAction, Action } from 'vs/base/common/actions';
 import { localize } from 'vs/nls';
-import { Separator } from 'vs/base/browser/ui/actionbar/actionbar';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
 import { Disposable } from 'vs/base/common/lifecycle';
@@ -13,8 +12,6 @@ import { EventHelper } from 'vs/base/browser/dom';
 import { IWorkbenchContribution, IWorkbenchContributionsRegistry, Extensions as WorkbenchExtensions } from 'vs/workbench/common/contributions';
 import { Registry } from 'vs/platform/registry/common/platform';
 import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
-import { isNative } from 'vs/base/common/platform';
-import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 
 export class TextInputActionsProvider extends Disposable implements IWorkbenchContribution {
 
@@ -22,9 +19,7 @@ export class TextInputActionsProvider extends Disposable implements IWorkbenchCo
 
 	constructor(
 		@IWorkbenchLayoutService private readonly layoutService: IWorkbenchLayoutService,
-		@IContextMenuService private readonly contextMenuService: IContextMenuService,
-		@IClipboardService private readonly clipboardService: IClipboardService
-	) {
+		@IContextMenuService private readonly contextMenuService: IContextMenuService	) {
 		super();
 
 		this.createActions();
@@ -36,37 +31,37 @@ export class TextInputActionsProvider extends Disposable implements IWorkbenchCo
 		this.textInputActions.push(
 
 			// Undo/Redo
-			new Action('undo', localize('undo', "Undo"), undefined, true, async () => document.execCommand('undo')),
-			new Action('redo', localize('redo', "Redo"), undefined, true, async () => document.execCommand('redo')),
-			new Separator(),
+			// new Action('undo', localize('undo', "Undo"), undefined, true, async () => document.execCommand('undo')),
+			// new Action('redo', localize('redo', "Redo"), undefined, true, async () => document.execCommand('redo')),
+			// new Separator(),
 
 			// Cut / Copy / Paste
-			new Action('editor.action.clipboardCutAction', localize('cut', "Cut"), undefined, true, async () => document.execCommand('cut')),
+			// new Action('editor.action.clipboardCutAction', localize('cut', "Cut"), undefined, true, async () => document.execCommand('cut')),
 			new Action('editor.action.clipboardCopyAction', localize('copy', "Copy"), undefined, true, async () => document.execCommand('copy')),
-			new Action('editor.action.clipboardPasteAction', localize('paste', "Paste"), undefined, true, async (element: HTMLInputElement | HTMLTextAreaElement) => {
+			// new Action('editor.action.clipboardPasteAction', localize('paste', "Paste"), undefined, true, async (element: HTMLInputElement | HTMLTextAreaElement) => {
 
-				// Native: paste is supported
-				if (isNative) {
-					document.execCommand('paste');
-				}
+			// 	// Native: paste is supported
+			// 	if (isNative) {
+			// 		document.execCommand('paste');
+			// 	}
 
-				// Web: paste is not supported due to security reasons
-				else {
-					const clipboardText = await this.clipboardService.readText();
-					if (
-						element instanceof HTMLTextAreaElement ||
-						element instanceof HTMLInputElement
-					) {
-						const selectionStart = element.selectionStart || 0;
-						const selectionEnd = element.selectionEnd || 0;
+			// 	// Web: paste is not supported due to security reasons
+			// 	else {
+			// 		const clipboardText = await this.clipboardService.readText();
+			// 		if (
+			// 			element instanceof HTMLTextAreaElement ||
+			// 			element instanceof HTMLInputElement
+			// 		) {
+			// 			const selectionStart = element.selectionStart || 0;
+			// 			const selectionEnd = element.selectionEnd || 0;
 
-						element.value = `${element.value.substring(0, selectionStart)}${clipboardText}${element.value.substring(selectionEnd, element.value.length)}`;
-						element.selectionStart = selectionStart + clipboardText.length;
-						element.selectionEnd = element.selectionStart;
-					}
-				}
-			}),
-			new Separator(),
+			// 			element.value = `${element.value.substring(0, selectionStart)}${clipboardText}${element.value.substring(selectionEnd, element.value.length)}`;
+			// 			element.selectionStart = selectionStart + clipboardText.length;
+			// 			element.selectionEnd = element.selectionStart;
+			// 		}
+			// 	}
+			// }),
+			// new Separator(),
 
 			// Select All
 			new Action('editor.action.selectAll', localize('selectAll', "Select All"), undefined, true, async () => document.execCommand('selectAll'))

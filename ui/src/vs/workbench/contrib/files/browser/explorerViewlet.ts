@@ -36,8 +36,7 @@ import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { WorkbenchStateContext, RemoteNameContext } from 'vs/workbench/browser/contextkeys';
 import { IsWebContext } from 'vs/platform/contextkey/common/contextkeys';
-import { AddRootFolderAction, OpenFolderAction, OpenFileFolderAction } from 'vs/workbench/browser/actions/workspaceActions';
-import { isMacintosh } from 'vs/base/common/platform';
+import { OpenFileAction } from 'vs/workbench/browser/actions/workspaceActions';
 import { Codicon } from 'vs/base/common/codicons';
 
 export class ExplorerViewletViewsContribution extends Disposable implements IWorkbenchContribution {
@@ -139,7 +138,7 @@ export class ExplorerViewletViewsContribution extends Disposable implements IWor
 	private createExplorerViewDescriptor(): IViewDescriptor {
 		return {
 			id: VIEW_ID,
-			name: localize('folders', "Folders"),
+			name: localize('assemblies', "Assemblies"),
 			containerIcon: Codicon.files.classNames,
 			ctorDescriptor: new SyncDescriptor(ExplorerView),
 			order: 1,
@@ -184,7 +183,7 @@ export class ExplorerViewPaneContainer extends ViewPaneContainer {
 
 		this.viewletVisibleContextKey = ExplorerViewletVisibleContext.bindTo(contextKeyService);
 
-		this._register(this.contextService.onDidChangeWorkspaceName(e => this.updateTitleArea()));
+		this._register(this.contextService.onDidChangeWorkspaceName(() => this.updateTitleArea()));
 	}
 
 	create(parent: HTMLElement): void {
@@ -271,21 +270,21 @@ export const VIEW_CONTAINER: ViewContainer = viewContainerRegistry.registerViewC
 }, ViewContainerLocation.Sidebar, true);
 
 const viewsRegistry = Registry.as<IViewsRegistry>(Extensions.ViewsRegistry);
-viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
-	content: localize({ key: 'noWorkspaceHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
-		"You have not yet added a folder to the workspace.\n[Add Folder](command:{0})", AddRootFolderAction.ID),
-	when: WorkbenchStateContext.isEqualTo('workspace')
-});
+// viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
+// 	content: localize({ key: 'noWorkspaceHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
+// 		"You have not yet added a folder to the workspace.\n[Add Folder](command:{0})", AddRootFolderAction.ID),
+// 	when: WorkbenchStateContext.isEqualTo('workspace')
+// });
 
-const commandId = isMacintosh ? OpenFileFolderAction.ID : OpenFolderAction.ID;
-viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
-	content: localize({ key: 'remoteNoFolderHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
-		"Connected to remote.\n[Open Folder](command:{0})", commandId),
-	when: ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), RemoteNameContext.notEqualsTo(''), IsWebContext.toNegated())
-});
+const commandId = OpenFileAction.ID;
+// viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
+// 	content: localize({ key: 'remoteNoFolderHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
+// 		"Connected to remote.\n[Open Folder](command:{0})", commandId),
+// 	when: ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), RemoteNameContext.notEqualsTo(''), IsWebContext.toNegated())
+// });
 
 viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
 	content: localize({ key: 'noFolderHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
-		"You have not yet opened a folder.\n[Open Folder](command:{0})", commandId),
+		"You have not yet opened an assembly.\n[Open File](command:{0})", commandId),
 	when: ContextKeyExpr.or(ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), RemoteNameContext.isEqualTo('')), ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), IsWebContext))
 });

@@ -335,7 +335,7 @@ export class ExtHostApiCommands {
 				{ name: 'left', description: 'Left-hand side resource of the diff editor', constraint: URI },
 				{ name: 'right', description: 'Right-hand side resource of the diff editor', constraint: URI },
 				{ name: 'title', description: '(optional) Human readable title for the diff editor', constraint: (v: any) => v === undefined || typeof v === 'string' },
-				{ name: 'options', description: '(optional) Editor options, see vscode.TextDocumentShowOptions' }
+				{ name: 'options', description: '(optional) Code Viewer options, see vscode.TextDocumentShowOptions' }
 			]
 		});
 

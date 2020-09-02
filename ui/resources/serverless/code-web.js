@@ -141,7 +141,7 @@ const server = http.createServer((req, res) => {
 	try {
 		if (pathname === '/favicon.ico') {
 			// favicon
-			return serveFile(req, res, path.join(APP_ROOT, 'resources', 'win32', 'code.ico'));
+			return serveFile(req, res, path.join(APP_ROOT, 'resources', 'win32', 'codemerx-logo.ico'));
 		}
 		if (pathname === '/manifest.json') {
 			// manifest

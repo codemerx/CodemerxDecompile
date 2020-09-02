@@ -499,13 +499,13 @@ export class ActivitybarPart extends Part implements IActivityBarService {
 			cssClass: Codicon.settingsGear.classNames
 		});
 
-		this.accountsActivityAction = new ActivityAction({
-			id: 'workbench.actions.accounts',
-			name: nls.localize('accounts', "Accounts"),
-			cssClass: Codicon.account.classNames
-		});
+		// this.accountsActivityAction = new ActivityAction({
+		// 	id: 'workbench.actions.accounts',
+		// 	name: nls.localize('accounts', "Accounts"),
+		// 	cssClass: Codicon.account.classNames
+		// });
 
-		this.globalActivityActionBar.push(this.accountsActivityAction);
+		// this.globalActivityActionBar.push(this.accountsActivityAction);
 
 		this.globalActivityActionBar.push(this.globalActivityAction);
 	}

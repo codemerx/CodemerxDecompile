@@ -228,7 +228,7 @@ CommandsRegistry.registerCommand({
 	id: SetEditorLayoutAPICommand.ID,
 	handler: adjustHandler(SetEditorLayoutAPICommand.execute),
 	description: {
-		description: 'Set Editor Layout',
+		description: 'Set Code Viewer Layout',
 		args: [{
 			name: 'args',
 			schema: {

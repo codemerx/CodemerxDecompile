@@ -777,7 +777,7 @@ registerEditorAction(PreviousMatchFindAction);
 registerEditorAction(PreviousMatchFindAction2);
 registerEditorAction(NextSelectionMatchFindAction);
 registerEditorAction(PreviousSelectionMatchFindAction);
-registerEditorAction(StartFindReplaceAction);
+// registerEditorAction(StartFindReplaceAction);
 
 const FindCommand = EditorCommand.bindToContribution<CommonFindController>(CommonFindController.get);
 

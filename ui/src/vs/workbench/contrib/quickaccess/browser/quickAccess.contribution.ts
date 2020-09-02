@@ -7,15 +7,13 @@ import { localize } from 'vs/nls';
 import { IQuickAccessRegistry, Extensions } from 'vs/platform/quickinput/common/quickAccess';
 import { Registry } from 'vs/platform/registry/common/platform';
 import { HelpQuickAccessProvider } from 'vs/platform/quickinput/browser/helpQuickAccess';
-import { ViewQuickAccessProvider, OpenViewPickerAction, QuickAccessViewPickerAction } from 'vs/workbench/contrib/quickaccess/browser/viewQuickAccess';
-import { CommandsQuickAccessProvider, ShowAllCommandsAction, ClearCommandHistoryAction } from 'vs/workbench/contrib/quickaccess/browser/commandsQuickAccess';
-import { MenuRegistry, MenuId, SyncActionDescriptor } from 'vs/platform/actions/common/actions';
-import { IWorkbenchActionRegistry, Extensions as ActionExtensions } from 'vs/workbench/common/actions';
+import { OpenViewPickerAction } from 'vs/workbench/contrib/quickaccess/browser/viewQuickAccess';
+import { CommandsQuickAccessProvider } from 'vs/workbench/contrib/quickaccess/browser/commandsQuickAccess';
+import { MenuRegistry, MenuId } from 'vs/platform/actions/common/actions';
 import { KeyMod, KeyCode } from 'vs/base/common/keyCodes';
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { inQuickPickContext, getQuickNavigateHandler } from 'vs/workbench/browser/quickaccess';
 import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
-import { EditorContextKeys } from 'vs/editor/common/editorContextKeys';
 
 //#region Quick Access Proviers
 
@@ -28,13 +26,13 @@ quickAccessRegistry.registerQuickAccessProvider({
 	helpEntries: [{ description: localize('helpQuickAccess', "Show all Quick Access Providers"), needsEditor: false }]
 });
 
-quickAccessRegistry.registerQuickAccessProvider({
-	ctor: ViewQuickAccessProvider,
-	prefix: ViewQuickAccessProvider.PREFIX,
-	contextKey: 'inViewsPicker',
-	placeholder: localize('viewQuickAccessPlaceholder', "Type the name of a view, output channel or terminal to open."),
-	helpEntries: [{ description: localize('viewQuickAccess', "Open View"), needsEditor: false }]
-});
+// quickAccessRegistry.registerQuickAccessProvider({
+// 	ctor: ViewQuickAccessProvider,
+// 	prefix: ViewQuickAccessProvider.PREFIX,
+// 	contextKey: 'inViewsPicker',
+// 	placeholder: localize('viewQuickAccessPlaceholder', "Type the name of a view, output channel or terminal to open."),
+// 	helpEntries: [{ description: localize('viewQuickAccess', "Open View"), needsEditor: false }]
+// });
 
 quickAccessRegistry.registerQuickAccessProvider({
 	ctor: CommandsQuickAccessProvider,
@@ -49,14 +47,14 @@ quickAccessRegistry.registerQuickAccessProvider({
 
 //#region Menu contributions
 
-MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
-	group: '1_open',
-	command: {
-		id: ShowAllCommandsAction.ID,
-		title: localize({ key: 'miCommandPalette', comment: ['&& denotes a mnemonic'] }, "&&Command Palette...")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
+// 	group: '1_open',
+// 	command: {
+// 		id: ShowAllCommandsAction.ID,
+// 		title: localize({ key: 'miCommandPalette', comment: ['&& denotes a mnemonic'] }, "&&Command Palette...")
+// 	},
+// 	order: 1
+// });
 
 MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
 	group: '1_open',
@@ -71,7 +69,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarGoMenu, {
 	group: '4_symbol_nav',
 	command: {
 		id: 'workbench.action.gotoSymbol',
-		title: localize({ key: 'miGotoSymbolInEditor', comment: ['&& denotes a mnemonic'] }, "Go to &&Symbol in Editor...")
+		title: localize({ key: 'miGotoSymbolInEditor', comment: ['&& denotes a mnemonic'] }, "Go to &&Symbol in Code Viewer...")
 	},
 	order: 1
 });
@@ -85,45 +83,45 @@ MenuRegistry.appendMenuItem(MenuId.MenubarGoMenu, {
 	order: 1
 });
 
-MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
-	group: '1_command',
-	command: {
-		id: ShowAllCommandsAction.ID,
-		title: localize('commandPalette', "Command Palette...")
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
+// 	group: '1_command',
+// 	command: {
+// 		id: ShowAllCommandsAction.ID,
+// 		title: localize('commandPalette', "Command Palette...")
+// 	},
+// 	order: 1
+// });
 
-MenuRegistry.appendMenuItem(MenuId.EditorContext, {
-	group: 'z_commands',
-	command: {
-		id: ShowAllCommandsAction.ID,
-		title: localize('commandPalette', "Command Palette..."),
-		precondition: EditorContextKeys.editorSimpleInput.toNegated()
-	},
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.EditorContext, {
+// 	group: 'z_commands',
+// 	command: {
+// 		id: ShowAllCommandsAction.ID,
+// 		title: localize('commandPalette', "Command Palette..."),
+// 		precondition: EditorContextKeys.editorSimpleInput.toNegated()
+// 	},
+// 	order: 1
+// });
 
 //#endregion
 
 
 //#region Workbench actions and commands
 
-const registry = Registry.as<IWorkbenchActionRegistry>(ActionExtensions.WorkbenchActions);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(ClearCommandHistoryAction), 'Clear Command History');
-registry.registerWorkbenchAction(SyncActionDescriptor.from(ShowAllCommandsAction, {
-	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_P,
-	secondary: [KeyCode.F1]
-}), 'Show All Commands');
+// const registry = Registry.as<IWorkbenchActionRegistry>(ActionExtensions.WorkbenchActions);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(ClearCommandHistoryAction), 'Clear Command History');
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(ShowAllCommandsAction, {
+// 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_P,
+// 	secondary: [KeyCode.F1]
+// }), 'Show All Commands');
 
 const inViewsPickerContextKey = 'inViewsPicker';
 const inViewsPickerContext = ContextKeyExpr.and(inQuickPickContext, ContextKeyExpr.has(inViewsPickerContextKey));
 
 const viewPickerKeybinding = { primary: KeyMod.CtrlCmd | KeyCode.KEY_Q, mac: { primary: KeyMod.WinCtrl | KeyCode.KEY_Q }, linux: { primary: 0 } };
 
-const viewCategory = localize('view', "View");
-registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenViewPickerAction), 'View: Open View', viewCategory);
-registry.registerWorkbenchAction(SyncActionDescriptor.from(QuickAccessViewPickerAction, viewPickerKeybinding), 'View: Quick Open View', viewCategory);
+// const viewCategory = localize('view', "View");
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenViewPickerAction), 'View: Open View', viewCategory);
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(QuickAccessViewPickerAction, viewPickerKeybinding), 'View: Quick Open View', viewCategory);
 
 const quickAccessNavigateNextInViewPickerId = 'workbench.action.quickOpenNavigateNextInViewPicker';
 KeybindingsRegistry.registerCommandAndKeybindingRule({

@@ -21,12 +21,10 @@ import { IRemoteAgentService } from 'vs/workbench/services/remote/common/remoteA
 import { optional } from 'vs/platform/instantiation/common/instantiation';
 import { IExplorerService } from 'vs/workbench/contrib/files/common/files';
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
-import { IWorkbenchContribution, IWorkbenchContributionsRegistry, Extensions as WorkbenchExtensions } from 'vs/workbench/common/contributions';
+import { IWorkbenchContribution } from 'vs/workbench/common/contributions';
 import { Disposable } from 'vs/base/common/lifecycle';
 import { isWeb, isWindows } from 'vs/base/common/platform';
 import { dirname, basename } from 'vs/base/common/path';
-import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
-import { Registry } from 'vs/platform/registry/common/platform';
 
 const OPEN_IN_TERMINAL_COMMAND_ID = 'openInTerminal';
 CommandsRegistry.registerCommand({
@@ -135,4 +133,4 @@ export class ExternalTerminalContribution extends Disposable implements IWorkben
 	}
 }
 
-Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).registerWorkbenchContribution(ExternalTerminalContribution, LifecyclePhase.Restored);
+// Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).registerWorkbenchContribution(ExternalTerminalContribution, LifecyclePhase.Restored);

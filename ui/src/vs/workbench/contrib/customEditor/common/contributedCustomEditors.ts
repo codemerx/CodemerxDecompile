@@ -19,7 +19,7 @@ const builtinProviderDisplayName = nls.localize('builtinProviderDisplayName', "B
 
 export const defaultCustomEditor = new CustomEditorInfo({
 	id: DEFAULT_EDITOR_ID,
-	displayName: nls.localize('promptOpenWith.defaultEditor.displayName', "Text Editor"),
+	displayName: nls.localize('promptOpenWith.defaultEditor.displayName', "Text Code Viewer"),
 	providerDisplayName: builtinProviderDisplayName,
 	selector: [
 		{ filenamePattern: '*' }

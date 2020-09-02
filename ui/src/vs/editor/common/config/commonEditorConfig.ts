@@ -449,7 +449,7 @@ export const editorConfigurationBaseNode = Object.freeze<IConfigurationNode>({
 	id: 'editor',
 	order: 5,
 	type: 'object',
-	title: nls.localize('editorConfigurationTitle', "Editor"),
+	title: nls.localize('editorConfigurationTitle', "Code Viewer"),
 	scope: ConfigurationScope.LANGUAGE_OVERRIDABLE,
 });
 

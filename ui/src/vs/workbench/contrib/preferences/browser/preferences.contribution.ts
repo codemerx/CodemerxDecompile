@@ -12,7 +12,6 @@ import * as nls from 'vs/nls';
 import { Action2, MenuId, MenuRegistry, registerAction2 } from 'vs/platform/actions/common/actions';
 import { CommandsRegistry, ICommandService } from 'vs/platform/commands/common/commands';
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
-import { IsMacNativeContext } from 'vs/platform/contextkey/common/contextkeys';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { IInstantiationService, ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
@@ -61,7 +60,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		PreferencesEditor,
 		PreferencesEditor.ID,
-		nls.localize('defaultPreferencesEditor', "Default Preferences Editor")
+		nls.localize('defaultPreferencesEditor', "Default Preferences Code Viewer")
 	),
 	[
 		new SyncDescriptor(PreferencesEditorInput)
@@ -72,7 +71,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		SettingsEditor2,
 		SettingsEditor2.ID,
-		nls.localize('settingsEditor2', "Settings Editor 2")
+		nls.localize('settingsEditor2', "Settings Code Viewer 2")
 	),
 	[
 		new SyncDescriptor(SettingsEditor2Input)
@@ -83,7 +82,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		KeybindingsEditor,
 		KeybindingsEditor.ID,
-		nls.localize('keybindingsEditor', "Keybindings Editor")
+		nls.localize('keybindingsEditor', "Keybindings Code Viewer")
 	),
 	[
 		new SyncDescriptor(KeybindingsEditorInput)
@@ -187,28 +186,28 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 	private registerSettingsActions() {
 		const that = this;
 		const category = { value: nls.localize('preferences', "Preferences"), original: 'Preferences' };
-		registerAction2(class extends Action2 {
-			constructor() {
-				super({
-					id: SETTINGS_COMMAND_OPEN_SETTINGS,
-					title: nls.localize('settings', "Settings"),
-					keybinding: {
-						weight: KeybindingWeight.WorkbenchContrib,
-						when: null,
-						primary: KeyMod.CtrlCmd | KeyCode.US_COMMA,
-					},
-					menu: {
-						id: MenuId.GlobalActivity,
-						group: '2_configuration',
-						order: 1
-					}
-				});
-			}
-			run(accessor: ServicesAccessor, args: string | undefined) {
-				const query = typeof args === 'string' ? args : undefined;
-				return accessor.get(IPreferencesService).openSettings(query ? false : undefined, query);
-			}
-		});
+		// registerAction2(class extends Action2 {
+		// 	constructor() {
+		// 		super({
+		// 			id: SETTINGS_COMMAND_OPEN_SETTINGS,
+		// 			title: nls.localize('settings', "Settings"),
+		// 			keybinding: {
+		// 				weight: KeybindingWeight.WorkbenchContrib,
+		// 				when: null,
+		// 				primary: KeyMod.CtrlCmd | KeyCode.US_COMMA,
+		// 			},
+		// 			menu: {
+		// 				id: MenuId.GlobalActivity,
+		// 				group: '2_configuration',
+		// 				order: 1
+		// 			}
+		// 		});
+		// 	}
+		// 	run(accessor: ServicesAccessor, args: string | undefined) {
+		// 		const query = typeof args === 'string' ? args : undefined;
+		// 		return accessor.get(IPreferencesService).openSettings(query ? false : undefined, query);
+		// 	}
+		// });
 		MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 			group: '1_settings',
 			command: {
@@ -464,14 +463,14 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			},
 			order: 2
 		});
-		MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
-			group: '2_configuration',
-			command: {
-				id: SETTINGS_EDITOR_COMMAND_FILTER_ONLINE,
-				title: nls.localize('onlineServices', "Online Services Settings")
-			},
-			order: 2
-		});
+		// MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
+		// 	group: '2_configuration',
+		// 	command: {
+		// 		id: SETTINGS_EDITOR_COMMAND_FILTER_ONLINE,
+		// 		title: nls.localize('onlineServices', "Online Services Settings")
+		// 	},
+		// 	order: 2
+		// });
 
 		this.registerSettingsEditorActions();
 
@@ -757,14 +756,14 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 				return accessor.get(IPreferencesService).openGlobalKeybindingSettings(false);
 			}
 		});
-		MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
-			command: {
-				id: 'workbench.action.openGlobalKeybindings',
-				title: { value: nls.localize('Keyboard Shortcuts', "Keyboard Shortcuts"), original: 'Keyboard Shortcuts' }
-			},
-			group: '2_keybindings',
-			order: 1
-		});
+		// MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
+		// 	command: {
+		// 		id: 'workbench.action.openGlobalKeybindings',
+		// 		title: { value: nls.localize('Keyboard Shortcuts', "Keyboard Shortcuts"), original: 'Keyboard Shortcuts' }
+		// 	},
+		// 	group: '2_keybindings',
+		// 	order: 1
+		// });
 		MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 			command: {
 				id: 'workbench.action.openGlobalKeybindings',
@@ -878,7 +877,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyMod.CtrlCmd | KeyCode.KEY_K),
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.defineKeybinding(editorPane.activeKeybindingEntry!);
@@ -891,7 +890,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyMod.CtrlCmd | KeyCode.KEY_E),
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor && editorPane.activeKeybindingEntry!.keybindingItem.keybinding) {
 					editorPane.defineWhenExpression(editorPane.activeKeybindingEntry!);
@@ -907,7 +906,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			mac: {
 				primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyMod.CtrlCmd | KeyCode.Backspace)
 			},
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.removeKeybinding(editorPane.activeKeybindingEntry!);
@@ -920,7 +919,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.resetKeybinding(editorPane.activeKeybindingEntry!);
@@ -933,7 +932,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR),
 			primary: KeyMod.CtrlCmd | KeyCode.KEY_F,
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.focusSearch();
@@ -947,7 +946,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDINGS_SEARCH_FOCUS),
 			primary: KeyMod.Alt | KeyCode.KEY_K,
 			mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_K },
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.recordSearchKeys();
@@ -961,7 +960,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR),
 			primary: KeyMod.Alt | KeyCode.KEY_P,
 			mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_P },
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.toggleSortByPrecedence();
@@ -974,7 +973,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.showSimilarKeybindings(editorPane.activeKeybindingEntry!);
@@ -987,7 +986,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: KeyMod.CtrlCmd | KeyCode.KEY_C,
-			handler: async (accessor, args: any) => {
+			handler: async (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					await editorPane.copyKeybinding(editorPane.activeKeybindingEntry!);
@@ -1000,7 +999,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: async (accessor, args: any) => {
+			handler: async (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					await editorPane.copyKeybindingCommand(editorPane.activeKeybindingEntry!);
@@ -1013,7 +1012,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDINGS_SEARCH_FOCUS),
 			primary: KeyCode.DownArrow,
-			handler: (accessor, args: any) => {
+			handler: (accessor) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.focusKeybindings();
@@ -1072,10 +1071,10 @@ workbenchContributionsRegistry.registerWorkbenchContribution(PreferencesContribu
 
 // Preferences menu
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	title: nls.localize({ key: 'miPreferences', comment: ['&& denotes a mnemonic'] }, "&&Preferences"),
-	submenu: MenuId.MenubarPreferencesMenu,
-	group: '5_autosave',
-	order: 2,
-	when: IsMacNativeContext.toNegated() // on macOS native the preferences menu is separate under the application menu
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	title: nls.localize({ key: 'miPreferences', comment: ['&& denotes a mnemonic'] }, "&&Preferences"),
+// 	submenu: MenuId.MenubarPreferencesMenu,
+// 	group: '5_autosave',
+// 	order: 2,
+// 	when: IsMacNativeContext.toNegated() // on macOS native the preferences menu is separate under the application menu
+// });

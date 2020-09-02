@@ -222,9 +222,6 @@ import 'vs/workbench/contrib/tasks/browser/task.contribution';
 import 'vs/workbench/contrib/remote/common/remote.contribution';
 import 'vs/workbench/contrib/remote/browser/remote';
 
-// Emmet
-import 'vs/workbench/contrib/emmet/browser/emmet.contribution';
-
 // CodeEditor Contributions
 import 'vs/workbench/contrib/codeEditor/browser/codeEditor.contribution';
 
@@ -260,7 +257,7 @@ import 'vs/workbench/contrib/welcome/page/browser/welcomePage.contribution';
 import 'vs/workbench/contrib/welcome/walkThrough/browser/walkThrough.contribution';
 
 // Call Hierarchy
-import 'vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution';
+// import 'vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution';
 
 // Outline
 import 'vs/workbench/contrib/outline/browser/outline.contribution';

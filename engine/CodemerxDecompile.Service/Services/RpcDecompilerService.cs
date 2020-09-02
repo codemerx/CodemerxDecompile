@@ -29,6 +29,17 @@ namespace CodemerxDecompile.Service
             this.decompilationContext = decompilationContext;
         }
 
+        public override Task<GetAssemblyMetadataResponse> GetAssemblyMetadata(GetAssemblyMetadataRequest request, ServerCallContext context)
+        {
+            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
+
+            GetAssemblyMetadataResponse response = new GetAssemblyMetadataResponse();
+            response.StrongName = assembly.FullName;
+            response.MainModuleName = assembly.MainModule.Name;
+
+            return Task.FromResult(response);
+        }
+
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
@@ -45,7 +56,8 @@ namespace CodemerxDecompile.Service
                 Utilities.GetMaxRelativePathLength(request.TargetPath),
                 true);
 
-            this.decompilationContext.TypeToFilePathMap = filePathsService.GetTypesToFilePathsMap();
+            this.decompilationContext.TypeToFilePathMap = filePathsService.GetTypesToFilePathsMap()
+                                                                          .ToDictionary(kvp => kvp.Key, kvp => Path.Join(assembly.FullName, assembly.MainModule.Name, kvp.Value));
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
             response.TypeFilePaths.AddRange(this.decompilationContext.TypeToFilePathMap.Select(pair =>
@@ -139,7 +151,7 @@ namespace CodemerxDecompile.Service
             StringWriter theWriter = new StringWriter();
             CodeFormatter formatter = new CodeFormatter(theWriter);
             IWriterSettings settings = new WriterSettings(writeExceptionsAsComments: true,
-                                                          writeFullyQualifiedNames: true,
+                                                          writeFullyQualifiedNames: false,
                                                           writeDocumentation: true,
                                                           showCompilerGeneratedMembers: false,
                                                           writeLargeNumbersInHex: false);

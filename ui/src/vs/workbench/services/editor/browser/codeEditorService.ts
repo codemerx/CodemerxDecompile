@@ -8,11 +8,14 @@ import { CodeEditorServiceImpl } from 'vs/editor/browser/services/codeEditorServ
 import { ScrollType } from 'vs/editor/common/editorCommon';
 import { IResourceEditorInput } from 'vs/platform/editor/common/editor';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
-import { TextEditorOptions, /* AGPL */NavigationOptions/* End AGPL */ } from 'vs/workbench/common/editor';
+import { TextEditorOptions } from 'vs/workbench/common/editor';
 import { ACTIVE_GROUP, IEditorService, SIDE_GROUP } from 'vs/workbench/services/editor/common/editorService';
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { extUri } from 'vs/base/common/resources';
+/* AGPL */
+import { MemberNavigationData } from 'vs/cd/workbench/DecompilationService';
+/* End AGPL */
 
 export class CodeEditorService extends CodeEditorServiceImpl {
 
@@ -41,7 +44,7 @@ export class CodeEditorService extends CodeEditorServiceImpl {
 		return null;
 	}
 
-	async openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationOptions?: NavigationOptions/* End AGPL */): Promise<ICodeEditor | null> {
+	async openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: MemberNavigationData/* End AGPL */): Promise<ICodeEditor | null> {
 
 		// Special case: If the active editor is a diff editor and the request to open originates and
 		// targets the modified side of it, we just apply the request there to prevent opening the modified
@@ -65,11 +68,11 @@ export class CodeEditorService extends CodeEditorServiceImpl {
 		}
 
 		// Open using our normal editor service
-		return this.doOpenCodeEditor(input, source, sideBySide, /* AGPL */navigationOptions/* End AGPL */);
+		return this.doOpenCodeEditor(input, source, sideBySide, /* AGPL */navigationData/* End AGPL */);
 	}
 
-	private async doOpenCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationOptions?: any/* End AGPL */): Promise<ICodeEditor | null> {
-		const control = await this.editorService.openEditor(input, sideBySide ? SIDE_GROUP : ACTIVE_GROUP, /* AGPL */navigationOptions/* End AGPL */);
+	private async doOpenCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: MemberNavigationData/* End AGPL */): Promise<ICodeEditor | null> {
+		const control = await this.editorService.openEditor(input, sideBySide ? SIDE_GROUP : ACTIVE_GROUP, /* AGPL */navigationData/* End AGPL */);
 		if (control) {
 			const widget = control.getControl();
 			if (isCodeEditor(widget)) {

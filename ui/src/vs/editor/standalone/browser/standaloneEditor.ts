@@ -41,6 +41,10 @@ import { clearAllFontInfos } from 'vs/editor/browser/config/configuration';
 import { IEditorProgressService } from 'vs/platform/progress/common/progress';
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import { StandaloneThemeServiceImpl } from 'vs/editor/standalone/browser/standaloneThemeServiceImpl';
+/* AGPL */
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+/* End AGPL */
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
@@ -86,7 +90,11 @@ export function create(domElement: HTMLElement, options?: IStandaloneEditorConst
 			services.get(IStandaloneThemeService),
 			services.get(INotificationService),
 			services.get(IConfigurationService),
-			services.get(IAccessibilityService)
+			services.get(IAccessibilityService),
+			/* AGPL */
+			services.get(IDecompilationService),
+			services.get(IEnvironmentRpcService)
+			/* End AGPL */
 		);
 	});
 }

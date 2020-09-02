@@ -142,6 +142,14 @@ namespace JustDecompile.EngineInfrastructure
 				case "4.7.1":
 					frameworkVersion = FrameworkVersion.v4_7_1;
 					break;
+                /* AGPL */
+                case "4.7.2":
+                    frameworkVersion = FrameworkVersion.v4_7_2;
+                    break;
+                case "4.8":
+                    frameworkVersion = FrameworkVersion.v4_8;
+                    break;
+                /* End AGPL */
                 default:
                     return false;
             }

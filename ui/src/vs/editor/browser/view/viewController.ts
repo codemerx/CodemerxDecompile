@@ -17,7 +17,8 @@ import * as platform from 'vs/base/common/platform';
 /* AGPL */
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { URI } from 'vs/base/common/uri';
-import { getMemberDefinition } from 'vs/cd/services/decompiler';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
 /* End AGPL */
 
 export interface IMouseDispatchData {
@@ -64,7 +65,9 @@ export class ViewController {
 		userInputEvents: ViewUserInputEvents,
 		commandDelegate: ICommandDelegate,
 		/* AGPL */
-		codeEditorService: ICodeEditorService
+		codeEditorService: ICodeEditorService,
+		private readonly decompilationService: IDecompilationService,
+		private readonly environmentRpcService: IEnvironmentRpcService
 		/* End AGPL */
 	) {
 		this.configuration = configuration;
@@ -213,25 +216,24 @@ export class ViewController {
 					}
 				} else {
 					/* AGPL */
-					const relativePath = this.viewModel.model.uri.fsPath.replace(/C:\\Users\\User\\AppData\\Local\\Temp\\CD\\/ig, '');
-					getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1)
-						.then(memberDefinitionResponse => {
-							if (memberDefinitionResponse.getFilepath()) {
-								const path = 'C:\\Users\\User\\AppData\\Local\\Temp\\CD\\' + memberDefinitionResponse.getFilepath();
-
+					(async () => {
+						try {
+							const tempDir = await this.environmentRpcService.getTempDir();
+							const assembliedRootFolder = `${tempDir}\\CD\\`;
+							const relativePath = this.viewModel.model.uri.fsPath.substr(assembliedRootFolder.length);
+							const navigationData = await this.decompilationService.getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1);
+							
+							if (navigationData.filePath) {
 								this.codeEditorService.openCodeEditor({
-									resource: URI.file(path)
-								}, null, undefined, {
-									memberFullName: memberDefinitionResponse.getMemberfullname(),
-									filePath: memberDefinitionResponse.getFilepath()
-								});
+									resource: URI.file(assembliedRootFolder + navigationData.filePath)
+								}, null, undefined, navigationData);
 							} else {
 								this.moveTo(data.position);
 							}
-						})
-						.catch(() => {
+						} catch(err) {
 							this.moveTo(data.position);
-						});
+						}
+					})();
 					/* End AGPL */
 				}
 			}

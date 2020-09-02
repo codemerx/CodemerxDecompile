@@ -66,10 +66,16 @@ import { IUserDataAutoSyncService } from 'vs/platform/userDataSync/common/userDa
 import { UserDataAutoSyncService } from 'vs/workbench/contrib/userDataSync/electron-browser/userDataAutoSyncService';
 import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
+import { IGrpcService, GrpcService } from 'vs/cd/workbench/GrpcService';
+import { IDecompilationService, DecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService, EnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
 
 registerSingleton(ICredentialsService, KeytarCredentialsService, true);
 registerSingleton(IUserDataAutoSyncService, UserDataAutoSyncService);
 registerSingleton(ITunnelService, TunnelService);
+registerSingleton(IGrpcService, GrpcService);
+registerSingleton(IEnvironmentRpcService, EnvironmentRpcService);
+registerSingleton(IDecompilationService, DecompilationService);
 
 //#endregion
 

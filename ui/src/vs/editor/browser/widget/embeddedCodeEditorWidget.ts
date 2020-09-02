@@ -19,6 +19,10 @@ import { IAccessibilityService } from 'vs/platform/accessibility/common/accessib
 import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import { IEditorProgressService } from 'vs/platform/progress/common/progress';
+/* AGPL */
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+/* End AGPL */
 
 export class EmbeddedCodeEditorWidget extends CodeEditorWidget {
 
@@ -35,9 +39,13 @@ export class EmbeddedCodeEditorWidget extends CodeEditorWidget {
 		@IContextKeyService contextKeyService: IContextKeyService,
 		@IThemeService themeService: IThemeService,
 		@INotificationService notificationService: INotificationService,
-		@IAccessibilityService accessibilityService: IAccessibilityService
+		@IAccessibilityService accessibilityService: IAccessibilityService,
+		/* AGPL */
+		@IDecompilationService decompilationService: IDecompilationService,
+		@IEnvironmentRpcService environmentRpcService: IEnvironmentRpcService
+		/* End AGPL */
 	) {
-		super(domElement, parentEditor.getRawOptions(), {}, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService);
+		super(domElement, parentEditor.getRawOptions(), {}, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService, /* AGPL */decompilationService, environmentRpcService/* End AGPL */);
 
 		this._parentEditor = parentEditor;
 		this._overwriteOptions = options;

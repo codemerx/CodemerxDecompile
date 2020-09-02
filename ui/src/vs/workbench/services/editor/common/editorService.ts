@@ -11,6 +11,9 @@ import { IEditor, IDiffEditor } from 'vs/editor/common/editorCommon';
 import { IEditorGroup, IEditorReplacement, OpenEditorContext } from 'vs/workbench/services/editor/common/editorGroupsService';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { URI } from 'vs/base/common/uri';
+/* AGPL */
+import { MemberNavigationData } from 'vs/cd/workbench/DecompilationService';
+/* End AGPL */
 
 export const IEditorService = createDecorator<IEditorService>('editorService');
 
@@ -192,7 +195,7 @@ export interface IEditorService {
 	 * opened to be active.
 	 */
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE): Promise<IEditorPane | undefined>;
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE, /* AGPL */navigationOptions?: any/* End AGPL */): Promise<ITextEditorPane | undefined>;
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE, /* AGPL */navigationData?: MemberNavigationData/* End AGPL */): Promise<ITextEditorPane | undefined>;
 	openEditor(editor: IResourceDiffEditorInput, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE): Promise<ITextDiffEditorPane | undefined>;
 
 	/**

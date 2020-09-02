@@ -179,7 +179,21 @@ namespace Mono.Cecil.AssemblyResolver
             {
                 if (frameworkName.Identifier == ".NETCoreApp")
                 {
-                    if (frameworkName.Version == new Version(2, 1))
+                    /* AGPL */
+                    if (frameworkName.Version == new Version(3, 1))
+                    {
+                        return FrameworkVersion.NetCoreV3_1;
+                    }
+                    else if (frameworkName.Version == new Version(3, 0))
+                    {
+                        return FrameworkVersion.NetCoreV3_0;
+                    }
+                    else if (frameworkName.Version == new Version(2, 2))
+                    {
+                        return FrameworkVersion.NetCoreV2_2;
+                    }
+                    /* End AGPL */
+                    else if (frameworkName.Version == new Version(2, 1))
                     {
                         return FrameworkVersion.NetCoreV2_1;
                     }
@@ -309,6 +323,20 @@ namespace Mono.Cecil.AssemblyResolver
                         {
                             frameworkVersion = FrameworkVersion.NetCoreV2_1;
                         }
+                        /* AGPL */
+                        else if (modulePath[modulePath.Length - 2].StartsWith("2.2"))
+                        {
+                            frameworkVersion = FrameworkVersion.NetCoreV2_2;
+                        }
+                        else if (modulePath[modulePath.Length - 2].StartsWith("3.0"))
+                        {
+                            frameworkVersion = FrameworkVersion.NetCoreV3_0;
+                        }
+                        else if (modulePath[modulePath.Length - 2].StartsWith("3.1"))
+                        {
+                            frameworkVersion = FrameworkVersion.NetCoreV3_1;
+                        }
+                        /* End AGPL */
                     }
                     else if (moduleLocation.StartsWith(SystemInformation.WINRT_METADATA.ToLowerInvariant()) || moduleLocation.StartsWith(SystemInformation.WINDOWS_WINMD_LOCATION.ToLowerInvariant()))
                     {

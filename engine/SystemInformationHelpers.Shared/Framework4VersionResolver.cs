@@ -2,7 +2,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+/* AGPL */
+#if NETSTANDARD
 using System.Runtime.InteropServices;
+#endif
+/* End AGPL */
 using System.Security;
 
 namespace SystemInformationHelpers
@@ -19,9 +23,19 @@ namespace SystemInformationHelpers
             FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(assemblyFilePath);
             if (versionInfo.FileMajorPart == 4)
             {
-                if (versionInfo.FileMinorPart == 7)
+                /* AGPL */
+                if (versionInfo.FileMinorPart == 8)
                 {
-                    if (versionInfo.FileBuildPart >= 2558)
+                    return FrameworkVersion.v4_8;
+                }
+                else if (versionInfo.FileMinorPart == 7)
+                {
+                    if (versionInfo.FileBuildPart >= 3062)
+                    {
+                        return FrameworkVersion.v4_7_2;
+                    }
+                /* End AGPL */
+                    else if (versionInfo.FileBuildPart >= 2558)
                     {
                         return FrameworkVersion.v4_7_1;
                     }
@@ -86,7 +100,7 @@ namespace SystemInformationHelpers
                     {
                         RegistryKey ndpKey;
 
-                        // AGPL License
+                        /* AGPL */
 #if NETSTANDARD
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         {
@@ -98,9 +112,10 @@ namespace SystemInformationHelpers
                         }
                         else
                         {
-                            throw new NotSupportedException("Assembly type is not supported on this OS.");
+                            return FrameworkVersion.Unknown;
                         }
 #endif
+                        /* End AGPL */
 
                         using (ndpKey)
                         {
@@ -115,7 +130,17 @@ namespace SystemInformationHelpers
                             // The following values are taken from here: https://msdn.microsoft.com/en-us/library/hh925568%28v=vs.110%29.aspx
                             int releaseKey = Convert.ToInt32(releaseKeyAsObject);
 
-                            if (releaseKey >= 461308)
+                            /* AGPL */
+                            if (releaseKey >= 528040)
+                            {
+                                installedFramework4Version = FrameworkVersion.v4_8;
+                            }
+                            else if (releaseKey >= 461808)
+                            {
+                                installedFramework4Version = FrameworkVersion.v4_7_2;
+                            }
+                            /* End AGPL */
+                            else if (releaseKey >= 461308)
                             {
                                 installedFramework4Version = FrameworkVersion.v4_7_1;
                             }

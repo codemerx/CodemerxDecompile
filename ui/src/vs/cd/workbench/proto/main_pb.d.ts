@@ -24,6 +24,46 @@ export namespace GetMemberDefinitionPositionRequest {
   }
 }
 
+export class GetAssemblyMetadataRequest extends jspb.Message {
+  getAssemblypath(): string;
+  setAssemblypath(value: string): GetAssemblyMetadataRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetAssemblyMetadataRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetAssemblyMetadataRequest): GetAssemblyMetadataRequest.AsObject;
+  static serializeBinaryToWriter(message: GetAssemblyMetadataRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetAssemblyMetadataRequest;
+  static deserializeBinaryFromReader(message: GetAssemblyMetadataRequest, reader: jspb.BinaryReader): GetAssemblyMetadataRequest;
+}
+
+export namespace GetAssemblyMetadataRequest {
+  export type AsObject = {
+    assemblypath: string,
+  }
+}
+
+export class GetAssemblyMetadataResponse extends jspb.Message {
+  getStrongname(): string;
+  setStrongname(value: string): GetAssemblyMetadataResponse;
+
+  getMainmodulename(): string;
+  setMainmodulename(value: string): GetAssemblyMetadataResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetAssemblyMetadataResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetAssemblyMetadataResponse): GetAssemblyMetadataResponse.AsObject;
+  static serializeBinaryToWriter(message: GetAssemblyMetadataResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetAssemblyMetadataResponse;
+  static deserializeBinaryFromReader(message: GetAssemblyMetadataResponse, reader: jspb.BinaryReader): GetAssemblyMetadataResponse;
+}
+
+export namespace GetAssemblyMetadataResponse {
+  export type AsObject = {
+    strongname: string,
+    mainmodulename: string,
+  }
+}
+
 export class GetAllTypeFilePathsRequest extends jspb.Message {
   getAssemblypath(): string;
   setAssemblypath(value: string): GetAllTypeFilePathsRequest;

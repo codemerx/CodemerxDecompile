@@ -65,8 +65,9 @@ import { INativeWorkbenchEnvironmentService } from 'vs/workbench/services/enviro
 import { clearAllFontInfos } from 'vs/editor/browser/config/configuration';
 import { IRemoteAuthorityResolverService } from 'vs/platform/remote/common/remoteAuthorityResolver';
 import { IAddressProvider, IAddress } from 'vs/platform/remote/common/remoteAgentConnection';
-import { getAllTypeFilePaths } from 'vs/cd/services/decompiler';
 import { VSBuffer } from 'vs/base/common/buffer';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
 
 export class NativeWindow extends Disposable {
 
@@ -113,6 +114,8 @@ export class NativeWindow extends Disposable {
 		@IProductService private readonly productService: IProductService,
 		@IRemoteAuthorityResolverService private readonly remoteAuthorityResolverService: IRemoteAuthorityResolverService,
 		@IHostService private readonly hostService: IHostService,
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService
 	) {
 		super();
 
@@ -626,11 +629,21 @@ export class NativeWindow extends Disposable {
 			request.filesToOpenOrCreate[0].exists &&
 			request.filesToOpenOrCreate[0].fileUri?.path) {
 			const uri = URI.revive(request.filesToOpenOrCreate[0].fileUri);
-			const tempDir = 'C:\\Users\\User\\AppData\\Local\\Temp\\CD';
-			const typeFilePaths = await getAllTypeFilePaths(uri.fsPath, tempDir);
+			const tempDir = `${await this.environmentRpcService.getTempDir()}\\CD`;
+			const assemblyMetadata = await this.decompilationService.getAssemblyMetadata(uri.fsPath);
+			const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath, tempDir);
+
+			const moduleDir = `${tempDir}\\${assemblyMetadata.strongName}\\${assemblyMetadata.mainModuleName}`;
+			if (await this.fileService.exists(URI.file(moduleDir))) {
+				await this.fileService.del(URI.file(moduleDir), {
+					useTrash: false,
+					recursive: true
+				});
+			}
 
 			for (const typeFilePath of typeFilePaths) {
-				await this.fileService.createFile(URI.file(`${tempDir}\\${typeFilePath.relativeFilePath}`), VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`));
+				const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
+				await this.fileService.createFile(URI.file(`${tempDir}\\${typeFilePath.relativeFilePath}`), content);
 			}
 
 			await this.hostService.openWindow([{ folderUri: URI.file(tempDir) }], undefined);

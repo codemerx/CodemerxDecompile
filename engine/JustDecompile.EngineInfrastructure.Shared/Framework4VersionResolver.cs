@@ -51,6 +51,14 @@ namespace JustDecompile.EngineInfrastructure
 				case FrameworkVersion.v4_7_1:
 					resultFrameworkVersion = Mono.Cecil.AssemblyResolver.FrameworkVersion.v4_7_1;
 					break;
+                /* AGPL */
+                case FrameworkVersion.v4_7_2:
+                    resultFrameworkVersion = Mono.Cecil.AssemblyResolver.FrameworkVersion.v4_7_2;
+                    break;
+                case FrameworkVersion.v4_8:
+                    resultFrameworkVersion = Mono.Cecil.AssemblyResolver.FrameworkVersion.v4_8;
+                    break;
+                /* End AGPL */
 				default:
                     break;
             }

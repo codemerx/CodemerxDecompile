@@ -23,6 +23,10 @@ import { IAccessibilityService } from 'vs/platform/accessibility/common/accessib
 import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
 import { ICommentThreadWidget } from 'vs/workbench/contrib/comments/common/commentThreadWidget';
 import { CommentContextKeys } from 'vs/workbench/contrib/comments/common/commentContextKeys';
+/* AGPL */
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+/* End AGPL */
 
 export const ctxCommentEditorFocused = new RawContextKey<boolean>('commentEditorFocused', false);
 
@@ -44,7 +48,11 @@ export class SimpleCommentEditor extends CodeEditorWidget {
 		@IContextKeyService contextKeyService: IContextKeyService,
 		@IThemeService themeService: IThemeService,
 		@INotificationService notificationService: INotificationService,
-		@IAccessibilityService accessibilityService: IAccessibilityService
+		@IAccessibilityService accessibilityService: IAccessibilityService,
+		/* AGPL */
+		@IDecompilationService decompilationService: IDecompilationService,
+		@IEnvironmentRpcService environmentRpcService: IEnvironmentRpcService
+		/* End AGPL */
 	) {
 		const codeEditorWidgetOptions: ICodeEditorWidgetOptions = {
 			isSimpleWidget: true,
@@ -57,7 +65,7 @@ export class SimpleCommentEditor extends CodeEditorWidget {
 			]
 		};
 
-		super(domElement, options, codeEditorWidgetOptions, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService);
+		super(domElement, options, codeEditorWidgetOptions, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService, /* AGPL */decompilationService, environmentRpcService/* End AGPL */);
 
 		this._commentEditorFocused = ctxCommentEditorFocused.bindTo(contextKeyService);
 		this._commentEditorEmpty = CommentContextKeys.commentIsEmpty.bindTo(contextKeyService);

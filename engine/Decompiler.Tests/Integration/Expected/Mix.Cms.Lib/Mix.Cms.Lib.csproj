@@ -7,7 +7,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <AssemblyName>Mix.Cms.Lib</AssemblyName>
     <OutputType>Library</OutputType>
-    <TargetFrameworkVersion>vnetcoreapp2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>vnetcoreapp3.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>

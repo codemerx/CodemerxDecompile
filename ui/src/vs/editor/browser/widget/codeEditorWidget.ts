@@ -54,10 +54,6 @@ import { DOMLineBreaksComputerFactory } from 'vs/editor/browser/view/domLineBrea
 import { WordOperations } from 'vs/editor/common/controller/cursorWordOperations';
 import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 import { OutgoingViewModelEventKind } from 'vs/editor/common/viewModel/viewModelEventDispatcher';
-/* AGPL */
-import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
-/* End AGPL */
 
 let EDITOR_ID = 0;
 
@@ -249,11 +245,7 @@ export class CodeEditorWidget extends Disposable implements editorBrowser.ICodeE
 		@IContextKeyService contextKeyService: IContextKeyService,
 		@IThemeService themeService: IThemeService,
 		@INotificationService notificationService: INotificationService,
-		@IAccessibilityService accessibilityService: IAccessibilityService,
-		/* AGPL */
-		@IDecompilationService private readonly decompilationService: IDecompilationService,
-		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService
-		/* End AGPL */
+		@IAccessibilityService accessibilityService: IAccessibilityService
 	) {
 		super();
 		this._domElement = domElement;
@@ -1623,9 +1615,7 @@ export class CodeEditorWidget extends Disposable implements editorBrowser.ICodeE
 			viewModel,
 			viewUserInputEvents,
 			/* AGPL */
-			this._codeEditorService,
-			this.decompilationService,
-			this.environmentRpcService
+			this._codeEditorService
 			/* End AGPL */
 		);
 

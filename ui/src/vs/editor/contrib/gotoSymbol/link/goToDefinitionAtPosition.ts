@@ -4,34 +4,40 @@
  *--------------------------------------------------------------------------------------------*/
 
 import 'vs/css!./goToDefinitionAtPosition';
-import * as nls from 'vs/nls';
-import { createCancelablePromise, CancelablePromise } from 'vs/base/common/async';
-import { CancellationToken } from 'vs/base/common/cancellation';
+// import * as nls from 'vs/nls';
+// import { createCancelablePromise, CancelablePromise } from 'vs/base/common/async';
+// import { CancellationToken } from 'vs/base/common/cancellation';
 import { onUnexpectedError } from 'vs/base/common/errors';
 import { MarkdownString } from 'vs/base/common/htmlContent';
-import { IModeService } from 'vs/editor/common/services/modeService';
-import { Range, IRange } from 'vs/editor/common/core/range';
+// import { IModeService } from 'vs/editor/common/services/modeService';
+import { Range, /* IRange */ } from 'vs/editor/common/core/range';
 import { IEditorContribution } from 'vs/editor/common/editorCommon';
-import { DefinitionProviderRegistry, LocationLink } from 'vs/editor/common/modes';
+// import { LocationLink } from 'vs/editor/common/modes';
 import { ICodeEditor, MouseTargetType } from 'vs/editor/browser/editorBrowser';
 import { registerEditorContribution } from 'vs/editor/browser/editorExtensions';
-import { getDefinitionsAtPosition } from '../goToSymbol';
+// import { getDefinitionsAtPosition } from '../goToSymbol';
 import { DisposableStore } from 'vs/base/common/lifecycle';
-import { ITextModelService } from 'vs/editor/common/services/resolverService';
+// import { ITextModelService } from 'vs/editor/common/services/resolverService';
 import { registerThemingParticipant } from 'vs/platform/theme/common/themeService';
 import { editorActiveLinkForeground } from 'vs/platform/theme/common/colorRegistry';
 import { EditorState, CodeEditorStateFlag } from 'vs/editor/browser/core/editorState';
-import { DefinitionAction } from '../goToCommands';
+// import { DefinitionAction } from '../goToCommands';
 import { ClickLinkGesture, ClickLinkMouseEvent, ClickLinkKeyboardEvent } from 'vs/editor/contrib/gotoSymbol/link/clickLinkGesture';
-import { IWordAtPosition, IModelDeltaDecoration, ITextModel, IFoundBracket } from 'vs/editor/common/model';
+import { IWordAtPosition, IModelDeltaDecoration, ITextModel, /* IFoundBracket */ } from 'vs/editor/common/model';
 import { Position } from 'vs/editor/common/core/position';
 import { withNullAsUndefined } from 'vs/base/common/types';
 import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
-import { EditorOption } from 'vs/editor/common/config/editorOptions';
-import { PeekContext } from 'vs/editor/contrib/peekView/peekView';
-import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
-import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
+// import { EditorOption } from 'vs/editor/common/config/editorOptions';
+// import { PeekContext } from 'vs/editor/contrib/peekView/peekView';
+// import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
+// import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 
+/* AGPL */
+import { URI } from 'vs/base/common/uri';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
+/* End AGPL */
 export class GotoDefinitionAtPositionEditorContribution implements IEditorContribution {
 
 	public static readonly ID = 'editor.contrib.gotodefinitionatposition';
@@ -42,12 +48,18 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 	private readonly toUnhookForKeyboard = new DisposableStore();
 	private linkDecorations: string[] = [];
 	private currentWordAtPosition: IWordAtPosition | null = null;
-	private previousPromise: CancelablePromise<LocationLink[] | null> | null = null;
+	private previousPromise: Promise<any | null> | null = null;
+	private lastMemberDefinition: any;
 
 	constructor(
 		editor: ICodeEditor,
-		@ITextModelService private readonly textModelResolverService: ITextModelService,
-		@IModeService private readonly modeService: IModeService
+		// @ITextModelService private readonly textModelResolverService: ITextModelService,
+		// @IModeService private readonly modeService: IModeService,
+		/* AGPL */
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService,
+		@ICodeEditorService private readonly codeEditorService: ICodeEditorService
+		/* End AGPL */
 	) {
 		this.editor = editor;
 
@@ -60,12 +72,26 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 
 		this.toUnhook.add(linkGesture.onExecute((mouseEvent: ClickLinkMouseEvent) => {
 			if (this.isEnabled(mouseEvent)) {
-				this.gotoDefinition(mouseEvent.target.position!, mouseEvent.hasSideBySideModifier).then(() => {
-					this.removeLinkDecorations();
-				}, (error: Error) => {
-					this.removeLinkDecorations();
-					onUnexpectedError(error);
-				});
+				// this.gotoDefinition(mouseEvent.target.position!, mouseEvent.hasSideBySideModifier).then(() => {
+				// 	this.removeLinkDecorations();
+				// }, (error: Error) => {
+				// 	this.removeLinkDecorations();
+				// 	onUnexpectedError(error);
+				// });
+				(async() => {
+					try {
+						if (this.lastMemberDefinition) {
+							this.codeEditorService.openCodeEditor({
+								resource: this.lastMemberDefinition.uri
+							}, null, undefined, this.lastMemberDefinition);
+						} else {
+							this.removeLinkDecorations();
+						}
+					} catch(err) {
+						this.removeLinkDecorations();
+						onUnexpectedError(err);
+					}
+				})()
 			}
 		}));
 
@@ -149,158 +175,171 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		// Find definition and decorate word if found
 		let state = new EditorState(this.editor, CodeEditorStateFlag.Position | CodeEditorStateFlag.Value | CodeEditorStateFlag.Selection | CodeEditorStateFlag.Scroll);
 
-		if (this.previousPromise) {
-			this.previousPromise.cancel();
-			this.previousPromise = null;
-		}
+		this.previousPromise = this.getMemberDefinition(this.editor.getModel(), position);
 
-		this.previousPromise = createCancelablePromise(token => this.findDefinition(position, token));
-
-		return this.previousPromise.then(results => {
-			if (!results || !results.length || !state.validate(this.editor)) {
+		return this.previousPromise.then(result => {
+			if (!result || !result.filePath || !state.validate(this.editor)) {
 				this.removeLinkDecorations();
 				return;
 			}
 
-			// Multiple results
-			if (results.length > 1) {
-				this.addDecoration(
-					new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
-					new MarkdownString().appendText(nls.localize('multipleResults', "Click to show {0} definitions.", results.length))
-				);
-			}
+			this.lastMemberDefinition = result;
 
-			// Single result
-			else {
-				let result = results[0];
+			this.addDecoration(
+				new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn));
+			// // Multiple results
+			// if (results.length > 1) {
+			// 	this.addDecoration(
+			// 		new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
+			// 		new MarkdownString().appendText(nls.localize('multipleResults', "Click to show {0} definitions.", results.length))
+			// 	);
+			// }
 
-				if (!result.uri) {
-					return;
-				}
+			// // Single result
+			// else {
+			// 	let result = results[0];
 
-				this.textModelResolverService.createModelReference(result.uri).then(ref => {
+			// 	if (!result.uri) {
+			// 		return;
+			// 	}
 
-					if (!ref.object || !ref.object.textEditorModel) {
-						ref.dispose();
-						return;
-					}
+			// 	this.textModelResolverService.createModelReference(result.uri).then(ref => {
 
-					const { object: { textEditorModel } } = ref;
-					const { startLineNumber } = result.range;
+			// 		if (!ref.object || !ref.object.textEditorModel) {
+			// 			ref.dispose();
+			// 			return;
+			// 		}
 
-					if (startLineNumber < 1 || startLineNumber > textEditorModel.getLineCount()) {
-						// invalid range
-						ref.dispose();
-						return;
-					}
+			// 		const { object: { textEditorModel } } = ref;
+			// 		const { startLineNumber } = result.range;
 
-					const previewValue = this.getPreviewValue(textEditorModel, startLineNumber, result);
+			// 		if (startLineNumber < 1 || startLineNumber > textEditorModel.getLineCount()) {
+			// 			// invalid range
+			// 			ref.dispose();
+			// 			return;
+			// 		}
 
-					let wordRange: Range;
-					if (result.originSelectionRange) {
-						wordRange = Range.lift(result.originSelectionRange);
-					} else {
-						wordRange = new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
-					}
+			// 		const previewValue = this.getPreviewValue(textEditorModel, startLineNumber, result);
 
-					const modeId = this.modeService.getModeIdByFilepathOrFirstLine(textEditorModel.uri);
-					this.addDecoration(
-						wordRange,
-						new MarkdownString().appendCodeblock(modeId ? modeId : '', previewValue)
-					);
-					ref.dispose();
-				});
-			}
+			// 		let wordRange: Range;
+			// 		if (result.originSelectionRange) {
+			// 			wordRange = Range.lift(result.originSelectionRange);
+			// 		} else {
+			// 			wordRange = new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
+			// 		}
+
+			// 		const modeId = this.modeService.getModeIdByFilepathOrFirstLine(textEditorModel.uri);
+			// 		this.addDecoration(
+			// 			wordRange,
+			// 			new MarkdownString().appendCodeblock(modeId ? modeId : '', previewValue)
+			// 		);
+			// 		ref.dispose();
+			// 	});
+			// }
 		}).then(undefined, onUnexpectedError);
 	}
 
-	private getPreviewValue(textEditorModel: ITextModel, startLineNumber: number, result: LocationLink) {
-		let rangeToUse = result.targetSelectionRange ? result.range : this.getPreviewRangeBasedOnBrackets(textEditorModel, startLineNumber);
-		const numberOfLinesInRange = rangeToUse.endLineNumber - rangeToUse.startLineNumber;
-		if (numberOfLinesInRange >= GotoDefinitionAtPositionEditorContribution.MAX_SOURCE_PREVIEW_LINES) {
-			rangeToUse = this.getPreviewRangeBasedOnIndentation(textEditorModel, startLineNumber);
-		}
+	private async getMemberDefinition(model: ITextModel | null, position: Position) : Promise<any> {
+		const tempDir = await this.environmentRpcService.getTempDir();
+		const assembliedRootFolder = `${tempDir}\\CD\\`;
+		const relativePath = model?.uri.fsPath.substr(assembliedRootFolder.length) ?? '';
+		const navigationData = await this.decompilationService.getMemberDefinition(relativePath, position.lineNumber - 1, position.column - 1);
+		const uri = URI.file(assembliedRootFolder + navigationData.filePath);
 
-		const previewValue = this.stripIndentationFromPreviewRange(textEditorModel, startLineNumber, rangeToUse);
-		return previewValue;
+		return {
+			uri,
+			filePath: navigationData.filePath,
+			memberFullName: navigationData.memberFullName
+		};
 	}
 
-	private stripIndentationFromPreviewRange(textEditorModel: ITextModel, startLineNumber: number, previewRange: IRange) {
-		const startIndent = textEditorModel.getLineFirstNonWhitespaceColumn(startLineNumber);
-		let minIndent = startIndent;
+	// private getPreviewValue(textEditorModel: ITextModel, startLineNumber: number, result: LocationLink) {
+	// 	let rangeToUse = result.targetSelectionRange ? result.range : this.getPreviewRangeBasedOnBrackets(textEditorModel, startLineNumber);
+	// 	const numberOfLinesInRange = rangeToUse.endLineNumber - rangeToUse.startLineNumber;
+	// 	if (numberOfLinesInRange >= GotoDefinitionAtPositionEditorContribution.MAX_SOURCE_PREVIEW_LINES) {
+	// 		rangeToUse = this.getPreviewRangeBasedOnIndentation(textEditorModel, startLineNumber);
+	// 	}
 
-		for (let endLineNumber = startLineNumber + 1; endLineNumber < previewRange.endLineNumber; endLineNumber++) {
-			const endIndent = textEditorModel.getLineFirstNonWhitespaceColumn(endLineNumber);
-			minIndent = Math.min(minIndent, endIndent);
-		}
+	// 	const previewValue = this.stripIndentationFromPreviewRange(textEditorModel, startLineNumber, rangeToUse);
+	// 	return previewValue;
+	// }
 
-		const previewValue = textEditorModel.getValueInRange(previewRange).replace(new RegExp(`^\\s{${minIndent - 1}}`, 'gm'), '').trim();
-		return previewValue;
-	}
+	// private stripIndentationFromPreviewRange(textEditorModel: ITextModel, startLineNumber: number, previewRange: IRange) {
+	// 	const startIndent = textEditorModel.getLineFirstNonWhitespaceColumn(startLineNumber);
+	// 	let minIndent = startIndent;
 
-	private getPreviewRangeBasedOnIndentation(textEditorModel: ITextModel, startLineNumber: number) {
-		const startIndent = textEditorModel.getLineFirstNonWhitespaceColumn(startLineNumber);
-		const maxLineNumber = Math.min(textEditorModel.getLineCount(), startLineNumber + GotoDefinitionAtPositionEditorContribution.MAX_SOURCE_PREVIEW_LINES);
-		let endLineNumber = startLineNumber + 1;
+	// 	for (let endLineNumber = startLineNumber + 1; endLineNumber < previewRange.endLineNumber; endLineNumber++) {
+	// 		const endIndent = textEditorModel.getLineFirstNonWhitespaceColumn(endLineNumber);
+	// 		minIndent = Math.min(minIndent, endIndent);
+	// 	}
 
-		for (; endLineNumber < maxLineNumber; endLineNumber++) {
-			let endIndent = textEditorModel.getLineFirstNonWhitespaceColumn(endLineNumber);
+	// 	const previewValue = textEditorModel.getValueInRange(previewRange).replace(new RegExp(`^\\s{${minIndent - 1}}`, 'gm'), '').trim();
+	// 	return previewValue;
+	// }
 
-			if (startIndent === endIndent) {
-				break;
-			}
-		}
+	// private getPreviewRangeBasedOnIndentation(textEditorModel: ITextModel, startLineNumber: number) {
+	// 	const startIndent = textEditorModel.getLineFirstNonWhitespaceColumn(startLineNumber);
+	// 	const maxLineNumber = Math.min(textEditorModel.getLineCount(), startLineNumber + GotoDefinitionAtPositionEditorContribution.MAX_SOURCE_PREVIEW_LINES);
+	// 	let endLineNumber = startLineNumber + 1;
 
-		return new Range(startLineNumber, 1, endLineNumber + 1, 1);
-	}
+	// 	for (; endLineNumber < maxLineNumber; endLineNumber++) {
+	// 		let endIndent = textEditorModel.getLineFirstNonWhitespaceColumn(endLineNumber);
 
-	private getPreviewRangeBasedOnBrackets(textEditorModel: ITextModel, startLineNumber: number) {
-		const maxLineNumber = Math.min(textEditorModel.getLineCount(), startLineNumber + GotoDefinitionAtPositionEditorContribution.MAX_SOURCE_PREVIEW_LINES);
+	// 		if (startIndent === endIndent) {
+	// 			break;
+	// 		}
+	// 	}
 
-		const brackets: IFoundBracket[] = [];
+	// 	return new Range(startLineNumber, 1, endLineNumber + 1, 1);
+	// }
 
-		let ignoreFirstEmpty = true;
-		let currentBracket = textEditorModel.findNextBracket(new Position(startLineNumber, 1));
-		while (currentBracket !== null) {
+	// private getPreviewRangeBasedOnBrackets(textEditorModel: ITextModel, startLineNumber: number) {
+	// 	const maxLineNumber = Math.min(textEditorModel.getLineCount(), startLineNumber + GotoDefinitionAtPositionEditorContribution.MAX_SOURCE_PREVIEW_LINES);
 
-			if (brackets.length === 0) {
-				brackets.push(currentBracket);
-			} else {
-				const lastBracket = brackets[brackets.length - 1];
-				if (lastBracket.open[0] === currentBracket.open[0] && lastBracket.isOpen && !currentBracket.isOpen) {
-					brackets.pop();
-				} else {
-					brackets.push(currentBracket);
-				}
+	// 	const brackets: IFoundBracket[] = [];
 
-				if (brackets.length === 0) {
-					if (ignoreFirstEmpty) {
-						ignoreFirstEmpty = false;
-					} else {
-						return new Range(startLineNumber, 1, currentBracket.range.endLineNumber + 1, 1);
-					}
-				}
-			}
+	// 	let ignoreFirstEmpty = true;
+	// 	let currentBracket = textEditorModel.findNextBracket(new Position(startLineNumber, 1));
+	// 	while (currentBracket !== null) {
 
-			const maxColumn = textEditorModel.getLineMaxColumn(startLineNumber);
-			let nextLineNumber = currentBracket.range.endLineNumber;
-			let nextColumn = currentBracket.range.endColumn;
-			if (maxColumn === currentBracket.range.endColumn) {
-				nextLineNumber++;
-				nextColumn = 1;
-			}
+	// 		if (brackets.length === 0) {
+	// 			brackets.push(currentBracket);
+	// 		} else {
+	// 			const lastBracket = brackets[brackets.length - 1];
+	// 			if (lastBracket.open[0] === currentBracket.open[0] && lastBracket.isOpen && !currentBracket.isOpen) {
+	// 				brackets.pop();
+	// 			} else {
+	// 				brackets.push(currentBracket);
+	// 			}
 
-			if (nextLineNumber > maxLineNumber) {
-				return new Range(startLineNumber, 1, maxLineNumber + 1, 1);
-			}
+	// 			if (brackets.length === 0) {
+	// 				if (ignoreFirstEmpty) {
+	// 					ignoreFirstEmpty = false;
+	// 				} else {
+	// 					return new Range(startLineNumber, 1, currentBracket.range.endLineNumber + 1, 1);
+	// 				}
+	// 			}
+	// 		}
 
-			currentBracket = textEditorModel.findNextBracket(new Position(nextLineNumber, nextColumn));
-		}
+	// 		const maxColumn = textEditorModel.getLineMaxColumn(startLineNumber);
+	// 		let nextLineNumber = currentBracket.range.endLineNumber;
+	// 		let nextColumn = currentBracket.range.endColumn;
+	// 		if (maxColumn === currentBracket.range.endColumn) {
+	// 			nextLineNumber++;
+	// 			nextColumn = 1;
+	// 		}
 
-		return new Range(startLineNumber, 1, maxLineNumber + 1, 1);
-	}
+	// 		if (nextLineNumber > maxLineNumber) {
+	// 			return new Range(startLineNumber, 1, maxLineNumber + 1, 1);
+	// 		}
 
-	private addDecoration(range: Range, hoverMessage: MarkdownString): void {
+	// 		currentBracket = textEditorModel.findNextBracket(new Position(nextLineNumber, nextColumn));
+	// 	}
+
+	// 	return new Range(startLineNumber, 1, maxLineNumber + 1, 1);
+	// }
+
+	private addDecoration(range: Range, hoverMessage?: MarkdownString): void {
 
 		const newDecorations: IModelDeltaDecoration = {
 			range: range,
@@ -323,32 +362,32 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		return this.editor.hasModel() &&
 			mouseEvent.isNoneOrSingleMouseDown &&
 			(mouseEvent.target.type === MouseTargetType.CONTENT_TEXT) &&
-			(mouseEvent.hasTriggerModifier || (withKey ? withKey.keyCodeIsTriggerKey : false)) &&
-			DefinitionProviderRegistry.has(this.editor.getModel());
+			(mouseEvent.hasTriggerModifier || (withKey ? withKey.keyCodeIsTriggerKey : false));
+			// DefinitionProviderRegistry.has(this.editor.getModel());
 	}
 
-	private findDefinition(position: Position, token: CancellationToken): Promise<LocationLink[] | null> {
-		const model = this.editor.getModel();
-		if (!model) {
-			return Promise.resolve(null);
-		}
+	// private findDefinition(position: Position, token: CancellationToken): Promise<LocationLink[] | null> {
+	// 	const model = this.editor.getModel();
+	// 	if (!model) {
+	// 		return Promise.resolve(null);
+	// 	}
 
-		return getDefinitionsAtPosition(model, position, token);
-	}
+	// 	return getDefinitionsAtPosition(model, position, token);
+	// }
 
-	private gotoDefinition(position: Position, openToSide: boolean): Promise<any> {
-		this.editor.setPosition(position);
-		return this.editor.invokeWithinContext((accessor) => {
-			const canPeek = !openToSide && this.editor.getOption(EditorOption.definitionLinkOpensInPeek) && !this.isInPeekEditor(accessor);
-			const action = new DefinitionAction({ openToSide, openInPeek: canPeek, muteMessage: true }, { alias: '', label: '', id: '', precondition: undefined });
-			return action.run(accessor, this.editor);
-		});
-	}
+	// private gotoDefinition(position: Position, openToSide: boolean): Promise<any> {
+	// 	this.editor.setPosition(position);
+	// 	return this.editor.invokeWithinContext((accessor) => {
+	// 		const canPeek = !openToSide && this.editor.getOption(EditorOption.definitionLinkOpensInPeek) && !this.isInPeekEditor(accessor);
+	// 		const action = new DefinitionAction({ openToSide, openInPeek: canPeek, muteMessage: true }, { alias: '', label: '', id: '', precondition: undefined });
+	// 		return action.run(accessor, this.editor);
+	// 	});
+	// }
 
-	private isInPeekEditor(accessor: ServicesAccessor): boolean | undefined {
-		const contextKeyService = accessor.get(IContextKeyService);
-		return PeekContext.inPeekEditor.getValue(contextKeyService);
-	}
+	// private isInPeekEditor(accessor: ServicesAccessor): boolean | undefined {
+	// 	const contextKeyService = accessor.get(IContextKeyService);
+	// 	return PeekContext.inPeekEditor.getValue(contextKeyService);
+	// }
 
 	public dispose(): void {
 		this.toUnhook.dispose();

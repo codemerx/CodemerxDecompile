@@ -91,17 +91,17 @@ namespace CodemerxDecompile.Service
             }
 
             MemberReference reference = entry.Value;
-            TypeReference typeDef = reference.DeclaringType;
+            TypeReference typeRef = reference.DeclaringType;
             string typeDefFullName = string.Empty;
 
-            if (typeDef != null)
+            if (typeRef != null)
             {
-                while (typeDef.DeclaringType != null)
+                while (typeRef.DeclaringType != null)
                 {
-                    typeDef = typeDef.DeclaringType;
+                    typeRef = typeRef.DeclaringType;
                 }
 
-                typeDefFullName = typeDef.FullName;
+                typeDefFullName = typeRef.FullName;
             }
             else
             {

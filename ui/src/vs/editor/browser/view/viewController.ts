@@ -16,9 +16,9 @@ import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import * as platform from 'vs/base/common/platform';
 /* AGPL */
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
-import { URI } from 'vs/base/common/uri';
-import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+// import { URI } from 'vs/base/common/uri';
+// import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+// import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
 /* End AGPL */
 
 export interface IMouseDispatchData {
@@ -56,7 +56,7 @@ export class ViewController {
 	private readonly userInputEvents: ViewUserInputEvents;
 	private readonly commandDelegate: ICommandDelegate;
 	/* AGPL */
-	private readonly codeEditorService: ICodeEditorService;
+	// private readonly codeEditorService: ICodeEditorService;
 	/* End AGPL */
 
 	constructor(
@@ -66,8 +66,8 @@ export class ViewController {
 		commandDelegate: ICommandDelegate,
 		/* AGPL */
 		codeEditorService: ICodeEditorService,
-		private readonly decompilationService: IDecompilationService,
-		private readonly environmentRpcService: IEnvironmentRpcService
+		// private readonly decompilationService: IDecompilationService,
+		// private readonly environmentRpcService: IEnvironmentRpcService
 		/* End AGPL */
 	) {
 		this.configuration = configuration;
@@ -75,7 +75,7 @@ export class ViewController {
 		this.userInputEvents = userInputEvents;
 		this.commandDelegate = commandDelegate;
 		/* AGPL */
-		this.codeEditorService = codeEditorService;
+		// this.codeEditorService = codeEditorService;
 		/* End AGPL */
 	}
 
@@ -215,26 +215,27 @@ export class ViewController {
 						}
 					}
 				} else {
-					/* AGPL */
-					(async () => {
-						try {
-							const tempDir = await this.environmentRpcService.getTempDir();
-							const assembliedRootFolder = `${tempDir}\\CD\\`;
-							const relativePath = this.viewModel.model.uri.fsPath.substr(assembliedRootFolder.length);
-							const navigationData = await this.decompilationService.getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1);
+					this.moveTo(data.position);
+					// /* AGPL */
+					// (async () => {
+					// 	try {
+					// 		const tempDir = await this.environmentRpcService.getTempDir();
+					// 		const assembliedRootFolder = `${tempDir}\\CD\\`;
+					// 		const relativePath = this.viewModel.model.uri.fsPath.substr(assembliedRootFolder.length);
+					// 		const navigationData = await this.decompilationService.getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1);
 							
-							if (navigationData.filePath) {
-								this.codeEditorService.openCodeEditor({
-									resource: URI.file(assembliedRootFolder + navigationData.filePath)
-								}, null, undefined, navigationData);
-							} else {
-								this.moveTo(data.position);
-							}
-						} catch(err) {
-							this.moveTo(data.position);
-						}
-					})();
-					/* End AGPL */
+					// 		if (navigationData.filePath) {
+					// 			this.codeEditorService.openCodeEditor({
+					// 				resource: URI.file(assembliedRootFolder + navigationData.filePath)
+					// 			}, null, undefined, navigationData);
+					// 		} else {
+					// 			this.moveTo(data.position);
+					// 		}
+					// 	} catch(err) {
+					// 		this.moveTo(data.position);
+					// 	}
+					// })();
+					// /* End AGPL */
 				}
 			}
 		}

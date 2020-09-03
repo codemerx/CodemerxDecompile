@@ -31,10 +31,6 @@ import { StandaloneCodeEditorNLS } from 'vs/editor/common/standaloneStrings';
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import { IEditorProgressService } from 'vs/platform/progress/common/progress';
 import { StandaloneThemeServiceImpl } from 'vs/editor/standalone/browser/standaloneThemeServiceImpl';
-/* AGPL */
-import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
-/* End AGPL */
 
 /**
  * Description of an action contribution
@@ -235,16 +231,12 @@ export class StandaloneCodeEditor extends CodeEditorWidget implements IStandalon
 		@IKeybindingService keybindingService: IKeybindingService,
 		@IThemeService themeService: IThemeService,
 		@INotificationService notificationService: INotificationService,
-		@IAccessibilityService accessibilityService: IAccessibilityService,
-		/* AGPL */
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IEnvironmentRpcService environmentRpcService: IEnvironmentRpcService
-		/* End AGPL */
+		@IAccessibilityService accessibilityService: IAccessibilityService
 	) {
 		options = options || {};
 		options.ariaLabel = options.ariaLabel || StandaloneCodeEditorNLS.editorViewAccessibleLabel;
 		options.ariaLabel = options.ariaLabel + ';' + (StandaloneCodeEditorNLS.accessibilityHelpMessage);
-		super(domElement, options, {}, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService, /* AGPL */decompilationService, environmentRpcService/* End AGPL */);
+		super(domElement, options, {}, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService);
 
 		if (keybindingService instanceof StandaloneKeybindingService) {
 			this._standaloneKeybindingService = keybindingService;
@@ -368,11 +360,7 @@ export class StandaloneEditor extends StandaloneCodeEditor implements IStandalon
 		@IStandaloneThemeService themeService: IStandaloneThemeService,
 		@INotificationService notificationService: INotificationService,
 		@IConfigurationService configurationService: IConfigurationService,
-		@IAccessibilityService accessibilityService: IAccessibilityService,
-		/* AGPL */
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IEnvironmentRpcService environmentRpcService: IEnvironmentRpcService
-		/* End AGPL */
+		@IAccessibilityService accessibilityService: IAccessibilityService
 	) {
 		applyConfigurationValues(configurationService, options, false);
 		const themeDomRegistration = (<StandaloneThemeServiceImpl>themeService).registerEditorContainer(domElement);
@@ -382,7 +370,7 @@ export class StandaloneEditor extends StandaloneCodeEditor implements IStandalon
 		}
 		let _model: ITextModel | null | undefined = options.model;
 		delete options.model;
-		super(domElement, options, instantiationService, codeEditorService, commandService, contextKeyService, keybindingService, themeService, notificationService, accessibilityService, /* AGPL */decompilationService, environmentRpcService/* End AGPL */);
+		super(domElement, options, instantiationService, codeEditorService, commandService, contextKeyService, keybindingService, themeService, notificationService, accessibilityService);
 
 		this._contextViewService = <ContextViewService>contextViewService;
 		this._configurationService = configurationService;

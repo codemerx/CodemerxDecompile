@@ -1,0 +1,14 @@
+{
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/engine/CodemerxDecompile.Service/CodemerxDecompile.Service.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        }
+    ]
+}

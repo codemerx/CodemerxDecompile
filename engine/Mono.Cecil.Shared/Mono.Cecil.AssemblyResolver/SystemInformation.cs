@@ -13,9 +13,9 @@ namespace Mono.Cecil.AssemblyResolver
 
         public static readonly Version DefaultAssemblyVersion = new Version(0, 0, 0, 0);
 
-        public static string SILVERLIGHT_RUNTIME = GetSilverlightRunTime(ProgramFilesX86);
+        public static string SILVERLIGHT_RUNTIME = null;
 
-        public static string SILVERLIGHT_RUNTIME_64 = GetSilverlightRunTime(ProgramW6432);
+        public static string SILVERLIGHT_RUNTIME_64 = null;
 
         public static string SILVERLIGHT_DEFAULT = @"{0}\Reference Assemblies\Microsoft\Framework\Silverlight\{1}\{2}.dll";
 
@@ -90,7 +90,7 @@ namespace Mono.Cecil.AssemblyResolver
         {
             get
             {
-                return Environment.GetEnvironmentVariable("windir") ?? Environment.GetEnvironmentVariable("SystemRoot");
+                return string.Empty;
             }
         }
 
@@ -98,7 +98,7 @@ namespace Mono.Cecil.AssemblyResolver
         {
             get
             {
-                return Environment.GetEnvironmentVariable("ProgramFiles(x86)") ?? Environment.GetEnvironmentVariable("ProgramFiles");
+                return string.Empty;
             }
         }
 
@@ -106,7 +106,7 @@ namespace Mono.Cecil.AssemblyResolver
         {
             get
             {
-                return Environment.GetEnvironmentVariable("ProgramW6432") ?? string.Empty;
+                return string.Empty;
             }
         }
 

@@ -66,8 +66,11 @@ import { clearAllFontInfos } from 'vs/editor/browser/config/configuration';
 import { IRemoteAuthorityResolverService } from 'vs/platform/remote/common/remoteAuthorityResolver';
 import { IAddressProvider, IAddress } from 'vs/platform/remote/common/remoteAgentConnection';
 import { VSBuffer } from 'vs/base/common/buffer';
+/* AGPL */
 import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
+/* End AGPL */
 
 export class NativeWindow extends Disposable {
 
@@ -114,8 +117,11 @@ export class NativeWindow extends Disposable {
 		@IProductService private readonly productService: IProductService,
 		@IRemoteAuthorityResolverService private readonly remoteAuthorityResolverService: IRemoteAuthorityResolverService,
 		@IHostService private readonly hostService: IHostService,
+		/* AGPL */
 		@IDecompilationService private readonly decompilationService: IDecompilationService,
-		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService
+		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService,
+		@IProgressService private readonly progressService: IProgressService
+		/* End AGPL */
 	) {
 		super();
 
@@ -628,25 +634,31 @@ export class NativeWindow extends Disposable {
 		if (request.filesToOpenOrCreate?.length == 1 &&
 			request.filesToOpenOrCreate[0].exists &&
 			request.filesToOpenOrCreate[0].fileUri?.path) {
-			const uri = URI.revive(request.filesToOpenOrCreate[0].fileUri);
-			const tempDir = `${await this.environmentRpcService.getTempDir()}\\CD`;
-			const assemblyMetadata = await this.decompilationService.getAssemblyMetadata(uri.fsPath);
-			const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath, tempDir);
+			/* AGPL */
+			const fileUri = request.filesToOpenOrCreate[0].fileUri;
 
-			const moduleDir = `${tempDir}\\${assemblyMetadata.strongName}\\${assemblyMetadata.mainModuleName}`;
-			if (await this.fileService.exists(URI.file(moduleDir))) {
-				await this.fileService.del(URI.file(moduleDir), {
-					useTrash: false,
-					recursive: true
-				});
-			}
+			this.progressService.withProgress({ location: ProgressLocation.Explorer, delay: 150 }, async () => {
+				const uri = URI.revive(fileUri);
+				const tempDir = `${await this.environmentRpcService.getTempDir()}\\CD`;
+				const assemblyMetadata = await this.decompilationService.getAssemblyMetadata(uri.fsPath);
+				const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath, tempDir);
 
-			for (const typeFilePath of typeFilePaths) {
-				const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
-				await this.fileService.createFile(URI.file(`${tempDir}\\${typeFilePath.relativeFilePath}`), content);
-			}
+				const moduleDir = `${tempDir}\\${assemblyMetadata.strongName}\\${assemblyMetadata.mainModuleName}`;
+				if (await this.fileService.exists(URI.file(moduleDir))) {
+					await this.fileService.del(URI.file(moduleDir), {
+						useTrash: false,
+						recursive: true
+					});
+				}
 
-			await this.hostService.openWindow([{ folderUri: URI.file(tempDir) }], undefined);
+				for (const typeFilePath of typeFilePaths) {
+					const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
+					await this.fileService.createFile(URI.file(`${tempDir}\\${typeFilePath.relativeFilePath}`), content);
+				}
+
+				await this.hostService.openWindow([{ folderUri: URI.file(tempDir) }], undefined);
+			});
+			/* End AGPL */
 		}
 	}
 

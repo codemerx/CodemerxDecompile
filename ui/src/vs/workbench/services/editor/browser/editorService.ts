@@ -540,8 +540,8 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 
 			const navigationData = (groupOrNavigationData as MemberNavigationData);
 
-			if (navigationData.memberFullName && navigationData.filePath) {
-				const selection = await this.decompilationService.getMemberDefinitionPosition(navigationData.memberFullName, navigationData.filePath);
+			if (navigationData && navigationData.memberFullName && navigationData.navigationFilePath) {
+				const selection = await this.decompilationService.getMemberDefinitionPosition(navigationData.navigationFilePath, navigationData.memberFullName);
 
 				if (selection.startLineNumber && selection.endLineNumber && selection.startColumnIndex && selection.endColumnIndex) {
 					resourceEditorInput.options = {

@@ -23,7 +23,7 @@ import { editorActiveLinkForeground } from 'vs/platform/theme/common/colorRegist
 import { EditorState, CodeEditorStateFlag } from 'vs/editor/browser/core/editorState';
 // import { DefinitionAction } from '../goToCommands';
 import { ClickLinkGesture, ClickLinkMouseEvent, ClickLinkKeyboardEvent } from 'vs/editor/contrib/gotoSymbol/link/clickLinkGesture';
-import { IWordAtPosition, IModelDeltaDecoration, ITextModel, /* IFoundBracket */ } from 'vs/editor/common/model';
+import { IWordAtPosition, IModelDeltaDecoration, /* ITextModel, IFoundBracket */ } from 'vs/editor/common/model';
 import { Position } from 'vs/editor/common/core/position';
 import { withNullAsUndefined } from 'vs/base/common/types';
 import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
@@ -33,10 +33,9 @@ import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 // import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 
 /* AGPL */
-import { URI } from 'vs/base/common/uri';
-import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
+import { IDecompilationService, MemberNavigationData } from 'vs/cd/workbench/DecompilationService';
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
+import { URI } from 'vs/base/common/uri';
 /* End AGPL */
 export class GotoDefinitionAtPositionEditorContribution implements IEditorContribution {
 
@@ -48,8 +47,8 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 	private readonly toUnhookForKeyboard = new DisposableStore();
 	private linkDecorations: string[] = [];
 	private currentWordAtPosition: IWordAtPosition | null = null;
-	private previousPromise: Promise<any | null> | null = null;
-	private lastMemberDefinition: any;
+	private previousPromise: Promise<MemberNavigationData | null> | null = null;
+	private lastMemberDefinition: MemberNavigationData | null = null;
 
 	constructor(
 		editor: ICodeEditor,
@@ -57,7 +56,6 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		// @IModeService private readonly modeService: IModeService,
 		/* AGPL */
 		@IDecompilationService private readonly decompilationService: IDecompilationService,
-		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService,
 		@ICodeEditorService private readonly codeEditorService: ICodeEditorService
 		/* End AGPL */
 	) {
@@ -81,9 +79,11 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 				(async() => {
 					try {
 						if (this.lastMemberDefinition) {
-							this.codeEditorService.openCodeEditor({
-								resource: this.lastMemberDefinition.uri
+							await this.codeEditorService.openCodeEditor({
+								resource: URI.file(this.lastMemberDefinition.navigationFilePath)
 							}, null, undefined, this.lastMemberDefinition);
+
+							this.lastMemberDefinition = null;
 						} else {
 							this.removeLinkDecorations();
 						}
@@ -175,10 +175,16 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		// Find definition and decorate word if found
 		let state = new EditorState(this.editor, CodeEditorStateFlag.Position | CodeEditorStateFlag.Value | CodeEditorStateFlag.Selection | CodeEditorStateFlag.Scroll);
 
-		this.previousPromise = this.getMemberDefinition(this.editor.getModel(), position);
+		const openedEditorFilePath = this.editor.getModel()?.uri.fsPath;
+
+		if (openedEditorFilePath) {
+			this.previousPromise = this.decompilationService.getMemberDefinition(openedEditorFilePath, position.lineNumber - 1, position.column - 1)
+		} else {
+			this.previousPromise = Promise.resolve(null);
+		}
 
 		return this.previousPromise.then(result => {
-			if (!result || !result.filePath || !state.validate(this.editor)) {
+			if (!result || !result.navigationFilePath || !state.validate(this.editor)) {
 				this.removeLinkDecorations();
 				return;
 			}
@@ -236,20 +242,6 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 			// 	});
 			// }
 		}).then(undefined, onUnexpectedError);
-	}
-
-	private async getMemberDefinition(model: ITextModel | null, position: Position) : Promise<any> {
-		const tempDir = await this.environmentRpcService.getTempDir();
-		const assembliedRootFolder = `${tempDir}\\CD\\`;
-		const relativePath = model?.uri.fsPath.substr(assembliedRootFolder.length) ?? '';
-		const navigationData = await this.decompilationService.getMemberDefinition(relativePath, position.lineNumber - 1, position.column - 1);
-		const uri = URI.file(assembliedRootFolder + navigationData.filePath);
-
-		return {
-			uri,
-			filePath: navigationData.filePath,
-			memberFullName: navigationData.memberFullName
-		};
 	}
 
 	// private getPreviewValue(textEditorModel: ITextModel, startLineNumber: number, result: LocationLink) {

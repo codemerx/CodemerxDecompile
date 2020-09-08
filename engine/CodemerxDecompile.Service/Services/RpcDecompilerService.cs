@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services;
+using Google.Protobuf;
 using Grpc.Core;
 
 using JustDecompile.Tools.MSBuildProjectBuilder;
@@ -23,19 +24,22 @@ namespace CodemerxDecompile.Service
     public class RpcDecompilerService : RpcDecompiler.RpcDecompilerBase
     {
         private readonly IDecompilationContext decompilationContext;
+        private readonly string AssembliesDirectory = Path.Join(Path.GetTempPath(), "CD");
 
         public RpcDecompilerService(IDecompilationContext decompilationContext)
         {
             this.decompilationContext = decompilationContext;
         }
 
-        public override Task<GetAssemblyMetadataResponse> GetAssemblyMetadata(GetAssemblyMetadataRequest request, ServerCallContext context)
+        public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
 
-            GetAssemblyMetadataResponse response = new GetAssemblyMetadataResponse();
-            response.StrongName = assembly.FullName;
-            response.MainModuleName = assembly.MainModule.Name;
+            GetAssemblyRelatedFilePathsResponse response = new GetAssemblyRelatedFilePathsResponse()
+            {
+                DecompiledAssemblyDirectory = AssembliesDirectory
+            };
+            response.ModulesDirectories.AddRange(assembly.Modules.Select(m => Path.Join(AssembliesDirectory, assembly.FullName, m.Name)));
 
             return Task.FromResult(response);
         }
@@ -53,7 +57,7 @@ namespace CodemerxDecompile.Service
                 resources,
                 assembly.BuildNamespaceHierarchyTree(),
                 LanguageFactory.GetLanguage(CSharpVersion.V7),
-                Utilities.GetMaxRelativePathLength(request.TargetPath),
+                Utilities.GetMaxRelativePathLength(AssembliesDirectory),
                 true);
 
             this.decompilationContext.TypeToFilePathMap = filePathsService.GetTypesToFilePathsMap()
@@ -62,9 +66,11 @@ namespace CodemerxDecompile.Service
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
             response.TypeFilePaths.AddRange(this.decompilationContext.TypeToFilePathMap.Select(pair =>
             {
-                TypeFilePath result = new TypeFilePath();
-                result.TypeFullName = pair.Key.FullName;
-                result.RelativeFilePath = pair.Value;
+                TypeFilePath result = new TypeFilePath()
+                {
+                    TypeFullName = pair.Key.FullName,
+                    AbsoluteFilePath = Path.Join(AssembliesDirectory, pair.Value)
+                };
 
                 return result;
             }));
@@ -76,12 +82,19 @@ namespace CodemerxDecompile.Service
         {
             GetMemberDefinitionResponse response = new GetMemberDefinitionResponse();
 
-            if (!this.decompilationContext.CodeSpanToMemberReference.ContainsKey(request.FilePath))
+            if (string.IsNullOrEmpty(request.AbsoluteFilePath))
             {
                 return Task.FromResult(response);
             }
 
-            KeyValuePair<CodeSpan, MemberReference> entry = this.decompilationContext.CodeSpanToMemberReference[request.FilePath]
+            string memberRelativePath = Path.GetRelativePath(AssembliesDirectory, request.AbsoluteFilePath);
+
+            if (!this.decompilationContext.CodeSpanToMemberReference.ContainsKey(memberRelativePath))
+            {
+                return Task.FromResult(response);
+            }
+
+            KeyValuePair<CodeSpan, MemberReference> entry = this.decompilationContext.CodeSpanToMemberReference[memberRelativePath]
                 .FirstOrDefault(kvp => kvp.Key.Start.Line <= request.LineNumber && kvp.Key.End.Line >= request.LineNumber &&
                     kvp.Key.Start.Column < request.ColumnIndex && kvp.Key.End.Column > request.ColumnIndex);
 
@@ -111,7 +124,12 @@ namespace CodemerxDecompile.Service
             KeyValuePair<TypeDefinition, string> typeDefKvp = this.decompilationContext.TypeToFilePathMap.FirstOrDefault(kvp => kvp.Key.FullName == typeDefFullName);
             string typeDefinitionFilePath = typeDefKvp.Value;
 
-            response.Filepath = typeDefinitionFilePath;
+            if (string.IsNullOrEmpty(typeDefinitionFilePath))
+            {
+                return Task.FromResult(response);
+            }
+
+            response.NavigationFilePath = Path.Join(AssembliesDirectory, typeDefinitionFilePath);
             response.MemberFullName = reference.FullName;
 
             return Task.FromResult(response);
@@ -121,12 +139,19 @@ namespace CodemerxDecompile.Service
         {
             Selection selection = new Selection();
 
-            if (!this.decompilationContext.MemberDeclarationToCodeSpan.ContainsKey(request.Filepath))
+            if (string.IsNullOrEmpty(request.AbsoluteFilePath))
             {
                 return Task.FromResult(selection);
             }
 
-            KeyValuePair<IMemberDefinition, CodeSpan> entry = this.decompilationContext.MemberDeclarationToCodeSpan[request.Filepath].FirstOrDefault(kvp => kvp.Key.FullName == request.MemberFullName);
+            string memberRelativePath = Path.GetRelativePath(AssembliesDirectory, request.AbsoluteFilePath);
+
+            if (!this.decompilationContext.MemberDeclarationToCodeSpan.ContainsKey(memberRelativePath))
+            {
+                return Task.FromResult(selection);
+            }
+
+            KeyValuePair<IMemberDefinition, CodeSpan> entry = this.decompilationContext.MemberDeclarationToCodeSpan[memberRelativePath].FirstOrDefault(kvp => kvp.Key.FullName == request.MemberFullName);
             if (entry.Key == null)
             {
                 return Task.FromResult(selection);

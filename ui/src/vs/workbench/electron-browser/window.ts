@@ -68,7 +68,6 @@ import { IAddressProvider, IAddress } from 'vs/platform/remote/common/remoteAgen
 import { VSBuffer } from 'vs/base/common/buffer';
 /* AGPL */
 import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 /* End AGPL */
 
@@ -119,7 +118,6 @@ export class NativeWindow extends Disposable {
 		@IHostService private readonly hostService: IHostService,
 		/* AGPL */
 		@IDecompilationService private readonly decompilationService: IDecompilationService,
-		@IEnvironmentRpcService private readonly environmentRpcService: IEnvironmentRpcService,
 		@IProgressService private readonly progressService: IProgressService
 		/* End AGPL */
 	) {
@@ -639,24 +637,26 @@ export class NativeWindow extends Disposable {
 
 			this.progressService.withProgress({ location: ProgressLocation.Explorer, delay: 150 }, async () => {
 				const uri = URI.revive(fileUri);
-				const tempDir = `${await this.environmentRpcService.getTempDir()}\\CD`;
-				const assemblyMetadata = await this.decompilationService.getAssemblyMetadata(uri.fsPath);
-				const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath, tempDir);
+				const assemblyRelatedFilePaths = await this.decompilationService.getAssemblyRelatedFilePaths(uri.fsPath);
+				const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath);
 
-				const moduleDir = `${tempDir}\\${assemblyMetadata.strongName}\\${assemblyMetadata.mainModuleName}`;
-				if (await this.fileService.exists(URI.file(moduleDir))) {
-					await this.fileService.del(URI.file(moduleDir), {
-						useTrash: false,
-						recursive: true
-					});
+				if (assemblyRelatedFilePaths.modulesDirectories && assemblyRelatedFilePaths.modulesDirectories.length) {
+					for(const moduleFilePath of assemblyRelatedFilePaths.modulesDirectories) {
+						if (await this.fileService.exists(URI.file(moduleFilePath))) {
+							await this.fileService.del(URI.file(moduleFilePath), {
+								useTrash: false,
+								recursive: true
+							});
+						}
+					}
 				}
 
 				for (const typeFilePath of typeFilePaths) {
 					const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
-					await this.fileService.createFile(URI.file(`${tempDir}\\${typeFilePath.relativeFilePath}`), content);
+					await this.fileService.createFile(URI.file(typeFilePath.absoluteFilePath), content);
 				}
 
-				await this.hostService.openWindow([{ folderUri: URI.file(tempDir) }], undefined);
+				await this.hostService.openWindow([{ folderUri: URI.file(assemblyRelatedFilePaths.decompiledAssemblyDirectory) }], undefined);
 			});
 			/* End AGPL */
 		}

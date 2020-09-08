@@ -3,36 +3,40 @@ syntax = "proto3";
 option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
-  rpc GetAssemblyMetadata (GetAssemblyMetadataRequest) returns (GetAssemblyMetadataResponse);
+  rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
   rpc GetMemberDefinition (GetMemberDefinitionRequest) returns (GetMemberDefinitionResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
 }
 
-message GetMemberDefinitionPositionRequest {
-  string filepath = 1;
-  string memberFullName = 2;
-}
-
-message GetAssemblyMetadataRequest {
+message GetAssemblyRelatedFilePathsRequest {
   string assemblyPath = 1;
 }
 
-message GetAssemblyMetadataResponse {
-  string strongName = 1;
-  string mainModuleName = 2;
+message GetAssemblyRelatedFilePathsResponse {
+  string decompiledAssemblyDirectory = 1;
+  repeated string modulesDirectories = 2;
 }
 
 message GetAllTypeFilePathsRequest {
   string assemblyPath = 1;
-  string targetPath = 2;
 }
 
 message GetMemberDefinitionRequest {
-	string filePath = 1;
+	string absoluteFilePath = 1;
 	int32 lineNumber = 2;
 	int32 columnIndex = 3;
+}
+
+message GetMemberDefinitionResponse {
+  string navigationFilePath = 1;
+  string memberFullName = 2;
+}
+
+message GetMemberDefinitionPositionRequest {
+  string absoluteFilePath = 1;
+  string memberFullName = 2;
 }
 
 message Selection {
@@ -42,18 +46,13 @@ message Selection {
 	int32 endColumnIndex = 4;
 }
 
-message GetMemberDefinitionResponse {
-  string filepath = 1;
-  string memberFullName = 2;
-}
-
 message GetAllTypeFilePathsResponse {
   repeated TypeFilePath typeFilePaths = 1;
 }
 
 message TypeFilePath {
   string typeFullName = 1;
-  string relativeFilePath = 2;
+  string absoluteFilePath = 2;
 }
 
 message DecompileTypeRequest {

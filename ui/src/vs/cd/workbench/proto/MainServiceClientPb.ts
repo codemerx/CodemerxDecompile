@@ -35,44 +35,44 @@ export class RpcDecompilerClient {
     this.options_ = options;
   }
 
-  methodInfoGetAssemblyMetadata = new grpcWeb.AbstractClientBase.MethodInfo(
-    main_pb.GetAssemblyMetadataResponse,
-    (request: main_pb.GetAssemblyMetadataRequest) => {
+  methodInfoGetAssemblyRelatedFilePaths = new grpcWeb.AbstractClientBase.MethodInfo(
+    main_pb.GetAssemblyRelatedFilePathsResponse,
+    (request: main_pb.GetAssemblyRelatedFilePathsRequest) => {
       return request.serializeBinary();
     },
-    main_pb.GetAssemblyMetadataResponse.deserializeBinary
+    main_pb.GetAssemblyRelatedFilePathsResponse.deserializeBinary
   );
 
-  getAssemblyMetadata(
-    request: main_pb.GetAssemblyMetadataRequest,
-    metadata: grpcWeb.Metadata | null): Promise<main_pb.GetAssemblyMetadataResponse>;
+  getAssemblyRelatedFilePaths(
+    request: main_pb.GetAssemblyRelatedFilePathsRequest,
+    metadata: grpcWeb.Metadata | null): Promise<main_pb.GetAssemblyRelatedFilePathsResponse>;
 
-  getAssemblyMetadata(
-    request: main_pb.GetAssemblyMetadataRequest,
+  getAssemblyRelatedFilePaths(
+    request: main_pb.GetAssemblyRelatedFilePathsRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: main_pb.GetAssemblyMetadataResponse) => void): grpcWeb.ClientReadableStream<main_pb.GetAssemblyMetadataResponse>;
+               response: main_pb.GetAssemblyRelatedFilePathsResponse) => void): grpcWeb.ClientReadableStream<main_pb.GetAssemblyRelatedFilePathsResponse>;
 
-  getAssemblyMetadata(
-    request: main_pb.GetAssemblyMetadataRequest,
+  getAssemblyRelatedFilePaths(
+    request: main_pb.GetAssemblyRelatedFilePathsRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: main_pb.GetAssemblyMetadataResponse) => void) {
+               response: main_pb.GetAssemblyRelatedFilePathsResponse) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/RpcDecompiler/GetAssemblyMetadata',
+          '/RpcDecompiler/GetAssemblyRelatedFilePaths',
         request,
         metadata || {},
-        this.methodInfoGetAssemblyMetadata,
+        this.methodInfoGetAssemblyRelatedFilePaths,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/RpcDecompiler/GetAssemblyMetadata',
+      '/RpcDecompiler/GetAssemblyRelatedFilePaths',
     request,
     metadata || {},
-    this.methodInfoGetAssemblyMetadata);
+    this.methodInfoGetAssemblyRelatedFilePaths);
   }
 
   methodInfoGetAllTypeFilePaths = new grpcWeb.AbstractClientBase.MethodInfo(

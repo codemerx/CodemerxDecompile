@@ -60,13 +60,13 @@ function code-wsl()
 	export DISPLAY="$HOST_IP:0"
 
 	# in a wsl shell
-	ELECTRON="$ROOT/.build/electron/Codemerx Decompile.exe"
+	ELECTRON="$ROOT/.build/electron/CodemerxDecompile.exe"
 	if [ -f "$ELECTRON"  ]; then
 		local CWD=$(pwd)
 		cd $ROOT
 		export WSLENV=ELECTRON_RUN_AS_NODE/w:$WSLENV
 		local WSL_EXT_ID="ms-vscode-remote.remote-wsl"
-		local WSL_EXT_WLOC=$(ELECTRON_RUN_AS_NODE=1 "$ROOT/.build/electron/Codemerx Decompile.exe" "out/cli.js" --locate-extension $WSL_EXT_ID)
+		local WSL_EXT_WLOC=$(ELECTRON_RUN_AS_NODE=1 "$ROOT/.build/electron/CodemerxDecompile.exe" "out/cli.js" --locate-extension $WSL_EXT_ID)
 		cd $CWD
 		if [ -n "$WSL_EXT_WLOC" ]; then
 			# replace \r\n with \n in WSL_EXT_WLOC

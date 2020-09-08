@@ -543,13 +543,15 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 			if (navigationData.memberFullName && navigationData.filePath) {
 				const selection = await this.decompilationService.getMemberDefinitionPosition(navigationData.memberFullName, navigationData.filePath);
 
-				resourceEditorInput.options = {
-					...resourceEditorInput.options,
-					selection: {
-						startLineNumber: selection.startLineNumber,
-						startColumn: selection.startColumnIndex,
-						endLineNumber: selection.endLineNumber,
-						endColumn: selection.endColumnIndex
+				if (selection.startLineNumber && selection.endLineNumber && selection.startColumnIndex && selection.endColumnIndex) {
+					resourceEditorInput.options = {
+						...resourceEditorInput.options,
+						selection: {
+							startLineNumber: selection.startLineNumber,
+							startColumn: selection.startColumnIndex,
+							endLineNumber: selection.endLineNumber,
+							endColumn: selection.endColumnIndex
+						}
 					}
 				}
 			}

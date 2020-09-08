@@ -1613,10 +1613,7 @@ export class CodeEditorWidget extends Disposable implements editorBrowser.ICodeE
 			this._configuration,
 			this._themeService,
 			viewModel,
-			viewUserInputEvents,
-			/* AGPL */
-			this._codeEditorService
-			/* End AGPL */
+			viewUserInputEvents
 		);
 
 		return [view, true];

@@ -14,12 +14,6 @@ import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 import { IMouseWheelEvent } from 'vs/base/browser/mouseEvent';
 import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import * as platform from 'vs/base/common/platform';
-/* AGPL */
-import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
-// import { URI } from 'vs/base/common/uri';
-// import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-// import { IEnvironmentRpcService } from 'vs/cd/workbench/EnvironmentRpcService';
-/* End AGPL */
 
 export interface IMouseDispatchData {
 	position: Position;
@@ -55,28 +49,17 @@ export class ViewController {
 	private readonly viewModel: IViewModel;
 	private readonly userInputEvents: ViewUserInputEvents;
 	private readonly commandDelegate: ICommandDelegate;
-	/* AGPL */
-	// private readonly codeEditorService: ICodeEditorService;
-	/* End AGPL */
 
 	constructor(
 		configuration: IConfiguration,
 		viewModel: IViewModel,
 		userInputEvents: ViewUserInputEvents,
-		commandDelegate: ICommandDelegate,
-		/* AGPL */
-		codeEditorService: ICodeEditorService,
-		// private readonly decompilationService: IDecompilationService,
-		// private readonly environmentRpcService: IEnvironmentRpcService
-		/* End AGPL */
+		commandDelegate: ICommandDelegate
 	) {
 		this.configuration = configuration;
 		this.viewModel = viewModel;
 		this.userInputEvents = userInputEvents;
 		this.commandDelegate = commandDelegate;
-		/* AGPL */
-		// this.codeEditorService = codeEditorService;
-		/* End AGPL */
 	}
 
 	public paste(text: string, pasteOnNewLine: boolean, multicursorText: string[] | null, mode: string | null): void {
@@ -216,26 +199,6 @@ export class ViewController {
 					}
 				} else {
 					this.moveTo(data.position);
-					// /* AGPL */
-					// (async () => {
-					// 	try {
-					// 		const tempDir = await this.environmentRpcService.getTempDir();
-					// 		const assembliedRootFolder = `${tempDir}\\CD\\`;
-					// 		const relativePath = this.viewModel.model.uri.fsPath.substr(assembliedRootFolder.length);
-					// 		const navigationData = await this.decompilationService.getMemberDefinition(relativePath, data.position.lineNumber - 1, data.position.column - 1);
-							
-					// 		if (navigationData.filePath) {
-					// 			this.codeEditorService.openCodeEditor({
-					// 				resource: URI.file(assembliedRootFolder + navigationData.filePath)
-					// 			}, null, undefined, navigationData);
-					// 		} else {
-					// 			this.moveTo(data.position);
-					// 		}
-					// 	} catch(err) {
-					// 		this.moveTo(data.position);
-					// 	}
-					// })();
-					// /* End AGPL */
 				}
 			}
 		}

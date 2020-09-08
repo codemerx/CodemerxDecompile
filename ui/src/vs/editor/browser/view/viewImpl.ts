@@ -49,9 +49,6 @@ import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 import { IThemeService, getThemeTypeSelector } from 'vs/platform/theme/common/themeService';
 import { EditorOption } from 'vs/editor/common/config/editorOptions';
 import { PointerHandlerLastRenderData } from 'vs/editor/browser/controller/mouseTarget';
-/* AGPL */
-import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
-/* End AGPL */
 
 export interface IContentWidgetData {
 	widget: IContentWidget;
@@ -95,16 +92,13 @@ export class View extends ViewEventHandler {
 		configuration: IConfiguration,
 		themeService: IThemeService,
 		model: IViewModel,
-		userInputEvents: ViewUserInputEvents,
-		/* AGPL */
-		codeEditorService: ICodeEditorService
-		/* End AGPL */
+		userInputEvents: ViewUserInputEvents
 	) {
 		super();
 		this._selections = [new Selection(1, 1, 1, 1)];
 		this._renderAnimationFrame = null;
 
-		const viewController = new ViewController(configuration, model, userInputEvents, commandDelegate, /* AGPL */codeEditorService);
+		const viewController = new ViewController(configuration, model, userInputEvents, commandDelegate);
 
 		// The view context is passed on to most classes (basically to reduce param. counts in ctors)
 		this._context = new ViewContext(configuration, themeService.getColorTheme(), model);

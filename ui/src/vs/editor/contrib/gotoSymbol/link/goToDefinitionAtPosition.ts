@@ -185,8 +185,7 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 
 			this.lastMemberDefinition = result;
 
-			this.addDecoration(
-				new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn));
+			this.addDecoration(new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn));
 			// // Multiple results
 			// if (results.length > 1) {
 			// 	this.addDecoration(

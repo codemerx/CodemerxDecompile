@@ -21,8 +21,8 @@ if (isWeb) {
 	if (Object.keys(product).length === 0) {
 		Object.assign(product, {
 			version: '1.47.0-dev',
-			nameLong: 'Codemerx Decompile Web Dev',
-			nameShort: 'Codemerx Decompile Web Dev',
+			nameLong: 'CodemerxDecompile Web Dev',
+			nameShort: 'CodemerxDecompile Web Dev',
 			urlProtocol: 'code-oss'
 		});
 	}

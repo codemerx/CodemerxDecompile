@@ -1,9 +1,9 @@
 {
-  "name": "codemerx-decompile",
+  "name": "codemerxdecompile",
   "version": "1.47.2",
   "distro": "1c45ca75fd18ee8dc55738baac0c49bc64d356e6",
   "author": {
-    "name": "Codemerx"
+    "name": "CodeMerx"
   },
   "license": "MIT",
   "main": "./out/main",

@@ -17,6 +17,9 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { join } from 'path';
 import { spawn } from 'child_process';
+import { RpcManagerClient } from 'vs/cd/workbench/proto/manager_grpc_pb';
+import * as grpc from "grpc";
+import { GetServerStatusRequest } from 'vs/cd/workbench/proto/manager_pb';
 
 export const IGrpcMainService = createDecorator<IGrpcMainService>('grpcService');
 
@@ -24,7 +27,7 @@ interface IGrpcMainService {
 	readonly _serviceBrand: undefined;
 
 	initialize(): void;
-	getServiceUrl() : Promise<string>;
+	getServiceUrl(): Promise<string>;
 };
 
 export class GrpcMainService implements IGrpcMainService {
@@ -41,6 +44,16 @@ export class GrpcMainService implements IGrpcMainService {
 			const serverPath = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.dll');
 
 			spawn('dotnet', [serverPath, `--port=${this.port}`]);
+
+			const statusService = new RpcManagerClient(`localhost:${this.port}`, grpc.credentials.createInsecure());
+			statusService.getServerStatus(new GetServerStatusRequest(), (error, response) => {
+				if (error) {
+					console.error(error);
+				}
+				else {
+					console.log(response?.getStatus());
+				}
+			});
 
 			resolve();
 		});

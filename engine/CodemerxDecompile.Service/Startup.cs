@@ -18,7 +18,6 @@ using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services.DecompilationContext;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -49,6 +48,7 @@ namespace CodemerxDecompile.Service
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<RpcDecompilerService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<RpcManagerService>();
             });
         }
     }

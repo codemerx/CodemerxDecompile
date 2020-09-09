@@ -31,6 +31,9 @@
     <Protobuf Include="..\..\common\proto\main.proto" GrpcServices="Server">
       <Link>proto\main.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\..\common\proto\manager.proto" GrpcServices="Server">
+      <Link>proto\manager.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
   <ItemGroup>

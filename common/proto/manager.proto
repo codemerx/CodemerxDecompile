@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option csharp_namespace = "CodemerxDecompile.Service";
+
+service RpcManager {
+  rpc GetServerStatus (GetServerStatusRequest) returns (GetServerStatusResponse);
+}
+
+message GetServerStatusRequest {
+}
+
+message GetServerStatusResponse {
+  string status = 1;
+}

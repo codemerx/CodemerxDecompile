@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CodemerxDecompile.Service.Extensions;
 using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services;
 using Grpc.Core;
@@ -58,11 +59,13 @@ namespace CodemerxDecompile.Service
                 Utilities.GetMaxRelativePathLength(AssembliesDirectory),
                 true);
 
-            this.decompilationContext.TypeToFilePathMap = filePathsService.GetTypesToFilePathsMap()
-                                                                          .ToDictionary(kvp => kvp.Key, kvp => Path.Join(assembly.FullName, assembly.MainModule.Name, kvp.Value));
+            Dictionary<TypeDefinition, string> typeToFilePath = filePathsService.GetTypesToFilePathsMap()
+                                                                                .ToDictionary(kvp => kvp.Key, kvp => Path.Join(assembly.FullName, assembly.MainModule.Name, kvp.Value));
+
+            this.decompilationContext.TypeToFilePathMap.AddRange(typeToFilePath);
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
-            response.TypeFilePaths.AddRange(this.decompilationContext.TypeToFilePathMap.Select(pair =>
+            response.TypeFilePaths.AddRange(typeToFilePath.Select(pair =>
             {
                 TypeFilePath result = new TypeFilePath()
                 {

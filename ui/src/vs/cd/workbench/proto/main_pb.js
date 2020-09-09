@@ -55,7 +55,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.GetAssemblyRelatedFilePathsResponse = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.GetAssemblyRelatedFilePathsResponse.repeatedFields_, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.GetAssemblyRelatedFilePathsResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -385,13 +385,6 @@ proto.GetAssemblyRelatedFilePathsRequest.prototype.setAssemblypath = function(va
 
 
 
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.GetAssemblyRelatedFilePathsResponse.repeatedFields_ = [2];
-
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -424,7 +417,7 @@ proto.GetAssemblyRelatedFilePathsResponse.prototype.toObject = function(opt_incl
 proto.GetAssemblyRelatedFilePathsResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     decompiledassemblydirectory: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    modulesdirectoriesList: (f = jspb.Message.getRepeatedField(msg, 2)) == null ? undefined : f
+    decompiledassemblypath: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -467,7 +460,7 @@ proto.GetAssemblyRelatedFilePathsResponse.deserializeBinaryFromReader = function
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.addModulesdirectories(value);
+      msg.setDecompiledassemblypath(value);
       break;
     default:
       reader.skipField();
@@ -505,9 +498,9 @@ proto.GetAssemblyRelatedFilePathsResponse.serializeBinaryToWriter = function(mes
       f
     );
   }
-  f = message.getModulesdirectoriesList();
+  f = message.getDecompiledassemblypath();
   if (f.length > 0) {
-    writer.writeRepeatedString(
+    writer.writeString(
       2,
       f
     );
@@ -534,39 +527,20 @@ proto.GetAssemblyRelatedFilePathsResponse.prototype.setDecompiledassemblydirecto
 
 
 /**
- * repeated string modulesDirectories = 2;
- * @return {!Array<string>}
+ * optional string decompiledAssemblyPath = 2;
+ * @return {string}
  */
-proto.GetAssemblyRelatedFilePathsResponse.prototype.getModulesdirectoriesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
-};
-
-
-/**
- * @param {!Array<string>} value
- * @return {!proto.GetAssemblyRelatedFilePathsResponse} returns this
- */
-proto.GetAssemblyRelatedFilePathsResponse.prototype.setModulesdirectoriesList = function(value) {
-  return jspb.Message.setField(this, 2, value || []);
+proto.GetAssemblyRelatedFilePathsResponse.prototype.getDecompiledassemblypath = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /**
  * @param {string} value
- * @param {number=} opt_index
  * @return {!proto.GetAssemblyRelatedFilePathsResponse} returns this
  */
-proto.GetAssemblyRelatedFilePathsResponse.prototype.addModulesdirectories = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 2, value, opt_index);
-};
-
-
-/**
- * Clears the list making it empty but non-null.
- * @return {!proto.GetAssemblyRelatedFilePathsResponse} returns this
- */
-proto.GetAssemblyRelatedFilePathsResponse.prototype.clearModulesdirectoriesList = function() {
-  return this.setModulesdirectoriesList([]);
+proto.GetAssemblyRelatedFilePathsResponse.prototype.setDecompiledassemblypath = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

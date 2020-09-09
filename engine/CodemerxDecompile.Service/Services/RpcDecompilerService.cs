@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services;
-using Google.Protobuf;
 using Grpc.Core;
 
 using JustDecompile.Tools.MSBuildProjectBuilder;
@@ -15,7 +14,6 @@ using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
-using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
 
@@ -37,9 +35,9 @@ namespace CodemerxDecompile.Service
 
             GetAssemblyRelatedFilePathsResponse response = new GetAssemblyRelatedFilePathsResponse()
             {
-                DecompiledAssemblyDirectory = AssembliesDirectory
+                DecompiledAssemblyDirectory = AssembliesDirectory,
+                DecompiledAssemblyPath = Path.Join(AssembliesDirectory, assembly.FullName)
             };
-            response.ModulesDirectories.AddRange(assembly.Modules.Select(m => Path.Join(AssembliesDirectory, assembly.FullName, m.Name)));
 
             return Task.FromResult(response);
         }

@@ -45,7 +45,7 @@ export class DecompilationService implements IDecompilationService {
 
 				const assemblyRelatedFilePaths: AssemblyRelatedFilePaths = {
 					decompiledAssemblyDirectory: response.getDecompiledassemblydirectory(),
-					modulesDirectories: response.getModulesdirectoriesList()
+					decompiledAssemblyPath: response.getDecompiledassemblypath()
 				};
 
 				resolve(assemblyRelatedFilePaths);
@@ -143,7 +143,7 @@ export class DecompilationService implements IDecompilationService {
 
 export interface AssemblyRelatedFilePaths {
 	decompiledAssemblyDirectory: string;
-	modulesDirectories: string[];
+	decompiledAssemblyPath: string;
 }
 
 export interface TypeFilePath {

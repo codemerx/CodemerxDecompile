@@ -24,10 +24,8 @@ export class GetAssemblyRelatedFilePathsResponse extends jspb.Message {
   getDecompiledassemblydirectory(): string;
   setDecompiledassemblydirectory(value: string): GetAssemblyRelatedFilePathsResponse;
 
-  getModulesdirectoriesList(): Array<string>;
-  setModulesdirectoriesList(value: Array<string>): GetAssemblyRelatedFilePathsResponse;
-  clearModulesdirectoriesList(): GetAssemblyRelatedFilePathsResponse;
-  addModulesdirectories(value: string, index?: number): GetAssemblyRelatedFilePathsResponse;
+  getDecompiledassemblypath(): string;
+  setDecompiledassemblypath(value: string): GetAssemblyRelatedFilePathsResponse;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetAssemblyRelatedFilePathsResponse.AsObject;
@@ -40,7 +38,7 @@ export class GetAssemblyRelatedFilePathsResponse extends jspb.Message {
 export namespace GetAssemblyRelatedFilePathsResponse {
   export type AsObject = {
     decompiledassemblydirectory: string,
-    modulesdirectoriesList: Array<string>,
+    decompiledassemblypath: string,
   }
 }
 

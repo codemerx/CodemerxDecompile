@@ -16,7 +16,7 @@ message GetAssemblyRelatedFilePathsRequest {
 
 message GetAssemblyRelatedFilePathsResponse {
   string decompiledAssemblyDirectory = 1;
-  repeated string modulesDirectories = 2;
+  string decompiledAssemblyPath = 2;
 }
 
 message GetAllTypeFilePathsRequest {

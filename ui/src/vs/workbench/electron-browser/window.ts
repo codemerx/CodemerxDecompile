@@ -629,37 +629,39 @@ export class NativeWindow extends Disposable {
 	}
 
 	private async onOpenFiles(request: INativeOpenFileRequest): Promise<void> {
-		if (request.filesToOpenOrCreate?.length == 1 &&
-			request.filesToOpenOrCreate[0].exists &&
-			request.filesToOpenOrCreate[0].fileUri?.path) {
-			/* AGPL */
-			const fileUri = request.filesToOpenOrCreate[0].fileUri;
+		/* AGPL */
+		const filesToOpenOrCreate = request.filesToOpenOrCreate;
 
+		if (filesToOpenOrCreate && filesToOpenOrCreate?.length) {
 			this.progressService.withProgress({ location: ProgressLocation.Explorer, delay: 150 }, async () => {
-				const uri = URI.revive(fileUri);
-				const assemblyRelatedFilePaths = await this.decompilationService.getAssemblyRelatedFilePaths(uri.fsPath);
-				const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath);
+				const decompiledAssemblyDirectoriesToOpen: Set<string> = new Set<string>();
 
-				if (assemblyRelatedFilePaths.modulesDirectories && assemblyRelatedFilePaths.modulesDirectories.length) {
-					for(const moduleFilePath of assemblyRelatedFilePaths.modulesDirectories) {
-						if (await this.fileService.exists(URI.file(moduleFilePath))) {
-							await this.fileService.del(URI.file(moduleFilePath), {
+				for(const fileToOpenOrCreate of filesToOpenOrCreate) {
+					if (fileToOpenOrCreate.exists && fileToOpenOrCreate.fileUri?.path) {
+						const uri = URI.revive(fileToOpenOrCreate.fileUri);
+						const assemblyRelatedFilePaths = await this.decompilationService.getAssemblyRelatedFilePaths(uri.fsPath);
+						const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath);
+
+						if (assemblyRelatedFilePaths && assemblyRelatedFilePaths.decompiledAssemblyPath && await this.fileService.exists(URI.file(assemblyRelatedFilePaths.decompiledAssemblyPath))) {
+							await this.fileService.del(URI.file(assemblyRelatedFilePaths.decompiledAssemblyPath), {
 								useTrash: false,
 								recursive: true
 							});
 						}
+
+						for (const typeFilePath of typeFilePaths) {
+							const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
+							await this.fileService.createFile(URI.file(typeFilePath.absoluteFilePath), content);
+						}
+
+						decompiledAssemblyDirectoriesToOpen.add(assemblyRelatedFilePaths.decompiledAssemblyDirectory);
 					}
 				}
 
-				for (const typeFilePath of typeFilePaths) {
-					const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
-					await this.fileService.createFile(URI.file(typeFilePath.absoluteFilePath), content);
-				}
-
-				await this.hostService.openWindow([{ folderUri: URI.file(assemblyRelatedFilePaths.decompiledAssemblyDirectory) }], undefined);
+				await this.hostService.openWindow([...decompiledAssemblyDirectoriesToOpen].map(d => ({ folderUri: URI.file(d) })), undefined);
 			});
-			/* End AGPL */
 		}
+		/* End AGPL */
 	}
 
 	private async trackClosedWaitFiles(waitMarkerFile: URI, resourcesToWaitFor: URI[]): Promise<void> {

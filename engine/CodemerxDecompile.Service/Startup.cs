@@ -43,11 +43,9 @@ namespace CodemerxDecompile.Service
 
             app.UseRouting();
 
-            app.UseGrpcWeb();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<RpcDecompilerService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<RpcDecompilerService>();
                 endpoints.MapGrpcService<RpcManagerService>();
             });
         }

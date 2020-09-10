@@ -83,7 +83,6 @@ import { IWebviewManagerService } from 'vs/platform/webview/common/webviewManage
 import { createServer, AddressInfo } from 'net';
 import { IOpenExtensionWindowResult } from 'vs/platform/debug/common/extensionHostDebug';
 import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
-import { IEnvironmentMainService } from 'vs/cd/platform/EnvironmentMainService';
 
 export class CodeApplication extends Disposable {
 	private windowsMainService: IWindowsMainService | undefined;
@@ -581,10 +580,6 @@ export class CodeApplication extends Disposable {
 		const grpcMainService = accessor.get(IGrpcMainService);
 		const grpcChannel = createChannelReceiver(grpcMainService);
 		electronIpcServer.registerChannel('grpc', grpcChannel);
-
-		const environmentMainService = accessor.get(IEnvironmentMainService);
-		const environmentMainChannel = createChannelReceiver(environmentMainService);
-		electronIpcServer.registerChannel('environment', environmentMainChannel);
 
 		// ExtensionHost Debug broadcast service
 		const windowsMainService = this.windowsMainService = accessor.get(IWindowsMainService);

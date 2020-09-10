@@ -51,7 +51,6 @@ import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IProductService } from 'vs/platform/product/common/productService';
 import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
-import { IEnvironmentMainService, EnvironmentMainService } from 'vs/cd/platform/EnvironmentMainService';
 
 class ExpectedError extends Error {
 	readonly isExpected = true;
@@ -172,7 +171,6 @@ class CodeMain {
 		services.set(ITunnelService, new SyncDescriptor(TunnelService));
 
 		services.set(IGrpcMainService, new GrpcMainService());
-		services.set(IEnvironmentMainService, new EnvironmentMainService());
 
 		return [new InstantiationService(services, true), instanceEnvironment, environmentService];
 	}

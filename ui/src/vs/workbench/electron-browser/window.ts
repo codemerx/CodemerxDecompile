@@ -650,8 +650,8 @@ export class NativeWindow extends Disposable {
 						}
 
 						for (const typeFilePath of typeFilePaths) {
-							const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
-							await this.fileService.createFile(URI.file(typeFilePath.absoluteFilePath), content);
+							const content = VSBuffer.fromString('CodemerxDecompile');
+							await this.fileService.createFile(URI.file(typeFilePath), content);
 						}
 
 						decompiledAssemblyDirectoriesToOpen.add(assemblyRelatedFilePaths.decompiledAssemblyDirectory);

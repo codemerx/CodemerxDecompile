@@ -23,6 +23,10 @@ message GetAllTypeFilePathsRequest {
   string assemblyPath = 1;
 }
 
+message GetAllTypeFilePathsResponse {
+  repeated string typeFilePaths = 1;
+}
+
 message GetMemberDefinitionRequest {
 	string absoluteFilePath = 1;
 	int32 lineNumber = 2;
@@ -32,6 +36,8 @@ message GetMemberDefinitionRequest {
 message GetMemberDefinitionResponse {
   string navigationFilePath = 1;
   string memberFullName = 2;
+  bool isCrossAssemblyReference = 3;
+  string assemblyReferenceFilePath = 4;
 }
 
 message GetMemberDefinitionPositionRequest {
@@ -46,18 +52,13 @@ message Selection {
 	int32 endColumnIndex = 4;
 }
 
-message GetAllTypeFilePathsResponse {
-  repeated TypeFilePath typeFilePaths = 1;
-}
-
 message TypeFilePath {
   string typeFullName = 1;
   string absoluteFilePath = 2;
 }
 
 message DecompileTypeRequest {
-  string assemblyPath = 1;
-  string typeFullName = 2;
+  string filePath = 1;
 }
 
 message DecompileTypeResponse {

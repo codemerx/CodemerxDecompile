@@ -60,6 +60,26 @@ export namespace GetAllTypeFilePathsRequest {
   }
 }
 
+export class GetAllTypeFilePathsResponse extends jspb.Message {
+  getTypefilepathsList(): Array<string>;
+  setTypefilepathsList(value: Array<string>): GetAllTypeFilePathsResponse;
+  clearTypefilepathsList(): GetAllTypeFilePathsResponse;
+  addTypefilepaths(value: string, index?: number): GetAllTypeFilePathsResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetAllTypeFilePathsResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetAllTypeFilePathsResponse): GetAllTypeFilePathsResponse.AsObject;
+  static serializeBinaryToWriter(message: GetAllTypeFilePathsResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetAllTypeFilePathsResponse;
+  static deserializeBinaryFromReader(message: GetAllTypeFilePathsResponse, reader: jspb.BinaryReader): GetAllTypeFilePathsResponse;
+}
+
+export namespace GetAllTypeFilePathsResponse {
+  export type AsObject = {
+    typefilepathsList: Array<string>,
+  }
+}
+
 export class GetMemberDefinitionRequest extends jspb.Message {
   getAbsolutefilepath(): string;
   setAbsolutefilepath(value: string): GetMemberDefinitionRequest;
@@ -93,6 +113,12 @@ export class GetMemberDefinitionResponse extends jspb.Message {
   getMemberfullname(): string;
   setMemberfullname(value: string): GetMemberDefinitionResponse;
 
+  getIscrossassemblyreference(): boolean;
+  setIscrossassemblyreference(value: boolean): GetMemberDefinitionResponse;
+
+  getAssemblyreferencefilepath(): string;
+  setAssemblyreferencefilepath(value: string): GetMemberDefinitionResponse;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetMemberDefinitionResponse.AsObject;
   static toObject(includeInstance: boolean, msg: GetMemberDefinitionResponse): GetMemberDefinitionResponse.AsObject;
@@ -105,6 +131,8 @@ export namespace GetMemberDefinitionResponse {
   export type AsObject = {
     navigationfilepath: string,
     memberfullname: string,
+    iscrossassemblyreference: boolean,
+    assemblyreferencefilepath: string,
   }
 }
 
@@ -160,26 +188,6 @@ export namespace Selection {
   }
 }
 
-export class GetAllTypeFilePathsResponse extends jspb.Message {
-  getTypefilepathsList(): Array<TypeFilePath>;
-  setTypefilepathsList(value: Array<TypeFilePath>): GetAllTypeFilePathsResponse;
-  clearTypefilepathsList(): GetAllTypeFilePathsResponse;
-  addTypefilepaths(value?: TypeFilePath, index?: number): TypeFilePath;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetAllTypeFilePathsResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: GetAllTypeFilePathsResponse): GetAllTypeFilePathsResponse.AsObject;
-  static serializeBinaryToWriter(message: GetAllTypeFilePathsResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetAllTypeFilePathsResponse;
-  static deserializeBinaryFromReader(message: GetAllTypeFilePathsResponse, reader: jspb.BinaryReader): GetAllTypeFilePathsResponse;
-}
-
-export namespace GetAllTypeFilePathsResponse {
-  export type AsObject = {
-    typefilepathsList: Array<TypeFilePath.AsObject>,
-  }
-}
-
 export class TypeFilePath extends jspb.Message {
   getTypefullname(): string;
   setTypefullname(value: string): TypeFilePath;
@@ -203,11 +211,8 @@ export namespace TypeFilePath {
 }
 
 export class DecompileTypeRequest extends jspb.Message {
-  getAssemblypath(): string;
-  setAssemblypath(value: string): DecompileTypeRequest;
-
-  getTypefullname(): string;
-  setTypefullname(value: string): DecompileTypeRequest;
+  getFilepath(): string;
+  setFilepath(value: string): DecompileTypeRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DecompileTypeRequest.AsObject;
@@ -219,8 +224,7 @@ export class DecompileTypeRequest extends jspb.Message {
 
 export namespace DecompileTypeRequest {
   export type AsObject = {
-    assemblypath: string,
-    typefullname: string,
+    filepath: string,
   }
 }
 

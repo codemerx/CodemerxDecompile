@@ -78,7 +78,7 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 				// });
 				(async() => {
 					try {
-						if (this.lastMemberDefinition) {
+						if (this.lastMemberDefinition && this.lastMemberDefinition.navigationFilePath) {
 							await this.codeEditorService.openCodeEditor({
 								resource: URI.file(this.lastMemberDefinition.navigationFilePath)
 							}, null, undefined, this.lastMemberDefinition);

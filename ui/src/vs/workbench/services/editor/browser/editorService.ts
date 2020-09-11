@@ -532,9 +532,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 		if (resourceEditorInput) {
 			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
 			const str = fileContent.value.toString();
-			const parts = str.split('-');
-			if (parts.length == 3 && parts[0] === 'CodemerxDecompile') {
-				const sourceCode = await this.decompilationService.decompileType(parts[1], parts[2]);
+
+			if (str === 'CodemerxDecompile') {
+				const sourceCode = await this.decompilationService.decompileType(resourceEditorInput.resource.fsPath);
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
 
@@ -1323,9 +1323,8 @@ export class DelegatingEditorService implements IEditorService {
 		if (resourceEditorInput) {
 			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
 			const str = fileContent.value.toString();
-			const parts = str.split('-');
-			if (parts.length == 3 && parts[0] === 'CodemerxDecompile') {
-				const sourceCode = await this.decompilationService.decompileType(parts[1], parts[2]);
+			if (str === 'CodemerxDecompile') {
+				const sourceCode = await this.decompilationService.decompileType(resourceEditorInput.resource.fsPath);
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
 		}

@@ -15,8 +15,8 @@ export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
 	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
-	getAllTypeFilePaths(assemblyPath: string) : Promise<TypeFilePath[]>;
-	decompileType(assemblyPath: string, typeFullName: string) : Promise<string>;
+	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
+	decompileType(filePath: string) : Promise<string>;
 	getMemberDefinition(absoluteFilePath: string, rowNumber: number, columnIndex: number) : Promise<MemberNavigationData>;
 	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
 }
@@ -53,33 +53,25 @@ export class DecompilationService implements IDecompilationService {
 		});
 	}
 
-	getAllTypeFilePaths(assemblyPath: string) : Promise<TypeFilePath[]> {
+	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]> {
 		const request = new GetAllTypeFilePathsRequest();
 		request.setAssemblypath(assemblyPath);
 
-		return new Promise<TypeFilePath[]>((resolve, reject) => {
+		return new Promise<string[]>((resolve, reject) => {
 			this.client?.getAllTypeFilePaths(request, null, (err, response) => {
 				if (err) {
 					reject(`getAllTypeFilePaths failed. Error: ${JSON.stringify(err)}`);
 					return;
 				}
 
-				resolve(response.getTypefilepathsList().map(tfp => {
-					const typeFilePath: TypeFilePath = {
-						typeFullName: tfp.getTypefullname(),
-						absoluteFilePath: tfp.getAbsolutefilepath()
-					};
-
-					return typeFilePath;
-				}));
+				resolve(response.getTypefilepathsList());
 			});
 		});
 	};
 
-	decompileType(assemblyPath: string, typeFullName: string) : Promise<string> {
+	decompileType(filePath: string) : Promise<string> {
 		const request = new DecompileTypeRequest();
-		request.setAssemblypath(assemblyPath);
-		request.setTypefullname(typeFullName);
+		request.setFilepath(filePath);
 
 		return new Promise<string>((resolve, reject) => {
 			this.client?.decompileType(request, null, (err, response) => {
@@ -107,8 +99,10 @@ export class DecompilationService implements IDecompilationService {
 				}
 
 				const memberDefinitionData: MemberNavigationData = {
+					memberFullName: response.getMemberfullname(),
 					navigationFilePath: response.getNavigationfilepath(),
-					memberFullName: response.getMemberfullname()
+					isCrossAssemblyReference: response.getIscrossassemblyreference(),
+					assemblyReferenceFilePath: response.getAssemblyreferencefilepath()
 				};
 
 				resolve(memberDefinitionData);
@@ -159,6 +153,8 @@ export interface Selection {
 }
 
 export interface MemberNavigationData {
-	navigationFilePath: string;
 	memberFullName: string;
+	navigationFilePath?: string;
+	isCrossAssemblyReference: boolean;
+    assemblyReferenceFilePath?: string;
 }

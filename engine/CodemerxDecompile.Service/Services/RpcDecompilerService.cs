@@ -11,12 +11,15 @@ using Grpc.Core;
 using JustDecompile.Tools.MSBuildProjectBuilder;
 using JustDecompile.Tools.MSBuildProjectBuilder.FilePathsServices;
 using Mono.Cecil;
+using Mono.Cecil.AssemblyResolver;
 using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
+using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
+using CodemerxDecompile.Service.Services.DecompilationContext.Models;
 
 namespace CodemerxDecompile.Service
 {
@@ -45,7 +48,9 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
+            AssemblyDefinition assembly = ExternallyVisibleDecompilationUtilities.ResolveAssembly(new AssemblyIdentifier(request.AssemblyPath));
+            //SpecialTypeAssembly special = assembly.MainModule.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
+            //IAssemblyResolver assemblyResolver = assembly.MainModule.AssemblyResolver;
             Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
             Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
             DefaultFilePathsService filePathsService = new DefaultFilePathsService(
@@ -59,119 +64,143 @@ namespace CodemerxDecompile.Service
                 Utilities.GetMaxRelativePathLength(AssembliesDirectory),
                 true);
 
-            Dictionary<TypeDefinition, string> typeToFilePath = filePathsService.GetTypesToFilePathsMap()
-                                                                                .ToDictionary(kvp => kvp.Key, kvp => Path.Join(assembly.FullName, assembly.MainModule.Name, kvp.Value));
+            Dictionary<string, TypeDefinition> filePathToTypeDefinition = filePathsService.GetTypesToFilePathsMap()
+                                                                                          .ToDictionary(kvp => Path.Join(AssembliesDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
 
-            this.decompilationContext.TypeToFilePathMap.AddRange(typeToFilePath);
+            this.decompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
+            //ICollection<AssemblyNameReference> assemblyReferencesNames = this.GetAssembliesDependingOn(assembly.MainModule, userDefinedTypes);
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
-            response.TypeFilePaths.AddRange(typeToFilePath.Select(pair =>
-            {
-                TypeFilePath result = new TypeFilePath()
-                {
-                    TypeFullName = pair.Key.FullName,
-                    AbsoluteFilePath = Path.Join(AssembliesDirectory, pair.Value)
-                };
-
-                return result;
-            }));
+            response.TypeFilePaths.AddRange(filePathToTypeDefinition.Keys);
 
             return Task.FromResult(response);
         }
 
         public override Task<GetMemberDefinitionResponse> GetMemberDefinition(GetMemberDefinitionRequest request, ServerCallContext context)
         {
-            GetMemberDefinitionResponse response = new GetMemberDefinitionResponse();
-
             if (string.IsNullOrEmpty(request.AbsoluteFilePath))
             {
-                return Task.FromResult(response);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "No file path provided in member definition retrieval request"));
             }
 
-            string memberRelativePath = Path.GetRelativePath(AssembliesDirectory, request.AbsoluteFilePath);
+            string normalizedFilePath = this.NormalizeFilePath(request.AbsoluteFilePath);
 
-            if (!this.decompilationContext.CodeSpanToMemberReference.ContainsKey(memberRelativePath))
+            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
             {
-                return Task.FromResult(response);
+                throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path"));
             }
 
-            KeyValuePair<CodeSpan, MemberReference> entry = this.decompilationContext.CodeSpanToMemberReference[memberRelativePath]
+            if (!this.decompilationContext.TryGetTypeMetadataFromCache(typeDefinition, out DecompiledTypeMetadata typeMetadata))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "No metadata for the provided type was found"));
+            }
+
+            KeyValuePair<CodeSpan, MemberReference> codeSpanToMemberReference = typeMetadata.CodeSpanToMemberReference
                 .FirstOrDefault(kvp => kvp.Key.Start.Line <= request.LineNumber && kvp.Key.End.Line >= request.LineNumber &&
                     kvp.Key.Start.Column < request.ColumnIndex && kvp.Key.End.Column > request.ColumnIndex);
 
-            if (entry.Value == null)
+            if (codeSpanToMemberReference.Value == null)
             {
-                return Task.FromResult(response);
+                throw new RpcException(new Status(StatusCode.NotFound, "No member reference found at the specified coordinates"));
             }
 
-            MemberReference reference = entry.Value;
-            TypeReference typeRef = reference.DeclaringType;
-            string typeDefFullName = string.Empty;
+            MemberReference memberReference = codeSpanToMemberReference.Value;
+            TypeReference typeReference = memberReference.DeclaringType;
 
-            if (typeRef != null)
+            if (typeReference != null)
             {
-                while (typeRef.DeclaringType != null)
+                while (typeReference.DeclaringType != null)
                 {
-                    typeRef = typeRef.DeclaringType;
+                    typeReference = typeReference.DeclaringType;
                 }
-
-                typeDefFullName = typeRef.FullName;
             }
             else
             {
-                typeDefFullName = reference.FullName;
+                typeReference = memberReference as TypeReference;
             }
 
-            KeyValuePair<TypeDefinition, string> typeDefKvp = this.decompilationContext.TypeToFilePathMap.FirstOrDefault(kvp => kvp.Key.FullName == typeDefFullName);
-            string typeDefinitionFilePath = typeDefKvp.Value;
+            GetMemberDefinitionResponse response = new GetMemberDefinitionResponse();
 
-            if (string.IsNullOrEmpty(typeDefinitionFilePath))
+            if (!this.decompilationContext.TryGetTypeFilePathFromCache(typeReference, out string typeFilePath))
             {
-                return Task.FromResult(response);
+                if (typeReference.Scope != null && typeReference.Scope.MetadataScopeType == MetadataScopeType.AssemblyNameReference)
+                {
+                    response.IsCrossAssemblyReference = true;
+
+                    if (this.TryResolveTypeAssemblyFilePath(typeReference, out string referencedAssemblyPath))
+                    {
+                        response.AssemblyReferenceFilePath = referencedAssemblyPath;
+                    }
+                    else
+                    {
+                        throw new RpcException(new Status(StatusCode.NotFound, "Could not resolve referenced assembly."));
+                    }
+                }
+                else
+                {
+                    throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path."));
+                }
+            }
+            else
+            {
+                response.NavigationFilePath = typeFilePath;
             }
 
-            response.NavigationFilePath = Path.Join(AssembliesDirectory, typeDefinitionFilePath);
-            response.MemberFullName = reference.FullName;
+            response.MemberFullName = memberReference.FullName;
 
             return Task.FromResult(response);
         }
 
         public override Task<Selection> GetMemberDefinitionPosition(GetMemberDefinitionPositionRequest request, ServerCallContext context)
         {
-            Selection selection = new Selection();
-
             if (string.IsNullOrEmpty(request.AbsoluteFilePath))
             {
-                return Task.FromResult(selection);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "No file path provided in member definition retrieval request"));
             }
 
-            string memberRelativePath = Path.GetRelativePath(AssembliesDirectory, request.AbsoluteFilePath);
+            string normalizedFilePath = this.NormalizeFilePath(request.AbsoluteFilePath);
 
-            if (!this.decompilationContext.MemberDeclarationToCodeSpan.ContainsKey(memberRelativePath))
+            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
             {
-                return Task.FromResult(selection);
+                throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path"));
             }
 
-            KeyValuePair<IMemberDefinition, CodeSpan> entry = this.decompilationContext.MemberDeclarationToCodeSpan[memberRelativePath].FirstOrDefault(kvp => kvp.Key.FullName == request.MemberFullName);
-            if (entry.Key == null)
+            if (!this.decompilationContext.TryGetTypeMetadataFromCache(typeDefinition, out DecompiledTypeMetadata typeMetadata))
             {
-                return Task.FromResult(selection);
+                throw new RpcException(new Status(StatusCode.NotFound, "No metadata for the provided type was found"));
             }
             else
             {
-                selection.StartLineNumber = entry.Value.Start.Line + 1;
-                selection.StartColumnIndex = entry.Value.Start.Column + 1;
-                selection.EndLineNumber = entry.Value.End.Line + 1;
-                selection.EndColumnIndex = entry.Value.End.Column + 1;
+                KeyValuePair<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = typeMetadata.MemberDeclarationToCodeSpan.FirstOrDefault(kvp => kvp.Key.FullName == request.MemberFullName);
+                if (memberDeclarationToCodeSpan.Key == null)
+                {
+                    throw new RpcException(new Status(StatusCode.NotFound, "No coordinates found for the supplied member reference"));
+                }
+                else
+                {
+                    Selection selection = new Selection()
+                    {
+                        StartLineNumber = memberDeclarationToCodeSpan.Value.Start.Line + 1,
+                        StartColumnIndex = memberDeclarationToCodeSpan.Value.Start.Column + 1,
+                        EndLineNumber = memberDeclarationToCodeSpan.Value.End.Line + 1,
+                        EndColumnIndex = memberDeclarationToCodeSpan.Value.End.Column + 1
+                    };
 
-                return Task.FromResult(selection);
+                    return Task.FromResult(selection);
+                }
             }
         }
 
         public override Task<DecompileTypeResponse> DecompileType(DecompileTypeRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
-            TypeDefinition type = assembly.MainModule.GetType(request.TypeFullName);
+            string normalizedFilePath = this.NormalizeFilePath(request.FilePath);
+
+            if (!this.decompilationContext.FilePathToType.ContainsKey(normalizedFilePath))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path"));
+            }
+
+            TypeDefinition type = this.decompilationContext.FilePathToType[normalizedFilePath];
             IExceptionFormatter exceptionFormatter = SimpleExceptionFormatter.Instance;
             ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             StringWriter theWriter = new StringWriter();
@@ -189,20 +218,14 @@ namespace CodemerxDecompile.Service
             {
                 List<WritingInfo> infos = (writer as INamespaceLanguageWriter).WriteTypeAndNamespaces(type, writerContextService);
 
-                Dictionary<IMemberDefinition, CodeSpan> mapping = new Dictionary<IMemberDefinition, CodeSpan>();
+                Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = new Dictionary<IMemberDefinition, CodeSpan>();
 
                 foreach (WritingInfo info in infos)
                 {
-                    this.AddRange(mapping, info.MemberDeclarationToCodeSpan);
+                    memberDeclarationToCodeSpan.AddRange(info.MemberDeclarationToCodeSpan);
                 }
 
-                KeyValuePair<TypeDefinition, string> kvp = this.decompilationContext.TypeToFilePathMap.Where(kvp => kvp.Key.FullName == type.FullName).FirstOrDefault();
-
-                if (kvp.Value != null)
-                {
-                    this.decompilationContext.MemberDeclarationToCodeSpan.Add(kvp.Value, mapping);
-                    this.decompilationContext.CodeSpanToMemberReference.Add(kvp.Value, formatter.CodeSpanToMemberReference);
-                }
+                this.decompilationContext.AddTypeMetadataToCache(type, memberDeclarationToCodeSpan, formatter.CodeSpanToMemberReference);
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = theWriter.ToString() });
             }
@@ -216,12 +239,86 @@ namespace CodemerxDecompile.Service
             }
 		}
 
-        private void AddRange(Dictionary<IMemberDefinition, CodeSpan> source, Dictionary<IMemberDefinition, CodeSpan> target)
+        private bool TryResolveTypeAssemblyFilePath(TypeReference typeReference, out string assemblyFilePath)
         {
-            foreach (var item in target)
+            ModuleDefinition moduleDefinition = typeReference.Module;
+            AssemblyNameReference assemblyNameReference = typeReference.Scope as AssemblyNameReference;
+
+            if (assemblyNameReference == null)
             {
-                source[item.Key] = item.Value;
+                assemblyFilePath = null;
+                return false;
             }
+
+            SpecialTypeAssembly special = moduleDefinition.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
+
+            AssemblyName assemblyName = new AssemblyName(assemblyNameReference.Name,
+                                                                assemblyNameReference.FullName,
+                                                                assemblyNameReference.Version,
+                                                                assemblyNameReference.PublicKeyToken);
+            AssemblyStrongNameExtended assemblyKey = new AssemblyStrongNameExtended(assemblyName.FullName, moduleDefinition.Architecture, special);
+
+            assemblyFilePath = moduleDefinition.AssemblyResolver.FindAssemblyPath(assemblyName, null, assemblyKey);
+
+            return File.Exists(assemblyFilePath);
+        }
+
+        private string NormalizeFilePath(string filePath)
+        {
+            bool isWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
+
+            if (isWindows && Path.IsPathFullyQualified(filePath))
+            {
+                return char.ToUpper(filePath[0]) + filePath.Substring(1);
+            }
+
+            return filePath;
+        }
+
+        private ICollection<TypeReference> GetExpandedTypeDependanceList(ModuleDefinition module, Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes)
+        {
+            Mono.Collections.Generic.Collection<TypeDefinition> moduleTypes;
+            if (!userDefinedTypes.TryGetValue(module, out moduleTypes))
+            {
+                throw new Exception("Module types not found.");
+            }
+
+            HashSet<TypeReference> firstLevelDependanceTypes = new HashSet<TypeReference>();
+            foreach (TypeReference type in moduleTypes)
+            {
+                if (!firstLevelDependanceTypes.Contains(type))
+                {
+                    firstLevelDependanceTypes.Add(type);
+                }
+            }
+
+            foreach (TypeReference type in module.GetTypeReferences())
+            {
+                if (!firstLevelDependanceTypes.Contains(type))
+                {
+                    firstLevelDependanceTypes.Add(type);
+                }
+            }
+
+            return Telerik.JustDecompiler.Decompiler.Utilities.GetExpandedTypeDependanceList(firstLevelDependanceTypes);
+        }
+
+        private ICollection<AssemblyNameReference> GetAssembliesDependingOn(ModuleDefinition module, Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes)
+        {
+            ICollection<AssemblyNameReference> result;
+
+            ICollection<TypeReference> expadendTypeDependanceList = this.GetExpandedTypeDependanceList(module, userDefinedTypes);
+            result = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembliesDependingOn(module, expadendTypeDependanceList);
+
+            foreach (AssemblyNameReference assemblyReference in module.AssemblyReferences)
+            {
+                if (!result.Contains(assemblyReference))
+                {
+                    result.Add(assemblyReference);
+                }
+            }
+
+            return result;
         }
     }
 }

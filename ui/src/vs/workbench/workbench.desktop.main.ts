@@ -68,12 +68,14 @@ import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IGrpcService, GrpcService } from 'vs/cd/workbench/GrpcService';
 import { IDecompilationService, DecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IDecompilationHelper, DecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 
 registerSingleton(ICredentialsService, KeytarCredentialsService, true);
 registerSingleton(IUserDataAutoSyncService, UserDataAutoSyncService);
 registerSingleton(ITunnelService, TunnelService);
 registerSingleton(IGrpcService, GrpcService);
 registerSingleton(IDecompilationService, DecompilationService);
+registerSingleton(IDecompilationHelper, DecompilationHelper);
 
 //#endregion
 

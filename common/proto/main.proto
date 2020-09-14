@@ -6,7 +6,7 @@ service RpcDecompiler {
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
-  rpc GetMemberDefinition (GetMemberDefinitionRequest) returns (GetMemberDefinitionResponse);
+  rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
 }
 
@@ -27,17 +27,18 @@ message GetAllTypeFilePathsResponse {
   repeated string typeFilePaths = 1;
 }
 
-message GetMemberDefinitionRequest {
+message GetMemberReferenceMetadataRequest {
 	string absoluteFilePath = 1;
 	int32 lineNumber = 2;
-	int32 columnIndex = 3;
+	int32 column = 3;
 }
 
-message GetMemberDefinitionResponse {
-  string navigationFilePath = 1;
+message GetMemberReferenceMetadataResponse {
+  string definitionFilePath = 1;
   string memberFullName = 2;
   bool isCrossAssemblyReference = 3;
-  string assemblyReferenceFilePath = 4;
+  string referencedAssemblyFullName = 4;
+  string referencedAssemblyFilePath = 5;
 }
 
 message GetMemberDefinitionPositionRequest {
@@ -47,9 +48,9 @@ message GetMemberDefinitionPositionRequest {
 
 message Selection {
 	int32 startLineNumber = 1;
-	int32 startColumnIndex = 2;
+	int32 startColumn = 2;
 	int32 endLineNumber = 3;
-	int32 endColumnIndex = 4;
+	int32 endColumn = 4;
 }
 
 message TypeFilePath {

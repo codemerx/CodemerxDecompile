@@ -11,7 +11,7 @@ import { IResourceEditorInput } from 'vs/platform/editor/common/editor';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { URI } from 'vs/base/common/uri';
 /* AGPL */
-import { MemberNavigationData } from 'vs/cd/workbench/DecompilationService';
+import { ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
 /* End AGPL */
 
 export const ICodeEditorService = createDecorator<ICodeEditorService>('codeEditorService');
@@ -53,5 +53,5 @@ export interface ICodeEditorService {
 	getTransientModelProperties(model: ITextModel): [string, any][] | undefined;
 
 	getActiveCodeEditor(): ICodeEditor | null;
-	openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: MemberNavigationData/* End AGPL */): Promise<ICodeEditor | null>;
+	openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: ReferenceMetadata/* End AGPL */): Promise<ICodeEditor | null>;
 }

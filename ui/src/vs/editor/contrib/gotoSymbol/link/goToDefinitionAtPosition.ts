@@ -33,10 +33,14 @@ import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 // import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 
 /* AGPL */
-import { IDecompilationService, MemberNavigationData } from 'vs/cd/workbench/DecompilationService';
+import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { URI } from 'vs/base/common/uri';
+import { INotificationService, Severity, IPromptChoice } from 'vs/platform/notification/common/notification';
+import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
+import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
+
 export class GotoDefinitionAtPositionEditorContribution implements IEditorContribution {
 
 	public static readonly ID = 'editor.contrib.gotodefinitionatposition';
@@ -47,8 +51,8 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 	private readonly toUnhookForKeyboard = new DisposableStore();
 	private linkDecorations: string[] = [];
 	private currentWordAtPosition: IWordAtPosition | null = null;
-	private previousPromise: Promise<MemberNavigationData | null> | null = null;
-	private lastMemberDefinition: MemberNavigationData | null = null;
+	private previousPromise: Promise<ReferenceMetadata | null> | null = null;
+	private lastMemberReferenceResult: { position: Position, metadata: ReferenceMetadata } | null = null;
 
 	constructor(
 		editor: ICodeEditor,
@@ -56,7 +60,10 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		// @IModeService private readonly modeService: IModeService,
 		/* AGPL */
 		@IDecompilationService private readonly decompilationService: IDecompilationService,
-		@ICodeEditorService private readonly codeEditorService: ICodeEditorService
+		@ICodeEditorService private readonly codeEditorService: ICodeEditorService,
+		@INotificationService private readonly notificationService: INotificationService,
+		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper,
+		@IProgressService private readonly progressService: IProgressService
 		/* End AGPL */
 	) {
 		this.editor = editor;
@@ -76,22 +83,54 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 				// 	this.removeLinkDecorations();
 				// 	onUnexpectedError(error);
 				// });
-				(async() => {
-					try {
-						if (this.lastMemberDefinition && this.lastMemberDefinition.navigationFilePath) {
-							await this.codeEditorService.openCodeEditor({
-								resource: URI.file(this.lastMemberDefinition.navigationFilePath)
-							}, null, undefined, this.lastMemberDefinition);
 
-							this.lastMemberDefinition = null;
-						} else {
-							this.removeLinkDecorations();
-						}
-					} catch(err) {
+				try {
+					const referenceMetadata = this.lastMemberReferenceResult?.metadata;
+					if (referenceMetadata?.isCrossAssemblyReference && referenceMetadata?.referencedAssemblyFullName && referenceMetadata?.referencedAssemblyFilePath) {
+						const choices: IPromptChoice[] = [
+							{
+								label: 'Yes',
+								run: async () => {
+									if (referenceMetadata?.isCrossAssemblyReference && referenceMetadata?.referencedAssemblyFilePath) {
+										const assemblyFilePath = referenceMetadata?.referencedAssemblyFilePath;
+
+										await this.progressService.withProgress({ location: ProgressLocation.Explorer }, async () => {
+											await this.decompilationHelper.createAssemblyFileHierarchy(URI.file(assemblyFilePath));
+										});
+
+										const openedEditorFilePath = this.editor.getModel()?.uri.fsPath;
+										if (openedEditorFilePath && this.lastMemberReferenceResult?.position) {
+											const { lineNumber, column } = this.lastMemberReferenceResult?.position;
+											this.lastMemberReferenceResult.metadata = await this.decompilationService.getMemberReferenceMetadata(openedEditorFilePath, lineNumber, column);
+
+											if (this.lastMemberReferenceResult.metadata?.definitionFilePath) {
+												await this.goToDefinition(this.lastMemberReferenceResult.metadata);
+											}
+										}
+
+										this.removeLinkDecorations();
+									}
+								}
+							}, {
+								label: 'No',
+								run: () => {
+									this.removeLinkDecorations();
+								}
+							}
+						];
+
+						this.notificationService.prompt(Severity.Info, `Would you like to load ${referenceMetadata.referencedAssemblyFullName}?`, choices, {
+							onCancel: () => this.removeLinkDecorations()
+						});
+					} else if (referenceMetadata?.definitionFilePath) {
+						this.goToDefinition(referenceMetadata);
+					} else {
 						this.removeLinkDecorations();
-						onUnexpectedError(err);
 					}
-				})()
+				} catch(err) {
+					this.removeLinkDecorations();
+					onUnexpectedError(err);
+				}
 			}
 		}));
 
@@ -132,6 +171,16 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 				}
 			}));
 		});
+	}
+
+	private async goToDefinition(memberReferenceMetadata: ReferenceMetadata) : Promise<void> {
+		if (memberReferenceMetadata?.definitionFilePath) {
+			await this.codeEditorService.openCodeEditor({
+				resource: URI.file(memberReferenceMetadata.definitionFilePath)
+			}, null, undefined, memberReferenceMetadata);
+		}
+
+		this.lastMemberReferenceResult = null;
 	}
 
 	private startFindDefinitionFromMouse(mouseEvent: ClickLinkMouseEvent, withKey?: ClickLinkKeyboardEvent): void {
@@ -178,18 +227,21 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		const openedEditorFilePath = this.editor.getModel()?.uri.fsPath;
 
 		if (openedEditorFilePath) {
-			this.previousPromise = this.decompilationService.getMemberDefinition(openedEditorFilePath, position.lineNumber - 1, position.column - 1)
+			this.previousPromise = this.decompilationService.getMemberReferenceMetadata(openedEditorFilePath, position.lineNumber, position.column);
 		} else {
 			this.previousPromise = Promise.resolve(null);
 		}
 
 		return this.previousPromise.then(result => {
-			if (!result || !result.navigationFilePath || !state.validate(this.editor)) {
+			if (!result || !state.validate(this.editor)) {
 				this.removeLinkDecorations();
 				return;
 			}
 
-			this.lastMemberDefinition = result;
+			this.lastMemberReferenceResult = {
+				position,
+				metadata: result
+			};
 
 			this.addDecoration(new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn));
 			// // Multiple results
@@ -241,7 +293,16 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 			// 		ref.dispose();
 			// 	});
 			// }
-		}).then(undefined, onUnexpectedError);
+		})
+		.catch(err => {
+			if (err && err.metadata && err.metadata.unresolvedassemblyname) {
+				const tooltipContent: MarkdownString = new MarkdownString().appendMarkdown(`Ambiguous type reference. Please locate the assembly where the type is defined.\nAssemblyName: **${err.metadata.unresolvedassemblyname}**`);
+				this.addDecoration(new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn), tooltipContent, true);
+			} else {
+				throw err;
+			}
+		})
+		.then(undefined, onUnexpectedError);
 	}
 
 	// private getPreviewValue(textEditorModel: ITextModel, startLineNumber: number, result: LocationLink) {
@@ -330,12 +391,12 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 	// 	return new Range(startLineNumber, 1, maxLineNumber + 1, 1);
 	// }
 
-	private addDecoration(range: Range, hoverMessage?: MarkdownString): void {
+	private addDecoration(range: Range, hoverMessage?: MarkdownString, isErrorDecoration?: boolean): void {
 
 		const newDecorations: IModelDeltaDecoration = {
 			range: range,
 			options: {
-				inlineClassName: 'goto-definition-link',
+				inlineClassName: isErrorDecoration ? 'goto-error-definition-link' : 'goto-definition-link',
 				hoverMessage
 			}
 		};

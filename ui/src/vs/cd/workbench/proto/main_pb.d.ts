@@ -80,59 +80,63 @@ export namespace GetAllTypeFilePathsResponse {
   }
 }
 
-export class GetMemberDefinitionRequest extends jspb.Message {
+export class GetMemberReferenceMetadataRequest extends jspb.Message {
   getAbsolutefilepath(): string;
-  setAbsolutefilepath(value: string): GetMemberDefinitionRequest;
+  setAbsolutefilepath(value: string): GetMemberReferenceMetadataRequest;
 
   getLinenumber(): number;
-  setLinenumber(value: number): GetMemberDefinitionRequest;
+  setLinenumber(value: number): GetMemberReferenceMetadataRequest;
 
-  getColumnindex(): number;
-  setColumnindex(value: number): GetMemberDefinitionRequest;
+  getColumn(): number;
+  setColumn(value: number): GetMemberReferenceMetadataRequest;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetMemberDefinitionRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: GetMemberDefinitionRequest): GetMemberDefinitionRequest.AsObject;
-  static serializeBinaryToWriter(message: GetMemberDefinitionRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetMemberDefinitionRequest;
-  static deserializeBinaryFromReader(message: GetMemberDefinitionRequest, reader: jspb.BinaryReader): GetMemberDefinitionRequest;
+  toObject(includeInstance?: boolean): GetMemberReferenceMetadataRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetMemberReferenceMetadataRequest): GetMemberReferenceMetadataRequest.AsObject;
+  static serializeBinaryToWriter(message: GetMemberReferenceMetadataRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetMemberReferenceMetadataRequest;
+  static deserializeBinaryFromReader(message: GetMemberReferenceMetadataRequest, reader: jspb.BinaryReader): GetMemberReferenceMetadataRequest;
 }
 
-export namespace GetMemberDefinitionRequest {
+export namespace GetMemberReferenceMetadataRequest {
   export type AsObject = {
     absolutefilepath: string,
     linenumber: number,
-    columnindex: number,
+    column: number,
   }
 }
 
-export class GetMemberDefinitionResponse extends jspb.Message {
-  getNavigationfilepath(): string;
-  setNavigationfilepath(value: string): GetMemberDefinitionResponse;
+export class GetMemberReferenceMetadataResponse extends jspb.Message {
+  getDefinitionfilepath(): string;
+  setDefinitionfilepath(value: string): GetMemberReferenceMetadataResponse;
 
   getMemberfullname(): string;
-  setMemberfullname(value: string): GetMemberDefinitionResponse;
+  setMemberfullname(value: string): GetMemberReferenceMetadataResponse;
 
   getIscrossassemblyreference(): boolean;
-  setIscrossassemblyreference(value: boolean): GetMemberDefinitionResponse;
+  setIscrossassemblyreference(value: boolean): GetMemberReferenceMetadataResponse;
 
-  getAssemblyreferencefilepath(): string;
-  setAssemblyreferencefilepath(value: string): GetMemberDefinitionResponse;
+  getReferencedassemblyfullname(): string;
+  setReferencedassemblyfullname(value: string): GetMemberReferenceMetadataResponse;
+
+  getReferencedassemblyfilepath(): string;
+  setReferencedassemblyfilepath(value: string): GetMemberReferenceMetadataResponse;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetMemberDefinitionResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: GetMemberDefinitionResponse): GetMemberDefinitionResponse.AsObject;
-  static serializeBinaryToWriter(message: GetMemberDefinitionResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetMemberDefinitionResponse;
-  static deserializeBinaryFromReader(message: GetMemberDefinitionResponse, reader: jspb.BinaryReader): GetMemberDefinitionResponse;
+  toObject(includeInstance?: boolean): GetMemberReferenceMetadataResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetMemberReferenceMetadataResponse): GetMemberReferenceMetadataResponse.AsObject;
+  static serializeBinaryToWriter(message: GetMemberReferenceMetadataResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetMemberReferenceMetadataResponse;
+  static deserializeBinaryFromReader(message: GetMemberReferenceMetadataResponse, reader: jspb.BinaryReader): GetMemberReferenceMetadataResponse;
 }
 
-export namespace GetMemberDefinitionResponse {
+export namespace GetMemberReferenceMetadataResponse {
   export type AsObject = {
-    navigationfilepath: string,
+    definitionfilepath: string,
     memberfullname: string,
     iscrossassemblyreference: boolean,
-    assemblyreferencefilepath: string,
+    referencedassemblyfullname: string,
+    referencedassemblyfilepath: string,
   }
 }
 
@@ -162,14 +166,14 @@ export class Selection extends jspb.Message {
   getStartlinenumber(): number;
   setStartlinenumber(value: number): Selection;
 
-  getStartcolumnindex(): number;
-  setStartcolumnindex(value: number): Selection;
+  getStartcolumn(): number;
+  setStartcolumn(value: number): Selection;
 
   getEndlinenumber(): number;
   setEndlinenumber(value: number): Selection;
 
-  getEndcolumnindex(): number;
-  setEndcolumnindex(value: number): Selection;
+  getEndcolumn(): number;
+  setEndcolumn(value: number): Selection;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Selection.AsObject;
@@ -182,9 +186,9 @@ export class Selection extends jspb.Message {
 export namespace Selection {
   export type AsObject = {
     startlinenumber: number,
-    startcolumnindex: number,
+    startcolumn: number,
     endlinenumber: number,
-    endcolumnindex: number,
+    endcolumn: number,
   }
 }
 

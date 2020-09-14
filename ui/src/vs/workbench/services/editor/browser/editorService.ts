@@ -41,7 +41,7 @@ import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/ur
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { VSBuffer } from 'vs/base/common/buffer';
 /* AGPL */
-import { IDecompilationService, MemberNavigationData } from 'vs/cd/workbench/DecompilationService';
+import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
 /* End AGPL */
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
@@ -524,9 +524,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	//#region openEditor()
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, /* AGPL */navigationData?: MemberNavigationData/* End AGPL */): Promise<ITextEditorPane | undefined>;
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, /* AGPL */navigationData?: ReferenceMetadata/* End AGPL */): Promise<ITextEditorPane | undefined>;
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, /* AGPL */groupOrNavigationData?: OpenInEditorGroup | MemberNavigationData/* End AGPL */): Promise<IEditorPane | undefined> {
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, /* AGPL */groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata/* End AGPL */): Promise<IEditorPane | undefined> {
 		/* AGPL */
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
@@ -538,19 +538,19 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
 
-			const navigationData = (groupOrNavigationData as MemberNavigationData);
+			const referenceMetadata = (groupOrReferenceMetadata as ReferenceMetadata);
 
-			if (navigationData && navigationData.memberFullName && navigationData.navigationFilePath) {
-				const selection = await this.decompilationService.getMemberDefinitionPosition(navigationData.navigationFilePath, navigationData.memberFullName);
+			if (referenceMetadata?.memberFullName && referenceMetadata?.definitionFilePath) {
+				const selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
 
-				if (selection.startLineNumber && selection.endLineNumber && selection.startColumnIndex && selection.endColumnIndex) {
+				if (selection.startLineNumber && selection.endLineNumber && selection.startColumn && selection.endColumn) {
 					resourceEditorInput.options = {
 						...resourceEditorInput.options,
 						selection: {
 							startLineNumber: selection.startLineNumber,
-							startColumn: selection.startColumnIndex,
+							startColumn: selection.startColumn,
 							endLineNumber: selection.endLineNumber,
-							endColumn: selection.endColumnIndex
+							endColumn: selection.endColumn
 						}
 					}
 				}
@@ -558,7 +558,7 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 		}
 		/* End AGPL */
 
-		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, /* AGPL */groupOrNavigationData as OpenInEditorGroup/* End AGPL */);
+		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, /* AGPL */groupOrReferenceMetadata as OpenInEditorGroup/* End AGPL */);
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
 

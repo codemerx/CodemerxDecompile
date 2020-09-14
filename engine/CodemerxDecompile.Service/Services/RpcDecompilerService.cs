@@ -76,7 +76,7 @@ namespace CodemerxDecompile.Service
             return Task.FromResult(response);
         }
 
-        public override Task<GetMemberDefinitionResponse> GetMemberDefinition(GetMemberDefinitionRequest request, ServerCallContext context)
+        public override Task<GetMemberReferenceMetadataResponse> GetMemberReferenceMetadata(GetMemberReferenceMetadataRequest request, ServerCallContext context)
         {
             if (string.IsNullOrEmpty(request.AbsoluteFilePath))
             {
@@ -95,9 +95,11 @@ namespace CodemerxDecompile.Service
                 throw new RpcException(new Status(StatusCode.NotFound, "No metadata for the provided type was found"));
             }
 
+            int lineIndex = request.LineNumber - 1;
+            int columnIndex = request.Column - 1;
             KeyValuePair<CodeSpan, MemberReference> codeSpanToMemberReference = typeMetadata.CodeSpanToMemberReference
-                .FirstOrDefault(kvp => kvp.Key.Start.Line <= request.LineNumber && kvp.Key.End.Line >= request.LineNumber &&
-                    kvp.Key.Start.Column < request.ColumnIndex && kvp.Key.End.Column > request.ColumnIndex);
+                .FirstOrDefault(kvp => kvp.Key.Start.Line <= lineIndex && kvp.Key.End.Line >= lineIndex &&
+                    kvp.Key.Start.Column <= columnIndex && kvp.Key.End.Column >= columnIndex);
 
             if (codeSpanToMemberReference.Value == null)
             {
@@ -119,17 +121,35 @@ namespace CodemerxDecompile.Service
                 typeReference = memberReference as TypeReference;
             }
 
-            GetMemberDefinitionResponse response = new GetMemberDefinitionResponse();
+            GetMemberReferenceMetadataResponse response = new GetMemberReferenceMetadataResponse();
+
+            bool isCrossAssemblyReference = typeReference.Scope != null && typeReference.Scope.MetadataScopeType == MetadataScopeType.AssemblyNameReference;
+            if (isCrossAssemblyReference)
+            {
+                TypeDefinition resolvedTypeDefinition = typeReference.Resolve();
+                string referencedAssemblyStrongName = ((AssemblyNameReference)typeReference.Scope).FullName;
+                
+                if (resolvedTypeDefinition == null)
+                {
+                    throw new RpcException(new Status(StatusCode.NotFound, "Could not resolve type assembly"), new Metadata
+                    {
+                        { "unresolvedAssemblyName", referencedAssemblyStrongName }
+                    });
+                }
+
+                response.ReferencedAssemblyFullName = referencedAssemblyStrongName;
+                typeReference = resolvedTypeDefinition;
+            }
 
             if (!this.decompilationContext.TryGetTypeFilePathFromCache(typeReference, out string typeFilePath))
             {
-                if (typeReference.Scope != null && typeReference.Scope.MetadataScopeType == MetadataScopeType.AssemblyNameReference)
+                if (isCrossAssemblyReference)
                 {
                     response.IsCrossAssemblyReference = true;
 
                     if (this.TryResolveTypeAssemblyFilePath(typeReference, out string referencedAssemblyPath))
                     {
-                        response.AssemblyReferenceFilePath = referencedAssemblyPath;
+                        response.ReferencedAssemblyFilePath = referencedAssemblyPath;
                     }
                     else
                     {
@@ -143,7 +163,7 @@ namespace CodemerxDecompile.Service
             }
             else
             {
-                response.NavigationFilePath = typeFilePath;
+                response.DefinitionFilePath = typeFilePath;
             }
 
             response.MemberFullName = memberReference.FullName;
@@ -181,9 +201,9 @@ namespace CodemerxDecompile.Service
                     Selection selection = new Selection()
                     {
                         StartLineNumber = memberDeclarationToCodeSpan.Value.Start.Line + 1,
-                        StartColumnIndex = memberDeclarationToCodeSpan.Value.Start.Column + 1,
+                        StartColumn = memberDeclarationToCodeSpan.Value.Start.Column + 1,
                         EndLineNumber = memberDeclarationToCodeSpan.Value.End.Line + 1,
-                        EndColumnIndex = memberDeclarationToCodeSpan.Value.End.Column + 1
+                        EndColumn = memberDeclarationToCodeSpan.Value.End.Column + 1
                     };
 
                     return Task.FromResult(selection);
@@ -242,13 +262,7 @@ namespace CodemerxDecompile.Service
         private bool TryResolveTypeAssemblyFilePath(TypeReference typeReference, out string assemblyFilePath)
         {
             ModuleDefinition moduleDefinition = typeReference.Module;
-            AssemblyNameReference assemblyNameReference = typeReference.Scope as AssemblyNameReference;
-
-            if (assemblyNameReference == null)
-            {
-                assemblyFilePath = null;
-                return false;
-            }
+            AssemblyNameReference assemblyNameReference = typeReference.Module.Assembly.Name;
 
             SpecialTypeAssembly special = moduleDefinition.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
 
@@ -260,7 +274,7 @@ namespace CodemerxDecompile.Service
 
             assemblyFilePath = moduleDefinition.AssemblyResolver.FindAssemblyPath(assemblyName, null, assemblyKey);
 
-            return File.Exists(assemblyFilePath);
+            return !string.IsNullOrEmpty(assemblyFilePath);
         }
 
         private string NormalizeFilePath(string filePath)

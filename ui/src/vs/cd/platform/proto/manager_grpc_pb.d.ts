@@ -1,10 +1,10 @@
 // GENERATED CODE -- DO NOT EDIT!
 
-// package:
+// package: 
 // file: manager.proto
 
 import * as manager_pb from "./manager_pb";
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 
 interface IRpcManagerService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
   getServerStatus: grpc.MethodDefinition<manager_pb.GetServerStatusRequest, manager_pb.GetServerStatusResponse>;

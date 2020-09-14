@@ -17,13 +17,13 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { join } from 'path';
 import { spawn } from 'child_process';
-import { RpcManagerClient } from 'vs/cd/workbench/proto/manager_grpc_pb';
-import * as grpc from "grpc";
-import { GetServerStatusRequest } from 'vs/cd/workbench/proto/manager_pb';
+import * as grpc from "@grpc/grpc-js";
+import { RpcManagerClient } from 'vs/cd/platform/proto/manager_grpc_pb';
+import { GetServerStatusRequest } from 'vs/cd/platform/proto/manager_pb';
 
 export const IGrpcMainService = createDecorator<IGrpcMainService>('grpcService');
 
-interface IGrpcMainService {
+export interface IGrpcMainService {
 	readonly _serviceBrand: undefined;
 
 	initialize(): void;
@@ -36,7 +36,7 @@ export class GrpcMainService implements IGrpcMainService {
 	private readonly port = 5000;
 
 	getServiceUrl(): Promise<string> {
-		return Promise.resolve(`http://localhost:${this.port}`);
+		return Promise.resolve(`localhost:${this.port}`);
 	}
 
 	initialize(): Promise<void> {
@@ -45,17 +45,18 @@ export class GrpcMainService implements IGrpcMainService {
 
 			spawn('dotnet', [serverPath, `--port=${this.port}`]);
 
-			const statusService = new RpcManagerClient(`localhost:${this.port}`, grpc.credentials.createInsecure());
-			statusService.getServerStatus(new GetServerStatusRequest(), (error, response) => {
-				if (error) {
-					console.error(error);
-				}
-				else {
-					console.log(response?.getStatus());
-				}
-			});
-
-			resolve();
+			this.getServiceUrl().then(url => {
+				const statusService = new RpcManagerClient(url, grpc.credentials.createInsecure());
+				statusService.getServerStatus(new GetServerStatusRequest(), (error, response) => {
+					if (!error) {
+						console.log(response?.getStatus());
+						resolve();
+					}
+					else {
+						reject(error);
+					}
+				});
+			})
 		});
 	}
 };

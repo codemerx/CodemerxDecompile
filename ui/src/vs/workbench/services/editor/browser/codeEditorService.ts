@@ -14,7 +14,7 @@ import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { extUri } from 'vs/base/common/resources';
 /* AGPL */
-import { ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
+import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
 /* End AGPL */
 
 export class CodeEditorService extends CodeEditorServiceImpl {

@@ -40,7 +40,8 @@ import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/wo
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
 /* AGPL */
-import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
 import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
 
@@ -556,7 +557,7 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 				}
 			}
 		}
-		
+
 		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrReferenceMetadata as OpenInEditorGroup);
 		/* End AGPL */
 		if (result) {

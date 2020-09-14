@@ -52,6 +52,7 @@ import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IProductService } from 'vs/platform/product/common/productService';
 /* AGPL */
 import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
+import { IDecompilationMainService, DecompilationMainService } from 'vs/cd/platform/DecompilationMainService';
 /* End AGPL */
 
 class ExpectedError extends Error {
@@ -177,7 +178,9 @@ class CodeMain {
 		services.set(ITunnelService, new SyncDescriptor(TunnelService));
 
 		/* AGPL */
-		services.set(IGrpcMainService, new GrpcMainService());
+		const grpcMainService = new GrpcMainService();
+		services.set(IGrpcMainService, grpcMainService);
+		services.set(IDecompilationMainService, new DecompilationMainService(grpcMainService));
 		/* End AGPL */
 
 		return [new InstantiationService(services, true), instanceEnvironment, environmentService];

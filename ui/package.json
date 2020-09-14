@@ -120,7 +120,6 @@
     "fast-plist": "0.1.2",
     "file-loader": "^4.2.0",
     "glob": "^5.0.13",
-    "grpc": "^1.24.3",
     "grpc-tools": "^1.9.1",
     "grpc_tools_node_protoc_ts": "^4.1.4",
     "gulp": "^4.0.0",

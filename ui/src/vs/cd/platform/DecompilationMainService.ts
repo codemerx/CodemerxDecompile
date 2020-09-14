@@ -57,7 +57,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		request.setAssemblypath(assemblyPath);
 
 		return new Promise<AssemblyRelatedFilePaths>((resolve, reject) => {
-			this.client?.getAssemblyRelatedFilePaths(request, null, (err, response) => {
+			this.client?.getAssemblyRelatedFilePaths(request, {}, (err, response) => {
 				if (err) {
 					reject(`getAssemblyRelatedFilePaths failed. Error: ${JSON.stringify(err)}`);
 					return;
@@ -78,7 +78,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		request.setAssemblypath(assemblyPath);
 
 		return new Promise<string[]>((resolve, reject) => {
-			this.client?.getAllTypeFilePaths(request, null, (err, response) => {
+			this.client?.getAllTypeFilePaths(request, {}, (err, response) => {
 				if (err) {
 					reject(`getAllTypeFilePaths failed. Error: ${JSON.stringify(err)}`);
 					return;
@@ -94,7 +94,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		request.setFilepath(filePath);
 
 		return new Promise<string>((resolve, reject) => {
-			this.client?.decompileType(request, null, (err, response) => {
+			this.client?.decompileType(request, {}, (err, response) => {
 				if (err) {
 					reject(err);
 					return;
@@ -110,7 +110,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		request.setFilepath(filePath);
 
 		return new Promise<void>((resolve, reject) => {
-			this.client?.addResolvedAssembly(request, null, (err, response) => {
+			this.client?.addResolvedAssembly(request, {}, (err, response) => {
 				if (err) {
 					reject(`addResolvedAssembly failed. Error: ${JSON.stringify(err)}`);
 					return;
@@ -128,7 +128,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		request.setColumn(column);
 
 		return new Promise<ReferenceMetadata>((resolve, reject) => {
-			this.client?.getMemberReferenceMetadata(request, null, (err, response) => {
+			this.client?.getMemberReferenceMetadata(request, {}, (err, response) => {
 				if (err) {
 					reject(err);
 					return;
@@ -153,7 +153,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		request.setAbsolutefilepath(absoluteFilePath);
 
 		return new Promise<Selection>((resolve, reject) => {
-			this.client?.getMemberDefinitionPosition(request, null, (err, response) => {
+			this.client?.getMemberDefinitionPosition(request, {}, (err, response) => {
 				if (err) {
 					reject(`getMemberDefinitionPosition failed. Error: ${JSON.stringify(err)}`);
 					return;

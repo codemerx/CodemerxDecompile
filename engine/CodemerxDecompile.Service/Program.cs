@@ -15,6 +15,7 @@
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 namespace CodemerxDecompile.Service
@@ -35,11 +36,16 @@ namespace CodemerxDecompile.Service
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
-                    if (parameters.HasPort)
+                    webBuilder.ConfigureKestrel(options =>
                     {
-                        webBuilder.UseUrls($"http://localhost:{parameters.Port}/");
-                    }
+                        if (parameters.HasPort)
+                        {
+                            // Setup a HTTP/2 endpoint without TLS.
+                            options.ListenLocalhost(int.Parse(parameters.Port), o => o.Protocols = HttpProtocols.Http2);
+                        }
+                    });
+
+                    webBuilder.UseStartup<Startup>();
                 });
         }
     }

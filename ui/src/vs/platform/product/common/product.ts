@@ -21,9 +21,11 @@ if (isWeb) {
 	if (Object.keys(product).length === 0) {
 		Object.assign(product, {
 			version: '1.47.0-dev',
-			nameLong: 'CodemerxDecompile Web Dev',
-			nameShort: 'CodemerxDecompile Web Dev',
-			urlProtocol: 'code-oss'
+			/* AGPL */
+			nameLong: 'CodemerxDecompile Web',
+			nameShort: 'CodemerxDecompile Web',
+			urlProtocol: 'codemerxdecompile'
+			/* End AGPL */
 		});
 	}
 }
@@ -40,9 +42,11 @@ else if (typeof require !== 'undefined' && typeof require.__$__nodeRequire === '
 	// Running out of sources
 	if (env['VSCODE_DEV']) {
 		Object.assign(product, {
-			nameShort: `${product.nameShort} Dev`,
-			nameLong: `${product.nameLong} Dev`,
-			dataFolderName: `${product.dataFolderName}-dev`
+			/* AGPL */
+			nameShort: `${product.nameShort}`,
+			nameLong: `${product.nameLong}`,
+			dataFolderName: `${product.dataFolderName}`
+			/* End AGPL */
 		});
 	}
 

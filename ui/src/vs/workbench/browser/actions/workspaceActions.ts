@@ -25,7 +25,7 @@ import { KeyChord, KeyMod, KeyCode } from 'vs/base/common/keyCodes';
 export class OpenFileAction extends Action {
 
 	static readonly ID = 'workbench.action.files.openFile';
-	static readonly LABEL = nls.localize('openFile', "Open File...");
+	static readonly LABEL = nls.localize('openFile', /* AGPL */"Open Assembly..."/* End AGPL */);
 
 	constructor(
 		id: string,
@@ -295,7 +295,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 	group: '6_close',
 	command: {
 		id: CloseWorkspaceAction.ID,
-		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Close &&Folder"),
+		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, /* AGPL */"Clear &&Assembly List"/* End AGPL */),
 		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
 	},
 	order: 3,

@@ -44,7 +44,7 @@ const fileCategory = nls.localize('file', "File");
 if (isMacintosh) {
 	registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenFileFolderAction, { primary: KeyMod.CtrlCmd | KeyCode.KEY_O }), 'File: Open...', fileCategory);
 } else {
-	registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenFileAction, { primary: KeyMod.CtrlCmd | KeyCode.KEY_O }), 'File: Open File...', fileCategory);
+	registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenFileAction, { primary: KeyMod.CtrlCmd | KeyCode.KEY_O }), /* AGPL */'File: Open Assembly...'/* End AGPL */, fileCategory);
 	// registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenFolderAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyMod.CtrlCmd | KeyCode.KEY_O) }), 'File: Open Folder...', fileCategory);
 }
 
@@ -618,7 +618,7 @@ if (isMacintosh) {
 		group: '2_open',
 		command: {
 			id: OpenFileAction.ID,
-			title: nls.localize({ key: 'miOpenFile', comment: ['&& denotes a mnemonic'] }, "&&Open File...")
+			title: nls.localize({ key: 'miOpenFile', comment: ['&& denotes a mnemonic'] }, /* AGPL */"&&Open Assembly..."/* End AGPL */)
 		},
 		order: 1
 	});

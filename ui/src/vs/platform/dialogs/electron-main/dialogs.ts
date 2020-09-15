@@ -67,7 +67,7 @@ export class DialogMainService implements IDialogMainService {
 	}
 
 	pickFile(options: INativeOpenDialogOptions, window?: BrowserWindow): Promise<string[] | undefined> {
-		return this.doPick({ ...options, pickFiles: true, title: localize('openFile', "Open File")/* AGPL */, filters: [{ name: 'Assembly files (.exe;.dll)', extensions: ['dll', 'exe'] }]/* AGPL */ }, window);
+		return this.doPick({ ...options, pickFiles: true, title: localize('openFile', /* AGPL */"Open Assembly"), filters: [{ name: 'Assembly files (.exe;.dll)', extensions: ['dll', 'exe'] }]/* End AGPL */ }, window);
 	}
 
 	pickWorkspace(options: INativeOpenDialogOptions, window?: BrowserWindow): Promise<string[] | undefined> {

@@ -288,11 +288,11 @@ namespace Mono.Cecil.AssemblyResolver
 
         private string ResolveSilverlightRuntimePath(AssemblyName assemblyName, string path)
         {
-            string searchPattern = string.Format(path, assemblyName.Name);
-            if (CheckFileExistence(assemblyName, searchPattern, true, true))
-            {
-                return searchPattern;
-            }
+            // string searchPattern = string.Format(path, assemblyName.Name);
+            // if (CheckFileExistence(assemblyName, searchPattern, true, true))
+            // {
+            //     return searchPattern;
+            // }
             return string.Empty;
         }
 

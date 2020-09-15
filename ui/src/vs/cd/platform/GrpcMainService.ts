@@ -22,9 +22,9 @@ export class GrpcMainService implements IGrpcMainService {
 
 	initialize(): Promise<void> {
 		return new Promise((resolve, reject) => {
-			const serverPath = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.exe');
+			const serverPath = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.dll');
 
-			spawn(serverPath, [`--port=${this.port}`]);
+			spawn('dotnet', [serverPath, `--port=${this.port}`]);
 
 			resolve();
 		});

@@ -179,17 +179,17 @@ export class Menubar {
 		return enableMenuBarMnemonics;
 	}
 
-	private get currentEnableNativeTabs(): boolean {
-		if (!isMacintosh) {
-			return false;
-		}
+	// private get currentEnableNativeTabs(): boolean {
+	// 	if (!isMacintosh) {
+	// 		return false;
+	// 	}
 
-		let enableNativeTabs = this.configurationService.getValue<boolean>('window.nativeTabs');
-		if (typeof enableNativeTabs !== 'boolean') {
-			enableNativeTabs = false;
-		}
-		return enableNativeTabs;
-	}
+	// 	let enableNativeTabs = this.configurationService.getValue<boolean>('window.nativeTabs');
+	// 	if (typeof enableNativeTabs !== 'boolean') {
+	// 		enableNativeTabs = false;
+	// 	}
+	// 	return enableNativeTabs;
+	// }
 
 	updateMenu(menubarData: IMenubarData, windowId: number) {
 		this.menubarMenus = menubarData.menus;
@@ -286,58 +286,58 @@ export class Menubar {
 		menubar.append(editMenuItem);
 
 		// Selection
-		const selectionMenu = new Menu();
-		const selectionMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mSelection', comment: ['&& denotes a mnemonic'] }, "&&Selection")), submenu: selectionMenu });
+		// const selectionMenu = new Menu();
+		// const selectionMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mSelection', comment: ['&& denotes a mnemonic'] }, "&&Selection")), submenu: selectionMenu });
 
-		this.setMenuById(selectionMenu, 'Selection');
-		menubar.append(selectionMenuItem);
+		// this.setMenuById(selectionMenu, 'Selection');
+		// menubar.append(selectionMenuItem);
 
-		// View
-		const viewMenu = new Menu();
-		const viewMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mView', comment: ['&& denotes a mnemonic'] }, "&&View")), submenu: viewMenu });
+		// // View
+		// const viewMenu = new Menu();
+		// const viewMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mView', comment: ['&& denotes a mnemonic'] }, "&&View")), submenu: viewMenu });
 
-		this.setMenuById(viewMenu, 'View');
-		menubar.append(viewMenuItem);
+		// this.setMenuById(viewMenu, 'View');
+		// menubar.append(viewMenuItem);
 
-		// Go
-		const gotoMenu = new Menu();
-		const gotoMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mGoto', comment: ['&& denotes a mnemonic'] }, "&&Go")), submenu: gotoMenu });
+		// // Go
+		// const gotoMenu = new Menu();
+		// const gotoMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mGoto', comment: ['&& denotes a mnemonic'] }, "&&Go")), submenu: gotoMenu });
 
-		this.setMenuById(gotoMenu, 'Go');
-		menubar.append(gotoMenuItem);
+		// this.setMenuById(gotoMenu, 'Go');
+		// menubar.append(gotoMenuItem);
 
-		// Debug
-		const debugMenu = new Menu();
-		const debugMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mRun', comment: ['&& denotes a mnemonic'] }, "&&Run")), submenu: debugMenu });
+		// // Debug
+		// const debugMenu = new Menu();
+		// const debugMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mRun', comment: ['&& denotes a mnemonic'] }, "&&Run")), submenu: debugMenu });
 
-		this.setMenuById(debugMenu, 'Run');
-		menubar.append(debugMenuItem);
+		// this.setMenuById(debugMenu, 'Run');
+		// menubar.append(debugMenuItem);
 
-		// Terminal
-		const terminalMenu = new Menu();
-		const terminalMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mTerminal', comment: ['&& denotes a mnemonic'] }, "&&Terminal")), submenu: terminalMenu });
+		// // Terminal
+		// const terminalMenu = new Menu();
+		// const terminalMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mTerminal', comment: ['&& denotes a mnemonic'] }, "&&Terminal")), submenu: terminalMenu });
 
-		this.setMenuById(terminalMenu, 'Terminal');
-		menubar.append(terminalMenuItem);
+		// this.setMenuById(terminalMenu, 'Terminal');
+		// menubar.append(terminalMenuItem);
 
-		// Mac: Window
-		let macWindowMenuItem: MenuItem | undefined;
-		if (this.shouldDrawMenu('Window')) {
-			const windowMenu = new Menu();
-			macWindowMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize('mWindow', "Window")), submenu: windowMenu, role: 'window' });
-			this.setMacWindowMenu(windowMenu);
-		}
+		// // Mac: Window
+		// let macWindowMenuItem: MenuItem | undefined;
+		// if (this.shouldDrawMenu('Window')) {
+		// 	const windowMenu = new Menu();
+		// 	macWindowMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize('mWindow', "Window")), submenu: windowMenu, role: 'window' });
+		// 	this.setMacWindowMenu(windowMenu);
+		// }
 
-		if (macWindowMenuItem) {
-			menubar.append(macWindowMenuItem);
-		}
+		// if (macWindowMenuItem) {
+		// 	menubar.append(macWindowMenuItem);
+		// }
 
-		// Help
-		const helpMenu = new Menu();
-		const helpMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mHelp', comment: ['&& denotes a mnemonic'] }, "&&Help")), submenu: helpMenu, role: 'help' });
+		// // Help
+		// const helpMenu = new Menu();
+		// const helpMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mHelp', comment: ['&& denotes a mnemonic'] }, "&&Help")), submenu: helpMenu, role: 'help' });
 
-		this.setMenuById(helpMenu, 'Help');
-		menubar.append(helpMenuItem);
+		// this.setMenuById(helpMenu, 'Help');
+		// menubar.append(helpMenuItem);
 
 		if (menubar.items && menubar.items.length > 0) {
 			Menu.setApplicationMenu(menubar);
@@ -503,44 +503,44 @@ export class Menubar {
 		return !!(event && ((!isMacintosh && (event.ctrlKey || event.shiftKey)) || (isMacintosh && (event.metaKey || event.altKey))));
 	}
 
-	private createRoleMenuItem(label: string, commandId: string, role: any): MenuItem {
-		const options: MenuItemConstructorOptions = {
-			label: this.mnemonicLabel(label),
-			role,
-			enabled: true
-		};
+	// private createRoleMenuItem(label: string, commandId: string, role: any): MenuItem {
+	// 	const options: MenuItemConstructorOptions = {
+	// 		label: this.mnemonicLabel(label),
+	// 		role,
+	// 		enabled: true
+	// 	};
 
-		return new MenuItem(this.withKeybinding(commandId, options));
-	}
+	// 	return new MenuItem(this.withKeybinding(commandId, options));
+	// }
 
-	private setMacWindowMenu(macWindowMenu: Menu): void {
-		const minimize = new MenuItem({ label: nls.localize('mMinimize', "Minimize"), role: 'minimize', accelerator: 'Command+M', enabled: this.windowsMainService.getWindowCount() > 0 });
-		const zoom = new MenuItem({ label: nls.localize('mZoom', "Zoom"), role: 'zoom', enabled: this.windowsMainService.getWindowCount() > 0 });
-		const bringAllToFront = new MenuItem({ label: nls.localize('mBringToFront', "Bring All to Front"), role: 'front', enabled: this.windowsMainService.getWindowCount() > 0 });
-		const switchWindow = this.createMenuItem(nls.localize({ key: 'miSwitchWindow', comment: ['&& denotes a mnemonic'] }, "Switch &&Window..."), 'workbench.action.switchWindow');
+	// private setMacWindowMenu(macWindowMenu: Menu): void {
+	// 	const minimize = new MenuItem({ label: nls.localize('mMinimize', "Minimize"), role: 'minimize', accelerator: 'Command+M', enabled: this.windowsMainService.getWindowCount() > 0 });
+	// 	const zoom = new MenuItem({ label: nls.localize('mZoom', "Zoom"), role: 'zoom', enabled: this.windowsMainService.getWindowCount() > 0 });
+	// 	const bringAllToFront = new MenuItem({ label: nls.localize('mBringToFront', "Bring All to Front"), role: 'front', enabled: this.windowsMainService.getWindowCount() > 0 });
+	// 	const switchWindow = this.createMenuItem(nls.localize({ key: 'miSwitchWindow', comment: ['&& denotes a mnemonic'] }, "Switch &&Window..."), 'workbench.action.switchWindow');
 
-		const nativeTabMenuItems: MenuItem[] = [];
-		if (this.currentEnableNativeTabs) {
-			nativeTabMenuItems.push(__separator__());
+	// 	const nativeTabMenuItems: MenuItem[] = [];
+	// 	if (this.currentEnableNativeTabs) {
+	// 		nativeTabMenuItems.push(__separator__());
 
-			nativeTabMenuItems.push(this.createMenuItem(nls.localize('mNewTab', "New Tab"), 'workbench.action.newWindowTab'));
+	// 		nativeTabMenuItems.push(this.createMenuItem(nls.localize('mNewTab', "New Tab"), 'workbench.action.newWindowTab'));
 
-			nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mShowPreviousTab', "Show Previous Tab"), 'workbench.action.showPreviousWindowTab', 'selectPreviousTab'));
-			nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mShowNextTab', "Show Next Tab"), 'workbench.action.showNextWindowTab', 'selectNextTab'));
-			nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mMoveTabToNewWindow', "Move Tab to New Window"), 'workbench.action.moveWindowTabToNewWindow', 'moveTabToNewWindow'));
-			nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mMergeAllWindows', "Merge All Windows"), 'workbench.action.mergeAllWindowTabs', 'mergeAllWindows'));
-		}
+	// 		nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mShowPreviousTab', "Show Previous Tab"), 'workbench.action.showPreviousWindowTab', 'selectPreviousTab'));
+	// 		nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mShowNextTab', "Show Next Tab"), 'workbench.action.showNextWindowTab', 'selectNextTab'));
+	// 		nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mMoveTabToNewWindow', "Move Tab to New Window"), 'workbench.action.moveWindowTabToNewWindow', 'moveTabToNewWindow'));
+	// 		nativeTabMenuItems.push(this.createRoleMenuItem(nls.localize('mMergeAllWindows', "Merge All Windows"), 'workbench.action.mergeAllWindowTabs', 'mergeAllWindows'));
+	// 	}
 
-		[
-			minimize,
-			zoom,
-			__separator__(),
-			switchWindow,
-			...nativeTabMenuItems,
-			__separator__(),
-			bringAllToFront
-		].forEach(item => macWindowMenu.append(item));
-	}
+	// 	[
+	// 		minimize,
+	// 		zoom,
+	// 		__separator__(),
+	// 		switchWindow,
+	// 		...nativeTabMenuItems,
+	// 		__separator__(),
+	// 		bringAllToFront
+	// 	].forEach(item => macWindowMenu.append(item));
+	// }
 
 	private getUpdateMenuItems(): MenuItem[] {
 		const state = this.updateService.state;

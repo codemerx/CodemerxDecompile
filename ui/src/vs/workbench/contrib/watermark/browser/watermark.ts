@@ -32,8 +32,8 @@ interface WatermarkEntry {
 }
 
 // const showCommands: WatermarkEntry = { text: nls.localize('watermark.showCommands', "Show All Commands"), id: ShowAllCommandsAction.ID };
-const quickAccess: WatermarkEntry = { text: nls.localize('watermark.quickAccess', "Go to File"), id: 'workbench.action.quickOpen' };
-const openFileNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFile', "Open File"), id: OpenFileAction.ID, mac: false };
+const quickAccess: WatermarkEntry = { text: nls.localize('watermark.quickAccess', /* AGPL */"Go to Type"/* End AGPL */), id: 'workbench.action.quickOpen' };
+const openFileNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFile', /* AGPL */"Open Assembly"/* End AGPL */), id: OpenFileAction.ID, mac: false };
 const openFolderNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFolder', "Open Folder"), id: OpenFolderAction.ID, mac: false };
 const openFileOrFolderMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFileFolder', "Open File or Folder"), id: OpenFileFolderAction.ID, mac: true };
 const openRecent: WatermarkEntry = { text: nls.localize('watermark.openRecent', "Open Recent"), id: 'workbench.action.openRecent' };

@@ -155,44 +155,44 @@ export class RpcDecompilerClient {
     this.methodInfoDecompileType);
   }
 
-  methodInfoGetMemberDefinition = new grpcWeb.AbstractClientBase.MethodInfo(
-    main_pb.GetMemberDefinitionResponse,
-    (request: main_pb.GetMemberDefinitionRequest) => {
+  methodInfoGetMemberReferenceMetadata = new grpcWeb.AbstractClientBase.MethodInfo(
+    main_pb.GetMemberReferenceMetadataResponse,
+    (request: main_pb.GetMemberReferenceMetadataRequest) => {
       return request.serializeBinary();
     },
-    main_pb.GetMemberDefinitionResponse.deserializeBinary
+    main_pb.GetMemberReferenceMetadataResponse.deserializeBinary
   );
 
-  getMemberDefinition(
-    request: main_pb.GetMemberDefinitionRequest,
-    metadata: grpcWeb.Metadata | null): Promise<main_pb.GetMemberDefinitionResponse>;
+  getMemberReferenceMetadata(
+    request: main_pb.GetMemberReferenceMetadataRequest,
+    metadata: grpcWeb.Metadata | null): Promise<main_pb.GetMemberReferenceMetadataResponse>;
 
-  getMemberDefinition(
-    request: main_pb.GetMemberDefinitionRequest,
+  getMemberReferenceMetadata(
+    request: main_pb.GetMemberReferenceMetadataRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: main_pb.GetMemberDefinitionResponse) => void): grpcWeb.ClientReadableStream<main_pb.GetMemberDefinitionResponse>;
+               response: main_pb.GetMemberReferenceMetadataResponse) => void): grpcWeb.ClientReadableStream<main_pb.GetMemberReferenceMetadataResponse>;
 
-  getMemberDefinition(
-    request: main_pb.GetMemberDefinitionRequest,
+  getMemberReferenceMetadata(
+    request: main_pb.GetMemberReferenceMetadataRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: main_pb.GetMemberDefinitionResponse) => void) {
+               response: main_pb.GetMemberReferenceMetadataResponse) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/RpcDecompiler/GetMemberDefinition',
+          '/RpcDecompiler/GetMemberReferenceMetadata',
         request,
         metadata || {},
-        this.methodInfoGetMemberDefinition,
+        this.methodInfoGetMemberReferenceMetadata,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/RpcDecompiler/GetMemberDefinition',
+      '/RpcDecompiler/GetMemberReferenceMetadata',
     request,
     metadata || {},
-    this.methodInfoGetMemberDefinition);
+    this.methodInfoGetMemberReferenceMetadata);
   }
 
   methodInfoGetMemberDefinitionPosition = new grpcWeb.AbstractClientBase.MethodInfo(
@@ -233,6 +233,46 @@ export class RpcDecompilerClient {
     request,
     metadata || {},
     this.methodInfoGetMemberDefinitionPosition);
+  }
+
+  methodInfoAddResolvedAssembly = new grpcWeb.AbstractClientBase.MethodInfo(
+    main_pb.Empty,
+    (request: main_pb.AddResolvedAssemblyRequest) => {
+      return request.serializeBinary();
+    },
+    main_pb.Empty.deserializeBinary
+  );
+
+  addResolvedAssembly(
+    request: main_pb.AddResolvedAssemblyRequest,
+    metadata: grpcWeb.Metadata | null): Promise<main_pb.Empty>;
+
+  addResolvedAssembly(
+    request: main_pb.AddResolvedAssemblyRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: main_pb.Empty) => void): grpcWeb.ClientReadableStream<main_pb.Empty>;
+
+  addResolvedAssembly(
+    request: main_pb.AddResolvedAssemblyRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: main_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/RpcDecompiler/AddResolvedAssembly',
+        request,
+        metadata || {},
+        this.methodInfoAddResolvedAssembly,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/RpcDecompiler/AddResolvedAssembly',
+    request,
+    metadata || {},
+    this.methodInfoAddResolvedAssembly);
   }
 
 }

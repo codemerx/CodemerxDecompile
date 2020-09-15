@@ -3,8 +3,9 @@ import {
 	GetAllTypeFilePathsRequest,
 	DecompileTypeRequest,
 	GetAssemblyRelatedFilePathsRequest,
-	GetMemberDefinitionRequest,
-	GetMemberDefinitionPositionRequest
+	GetMemberReferenceMetadataRequest,
+	GetMemberDefinitionPositionRequest,
+	AddResolvedAssemblyRequest
 } from './proto/main_pb';
 import { IGrpcService } from 'vs/cd/workbench/GrpcService';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
@@ -15,10 +16,11 @@ export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
 	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
-	getAllTypeFilePaths(assemblyPath: string) : Promise<TypeFilePath[]>;
-	decompileType(assemblyPath: string, typeFullName: string) : Promise<string>;
-	getMemberDefinition(absoluteFilePath: string, rowNumber: number, columnIndex: number) : Promise<MemberNavigationData>;
+	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
+	decompileType(filePath: string) : Promise<string>;
+	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
 	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
+	addResolvedAssembly(filePath: string) : Promise<void>;
 }
 
 export class DecompilationService implements IDecompilationService {
@@ -53,33 +55,25 @@ export class DecompilationService implements IDecompilationService {
 		});
 	}
 
-	getAllTypeFilePaths(assemblyPath: string) : Promise<TypeFilePath[]> {
+	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]> {
 		const request = new GetAllTypeFilePathsRequest();
 		request.setAssemblypath(assemblyPath);
 
-		return new Promise<TypeFilePath[]>((resolve, reject) => {
+		return new Promise<string[]>((resolve, reject) => {
 			this.client?.getAllTypeFilePaths(request, null, (err, response) => {
 				if (err) {
 					reject(`getAllTypeFilePaths failed. Error: ${JSON.stringify(err)}`);
 					return;
 				}
 
-				resolve(response.getTypefilepathsList().map(tfp => {
-					const typeFilePath: TypeFilePath = {
-						typeFullName: tfp.getTypefullname(),
-						absoluteFilePath: tfp.getAbsolutefilepath()
-					};
-
-					return typeFilePath;
-				}));
+				resolve(response.getTypefilepathsList());
 			});
 		});
 	};
 
-	decompileType(assemblyPath: string, typeFullName: string) : Promise<string> {
+	decompileType(filePath: string) : Promise<string> {
 		const request = new DecompileTypeRequest();
-		request.setAssemblypath(assemblyPath);
-		request.setTypefullname(typeFullName);
+		request.setFilepath(filePath);
 
 		return new Promise<string>((resolve, reject) => {
 			this.client?.decompileType(request, null, (err, response) => {
@@ -93,25 +87,44 @@ export class DecompilationService implements IDecompilationService {
 		});
 	}
 
-	getMemberDefinition(absoluteFilePath: string, rowNumber: number, columnIndex: number) : Promise<MemberNavigationData> {
-		const request = new GetMemberDefinitionRequest();
-		request.setAbsolutefilepath(absoluteFilePath);
-		request.setLinenumber(rowNumber);
-		request.setColumnindex(columnIndex);
+	addResolvedAssembly(filePath: string) : Promise<void> {
+		const request = new AddResolvedAssemblyRequest();
+		request.setFilepath(filePath);
 
-		return new Promise<MemberNavigationData>((resolve, reject) => {
-			this.client?.getMemberDefinition(request, null, (err, response) => {
+		return new Promise<void>((resolve, reject) => {
+			this.client?.addResolvedAssembly(request, null, (err, response) => {
 				if (err) {
-					reject(`getMemberDefinition failed. Error: ${JSON.stringify(err)}`);
+					reject(`addResolvedAssembly failed. Error: ${JSON.stringify(err)}`);
 					return;
 				}
 
-				const memberDefinitionData: MemberNavigationData = {
-					navigationFilePath: response.getNavigationfilepath(),
-					memberFullName: response.getMemberfullname()
+				resolve();
+			});
+		})
+	}
+
+	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata> {
+		const request = new GetMemberReferenceMetadataRequest();
+		request.setAbsolutefilepath(absoluteFilePath);
+		request.setLinenumber(lineNumber);
+		request.setColumn(column);
+
+		return new Promise<ReferenceMetadata>((resolve, reject) => {
+			this.client?.getMemberReferenceMetadata(request, null, (err, response) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				const memberReferenceMetadata: ReferenceMetadata = {
+					memberFullName: response.getMemberfullname(),
+					definitionFilePath: response.getDefinitionfilepath(),
+					isCrossAssemblyReference: response.getIscrossassemblyreference(),
+					referencedAssemblyFullName: response.getReferencedassemblyfullname(),
+					referencedAssemblyFilePath: response.getReferencedassemblyfilepath()
 				};
 
-				resolve(memberDefinitionData);
+				resolve(memberReferenceMetadata);
 			});
 		})
 	}
@@ -131,8 +144,8 @@ export class DecompilationService implements IDecompilationService {
 				const selection: Selection = {
 					startLineNumber: response.getStartlinenumber(),
 					endLineNumber: response.getEndlinenumber(),
-					startColumnIndex: response.getStartcolumnindex(),
-					endColumnIndex: response.getEndcolumnindex()
+					startColumn: response.getStartcolumn(),
+					endColumn: response.getEndcolumn()
 				};
 
 				resolve(selection);
@@ -154,11 +167,14 @@ export interface TypeFilePath {
 export interface Selection {
 	startLineNumber: number;
 	endLineNumber: number;
-	startColumnIndex: number;
-	endColumnIndex: number;
+	startColumn: number;
+	endColumn: number;
 }
 
-export interface MemberNavigationData {
-	navigationFilePath: string;
+export interface ReferenceMetadata {
 	memberFullName: string;
+	definitionFilePath?: string;
+	isCrossAssemblyReference: boolean;
+    referencedAssemblyFullName?: string;
+    referencedAssemblyFilePath?: string;
 }

@@ -6,9 +6,12 @@ service RpcDecompiler {
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
-  rpc GetMemberDefinition (GetMemberDefinitionRequest) returns (GetMemberDefinitionResponse);
+  rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
+  rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
 }
+
+message Empty { }
 
 message GetAssemblyRelatedFilePathsRequest {
   string assemblyPath = 1;
@@ -23,15 +26,22 @@ message GetAllTypeFilePathsRequest {
   string assemblyPath = 1;
 }
 
-message GetMemberDefinitionRequest {
-	string absoluteFilePath = 1;
-	int32 lineNumber = 2;
-	int32 columnIndex = 3;
+message GetAllTypeFilePathsResponse {
+  repeated string typeFilePaths = 1;
 }
 
-message GetMemberDefinitionResponse {
-  string navigationFilePath = 1;
+message GetMemberReferenceMetadataRequest {
+	string absoluteFilePath = 1;
+	int32 lineNumber = 2;
+	int32 column = 3;
+}
+
+message GetMemberReferenceMetadataResponse {
+  string definitionFilePath = 1;
   string memberFullName = 2;
+  bool isCrossAssemblyReference = 3;
+  string referencedAssemblyFullName = 4;
+  string referencedAssemblyFilePath = 5;
 }
 
 message GetMemberDefinitionPositionRequest {
@@ -41,13 +51,9 @@ message GetMemberDefinitionPositionRequest {
 
 message Selection {
 	int32 startLineNumber = 1;
-	int32 startColumnIndex = 2;
+	int32 startColumn = 2;
 	int32 endLineNumber = 3;
-	int32 endColumnIndex = 4;
-}
-
-message GetAllTypeFilePathsResponse {
-  repeated TypeFilePath typeFilePaths = 1;
+	int32 endColumn = 4;
 }
 
 message TypeFilePath {
@@ -56,10 +62,13 @@ message TypeFilePath {
 }
 
 message DecompileTypeRequest {
-  string assemblyPath = 1;
-  string typeFullName = 2;
+  string filePath = 1;
 }
 
 message DecompileTypeResponse {
   string sourceCode = 1;
+}
+
+message AddResolvedAssemblyRequest {
+  string filePath = 1;
 }

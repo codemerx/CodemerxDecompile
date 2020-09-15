@@ -36,7 +36,9 @@ export class HoverWidget extends Disposable {
 	}
 }
 
-export function renderHoverAction(parent: HTMLElement, actionOptions: { label: string, iconClass?: string, run: (target: HTMLElement) => void, commandId: string }, keybindingLabel: string | null): IDisposable {
+/* AGPL */
+export function renderHoverAction(parent: HTMLElement, actionOptions: { label: string, iconClass?: string, run: (target: HTMLElement) => void, commandId?: string }, keybindingLabel: string | null): IDisposable {
+/* End AGPL */
 	const actionContainer = dom.append(parent, $('div.action-container'));
 	const action = dom.append(actionContainer, $('a.action'));
 	action.setAttribute('href', '#');

@@ -65,10 +65,9 @@ import { INativeWorkbenchEnvironmentService } from 'vs/workbench/services/enviro
 import { clearAllFontInfos } from 'vs/editor/browser/config/configuration';
 import { IRemoteAuthorityResolverService } from 'vs/platform/remote/common/remoteAuthorityResolver';
 import { IAddressProvider, IAddress } from 'vs/platform/remote/common/remoteAgentConnection';
-import { VSBuffer } from 'vs/base/common/buffer';
 /* AGPL */
-import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
+import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
 
 export class NativeWindow extends Disposable {
@@ -117,7 +116,7 @@ export class NativeWindow extends Disposable {
 		@IRemoteAuthorityResolverService private readonly remoteAuthorityResolverService: IRemoteAuthorityResolverService,
 		@IHostService private readonly hostService: IHostService,
 		/* AGPL */
-		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper,
 		@IProgressService private readonly progressService: IProgressService
 		/* End AGPL */
 	) {
@@ -638,23 +637,11 @@ export class NativeWindow extends Disposable {
 
 				for(const fileToOpenOrCreate of filesToOpenOrCreate) {
 					if (fileToOpenOrCreate.exists && fileToOpenOrCreate.fileUri?.path) {
-						const uri = URI.revive(fileToOpenOrCreate.fileUri);
-						const assemblyRelatedFilePaths = await this.decompilationService.getAssemblyRelatedFilePaths(uri.fsPath);
-						const typeFilePaths = await this.decompilationService.getAllTypeFilePaths(uri.fsPath);
+						const result = await this.decompilationHelper.createAssemblyFileHierarchy(fileToOpenOrCreate.fileUri)
 
-						if (assemblyRelatedFilePaths && assemblyRelatedFilePaths.decompiledAssemblyPath && await this.fileService.exists(URI.file(assemblyRelatedFilePaths.decompiledAssemblyPath))) {
-							await this.fileService.del(URI.file(assemblyRelatedFilePaths.decompiledAssemblyPath), {
-								useTrash: false,
-								recursive: true
-							});
+						if (result?.hierarchyDirectory) {
+							decompiledAssemblyDirectoriesToOpen.add(result?.hierarchyDirectory);
 						}
-
-						for (const typeFilePath of typeFilePaths) {
-							const content = VSBuffer.fromString(`CodemerxDecompile-${uri.fsPath}-${typeFilePath.typeFullName}`);
-							await this.fileService.createFile(URI.file(typeFilePath.absoluteFilePath), content);
-						}
-
-						decompiledAssemblyDirectoriesToOpen.add(assemblyRelatedFilePaths.decompiledAssemblyDirectory);
 					}
 				}
 

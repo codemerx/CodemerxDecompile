@@ -21,6 +21,10 @@ import * as grpc from "@grpc/grpc-js";
 import { RpcManagerClient } from 'vs/cd/platform/proto/manager_grpc_pb';
 import { GetServerStatusRequest } from 'vs/cd/platform/proto/manager_pb';
 
+const SERVER_PATH = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.exe');
+const MAX_RETRIES = 5;
+const RUNNING_STATUS = 'Running';
+
 export const IGrpcMainService = createDecorator<IGrpcMainService>('grpcService');
 
 export interface IGrpcMainService {
@@ -35,28 +39,52 @@ export class GrpcMainService implements IGrpcMainService {
 
 	private readonly port = 5000;
 
+	private async getServerStatus(): Promise<string> {
+		const url = await this.getServiceUrl();
+		const statusService = new RpcManagerClient(url, grpc.credentials.createInsecure());
+
+		const status = await new Promise<string>((resolve, reject) => {
+			statusService.getServerStatus(new GetServerStatusRequest(), (error, response) => {
+				if (!error) {
+					resolve(response?.getStatus());
+				}
+				else {
+					reject(error);
+				}
+			});
+		});
+
+		return status;
+	}
+
 	getServiceUrl(): Promise<string> {
 		return Promise.resolve(`localhost:${this.port}`);
 	}
 
-	initialize(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			const serverPath = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.dll');
+	async initialize(): Promise<void> {
+		console.info('Starting CodemerxDecompile.Service...');
 
-			spawn('dotnet', [serverPath, `--port=${this.port}`]);
+		let count = 1;
+		while (count <= MAX_RETRIES) {
+			spawn('dotnet', [SERVER_PATH, `--port=${this.port}`]);
 
-			this.getServiceUrl().then(url => {
-				const statusService = new RpcManagerClient(url, grpc.credentials.createInsecure());
-				statusService.getServerStatus(new GetServerStatusRequest(), (error, response) => {
-					if (!error) {
-						console.log(response?.getStatus());
-						resolve();
-					}
-					else {
-						reject(error);
-					}
-				});
-			})
-		});
+			try {
+				const status = await this.getServerStatus();
+
+				if (status == RUNNING_STATUS) {
+					console.info(`CodemerxDecompile.Service is listening on port ${this.port}.`);
+
+					return;
+				}
+			} catch (error) {
+				if (count < MAX_RETRIES) {
+					console.error(`Failed starting CodemerxDecompile.Service on port "${this.port}" with reason: ${error}. Retrying attempt.`);
+				} else {
+					throw error;
+				}
+			}
+
+			count++;
+		}
 	}
 };

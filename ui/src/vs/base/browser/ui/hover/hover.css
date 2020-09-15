@@ -95,7 +95,8 @@
 	line-height: 22px;
 }
 
-.monaco-hover .hover-row.status-bar .actions {
+.monaco-hover .hover-row.status-bar .actions,
+.monaco-hover .markdown-hover .actions {
 	display: flex;
 	padding: 0px 8px;
 }

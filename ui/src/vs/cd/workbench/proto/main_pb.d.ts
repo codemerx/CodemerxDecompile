@@ -2,6 +2,20 @@ import * as jspb from 'google-protobuf'
 
 
 
+export class Empty extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Empty.AsObject;
+  static toObject(includeInstance: boolean, msg: Empty): Empty.AsObject;
+  static serializeBinaryToWriter(message: Empty, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Empty;
+  static deserializeBinaryFromReader(message: Empty, reader: jspb.BinaryReader): Empty;
+}
+
+export namespace Empty {
+  export type AsObject = {
+  }
+}
+
 export class GetAssemblyRelatedFilePathsRequest extends jspb.Message {
   getAssemblypath(): string;
   setAssemblypath(value: string): GetAssemblyRelatedFilePathsRequest;
@@ -247,6 +261,24 @@ export class DecompileTypeResponse extends jspb.Message {
 export namespace DecompileTypeResponse {
   export type AsObject = {
     sourcecode: string,
+  }
+}
+
+export class AddResolvedAssemblyRequest extends jspb.Message {
+  getFilepath(): string;
+  setFilepath(value: string): AddResolvedAssemblyRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AddResolvedAssemblyRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: AddResolvedAssemblyRequest): AddResolvedAssemblyRequest.AsObject;
+  static serializeBinaryToWriter(message: AddResolvedAssemblyRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AddResolvedAssemblyRequest;
+  static deserializeBinaryFromReader(message: AddResolvedAssemblyRequest, reader: jspb.BinaryReader): AddResolvedAssemblyRequest;
+}
+
+export namespace AddResolvedAssemblyRequest {
+  export type AsObject = {
+    filepath: string,
   }
 }
 

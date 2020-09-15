@@ -8,7 +8,10 @@ service RpcDecompiler {
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
   rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
+  rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
 }
+
+message Empty { }
 
 message GetAssemblyRelatedFilePathsRequest {
   string assemblyPath = 1;
@@ -64,4 +67,8 @@ message DecompileTypeRequest {
 
 message DecompileTypeResponse {
   string sourceCode = 1;
+}
+
+message AddResolvedAssemblyRequest {
+  string filePath = 1;
 }

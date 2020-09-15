@@ -235,5 +235,45 @@ export class RpcDecompilerClient {
     this.methodInfoGetMemberDefinitionPosition);
   }
 
+  methodInfoAddResolvedAssembly = new grpcWeb.AbstractClientBase.MethodInfo(
+    main_pb.Empty,
+    (request: main_pb.AddResolvedAssemblyRequest) => {
+      return request.serializeBinary();
+    },
+    main_pb.Empty.deserializeBinary
+  );
+
+  addResolvedAssembly(
+    request: main_pb.AddResolvedAssemblyRequest,
+    metadata: grpcWeb.Metadata | null): Promise<main_pb.Empty>;
+
+  addResolvedAssembly(
+    request: main_pb.AddResolvedAssemblyRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: main_pb.Empty) => void): grpcWeb.ClientReadableStream<main_pb.Empty>;
+
+  addResolvedAssembly(
+    request: main_pb.AddResolvedAssemblyRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: main_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/RpcDecompiler/AddResolvedAssembly',
+        request,
+        metadata || {},
+        this.methodInfoAddResolvedAssembly,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/RpcDecompiler/AddResolvedAssembly',
+    request,
+    metadata || {},
+    this.methodInfoAddResolvedAssembly);
+  }
+
 }
 

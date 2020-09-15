@@ -76,6 +76,21 @@ namespace CodemerxDecompile.Service
             return Task.FromResult(response);
         }
 
+        public override Task<Empty> AddResolvedAssembly(AddResolvedAssemblyRequest request, ServerCallContext context)
+        {
+            string normalizedFilePath = this.NormalizeFilePath(request.FilePath);
+
+            if (!File.Exists(normalizedFilePath))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "The specified assembly path does not exist"));
+            }
+
+            AssemblyDefinition resolvedAssembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(normalizedFilePath);
+            GlobalAssemblyResolver.Instance.RemoveFromFailedAssemblies(this.GetExtendedStrongName(resolvedAssembly.MainModule));
+
+            return Task.FromResult(new Empty());
+        }
+
         public override Task<GetMemberReferenceMetadataResponse> GetMemberReferenceMetadata(GetMemberReferenceMetadataRequest request, ServerCallContext context)
         {
             if (string.IsNullOrEmpty(request.AbsoluteFilePath))
@@ -128,17 +143,11 @@ namespace CodemerxDecompile.Service
             {
                 TypeDefinition resolvedTypeDefinition = typeReference.Resolve();
                 string referencedAssemblyStrongName = ((AssemblyNameReference)typeReference.Scope).FullName;
-                
-                if (resolvedTypeDefinition == null)
-                {
-                    throw new RpcException(new Status(StatusCode.NotFound, "Could not resolve type assembly"), new Metadata
+                response.ReferencedAssemblyFullName = referencedAssemblyStrongName;
+                typeReference = resolvedTypeDefinition ?? throw new RpcException(new Status(StatusCode.NotFound, "Could not resolve type assembly"), new Metadata
                     {
                         { "unresolvedAssemblyName", referencedAssemblyStrongName }
                     });
-                }
-
-                response.ReferencedAssemblyFullName = referencedAssemblyStrongName;
-                typeReference = resolvedTypeDefinition;
             }
 
             if (!this.decompilationContext.TryGetTypeFilePathFromCache(typeReference, out string typeFilePath))
@@ -263,22 +272,32 @@ namespace CodemerxDecompile.Service
         {
             ModuleDefinition moduleDefinition = typeReference.Module;
             AssemblyNameReference assemblyNameReference = typeReference.Module.Assembly.Name;
-
-            SpecialTypeAssembly special = moduleDefinition.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
-
+            AssemblyStrongNameExtended assemblyKey = this.GetExtendedStrongName(moduleDefinition);
             AssemblyName assemblyName = new AssemblyName(assemblyNameReference.Name,
                                                                 assemblyNameReference.FullName,
                                                                 assemblyNameReference.Version,
                                                                 assemblyNameReference.PublicKeyToken);
-            AssemblyStrongNameExtended assemblyKey = new AssemblyStrongNameExtended(assemblyName.FullName, moduleDefinition.Architecture, special);
 
             assemblyFilePath = moduleDefinition.AssemblyResolver.FindAssemblyPath(assemblyName, null, assemblyKey);
 
             return !string.IsNullOrEmpty(assemblyFilePath);
         }
 
+        private AssemblyStrongNameExtended GetExtendedStrongName(ModuleDefinition moduleDefinition)
+        {
+            AssemblyNameReference assemblyNameReference = moduleDefinition.Assembly.Name;
+            SpecialTypeAssembly special = moduleDefinition.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
+
+            return new AssemblyStrongNameExtended(assemblyNameReference.FullName, moduleDefinition.GetModuleArchitecture(), special);
+        }
+
         private string NormalizeFilePath(string filePath)
         {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return null;
+            }
+
             bool isWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
 
             if (isWindows && Path.IsPathFullyQualified(filePath))

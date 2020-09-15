@@ -42,6 +42,10 @@ import { Constants } from 'vs/base/common/uint';
 import { textLinkForeground } from 'vs/platform/theme/common/colorRegistry';
 import { Progress } from 'vs/platform/progress/common/progress';
 import { IContextKey } from 'vs/platform/contextkey/common/contextkey';
+import { renderHoverAction } from 'vs/base/browser/ui/hover/hoverWidget';
+import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { ASSEMBLY_FILE_FILTER } from 'vs/cd/workbench/common';
 
 const $ = dom.$;
 
@@ -62,7 +66,15 @@ class MarkerHover {
 	) { }
 }
 
-type HoverPart = MarkdownHover | ColorHover | MarkerHover;
+class LocateAssemblyHover {
+
+	constructor(
+		public readonly range: IRange,
+		public readonly message: IMarkdownString | undefined
+	) { }
+}
+
+type HoverPart = MarkdownHover | ColorHover | MarkerHover | LocateAssemblyHover;
 
 class ModesContentComputer implements IHoverComputer<HoverPart[]> {
 
@@ -135,6 +147,10 @@ class ModesContentComputer implements IHoverComputer<HoverPart[]> {
 			const marker = this._markerDecorationsService.getMarker(model, d);
 			if (marker) {
 				return new MarkerHover(range, marker);
+			}
+
+			if (d.options.isLocateAssemblyHover) {
+				return new LocateAssemblyHover(range, d.options.hoverMessage as IMarkdownString);
 			}
 
 			const colorData = colorDetector.getColorData(d.range.getStartPosition());
@@ -454,6 +470,32 @@ export class ModesContentHoverWidget extends ContentHoverWidget {
 				if (msg instanceof MarkerHover) {
 					markerMessages.push(msg);
 					isEmptyHoverContent = false;
+				} else if (msg instanceof LocateAssemblyHover) {
+					const markdownHoverElement = $('div.hover-row.markdown-hover');
+					const hoverContentsElement = dom.append(markdownHoverElement, $('div.hover-contents'));
+					const renderer = markdownDisposeables.add(new MarkdownRenderer(this._editor, this._modeService, this._openerService));
+
+					const actionsElement = dom.append(markdownHoverElement, $('div.actions'));
+					markdownDisposeables.add(renderHoverAction(actionsElement, {
+						label: 'Locate Assembly',
+						run: () => {
+							this._editor.invokeWithinContext(async (accessor) => {
+								const fileDialogService = accessor.get(IFileDialogService);
+								const decompilationService = accessor.get(IDecompilationService);
+
+								const fileUris = await fileDialogService.showOpenDialog({ canSelectFolders: false, canSelectMany: false, filters: ASSEMBLY_FILE_FILTER });
+
+								if (fileUris?.length) {
+									decompilationService.addResolvedAssembly(fileUris[0].fsPath);
+								}
+							});
+						}
+					}, null));
+
+					const renderedContents = markdownDisposeables.add(renderer.render(msg.message));
+					hoverContentsElement.appendChild(renderedContents.element);
+					fragment.appendChild(markdownHoverElement);
+					isEmptyHoverContent = false;
 				} else {
 					msg.contents
 						.filter(contents => !isEmptyMarkdownString(contents))
@@ -655,6 +697,9 @@ function hoverContentsEquals(first: HoverPart[], second: HoverPart[]): boolean {
 		}
 		if (firstElement instanceof MarkerHover || secondElement instanceof MarkerHover) {
 			return false;
+		}
+		if (firstElement instanceof LocateAssemblyHover || secondElement instanceof LocateAssemblyHover) {
+			return true;
 		}
 		if (!markedStringsEquals(firstElement.contents, secondElement.contents)) {
 			return false;

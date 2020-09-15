@@ -16,6 +16,7 @@ import { withNullAsUndefined } from 'vs/base/common/types';
 import { localize } from 'vs/nls';
 import { WORKSPACE_FILTER } from 'vs/platform/workspaces/common/workspaces';
 import { mnemonicButtonLabel } from 'vs/base/common/labels';
+import { ASSEMBLY_FILE_FILTER } from 'vs/cd/workbench/common';
 
 export const IDialogMainService = createDecorator<IDialogMainService>('dialogMainService');
 
@@ -67,7 +68,7 @@ export class DialogMainService implements IDialogMainService {
 	}
 
 	pickFile(options: INativeOpenDialogOptions, window?: BrowserWindow): Promise<string[] | undefined> {
-		return this.doPick({ ...options, pickFiles: true, title: localize('openFile', "Open File")/* AGPL */, filters: [{ name: 'Assembly files (.exe;.dll)', extensions: ['dll', 'exe'] }]/* AGPL */ }, window);
+		return this.doPick({ ...options, pickFiles: true, title: localize('openFile', "Open File")/* AGPL */, filters: ASSEMBLY_FILE_FILTER/* AGPL */ }, window);
 	}
 
 	pickWorkspace(options: INativeOpenDialogOptions, window?: BrowserWindow): Promise<string[] | undefined> {

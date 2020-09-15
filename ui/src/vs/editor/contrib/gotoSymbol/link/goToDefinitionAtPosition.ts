@@ -397,7 +397,8 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 			range: range,
 			options: {
 				inlineClassName: isErrorDecoration ? 'goto-error-definition-link' : 'goto-definition-link',
-				hoverMessage
+				hoverMessage,
+				isLocateAssemblyHover: isErrorDecoration
 			}
 		};
 

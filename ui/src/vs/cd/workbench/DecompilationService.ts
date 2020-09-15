@@ -4,7 +4,8 @@ import {
 	DecompileTypeRequest,
 	GetAssemblyRelatedFilePathsRequest,
 	GetMemberReferenceMetadataRequest,
-	GetMemberDefinitionPositionRequest
+	GetMemberDefinitionPositionRequest,
+	AddResolvedAssemblyRequest
 } from './proto/main_pb';
 import { IGrpcService } from 'vs/cd/workbench/GrpcService';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
@@ -19,6 +20,7 @@ export interface IDecompilationService {
 	decompileType(filePath: string) : Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
 	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
+	addResolvedAssembly(filePath: string) : Promise<void>;
 }
 
 export class DecompilationService implements IDecompilationService {
@@ -83,6 +85,22 @@ export class DecompilationService implements IDecompilationService {
 				resolve(response.getSourcecode());
 			});
 		});
+	}
+
+	addResolvedAssembly(filePath: string) : Promise<void> {
+		const request = new AddResolvedAssemblyRequest();
+		request.setFilepath(filePath);
+
+		return new Promise<void>((resolve, reject) => {
+			this.client?.addResolvedAssembly(request, null, (err, response) => {
+				if (err) {
+					reject(`addResolvedAssembly failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				resolve();
+			});
+		})
 	}
 
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata> {

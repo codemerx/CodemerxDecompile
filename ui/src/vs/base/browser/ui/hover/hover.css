@@ -96,7 +96,9 @@
 }
 
 .monaco-hover .hover-row.status-bar .actions,
+/* AGPL */
 .monaco-hover .markdown-hover .actions {
+/* End AGPL */
 	display: flex;
 	padding: 0px 8px;
 }

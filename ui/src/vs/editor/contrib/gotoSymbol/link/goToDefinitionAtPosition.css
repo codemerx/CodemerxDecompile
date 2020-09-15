@@ -8,7 +8,9 @@
 	cursor: pointer;
 }
 
+/* AGPL */
 .monaco-editor .goto-error-definition-link {
 	color: #fe0b08;
 	text-decoration: none;
 }
+/* End AGPL */

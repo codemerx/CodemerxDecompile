@@ -3180,7 +3180,9 @@ export class ModelDecorationOptions implements model.IModelDecorationOptions {
 	readonly inlineClassNameAffectsLetterSpacing: boolean;
 	readonly beforeContentClassName: string | null;
 	readonly afterContentClassName: string | null;
+	/* AGPL */
 	readonly isLocateAssemblyHover: boolean;
+	/* End AGPL */
 
 	private constructor(options: model.IModelDecorationOptions) {
 		this.stickiness = options.stickiness || model.TrackedRangeStickiness.AlwaysGrowsWhenTypingAtEdges;
@@ -3201,7 +3203,9 @@ export class ModelDecorationOptions implements model.IModelDecorationOptions {
 		this.inlineClassNameAffectsLetterSpacing = options.inlineClassNameAffectsLetterSpacing || false;
 		this.beforeContentClassName = options.beforeContentClassName ? cleanClassName(options.beforeContentClassName) : null;
 		this.afterContentClassName = options.afterContentClassName ? cleanClassName(options.afterContentClassName) : null;
+		/* AGPL */
 		this.isLocateAssemblyHover = options.isLocateAssemblyHover || false;
+		/* End AGPL */
 	}
 }
 ModelDecorationOptions.EMPTY = ModelDecorationOptions.register({});

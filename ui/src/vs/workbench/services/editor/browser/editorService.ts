@@ -1316,20 +1316,43 @@ export class DelegatingEditorService implements IEditorService {
 	) { }
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup): Promise<ITextEditorPane | undefined>;
+	/* AGPL */
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, navigationData?: ReferenceMetadata): Promise<ITextEditorPane | undefined>;
+	/* End AGPL */
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, group?: OpenInEditorGroup): Promise<IEditorPane | undefined> {
+	/* AGPL */
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
 			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
 			const str = fileContent.value.toString();
+
 			if (str === 'CodemerxDecompile') {
 				const sourceCode = await this.decompilationService.decompileType(resourceEditorInput.resource.fsPath);
 				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
 			}
+
+			const referenceMetadata = (groupOrReferenceMetadata as ReferenceMetadata);
+
+			if (referenceMetadata?.memberFullName && referenceMetadata?.definitionFilePath) {
+				const selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+
+				if (selection.startLineNumber && selection.endLineNumber && selection.startColumn && selection.endColumn) {
+					resourceEditorInput.options = {
+						...resourceEditorInput.options,
+						selection: {
+							startLineNumber: selection.startLineNumber,
+							startColumn: selection.startColumn,
+							endLineNumber: selection.endLineNumber,
+							endColumn: selection.endColumn
+						}
+					}
+				}
+			}
 		}
 
-		const result = this.editorService.doResolveEditorOpenRequest(editor, optionsOrGroup, group);
+		const result = this.editorService.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrReferenceMetadata as OpenInEditorGroup);
+		/* End AGPL */
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
 

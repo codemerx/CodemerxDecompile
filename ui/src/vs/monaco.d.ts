@@ -1408,7 +1408,9 @@ declare namespace monaco.editor {
 		 * If set, the decoration will be rendered after the text with this CSS class name.
 		 */
 		afterContentClassName?: string | null;
+		/* AGPL */
 		isLocateAssemblyHover?: boolean;
+		/* End AGPL */
 	}
 
 	/**

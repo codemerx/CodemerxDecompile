@@ -42,10 +42,12 @@ import { Constants } from 'vs/base/common/uint';
 import { textLinkForeground } from 'vs/platform/theme/common/colorRegistry';
 import { Progress } from 'vs/platform/progress/common/progress';
 import { IContextKey } from 'vs/platform/contextkey/common/contextkey';
+/* AGPL */
 import { renderHoverAction } from 'vs/base/browser/ui/hover/hoverWidget';
 import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
 import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { ASSEMBLY_FILE_FILTER } from 'vs/cd/workbench/common';
+/* End AGPL */
 
 const $ = dom.$;
 
@@ -66,6 +68,7 @@ class MarkerHover {
 	) { }
 }
 
+/* AGPL */
 class LocateAssemblyHover {
 
 	constructor(
@@ -75,6 +78,7 @@ class LocateAssemblyHover {
 }
 
 type HoverPart = MarkdownHover | ColorHover | MarkerHover | LocateAssemblyHover;
+/* End AGPL */
 
 class ModesContentComputer implements IHoverComputer<HoverPart[]> {
 
@@ -149,9 +153,11 @@ class ModesContentComputer implements IHoverComputer<HoverPart[]> {
 				return new MarkerHover(range, marker);
 			}
 
+			/* AGPL */
 			if (d.options.isLocateAssemblyHover) {
 				return new LocateAssemblyHover(range, d.options.hoverMessage as IMarkdownString);
 			}
+			/* End AGPL */
 
 			const colorData = colorDetector.getColorData(d.range.getStartPosition());
 
@@ -470,6 +476,7 @@ export class ModesContentHoverWidget extends ContentHoverWidget {
 				if (msg instanceof MarkerHover) {
 					markerMessages.push(msg);
 					isEmptyHoverContent = false;
+				/* AGPL */
 				} else if (msg instanceof LocateAssemblyHover) {
 					const markdownHoverElement = $('div.hover-row.markdown-hover');
 					const hoverContentsElement = dom.append(markdownHoverElement, $('div.hover-contents'));
@@ -496,6 +503,7 @@ export class ModesContentHoverWidget extends ContentHoverWidget {
 					hoverContentsElement.appendChild(renderedContents.element);
 					fragment.appendChild(markdownHoverElement);
 					isEmptyHoverContent = false;
+				/* End AGPL */
 				} else {
 					msg.contents
 						.filter(contents => !isEmptyMarkdownString(contents))
@@ -698,9 +706,11 @@ function hoverContentsEquals(first: HoverPart[], second: HoverPart[]): boolean {
 		if (firstElement instanceof MarkerHover || secondElement instanceof MarkerHover) {
 			return false;
 		}
+		/* AGPL */
 		if (firstElement instanceof LocateAssemblyHover || secondElement instanceof LocateAssemblyHover) {
 			return true;
 		}
+		/* End AGPL */
 		if (!markedStringsEquals(firstElement.contents, secondElement.contents)) {
 			return false;
 		}

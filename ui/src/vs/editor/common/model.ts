@@ -152,7 +152,9 @@ export interface IModelDecorationOptions {
 	 */
 	afterContentClassName?: string | null;
 
+	/* AGPL */
 	isLocateAssemblyHover?: boolean;
+	/* End AGPL */
 }
 
 /**

@@ -20,12 +20,15 @@ import { URI, UriComponents } from 'vs/base/common/uri';
 import { IFileService } from 'vs/platform/files/common/files';
 import { VSBuffer } from 'vs/base/common/buffer';
 
+const CODEMERX_FILE_IDENTIFICATOR = 'CodemerxDecompile';
+
 export const IDecompilationHelper = createDecorator<IDecompilationHelper>('IDecompilationHelper');
 
 export interface IDecompilationHelper {
 	readonly _serviceBrand: undefined;
 
 	createAssemblyFileHierarchy(assemblyPath: URI | UriComponents) : Promise<{ hierarchyDirectory: string } | null>;
+	ensureTypeIsDecompiled(typeUri: URI) : Promise<void>
 }
 
 export class DecompilationHelper implements IDecompilationHelper {
@@ -51,7 +54,7 @@ export class DecompilationHelper implements IDecompilationHelper {
 				}
 
 				for (const typeFilePath of typeFilePaths) {
-					const content = VSBuffer.fromString('CodemerxDecompile');
+					const content = VSBuffer.fromString(CODEMERX_FILE_IDENTIFICATOR);
 					await this.fileService.createFile(URI.file(typeFilePath), content);
 				}
 
@@ -63,5 +66,15 @@ export class DecompilationHelper implements IDecompilationHelper {
 		} catch (err) { }
 
 		return null;
+	}
+
+	async ensureTypeIsDecompiled(typeUri: URI) : Promise<void> {
+		const fileContent = await this.fileService.readFile(typeUri);
+		const str = fileContent.value.toString();
+
+		if (str === CODEMERX_FILE_IDENTIFICATOR) {
+			const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
+			await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
+		}
 	}
 }

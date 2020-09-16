@@ -44,6 +44,9 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { openEditorWith } from 'vs/workbench/services/editor/common/editorOpenWith';
+/* AGPL */
+import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
+/* End AGPL */
 
 // Commands
 
@@ -127,12 +130,21 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		const listService = accessor.get(IListService);
 		const fileService = accessor.get(IFileService);
 		const explorerService = accessor.get(IExplorerService);
+		/* AGPL */
+		const decompilationHelper = accessor.get(IDecompilationHelper);
+		/* End AGPL */
 		const resources = getMultiSelectedResources(resource, listService, editorService, explorerService);
 
 		// Set side input
 		if (resources.length) {
 			const untitledResources = resources.filter(resource => resource.scheme === Schemas.untitled);
 			const fileResources = resources.filter(resource => resource.scheme !== Schemas.untitled);
+
+			/* AGPL */
+			for(const fileResource of fileResources) {
+				await decompilationHelper.ensureTypeIsDecompiled(fileResource);
+			}
+			/* End AGPL */
 
 			const resolved = await fileService.resolveAll(fileResources.map(resource => ({ resource })));
 			const editors = resolved.filter(r => r.stat && r.success && !r.stat.isDirectory).map(r => ({

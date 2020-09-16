@@ -55,6 +55,9 @@ export interface IProgressOptions {
 	readonly total?: number;
 	readonly cancellable?: boolean;
 	readonly buttons?: string[];
+	/* AGPL */
+	readonly nonClosable?: boolean;
+	/* End AGPL */
 }
 
 export interface IProgressNotificationOptions extends IProgressOptions {

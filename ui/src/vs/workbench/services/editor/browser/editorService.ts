@@ -43,6 +43,7 @@ import { IModelService } from 'vs/editor/common/services/modelService';
 import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
 import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
+
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
 
@@ -83,7 +84,7 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 		@IUriIdentityService private readonly uriIdentityService: IUriIdentityService,
 		/* AGPL */
 		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper,
-		@IDecompilationService private readonly decompilationService: IDecompilationService
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
 		/* End AGPL */
 	) {
 		super();

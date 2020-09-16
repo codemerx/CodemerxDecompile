@@ -26,6 +26,9 @@ export interface IDialogOptions {
 	checkboxChecked?: boolean;
 	type?: 'none' | 'info' | 'error' | 'question' | 'warning' | 'pending';
 	keyEventProcessor?: (event: StandardKeyboardEvent) => void;
+	/* AGPL */
+	nonClosable?: boolean;
+	/* End AGPL */
 }
 
 export interface IDialogResult {
@@ -76,10 +79,14 @@ export class Dialog extends Disposable {
 		this.element.setAttribute('role', 'dialog');
 		hide(this.element);
 
-		// If no button is provided, default to OK
-		this.buttons = buttons.length ? buttons : [nls.localize('ok', "OK")];
-		const buttonsRowElement = this.element.appendChild($('.dialog-buttons-row'));
-		this.buttonsContainer = buttonsRowElement.appendChild($('.dialog-buttons'));
+		/* AGPL */
+		this.buttons = buttons.length ? buttons : (options.nonClosable ? [] : [nls.localize('ok', "OK")]);
+
+		if (this.buttons.length) {
+			const buttonsRowElement = this.element.appendChild($('.dialog-buttons-row'));
+			this.buttonsContainer = buttonsRowElement.appendChild($('.dialog-buttons'));
+		}
+		/* End AGPL */
 
 		const messageRowElement = this.element.appendChild($('.dialog-message-row'));
 		this.iconElement = messageRowElement.appendChild($('.dialog-icon'));
@@ -142,97 +149,111 @@ export class Dialog extends Disposable {
 		this.focusToReturn = document.activeElement as HTMLElement;
 
 		return new Promise<IDialogResult>((resolve) => {
-			if (!this.element || !this.buttonsContainer || !this.iconElement || !this.toolbarContainer) {
+			/* AGPL */
+			if (!this.element || !this.iconElement || !this.toolbarContainer) {
+			/* End AGPL */
 				resolve({ button: 0 });
 				return;
 			}
 
-			clearNode(this.buttonsContainer);
-
+			/* AGPL */
+			let buttonGroup: ButtonGroup | undefined;
 			let focusedButton = 0;
-			const buttonGroup = this.buttonGroup = new ButtonGroup(this.buttonsContainer, this.buttons.length, { title: true });
-			const buttonMap = this.rearrangeButtons(this.buttons, this.options.cancelId);
 
-			// Set focused button to UI index
-			buttonMap.forEach((value, index) => {
-				if (value.index === 0) {
-					focusedButton = index;
-				}
-			});
+			if (this.buttonsContainer) {
+			/* End AGPL */
+				clearNode(this.buttonsContainer);
 
-			buttonGroup.buttons.forEach((button, index) => {
-				button.label = mnemonicButtonLabel(buttonMap[index].label, true);
+				/* AGPL */
+				buttonGroup = this.buttonGroup = new ButtonGroup(this.buttonsContainer, this.buttons.length, { title: true });
+				/* End AGPL */
+				const buttonMap = this.rearrangeButtons(this.buttons, this.options.cancelId);
 
-				this._register(button.onDidClick(e => {
-					EventHelper.stop(e);
-					resolve({ button: buttonMap[index].index, checkboxChecked: this.checkbox ? this.checkbox.checked : undefined });
+				// Set focused button to UI index
+				buttonMap.forEach((value, index) => {
+					if (value.index === 0) {
+						focusedButton = index;
+					}
+				});
+
+				buttonGroup.buttons.forEach((button, index) => {
+					button.label = mnemonicButtonLabel(buttonMap[index].label, true);
+
+					this._register(button.onDidClick(e => {
+						EventHelper.stop(e);
+						resolve({ button: buttonMap[index].index, checkboxChecked: this.checkbox ? this.checkbox.checked : undefined });
+					}));
+				});
+
+				this._register(domEvent(window, 'keydown', true)((e: KeyboardEvent) => {
+					const evt = new StandardKeyboardEvent(e);
+					if (evt.equals(KeyCode.Enter) || evt.equals(KeyCode.Space)) {
+						return;
+					}
+
+					let eventHandled = false;
+					if (evt.equals(KeyMod.Shift | KeyCode.Tab) || evt.equals(KeyCode.LeftArrow)) {
+						if (!this.checkboxHasFocus && focusedButton === 0) {
+							if (this.checkbox) {
+								this.checkbox.domNode.focus();
+							}
+							this.checkboxHasFocus = true;
+						} else {
+							focusedButton = (this.checkboxHasFocus ? 0 : focusedButton) + buttonGroup!.buttons.length - 1;
+							focusedButton = focusedButton % buttonGroup!.buttons.length;
+							buttonGroup!.buttons[focusedButton].focus();
+							this.checkboxHasFocus = false;
+						}
+
+						eventHandled = true;
+					} else if (evt.equals(KeyCode.Tab) || evt.equals(KeyCode.RightArrow)) {
+						if (!this.checkboxHasFocus && focusedButton === buttonGroup!.buttons.length - 1) {
+							if (this.checkbox) {
+								this.checkbox.domNode.focus();
+							}
+							this.checkboxHasFocus = true;
+						} else {
+							focusedButton = this.checkboxHasFocus ? 0 : focusedButton + 1;
+							focusedButton = focusedButton % buttonGroup!.buttons.length;
+							if (buttonGroup!.buttons.length) {
+								buttonGroup!.buttons[focusedButton].focus();
+							}
+							this.checkboxHasFocus = false;
+						}
+						eventHandled = true;
+					}
+
+					if (eventHandled) {
+						EventHelper.stop(e, true);
+					} else if (this.options.keyEventProcessor) {
+						this.options.keyEventProcessor(evt);
+					}
 				}));
-			});
 
-			this._register(domEvent(window, 'keydown', true)((e: KeyboardEvent) => {
-				const evt = new StandardKeyboardEvent(e);
-				if (evt.equals(KeyCode.Enter) || evt.equals(KeyCode.Space)) {
-					return;
-				}
-
-				let eventHandled = false;
-				if (evt.equals(KeyMod.Shift | KeyCode.Tab) || evt.equals(KeyCode.LeftArrow)) {
-					if (!this.checkboxHasFocus && focusedButton === 0) {
-						if (this.checkbox) {
-							this.checkbox.domNode.focus();
-						}
-						this.checkboxHasFocus = true;
-					} else {
-						focusedButton = (this.checkboxHasFocus ? 0 : focusedButton) + buttonGroup.buttons.length - 1;
-						focusedButton = focusedButton % buttonGroup.buttons.length;
-						buttonGroup.buttons[focusedButton].focus();
-						this.checkboxHasFocus = false;
-					}
-
-					eventHandled = true;
-				} else if (evt.equals(KeyCode.Tab) || evt.equals(KeyCode.RightArrow)) {
-					if (!this.checkboxHasFocus && focusedButton === buttonGroup.buttons.length - 1) {
-						if (this.checkbox) {
-							this.checkbox.domNode.focus();
-						}
-						this.checkboxHasFocus = true;
-					} else {
-						focusedButton = this.checkboxHasFocus ? 0 : focusedButton + 1;
-						focusedButton = focusedButton % buttonGroup.buttons.length;
-						buttonGroup.buttons[focusedButton].focus();
-						this.checkboxHasFocus = false;
-					}
-					eventHandled = true;
-				}
-
-				if (eventHandled) {
+				this._register(domEvent(window, 'keyup', true)((e: KeyboardEvent) => {
 					EventHelper.stop(e, true);
-				} else if (this.options.keyEventProcessor) {
-					this.options.keyEventProcessor(evt);
-				}
-			}));
+					const evt = new StandardKeyboardEvent(e);
 
-			this._register(domEvent(window, 'keyup', true)((e: KeyboardEvent) => {
-				EventHelper.stop(e, true);
-				const evt = new StandardKeyboardEvent(e);
+					if (evt.equals(KeyCode.Escape)) {
+						resolve({ button: this.options.cancelId || 0, checkboxChecked: this.checkbox ? this.checkbox.checked : undefined });
+					}
+				}));
 
-				if (evt.equals(KeyCode.Escape)) {
-					resolve({ button: this.options.cancelId || 0, checkboxChecked: this.checkbox ? this.checkbox.checked : undefined });
-				}
-			}));
+				this._register(domEvent(this.element, 'focusout', false)((e: FocusEvent) => {
+					if (!!e.relatedTarget && !!this.element) {
+						if (!isAncestor(e.relatedTarget as HTMLElement, this.element)) {
+							this.focusToReturn = e.relatedTarget as HTMLElement;
 
-			this._register(domEvent(this.element, 'focusout', false)((e: FocusEvent) => {
-				if (!!e.relatedTarget && !!this.element) {
-					if (!isAncestor(e.relatedTarget as HTMLElement, this.element)) {
-						this.focusToReturn = e.relatedTarget as HTMLElement;
-
-						if (e.target) {
-							(e.target as HTMLElement).focus();
-							EventHelper.stop(e, true);
+							if (e.target) {
+								(e.target as HTMLElement).focus();
+								EventHelper.stop(e, true);
+							}
 						}
 					}
-				}
-			}));
+				}));
+			/* AGPL */
+			}
+			/* End AGPL */
 
 			removeClasses(this.iconElement, dialogErrorIcon.classNames, dialogWarningIcon.classNames, dialogInfoIcon.classNames, Codicon.loading.classNames);
 
@@ -254,22 +275,34 @@ export class Dialog extends Disposable {
 					break;
 			}
 
-			const actionBar = new ActionBar(this.toolbarContainer, {});
+			/* AGPL */
+			if (!this.options.nonClosable) {
+			/* End AGPL */
+				const actionBar = new ActionBar(this.toolbarContainer, {});
 
-			const action = new Action('dialog.close', nls.localize('dialogClose', "Close Dialog"), dialogCloseIcon.classNames, true, () => {
-				resolve({ button: this.options.cancelId || 0, checkboxChecked: this.checkbox ? this.checkbox.checked : undefined });
-				return Promise.resolve();
-			});
+				const action = new Action('dialog.close', nls.localize('dialogClose', "Close Dialog"), dialogCloseIcon.classNames, true, () => {
+					resolve({ button: this.options.cancelId || 0, checkboxChecked: this.checkbox ? this.checkbox.checked : undefined });
+					return Promise.resolve();
+				});
 
-			actionBar.push(action, { icon: true, label: false, });
+				actionBar.push(action, { icon: true, label: false, });
+			/* AGPL */
+			}
+			/* End AGPL */
 
 			this.applyStyles();
 
 			this.element.setAttribute('aria-label', this.getAriaLabel());
 			show(this.element);
 
-			// Focus first element
-			buttonGroup.buttons[focusedButton].focus();
+			/* AGPL */
+			if (buttonGroup?.buttons.length) {
+			/* End AGPL */
+				// Focus first element
+				buttonGroup.buttons[focusedButton].focus();
+			/* AGPL */
+			}
+			/* End AGPL */
 		});
 	}
 

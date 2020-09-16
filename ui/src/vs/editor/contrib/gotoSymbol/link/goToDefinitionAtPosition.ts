@@ -75,7 +75,8 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 									if (referenceMetadata?.isCrossAssemblyReference && referenceMetadata?.referencedAssemblyFilePath) {
 										const assemblyFilePath = referenceMetadata?.referencedAssemblyFilePath;
 
-										await this.progressService.withProgress({ location: ProgressLocation.Explorer }, async () => {
+										await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+											progress.report({ message: 'Loading assembly...' });
 											await this.decompilationHelper.createAssemblyFileHierarchy(URI.file(assemblyFilePath));
 										});
 

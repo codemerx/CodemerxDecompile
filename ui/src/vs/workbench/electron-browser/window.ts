@@ -634,7 +634,8 @@ export class NativeWindow extends Disposable {
 		const filesToOpenOrCreate = request.filesToOpenOrCreate;
 
 		if (filesToOpenOrCreate && filesToOpenOrCreate?.length) {
-			this.progressService.withProgress({ location: ProgressLocation.Explorer }, async () => {
+			this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async (progress) => {
+				progress.report({ message: `Loading assemblies...` });
 				const decompiledAssemblyDirectoriesToOpen: Set<string> = new Set<string>();
 
 				for(const fileToOpenOrCreate of filesToOpenOrCreate) {

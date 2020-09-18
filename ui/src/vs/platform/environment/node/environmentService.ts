@@ -256,6 +256,11 @@ export class EnvironmentService implements INativeEnvironmentService {
 	@memoize
 	get serviceMachineIdResource(): URI { return resources.joinPath(URI.file(this.userDataPath), 'machineid'); }
 
+	/* AGPL */
+	@memoize
+	get codemerxDecompileLogResource(): URI { return URI.file(path.join(this.logsPath, 'CodemerxDecompile.log')); }
+	/* End AGPL */
+
 	get disableUpdates(): boolean { return !!this._args['disable-updates']; }
 	get disableCrashReporter(): boolean { return !!this._args['disable-crash-reporter']; }
 	get crashReporterDirectory(): string | undefined { return this._args['crash-reporter-directory']; }

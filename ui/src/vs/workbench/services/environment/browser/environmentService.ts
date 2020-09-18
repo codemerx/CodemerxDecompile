@@ -165,6 +165,11 @@ export class BrowserWorkbenchEnvironmentService implements IWorkbenchEnvironment
 	@memoize
 	get serviceMachineIdResource(): URI { return joinPath(this.userRoamingDataHome, 'machineid'); }
 
+	/* AGPL */
+	@memoize
+	get codemerxDecompileLogResource(): URI { return joinPath(this.options.logsPath, 'CodemerxDecompile.log'); }
+	/* End AGPL */
+
 	private _extensionHostDebugEnvironment: IExtensionHostDebugEnvironment | undefined = undefined;
 	get debugExtensionHost(): IExtensionHostDebugParams {
 		if (!this._extensionHostDebugEnvironment) {

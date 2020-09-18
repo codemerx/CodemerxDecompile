@@ -19,7 +19,7 @@ import { ServicesAccessor, IInstantiationService } from 'vs/platform/instantiati
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 import { ServiceCollection } from 'vs/platform/instantiation/common/serviceCollection';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
-import { ILogService, ConsoleLogMainService, MultiplexLogService, getLogLevel } from 'vs/platform/log/common/log';
+import { ILogService, ConsoleLogMainService, MultiplexLogService, getLogLevel, ILoggerService } from 'vs/platform/log/common/log';
 import { StateService } from 'vs/platform/state/node/stateService';
 import { IStateService } from 'vs/platform/state/node/state';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
@@ -53,6 +53,7 @@ import { IProductService } from 'vs/platform/product/common/productService';
 /* AGPL */
 import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { IDecompilationMainService, DecompilationMainService } from 'vs/cd/platform/DecompilationMainService';
+import { FileLoggerService } from 'vs/platform/log/common/fileLogService';
 /* End AGPL */
 
 class ExpectedError extends Error {
@@ -178,9 +179,10 @@ class CodeMain {
 		services.set(ITunnelService, new SyncDescriptor(TunnelService));
 
 		/* AGPL */
-		const grpcMainService = new GrpcMainService();
-		services.set(IGrpcMainService, grpcMainService);
-		services.set(IDecompilationMainService, new DecompilationMainService(grpcMainService));
+		services.set(ILoggerService, new SyncDescriptor(FileLoggerService));
+
+		services.set(IGrpcMainService, new SyncDescriptor(GrpcMainService));
+		services.set(IDecompilationMainService, new SyncDescriptor(DecompilationMainService));
 		/* End AGPL */
 
 		return [new InstantiationService(services, true), instanceEnvironment, environmentService];

@@ -232,23 +232,11 @@ namespace Mono.Cecil.AssemblyResolver
 		/*Telerik Authorship*/
 		private IEnumerable<string> ResolveNetCoreReferences(AssemblyName assemblyName)
 		{
-			List<string> targetDirectories = null;
-
-			foreach (var ver in assemblyName.SupportedVersions(TargetPlatform.NetCore))
+            /* AGPL */
+			foreach (string ver in assemblyName.SupportedVersions(TargetPlatform.NetCore))
 			{
-				targetDirectories = new List<string>();
-
-				if (Directory.Exists(SystemInformation.NetCoreX64SharedAssemblies))
-				{
-                    targetDirectories.AddRange(Directory.GetDirectories(SystemInformation.NetCoreX64SharedAssemblies, ver + "*"));
-                }
-
-				if (Directory.Exists(SystemInformation.NetCoreX86SharedAssemblies))
-				{
-                    targetDirectories.AddRange(Directory.GetDirectories(SystemInformation.NetCoreX86SharedAssemblies, ver + "*"));
-                }
-
-				foreach (string dirVersions in targetDirectories)
+                foreach (string dirVersions in SystemInformation.GetNetCoreSharedAssemblyDirectories(ver))
+				/* End AGPL */
 				{
 					string searchPattern = string.Format("{0}\\{1}.dll", dirVersions, assemblyName.Name);
 					if (CheckFileExistence(assemblyName, searchPattern, true, true))
@@ -289,12 +277,16 @@ namespace Mono.Cecil.AssemblyResolver
         private string ResolveSilverlightRuntimePath(AssemblyName assemblyName, string path)
         {
             /* AGPL */
-            // string searchPattern = string.Format(path, assemblyName.Name);
-            // if (CheckFileExistence(assemblyName, searchPattern, true, true))
-            // {
-            //     return searchPattern;
-            // }
+            if (SystemInformation.IsWindows)
+            {
+                string searchPattern = string.Format(path, assemblyName.Name);
+                if (CheckFileExistence(assemblyName, searchPattern, true, true))
+                {
+                    return searchPattern;
+                }
+            }
             /* End AGPL */
+
             return string.Empty;
         }
 

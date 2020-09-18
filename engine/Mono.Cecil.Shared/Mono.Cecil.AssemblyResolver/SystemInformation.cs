@@ -1,7 +1,11 @@
 ﻿using System;
 using Microsoft.Win32;
 using System.IO;
-using System.Diagnostics;
+/* AGPL */
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
+/* End AGPL */
 
 namespace Mono.Cecil.AssemblyResolver
 {
@@ -11,12 +15,16 @@ namespace Mono.Cecil.AssemblyResolver
 
         private static readonly string[] resolvableExtensions = { ".dll", ".exe", ".winmd" };
 
+        /* AGPL */
+        public static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        /* End AGPL */
+
         public static readonly Version DefaultAssemblyVersion = new Version(0, 0, 0, 0);
 
         /* AGPL */
-        public static string SILVERLIGHT_RUNTIME = null;
+        public static string SILVERLIGHT_RUNTIME = IsWindows ? GetSilverlightRunTime(ProgramFilesX86) : null;
 
-        public static string SILVERLIGHT_RUNTIME_64 = null;
+        public static string SILVERLIGHT_RUNTIME_64 = IsWindows ? GetSilverlightRunTime(ProgramW6432) : null;
         /* End AGPL */
 
         public static string SILVERLIGHT_DEFAULT = @"{0}\Reference Assemblies\Microsoft\Framework\Silverlight\{1}\{2}.dll";
@@ -25,7 +33,9 @@ namespace Mono.Cecil.AssemblyResolver
 
         public static string COMPACT_FRAMEWORK = @"{0}\Microsoft.NET\SDK\CompactFramework\{1}\WindowsCE\{2}.dll";
 
-        public static string NETCORE_SHAREDASSEMBLIES = @"{0}\dotnet\shared\Microsoft.NETCore.App\";
+        /* AGPL */
+        public static string NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH = Path.Combine("dotnet", "shared", "Microsoft.NETCore.App");
+        /* End AGPL */
 
 		public static string WINDOWS_PHONE_STRING_PATHERN = @"{0}\Reference Assemblies\Microsoft\Framework\Silverlight\{1}\Profile\WindowsPhone{2}\{3}.dll";
 
@@ -55,7 +65,7 @@ namespace Mono.Cecil.AssemblyResolver
 
         public static string[] SILVERLIGHT_VERSIONS = new string[] { "v4.0", "v5.0", "v3.0", "v2.0" };
 
-		public static string[] NETCORE_VERSIONS = new string[] { "1.0", "1.1", "2.0" };
+		public static string[] NETCORE_VERSIONS = new string[] { "1.0", "1.1", "2.0", "2.1", "2.2", "3.0", "3.1" };
 
         public static readonly string[] CoreAssemblies = { 
                                                               "mscorlib.dll",
@@ -93,6 +103,11 @@ namespace Mono.Cecil.AssemblyResolver
             get
             {
                 /* AGPL */
+                if (IsWindows)
+                {
+                    return Environment.GetEnvironmentVariable("windir") ?? Environment.GetEnvironmentVariable("SystemRoot");
+                }
+
                 return string.Empty;
                 /* End AGPL */
             }
@@ -103,6 +118,11 @@ namespace Mono.Cecil.AssemblyResolver
             get
             {
                 /* AGPL */
+                if (IsWindows)
+                {
+                    return Environment.GetEnvironmentVariable("ProgramFiles(x86)") ?? Environment.GetEnvironmentVariable("ProgramFiles");
+                }
+
                 return string.Empty;
                 /* End AGPL */
             }
@@ -113,24 +133,13 @@ namespace Mono.Cecil.AssemblyResolver
             get
             {
                 /* AGPL */
+                if (IsWindows)
+                {
+                    return Environment.GetEnvironmentVariable("ProgramW6432") ?? string.Empty;
+                }
+
                 return string.Empty;
                 /* End AGPL */
-            }
-        }
-
-        public static string NetCoreX86SharedAssemblies
-        {
-            get
-            {
-                return string.Format(NETCORE_SHAREDASSEMBLIES, ProgramFilesX86);
-            }
-        }
-
-        public static string NetCoreX64SharedAssemblies
-        {
-            get
-            {
-                return string.Format(NETCORE_SHAREDASSEMBLIES, ProgramW6432);
             }
         }
 
@@ -138,13 +147,49 @@ namespace Mono.Cecil.AssemblyResolver
 		{
 			assemblyPath = assemblyPath.ToLowerInvariant();
 
-			if (assemblyPath.StartsWith(NetCoreX64SharedAssemblies.ToLowerInvariant()) || assemblyPath.StartsWith(NetCoreX86SharedAssemblies.ToLowerInvariant()))
-			{
-				return true;
-			}
+            /* AGPL */
+            return GetNetCoreSharedAssemblyRootDirectories().Any(d => assemblyPath.StartsWith(d.ToLowerInvariant()));
+            /* End AGPL */
+        }
 
-			return false;
-		}
+        /* AGPL */
+        public static List<string> GetNetCoreSharedAssemblyDirectories(string targetVersion)
+        {
+            List<string> rootDirectories = GetNetCoreSharedAssemblyRootDirectories();
+            List<string> versionSpecificDirectories = new List<string>();
+
+            foreach (string rootDirectory in rootDirectories)
+            {
+                if (Directory.Exists(rootDirectory))
+                {
+                    versionSpecificDirectories.AddRange(Directory.GetDirectories(rootDirectory, targetVersion + "*"));
+                }
+            }
+
+            return versionSpecificDirectories;
+        }
+
+        private static List<string> GetNetCoreSharedAssemblyRootDirectories()
+        {
+            List<string> directories = new List<string>();
+
+            if (IsWindows)
+            {
+                directories.Add(Path.Combine(ProgramW6432, NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine(ProgramFilesX86, NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                directories.Add(Path.Combine("usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                directories.Add(Path.Combine("usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+            }
+
+            return directories;
+        }
+        /* End AGPL */
 
         private static string GetSilverlightRunTime(string targetProgramFilesDir)
         {

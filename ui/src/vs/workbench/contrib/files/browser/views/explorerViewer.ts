@@ -7,9 +7,13 @@ import { IListAccessibilityProvider } from 'vs/base/browser/ui/list/listWidget';
 import * as DOM from 'vs/base/browser/dom';
 import * as glob from 'vs/base/common/glob';
 import { IListVirtualDelegate, ListDragOverEffect } from 'vs/base/browser/ui/list/list';
+/* AGPL */
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
+/* End AGPL */
 import { INotificationService, Severity } from 'vs/platform/notification/common/notification';
+/* AGPL */
 import { IFileService, FileKind } from 'vs/platform/files/common/files';
+/* End AGPL */
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { IDisposable, Disposable, dispose, toDisposable, DisposableStore } from 'vs/base/common/lifecycle';
@@ -18,9 +22,11 @@ import { IFileLabelOptions, IResourceLabel, ResourceLabels } from 'vs/workbench/
 import { ITreeNode, ITreeFilter, TreeVisibility, TreeFilterResult, IAsyncDataSource, ITreeSorter, ITreeDragAndDrop, ITreeDragOverReaction, TreeDragOverBubble } from 'vs/base/browser/ui/tree/tree';
 import { IContextViewService } from 'vs/platform/contextview/browser/contextView';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
+/* AGPL */
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IFilesConfiguration, IExplorerService } from 'vs/workbench/contrib/files/common/files';
 import { dirname, joinPath, isEqualOrParent } from 'vs/base/common/resources';
+/* End AGPL */
 import { InputBox, MessageType } from 'vs/base/browser/ui/inputbox/inputBox';
 import { localize } from 'vs/nls';
 import { attachInputBoxStyler } from 'vs/platform/theme/common/styler';
@@ -30,12 +36,16 @@ import { equals, deepClone } from 'vs/base/common/objects';
 import * as path from 'vs/base/common/path';
 import { ExplorerItem, NewExplorerItem } from 'vs/workbench/contrib/files/common/explorerModel';
 import { compareFileExtensionsNumeric, compareFileNamesNumeric } from 'vs/base/common/comparers';
+/* AGPL */
 import { fillResourceDataTransfers, CodeDataTransfers, containsDragType } from 'vs/workbench/browser/dnd';
+/* End AGPL */
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { IDragAndDropData, DataTransfers } from 'vs/base/browser/dnd';
 import { Schemas } from 'vs/base/common/network';
 import { DesktopDragAndDropData, ExternalElementsDragAndDropData, ElementsDragAndDropData } from 'vs/base/browser/ui/list/listView';
+/* AGPL */
 import { isMacintosh } from 'vs/base/common/platform';
+/* End AGPL */
 import { URI } from 'vs/base/common/uri';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { FuzzyScore, createMatches } from 'vs/base/common/filters';
@@ -444,7 +454,9 @@ export class FilesRenderer implements ICompressibleTreeRenderer<ExplorerItem, Fu
 					done(false, true);
 				}
 			}),
+			/* AGPL */
 			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_UP, () => {
+			/* End AGPL */
 				showInputBoxNotification();
 			}),
 			DOM.addDisposableListener(inputBox.inputElement, DOM.EventType.BLUR, () => {
@@ -739,7 +751,9 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 			this.dropEnabled = this.configurationService.getValue('explorer.enableDragAndDrop');
 		};
 		updateDropEnablement();
+		/* AGPL */
 		this.toDispose.push(this.configurationService.onDidChangeConfiguration(() => updateDropEnablement()));
+		/* End AGPL */
 	}
 
 	onDragOver(data: IDragAndDropData, target: ExplorerItem | undefined, targetIndex: number | undefined, originalEvent: DragEvent): boolean | ITreeDragOverReaction {
@@ -755,7 +769,9 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 				const iconLabelName = getIconLabelNameFromHTMLElement(originalEvent.target);
 
 				if (iconLabelName && iconLabelName.index < iconLabelName.count - 1) {
+					/* AGPL */
 					const result = this.handleDragOver(data, compressedTarget, originalEvent);
+					/* End AGPL */
 
 					if (result) {
 						if (iconLabelName.element !== this.compressedDragOverElement) {
@@ -779,10 +795,14 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 		}
 
 		this.compressedDropTargetDisposable.dispose();
+		/* AGPL */
 		return this.handleDragOver(data, target, originalEvent);
+		/* End AGPL */
 	}
 
+	/* AGPL */
 	private handleDragOver(data: IDragAndDropData, target: ExplorerItem | undefined, originalEvent: DragEvent): boolean | ITreeDragOverReaction {
+	/* End AGPL */
 		const isCopy = originalEvent && ((originalEvent.ctrlKey && !isMacintosh) || (originalEvent.altKey && isMacintosh));
 		const fromDesktop = data instanceof DesktopDragAndDropData;
 		const effect = (fromDesktop || isCopy) ? ListDragOverEffect.Copy : ListDragOverEffect.Move;
@@ -923,6 +943,7 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 			return;
 		}
 
+		/* AGPL */
 		// // Desktop DND (Import file)
 		// if (data instanceof DesktopDragAndDropData) {
 		// 	if (isWeb) {
@@ -935,6 +956,7 @@ export class FileDragAndDrop implements ITreeDragAndDrop<ExplorerItem> {
 		// else {
 		// 	this.handleExplorerDrop(data as ElementsDragAndDropData<ExplorerItem, ExplorerItem[]>, target, originalEvent).then(undefined, e => this.notificationService.warn(e));
 		// }
+		/* End AGPL */
 	}
 
 

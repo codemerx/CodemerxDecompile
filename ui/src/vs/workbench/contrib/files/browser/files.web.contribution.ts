@@ -16,7 +16,9 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		TextFileEditor,
 		TextFileEditor.ID,
+		/* AGPL */
 		nls.localize('textFileEditor', "Text File Code Viewer")
+		/* End AGPL */
 	),
 	[
 		new SyncDescriptor<EditorInput>(FileEditorInput)

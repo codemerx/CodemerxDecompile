@@ -78,7 +78,9 @@ export class BaseSplitEditorAction extends Action {
 export class SplitEditorAction extends BaseSplitEditorAction {
 
 	static readonly ID = 'workbench.action.splitEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('splitEditor', "Split Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -93,7 +95,9 @@ export class SplitEditorAction extends BaseSplitEditorAction {
 export class SplitEditorOrthogonalAction extends BaseSplitEditorAction {
 
 	static readonly ID = 'workbench.action.splitEditorOrthogonal';
+	/* AGPL */
 	static readonly LABEL = nls.localize('splitEditorOrthogonal', "Split Code Viewer Orthogonal");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -114,7 +118,9 @@ export class SplitEditorOrthogonalAction extends BaseSplitEditorAction {
 export class SplitEditorLeftAction extends ExecuteCommandAction {
 
 	static readonly ID = SPLIT_EDITOR_LEFT;
+	/* AGPL */
 	static readonly LABEL = nls.localize('splitEditorGroupLeft', "Split Code Viewer Left");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -128,7 +134,9 @@ export class SplitEditorLeftAction extends ExecuteCommandAction {
 export class SplitEditorRightAction extends ExecuteCommandAction {
 
 	static readonly ID = SPLIT_EDITOR_RIGHT;
+	/* AGPL */
 	static readonly LABEL = nls.localize('splitEditorGroupRight', "Split Code Viewer Right");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -142,7 +150,9 @@ export class SplitEditorRightAction extends ExecuteCommandAction {
 export class SplitEditorUpAction extends ExecuteCommandAction {
 
 	static readonly ID = SPLIT_EDITOR_UP;
+	/* AGPL */
 	static readonly LABEL = nls.localize('splitEditorGroupUp', "Split Code Viewer Up");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -156,7 +166,9 @@ export class SplitEditorUpAction extends ExecuteCommandAction {
 export class SplitEditorDownAction extends ExecuteCommandAction {
 
 	static readonly ID = SPLIT_EDITOR_DOWN;
+	/* AGPL */
 	static readonly LABEL = nls.localize('splitEditorGroupDown', "Split Code Viewer Down");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -170,7 +182,9 @@ export class SplitEditorDownAction extends ExecuteCommandAction {
 export class JoinTwoGroupsAction extends Action {
 
 	static readonly ID = 'workbench.action.joinTwoGroups';
+	/* AGPL */
 	static readonly LABEL = nls.localize('joinTwoGroups', "Join Code Viewer Group with Next Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -205,7 +219,9 @@ export class JoinTwoGroupsAction extends Action {
 export class JoinAllGroupsAction extends Action {
 
 	static readonly ID = 'workbench.action.joinAllGroups';
+	/* AGPL */
 	static readonly LABEL = nls.localize('joinAllGroups', "Join All Code Viewer Groups");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -223,7 +239,9 @@ export class JoinAllGroupsAction extends Action {
 export class NavigateBetweenGroupsAction extends Action {
 
 	static readonly ID = 'workbench.action.navigateEditorGroups';
+	/* AGPL */
 	static readonly LABEL = nls.localize('navigateEditorGroups', "Navigate Between Code Viewer Groups");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -242,7 +260,9 @@ export class NavigateBetweenGroupsAction extends Action {
 export class FocusActiveGroupAction extends Action {
 
 	static readonly ID = 'workbench.action.focusActiveEditorGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusActiveEditorGroup', "Focus Active Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -279,7 +299,9 @@ export abstract class BaseFocusGroupAction extends Action {
 export class FocusFirstGroupAction extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusFirstEditorGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusFirstEditorGroup', "Focus First Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -293,7 +315,9 @@ export class FocusFirstGroupAction extends BaseFocusGroupAction {
 export class FocusLastGroupAction extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusLastEditorGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusLastEditorGroup', "Focus Last Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -307,7 +331,9 @@ export class FocusLastGroupAction extends BaseFocusGroupAction {
 export class FocusNextGroup extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusNextGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusNextGroup', "Focus Next Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -321,7 +347,9 @@ export class FocusNextGroup extends BaseFocusGroupAction {
 export class FocusPreviousGroup extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusPreviousGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusPreviousGroup', "Focus Previous Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -335,7 +363,9 @@ export class FocusPreviousGroup extends BaseFocusGroupAction {
 export class FocusLeftGroup extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusLeftGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusLeftGroup', "Focus Left Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -349,7 +379,9 @@ export class FocusLeftGroup extends BaseFocusGroupAction {
 export class FocusRightGroup extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusRightGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusRightGroup', "Focus Right Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -363,7 +395,9 @@ export class FocusRightGroup extends BaseFocusGroupAction {
 export class FocusAboveGroup extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusAboveGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusAboveGroup', "Focus Above Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -377,7 +411,9 @@ export class FocusAboveGroup extends BaseFocusGroupAction {
 export class FocusBelowGroup extends BaseFocusGroupAction {
 
 	static readonly ID = 'workbench.action.focusBelowGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('focusBelowGroup', "Focus Below Code Viewer Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -391,7 +427,9 @@ export class FocusBelowGroup extends BaseFocusGroupAction {
 export class CloseEditorAction extends Action {
 
 	static readonly ID = 'workbench.action.closeActiveEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('closeEditor', "Close Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -452,7 +490,9 @@ export class CloseOneEditorAction extends Action {
 export class RevertAndCloseEditorAction extends Action {
 
 	static readonly ID = 'workbench.action.revertAndCloseActiveEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('revertAndCloseActiveEditor', "Revert and Close Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -656,7 +696,9 @@ export class CloseAllEditorsAction extends BaseCloseAllAction {
 export class CloseAllEditorGroupsAction extends BaseCloseAllAction {
 
 	static readonly ID = 'workbench.action.closeAllGroups';
+	/* AGPL */
 	static readonly LABEL = nls.localize('closeAllGroups', "Close All Code Viewer Groups");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -709,7 +751,9 @@ export class CloseEditorsInOtherGroupsAction extends Action {
 export class CloseEditorInAllGroupsAction extends Action {
 
 	static readonly ID = 'workbench.action.closeEditorInAllGroups';
+	/* AGPL */
 	static readonly LABEL = nls.localize('closeEditorInAllGroups', "Close Code Viewer in All Groups");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -786,7 +830,9 @@ export class BaseMoveGroupAction extends Action {
 export class MoveGroupLeftAction extends BaseMoveGroupAction {
 
 	static readonly ID = 'workbench.action.moveActiveEditorGroupLeft';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveActiveGroupLeft', "Move Code Viewer Group Left");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -800,7 +846,9 @@ export class MoveGroupLeftAction extends BaseMoveGroupAction {
 export class MoveGroupRightAction extends BaseMoveGroupAction {
 
 	static readonly ID = 'workbench.action.moveActiveEditorGroupRight';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveActiveGroupRight', "Move Code Viewer Group Right");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -814,7 +862,9 @@ export class MoveGroupRightAction extends BaseMoveGroupAction {
 export class MoveGroupUpAction extends BaseMoveGroupAction {
 
 	static readonly ID = 'workbench.action.moveActiveEditorGroupUp';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveActiveGroupUp', "Move Code Viewer Group Up");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -828,7 +878,9 @@ export class MoveGroupUpAction extends BaseMoveGroupAction {
 export class MoveGroupDownAction extends BaseMoveGroupAction {
 
 	static readonly ID = 'workbench.action.moveActiveEditorGroupDown';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveActiveGroupDown', "Move Code Viewer Group Down");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -842,7 +894,9 @@ export class MoveGroupDownAction extends BaseMoveGroupAction {
 export class MinimizeOtherGroupsAction extends Action {
 
 	static readonly ID = 'workbench.action.minimizeOtherEditors';
+	/* AGPL */
 	static readonly LABEL = nls.localize('minimizeOtherEditorGroups', "Maximize Code Viewer Group");
+	/* End AGPL */
 
 	constructor(id: string, label: string, @IEditorGroupsService private readonly editorGroupService: IEditorGroupsService) {
 		super(id, label);
@@ -856,7 +910,9 @@ export class MinimizeOtherGroupsAction extends Action {
 export class ResetGroupSizesAction extends Action {
 
 	static readonly ID = 'workbench.action.evenEditorWidths';
+	/* AGPL */
 	static readonly LABEL = nls.localize('evenEditorGroups', "Reset Code Viewer Group Sizes");
+	/* End AGPL */
 
 	constructor(id: string, label: string, @IEditorGroupsService private readonly editorGroupService: IEditorGroupsService) {
 		super(id, label);
@@ -870,7 +926,9 @@ export class ResetGroupSizesAction extends Action {
 export class ToggleGroupSizesAction extends Action {
 
 	static readonly ID = 'workbench.action.toggleEditorWidths';
+	/* AGPL */
 	static readonly LABEL = nls.localize('toggleEditorWidths', "Toggle Code Viewer Group Sizes");
+	/* End AGPL */
 
 	constructor(id: string, label: string, @IEditorGroupsService private readonly editorGroupService: IEditorGroupsService) {
 		super(id, label);
@@ -884,7 +942,9 @@ export class ToggleGroupSizesAction extends Action {
 export class MaximizeGroupAction extends Action {
 
 	static readonly ID = 'workbench.action.maximizeEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('maximizeEditor', "Maximize Code Viewer Group and Hide Side Bar");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -938,7 +998,9 @@ export abstract class BaseNavigateEditorAction extends Action {
 export class OpenNextEditor extends BaseNavigateEditorAction {
 
 	static readonly ID = 'workbench.action.nextEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openNextEditor', "Open Next Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -973,7 +1035,9 @@ export class OpenNextEditor extends BaseNavigateEditorAction {
 export class OpenPreviousEditor extends BaseNavigateEditorAction {
 
 	static readonly ID = 'workbench.action.previousEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openPreviousEditor', "Open Previous Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1008,7 +1072,9 @@ export class OpenPreviousEditor extends BaseNavigateEditorAction {
 export class OpenNextEditorInGroup extends BaseNavigateEditorAction {
 
 	static readonly ID = 'workbench.action.nextEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('nextEditorInGroup', "Open Next Code Viewer in Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1031,7 +1097,9 @@ export class OpenNextEditorInGroup extends BaseNavigateEditorAction {
 export class OpenPreviousEditorInGroup extends BaseNavigateEditorAction {
 
 	static readonly ID = 'workbench.action.previousEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openPreviousEditorInGroup', "Open Previous Code Viewer in Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1054,7 +1122,9 @@ export class OpenPreviousEditorInGroup extends BaseNavigateEditorAction {
 export class OpenFirstEditorInGroup extends BaseNavigateEditorAction {
 
 	static readonly ID = 'workbench.action.firstEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('firstEditorInGroup', "Open First Code Viewer in Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1076,7 +1146,9 @@ export class OpenFirstEditorInGroup extends BaseNavigateEditorAction {
 export class OpenLastEditorInGroup extends BaseNavigateEditorAction {
 
 	static readonly ID = 'workbench.action.lastEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('lastEditorInGroup', "Open Last Code Viewer in Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1154,7 +1226,9 @@ export class NavigateLastAction extends Action {
 export class ReopenClosedEditorAction extends Action {
 
 	static readonly ID = 'workbench.action.reopenClosedEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('reopenClosedEditor', "Reopen Closed Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1273,7 +1347,9 @@ export class BaseQuickAccessEditorAction extends Action {
 export class QuickAccessPreviousRecentlyUsedEditorAction extends BaseQuickAccessEditorAction {
 
 	static readonly ID = 'workbench.action.quickOpenPreviousRecentlyUsedEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('quickOpenPreviousRecentlyUsedEditor', "Quick Open Previous Recently Used Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1288,7 +1364,9 @@ export class QuickAccessPreviousRecentlyUsedEditorAction extends BaseQuickAccess
 export class QuickAccessLeastRecentlyUsedEditorAction extends BaseQuickAccessEditorAction {
 
 	static readonly ID = 'workbench.action.quickOpenLeastRecentlyUsedEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('quickOpenLeastRecentlyUsedEditor', "Quick Open Least Recently Used Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1303,7 +1381,9 @@ export class QuickAccessLeastRecentlyUsedEditorAction extends BaseQuickAccessEdi
 export class QuickAccessPreviousRecentlyUsedEditorInGroupAction extends BaseQuickAccessEditorAction {
 
 	static readonly ID = 'workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('quickOpenPreviousRecentlyUsedEditorInGroup', "Quick Open Previous Recently Used Code Viewer in Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1318,7 +1398,9 @@ export class QuickAccessPreviousRecentlyUsedEditorInGroupAction extends BaseQuic
 export class QuickAccessLeastRecentlyUsedEditorInGroupAction extends BaseQuickAccessEditorAction {
 
 	static readonly ID = 'workbench.action.quickOpenLeastRecentlyUsedEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('quickOpenLeastRecentlyUsedEditorInGroup', "Quick Open Least Recently Used Code Viewer in Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1333,7 +1415,9 @@ export class QuickAccessLeastRecentlyUsedEditorInGroupAction extends BaseQuickAc
 export class QuickAccessPreviousEditorFromHistoryAction extends Action {
 
 	static readonly ID = 'workbench.action.openPreviousEditorFromHistory';
+	/* AGPL */
 	static readonly LABEL = nls.localize('navigateEditorHistoryByInput', "Quick Open Previous Code Viewer from History");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1362,7 +1446,9 @@ export class QuickAccessPreviousEditorFromHistoryAction extends Action {
 export class OpenNextRecentlyUsedEditorAction extends Action {
 
 	static readonly ID = 'workbench.action.openNextRecentlyUsedEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openNextRecentlyUsedEditor', "Open Next Recently Used Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1380,7 +1466,9 @@ export class OpenNextRecentlyUsedEditorAction extends Action {
 export class OpenPreviousRecentlyUsedEditorAction extends Action {
 
 	static readonly ID = 'workbench.action.openPreviousRecentlyUsedEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openPreviousRecentlyUsedEditor', "Open Previous Recently Used Code Viewer");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1398,7 +1486,9 @@ export class OpenPreviousRecentlyUsedEditorAction extends Action {
 export class OpenNextRecentlyUsedEditorInGroupAction extends Action {
 
 	static readonly ID = 'workbench.action.openNextRecentlyUsedEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openNextRecentlyUsedEditorInGroup', "Open Next Recently Used Code Viewer In Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1417,7 +1507,9 @@ export class OpenNextRecentlyUsedEditorInGroupAction extends Action {
 export class OpenPreviousRecentlyUsedEditorInGroupAction extends Action {
 
 	static readonly ID = 'workbench.action.openPreviousRecentlyUsedEditorInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('openPreviousRecentlyUsedEditorInGroup', "Open Previous Recently Used Code Viewer In Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1436,7 +1528,9 @@ export class OpenPreviousRecentlyUsedEditorInGroupAction extends Action {
 export class ClearEditorHistoryAction extends Action {
 
 	static readonly ID = 'workbench.action.clearEditorHistory';
+	/* AGPL */
 	static readonly LABEL = nls.localize('clearEditorHistory', "Clear Code Viewer History");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1456,7 +1550,9 @@ export class ClearEditorHistoryAction extends Action {
 export class MoveEditorLeftInGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorLeftInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorLeft', "Move Code Viewer Left");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1470,7 +1566,9 @@ export class MoveEditorLeftInGroupAction extends ExecuteCommandAction {
 export class MoveEditorRightInGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorRightInGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorRight', "Move Code Viewer Right");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1484,7 +1582,9 @@ export class MoveEditorRightInGroupAction extends ExecuteCommandAction {
 export class MoveEditorToPreviousGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToPreviousGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToPreviousGroup', "Move Code Viewer into Previous Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1498,7 +1598,9 @@ export class MoveEditorToPreviousGroupAction extends ExecuteCommandAction {
 export class MoveEditorToNextGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToNextGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToNextGroup', "Move Code Viewer into Next Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1512,7 +1614,9 @@ export class MoveEditorToNextGroupAction extends ExecuteCommandAction {
 export class MoveEditorToAboveGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToAboveGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToAboveGroup', "Move Code Viewer into Above Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1526,7 +1630,9 @@ export class MoveEditorToAboveGroupAction extends ExecuteCommandAction {
 export class MoveEditorToBelowGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToBelowGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToBelowGroup', "Move Code Viewer into Below Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1540,7 +1646,9 @@ export class MoveEditorToBelowGroupAction extends ExecuteCommandAction {
 export class MoveEditorToLeftGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToLeftGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToLeftGroup', "Move Code Viewer into Left Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1554,7 +1662,9 @@ export class MoveEditorToLeftGroupAction extends ExecuteCommandAction {
 export class MoveEditorToRightGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToRightGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToRightGroup', "Move Code Viewer into Right Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1568,7 +1678,9 @@ export class MoveEditorToRightGroupAction extends ExecuteCommandAction {
 export class MoveEditorToFirstGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToFirstGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToFirstGroup', "Move Code Viewer into First Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1582,7 +1694,9 @@ export class MoveEditorToFirstGroupAction extends ExecuteCommandAction {
 export class MoveEditorToLastGroupAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.moveEditorToLastGroup';
+	/* AGPL */
 	static readonly LABEL = nls.localize('moveEditorToLastGroup', "Move Code Viewer into Last Group");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1596,7 +1710,9 @@ export class MoveEditorToLastGroupAction extends ExecuteCommandAction {
 export class EditorLayoutSingleAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutSingle';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutSingle', "Single Column Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1610,7 +1726,9 @@ export class EditorLayoutSingleAction extends ExecuteCommandAction {
 export class EditorLayoutTwoColumnsAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutTwoColumns';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutTwoColumns', "Two Columns Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1624,7 +1742,9 @@ export class EditorLayoutTwoColumnsAction extends ExecuteCommandAction {
 export class EditorLayoutThreeColumnsAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutThreeColumns';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutThreeColumns', "Three Columns Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1638,7 +1758,9 @@ export class EditorLayoutThreeColumnsAction extends ExecuteCommandAction {
 export class EditorLayoutTwoRowsAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutTwoRows';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutTwoRows', "Two Rows Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1652,7 +1774,9 @@ export class EditorLayoutTwoRowsAction extends ExecuteCommandAction {
 export class EditorLayoutThreeRowsAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutThreeRows';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutThreeRows', "Three Rows Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1666,7 +1790,9 @@ export class EditorLayoutThreeRowsAction extends ExecuteCommandAction {
 export class EditorLayoutTwoByTwoGridAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutTwoByTwoGrid';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutTwoByTwoGrid', "Grid Code Viewer Layout (2x2)");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1680,7 +1806,9 @@ export class EditorLayoutTwoByTwoGridAction extends ExecuteCommandAction {
 export class EditorLayoutTwoColumnsBottomAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutTwoColumnsBottom';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutTwoColumnsBottom', "Two Columns Bottom Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1694,7 +1822,9 @@ export class EditorLayoutTwoColumnsBottomAction extends ExecuteCommandAction {
 export class EditorLayoutTwoRowsRightAction extends ExecuteCommandAction {
 
 	static readonly ID = 'workbench.action.editorLayoutTwoRowsRight';
+	/* AGPL */
 	static readonly LABEL = nls.localize('editorLayoutTwoRowsRight', "Two Rows Right Code Viewer Layout");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1724,7 +1854,9 @@ export class BaseCreateEditorGroupAction extends Action {
 export class NewEditorGroupLeftAction extends BaseCreateEditorGroupAction {
 
 	static readonly ID = 'workbench.action.newGroupLeft';
+	/* AGPL */
 	static readonly LABEL = nls.localize('newEditorLeft', "New Code Viewer Group to the Left");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1738,7 +1870,9 @@ export class NewEditorGroupLeftAction extends BaseCreateEditorGroupAction {
 export class NewEditorGroupRightAction extends BaseCreateEditorGroupAction {
 
 	static readonly ID = 'workbench.action.newGroupRight';
+	/* AGPL */
 	static readonly LABEL = nls.localize('newEditorRight', "New Code Viewer Group to the Right");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1752,7 +1886,9 @@ export class NewEditorGroupRightAction extends BaseCreateEditorGroupAction {
 export class NewEditorGroupAboveAction extends BaseCreateEditorGroupAction {
 
 	static readonly ID = 'workbench.action.newGroupAbove';
+	/* AGPL */
 	static readonly LABEL = nls.localize('newEditorAbove', "New Code Viewer Group Above");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1766,7 +1902,9 @@ export class NewEditorGroupAboveAction extends BaseCreateEditorGroupAction {
 export class NewEditorGroupBelowAction extends BaseCreateEditorGroupAction {
 
 	static readonly ID = 'workbench.action.newGroupBelow';
+	/* AGPL */
 	static readonly LABEL = nls.localize('newEditorBelow', "New Code Viewer Group Below");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1780,7 +1918,9 @@ export class NewEditorGroupBelowAction extends BaseCreateEditorGroupAction {
 export class ReopenResourcesAction extends Action {
 
 	static readonly ID = 'workbench.action.reopenWithEditor';
+	/* AGPL */
 	static readonly LABEL = nls.localize('workbench.action.reopenWithEditor', "Reopen Code Viewer With...");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -1812,7 +1952,9 @@ export class ReopenResourcesAction extends Action {
 export class ToggleEditorTypeAction extends Action {
 
 	static readonly ID = 'workbench.action.toggleEditorType';
+	/* AGPL */
 	static readonly LABEL = nls.localize('workbench.action.toggleEditorType', "Toggle Code Viewer Type");
+	/* End AGPL */
 
 	constructor(
 		id: string,

@@ -4,16 +4,22 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as nls from 'vs/nls';
+/* AGPL */
 import { onUnexpectedError } from 'vs/base/common/errors';
 import { KeyCode } from 'vs/base/common/keyCodes';
+/* End AGPL */
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { IEditorProgressService } from 'vs/platform/progress/common/progress';
+/* AGPL */
 import { ServicesAccessor, EditorAction } from 'vs/editor/browser/editorExtensions';
+/* End AGPL */
 import { IEditorContribution } from 'vs/editor/common/editorCommon';
 import { ITextModel } from 'vs/editor/common/model';
 import { EditorContextKeys } from 'vs/editor/common/editorContextKeys';
 import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
+/* AGPL */
 import { RenameInputField } from './renameInputField';
+/* End AGPL */
 import { WorkspaceEdit, RenameProviderRegistry, RenameProvider, RenameLocation, Rejection } from 'vs/editor/common/modes';
 import { Position, IPosition } from 'vs/editor/common/core/position';
 import { alert } from 'vs/base/browser/ui/aria/aria';
@@ -307,6 +313,7 @@ export class RenameAction extends EditorAction {
 	}
 }
 
+/* AGPL */
 // registerEditorContribution(RenameController.ID, RenameController);
 // registerEditorAction(RenameAction);
 
@@ -345,9 +352,11 @@ export class RenameAction extends EditorAction {
 // 		secondary: [KeyMod.Shift | KeyCode.Escape]
 // 	}
 // }));
+/* End AGPL */
 
 // ---- api bridge command
 
+/* AGPL */
 // registerDefaultLanguageCommand('_executeDocumentRenameProvider', function (model, position, args) {
 // 	let { newName } = args;
 // 	if (typeof newName !== 'string') {
@@ -355,9 +364,11 @@ export class RenameAction extends EditorAction {
 // 	}
 // 	return rename(model, position, newName);
 // });
+/* End AGPL */
 
 
 //todo@joh use editor options world
+/* AGPL */
 // Registry.as<IConfigurationRegistry>(Extensions.Configuration).registerConfiguration({
 // 	id: 'editor',
 // 	properties: {
@@ -369,3 +380,4 @@ export class RenameAction extends EditorAction {
 // 		}
 // 	}
 // });
+/* End AGPL */

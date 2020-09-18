@@ -11,7 +11,9 @@ import { ITextFileService, TextFileEditorModelState, ITextFileEditorModel, IText
 import { EncodingMode, IRevertOptions, SaveReason } from 'vs/workbench/common/editor';
 import { BaseTextEditorModel } from 'vs/workbench/common/editor/textEditorModel';
 import { IBackupFileService, IResolvedBackup } from 'vs/workbench/services/backup/common/backup';
+/* AGPL */
 import { IFileService, FileOperationError, FileOperationResult, FileChangesEvent, FileChangeType, IFileStatWithMetadata, ETAG_DISABLED } from 'vs/platform/files/common/files';
+/* End AGPL */
 import { IModeService } from 'vs/editor/common/services/modeService';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { timeout, TaskSequentializer } from 'vs/base/common/async';
@@ -110,7 +112,9 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 
 	private registerListeners(): void {
 		this._register(this.fileService.onDidFilesChange(e => this.onDidFilesChange(e)));
+		/* AGPL */
 		this._register(this.filesConfigurationService.onFilesAssociationChange(() => this.onFilesAssociationChange()));
+		/* End AGPL */
 	}
 
 	private async onDidFilesChange(e: FileChangesEvent): Promise<void> {
@@ -918,7 +922,9 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 	}
 
 	isReadonly(): boolean {
+		/* AGPL */
 		return true;
+		/* End AGPL */
 	}
 
 	isDisposed(): boolean {

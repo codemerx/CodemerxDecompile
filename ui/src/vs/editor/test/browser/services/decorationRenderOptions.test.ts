@@ -52,7 +52,9 @@ class TestGlobalStyleSheet extends GlobalStyleSheet {
 
 suite('Decoration Render Options', () => {
 	let options: IDecorationRenderOptions = {
+		/* AGPL */
 		gutterIconPath: URI.parse('https://github.com/Microsoft/vscode/blob/master/resources/linux/codemerx-logo-512x512.png'),
+		/* End AGPL */
 		gutterIconSize: 'contain',
 		backgroundColor: 'red',
 		borderColor: 'yellow'
@@ -79,7 +81,9 @@ suite('Decoration Render Options', () => {
 		const s = new TestCodeEditorServiceImpl(themeServiceMock, styleSheet);
 		s.registerDecorationType('example', options);
 		const sheet = readStyleSheet(styleSheet);
+		/* AGPL */
 		assert(sheet.indexOf(`{background:url('https://github.com/Microsoft/vscode/blob/master/resources/linux/codemerx-logo-512x512.png') center center no-repeat;background-size:contain;}`) >= 0);
+		/* End AGPL */
 		assert(sheet.indexOf(`{background-color:red;border-color:yellow;box-sizing: border-box;}`) >= 0);
 	});
 

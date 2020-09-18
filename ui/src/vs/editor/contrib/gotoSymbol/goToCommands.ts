@@ -26,7 +26,9 @@ import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IEditorProgressService } from 'vs/platform/progress/common/progress';
+/* AGPL */
 import { getDefinitionsAtPosition, getReferencesAtPosition } from './goToSymbol';
+/* End AGPL */
 import { CommandsRegistry, ICommandService } from 'vs/platform/commands/common/commands';
 import { EditorStateCancellationTokenSource, CodeEditorStateFlag } from 'vs/editor/browser/core/editorState';
 import { ISymbolNavigationService } from 'vs/editor/contrib/gotoSymbol/symbolNavigation';
@@ -325,6 +327,7 @@ registerEditorAction(class PeekDefinitionAction extends DefinitionAction {
 
 //#region --- DECLARATION
 
+/* AGPL */
 // class DeclarationAction extends SymbolNavigationAction {
 
 // 	protected async _getLocationModel(model: ITextModel, position: corePosition.Position, token: CancellationToken): Promise<ReferencesModel> {
@@ -406,11 +409,13 @@ registerEditorAction(class PeekDefinitionAction extends DefinitionAction {
 // 		});
 // 	}
 // });
+/* End AGPL */
 
 //#endregion
 
 //#region --- TYPE DEFINITION
 
+/* AGPL */
 // class TypeDefinitionAction extends SymbolNavigationAction {
 
 // 	protected async _getLocationModel(model: ITextModel, position: corePosition.Position, token: CancellationToken): Promise<ReferencesModel> {
@@ -493,11 +498,13 @@ registerEditorAction(class PeekDefinitionAction extends DefinitionAction {
 // 		});
 // 	}
 // });
+/* End AGPL */
 
 //#endregion
 
 //#region --- IMPLEMENTATION
 
+/* AGPL */
 // class ImplementationAction extends SymbolNavigationAction {
 
 // 	protected async _getLocationModel(model: ITextModel, position: corePosition.Position, token: CancellationToken): Promise<ReferencesModel> {
@@ -585,6 +592,7 @@ registerEditorAction(class PeekDefinitionAction extends DefinitionAction {
 // 		});
 // 	}
 // });
+/* End AGPL */
 
 //#endregion
 
@@ -607,6 +615,7 @@ abstract class ReferencesAction extends SymbolNavigationAction {
 	}
 }
 
+/* AGPL */
 // registerEditorAction(class GoToReferencesAction extends ReferencesAction {
 
 // 	constructor() {
@@ -645,6 +654,7 @@ abstract class ReferencesAction extends SymbolNavigationAction {
 // 		return new ReferencesModel(await getReferencesAtPosition(model, position, true, token), nls.localize('ref.title', 'References'));
 // 	}
 // });
+/* End AGPL */
 
 registerEditorAction(class PeekReferencesAction extends ReferencesAction {
 

@@ -5,7 +5,9 @@
 
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
+/* AGPL */
 import { IViewDescriptor } from 'vs/workbench/common/views';
+/* End AGPL */
 import { ITimelineService, TimelinePaneId } from 'vs/workbench/contrib/timeline/common/timeline';
 import { TimelineService } from 'vs/workbench/contrib/timeline/common/timelineService';
 import { TimelinePane } from './timelinePane';
@@ -26,6 +28,7 @@ export class TimelinePaneDescriptor implements IViewDescriptor {
 }
 
 // Configuration
+/* AGPL */
 // const configurationRegistry = Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Configuration);
 // configurationRegistry.registerConfiguration({
 // 	id: 'timeline',
@@ -81,5 +84,6 @@ export class TimelinePaneDescriptor implements IViewDescriptor {
 // 	},
 // 	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource)
 // }));
+/* End AGPL */
 
 registerSingleton(ITimelineService, TimelineService, true);

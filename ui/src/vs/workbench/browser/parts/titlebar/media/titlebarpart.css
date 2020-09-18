@@ -85,7 +85,9 @@
 	height: 100%;
 	position: relative;
 	z-index: 3000;
+	/* AGPL */
 	background-image: url('../../../media/codemerx-logo.svg');
+	/* End AGPL */
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: 16px;

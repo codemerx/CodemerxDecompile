@@ -12,8 +12,10 @@ import { IContextMenuService } from 'vs/platform/contextview/browser/contextView
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { ViewPane } from 'vs/workbench/browser/parts/views/viewPaneContainer';
+/* AGPL */
 // import { ResourcesDropHandler, DragAndDropObserver } from 'vs/workbench/browser/dnd';
 // import { listDropBackground } from 'vs/platform/theme/common/colorRegistry';
+/* End AGPL */
 import { ILabelService } from 'vs/platform/label/common/label';
 import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
 import { IViewDescriptorService } from 'vs/workbench/common/views';
@@ -23,7 +25,9 @@ import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 export class EmptyView extends ViewPane {
 
 	static readonly ID: string = 'workbench.explorer.emptyView';
+	/* AGPL */
 	static readonly NAME = nls.localize('noWorkspace', "No Assembly Opened");
+	/* End AGPL */
 
 	constructor(
 		options: IViewletViewOptions,
@@ -52,6 +56,7 @@ export class EmptyView extends ViewPane {
 	protected renderBody(container: HTMLElement): void {
 		super.renderBody(container);
 
+		/* AGPL */
 		// this._register(new DragAndDropObserver(container, {
 		// 	onDrop: e => {
 		// 		container.style.backgroundColor = '';
@@ -74,6 +79,7 @@ export class EmptyView extends ViewPane {
 		// 		}
 		// 	}
 		// }));
+		/* End AGPL */
 
 		this.refreshTitle();
 	}

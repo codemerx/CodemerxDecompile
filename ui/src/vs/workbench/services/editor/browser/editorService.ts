@@ -39,8 +39,8 @@ import { Extensions as ConfigurationExtensions, IConfigurationRegistry } from 'v
 import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/workingCopyService';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
-import { VSBuffer } from 'vs/base/common/buffer';
 /* AGPL */
+import { VSBuffer } from 'vs/base/common/buffer';
 import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
 /* End AGPL */
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
@@ -81,7 +81,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 		@IWorkspaceContextService private readonly contextService: IWorkspaceContextService,
 		@IWorkingCopyService private readonly workingCopyService: IWorkingCopyService,
 		@IUriIdentityService private readonly uriIdentityService: IUriIdentityService,
+		/* AGPL */
 		@IDecompilationService private readonly decompilationService: IDecompilationService
+		/* End AGPL */
 	) {
 		super();
 
@@ -524,10 +526,12 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	//#region openEditor()
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, /* AGPL */navigationData?: ReferenceMetadata/* End AGPL */): Promise<ITextEditorPane | undefined>;
+	/* AGPL */
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: OpenInEditorGroup, navigationData?: ReferenceMetadata): Promise<ITextEditorPane | undefined>;
+	/* End AGPL */
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, /* AGPL */groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata/* End AGPL */): Promise<IEditorPane | undefined> {
-		/* AGPL */
+	/* AGPL */
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
 			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
@@ -556,9 +560,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 				}
 			}
 		}
+		
+		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrReferenceMetadata as OpenInEditorGroup);
 		/* End AGPL */
-
-		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, /* AGPL */groupOrReferenceMetadata as OpenInEditorGroup/* End AGPL */);
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
 
@@ -1310,9 +1314,11 @@ export class DelegatingEditorService implements IEditorService {
 
 	constructor(
 		private editorOpenHandler: IEditorOpenHandler,
+		/* AGPL */
 		@IEditorService private editorService: EditorService,
 		@IFileService private fileService: IFileService,
 		@IDecompilationService private decompilationService: IDecompilationService
+		/* End AGPL */
 	) { }
 
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: OpenInEditorGroup): Promise<IEditorPane | undefined>;

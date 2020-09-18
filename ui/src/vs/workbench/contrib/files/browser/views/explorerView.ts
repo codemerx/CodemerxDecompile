@@ -9,7 +9,9 @@ import * as perf from 'vs/base/common/performance';
 import { IAction, WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification } from 'vs/base/common/actions';
 import { memoize } from 'vs/base/common/decorators';
 import { IFilesConfiguration, ExplorerFolderContext, FilesExplorerFocusedContext, ExplorerFocusedContext, ExplorerRootContext, ExplorerResourceReadonlyContext, IExplorerService, ExplorerResourceCut, ExplorerResourceMoveableToTrash, ExplorerCompressedFocusContext, ExplorerCompressedFirstFocusContext, ExplorerCompressedLastFocusContext, ExplorerResourceAvailableEditorIdsContext } from 'vs/workbench/contrib/files/common/files';
+/* AGPL */
 import { FileCopiedContext, CollapseExplorerView } from 'vs/workbench/contrib/files/browser/fileActions';
+/* End AGPL */
 import { toResource, SideBySideEditor } from 'vs/workbench/common/editor';
 import { DiffEditorInput } from 'vs/workbench/common/editor/diffEditorInput';
 import * as DOM from 'vs/base/browser/dom';
@@ -191,7 +193,9 @@ export class ExplorerView extends ViewPane {
 	}
 
 	get name(): string {
+		/* AGPL */
 		return nls.localize('assemblies', "Assemblies");
+		/* End AGPL */
 	}
 
 	get title(): string {
@@ -286,9 +290,11 @@ export class ExplorerView extends ViewPane {
 	getActions(): IAction[] {
 		if (!this.actions) {
 			this.actions = [
+				/* AGPL */
 				// this.instantiationService.createInstance(NewFileAction),
 				// this.instantiationService.createInstance(NewFolderAction),
 				// this.instantiationService.createInstance(RefreshExplorerView, RefreshExplorerView.ID, RefreshExplorerView.LABEL),
+				/* End AGPL */
 				this.instantiationService.createInstance(CollapseExplorerView, CollapseExplorerView.ID, CollapseExplorerView.LABEL)
 			];
 			this.actions.forEach(a => this._register(a));

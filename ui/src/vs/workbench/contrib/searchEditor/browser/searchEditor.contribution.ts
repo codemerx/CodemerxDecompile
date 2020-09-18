@@ -57,7 +57,9 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 	EditorDescriptor.create(
 		SearchEditor,
 		SearchEditor.ID,
+		/* AGPL */
 		localize('searchEditor', "Search Code Viewer")
+		/* End AGPL */
 	),
 	[
 		new SyncDescriptor(SearchEditorInput)
@@ -211,13 +213,17 @@ CommandsRegistry.registerCommand(
 //#endregion
 
 //#region Actions
+/* AGPL */
 const category = localize('search', "Search Code Viewer");
+/* End AGPL */
 
 export type OpenSearchEditorArgs = Partial<SearchConfiguration & { triggerSearch: boolean, focusResults: boolean }>;
 const openArgDescription = {
 	description: 'Open a new search editor. Arguments passed can include variables like ${relativeFileDirname}.',
 	args: [{
+		/* AGPL */
 		name: 'Open new Search Code Viewer args',
+		/* End AGPL */
 		schema: {
 			properties: {
 				query: { type: 'string' },
@@ -240,7 +246,9 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: SearchEditorConstants.OpenNewEditorCommandId,
+			/* AGPL */
 			title: localize('search.openNewSearchEditor', "Open new Search Code Viewer"),
+			/* End AGPL */
 			category,
 			f1: true,
 			description: openArgDescription
@@ -255,7 +263,9 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: OpenNewEditorToSideCommandId,
+			/* AGPL */
 			title: localize('search.openNewEditorToSide', "Open new Search Code Viewer to the Side"),
+			/* End AGPL */
 			category,
 			f1: true,
 			description: openArgDescription
@@ -270,7 +280,9 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: OpenInEditorCommandId,
+			/* AGPL */
 			title: localize('search.openResultsInEditor', "Open Results in Code Viewer"),
+			/* End AGPL */
 			category,
 			f1: true,
 			keybinding: {
@@ -329,7 +341,9 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: FocusQueryEditorWidgetCommandId,
+			/* AGPL */
 			title: localize('search.action.focusQueryEditorWidget', "Focus Search Code Viewer Input"),
+			/* End AGPL */
 			category,
 			menu: {
 				id: MenuId.CommandPalette,

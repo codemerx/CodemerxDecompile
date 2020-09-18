@@ -148,10 +148,11 @@ export class CursorWordPartRightSelect extends WordPartRightCommand {
 	}
 }
 
-
+/* AGPL */
 // registerEditorCommand(new DeleteWordPartLeft());
 // registerEditorCommand(new DeleteWordPartRight());
 // registerEditorCommand(new CursorWordPartLeft());
 // registerEditorCommand(new CursorWordPartLeftSelect());
 // registerEditorCommand(new CursorWordPartRight());
 // registerEditorCommand(new CursorWordPartRightSelect());
+/* End AGPL */

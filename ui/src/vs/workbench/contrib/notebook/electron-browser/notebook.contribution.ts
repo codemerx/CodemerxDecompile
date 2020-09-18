@@ -4,7 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { isMacintosh } from 'vs/base/common/platform';
+/* AGPL */
 import { CopyAction } from 'vs/editor/contrib/clipboard/clipboard';
+/* End AGPL */
 import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { getActiveNotebookEditor } from 'vs/workbench/contrib/notebook/browser/contrib/coreActions';
 import { ElectronWebviewBasedWebview } from 'vs/workbench/contrib/webview/electron-browser/webviewElement';
@@ -36,6 +38,7 @@ if (isMacintosh) {
 
 	const PRIORITY = 100;
 
+	/* AGPL */
 	// UndoCommand.addImplementation(PRIORITY, accessor => {
 	// 	return withWebview(accessor, webview => webview.undo());
 	// });
@@ -43,11 +46,13 @@ if (isMacintosh) {
 	// RedoCommand.addImplementation(PRIORITY, accessor => {
 	// 	return withWebview(accessor, webview => webview.redo());
 	// });
+	/* End AGPL */
 
 	CopyAction?.addImplementation(PRIORITY, accessor => {
 		return withWebview(accessor, webview => webview.copy());
 	});
 
+	/* AGPL */
 	// PasteAction?.addImplementation(PRIORITY, accessor => {
 	// 	return withWebview(accessor, webview => webview.paste());
 	// });
@@ -55,4 +60,5 @@ if (isMacintosh) {
 	// CutAction?.addImplementation(PRIORITY, accessor => {
 	// 	return withWebview(accessor, webview => webview.cut());
 	// });
+	/* End AGPL */
 }

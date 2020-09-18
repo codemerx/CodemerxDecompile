@@ -355,9 +355,13 @@ namespace Telerik.JustDecompiler.Languages.IL
             WriteTypeReference(field.FieldType);
             WriteSpace();
             int startOffset = this.formatter.CurrentPosition;
+            /* AGPL */
             CodeSpan codeSpan = this.Write(() => WriteReference(ILHelpers.Escape(field.Name), field));
+            /* End AGPL */
             int endIndex = this.formatter.CurrentPosition - 1;
+            /* AGPL */
             this.currentWritingInfo.MemberDeclarationToCodeSpan[field] = codeSpan;
+            /* End AGPL */
             this.currentWritingInfo.MemberDeclarationToCodePostionMap[field] = new OffsetSpan(startOffset, endIndex);
             if ((field.Attributes & FieldAttributes.HasFieldRVA) == FieldAttributes.HasFieldRVA)
             {

@@ -1,9 +1,13 @@
 {
+  "//": "AGPL",
   "name": "codemerxdecompile",
+  "//": "End AGPL",
   "version": "1.47.2",
   "distro": "1c45ca75fd18ee8dc55738baac0c49bc64d356e6",
   "author": {
-    "name": "CodeMerx"
+    "//": "AGPL",
+    "name": "CodeMerx",
+    "//": "End AGPL"
   },
   "license": "MIT",
   "main": "./out/main",
@@ -177,10 +181,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/codemerx/CodemerxDecompile.git"
+    "//": "AGPL",
+    "url": "https://github.com/codemerx/CodemerxDecompile.git",
+    "//": "End AGPL"
   },
   "bugs": {
-    "url": "https://github.com/codemerx/CodemerxDecompile/issues"
+    "//": "AGPL",
+    "url": "https://github.com/codemerx/CodemerxDecompile/issues",
+    "//": "End AGPL"
   },
   "optionalDependencies": {
     "vscode-windows-ca-certs": "0.2.0",

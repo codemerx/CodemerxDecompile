@@ -220,7 +220,9 @@
 
 .file-icons-enabled .show-file-icons .vs_code_welcome_page-name-file-icon.file-icon::before {
 	content: ' ';
+	/* AGPL */
 	background-image: url('../../../../browser/media/codemerx-logo.svg');
+	/* End AGPL */
 }
 
 .monaco-workbench .part.editor > .content .welcomePage .mac-only,

@@ -141,7 +141,9 @@ const server = http.createServer((req, res) => {
 	try {
 		if (pathname === '/favicon.ico') {
 			// favicon
+			/* AGPL */
 			return serveFile(req, res, path.join(APP_ROOT, 'resources', 'win32', 'codemerx-logo.ico'));
+			/* End AGPL */
 		}
 		if (pathname === '/manifest.json') {
 			// manifest

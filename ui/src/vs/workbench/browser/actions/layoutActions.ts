@@ -134,7 +134,9 @@ MenuRegistry.appendMenuItem(MenuId.MenubarAppearanceMenu, {
 export class ToggleEditorLayoutAction extends Action {
 
 	static readonly ID = 'workbench.action.toggleEditorGroupLayout';
+	/* AGPL */
 	static readonly LABEL = nls.localize('flipLayout', "Toggle Vertical/Horizontal Code Viewer Layout");
+	/* End AGPL */
 
 	private readonly toDispose = this._register(new DisposableStore());
 
@@ -167,7 +169,9 @@ export class ToggleEditorLayoutAction extends Action {
 }
 
 const group = viewCategory;
+/* AGPL */
 registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleEditorLayoutAction, { primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_0, mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_0 } }), 'View: Toggle Vertical/Horizontal Code Viewer Layout', group);
+/* End AGPL */
 
 MenuRegistry.appendMenuItem(MenuId.MenubarLayoutMenu, {
 	group: 'z_flip',
@@ -236,7 +240,9 @@ MenuRegistry.appendMenuItem(MenuId.MenubarAppearanceMenu, {
 
 export class ToggleEditorVisibilityAction extends Action {
 	static readonly ID = 'workbench.action.toggleEditorVisibility';
+	/* AGPL */
 	static readonly LABEL = nls.localize('toggleEditor', "Toggle Code Viewer Area Visibility");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -253,13 +259,17 @@ export class ToggleEditorVisibilityAction extends Action {
 	}
 }
 
+/* AGPL */
 registry.registerWorkbenchAction(SyncActionDescriptor.from(ToggleEditorVisibilityAction), 'View: Toggle Code Viewer Area Visibility', viewCategory);
+/* End AGPL */
 
 MenuRegistry.appendMenuItem(MenuId.MenubarAppearanceMenu, {
 	group: '2_workbench_layout',
 	command: {
 		id: ToggleEditorVisibilityAction.ID,
+		/* AGPL */
 		title: nls.localize({ key: 'miShowEditorArea', comment: ['&& denotes a mnemonic'] }, "Show &&Code Viewer Area"),
+		/* End AGPL */
 		toggled: EditorAreaVisibleContext
 	},
 	order: 5

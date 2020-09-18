@@ -82,7 +82,9 @@ import { WebviewMainService } from 'vs/platform/webview/electron-main/webviewMai
 import { IWebviewManagerService } from 'vs/platform/webview/common/webviewManagerService';
 import { createServer, AddressInfo } from 'net';
 import { IOpenExtensionWindowResult } from 'vs/platform/debug/common/extensionHostDebug';
+/* AGPL */
 import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
+/* End AGPL */
 
 export class CodeApplication extends Disposable {
 	private windowsMainService: IWindowsMainService | undefined;
@@ -577,9 +579,11 @@ export class CodeApplication extends Disposable {
 		electronIpcServer.registerChannel('logger', loggerChannel);
 		sharedProcessClient.then(client => client.registerChannel('logger', loggerChannel));
 
+		/* AGPL */
 		const grpcMainService = accessor.get(IGrpcMainService);
 		const grpcChannel = createChannelReceiver(grpcMainService);
 		electronIpcServer.registerChannel('grpc', grpcChannel);
+		/* End AGPL */
 
 		// ExtensionHost Debug broadcast service
 		const windowsMainService = this.windowsMainService = accessor.get(IWindowsMainService);

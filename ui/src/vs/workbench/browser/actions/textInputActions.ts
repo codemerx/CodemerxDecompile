@@ -31,13 +31,18 @@ export class TextInputActionsProvider extends Disposable implements IWorkbenchCo
 		this.textInputActions.push(
 
 			// Undo/Redo
+			/* AGPL */
 			// new Action('undo', localize('undo', "Undo"), undefined, true, async () => document.execCommand('undo')),
 			// new Action('redo', localize('redo', "Redo"), undefined, true, async () => document.execCommand('redo')),
 			// new Separator(),
+			/* End AGPL */
 
 			// Cut / Copy / Paste
+			/* AGPL */
 			// new Action('editor.action.clipboardCutAction', localize('cut', "Cut"), undefined, true, async () => document.execCommand('cut')),
+			/* End AGPL */
 			new Action('editor.action.clipboardCopyAction', localize('copy', "Copy"), undefined, true, async () => document.execCommand('copy')),
+			/* AGPL */
 			// new Action('editor.action.clipboardPasteAction', localize('paste', "Paste"), undefined, true, async (element: HTMLInputElement | HTMLTextAreaElement) => {
 
 			// 	// Native: paste is supported
@@ -62,6 +67,7 @@ export class TextInputActionsProvider extends Disposable implements IWorkbenchCo
 			// 	}
 			// }),
 			// new Separator(),
+			/* End AGPL */
 
 			// Select All
 			new Action('editor.action.selectAll', localize('selectAll', "Select All"), undefined, true, async () => document.execCommand('selectAll'))

@@ -1317,6 +1317,7 @@ suite('Editor Controller - Regression tests', () => {
 		model.dispose();
 	});
 
+	/* AGPL */
 	// test('Bug 9121: Auto indent + undo + redo is funky', () => {
 	// 	let model = createTextModel(
 	// 		[
@@ -1482,6 +1483,7 @@ suite('Editor Controller - Regression tests', () => {
 
 	// 	model.dispose();
 	// });
+	/* End AGPL */
 
 	test('bug #16815:Shift+Tab doesn\'t go back to tabstop', () => {
 		let mode = new OnEnterMode(IndentAction.IndentOutdent);
@@ -1847,6 +1849,7 @@ suite('Editor Controller - Regression tests', () => {
 		});
 	});
 
+	/* AGPL */
 	// test('issue #3071: Investigate why undo stack gets corrupted', () => {
 	// 	let model = createTextModel(
 	// 		[
@@ -1897,6 +1900,7 @@ suite('Editor Controller - Regression tests', () => {
 
 	// 	model.dispose();
 	// });
+	/* End AGPL */
 
 	test('issue #12950: Cannot Double Click To Insert Emoji Using OSX Emoji Panel', () => {
 		usingCursor({
@@ -2072,6 +2076,7 @@ suite('Editor Controller - Regression tests', () => {
 		model.dispose();
 	});
 
+	/* AGPL */
 	// test('issue #9675: Undo/Redo adds a stop in between CHN Characters', () => {
 	// 	withTestCodeEditor([], {}, (editor, viewModel) => {
 	// 		const model = editor.getModel()!;
@@ -2098,6 +2103,7 @@ suite('Editor Controller - Regression tests', () => {
 	// 		assertCursor(viewModel, new Position(1, 1));
 	// 	});
 	// });
+	/* End AGPL */
 
 	test('issue #23913: Greater than 1000+ multi cursor typing replacement text appears inverted, lines begin to drop off selection', function () {
 		this.timeout(10000);
@@ -2313,6 +2319,7 @@ suite('Editor Controller - Regression tests', () => {
 		});
 	});
 
+	/* AGPL */
 	// test('issue #44805: Should not be able to undo in readonly editor', () => {
 	// 	let model = createTextModel(
 	// 		[
@@ -2333,6 +2340,7 @@ suite('Editor Controller - Regression tests', () => {
 
 	// 	model.dispose();
 	// });
+	/* End AGPL */
 
 	test('issue #46314: ViewModel is out of sync with Model!', () => {
 
@@ -2397,6 +2405,7 @@ suite('Editor Controller - Regression tests', () => {
 		model.dispose();
 	});
 
+	/* AGPL */
 	// test('issue #15761: Cursor doesn\'t move in a redo operation', () => {
 	// 	let model = createTextModel(
 	// 		[
@@ -2468,6 +2477,7 @@ suite('Editor Controller - Regression tests', () => {
 
 	// 	model.dispose();
 	// });
+	/* End AGPL */
 
 	test('issue #85712: Paste line moves cursor to start of current line rather than start of next line', () => {
 		let model = createTextModel(
@@ -2547,6 +2557,7 @@ suite('Editor Controller - Cursor Configuration', () => {
 		});
 	});
 
+	/* AGPL */
 	// test('Cursor honors insertSpaces configuration on tab', () => {
 	// 	let model = createTextModel(
 	// 		[
@@ -2620,6 +2631,7 @@ suite('Editor Controller - Cursor Configuration', () => {
 
 	// 	model.dispose();
 	// });
+	/* End AGPL */
 
 	test('Enter auto-indents with insertSpaces setting 1', () => {
 		let mode = new OnEnterMode(IndentAction.Indent);
@@ -2938,6 +2950,7 @@ suite('Editor Controller - Cursor Configuration', () => {
 		model.dispose();
 	});
 
+	/* AGPL */
 	// test('Backspace removes whitespaces with tab size', () => {
 	// 	let model = createTextModel(
 	// 		[
@@ -3094,6 +3107,7 @@ suite('Editor Controller - Cursor Configuration', () => {
 
 	// 	model.dispose();
 	// });
+	/* End AGPL */
 
 
 });
@@ -5536,6 +5550,7 @@ suite('autoClosingPairs', () => {
 	});
 });
 
+/* AGPL */
 // suite('Undo stops', () => {
 
 // 	test('there is an undo stop between typing and deleting left', () => {
@@ -5808,3 +5823,4 @@ suite('autoClosingPairs', () => {
 // 		});
 // 	});
 // });
+/* End AGPL */

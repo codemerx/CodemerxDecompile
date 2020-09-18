@@ -31,33 +31,45 @@ interface WatermarkEntry {
 	mac?: boolean;
 }
 
+/* AGPL */
 // const showCommands: WatermarkEntry = { text: nls.localize('watermark.showCommands', "Show All Commands"), id: ShowAllCommandsAction.ID };
-const quickAccess: WatermarkEntry = { text: nls.localize('watermark.quickAccess', /* AGPL */"Go to Type"/* End AGPL */), id: 'workbench.action.quickOpen' };
-const openFileNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFile', /* AGPL */"Open Assembly"/* End AGPL */), id: OpenFileAction.ID, mac: false };
+const quickAccess: WatermarkEntry = { text: nls.localize('watermark.quickAccess', "Go to Type"), id: 'workbench.action.quickOpen' };
+const openFileNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFile', "Open Assembly"), id: OpenFileAction.ID, mac: false };
+/* End AGPL */
 const openFolderNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFolder', "Open Folder"), id: OpenFolderAction.ID, mac: false };
 const openFileOrFolderMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFileFolder', "Open File or Folder"), id: OpenFileFolderAction.ID, mac: true };
 const openRecent: WatermarkEntry = { text: nls.localize('watermark.openRecent', "Open Recent"), id: 'workbench.action.openRecent' };
+/* AGPL */
 // const newUntitledFile: WatermarkEntry = { text: nls.localize('watermark.newUntitledFile', "New Untitled File"), id: NEW_UNTITLED_FILE_COMMAND_ID };
 // const newUntitledFileMacOnly: WatermarkEntry = assign({ mac: true }, newUntitledFile);
 // const toggleTerminal: WatermarkEntry = { text: nls.localize({ key: 'watermark.toggleTerminal', comment: ['toggle is a verb here'] }, "Toggle Terminal"), id: TERMINAL_COMMAND_ID.TOGGLE };
 // const findInFiles: WatermarkEntry = { text: nls.localize('watermark.findInFiles', "Find in Files"), id: FindInFilesActionId };
 // const startDebugging: WatermarkEntry = { text: nls.localize('watermark.startDebugging', "Start Debugging"), id: StartAction.ID };
+/* End AGPL */
 
 const noFolderEntries = [
+	/* AGPL */
 	// showCommands,
+	/* End AGPL */
 	openFileNonMacOnly,
 	openFolderNonMacOnly,
 	openFileOrFolderMacOnly,
 	openRecent,
+	/* AGPL */
 	// newUntitledFileMacOnly
+	/* End AGPL */
 ];
 
 const folderEntries = [
+	/* AGPL */
 	// showCommands,
+	/* End AGPL */
 	quickAccess,
+	/* AGPL */
 	// findInFiles,
 	// startDebugging,
 	// toggleTerminal
+	/* End AGPL */
 ];
 
 const WORKBENCH_TIPS_ENABLED_KEY = 'workbench.tips.enabled';
@@ -105,7 +117,9 @@ export class WatermarkContribution extends Disposable implements IWorkbenchContr
 			}
 		}));
 
+		/* AGPL */
 		this._register(this.contextService.onDidChangeWorkbenchState(() => {
+		/* End AGPL */
 			const previousWorkbenchState = this.workbenchState;
 			this.workbenchState = this.contextService.getWorkbenchState();
 

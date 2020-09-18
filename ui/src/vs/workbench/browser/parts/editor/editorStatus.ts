@@ -463,7 +463,9 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.gotoLine'
 		};
 
+		/* AGPL */
 		this.updateElement(this.selectionElement, props, 'status.editor.selection', nls.localize('status.editor.selection', "Code Viewer Selection"), StatusbarAlignment.RIGHT, 100.5);
+		/* End AGPL */
 	}
 
 	private updateIndentationElement(text: string | undefined): void {
@@ -479,7 +481,9 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'changeEditorIndentation'
 		};
 
+		/* AGPL */
 		this.updateElement(this.indentationElement, props, 'status.editor.indentation', nls.localize('status.editor.indentation', "Code Viewer Indentation"), StatusbarAlignment.RIGHT, 100.4);
+		/* End AGPL */
 	}
 
 	private updateEncodingElement(text: string | undefined): void {
@@ -499,7 +503,9 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.editor.changeEncoding'
 		};
 
+		/* AGPL */
 		this.updateElement(this.encodingElement, props, 'status.editor.encoding', nls.localize('status.editor.encoding', "Code Viewer Encoding"), StatusbarAlignment.RIGHT, 100.3);
+		/* End AGPL */
 	}
 
 	private updateEOLElement(text: string | undefined): void {
@@ -515,7 +521,9 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.editor.changeEOL'
 		};
 
+		/* AGPL */
 		this.updateElement(this.eolElement, props, 'status.editor.eol', nls.localize('status.editor.eol', "Code Viewer End of Line"), StatusbarAlignment.RIGHT, 100.2);
+		/* End AGPL */
 	}
 
 	private updateModeElement(text: string | undefined): void {
@@ -531,7 +539,9 @@ export class EditorStatus extends Disposable implements IWorkbenchContribution {
 			command: 'workbench.action.editor.changeLanguageMode'
 		};
 
+		/* AGPL */
 		this.updateElement(this.modeElement, props, 'status.editor.mode', nls.localize('status.editor.mode', "Code Viewer Language"), StatusbarAlignment.RIGHT, 100.1);
+		/* End AGPL */
 	}
 
 	private updateMetadataElement(text: string | undefined): void {

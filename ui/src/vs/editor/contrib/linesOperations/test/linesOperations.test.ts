@@ -6,7 +6,9 @@ import * as assert from 'assert';
 import { CoreEditingCommands } from 'vs/editor/browser/controller/coreCommands';
 import { Position } from 'vs/editor/common/core/position';
 import { Selection } from 'vs/editor/common/core/selection';
+/* AGPL */
 // import { Handler } from 'vs/editor/common/editorCommon';
+/* End AGPL */
 import { ITextModel } from 'vs/editor/common/model';
 import { TitleCaseAction, DeleteAllLeftAction, DeleteAllRightAction, IndentLinesAction, InsertLineAfterAction, InsertLineBeforeAction, JoinLinesAction, LowerCaseAction, SortLinesAscendingAction, SortLinesDescendingAction, TransposeAction, UpperCaseAction, DeleteLinesAction } from 'vs/editor/contrib/linesOperations/linesOperations';
 import { withTestCodeEditor } from 'vs/editor/test/browser/testCodeEditor';
@@ -297,6 +299,7 @@ suite('Editor Contrib - Line Operations', () => {
 				});
 		});
 
+		/* AGPL */
 		// test('issue #36234: should push undo stop', () => {
 		// 	withTestCodeEditor(
 		// 		[
@@ -322,6 +325,7 @@ suite('Editor Contrib - Line Operations', () => {
 		// 			assert.deepEqual(editor.getSelection(), new Selection(1, 31, 1, 31));
 		// 		});
 		// });
+		/* End AGPL */
 	});
 
 	suite('JoinLinesAction', () => {
@@ -428,6 +432,7 @@ suite('Editor Contrib - Line Operations', () => {
 				});
 		});
 
+		/* AGPL */
 		// test('should push undo stop', function () {
 		// 	withTestCodeEditor(
 		// 		[
@@ -452,6 +457,7 @@ suite('Editor Contrib - Line Operations', () => {
 		// 			assert.deepEqual(editor.getSelection(), new Selection(1, 14, 1, 14));
 		// 		});
 		// });
+		/* End AGPL */
 	});
 
 	test('transpose', () => {
@@ -794,6 +800,7 @@ suite('Editor Contrib - Line Operations', () => {
 			});
 		});
 
+		/* AGPL */
 		// test('should work with undo/redo', () => {
 		// 	withTestCodeEditor([
 		// 		'hello',
@@ -828,6 +835,7 @@ suite('Editor Contrib - Line Operations', () => {
 		// 		]);
 		// 	});
 		// });
+		/* End AGPL */
 	});
 
 	test('InsertLineBeforeAction', () => {

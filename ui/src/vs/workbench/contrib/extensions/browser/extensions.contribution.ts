@@ -5,9 +5,13 @@
 
 import { localize } from 'vs/nls';
 import { Registry } from 'vs/platform/registry/common/platform';
+/* AGPL */
 import { MenuRegistry, MenuId, registerAction2, Action2 } from 'vs/platform/actions/common/actions';
+/* End AGPL */
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
+/* AGPL */
 import { ExtensionsLabel, ExtensionsChannelId, IExtensionManagementService, IExtensionGalleryService } from 'vs/platform/extensionManagement/common/extensionManagement';
+/* End AGPL */
 import { IExtensionManagementServerService, IExtensionRecommendationsService } from 'vs/workbench/services/extensionManagement/common/extensionManagement';
 import { IWorkbenchContributionsRegistry, Extensions as WorkbenchExtensions, IWorkbenchContribution } from 'vs/workbench/common/contributions';
 import { IOutputChannelRegistry, Extensions as OutputExtensions } from 'vs/workbench/services/output/common/output';
@@ -15,10 +19,14 @@ import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { VIEWLET_ID, IExtensionsWorkbenchService, IExtensionsViewPaneContainer, TOGGLE_IGNORE_EXTENSION_ACTION_ID } from 'vs/workbench/contrib/extensions/common/extensions';
 import { ExtensionsWorkbenchService } from 'vs/workbench/contrib/extensions/browser/extensionsWorkbenchService';
 import {
+	/* AGPL */
 	ShowRecommendedKeymapExtensionsAction, ConfigureRecommendedExtensionsCommandsContributor} from 'vs/workbench/contrib/extensions/browser/extensionsActions';
+	/* End AGPL */
 import { ExtensionsInput } from 'vs/workbench/contrib/extensions/common/extensionsInput';
 import { ExtensionEditor } from 'vs/workbench/contrib/extensions/browser/extensionEditor';
+/* AGPL */
 import { StatusUpdater, MaliciousExtensionChecker, ExtensionsViewletViewsContribution } from 'vs/workbench/contrib/extensions/browser/extensionsViewlet';
+/* End AGPL */
 import { IConfigurationRegistry, Extensions as ConfigurationExtensions, ConfigurationScope } from 'vs/platform/configuration/common/configurationRegistry';
 import * as jsonContributionRegistry from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
 import { ExtensionsConfigurationSchema, ExtensionsConfigurationSchemaId } from 'vs/workbench/contrib/extensions/common/extensionsFileTemplate';
@@ -70,6 +78,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 		new SyncDescriptor(ExtensionsInput)
 	]);
 
+/* AGPL */
 // Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer(
 // 	{
 // 		id: VIEWLET_ID,
@@ -147,6 +156,7 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors).registerEditor(
 // actionRegistry.registerWorkbenchAction(SyncActionDescriptor.from(DisableAutoUpdateAction), `Extensions: Disable Auto Updating Extensions`, ExtensionsLabel);
 // actionRegistry.registerWorkbenchAction(SyncActionDescriptor.from(InstallSpecificVersionOfExtensionAction), 'Install Specific Version of Extension...', ExtensionsLabel);
 // actionRegistry.registerWorkbenchAction(SyncActionDescriptor.from(ReinstallAction), 'Reinstall Extension...', localize({ key: 'developer', comment: ['A developer on Code itself or someone diagnosing issues in Code'] }, "Developer"));
+/* End AGPL */
 
 Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Configuration)
 	.registerConfiguration({
@@ -325,6 +335,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 	order: 2
 });
 
+/* AGPL */
 // MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
 // 	group: '2_keybindings',
 // 	command: {
@@ -333,6 +344,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 // 	},
 // 	order: 2
 // });
+/* End AGPL */
 
 MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 	group: '1_settings',
@@ -356,6 +368,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
 
 // Global Activity Menu
 
+/* AGPL */
 // MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
 // 	group: '2_configuration',
 // 	command: {
@@ -364,6 +377,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
 // 	},
 // 	order: 3
 // });
+/* End AGPL */
 
 // Extension Context Menu
 

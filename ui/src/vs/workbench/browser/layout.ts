@@ -607,9 +607,11 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 						case 'scm':
 							viewletId = 'workbench.view.scm';
 							break;
+						/* AGPL */
 						// case 'search':
 						// 	viewletId = 'workbench.view.search';
 						// 	break;
+						/* End AGPL */
 						case 'extensions':
 							viewletId = 'workbench.view.extensions';
 							break;
@@ -1796,7 +1798,9 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			type: 'leaf',
 			data: { type: Parts.PANEL_PART },
 			size: panelSize,
+			/* AGPL */
 			visible: false
+			/* End AGPL */
 		};
 
 		const editorSectionNode = this.arrangeEditorNodes(editorNode, panelNode, editorSectionWidth);
@@ -1825,7 +1829,9 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 						type: 'leaf',
 						data: { type: Parts.STATUSBAR_PART },
 						size: statusBarHeight,
+						/* AGPL */
 						visible: false
+						/* End AGPL */
 					}
 				]
 			},

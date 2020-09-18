@@ -546,6 +546,7 @@ function registerCommand<T extends Command>(command: T): T {
 	return command;
 }
 
+/* AGPL */
 // export const UndoCommand = registerCommand(new MultiCommand({
 // 	id: 'undo',
 // 	precondition: undefined,
@@ -591,6 +592,7 @@ function registerCommand<T extends Command>(command: T): T {
 // }));
 
 // registerCommand(new ProxyCommand(RedoCommand, { id: 'default:redo', precondition: undefined }));
+/* End AGPL */
 
 export const SelectAllCommand = registerCommand(new MultiCommand({
 	id: 'editor.action.selectAll',

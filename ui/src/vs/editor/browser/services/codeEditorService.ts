@@ -53,5 +53,7 @@ export interface ICodeEditorService {
 	getTransientModelProperties(model: ITextModel): [string, any][] | undefined;
 
 	getActiveCodeEditor(): ICodeEditor | null;
-	openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: ReferenceMetadata/* End AGPL */): Promise<ICodeEditor | null>;
+	/* AGPL */
+	openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, navigationData?: ReferenceMetadata): Promise<ICodeEditor | null>;
+	/* End AGPL */
 }

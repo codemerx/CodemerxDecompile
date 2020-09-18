@@ -27,7 +27,9 @@ Registry.as<IEditorRegistry>(EditorExtensions.Editors)
 		EditorDescriptor.create(
 			WebviewEditor,
 			WebviewEditor.ID,
+			/* AGPL */
 			'Webview Code Viewer',
+			/* End AGPL */
 		), [
 		new SyncDescriptor(CustomEditorInput)
 	]);

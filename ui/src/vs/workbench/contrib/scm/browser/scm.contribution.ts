@@ -23,7 +23,9 @@ import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/co
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { SCMService } from 'vs/workbench/contrib/scm/common/scmService';
+/* AGPL */
 import { Extensions as ViewContainerExtensions, IViewsRegistry } from 'vs/workbench/common/views';
+/* End AGPL */
 import { ModesRegistry } from 'vs/editor/common/modes/modesRegistry';
 
 class OpenSCMViewletAction extends ShowViewletAction {
@@ -45,6 +47,7 @@ ModesRegistry.registerLanguage({
 Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench)
 	.registerWorkbenchContribution(DirtyDiffWorkbenchController, LifecyclePhase.Restored);
 
+/* AGPL */
 // const viewContainer = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
 // 	id: VIEWLET_ID,
 // 	name: localize('source control', "Source Control"),
@@ -55,6 +58,7 @@ Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench)
 // 	order: 2,
 // 	hideIfEmpty: true
 // }, ViewContainerLocation.Sidebar);
+/* End AGPL */
 
 const viewsRegistry = Registry.as<IViewsRegistry>(ViewContainerExtensions.ViewsRegistry);
 
@@ -63,6 +67,7 @@ viewsRegistry.registerViewWelcomeContent(VIEW_PANE_ID, {
 	when: 'default'
 });
 
+/* AGPL */
 // viewsRegistry.registerViews([{
 // 	id: VIEW_PANE_ID,
 // 	name: localize('source control', "Source Control"),
@@ -71,6 +76,7 @@ viewsRegistry.registerViewWelcomeContent(VIEW_PANE_ID, {
 // 	workspace: true,
 // 	canMoveView: true,
 // }], viewContainer);
+/* End AGPL */
 
 Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench)
 	.registerWorkbenchContribution(SCMStatusController, LifecyclePhase.Restored);

@@ -109,6 +109,8 @@
     <!--Telerik Authorship-->
     <!--Telerik Authorship-->
   </ItemGroup>
+  <!-- AGPL -->
   <Import Project="..\Mono.Cecil.Shared\Mono.Cecil.Shared.projitems" Label="Shared" />
+  <!-- End AGPL -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

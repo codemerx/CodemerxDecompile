@@ -49,7 +49,9 @@ export class HighlightedLabel {
 		}
 
 		this.text = text;
+		/* AGPL */
 		this.title = this.text;
+		/* End AGPL */
 
 		this.highlights = highlights;
 		this.render();

@@ -74,7 +74,9 @@ exports.config = {
     darwinForceDarkModeSupport: true,
     darwinCredits: darwinCreditsTemplate ? Buffer.from(darwinCreditsTemplate({ commit: commit, date: new Date().toISOString() })) : undefined,
     linuxExecutableName: product.applicationName,
+    /* AGPL */
     winIcon: 'resources/win32/codemerx-logo.ico',
+    /* End AGPL */
     token: process.env['VSCODE_MIXIN_PASSWORD'] || process.env['GITHUB_TOKEN'] || undefined,
     repo: product.electronRepository || undefined
 };

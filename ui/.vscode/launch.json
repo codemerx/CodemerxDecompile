@@ -354,12 +354,18 @@
 			"request": "launch",
 			"name": "Run Unit Tests",
 			"program": "${workspaceFolder}/test/unit/electron/index.js",
+			/* AGPL */
 			"runtimeExecutable": "${workspaceFolder}/.build/electron/CodemerxDecompile.app/Contents/MacOS/Electron",
+			/* End AGPL */
 			"windows": {
+				/* AGPL */
 				"runtimeExecutable": "${workspaceFolder}/.build/electron/CodemerxDecompile.exe"
+				/* End AGPL */
 			},
 			"linux": {
+				/* AGPL */
 				"runtimeExecutable": "${workspaceFolder}/.build/electron/CodemerxDecompile"
+				/* End AGPL */
 			},
 			"outputCapture": "std",
 			"args": [
@@ -386,7 +392,9 @@
 			"port": 9999,
 			"args": [
 				"-l",
+				/* AGPL */
 				"${workspaceFolder}/.build/electron/CodemerxDecompile.app/Contents/MacOS/Electron"
+				/* End AGPL */
 			],
 			"outFiles": [
 				"${cwd}/out/**/*.js"

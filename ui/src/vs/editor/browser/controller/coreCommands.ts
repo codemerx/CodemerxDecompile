@@ -7,7 +7,9 @@ import * as nls from 'vs/nls';
 import { KeyCode, KeyMod } from 'vs/base/common/keyCodes';
 import * as types from 'vs/base/common/types';
 import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
+/* AGPL */
 import { Command, EditorCommand, ICommandOptions, registerEditorCommand, MultiCommand, SelectAllCommand } from 'vs/editor/browser/editorExtensions';
+/* End AGPL */
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { ColumnSelection, IColumnSelectResult } from 'vs/editor/common/controller/cursorColumnSelection';
 import { CursorState, EditOperationType, IColumnSelectData, PartialCursorState } from 'vs/editor/common/controller/cursorCommon';
@@ -24,7 +26,9 @@ import { ICommandHandlerDescription } from 'vs/platform/commands/common/commands
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { KeybindingWeight, KeybindingsRegistry } from 'vs/platform/keybinding/common/keybindingsRegistry';
+/* AGPL */
 // import { EditorOption } from 'vs/editor/common/config/editorOptions';
+/* End AGPL */
 import { IViewModel } from 'vs/editor/common/viewModel/viewModel';
 
 const CORE_WEIGHT = KeybindingWeight.EditorCore;
@@ -1838,6 +1842,7 @@ export namespace CoreEditingCommands {
 		}
 	});
 
+	/* AGPL */
 	// export const Undo = new class extends EditorOrNativeTextInputCommand {
 	// 	constructor() {
 	// 		super(UndoCommand);
@@ -1867,6 +1872,7 @@ export namespace CoreEditingCommands {
 	// 		editor.getModel().redo();
 	// 	}
 	// }();
+	/* End AGPL */
 }
 
 /**

@@ -107,7 +107,9 @@ export abstract class BaseWindowDriver implements IWindowDriver {
 		const element = document.querySelector(selector);
 
 		if (!element) {
+			/* AGPL */
 			throw new Error(`Code Viewer not found: ${selector}`);
+			/* End AGPL */
 		}
 
 		const textarea = element as HTMLTextAreaElement;

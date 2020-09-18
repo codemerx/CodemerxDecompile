@@ -56,6 +56,7 @@ const configurationRegistry = Registry.as<IConfigurationRegistry>(Extensions.Con
 configurationRegistry.registerConfiguration(terminalConfiguration);
 
 // Register views
+/* AGPL */
 // const VIEW_CONTAINER = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry).registerViewContainer({
 // 	id: TERMINAL_VIEW_ID,
 // 	name: nls.localize('terminal', "Terminal"),
@@ -66,7 +67,9 @@ configurationRegistry.registerConfiguration(terminalConfiguration);
 // 	hideIfEmpty: true,
 // 	order: 3
 // }, ViewContainerLocation.Panel);
+/* End AGPL */
 Registry.as<panel.PanelRegistry>(panel.Extensions.Panels).setDefaultPanelId(TERMINAL_VIEW_ID);
+/* AGPL */
 // Registry.as<IViewsRegistry>(ViewContainerExtensions.ViewsRegistry).registerViews([{
 // 	id: TERMINAL_VIEW_ID,
 // 	name: nls.localize('terminal', "Terminal"),
@@ -75,6 +78,7 @@ Registry.as<panel.PanelRegistry>(panel.Extensions.Panels).setDefaultPanelId(TERM
 // 	canMoveView: true,
 // 	ctorDescriptor: new SyncDescriptor(TerminalViewPane)
 // }], VIEW_CONTAINER);
+/* End AGPL */
 
 // Register actions
 const actionRegistry = Registry.as<IWorkbenchActionRegistry>(ActionExtensions.WorkbenchActions);

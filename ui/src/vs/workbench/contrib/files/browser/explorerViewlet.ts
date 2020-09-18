@@ -36,7 +36,9 @@ import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { WorkbenchStateContext, RemoteNameContext } from 'vs/workbench/browser/contextkeys';
 import { IsWebContext } from 'vs/platform/contextkey/common/contextkeys';
+/* AGPL */
 import { OpenFileAction } from 'vs/workbench/browser/actions/workspaceActions';
+/* End AGPL */
 import { Codicon } from 'vs/base/common/codicons';
 
 export class ExplorerViewletViewsContribution extends Disposable implements IWorkbenchContribution {
@@ -138,7 +140,9 @@ export class ExplorerViewletViewsContribution extends Disposable implements IWor
 	private createExplorerViewDescriptor(): IViewDescriptor {
 		return {
 			id: VIEW_ID,
+			/* AGPL */
 			name: localize('assemblies', "Assemblies"),
+			/* End AGPL */
 			containerIcon: Codicon.files.classNames,
 			ctorDescriptor: new SyncDescriptor(ExplorerView),
 			order: 1,
@@ -183,7 +187,9 @@ export class ExplorerViewPaneContainer extends ViewPaneContainer {
 
 		this.viewletVisibleContextKey = ExplorerViewletVisibleContext.bindTo(contextKeyService);
 
+		/* AGPL */
 		this._register(this.contextService.onDidChangeWorkspaceName(() => this.updateTitleArea()));
+		/* End AGPL */
 	}
 
 	create(parent: HTMLElement): void {
@@ -270,6 +276,7 @@ export const VIEW_CONTAINER: ViewContainer = viewContainerRegistry.registerViewC
 }, ViewContainerLocation.Sidebar, true);
 
 const viewsRegistry = Registry.as<IViewsRegistry>(Extensions.ViewsRegistry);
+/* AGPL */
 // viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
 // 	content: localize({ key: 'noWorkspaceHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
 // 		"You have not yet added a folder to the workspace.\n[Add Folder](command:{0})", AddRootFolderAction.ID),
@@ -282,9 +289,12 @@ const commandId = OpenFileAction.ID;
 // 		"Connected to remote.\n[Open Folder](command:{0})", commandId),
 // 	when: ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), RemoteNameContext.notEqualsTo(''), IsWebContext.toNegated())
 // });
+/* End AGPL */
 
 viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
+	/* AGPL */
 	content: localize({ key: 'noFolderHelp', comment: ['Please do not translate the word "commmand", it is part of our internal syntax which must not change'] },
-		/* AGPL */"You have not yet opened an assembly.\n[Open Assembly](command:{0})"/* End AGPL */, commandId),
+		"You have not yet opened an assembly.\n[Open Assembly](command:{0})", commandId),
+	/* End AGPL */
 	when: ContextKeyExpr.or(ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), RemoteNameContext.isEqualTo('')), ContextKeyExpr.and(WorkbenchStateContext.notEqualsTo('workspace'), IsWebContext))
 });

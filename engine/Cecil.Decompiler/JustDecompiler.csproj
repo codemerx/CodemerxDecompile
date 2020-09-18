@@ -297,7 +297,9 @@
       <Link>External\TelerikJustDecompileCOM.idl</Link>
     </Content>
   </ItemGroup>
+  <!-- AGPL -->
   <Import Project="..\JustDecompiler.Shared\JustDecompiler.Shared.projitems" Label="Shared" />
+  <!-- End AGPL -->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

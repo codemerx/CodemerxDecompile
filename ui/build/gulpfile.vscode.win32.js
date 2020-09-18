@@ -141,7 +141,9 @@ function copyInnoUpdater(arch) {
 
 function updateIcon(executablePath) {
 	return cb => {
+		/* AGPL */
 		const icon = path.join(repoPath, 'resources', 'win32', 'codemerx-logo.ico');
+		/* End AGPL */
 		rcedit(executablePath, { icon }, cb);
 	};
 }

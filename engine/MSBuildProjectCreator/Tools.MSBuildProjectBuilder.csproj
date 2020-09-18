@@ -164,7 +164,9 @@
       <Name>JustDecompile.EngineInfrastructure</Name>
     </ProjectReference>
   </ItemGroup>
+  <!-- AGPL -->
   <Import Project="..\Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems" Label="Shared" />
+  <!-- End AGPL -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

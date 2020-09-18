@@ -3980,7 +3980,9 @@ export const EditorOptions = {
 		{ description: nls.localize('quickSuggestionsDelay', "Controls the delay in milliseconds after which quick suggestions will show up.") }
 	)),
 	readOnly: register(new EditorBooleanOption(
+		/* AGPL */
 		EditorOption.readOnly, 'readOnly', true,
+		/* End AGPL */
 	)),
 	renameOnType: register(new EditorBooleanOption(
 		EditorOption.renameOnType, 'renameOnType', false,

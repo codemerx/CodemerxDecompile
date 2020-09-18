@@ -144,7 +144,9 @@ export class IconLabel extends Disposable {
 		}
 
 		this.domNode.className = classes.join(' ');
+		/* AGPL */
 		// this.domNode.title = options?.title || '';
+		/* End AGPL */
 
 		this.nameNode.setLabel(label, options);
 

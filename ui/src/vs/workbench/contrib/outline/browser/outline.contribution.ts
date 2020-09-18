@@ -6,6 +6,7 @@
 
 export const PANEL_ID = 'panel.view.outline';
 
+/* AGPL */
 // const _outlineDesc = <IViewDescriptor>{
 // 	id: OutlineViewId,
 // 	name: localize('name', "Outline"),
@@ -198,3 +199,4 @@ export const PANEL_ID = 'panel.view.outline';
 // 		}
 // 	}
 // });
+/* End AGPL */

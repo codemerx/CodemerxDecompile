@@ -7,32 +7,42 @@ import 'vs/css!./media/debug.contribution';
 import 'vs/css!./media/debugHover';
 import * as nls from 'vs/nls';
 import { Color } from 'vs/base/common/color';
+/* AGPL */
 import { MenuRegistry, MenuId } from 'vs/platform/actions/common/actions';
+/* End AGPL */
 import { Registry } from 'vs/platform/registry/common/platform';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { IConfigurationRegistry, Extensions as ConfigurationExtensions } from 'vs/platform/configuration/common/configurationRegistry';
 import { Extensions as WorkbenchExtensions, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
 import {
+	/* AGPL */
 	IDebugService, CONTEXT_IN_DEBUG_MODE, INTERNAL_CONSOLE_OPTIONS_SCHEMA,
 	CONTEXT_DEBUG_STATE,
+	/* End AGPL */
 } from 'vs/workbench/contrib/debug/common/debug';
+/* AGPL */
 import { StartAction, RunAction } from 'vs/workbench/contrib/debug/browser/debugActions';
+/* End AGPL */
 import * as service from 'vs/workbench/contrib/debug/browser/debugService';
+/* AGPL */
 import { registerCommands, RESTART_SESSION_ID, STEP_OVER_ID, STEP_INTO_ID, STEP_OUT_ID, PAUSE_ID, STOP_ID, CONTINUE_ID, RESTART_LABEL, STEP_INTO_LABEL, STEP_OVER_LABEL, STEP_OUT_LABEL, PAUSE_LABEL, STOP_LABEL, CONTINUE_LABEL } from 'vs/workbench/contrib/debug/browser/debugCommands';
+/* End AGPL */
 import { isMacintosh, isWeb } from 'vs/base/common/platform';
 import { ContextKeyExpr, ContextKeyExpression } from 'vs/platform/contextkey/common/contextkey';
 import { URI } from 'vs/base/common/uri';
 import { DebugStatusContribution } from 'vs/workbench/contrib/debug/browser/debugStatus';
 import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { launchSchemaId } from 'vs/workbench/services/configuration/common/configuration';
+/* AGPL */
 import { registerThemingParticipant } from 'vs/platform/theme/common/themeService';
+/* End AGPL */
 import { registerColor, foreground, badgeBackground, badgeForeground, listDeemphasizedForeground, contrastBorder, inputBorder, editorWarningForeground, errorForeground, editorInfoForeground } from 'vs/platform/theme/common/colorRegistry';
 import { IQuickAccessRegistry, Extensions as QuickAccessExtensions } from 'vs/platform/quickinput/common/quickAccess';
 import { StartDebugQuickAccessProvider } from 'vs/workbench/contrib/debug/browser/debugQuickAccess';
 import { DebugProgressContribution } from 'vs/workbench/contrib/debug/browser/debugProgress';
 import { DebugTitleContribution } from 'vs/workbench/contrib/debug/browser/debugTitle';
 
-
+/* AGPL */
 // const viewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
 // 	id: VIEWLET_ID,
 // 	name: nls.localize('run', "Run"),
@@ -48,9 +58,11 @@ import { DebugTitleContribution } from 'vs/workbench/contrib/debug/browser/debug
 // const openPanelKb: IKeybindings = {
 // 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_Y
 // };
+/* End AGPL */
 
 // register repl panel
 
+/* AGPL */
 // const VIEW_CONTAINER: ViewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
 // 	id: DEBUG_PANEL_ID,
 // 	name: nls.localize({ comment: ['Debug is a noun in this context, not a verb.'], key: 'debugPanel' }, 'Debug Console'),
@@ -82,9 +94,11 @@ import { DebugTitleContribution } from 'vs/workbench/contrib/debug/browser/debug
 // viewsRegistry.registerViews([{ id: BREAKPOINTS_VIEW_ID, name: nls.localize('breakpoints', "Breakpoints"), containerIcon: Codicon.debugAlt.classNames, ctorDescriptor: new SyncDescriptor(BreakpointsView), order: 40, weight: 20, canToggleVisibility: true, canMoveView: true, focusCommand: { id: 'workbench.debug.action.focusBreakpointsView' }, when: ContextKeyExpr.or(CONTEXT_BREAKPOINTS_EXIST, CONTEXT_DEBUG_UX.isEqualTo('default')) }], viewContainer);
 // viewsRegistry.registerViews([{ id: WelcomeView.ID, name: WelcomeView.LABEL, containerIcon: Codicon.debugAlt.classNames, ctorDescriptor: new SyncDescriptor(WelcomeView), order: 1, weight: 40, canToggleVisibility: true, when: CONTEXT_DEBUG_UX.isEqualTo('simple') }], viewContainer);
 // viewsRegistry.registerViews([{ id: LOADED_SCRIPTS_VIEW_ID, name: nls.localize('loadedScripts', "Loaded Scripts"), containerIcon: Codicon.debugAlt.classNames, ctorDescriptor: new SyncDescriptor(LoadedScriptsView), order: 35, weight: 5, canToggleVisibility: true, canMoveView: true, collapsed: true, when: ContextKeyExpr.and(CONTEXT_LOADED_SCRIPTS_SUPPORTED, CONTEXT_DEBUG_UX.isEqualTo('default')) }], viewContainer);
+/* End AGPL */
 
 registerCommands();
 
+/* AGPL */
 // register action to open viewlet
 // const registry = Registry.as<IWorkbenchActionRegistry>(WorkbenchActionRegistryExtensions.WorkbenchActions);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenDebugConsoleAction, openPanelKb), 'View: Debug Console', nls.localize('view', "View"));
@@ -123,7 +137,7 @@ registerCommands();
 // registerDebugCommandPaletteItem(JUMP_TO_CURSOR_ID, nls.localize('SetNextStatement', "Set Next Statement"), CONTEXT_JUMP_TO_CURSOR_SUPPORTED);
 // registerDebugCommandPaletteItem(RunToCursorAction.ID, RunToCursorAction.LABEL, ContextKeyExpr.and(CONTEXT_IN_DEBUG_MODE, CONTEXT_DEBUG_STATE.isEqualTo('stopped')));
 // registerDebugCommandPaletteItem(TOGGLE_INLINE_BREAKPOINT_ID, nls.localize('inlineBreakpoint', "Inline Breakpoint"));
-
+/* End AGPL */
 
 // Register Quick Access
 Registry.as<IQuickAccessRegistry>(QuickAccessExtensions.Quickaccess).registerQuickAccessProvider({
@@ -251,7 +265,7 @@ if (isWeb) {
 
 // Debug toolbar
 
-
+/* AGPL */
 // registerDebugToolBarItem(CONTINUE_ID, CONTINUE_LABEL, 10, { id: 'codicon/debug-continue' }, CONTEXT_DEBUG_STATE.isEqualTo('stopped'));
 // registerDebugToolBarItem(PAUSE_ID, PAUSE_LABEL, 10, { id: 'codicon/debug-pause' }, CONTEXT_DEBUG_STATE.notEqualsTo('stopped'));
 // registerDebugToolBarItem(STOP_ID, STOP_LABEL, 70, { id: 'codicon/debug-stop' }, CONTEXT_FOCUSED_SESSION_IS_ATTACH.toNegated());
@@ -490,6 +504,7 @@ if (isWeb) {
 // 	},
 // 	order: 1
 // });
+/* End AGPL */
 
 // Touch Bar
 if (isMacintosh) {

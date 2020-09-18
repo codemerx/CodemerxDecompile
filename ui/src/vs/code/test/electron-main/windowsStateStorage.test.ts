@@ -206,6 +206,7 @@ suite('Windows State Storing', () => {
 	});
 
 	test('open 1_32', () => {
+		/* AGPL */
 		const v1_32_workspace = `{
 			"openedWindows": [],
 			"lastActiveWindow": {
@@ -223,12 +224,15 @@ suite('Windows State Storing', () => {
 				}
 			}
 		}`;
+		/* End AGPL */
 
 		let windowsState = restoreWindowsState(JSON.parse(v1_32_workspace));
 		let expected: IWindowsState = {
 			openedWindows: [],
 			lastActiveWindow: {
+				/* AGPL */
 				backupPath: '/home/user/.config/CodemerxDecompile/Backups/53b714b46ef1a2d4346568b4f591028c',
+				/* End AGPL */
 				uiState: { mode: WindowMode.Maximized, x: 0, y: 27, width: 2560, height: 1364 },
 				workspace: { id: '53b714b46ef1a2d4346568b4f591028c', configPath: URI.parse('file:///home/user/workspaces/testing/custom.code-workspace') }
 			}
@@ -236,6 +240,7 @@ suite('Windows State Storing', () => {
 
 		assertEqualWindowsState(expected, windowsState, 'v1_32_workspace');
 
+		/* AGPL */
 		const v1_32_folder = `{
 			"openedWindows": [],
 			"lastActiveWindow": {
@@ -250,18 +255,22 @@ suite('Windows State Storing', () => {
 				}
 			}
 		}`;
+		/* End AGPL */
 
 		windowsState = restoreWindowsState(JSON.parse(v1_32_folder));
 		expected = {
 			openedWindows: [],
 			lastActiveWindow: {
+				/* AGPL */
 				backupPath: '/home/user/.config/CodemerxDecompile/Backups/1daac1621c6c06f9e916ac8062e5a1b5',
+				/* End AGPL */
 				uiState: { mode: WindowMode.Normal, x: 625, y: 263, width: 1718, height: 953 },
 				folderUri: URI.parse('file:///home/user/workspaces/testing/folding')
 			}
 		};
 		assertEqualWindowsState(expected, windowsState, 'v1_32_folder');
 
+		/* AGPL */
 		const v1_32_empty_window = ` {
 			"openedWindows": [
 			],
@@ -276,12 +285,15 @@ suite('Windows State Storing', () => {
 				}
 			}
 		}`;
+		/* End AGPL */
 
 		windowsState = restoreWindowsState(JSON.parse(v1_32_empty_window));
 		expected = {
 			openedWindows: [],
 			lastActiveWindow: {
+				/* AGPL */
 				backupPath: '/home/user/.config/CodemerxDecompile/Backups/1549539668998',
+				/* End AGPL */
 				uiState: { mode: WindowMode.Normal, x: 768, y: 336, width: 1024, height: 768 }
 			}
 		};

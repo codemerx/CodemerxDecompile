@@ -71,7 +71,9 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 			this.updateContexts();
 			this._onDidChangeViewTypes.fire();
 		}));
+		/* AGPL */
 		this._register(this.editorService.registerCustomEditorViewTypesHandler('Custom Code Viewer', this));
+		/* End AGPL */
 		this._register(this.editorService.onDidActiveEditorChange(() => this.updateContexts()));
 
 		this._register(fileService.onDidRunOperation(e => {
@@ -80,6 +82,7 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 			}
 		}));
 
+		/* AGPL */
 		// const PRIORITY = 105;
 		// this._register(UndoCommand.addImplementation(PRIORITY, () => {
 		// 	return this.withActiveCustomEditor(editor => editor.undo());
@@ -87,6 +90,7 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 		// this._register(RedoCommand.addImplementation(PRIORITY, () => {
 		// 	return this.withActiveCustomEditor(editor => editor.redo());
 		// }));
+		/* End AGPL */
 		this.updateContexts();
 	}
 
@@ -94,6 +98,7 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 		return [...this._contributedEditors];
 	}
 
+	/* AGPL */
 	// private withActiveCustomEditor(f: (editor: CustomEditorInput) => void): boolean {
 	// 	const activeEditor = this.editorService.activeEditor;
 	// 	if (activeEditor instanceof CustomEditorInput) {
@@ -102,6 +107,7 @@ export class CustomEditorService extends Disposable implements ICustomEditorServ
 	// 	}
 	// 	return false;
 	// }
+	/* End AGPL */
 
 	public get models() { return this._models; }
 

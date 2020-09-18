@@ -3,7 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+ /* AGPL */
 import { MultiCommand, SelectAllCommand } from 'vs/editor/browser/editorExtensions';
+/* End AGPL */
 import { CopyAction, CutAction, PasteAction } from 'vs/editor/contrib/clipboard/clipboard';
 import { SyncActionDescriptor } from 'vs/platform/actions/common/actions';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
@@ -66,8 +68,10 @@ function overrideCommandForWebview(command: MultiCommand | undefined, f: (webvie
 	});
 }
 
+/* AGPL */
 // overrideCommandForWebview(UndoCommand, webview => webview.undo());
 // overrideCommandForWebview(RedoCommand, webview => webview.redo());
+/* End AGPL */
 overrideCommandForWebview(SelectAllCommand, webview => webview.selectAll());
 overrideCommandForWebview(CopyAction, webview => webview.copy());
 overrideCommandForWebview(PasteAction, webview => webview.paste());

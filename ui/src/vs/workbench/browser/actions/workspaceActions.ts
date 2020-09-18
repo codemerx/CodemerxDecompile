@@ -9,23 +9,29 @@ import { ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
 import { IWorkspaceContextService, WorkbenchState, IWorkspaceFolder } from 'vs/platform/workspace/common/workspace';
 import { IWorkspaceEditingService } from 'vs/workbench/services/workspaces/common/workspaceEditing';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
+/* AGPL */
 import { ICommandService } from 'vs/platform/commands/common/commands';
+/* End AGPL */
 import { ADD_ROOT_FOLDER_COMMAND_ID, ADD_ROOT_FOLDER_LABEL, PICK_WORKSPACE_FOLDER_COMMAND_ID } from 'vs/workbench/browser/actions/workspaceCommands';
 import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IHostService } from 'vs/workbench/services/host/browser/host';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
 import { IWorkspacesService, hasWorkspaceFileExtension } from 'vs/platform/workspaces/common/workspaces';
+/* AGPL */
 import { MenuRegistry, MenuId, SyncActionDescriptor } from 'vs/platform/actions/common/actions';
 import { WorkspaceFolderCountContext, WorkbenchStateContext } from 'vs/workbench/browser/contextkeys';
 import { Registry } from 'vs/platform/registry/common/platform';
 import { IWorkbenchActionRegistry, Extensions } from 'vs/workbench/common/actions';
 import { KeyChord, KeyMod, KeyCode } from 'vs/base/common/keyCodes';
+/* End AGPL */
 
 export class OpenFileAction extends Action {
 
 	static readonly ID = 'workbench.action.files.openFile';
-	static readonly LABEL = nls.localize('openFile', /* AGPL */"Open Assembly..."/* End AGPL */);
+	/* AGPL */
+	static readonly LABEL = nls.localize('openFile', "Open Assembly...");
+	/* End AGPL */
 
 	constructor(
 		id: string,
@@ -253,14 +259,19 @@ export class DuplicateWorkspaceInNewWindowAction extends Action {
 const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
 const workspacesCategory = nls.localize('workspaces', "Workspaces");
 
+/* AGPL */
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(AddRootFolderAction), 'Workspaces: Add Folder to Workspace...', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(GlobalRemoveRootFolderAction), 'Workspaces: Remove Folder from Workspace...', workspacesCategory);
+/* End AGPL */
 registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_F) }), 'Workspaces: Close Workspace', workspacesCategory);
+/* AGPL */
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(SaveWorkspaceAsAction), 'Workspaces: Save Workspace As...', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(DuplicateWorkspaceInNewWindowAction), 'Workspaces: Duplicate Workspace in New Window', workspacesCategory);
+/* End AGPL */
 
 // --- Menu Registration
 
+/* AGPL */
 // CommandsRegistry.registerCommand(OpenWorkspaceConfigFileAction.ID, serviceAccessor => {
 // 	serviceAccessor.get(IInstantiationService).createInstance(OpenWorkspaceConfigFileAction, OpenWorkspaceConfigFileAction.ID, OpenWorkspaceConfigFileAction.LABEL).run();
 // });
@@ -290,18 +301,22 @@ registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction,
 // 	},
 // 	when: WorkbenchStateContext.isEqualTo('workspace')
 // });
+/* End AGPL */
 
 MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 	group: '6_close',
 	command: {
 		id: CloseWorkspaceAction.ID,
-		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, /* AGPL */"Clear &&Assembly List"/* End AGPL */),
+		/* AGPL */
+		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Clear &&Assembly List"),
+		/* End AGPL */
 		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
 	},
 	order: 3,
 	when: WorkbenchStateContext.notEqualsTo('workspace')
 });
 
+/* AGPL */
 // MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 // 	group: '6_close',
 // 	command: {
@@ -311,3 +326,4 @@ MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 // 	order: 3,
 // 	when: ContextKeyExpr.and(WorkbenchStateContext.isEqualTo('workspace'))
 // });
+/* End AGPL */

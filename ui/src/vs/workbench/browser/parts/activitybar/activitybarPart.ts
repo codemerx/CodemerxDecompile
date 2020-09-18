@@ -499,6 +499,7 @@ export class ActivitybarPart extends Part implements IActivityBarService {
 			cssClass: Codicon.settingsGear.classNames
 		});
 
+		/* AGPL */
 		// this.accountsActivityAction = new ActivityAction({
 		// 	id: 'workbench.actions.accounts',
 		// 	name: nls.localize('accounts', "Accounts"),
@@ -506,6 +507,7 @@ export class ActivitybarPart extends Part implements IActivityBarService {
 		// });
 
 		// this.globalActivityActionBar.push(this.accountsActivityAction);
+		/* End AGPL */
 
 		this.globalActivityActionBar.push(this.globalActivityAction);
 	}

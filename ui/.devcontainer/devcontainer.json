@@ -1,5 +1,7 @@
 {
+	/* AGPL */
 	"name": "CodemerxDecompile",
+	/* End AGPL */
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {

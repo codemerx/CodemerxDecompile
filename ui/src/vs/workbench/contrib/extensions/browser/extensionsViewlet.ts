@@ -25,19 +25,27 @@ import {
 	EnableAutoUpdateAction, DisableAutoUpdateAction, ShowBuiltInExtensionsAction, InstallVSIXAction
 } from 'vs/workbench/contrib/extensions/browser/extensionsActions';
 import { IExtensionManagementService } from 'vs/platform/extensionManagement/common/extensionManagement';
+/* AGPL */
 import { IWorkbenchExtensionEnablementService } from 'vs/workbench/services/extensionManagement/common/extensionManagement';
+/* End AGPL */
 import { ExtensionsInput } from 'vs/workbench/contrib/extensions/common/extensionsInput';
+/* AGPL */
 import { ExtensionsListView } from 'vs/workbench/contrib/extensions/browser/extensionsViews';
+/* End AGPL */
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import Severity from 'vs/base/common/severity';
 import { IActivityService, NumberBadge } from 'vs/workbench/services/activity/common/activity';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
+/* AGPL */
 import { IViewDescriptorService, IAddedViewDescriptorRef } from 'vs/workbench/common/views';
+/* End AGPL */
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
+/* AGPL */
 import { IContextKeyService, RawContextKey, IContextKey } from 'vs/platform/contextkey/common/contextkey';
+/* End AGPL */
 import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
 import { getMaliciousExtensionsSet } from 'vs/platform/extensionManagement/common/extensionManagementUtil';
 import { ILogService } from 'vs/platform/log/common/log';
@@ -212,7 +220,9 @@ export class ExtensionsViewPaneContainer extends ViewPaneContainer implements IE
 
 		// Register DragAndDrop support
 		this._register(new DragAndDropObserver(this.root, {
+			/* AGPL */
 			onDragEnd: () => undefined,
+			/* End AGPL */
 			onDragEnter: (e: DragEvent) => {
 				if (this.isSupportedDragElement(e)) {
 					show(overlay);

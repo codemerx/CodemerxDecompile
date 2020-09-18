@@ -272,6 +272,7 @@ MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 	order: 1
 });
 
+/* AGPL */
 // MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
 // 	group: '3_snippets',
 // 	command: {
@@ -280,3 +281,4 @@ MenuRegistry.appendMenuItem(MenuId.MenubarPreferencesMenu, {
 // 	},
 // 	order: 1
 // });
+/* End AGPL */

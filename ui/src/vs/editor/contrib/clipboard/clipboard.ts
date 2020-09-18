@@ -19,14 +19,18 @@ import { EditorOption } from 'vs/editor/common/config/editorOptions';
 
 const CLIPBOARD_CONTEXT_MENU_GROUP = '9_cutcopypaste';
 
+/* AGPL */
 const supportsCut = false;// (platform.isNative || document.queryCommandSupported('cut'));
+/* End AGPL */
 const supportsCopy = (platform.isNative || document.queryCommandSupported('copy'));
 // IE and Edge have trouble with setting html content in clipboard
 const supportsCopyWithSyntaxHighlighting = (supportsCopy && !browser.isEdge);
 // Chrome incorrectly returns true for document.queryCommandSupported('paste')
 // when the paste feature is available but the calling script has insufficient
 // privileges to actually perform the action
+/* AGPL */
 const supportsPaste = false;// (platform.isNative || (!browser.isChrome && document.queryCommandSupported('paste')));
+/* End AGPL */
 
 function registerCommand<T extends Command>(command: T): T {
 	command.register();
@@ -192,9 +196,13 @@ function registerExecCommandImpl(target: MultiCommand | undefined, browserComman
 	});
 }
 
+/* AGPL */
 // registerExecCommandImpl(CutAction, 'cut');
+/* End AGPL */
 registerExecCommandImpl(CopyAction, 'copy');
+/* AGPL */
 // registerExecCommandImpl(PasteAction, 'paste');
+/* End AGPL */
 
 if (supportsCopyWithSyntaxHighlighting) {
 	registerEditorAction(ExecCommandCopyWithSyntaxHighlightingAction);

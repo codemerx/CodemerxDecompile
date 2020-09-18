@@ -14,7 +14,9 @@ import { IEditorGroupsService, IEditorGroup, GroupChangeKind, GroupsOrder } from
 import { IConfigurationService, IConfigurationChangeEvent } from 'vs/platform/configuration/common/configuration';
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
 import { IEditorInput, Verbosity, toResource, SideBySideEditor } from 'vs/workbench/common/editor';
+/* AGPL */
 import { SaveAllInGroupAction, CloseGroupAction } from 'vs/workbench/contrib/files/browser/fileActions';
+/* End AGPL */
 import { OpenEditorsFocusedContext, ExplorerFocusedContext, IFilesConfiguration, OpenEditor } from 'vs/workbench/contrib/files/common/files';
 import { CloseAllEditorsAction, CloseEditorAction } from 'vs/workbench/browser/parts/editor/editorActions';
 import { ToggleEditorLayoutAction } from 'vs/workbench/browser/actions/layoutActions';
@@ -55,7 +57,9 @@ export class OpenEditorsView extends ViewPane {
 
 	private static readonly DEFAULT_VISIBLE_OPEN_EDITORS = 9;
 	static readonly ID = 'workbench.explorer.openEditorsView';
+	/* AGPL */
 	static readonly NAME = nls.localize({ key: 'openTypes', comment: ['Open is an adjective'] }, "Open Types");
+	/* End AGPL */
 
 	private dirtyCountElement!: HTMLElement;
 	private listRefreshScheduler: RunOnceScheduler;
@@ -305,7 +309,9 @@ export class OpenEditorsView extends ViewPane {
 	getActions(): IAction[] {
 		return [
 			this.instantiationService.createInstance(ToggleEditorLayoutAction, ToggleEditorLayoutAction.ID, ToggleEditorLayoutAction.LABEL),
+			/* AGPL */
 			// this.instantiationService.createInstance(SaveAllAction, SaveAllAction.ID, SaveAllAction.LABEL),
+			/* End AGPL */
 			this.instantiationService.createInstance(CloseAllEditorsAction, CloseAllEditorsAction.ID, CloseAllEditorsAction.LABEL)
 		];
 	}
@@ -697,7 +703,9 @@ class OpenEditorsDragAndDrop implements IListDragAndDrop<OpenEditor | IEditorGro
 class OpenEditorsAccessibilityProvider implements IListAccessibilityProvider<OpenEditor | IEditorGroup> {
 
 	getWidgetAriaLabel(): string {
+		/* AGPL */
 		return nls.localize('openTypes', "Open Types");
+		/* End AGPL */
 	}
 
 	getAriaLabel(element: OpenEditor | IEditorGroup): string | null {

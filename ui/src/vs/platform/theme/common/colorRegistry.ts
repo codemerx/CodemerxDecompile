@@ -311,8 +311,10 @@ export const editorFindRangeHighlightBorder = registerColor('editor.findRangeHig
  *
  * Distinct from normal editor find match to allow for better differentiation
  */
+/* AGPL */
 export const searchEditorFindMatch = registerColor('searchEditor.findMatchBackground', { light: transparent(editorFindMatchHighlight, 0.66), dark: transparent(editorFindMatchHighlight, 0.66), hc: editorFindMatchHighlight }, nls.localize('searchEditor.queryMatch', "Color of the Search Code Viewer query matches."));
 export const searchEditorFindMatchBorder = registerColor('searchEditor.findMatchBorder', { light: transparent(editorFindMatchHighlightBorder, 0.66), dark: transparent(editorFindMatchHighlightBorder, 0.66), hc: editorFindMatchHighlightBorder }, nls.localize('searchEditor.editorFindMatchBorder', "Border color of the Search Code Viewer query matches."));
+/* End AGPL */
 
 /**
  * Editor hover

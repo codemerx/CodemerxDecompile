@@ -107,6 +107,8 @@
       <Link>ProjectInfo.cs</Link>
     </Compile>
   </ItemGroup>
+  <!-- AGPL -->
   <Import Project="..\..\..\Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems" Label="Shared" />
+  <!-- End AGPL -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

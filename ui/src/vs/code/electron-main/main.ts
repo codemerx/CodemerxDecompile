@@ -50,7 +50,9 @@ import { IStorageKeysSyncRegistryService, StorageKeysSyncRegistryService } from 
 import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IProductService } from 'vs/platform/product/common/productService';
+/* AGPL */
 import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
+/* End AGPL */
 
 class ExpectedError extends Error {
 	readonly isExpected = true;
@@ -109,10 +111,14 @@ class CodeMain {
 			await instantiationService.invokeFunction(async accessor => {
 				const configurationService = accessor.get(IConfigurationService);
 				const stateService = accessor.get(IStateService);
+				/* AGPL */
 				const grpcService = accessor.get(IGrpcMainService);
+				/* End AGPL */
 
 				try {
+					/* AGPL */
 					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService, grpcService as GrpcMainService);
+					/* End AGPL */
 				} catch (error) {
 
 					// Show a dialog for errors that can be resolved by the user
@@ -170,12 +176,16 @@ class CodeMain {
 		services.set(IProductService, { _serviceBrand: undefined, ...product });
 		services.set(ITunnelService, new SyncDescriptor(TunnelService));
 
+		/* AGPL */
 		services.set(IGrpcMainService, new GrpcMainService());
+		/* End AGPL */
 
 		return [new InstantiationService(services, true), instanceEnvironment, environmentService];
 	}
 
+	/* AGPL */
 	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService, grpcService: GrpcMainService): Promise<unknown> {
+	/* End AGPL */
 
 		// Environment service (paths)
 		const environmentServiceInitialization = Promise.all<void | undefined>([
@@ -193,10 +203,12 @@ class CodeMain {
 		// State service
 		const stateServiceInitialization = stateService.init();
 
+		/* AGPL */
 		// GRPC service
 		const grpcServiceInitialization = grpcService.initialize();
 
 		return Promise.all([environmentServiceInitialization, configurationServiceInitialization, stateServiceInitialization, grpcServiceInitialization]);
+		/* End AGPL */
 	}
 
 	private patchEnvironment(environmentService: INativeEnvironmentService): IProcessEnvironment {

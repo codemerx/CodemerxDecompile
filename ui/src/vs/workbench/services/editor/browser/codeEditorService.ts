@@ -44,7 +44,9 @@ export class CodeEditorService extends CodeEditorServiceImpl {
 		return null;
 	}
 
-	async openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: ReferenceMetadata/* End AGPL */): Promise<ICodeEditor | null> {
+	/* AGPL */
+	async openCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, navigationData?: ReferenceMetadata): Promise<ICodeEditor | null> {
+	/* End AGPL */
 
 		// Special case: If the active editor is a diff editor and the request to open originates and
 		// targets the modified side of it, we just apply the request there to prevent opening the modified
@@ -68,11 +70,15 @@ export class CodeEditorService extends CodeEditorServiceImpl {
 		}
 
 		// Open using our normal editor service
-		return this.doOpenCodeEditor(input, source, sideBySide, /* AGPL */navigationData/* End AGPL */);
+		/* AGPL */
+		return this.doOpenCodeEditor(input, source, sideBySide, navigationData);
+		/* End AGPL */
 	}
 
-	private async doOpenCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, /* AGPL */navigationData?: ReferenceMetadata/* End AGPL */): Promise<ICodeEditor | null> {
-		const control = await this.editorService.openEditor(input, sideBySide ? SIDE_GROUP : ACTIVE_GROUP, /* AGPL */navigationData/* End AGPL */);
+	/* AGPL */
+	private async doOpenCodeEditor(input: IResourceEditorInput, source: ICodeEditor | null, sideBySide?: boolean, navigationData?: ReferenceMetadata): Promise<ICodeEditor | null> {
+		const control = await this.editorService.openEditor(input, sideBySide ? SIDE_GROUP : ACTIVE_GROUP, navigationData);
+	/* End AGPL */
 		if (control) {
 			const widget = control.getControl();
 			if (isCodeEditor(widget)) {

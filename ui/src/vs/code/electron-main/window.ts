@@ -177,9 +177,13 @@ export class CodeWindow extends Disposable implements ICodeWindow {
 			// Linux: always
 			// Windows: only when running out of sources, otherwise an icon is set by us on the executable
 			if (isLinux) {
+				/* AGPL */
 				options.icon = path.join(this.environmentService.appRoot, 'resources/linux/codemerx-logo-512x512.png');
+				/* End AGPL */
 			} else if (isWindows && !this.environmentService.isBuilt) {
+				/* AGPL */
 				options.icon = path.join(this.environmentService.appRoot, 'resources/win32/codemerx-logo-150x150.png');
+				/* End AGPL */
 			}
 
 			const windowConfig = this.configurationService.getValue<IWindowSettings>('window');

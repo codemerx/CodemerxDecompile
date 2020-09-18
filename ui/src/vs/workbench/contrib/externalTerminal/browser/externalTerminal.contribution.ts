@@ -21,7 +21,9 @@ import { IRemoteAgentService } from 'vs/workbench/services/remote/common/remoteA
 import { optional } from 'vs/platform/instantiation/common/instantiation';
 import { IExplorerService } from 'vs/workbench/contrib/files/common/files';
 import { ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
+/* AGPL */
 import { IWorkbenchContribution } from 'vs/workbench/common/contributions';
+/* End AGPL */
 import { Disposable } from 'vs/base/common/lifecycle';
 import { isWeb, isWindows } from 'vs/base/common/platform';
 import { dirname, basename } from 'vs/base/common/path';
@@ -133,4 +135,6 @@ export class ExternalTerminalContribution extends Disposable implements IWorkben
 	}
 }
 
+/* AGPL */
 // Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).registerWorkbenchContribution(ExternalTerminalContribution, LifecyclePhase.Restored);
+/* End AGPL */

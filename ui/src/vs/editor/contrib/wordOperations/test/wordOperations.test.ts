@@ -11,8 +11,10 @@ import { Selection } from 'vs/editor/common/core/selection';
 import { deserializePipePositions, serializePipePositions, testRepeatedActionAndExtractPositions } from 'vs/editor/contrib/wordOperations/test/wordTestUtils';
 import { CursorWordEndLeft, CursorWordEndLeftSelect, CursorWordEndRight, CursorWordEndRightSelect, CursorWordLeft, CursorWordLeftSelect, CursorWordRight, CursorWordRightSelect, CursorWordStartLeft, CursorWordStartLeftSelect, CursorWordStartRight, CursorWordStartRightSelect, DeleteWordEndLeft, DeleteWordEndRight, DeleteWordLeft, DeleteWordRight, DeleteWordStartLeft, DeleteWordStartRight, CursorWordAccessibilityLeft, CursorWordAccessibilityLeftSelect, CursorWordAccessibilityRight, CursorWordAccessibilityRightSelect } from 'vs/editor/contrib/wordOperations/wordOperations';
 import { withTestCodeEditor } from 'vs/editor/test/browser/testCodeEditor';
+/* AGPL */
 // import { CoreEditingCommands } from 'vs/editor/browser/controller/coreCommands';
 // import { ViewModel } from 'vs/editor/common/viewModel/viewModelImpl';
+/* End AGPL */
 
 suite('WordOperations', () => {
 
@@ -195,6 +197,7 @@ suite('WordOperations', () => {
 		assert.deepEqual(actual, EXPECTED);
 	});
 
+	/* AGPL */
 	// test('issue #51275 - cursorWordStartLeft does not push undo/redo stack element', () => {
 	// 	function type(viewModel: ViewModel, text: string) {
 	// 		for (let i = 0; i < text.length; i++) {
@@ -216,6 +219,7 @@ suite('WordOperations', () => {
 	// 		assert.equal(editor.getValue(), 'foo bar baz');
 	// 	});
 	// });
+	/* End AGPL */
 
 	test('cursorWordEndLeft', () => {
 		const EXPECTED = ['|   /*| Just| some|   more|   text| a|+=| 3| +|5|-|3| +| 7| */|  '].join('\n');

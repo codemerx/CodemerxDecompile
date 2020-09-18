@@ -258,11 +258,15 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 				'resources/win32/vue.ico',
 				'resources/win32/xml.ico',
 				'resources/win32/yaml.ico',
+				/* AGPL */
 				'resources/win32/codemerx-logo-70x70.png',
 				'resources/win32/codemerx-logo-150x150.png'
+				/* End AGPL */
 			], { base: '.' }));
 		} else if (platform === 'linux') {
+			/* AGPL */
 			all = es.merge(all, gulp.src('resources/linux/codemerx-logo-512x512.png', { base: '.' }));
+			/* End AGPL */
 		} else if (platform === 'darwin') {
 			const shortcut = gulp.src('resources/darwin/bin/code.sh')
 				.pipe(rename('bin/code'));

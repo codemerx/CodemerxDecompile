@@ -179,6 +179,7 @@ export class Menubar {
 		return enableMenuBarMnemonics;
 	}
 
+	/* AGPL */
 	// private get currentEnableNativeTabs(): boolean {
 	// 	if (!isMacintosh) {
 	// 		return false;
@@ -190,6 +191,7 @@ export class Menubar {
 	// 	}
 	// 	return enableNativeTabs;
 	// }
+	/* End AGPL */
 
 	updateMenu(menubarData: IMenubarData, windowId: number) {
 		this.menubarMenus = menubarData.menus;
@@ -285,7 +287,8 @@ export class Menubar {
 		this.setMenuById(editMenu, 'Edit');
 		menubar.append(editMenuItem);
 
-		// Selection
+		/* AGPL */
+		// // Selection
 		// const selectionMenu = new Menu();
 		// const selectionMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mSelection', comment: ['&& denotes a mnemonic'] }, "&&Selection")), submenu: selectionMenu });
 
@@ -338,6 +341,7 @@ export class Menubar {
 
 		// this.setMenuById(helpMenu, 'Help');
 		// menubar.append(helpMenuItem);
+		/* End AGPL */
 
 		if (menubar.items && menubar.items.length > 0) {
 			Menu.setApplicationMenu(menubar);
@@ -503,6 +507,7 @@ export class Menubar {
 		return !!(event && ((!isMacintosh && (event.ctrlKey || event.shiftKey)) || (isMacintosh && (event.metaKey || event.altKey))));
 	}
 
+	/* AGPL */
 	// private createRoleMenuItem(label: string, commandId: string, role: any): MenuItem {
 	// 	const options: MenuItemConstructorOptions = {
 	// 		label: this.mnemonicLabel(label),
@@ -541,6 +546,7 @@ export class Menubar {
 	// 		bringAllToFront
 	// 	].forEach(item => macWindowMenu.append(item));
 	// }
+	/* End AGPL */
 
 	private getUpdateMenuItems(): MenuItem[] {
 		const state = this.updateService.state;

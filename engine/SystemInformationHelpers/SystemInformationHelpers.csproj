@@ -117,6 +117,8 @@
       <Link>Properties\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+  <!-- AGPL -->
   <Import Project="..\SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems" Label="Shared" />
+  <!-- End AGPL -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

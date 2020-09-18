@@ -13,7 +13,9 @@ import * as modes from 'vs/editor/common/modes';
 import { OnTypeRenameContribution } from 'vs/editor/contrib/rename/onTypeRename';
 import { createTestCodeEditor, ITestCodeEditor } from 'vs/editor/test/browser/testCodeEditor';
 import { createTextModel } from 'vs/editor/test/common/editorTestUtils';
+/* AGPL */
 // import { CoreEditingCommands } from 'vs/editor/browser/controller/coreCommands';
+/* End AGPL */
 
 const mockFile = URI.parse('test:somefile.ttt');
 const mockFileSelector = { scheme: 'test' };
@@ -244,6 +246,7 @@ suite('On type rename', () => {
 		editor.trigger('keyboard', Handler.Type, { text: ' ' });
 	}, '<ooo ></ooo>');
 
+	/* AGPL */
 	// testCase('Breakout - type space then undo', state, async (editor, ontypeRenameContribution) => {
 	// 	const pos = new Position(1, 5);
 	// 	editor.setPosition(pos);
@@ -251,6 +254,7 @@ suite('On type rename', () => {
 	// 	editor.trigger('keyboard', Handler.Type, { text: ' ' });
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// }, '<ooo></ooo>');
+	/* End AGPL */
 
 	testCase('Breakout - type space in middle', state, async (editor, ontypeRenameContribution) => {
 		const pos = new Position(1, 4);
@@ -266,6 +270,7 @@ suite('On type rename', () => {
 		editor.trigger('keyboard', Handler.Paste, { text: ' i="i"' });
 	}, '<ooo i="i"></ooo>');
 
+	/* AGPL */
 	// testCase('Breakout - paste content starting with space then undo', state, async (editor, ontypeRenameContribution) => {
 	// 	const pos = new Position(1, 5);
 	// 	editor.setPosition(pos);
@@ -273,6 +278,7 @@ suite('On type rename', () => {
 	// 	editor.trigger('keyboard', Handler.Paste, { text: ' i="i"' });
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// }, '<ooo></ooo>');
+	/* End AGPL */
 
 	testCase('Breakout - paste content starting with space in middle', state, async (editor, ontypeRenameContribution) => {
 		const pos = new Position(1, 4);
@@ -335,6 +341,7 @@ suite('On type rename', () => {
 		editor.trigger('keyboard', 'deleteLeft', {});
 	}, '<oo></oo>');
 
+	/* AGPL */
 	// testCase('Delete - left char then undo', state, async (editor, ontypeRenameContribution) => {
 	// 	const pos = new Position(1, 5);
 	// 	editor.setPosition(pos);
@@ -342,6 +349,7 @@ suite('On type rename', () => {
 	// 	editor.trigger('keyboard', 'deleteLeft', {});
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// }, '<ooo></ooo>');
+	/* End AGPL */
 
 	testCase('Delete - left word', state, async (editor, ontypeRenameContribution) => {
 		const pos = new Position(1, 5);
@@ -350,6 +358,7 @@ suite('On type rename', () => {
 		editor.trigger('keyboard', 'deleteWordLeft', {});
 	}, '<></>');
 
+	/* AGPL */
 	// testCase('Delete - left word then undo', state, async (editor, ontypeRenameContribution) => {
 	// 	const pos = new Position(1, 5);
 	// 	editor.setPosition(pos);
@@ -357,6 +366,7 @@ suite('On type rename', () => {
 	// 	editor.trigger('keyboard', 'deleteWordLeft', {});
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// }, '<ooo></ooo>');
+	/* End AGPL */
 
 	/**
 	 * Todo: Fix test
@@ -379,6 +389,7 @@ suite('On type rename', () => {
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// }, '></ooo>');
 
+	/* AGPL */
 	// testCase('Delete - left all then undo twice', state, async (editor, ontypeRenameContribution) => {
 	// 	const pos = new Position(1, 5);
 	// 	editor.setPosition(pos);
@@ -387,6 +398,7 @@ suite('On type rename', () => {
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// }, '<ooo></ooo>');
+	/* End AGPL */
 
 	testCase('Delete - selection', state, async (editor, ontypeRenameContribution) => {
 		const pos = new Position(1, 5);
@@ -407,6 +419,7 @@ suite('On type rename', () => {
 	/**
 	 * Undo / redo
 	 */
+	/* AGPL */
 	// testCase('Undo/redo - simple undo', state, async (editor, ontypeRenameContribution) => {
 	// 	const pos = new Position(1, 2);
 	// 	editor.setPosition(pos);
@@ -424,6 +437,7 @@ suite('On type rename', () => {
 	// 	CoreEditingCommands.Undo.runEditorCommand(null, editor, null);
 	// 	CoreEditingCommands.Redo.runEditorCommand(null, editor, null);
 	// }, '<iooo></iooo>');
+	/* End AGPL */
 
 	/**
 	 * Multi line

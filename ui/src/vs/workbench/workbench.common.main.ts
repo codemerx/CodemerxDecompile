@@ -257,7 +257,9 @@ import 'vs/workbench/contrib/welcome/page/browser/welcomePage.contribution';
 import 'vs/workbench/contrib/welcome/walkThrough/browser/walkThrough.contribution';
 
 // Call Hierarchy
+/* AGPL */
 // import 'vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution';
+/* End AGPL */
 
 // Outline
 import 'vs/workbench/contrib/outline/browser/outline.contribution';

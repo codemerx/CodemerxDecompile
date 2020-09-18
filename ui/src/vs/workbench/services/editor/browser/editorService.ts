@@ -40,8 +40,8 @@ import { IWorkingCopyService } from 'vs/workbench/services/workingCopy/common/wo
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
 import { IModelService } from 'vs/editor/common/services/modelService';
 /* AGPL */
-import { VSBuffer } from 'vs/base/common/buffer';
 import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
+import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
 type CachedEditorInput = ResourceEditorInput | IFileEditorInput | UntitledTextEditorInput;
 type OpenInEditorGroup = IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE;
@@ -82,6 +82,7 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 		@IWorkingCopyService private readonly workingCopyService: IWorkingCopyService,
 		@IUriIdentityService private readonly uriIdentityService: IUriIdentityService,
 		/* AGPL */
+		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper,
 		@IDecompilationService private readonly decompilationService: IDecompilationService
 		/* End AGPL */
 	) {
@@ -534,13 +535,7 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
-			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
-			const str = fileContent.value.toString();
-
-			if (str === 'CodemerxDecompile') {
-				const sourceCode = await this.decompilationService.decompileType(resourceEditorInput.resource.fsPath);
-				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
-			}
+			await this.decompilationHelper.ensureTypeIsDecompiled(resourceEditorInput.resource);
 
 			const referenceMetadata = (groupOrReferenceMetadata as ReferenceMetadata);
 
@@ -1316,8 +1311,8 @@ export class DelegatingEditorService implements IEditorService {
 		private editorOpenHandler: IEditorOpenHandler,
 		/* AGPL */
 		@IEditorService private editorService: EditorService,
-		@IFileService private fileService: IFileService,
-		@IDecompilationService private decompilationService: IDecompilationService
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper
 		/* End AGPL */
 	) { }
 
@@ -1330,13 +1325,7 @@ export class DelegatingEditorService implements IEditorService {
 	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
-			const fileContent = await this.fileService.readFile(resourceEditorInput.resource);
-			const str = fileContent.value.toString();
-
-			if (str === 'CodemerxDecompile') {
-				const sourceCode = await this.decompilationService.decompileType(resourceEditorInput.resource.fsPath);
-				await this.fileService.writeFile(resourceEditorInput.resource, VSBuffer.fromString(sourceCode));
-			}
+			await this.decompilationHelper.ensureTypeIsDecompiled(resourceEditorInput.resource);
 
 			const referenceMetadata = (groupOrReferenceMetadata as ReferenceMetadata);
 

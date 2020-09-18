@@ -316,7 +316,7 @@ namespace CodemerxDecompile.Service
 
             bool isWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
 
-            if (isWindows && Path.IsPathFullyQualified(filePath))
+            if (SystemInformation.IsWindows && Path.IsPathFullyQualified(filePath))
             {
                 return char.ToUpper(filePath[0]) + filePath.Substring(1);
             }

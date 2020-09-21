@@ -76,6 +76,8 @@ export class DecompilationHelper implements IDecompilationHelper {
 
 		if (str === CODEMERX_FILE_IDENTIFICATOR) {
 			await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+				progress.report({ message: 'Loading type...'});
+
 				const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
 				await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
 			});

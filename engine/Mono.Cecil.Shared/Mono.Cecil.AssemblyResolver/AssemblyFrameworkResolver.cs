@@ -303,7 +303,9 @@ namespace Mono.Cecil.AssemblyResolver
                 {
                     moduleLocation = moduleLocation.ToLowerInvariant();
 
-                    string[] modulePath = moduleLocation.Split('\\');
+                    /* AGPL */
+                    string[] modulePath = moduleLocation.Split(Path.DirectorySeparatorChar);
+                    /* End AGPL */
 
                     if (SystemInformation.IsInNetCoreSharedAssembliesDir(moduleLocation))
                     {

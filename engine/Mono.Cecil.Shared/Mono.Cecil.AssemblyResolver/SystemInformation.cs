@@ -180,11 +180,11 @@ namespace Mono.Cecil.AssemblyResolver
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                directories.Add(Path.Combine("usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine("/", "usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                directories.Add(Path.Combine("usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine("/", "usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
 
             return directories;

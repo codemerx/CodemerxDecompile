@@ -513,13 +513,20 @@ export class ProgressService extends Disposable implements IProgressService {
 		const createDialog = (message: string) => {
 
 			const buttons = options.buttons || [];
-			buttons.push(options.cancellable ? localize('cancel', "Cancel") : localize('dismiss', "Dismiss"));
+			/* AGPL */
+			if (!options.nonClosable) {
+				buttons.push(options.cancellable ? localize('cancel', "Cancel") : localize('dismiss', "Dismiss"));
+			}
+			/* End AGPL */
 
 			dialog = new Dialog(
 				this.layoutService.container,
 				message,
 				buttons,
 				{
+					/* AGPL */
+					nonClosable: options.nonClosable,
+					/* End AGPL */
 					type: 'pending',
 					cancelId: buttons.length - 1,
 					keyEventProcessor: (event: StandardKeyboardEvent) => {
@@ -555,13 +562,24 @@ export class ProgressService extends Disposable implements IProgressService {
 			}
 		};
 
+		/* AGPL */
+		let delayHandle: any = undefined;
+		/* End AGPL */
 		const promise = task({
 			report: progress => {
-				updateDialog(progress.message);
+				/* AGPL */
+				delayHandle = setTimeout(() => {
+					delayHandle = undefined;
+					updateDialog(progress.message);
+				}, 500);
+				/* End AGPL */
 			}
 		});
 
 		promise.finally(() => {
+			/* AGPL */
+			clearTimeout(delayHandle);
+			/* End AGPL */
 			dispose(disposables);
 		});
 

@@ -19,6 +19,7 @@ import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { URI, UriComponents } from 'vs/base/common/uri';
 import { IFileService } from 'vs/platform/files/common/files';
 import { VSBuffer } from 'vs/base/common/buffer';
+import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 
 const CODEMERX_FILE_IDENTIFICATOR = 'CodemerxDecompile';
 
@@ -35,7 +36,8 @@ export class DecompilationHelper implements IDecompilationHelper {
 	readonly _serviceBrand: undefined;
 
 	constructor(@IFileService private readonly fileService: IFileService,
-				@IDecompilationService private readonly decompilationService: IDecompilationService) {}
+				@IDecompilationService private readonly decompilationService: IDecompilationService,
+				@IProgressService private readonly progressService: IProgressService) {}
 
 	async createAssemblyFileHierarchy(assemblyPath: URI | UriComponents) : Promise<{ hierarchyDirectory: string } | null> {
 		try {
@@ -73,8 +75,12 @@ export class DecompilationHelper implements IDecompilationHelper {
 		const str = fileContent.value.toString();
 
 		if (str === CODEMERX_FILE_IDENTIFICATOR) {
-			const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
-			await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
+			await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+				progress.report({ message: 'Loading type...'});
+
+				const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
+				await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
+			});
 		}
 	}
 }

@@ -158,7 +158,7 @@ namespace CodemerxDecompile.Service
             if (isCrossAssemblyReference)
             {
                 TypeDefinition resolvedTypeDefinition = typeReference.Resolve();
-                string referencedAssemblyStrongName = ((AssemblyNameReference)typeReference.Scope).FullName;
+                string referencedAssemblyStrongName = resolvedTypeDefinition == null ? ((AssemblyNameReference)typeReference.Scope).FullName : resolvedTypeDefinition.Module.Assembly.FullName;
                 response.ReferencedAssemblyFullName = referencedAssemblyStrongName;
                 typeReference = resolvedTypeDefinition ?? throw new RpcException(new Status(StatusCode.NotFound, "Could not resolve type assembly"), new Metadata
                     {

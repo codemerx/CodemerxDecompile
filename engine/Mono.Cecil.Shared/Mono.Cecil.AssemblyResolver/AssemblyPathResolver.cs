@@ -236,9 +236,9 @@ namespace Mono.Cecil.AssemblyResolver
 			foreach (string ver in assemblyName.SupportedVersions(TargetPlatform.NetCore))
 			{
                 foreach (string dirVersions in SystemInformation.GetNetCoreSharedAssemblyDirectories(ver))
-				/* End AGPL */
 				{
-					string searchPattern = string.Format("{0}\\{1}.dll", dirVersions, assemblyName.Name);
+					string searchPattern = Path.Combine(dirVersions, $"{assemblyName.Name}.dll");
+			/* End AGPL */
 					if (CheckFileExistence(assemblyName, searchPattern, true, true))
 					{
 						yield return searchPattern;

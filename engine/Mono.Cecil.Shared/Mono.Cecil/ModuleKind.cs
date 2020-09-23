@@ -20,18 +20,14 @@ namespace Mono.Cecil {
 	}
 
 	public enum TargetArchitecture {
-		/* AGPL */
 		// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
 		I386 = 0x014c,
 		AMD64 = 0x8664,
 		IA64 = 0x0200,
-		/* End AGPL */
 		AnyCPU, /*Telerik Authorship*/
-		/* AGPL */
 		ARM = 0x01c0,
 		ARMv7 = 0x01c4,
 		ARM64 = 0xaa64
-		/* End AGPL */
 	}
 
 	[Flags]

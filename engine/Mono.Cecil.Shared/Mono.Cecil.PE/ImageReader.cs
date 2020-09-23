@@ -95,10 +95,8 @@ namespace Mono.Cecil.PE {
 
 		TargetArchitecture ReadArchitecture ()
 		{
-			/* AGPL */
 			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
 			return (TargetArchitecture)ReadUInt16 ();
-			/* End AGPL */
 		}
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)

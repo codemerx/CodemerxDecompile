@@ -167,7 +167,7 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 			if (stackVariable17 == null)
 			{
 				dummyVar0 = stackVariable17;
-				stackVariable17 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cExpandViewu003eb__74_0);
+				stackVariable17 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cu003e9.u003cExpandViewu003eb__74_0);
 				Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cu003e9__74_0 = stackVariable17;
 			}
 			stackVariable16.ForEach(stackVariable17);
@@ -187,7 +187,7 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 			if (stackVariable17 == null)
 			{
 				dummyVar0 = stackVariable17;
-				stackVariable17 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cExpandViewAsyncu003eb__70_0);
+				stackVariable17 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cu003e9.u003cExpandViewAsyncu003eb__70_0);
 				Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cu003ec.u003cu003e9__70_0 = stackVariable17;
 			}
 			stackVariable16.ForEach(stackVariable17);
@@ -282,7 +282,7 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 
 		public override RepositoryResponse<bool> RemoveRelatedModels(Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = Enumerable.Where<SupportedCulture>(this.get_Cultures(), new Func<SupportedCulture, bool>(this, Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cRemoveRelatedModelsu003eb__75_0)).GetEnumerator();
+			V_0 = this.get_Cultures().Where<SupportedCulture>(new Func<SupportedCulture, bool>(this.u003cRemoveRelatedModelsu003eb__75_0)).GetEnumerator();
 			try
 			{
 				while (V_0.MoveNext())

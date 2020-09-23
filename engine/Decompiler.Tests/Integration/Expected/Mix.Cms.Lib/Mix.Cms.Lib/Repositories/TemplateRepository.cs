@@ -69,7 +69,7 @@ namespace Mix.Cms.Lib.Repositories
 		{
 			V_0 = new TemplateRepository.u003cu003ec__DisplayClass5_0();
 			V_0.templatePath = templatePath;
-			stackVariable7 = templates.Find(new Predicate<TemplateViewModel>(V_0, TemplateRepository.u003cu003ec__DisplayClass5_0.u003cGetTemplateu003eb__0));
+			stackVariable7 = templates.Find(new Predicate<TemplateViewModel>(V_0.u003cGetTemplateu003eb__0));
 			if (stackVariable7 == null)
 			{
 				dummyVar0 = stackVariable7;
@@ -81,7 +81,7 @@ namespace Mix.Cms.Lib.Repositories
 
 		public TemplateViewModel GetTemplate(string name, string templateFolder)
 		{
-			V_0 = Enumerable.FirstOrDefault<FileInfo>((new DirectoryInfo(templateFolder)).GetFiles(name));
+			V_0 = (new DirectoryInfo(templateFolder)).GetFiles(name).FirstOrDefault<FileInfo>();
 			V_1 = null;
 			if (V_0 != null)
 			{
@@ -99,7 +99,7 @@ namespace Mix.Cms.Lib.Repositories
 				{
 					if (V_2 != null)
 					{
-						V_2.Dispose();
+						((IDisposable)V_2).Dispose();
 					}
 				}
 			}
@@ -140,7 +140,7 @@ namespace Mix.Cms.Lib.Repositories
 				{
 					if (V_4 != null)
 					{
-						V_4.Dispose();
+						((IDisposable)V_4).Dispose();
 					}
 				}
 				V_2 = V_2 + 1;
@@ -175,7 +175,7 @@ namespace Mix.Cms.Lib.Repositories
 					{
 						if (V_0 != null)
 						{
-							V_0.Dispose();
+							((IDisposable)V_0).Dispose();
 						}
 					}
 				}

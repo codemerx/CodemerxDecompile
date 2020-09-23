@@ -24,7 +24,7 @@ namespace OrchardCore.Environment.Shell
 		{
 			stackVariable1 = new ShellSettings[1];
 			stackVariable1[0] = this.CreateDefaultSettings();
-			return Task.FromResult<IEnumerable<ShellSettings>>(Enumerable.AsEnumerable<ShellSettings>(stackVariable1));
+			return Task.FromResult<IEnumerable<ShellSettings>>(stackVariable1.AsEnumerable<ShellSettings>());
 		}
 
 		public Task<ShellSettings> LoadSettingsAsync(string tenant)

@@ -36,8 +36,8 @@ namespace OrchardCore.Modules
 			V_0 = new ApplicationBuilder(ShellScope.get_Context().get_ServiceProvider(), this._features);
 			stackVariable7 = ServiceProviderServiceExtensions.GetService<IEnumerable<IStartupFilter>>(V_0.get_ApplicationServices());
 			V_1 = new ShellRequestPipeline();
-			V_2 = new Action<IApplicationBuilder>(this, ModularTenantRouterMiddleware.u003cBuildTenantPipelineu003eb__6_0);
-			V_3 = Enumerable.Reverse<IStartupFilter>(stackVariable7).GetEnumerator();
+			V_2 = new Action<IApplicationBuilder>(this.u003cBuildTenantPipelineu003eb__6_0);
+			V_3 = stackVariable7.Reverse<IStartupFilter>().GetEnumerator();
 			try
 			{
 				while (V_3.MoveNext())
@@ -68,11 +68,11 @@ namespace OrchardCore.Modules
 			if (stackVariable11 == null)
 			{
 				dummyVar0 = stackVariable11;
-				stackVariable11 = new Func<IStartup, int>(ModularTenantRouterMiddleware.u003cu003ec.u003cu003e9, ModularTenantRouterMiddleware.u003cu003ec.u003cConfigureTenantPipelineu003eb__7_0);
+				stackVariable11 = new Func<IStartup, int>(ModularTenantRouterMiddleware.u003cu003ec.u003cu003e9.u003cConfigureTenantPipelineu003eb__7_0);
 				ModularTenantRouterMiddleware.u003cu003ec.u003cu003e9__7_0 = stackVariable11;
 			}
-			stackVariable8.startups = Enumerable.OrderBy<IStartup, int>(stackVariable10, stackVariable11);
-			dummyVar1 = EndpointRoutingApplicationBuilderExtensions.UseEndpoints(EndpointRoutingApplicationBuilderExtensions.UseRouting(V_0.appBuilder), new Action<IEndpointRouteBuilder>(V_0, ModularTenantRouterMiddleware.u003cu003ec__DisplayClass7_0.u003cConfigureTenantPipelineu003eb__1));
+			stackVariable8.startups = stackVariable10.OrderBy<IStartup, int>(stackVariable11);
+			dummyVar1 = EndpointRoutingApplicationBuilderExtensions.UseEndpoints(EndpointRoutingApplicationBuilderExtensions.UseRouting(V_0.appBuilder), new Action<IEndpointRouteBuilder>(V_0.u003cConfigureTenantPipelineu003eb__1));
 			return;
 		}
 

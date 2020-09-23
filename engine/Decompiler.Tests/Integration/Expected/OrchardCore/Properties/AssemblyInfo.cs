@@ -8,5 +8,5 @@ using System.Runtime.Versioning;
 [assembly: AssemblyTitle("OrchardCore")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: CompilationRelaxations(8)]
-[assembly: Debuggable(,)]    // JustDecompile was unable to locate the assembly where attribute parameters types are defined. Generating parameters values is impossible.
+[assembly: Debuggable(DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows=true)]

@@ -18,7 +18,7 @@ namespace OrchardCore.Environment.Extensions
 		public IFeatureInfo GetFeatureForDependency(Type dependency)
 		{
 			V_0 = null;
-			if (!this._features.TryGetValue(dependency, ref V_0))
+			if (!this._features.TryGetValue(dependency, out V_0))
 			{
 				throw new InvalidOperationException(string.Concat("Could not resolve feature for type ", dependency.get_Name()));
 			}

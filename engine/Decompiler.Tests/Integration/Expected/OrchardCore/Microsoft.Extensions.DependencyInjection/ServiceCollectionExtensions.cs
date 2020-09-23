@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable4 == null)
 			{
 				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<IServiceCollection, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddAntiForgeryu003eb__7_0);
+				stackVariable4 = new Action<IServiceCollection, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddAntiForgeryu003eb__7_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__7_0 = stackVariable4;
 			}
 			dummyVar2 = stackVariable3.ConfigureServices(stackVariable4, 0);
@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable4 == null)
 			{
 				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddAuthenticationu003eb__10_0);
+				stackVariable4 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddAuthenticationu003eb__10_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__10_0 = stackVariable4;
 			}
 			stackVariable6 = stackVariable3.ConfigureServices(stackVariable4, 0);
@@ -52,7 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable7 == null)
 			{
 				dummyVar2 = stackVariable7;
-				stackVariable7 = new Action<IApplicationBuilder>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddAuthenticationu003eb__10_1);
+				stackVariable7 = new Action<IApplicationBuilder>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddAuthenticationu003eb__10_1);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__10_1 = stackVariable7;
 			}
 			dummyVar3 = stackVariable6.Configure(stackVariable7, 0);
@@ -66,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddDataProtectionu003eb__11_0);
+				stackVariable1 = new Action<IServiceCollection, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddDataProtectionu003eb__11_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__11_0 = stackVariable1;
 			}
 			dummyVar1 = stackVariable0.ConfigureServices(stackVariable1, 0);
@@ -102,7 +102,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable10 == null)
 			{
 				dummyVar3 = stackVariable10;
-				stackVariable10 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddExtensionServicesu003eb__4_0);
+				stackVariable10 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddExtensionServicesu003eb__4_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__4_0 = stackVariable10;
 			}
 			dummyVar4 = stackVariable9.ConfigureServices(stackVariable10, 0);
@@ -120,10 +120,10 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable2 == null)
 			{
 				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<ServiceDescriptor, bool>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddOrchardCoreu003eb__0_0);
+				stackVariable2 = new Func<ServiceDescriptor, bool>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddOrchardCoreu003eb__0_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__0_0 = stackVariable2;
 			}
-			stackVariable3 = Enumerable.LastOrDefault<ServiceDescriptor>(stackVariable1, stackVariable2);
+			stackVariable3 = stackVariable1.LastOrDefault<ServiceDescriptor>(stackVariable2);
 			if (stackVariable3 != null)
 			{
 				stackVariable4 = stackVariable3.get_ImplementationInstance();
@@ -169,7 +169,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddRoutingu003eb__6_0);
+				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddRoutingu003eb__6_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__6_0 = stackVariable1;
 			}
 			dummyVar1 = stackVariable0.ConfigureServices(stackVariable1, -2147483548);
@@ -183,7 +183,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddSameSiteCookieBackwardsCompatibilityu003eb__8_0);
+				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddSameSiteCookieBackwardsCompatibilityu003eb__8_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__8_0 = stackVariable1;
 			}
 			stackVariable3 = stackVariable0.ConfigureServices(stackVariable1, 0);
@@ -191,7 +191,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable4 == null)
 			{
 				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<IApplicationBuilder>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddSameSiteCookieBackwardsCompatibilityu003eb__8_1);
+				stackVariable4 = new Action<IApplicationBuilder>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddSameSiteCookieBackwardsCompatibilityu003eb__8_1);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__8_1 = stackVariable4;
 			}
 			dummyVar2 = stackVariable3.Configure(stackVariable4, 0);
@@ -207,7 +207,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable5 == null)
 			{
 				dummyVar2 = stackVariable5;
-				stackVariable5 = new Func<IServiceProvider, ShellFeature>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddShellServicesu003eb__3_0);
+				stackVariable5 = new Func<IServiceProvider, ShellFeature>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddShellServicesu003eb__3_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__3_0 = stackVariable5;
 			}
 			dummyVar3 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(stackVariable4, stackVariable5);
@@ -216,7 +216,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable8 == null)
 			{
 				dummyVar4 = stackVariable8;
-				stackVariable8 = new Func<IServiceProvider, ShellFeature>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddShellServicesu003eb__3_1);
+				stackVariable8 = new Func<IServiceProvider, ShellFeature>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddShellServicesu003eb__3_1);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__3_1 = stackVariable8;
 			}
 			dummyVar5 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(stackVariable7, stackVariable8);
@@ -230,7 +230,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddStaticFilesu003eb__5_0);
+				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddStaticFilesu003eb__5_0);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__5_0 = stackVariable1;
 			}
 			dummyVar1 = stackVariable0.ConfigureServices(stackVariable1, 0);
@@ -239,7 +239,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable5 == null)
 			{
 				dummyVar2 = stackVariable5;
-				stackVariable5 = new Action<IApplicationBuilder, IEndpointRouteBuilder, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cAddStaticFilesu003eb__5_1);
+				stackVariable5 = new Action<IApplicationBuilder, IEndpointRouteBuilder, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddStaticFilesu003eb__5_1);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__5_1 = stackVariable5;
 			}
 			dummyVar3 = stackVariable4.Configure(stackVariable5, 0);

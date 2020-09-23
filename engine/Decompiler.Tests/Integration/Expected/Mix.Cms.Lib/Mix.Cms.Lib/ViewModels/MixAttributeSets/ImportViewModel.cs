@@ -236,7 +236,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSets
 				}
 				finally
 				{
-					V_1.Dispose();
+					((IDisposable)V_1).Dispose();
 				}
 			}
 			return V_0;

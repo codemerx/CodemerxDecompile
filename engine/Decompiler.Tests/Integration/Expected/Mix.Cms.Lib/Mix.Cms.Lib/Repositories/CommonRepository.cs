@@ -80,7 +80,7 @@ namespace Mix.Cms.Lib.Repositories
 				}
 				finally
 				{
-					V_2.Dispose();
+					((IDisposable)V_2).Dispose();
 				}
 			}
 			return V_1;

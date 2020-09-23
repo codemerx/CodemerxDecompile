@@ -194,7 +194,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 			{
 				if (V_1 != null)
 				{
-					V_1.Dispose();
+					((IDisposable)V_1).Dispose();
 				}
 			}
 			return V_9;

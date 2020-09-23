@@ -345,7 +345,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		{
 			V_0 = new Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel.u003cu003ec__DisplayClass153_0();
 			V_0.name = name;
-			stackVariable8 = Enumerable.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel>(this.get_Modules(), new Func<Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel, bool>(V_0, Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel.u003cu003ec__DisplayClass153_0.u003cGetModuleu003eb__0));
+			stackVariable8 = this.get_Modules().FirstOrDefault<Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel>(new Func<Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel, bool>(V_0.u003cGetModuleu003eb__0));
 			if (stackVariable8 != null)
 			{
 				return stackVariable8.get_Module();
@@ -432,7 +432,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 					}
 					finally
 					{
-						V_6.Dispose();
+						((IDisposable)V_6).Dispose();
 					}
 					if (this.get_Type() != 2)
 					{

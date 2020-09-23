@@ -584,7 +584,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			V_1 = 1;
 			V_0.name = this.get_SeoName();
-			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0, SyncViewModel.u003cu003ec__DisplayClass184_0.u003cGenerateSEOu003eb__0), null, null))
+			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0.u003cGenerateSEOu003eb__0), null, null))
 			{
 				V_0.name = string.Concat(this.get_SeoName(), "_", V_1.ToString());
 				V_1 = V_1 + 1;

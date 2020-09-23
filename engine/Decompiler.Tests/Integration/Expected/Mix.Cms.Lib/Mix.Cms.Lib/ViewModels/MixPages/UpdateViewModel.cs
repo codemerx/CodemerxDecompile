@@ -441,7 +441,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 			}
 			V_1 = 1;
 			V_0.name = this.get_SeoName();
-			while (ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPage, bool>(V_0, Mix.Cms.Lib.ViewModels.MixPages.UpdateViewModel.u003cu003ec__DisplayClass188_0.u003cGenerateSEOu003eb__0), null, null))
+			while (ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPage, bool>(V_0.u003cGenerateSEOu003eb__0), null, null))
 			{
 				V_0.name = string.Concat(this.get_SeoName(), "_", V_1.ToString());
 				V_1 = V_1 + 1;
@@ -571,7 +571,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 				}
 				finally
 				{
-					V_1.Dispose();
+					((IDisposable)V_1).Dispose();
 				}
 			}
 			if (V_0.get_IsSucceed())
@@ -595,7 +595,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 				}
 				finally
 				{
-					V_4.Dispose();
+					((IDisposable)V_4).Dispose();
 				}
 			}
 			return V_0;

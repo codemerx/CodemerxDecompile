@@ -52,7 +52,7 @@ namespace OrchardCore.Environment.Shell.Builders
 			if (stackVariable9 == null)
 			{
 				dummyVar1 = stackVariable9;
-				stackVariable9 = new Func<IServiceProvider, IShellConfiguration>(ShellContainerFactory.u003cu003ec.u003cu003e9, ShellContainerFactory.u003cu003ec.u003cCreateContaineru003eb__7_0);
+				stackVariable9 = new Func<IServiceProvider, IShellConfiguration>(ShellContainerFactory.u003cu003ec.u003cu003e9.u003cCreateContaineru003eb__7_0);
 				ShellContainerFactory.u003cu003ec.u003cu003e9__7_0 = stackVariable9;
 			}
 			dummyVar2 = ServiceCollectionServiceExtensions.AddSingleton<IShellConfiguration>(stackVariable8, stackVariable9);
@@ -65,10 +65,10 @@ namespace OrchardCore.Environment.Shell.Builders
 			if (stackVariable27 == null)
 			{
 				dummyVar5 = stackVariable27;
-				stackVariable27 = new Func<KeyValuePair<Type, FeatureEntry>, bool>(ShellContainerFactory.u003cu003ec.u003cu003e9, ShellContainerFactory.u003cu003ec.u003cCreateContaineru003eb__7_3);
+				stackVariable27 = new Func<KeyValuePair<Type, FeatureEntry>, bool>(ShellContainerFactory.u003cu003ec.u003cu003e9.u003cCreateContaineru003eb__7_3);
 				ShellContainerFactory.u003cu003ec.u003cu003e9__7_3 = stackVariable27;
 			}
-			V_6 = Enumerable.Where<KeyValuePair<Type, FeatureEntry>>(stackVariable26, stackVariable27).GetEnumerator();
+			V_6 = stackVariable26.Where<KeyValuePair<Type, FeatureEntry>>(stackVariable27).GetEnumerator();
 			try
 			{
 				while (V_6.MoveNext())
@@ -93,7 +93,7 @@ namespace OrchardCore.Environment.Shell.Builders
 					Monitor.Enter(V_0, ref V_1);
 					if (this._applicationFeature == null)
 					{
-						this._applicationFeature = Enumerable.FirstOrDefault<IFeatureInfo>(this._extensionManager.GetFeatures(), new Func<IFeatureInfo, bool>(this, ShellContainerFactory.u003cEnsureApplicationFeatureu003eb__8_0));
+						this._applicationFeature = this._extensionManager.GetFeatures().FirstOrDefault<IFeatureInfo>(new Func<IFeatureInfo, bool>(this.u003cEnsureApplicationFeatureu003eb__8_0));
 					}
 				}
 				finally

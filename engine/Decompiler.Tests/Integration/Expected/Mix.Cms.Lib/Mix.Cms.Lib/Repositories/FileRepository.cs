@@ -224,7 +224,7 @@ namespace Mix.Cms.Lib.Repositories
 		{
 			V_0 = new FileRepository.u003cu003ec__DisplayClass10_0();
 			V_0.FilePath = FilePath;
-			stackVariable7 = Files.Find(new Predicate<FileViewModel>(V_0, FileRepository.u003cu003ec__DisplayClass10_0.u003cGetFileu003eb__0));
+			stackVariable7 = Files.Find(new Predicate<FileViewModel>(V_0.u003cGetFileu003eb__0));
 			if (stackVariable7 == null)
 			{
 				dummyVar0 = stackVariable7;
@@ -275,7 +275,7 @@ namespace Mix.Cms.Lib.Repositories
 						{
 							if (V_4 != null)
 							{
-								V_4.Dispose();
+								((IDisposable)V_4).Dispose();
 							}
 						}
 					}
@@ -283,7 +283,7 @@ namespace Mix.Cms.Lib.Repositories
 					{
 						if (V_3 != null)
 						{
-							V_3.Dispose();
+							((IDisposable)V_3).Dispose();
 						}
 					}
 				}
@@ -329,10 +329,10 @@ namespace Mix.Cms.Lib.Repositories
 				if (stackVariable18 == null)
 				{
 					dummyVar0 = stackVariable18;
-					stackVariable18 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9, FileRepository.u003cu003ec.u003cGetFilesu003eb__30_0);
+					stackVariable18 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9.u003cGetFilesu003eb__30_0);
 					FileRepository.u003cu003ec.u003cu003e9__30_0 = stackVariable18;
 				}
-				V_4 = Enumerable.OrderByDescending<FileInfo, DateTime>(stackVariable17, stackVariable18).GetEnumerator();
+				V_4 = ((IEnumerable<FileInfo>)stackVariable17).OrderByDescending<FileInfo, DateTime>(stackVariable18).GetEnumerator();
 				try
 				{
 					while (V_4.MoveNext())
@@ -381,10 +381,10 @@ namespace Mix.Cms.Lib.Repositories
 				if (stackVariable18 == null)
 				{
 					dummyVar0 = stackVariable18;
-					stackVariable18 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9, FileRepository.u003cu003ec.u003cGetFilesWithContentu003eb__29_0);
+					stackVariable18 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9.u003cGetFilesWithContentu003eb__29_0);
 					FileRepository.u003cu003ec.u003cu003e9__29_0 = stackVariable18;
 				}
-				V_4 = Enumerable.OrderByDescending<FileInfo, DateTime>(stackVariable17, stackVariable18).GetEnumerator();
+				V_4 = ((IEnumerable<FileInfo>)stackVariable17).OrderByDescending<FileInfo, DateTime>(stackVariable18).GetEnumerator();
 				try
 				{
 					while (V_4.MoveNext())
@@ -408,7 +408,7 @@ namespace Mix.Cms.Lib.Repositories
 						{
 							if (V_6 != null)
 							{
-								V_6.Dispose();
+								((IDisposable)V_6).Dispose();
 							}
 						}
 					}
@@ -453,10 +453,10 @@ namespace Mix.Cms.Lib.Repositories
 				if (stackVariable8 == null)
 				{
 					dummyVar0 = stackVariable8;
-					stackVariable8 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9, FileRepository.u003cu003ec.u003cGetTopFilesu003eb__28_0);
+					stackVariable8 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9.u003cGetTopFilesu003eb__28_0);
 					FileRepository.u003cu003ec.u003cu003e9__28_0 = stackVariable8;
 				}
-				V_2 = Enumerable.OrderByDescending<FileInfo, DateTime>(stackVariable7, stackVariable8).GetEnumerator();
+				V_2 = ((IEnumerable<FileInfo>)stackVariable7).OrderByDescending<FileInfo, DateTime>(stackVariable8).GetEnumerator();
 				try
 				{
 					while (V_2.MoveNext())
@@ -515,7 +515,7 @@ namespace Mix.Cms.Lib.Repositories
 				{
 					if (V_3 != null)
 					{
-						V_3.Dispose();
+						((IDisposable)V_3).Dispose();
 					}
 				}
 			}
@@ -546,10 +546,10 @@ namespace Mix.Cms.Lib.Repositories
 			if (stackVariable13 == null)
 			{
 				dummyVar0 = stackVariable13;
-				stackVariable13 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9, FileRepository.u003cu003ec.u003cGetUploadFilesu003eb__26_0);
+				stackVariable13 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9.u003cGetUploadFilesu003eb__26_0);
 				FileRepository.u003cu003ec.u003cu003e9__26_0 = stackVariable13;
 			}
-			V_2 = Enumerable.OrderByDescending<FileInfo, DateTime>(stackVariable11, stackVariable13).GetEnumerator();
+			V_2 = ((IEnumerable<FileInfo>)stackVariable11).OrderByDescending<FileInfo, DateTime>(stackVariable13).GetEnumerator();
 			try
 			{
 				while (V_2.MoveNext())
@@ -569,7 +569,7 @@ namespace Mix.Cms.Lib.Repositories
 					{
 						if (V_4 != null)
 						{
-							V_4.Dispose();
+							((IDisposable)V_4).Dispose();
 						}
 					}
 				}
@@ -608,7 +608,7 @@ namespace Mix.Cms.Lib.Repositories
 				{
 					if (V_4 != null)
 					{
-						V_4.Dispose();
+						((IDisposable)V_4).Dispose();
 					}
 				}
 			}
@@ -646,10 +646,10 @@ namespace Mix.Cms.Lib.Repositories
 				if (stackVariable35 == null)
 				{
 					dummyVar0 = stackVariable35;
-					stackVariable35 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9, FileRepository.u003cu003ec.u003cGetWebFilesu003eb__31_0);
+					stackVariable35 = new Func<FileInfo, DateTime>(FileRepository.u003cu003ec.u003cu003e9.u003cGetWebFilesu003eb__31_0);
 					FileRepository.u003cu003ec.u003cu003e9__31_0 = stackVariable35;
 				}
-				V_6 = Enumerable.OrderByDescending<FileInfo, DateTime>(stackVariable34, stackVariable35).GetEnumerator();
+				V_6 = ((IEnumerable<FileInfo>)stackVariable34).OrderByDescending<FileInfo, DateTime>(stackVariable35).GetEnumerator();
 				try
 				{
 					while (V_6.MoveNext())
@@ -714,7 +714,7 @@ namespace Mix.Cms.Lib.Repositories
 					{
 						if (V_2 != null)
 						{
-							V_2.Dispose();
+							((IDisposable)V_2).Dispose();
 						}
 					}
 					V_0.set_IsSucceed(true);
@@ -771,7 +771,7 @@ namespace Mix.Cms.Lib.Repositories
 						{
 							if (V_4 != null)
 							{
-								V_4.Dispose();
+								((IDisposable)V_4).Dispose();
 							}
 						}
 					}
@@ -788,7 +788,7 @@ namespace Mix.Cms.Lib.Repositories
 						{
 							if (V_1 != null)
 							{
-								V_1.Dispose();
+								((IDisposable)V_1).Dispose();
 							}
 						}
 					}
@@ -849,7 +849,7 @@ namespace Mix.Cms.Lib.Repositories
 							{
 								if (V_6 != null)
 								{
-									V_6.Dispose();
+									((IDisposable)V_6).Dispose();
 								}
 							}
 						}
@@ -870,7 +870,7 @@ namespace Mix.Cms.Lib.Repositories
 						{
 							if (V_2 != null)
 							{
-								V_2.Dispose();
+								((IDisposable)V_2).Dispose();
 							}
 						}
 					}

@@ -24,7 +24,7 @@ namespace OrchardCore.Environment.Shell.Descriptor.Settings
 			if (this._shellDescriptor == null)
 			{
 				stackVariable6 = new ShellDescriptor();
-				stackVariable6.set_Features(Enumerable.ToList<ShellFeature>(Enumerable.Distinct<ShellFeature>(this._shellFeatures)));
+				stackVariable6.set_Features(this._shellFeatures.Distinct<ShellFeature>().ToList<ShellFeature>());
 				this._shellDescriptor = stackVariable6;
 			}
 			return Task.FromResult<ShellDescriptor>(this._shellDescriptor);

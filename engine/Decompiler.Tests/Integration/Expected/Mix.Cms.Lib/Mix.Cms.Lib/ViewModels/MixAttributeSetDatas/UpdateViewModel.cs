@@ -183,10 +183,10 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 			if (stackVariable17 == null)
 			{
 				dummyVar0 = stackVariable17;
-				stackVariable17 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cu003ec.u003cParseDatau003eb__81_0);
+				stackVariable17 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cu003ec.u003cu003e9.u003cParseDatau003eb__81_0);
 				Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cu003ec.u003cu003e9__81_0 = stackVariable17;
 			}
-			V_0 = Enumerable.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(stackVariable16, stackVariable17).GetEnumerator();
+			V_0 = stackVariable16.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(stackVariable17).GetEnumerator();
 			try
 			{
 				while (V_0.MoveNext())
@@ -326,7 +326,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 						{
 							break;
 						}
-						V_2.item.set_Field(this.get_Fields().Find(new Predicate<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>(V_2, Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cu003ec__DisplayClass78_0.u003cSaveSubModelsu003eb__0)));
+						V_2.item.set_Field(this.get_Fields().Find(new Predicate<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>(V_2.u003cSaveSubModelsu003eb__0)));
 						stackVariable25 = V_2.item;
 						stackVariable28 = V_2.item.get_Field();
 						if (stackVariable28 != null)
@@ -346,7 +346,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 				}
 				finally
 				{
-					V_1.Dispose();
+					((IDisposable)V_1).Dispose();
 				}
 			}
 			return V_0;

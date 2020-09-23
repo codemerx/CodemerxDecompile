@@ -426,7 +426,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 			V_0._context = _context;
 			V_0.u003cu003e4__this = this;
 			this.set_Cultures(Mix.Cms.Lib.ViewModels.MixModules.Helper.LoadCultures(this.get_Id(), this.get_Specificulture(), V_0._context, _transaction));
-			this.get_Cultures().ForEach(new Action<SupportedCulture>(V_0, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass170_0.u003cExpandViewu003eb__0));
+			this.get_Cultures().ForEach(new Action<SupportedCulture>(V_0.u003cExpandViewu003eb__0));
 			this.set_Columns(new List<ModuleFieldViewModel>());
 			if (!string.IsNullOrEmpty(this.get_Fields()))
 			{
@@ -579,7 +579,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 				}
 				finally
 				{
-					V_2.Dispose();
+					((IDisposable)V_2).Dispose();
 				}
 			}
 			else
@@ -602,17 +602,17 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 			if (stackVariable8 == null)
 			{
 				dummyVar0 = stackVariable8;
-				stackVariable8 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel, int>(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec.u003cLoadAttributesu003eb__175_2);
+				stackVariable8 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel, int>(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec.u003cu003e9.u003cLoadAttributesu003eb__175_2);
 				Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec.u003cu003e9__175_2 = stackVariable8;
 			}
-			V_2 = Enumerable.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel, int>(stackVariable7, stackVariable8).GetEnumerator();
+			V_2 = stackVariable7.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel, int>(stackVariable8).GetEnumerator();
 			try
 			{
 				while (V_2.MoveNext())
 				{
 					V_3 = new Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass175_0();
 					V_3.field = V_2.get_Current();
-					V_4 = Enumerable.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>(this.get_AttributeData().get_Data().get_Values(), new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, bool>(V_3, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass175_0.u003cLoadAttributesu003eb__3));
+					V_4 = this.get_AttributeData().get_Data().get_Values().FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>(new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, bool>(V_3.u003cLoadAttributesu003eb__3));
 					if (V_4 == null)
 					{
 						stackVariable33 = new MixAttributeSetValue();
@@ -725,7 +725,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 			this.Validate(_context, _transaction);
 			if (this.get_IsValid() && this.get_Id() == 0)
 			{
-				this.set_IsValid(!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>.Repository.CheckIsExists(new Func<MixModule, bool>(this, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cValidateu003eb__168_0), _context, _transaction));
+				this.set_IsValid(!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>.Repository.CheckIsExists(new Func<MixModule, bool>(this.u003cValidateu003eb__168_0), _context, _transaction));
 				if (!this.get_IsValid())
 				{
 					this.get_Errors().Add("Module Name Existed");

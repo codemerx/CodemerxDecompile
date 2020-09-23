@@ -80,7 +80,7 @@ namespace Mix.Cms.Lib.ViewModels
 			}
 			finally
 			{
-				V_4.Dispose();
+				((IDisposable)V_4).Dispose();
 			}
 			return V_2;
 		}

@@ -26,7 +26,7 @@ namespace OrchardCore.Modules
 			stackVariable3 = settings.get_RequestUrlHost();
 			if (stackVariable3 != null)
 			{
-				stackVariable7 = Enumerable.FirstOrDefault<string>(stackVariable3.Split('/', 1));
+				stackVariable7 = stackVariable3.Split('/', 1).FirstOrDefault<string>();
 			}
 			else
 			{

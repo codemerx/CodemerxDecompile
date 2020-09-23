@@ -90,7 +90,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetRoleClaims>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_0);
+				stackVariable1 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetRoleClaims>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_0);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_0 = stackVariable1;
 			}
 			dummyVar1 = stackVariable0.Entity<Mix.Cms.Lib.Models.Account.AspNetRoleClaims>(stackVariable1);
@@ -99,7 +99,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable4 == null)
 			{
 				dummyVar2 = stackVariable4;
-				stackVariable4 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetRoles>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_1);
+				stackVariable4 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetRoles>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_1);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_1 = stackVariable4;
 			}
 			dummyVar3 = stackVariable3.Entity<Mix.Cms.Lib.Models.Account.AspNetRoles>(stackVariable4);
@@ -108,7 +108,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable7 == null)
 			{
 				dummyVar4 = stackVariable7;
-				stackVariable7 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserClaims>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_2);
+				stackVariable7 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserClaims>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_2);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_2 = stackVariable7;
 			}
 			dummyVar5 = stackVariable6.Entity<Mix.Cms.Lib.Models.Account.AspNetUserClaims>(stackVariable7);
@@ -117,7 +117,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable10 == null)
 			{
 				dummyVar6 = stackVariable10;
-				stackVariable10 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserLogins>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_3);
+				stackVariable10 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserLogins>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_3);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_3 = stackVariable10;
 			}
 			dummyVar7 = stackVariable9.Entity<Mix.Cms.Lib.Models.Account.AspNetUserLogins>(stackVariable10);
@@ -126,7 +126,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable13 == null)
 			{
 				dummyVar8 = stackVariable13;
-				stackVariable13 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserRoles>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_4);
+				stackVariable13 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserRoles>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_4);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_4 = stackVariable13;
 			}
 			dummyVar9 = stackVariable12.Entity<Mix.Cms.Lib.Models.Account.AspNetUserRoles>(stackVariable13);
@@ -135,7 +135,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable16 == null)
 			{
 				dummyVar10 = stackVariable16;
-				stackVariable16 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserTokens>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_5);
+				stackVariable16 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUserTokens>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_5);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_5 = stackVariable16;
 			}
 			dummyVar11 = stackVariable15.Entity<Mix.Cms.Lib.Models.Account.AspNetUserTokens>(stackVariable16);
@@ -144,7 +144,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable19 == null)
 			{
 				dummyVar12 = stackVariable19;
-				stackVariable19 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUsers>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_6);
+				stackVariable19 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.AspNetUsers>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_6);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_6 = stackVariable19;
 			}
 			dummyVar13 = stackVariable18.Entity<Mix.Cms.Lib.Models.Account.AspNetUsers>(stackVariable19);
@@ -153,7 +153,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable22 == null)
 			{
 				dummyVar14 = stackVariable22;
-				stackVariable22 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.Clients>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_7);
+				stackVariable22 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.Clients>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_7);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_7 = stackVariable22;
 			}
 			dummyVar15 = stackVariable21.Entity<Mix.Cms.Lib.Models.Account.Clients>(stackVariable22);
@@ -162,7 +162,7 @@ namespace Mix.Cms.Lib.Models.Account
 			if (stackVariable25 == null)
 			{
 				dummyVar16 = stackVariable25;
-				stackVariable25 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.RefreshTokens>>(mix_structure_accountContext.u003cu003ec.u003cu003e9, mix_structure_accountContext.u003cu003ec.u003cOnModelCreatingu003eb__39_8);
+				stackVariable25 = new Action<EntityTypeBuilder<Mix.Cms.Lib.Models.Account.RefreshTokens>>(mix_structure_accountContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__39_8);
 				mix_structure_accountContext.u003cu003ec.u003cu003e9__39_8 = stackVariable25;
 			}
 			dummyVar17 = stackVariable24.Entity<Mix.Cms.Lib.Models.Account.RefreshTokens>(stackVariable25);

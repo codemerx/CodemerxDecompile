@@ -128,7 +128,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_0);
+				stackVariable1 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_0);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_0 = stackVariable1;
 			}
 			dummyVar1 = stackVariable0.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom>(stackVariable1);
@@ -137,7 +137,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable4 == null)
 			{
 				dummyVar2 = stackVariable4;
-				stackVariable4 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_1);
+				stackVariable4 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_1);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_1 = stackVariable4;
 			}
 			dummyVar3 = stackVariable3.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>(stackVariable4);
@@ -146,7 +146,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable7 == null)
 			{
 				dummyVar4 = stackVariable7;
-				stackVariable7 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_2);
+				stackVariable7 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_2);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_2 = stackVariable7;
 			}
 			dummyVar5 = stackVariable6.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser>(stackVariable7);
@@ -155,7 +155,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable10 == null)
 			{
 				dummyVar6 = stackVariable10;
-				stackVariable10 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_3);
+				stackVariable10 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_3);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_3 = stackVariable10;
 			}
 			dummyVar7 = stackVariable9.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser>(stackVariable10);
@@ -164,7 +164,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable13 == null)
 			{
 				dummyVar8 = stackVariable13;
-				stackVariable13 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerTeam>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_4);
+				stackVariable13 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerTeam>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_4);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_4 = stackVariable13;
 			}
 			dummyVar9 = stackVariable12.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerTeam>(stackVariable13);
@@ -173,7 +173,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable16 == null)
 			{
 				dummyVar10 = stackVariable16;
-				stackVariable16 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerUser>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_5);
+				stackVariable16 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerUser>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_5);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_5 = stackVariable16;
 			}
 			dummyVar11 = stackVariable15.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerUser>(stackVariable16);
@@ -182,7 +182,7 @@ namespace Mix.Cms.Messenger.Models.Data
 			if (stackVariable19 == null)
 			{
 				dummyVar12 = stackVariable19;
-				stackVariable19 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerUserDevice>>(MixChatServiceContext.u003cu003ec.u003cu003e9, MixChatServiceContext.u003cu003ec.u003cOnModelCreatingu003eb__32_6);
+				stackVariable19 = new Action<EntityTypeBuilder<Mix.Cms.Messenger.Models.Data.MixMessengerUserDevice>>(MixChatServiceContext.u003cu003ec.u003cu003e9.u003cOnModelCreatingu003eb__32_6);
 				MixChatServiceContext.u003cu003ec.u003cu003e9__32_6 = stackVariable19;
 			}
 			dummyVar13 = stackVariable18.Entity<Mix.Cms.Messenger.Models.Data.MixMessengerUserDevice>(stackVariable19);

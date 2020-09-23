@@ -122,7 +122,7 @@ namespace Mix.Cms.Lib.ViewModels
 			V_0.id = id;
 			V_0.type = type;
 			V_0.u003cu003e4__this = this;
-			if (!Enumerable.Any<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel>(this.get_RelatedData(), new Func<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel, bool>(V_0, SiteStructureViewModel.u003cu003ec__DisplayClass51_0.u003cGetAdditionalDatau003eb__0)))
+			if (!this.get_RelatedData().Any<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel>(new Func<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel, bool>(V_0.u003cGetAdditionalDatau003eb__0)))
 			{
 				stackVariable13 = ViewModelBase<MixCmsContext, MixRelatedAttributeData, Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel>.Repository;
 				V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
@@ -305,7 +305,7 @@ namespace Mix.Cms.Lib.ViewModels
 			}
 			finally
 			{
-				V_0.Dispose();
+				((IDisposable)V_0).Dispose();
 			}
 			return;
 		}
@@ -331,7 +331,7 @@ namespace Mix.Cms.Lib.ViewModels
 							V_3 = new SiteStructureViewModel.u003cu003ec__DisplayClass49_0();
 							V_3.u003cu003e4__this = this;
 							V_3.nav = V_2.get_Current();
-							V_4 = Enumerable.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>(this.get_Modules(), new Func<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel, bool>(V_3, SiteStructureViewModel.u003cu003ec__DisplayClass49_0.u003cProcessPagesu003eb__0));
+							V_4 = this.get_Modules().FirstOrDefault<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>(new Func<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel, bool>(V_3.u003cProcessPagesu003eb__0));
 							if (V_4 == null)
 							{
 								V_3.nav.get_Module().set_IsExportData(true);
@@ -345,7 +345,7 @@ namespace Mix.Cms.Lib.ViewModels
 					}
 					finally
 					{
-						V_2.Dispose();
+						((IDisposable)V_2).Dispose();
 					}
 					V_1.set_UrlAliases(V_1.GetAliases(context, transaction));
 					V_5 = V_1.get_Id();
@@ -354,7 +354,7 @@ namespace Mix.Cms.Lib.ViewModels
 			}
 			finally
 			{
-				V_0.Dispose();
+				((IDisposable)V_0).Dispose();
 			}
 			return;
 		}

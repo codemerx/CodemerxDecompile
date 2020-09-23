@@ -156,7 +156,7 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 
 		public override RepositoryResponse<bool> RemoveRelatedModels(ReadMvcViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = Enumerable.Where<SupportedCulture>(this.get_Cultures(), new Func<SupportedCulture, bool>(this, ReadMvcViewModel.u003cRemoveRelatedModelsu003eb__67_0)).GetEnumerator();
+			V_0 = this.get_Cultures().Where<SupportedCulture>(new Func<SupportedCulture, bool>(this.u003cRemoveRelatedModelsu003eb__67_0)).GetEnumerator();
 			try
 			{
 				while (V_0.MoveNext())

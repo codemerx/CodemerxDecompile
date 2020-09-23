@@ -68,7 +68,7 @@ namespace Mix.Cms.Lib.ViewModels
 				this.set_StyleName(stackVariable7);
 				this.set_DataSource(new List<MobileComponent>());
 				V_0 = element.Elements();
-				if (!Enumerable.Any<XElement>(V_0))
+				if (!V_0.Any<XElement>())
 				{
 					V_4 = element.get_Name().get_LocalName();
 					if (V_4 != null)

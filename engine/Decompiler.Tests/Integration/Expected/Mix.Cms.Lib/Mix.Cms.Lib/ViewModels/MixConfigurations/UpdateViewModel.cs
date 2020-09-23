@@ -154,7 +154,7 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 			if (stackVariable9 == null)
 			{
 				dummyVar0 = stackVariable9;
-				stackVariable9 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cExpandViewu003eb__65_0);
+				stackVariable9 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cu003e9.u003cExpandViewu003eb__65_0);
 				Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cu003e9__65_0 = stackVariable9;
 			}
 			stackVariable8.ForEach(stackVariable9);

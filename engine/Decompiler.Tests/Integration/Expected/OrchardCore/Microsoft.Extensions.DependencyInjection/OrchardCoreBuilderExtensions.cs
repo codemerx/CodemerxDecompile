@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			{
 				V_2 = new OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass0_0();
 				V_2.featureId = V_0[V_1];
-				dummyVar0 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(builder.get_ApplicationServices(), new Func<IServiceProvider, ShellFeature>(V_2, OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass0_0.u003cAddGlobalFeaturesu003eb__0));
+				dummyVar0 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(builder.get_ApplicationServices(), new Func<IServiceProvider, ShellFeature>(V_2.u003cAddGlobalFeaturesu003eb__0));
 				V_1 = V_1 + 1;
 			}
 			return builder;
@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			{
 				V_2 = new OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass2_0();
 				V_2.featureId = V_0[V_1];
-				dummyVar0 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(builder.get_ApplicationServices(), new Func<IServiceProvider, ShellFeature>(V_2, OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass2_0.u003cAddSetupFeaturesu003eb__0));
+				dummyVar0 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(builder.get_ApplicationServices(), new Func<IServiceProvider, ShellFeature>(V_2.u003cAddSetupFeaturesu003eb__0));
 				V_1 = V_1 + 1;
 			}
 			return builder;
@@ -44,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
 		{
 			V_0 = new OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass1_0();
 			V_0.featureIds = featureIds;
-			dummyVar0 = builder.ConfigureServices(new Action<IServiceCollection>(V_0, OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass1_0.u003cAddTenantFeaturesu003eb__0), 0);
+			dummyVar0 = builder.ConfigureServices(new Action<IServiceCollection>(V_0.u003cAddTenantFeaturesu003eb__0), 0);
 			return builder;
 		}
 
@@ -56,7 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			{
 				V_2 = new OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass4_0();
 				V_2.featureId = V_0[V_1];
-				dummyVar0 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(builder.get_ApplicationServices(), new Func<IServiceProvider, ShellFeature>(V_2, OrchardCoreBuilderExtensions.u003cu003ec__DisplayClass4_0.u003cWithFeaturesu003eb__0));
+				dummyVar0 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(builder.get_ApplicationServices(), new Func<IServiceProvider, ShellFeature>(V_2.u003cWithFeaturesu003eb__0));
 				V_1 = V_1 + 1;
 			}
 			dummyVar1 = builder.get_ApplicationServices().AddSetFeaturesDescriptor();
@@ -76,7 +76,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			if (stackVariable8 == null)
 			{
 				dummyVar5 = stackVariable8;
-				stackVariable8 = new Action<IServiceCollection>(OrchardCoreBuilderExtensions.u003cu003ec.u003cu003e9, OrchardCoreBuilderExtensions.u003cu003ec.u003cWithTenantsu003eb__3_0);
+				stackVariable8 = new Action<IServiceCollection>(OrchardCoreBuilderExtensions.u003cu003ec.u003cu003e9.u003cWithTenantsu003eb__3_0);
 				OrchardCoreBuilderExtensions.u003cu003ec.u003cu003e9__3_0 = stackVariable8;
 			}
 			return stackVariable7.ConfigureServices(stackVariable8, 0);

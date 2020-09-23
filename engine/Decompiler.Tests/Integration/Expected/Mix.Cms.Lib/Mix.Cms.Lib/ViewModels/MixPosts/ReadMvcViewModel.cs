@@ -392,14 +392,14 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			V_0 = new Mix.Cms.Lib.ViewModels.MixPosts.ReadMvcViewModel.u003cu003ec__DisplayClass161_0();
 			V_0.name = name;
-			return Enumerable.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadViewModel>(this.get_AttributeSets(), new Func<Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadViewModel, bool>(V_0, Mix.Cms.Lib.ViewModels.MixPosts.ReadMvcViewModel.u003cu003ec__DisplayClass161_0.u003cGetAttributeSetu003eb__0));
+			return this.get_AttributeSets().FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadViewModel>(new Func<Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadViewModel, bool>(V_0.u003cGetAttributeSetu003eb__0));
 		}
 
 		public Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel GetModule(string name)
 		{
 			V_0 = new Mix.Cms.Lib.ViewModels.MixPosts.ReadMvcViewModel.u003cu003ec__DisplayClass160_0();
 			V_0.name = name;
-			stackVariable8 = Enumerable.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>(this.get_ModuleNavs(), new Func<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel, bool>(V_0, Mix.Cms.Lib.ViewModels.MixPosts.ReadMvcViewModel.u003cu003ec__DisplayClass160_0.u003cGetModuleu003eb__0));
+			stackVariable8 = this.get_ModuleNavs().FirstOrDefault<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>(new Func<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel, bool>(V_0.u003cGetModuleu003eb__0));
 			if (stackVariable8 != null)
 			{
 				return stackVariable8.get_Module();

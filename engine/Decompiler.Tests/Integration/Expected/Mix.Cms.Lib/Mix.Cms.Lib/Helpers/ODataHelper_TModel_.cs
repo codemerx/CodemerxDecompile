@@ -154,7 +154,7 @@ namespace Mix.Cms.Lib.Helpers
 
 			public override Expression Visit(Expression node)
 			{
-				if ((object)node == (object)this._oldValue)
+				if (node == this._oldValue)
 				{
 					return this._newValue;
 				}

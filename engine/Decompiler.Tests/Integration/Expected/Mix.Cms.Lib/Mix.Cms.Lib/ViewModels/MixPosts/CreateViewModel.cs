@@ -452,7 +452,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			V_1 = 1;
 			V_0.name = this.get_SeoName();
-			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0, CreateViewModel.u003cu003ec__DisplayClass207_0.u003cGenerateSEOu003eb__0), null, null))
+			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0.u003cGenerateSEOu003eb__0), null, null))
 			{
 				V_0.name = string.Concat(this.get_SeoName(), "_", V_1.ToString());
 				V_1 = V_1 + 1;
@@ -707,7 +707,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			if (V_1.get_IsSucceed())
 			{
 				this.set_Modules(V_1.get_Data());
-				this.get_Modules().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>(V_0, CreateViewModel.u003cu003ec__DisplayClass202_0.u003cLoadParentModulesu003eb__0));
+				this.get_Modules().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>(V_0.u003cLoadParentModulesu003eb__0));
 			}
 			stackVariable18 = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel>.Repository;
 			V_2 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
@@ -728,7 +728,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			if (V_1.get_IsSucceed())
 			{
 				this.set_Pages(V_1.get_Data());
-				this.get_Pages().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>(V_0, CreateViewModel.u003cu003ec__DisplayClass203_0.u003cLoadParentPageu003eb__0));
+				this.get_Pages().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>(V_0.u003cLoadParentPageu003eb__0));
 			}
 			return;
 		}
@@ -843,7 +843,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -901,7 +901,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -959,7 +959,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -1016,7 +1016,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -1126,7 +1126,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -1167,7 +1167,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 		Label0:
 			return V_0;

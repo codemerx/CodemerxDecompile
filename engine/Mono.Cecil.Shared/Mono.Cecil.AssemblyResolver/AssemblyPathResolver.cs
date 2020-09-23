@@ -167,17 +167,28 @@ namespace Mono.Cecil.AssemblyResolver
             {
                 return Enumerable.Empty<string>();
             }
-			var platforms = new List<TargetPlatform>
-			{
-				TargetPlatform.CLR_4,
-				TargetPlatform.CLR_2_3,
-				TargetPlatform.Silverlight,
-				TargetPlatform.WindowsPhone,
-				TargetPlatform.WindowsCE,
-				TargetPlatform.CLR_1,
-				TargetPlatform.WinRT,
-				TargetPlatform.NetCore
+
+            /* AGPL */
+            var platforms = new List<TargetPlatform>
+            {
+                TargetPlatform.NetCore
             };
+
+            if (SystemInformation.IsWindows)
+            {
+                platforms.InsertRange(0, new List<TargetPlatform>
+                {
+                    TargetPlatform.CLR_4,
+                    TargetPlatform.CLR_2_3,
+                    TargetPlatform.Silverlight,
+                    TargetPlatform.WindowsPhone,
+                    TargetPlatform.WindowsCE,
+                    TargetPlatform.CLR_1,
+                    TargetPlatform.WinRT
+                });
+            }
+            /* End AGPL */
+
             var result = new List<string>();
             foreach (TargetPlatform platform in platforms)
             {
@@ -386,7 +397,9 @@ namespace Mono.Cecil.AssemblyResolver
         private IEnumerable<string> ResolveClr1(AssemblyName assemblyName)
         {
             string path = Path.Combine(SystemInformation.WindowsPath, "Microsoft.NET\\Framework");
-            if (assemblyName.Version.Major != 1)
+            /* AGPL */
+            if (assemblyName.Version.Major != 1 || !Directory.Exists(path))
+            /* End AGPL */
             {
                 yield break;
             }

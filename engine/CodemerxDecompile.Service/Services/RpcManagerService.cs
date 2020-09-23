@@ -5,7 +5,7 @@ namespace CodemerxDecompile.Service.Services
 {
     public class RpcManagerService : RpcManager.RpcManagerBase
     {
-        private const string RunningStatus =  "Running";
+        private const string RunningStatus = "Running";
 
         public override Task<GetServerStatusResponse> GetServerStatus(GetServerStatusRequest request, ServerCallContext context)
         {

@@ -83,7 +83,7 @@ import { IWebviewManagerService } from 'vs/platform/webview/common/webviewManage
 import { createServer, AddressInfo } from 'net';
 import { IOpenExtensionWindowResult } from 'vs/platform/debug/common/extensionHostDebug';
 /* AGPL */
-import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
+import { IGrpcService } from 'vs/cd/platform/GrpcService';
 import { IDecompilationMainService } from 'vs/cd/platform/DecompilationMainService';
 /* End AGPL */
 
@@ -581,7 +581,7 @@ export class CodeApplication extends Disposable {
 		sharedProcessClient.then(client => client.registerChannel('logger', loggerChannel));
 
 		/* AGPL */
-		const grpcMainService = accessor.get(IGrpcMainService);
+		const grpcMainService = accessor.get(IGrpcService);
 		const grpcChannel = createChannelReceiver(grpcMainService);
 		electronIpcServer.registerChannel('grpc', grpcChannel);
 

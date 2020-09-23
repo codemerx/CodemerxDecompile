@@ -187,10 +187,10 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 			if (stackVariable4 == null)
 			{
 				dummyVar0 = stackVariable4;
-				stackVariable4 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(ExportViewModel.u003cu003ec.u003cu003e9, ExportViewModel.u003cu003ec.u003cParseDatau003eb__71_0);
+				stackVariable4 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(ExportViewModel.u003cu003ec.u003cu003e9.u003cParseDatau003eb__71_0);
 				ExportViewModel.u003cu003ec.u003cu003e9__71_0 = stackVariable4;
 			}
-			V_0 = Enumerable.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(stackVariable3, stackVariable4).GetEnumerator();
+			V_0 = stackVariable3.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(stackVariable4).GetEnumerator();
 			try
 			{
 				while (V_0.MoveNext())

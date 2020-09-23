@@ -99,7 +99,7 @@ namespace OrchardCore.Environment.Shell
 			{
 				return true;
 			}
-			if (!this._shellContexts.TryGetValue(settings.get_Name(), ref V_0))
+			if (!this._shellContexts.TryGetValue(settings.get_Name(), out V_0))
 			{
 				return false;
 			}
@@ -194,10 +194,10 @@ namespace OrchardCore.Environment.Shell
 			if (stackVariable2 == null)
 			{
 				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<ShellContext, ShellSettings>(ShellHost.u003cu003ec.u003cu003e9, ShellHost.u003cu003ec.u003cGetAllSettingsu003eb__20_0);
+				stackVariable2 = new Func<ShellContext, ShellSettings>(ShellHost.u003cu003ec.u003cu003e9.u003cGetAllSettingsu003eb__20_0);
 				ShellHost.u003cu003ec.u003cu003e9__20_0 = stackVariable2;
 			}
-			return Enumerable.Select<ShellContext, ShellSettings>(stackVariable1, stackVariable2);
+			return stackVariable1.Select<ShellContext, ShellSettings>(stackVariable2);
 		}
 
 		public async Task<ShellContext> GetOrCreateShellContextAsync(ShellSettings settings)
@@ -231,7 +231,7 @@ namespace OrchardCore.Environment.Shell
 
 		public IEnumerable<ShellContext> ListShellContexts()
 		{
-			return Enumerable.ToArray<ShellContext>(this._shellContexts.get_Values());
+			return this._shellContexts.get_Values().ToArray<ShellContext>();
 		}
 
 		private async Task PreCreateAndRegisterShellsAsync()
@@ -262,7 +262,7 @@ namespace OrchardCore.Environment.Shell
 			{
 				return Task.get_CompletedTask();
 			}
-			if (this._shellContexts.TryRemove(settings.get_Name(), ref V_0))
+			if (this._shellContexts.TryRemove(settings.get_Name(), out V_0))
 			{
 				V_0.Release();
 			}
@@ -286,7 +286,7 @@ namespace OrchardCore.Environment.Shell
 
 		public bool TryGetSettings(string name, out ShellSettings settings)
 		{
-			if (!this._shellContexts.TryGetValue(name, ref V_0))
+			if (!this._shellContexts.TryGetValue(name, out V_0))
 			{
 				settings = null;
 				return false;

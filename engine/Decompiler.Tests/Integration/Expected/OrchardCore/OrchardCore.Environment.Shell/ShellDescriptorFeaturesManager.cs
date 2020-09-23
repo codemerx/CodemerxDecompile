@@ -36,10 +36,10 @@ namespace OrchardCore.Environment.Shell
 			if (stackVariable5 == null)
 			{
 				dummyVar0 = stackVariable5;
-				stackVariable5 = new Func<ShellFeature, bool>(ShellDescriptorFeaturesManager.u003cu003ec.u003cu003e9, ShellDescriptorFeaturesManager.u003cu003ec.u003cu002ectoru003eb__8_0);
+				stackVariable5 = new Func<ShellFeature, bool>(ShellDescriptorFeaturesManager.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__8_0);
 				ShellDescriptorFeaturesManager.u003cu003ec.u003cu003e9__8_0 = stackVariable5;
 			}
-			this._alwaysEnabledFeatures = Enumerable.ToArray<ShellFeature>(Enumerable.Where<ShellFeature>(stackVariable4, stackVariable5));
+			this._alwaysEnabledFeatures = stackVariable4.Where<ShellFeature>(stackVariable5).ToArray<ShellFeature>();
 			this._shellDescriptorManager = shellDescriptorManager;
 			this._logger = logger;
 			return;
@@ -50,7 +50,7 @@ namespace OrchardCore.Environment.Shell
 			V_0 = new ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass11_0();
 			V_0.enabledFeatureIds = enabledFeatureIds;
 			V_0.featureInfo = featureInfo;
-			V_1 = Enumerable.ToList<IFeatureInfo>(Enumerable.Where<IFeatureInfo>(this._extensionManager.GetDependentFeatures(V_0.featureInfo.get_Id()), new Func<IFeatureInfo, bool>(V_0, ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass11_0.u003cGetFeaturesToDisableu003eb__0)));
+			V_1 = this._extensionManager.GetDependentFeatures(V_0.featureInfo.get_Id()).Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToDisableu003eb__0)).ToList<IFeatureInfo>();
 			if (V_1.get_Count() <= 1 || force)
 			{
 				return V_1;
@@ -65,7 +65,7 @@ namespace OrchardCore.Environment.Shell
 			stackVariable26 = this.get_FeatureDependencyNotification();
 			if (stackVariable26 != null)
 			{
-				stackVariable26.Invoke("If {0} is disabled, then you'll also need to disable {1}.", V_0.featureInfo, Enumerable.Where<IFeatureInfo>(V_1, new Func<IFeatureInfo, bool>(V_0, ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass11_0.u003cGetFeaturesToDisableu003eb__1)));
+				stackVariable26.Invoke("If {0} is disabled, then you'll also need to disable {1}.", V_0.featureInfo, V_1.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToDisableu003eb__1)));
 			}
 			else
 			{
@@ -79,7 +79,7 @@ namespace OrchardCore.Environment.Shell
 			V_0 = new ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass10_0();
 			V_0.enabledFeatureIds = enabledFeatureIds;
 			V_0.featureInfo = featureInfo;
-			V_1 = Enumerable.ToList<IFeatureInfo>(Enumerable.Where<IFeatureInfo>(this._extensionManager.GetFeatureDependencies(V_0.featureInfo.get_Id()), new Func<IFeatureInfo, bool>(V_0, ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass10_0.u003cGetFeaturesToEnableu003eb__0)));
+			V_1 = this._extensionManager.GetFeatureDependencies(V_0.featureInfo.get_Id()).Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToEnableu003eb__0)).ToList<IFeatureInfo>();
 			if (V_1.get_Count() <= 1 || force)
 			{
 				return V_1;
@@ -94,7 +94,7 @@ namespace OrchardCore.Environment.Shell
 			stackVariable26 = this.get_FeatureDependencyNotification();
 			if (stackVariable26 != null)
 			{
-				stackVariable26.Invoke("If {0} is enabled, then you'll also need to enable {1}.", V_0.featureInfo, Enumerable.Where<IFeatureInfo>(V_1, new Func<IFeatureInfo, bool>(V_0, ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass10_0.u003cGetFeaturesToEnableu003eb__1)));
+				stackVariable26.Invoke("If {0} is enabled, then you'll also need to enable {1}.", V_0.featureInfo, V_1.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToEnableu003eb__1)));
 			}
 			else
 			{

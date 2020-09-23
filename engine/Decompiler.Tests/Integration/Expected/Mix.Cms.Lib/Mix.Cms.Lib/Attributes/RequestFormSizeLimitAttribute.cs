@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.Attributes
 {
-	[AttributeUsage(,)]    // JustDecompile was unable to locate the assembly where attribute parameters types are defined. Generating parameters values is impossible.
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple=false, Inherited=true)]
 	public class RequestFormSizeLimitAttribute : Attribute, IAuthorizationFilter, IFilterMetadata, IOrderedFilter
 	{
 		private readonly FormOptions _formOptions;

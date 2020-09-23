@@ -18,10 +18,10 @@ namespace OrchardCore.Environment.Shell.Builders
 			if (stackVariable5 == null)
 			{
 				dummyVar0 = stackVariable5;
-				stackVariable5 = new Func<ServiceDescriptor, Type>(ServiceProviderExtensions.u003cu003ec.u003cu003e9, ServiceProviderExtensions.u003cu003ec.u003cCreateChildContaineru003eb__0_0);
+				stackVariable5 = new Func<ServiceDescriptor, Type>(ServiceProviderExtensions.u003cu003ec.u003cu003e9.u003cCreateChildContaineru003eb__0_0);
 				ServiceProviderExtensions.u003cu003ec.u003cu003e9__0_0 = stackVariable5;
 			}
-			V_2 = Enumerable.GroupBy<ServiceDescriptor, Type>(stackVariable4, stackVariable5).GetEnumerator();
+			V_2 = stackVariable4.GroupBy<ServiceDescriptor, Type>(stackVariable5).GetEnumerator();
 			try
 			{
 				while (V_2.MoveNext())

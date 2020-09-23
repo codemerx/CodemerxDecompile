@@ -61,7 +61,7 @@ namespace Mix.Cms.Lib.Services
 			V_0 = true;
 			try
 			{
-				if (Queryable.Count<MixCulture>(context.get_MixCulture()) == 0)
+				if (context.get_MixCulture().Count<MixCulture>() == 0)
 				{
 					stackVariable5 = new MixCulture();
 					stackVariable5.set_Id(1);
@@ -125,7 +125,7 @@ namespace Mix.Cms.Lib.Services
 			}
 			finally
 			{
-				V_0.Dispose();
+				((IDisposable)V_0).Dispose();
 			}
 			return;
 		}

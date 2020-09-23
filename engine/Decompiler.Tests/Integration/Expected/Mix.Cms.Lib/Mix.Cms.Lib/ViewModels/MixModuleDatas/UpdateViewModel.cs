@@ -168,14 +168,14 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 		{
 			V_0 = new UpdateViewModel.u003cu003ec__DisplayClass76_0();
 			V_0.name = name;
-			return Enumerable.FirstOrDefault<ApiModuleDataValueViewModel>(this.get_DataProperties(), new Func<ApiModuleDataValueViewModel, bool>(V_0, UpdateViewModel.u003cu003ec__DisplayClass76_0.u003cGetDataPropertyu003eb__0));
+			return this.get_DataProperties().FirstOrDefault<ApiModuleDataValueViewModel>(new Func<ApiModuleDataValueViewModel, bool>(V_0.u003cGetDataPropertyu003eb__0));
 		}
 
 		public string GetStringValue(string name)
 		{
 			V_0 = new UpdateViewModel.u003cu003ec__DisplayClass75_0();
 			V_0.name = name;
-			V_1 = Enumerable.FirstOrDefault<ApiModuleDataValueViewModel>(this.get_DataProperties(), new Func<ApiModuleDataValueViewModel, bool>(V_0, UpdateViewModel.u003cu003ec__DisplayClass75_0.u003cGetStringValueu003eb__0));
+			V_1 = this.get_DataProperties().FirstOrDefault<ApiModuleDataValueViewModel>(new Func<ApiModuleDataValueViewModel, bool>(V_0.u003cGetStringValueu003eb__0));
 			if (V_1 == null || V_1.get_Value() == null)
 			{
 				return string.Empty;
@@ -200,7 +200,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -235,7 +235,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0.ToString(0, Array.Empty<JsonConverter>());
 		}
@@ -261,7 +261,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 				}
 				finally
 				{
-					V_0.Dispose();
+					((IDisposable)V_0).Dispose();
 				}
 			}
 			return;

@@ -402,7 +402,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			V_0 = new ReadViewModel.u003cu003ec__DisplayClass122_0();
 			V_0.name = name;
-			stackVariable8 = Enumerable.FirstOrDefault<ExtraProperty>(this.get_Properties(), new Func<ExtraProperty, bool>(V_0, ReadViewModel.u003cu003ec__DisplayClass122_0.u003cPropertyu003eb__0));
+			stackVariable8 = this.get_Properties().FirstOrDefault<ExtraProperty>(new Func<ExtraProperty, bool>(V_0.u003cPropertyu003eb__0));
 			if (stackVariable8 != null)
 			{
 				return stackVariable8.get_Value();

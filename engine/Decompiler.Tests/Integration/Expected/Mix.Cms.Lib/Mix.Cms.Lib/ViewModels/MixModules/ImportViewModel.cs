@@ -254,7 +254,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 			this.Validate(_context, _transaction);
 			if (this.get_IsValid() && this.get_Id() == 0)
 			{
-				this.set_IsValid(!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository.CheckIsExists(new Func<MixModule, bool>(this, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cValidateu003eb__98_0), _context, _transaction));
+				this.set_IsValid(!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository.CheckIsExists(new Func<MixModule, bool>(this.u003cValidateu003eb__98_0), _context, _transaction));
 				if (!this.get_IsValid())
 				{
 					this.get_Errors().Add("Module Name Existed");

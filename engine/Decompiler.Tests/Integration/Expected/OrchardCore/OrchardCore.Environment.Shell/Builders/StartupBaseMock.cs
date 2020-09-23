@@ -88,8 +88,8 @@ namespace OrchardCore.Environment.Shell.Builders
 			{
 				return;
 			}
-			V_1 = Enumerable.Select<ParameterInfo, object>(this._configure.GetParameters(), new Func<ParameterInfo, object>(V_0, StartupBaseMock.u003cu003ec__DisplayClass11_0.u003cConfigureu003eb__0));
-			dummyVar0 = this._configure.Invoke(this._startup, Enumerable.ToArray<object>(V_1));
+			V_1 = this._configure.GetParameters().Select<ParameterInfo, object>(new Func<ParameterInfo, object>(V_0.u003cConfigureu003eb__0));
+			dummyVar0 = this._configure.Invoke(this._startup, V_1.ToArray<object>());
 			return;
 		}
 

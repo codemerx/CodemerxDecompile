@@ -483,7 +483,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			V_1 = 1;
 			V_0.name = this.get_SeoName();
-			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cu003ec__DisplayClass220_0.u003cGenerateSEOu003eb__0), null, null))
+			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0.u003cGenerateSEOu003eb__0), null, null))
 			{
 				V_0.name = string.Concat(this.get_SeoName(), "_", V_1.ToString());
 				V_1 = V_1 + 1;
@@ -618,7 +618,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 							dummyVar1 = stackVariable117;
 							stackVariable117 = V_4.get_Description();
 						}
-						stackVariable114.set_Description(stackVariable117);
+						stackVariable114.set_Description((string)stackVariable117);
 						V_4.set_Specificulture(this.get_Specificulture());
 						stackVariable121 = V_4;
 						stackVariable123 = V_4.get_Module();
@@ -636,15 +636,15 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 							dummyVar3 = stackVariable124;
 							stackVariable124 = V_4.get_Image();
 						}
-						stackVariable121.set_Image(stackVariable124);
+						stackVariable121.set_Image((string)stackVariable124);
 					}
 				}
 				finally
 				{
-					V_3.Dispose();
+					((IDisposable)V_3).Dispose();
 				}
 				this.set_Modules(V_1.get_Data());
-				this.get_Modules().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>(V_0, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cu003ec__DisplayClass215_0.u003cLoadParentModulesu003eb__0));
+				this.get_Modules().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>(V_0.u003cLoadParentModulesu003eb__0));
 			}
 			stackVariable18 = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel>.Repository;
 			V_5 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
@@ -665,7 +665,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			if (V_1.get_IsSucceed())
 			{
 				this.set_Pages(V_1.get_Data());
-				this.get_Pages().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>(V_0, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cu003ec__DisplayClass216_0.u003cLoadParentPageu003eb__0));
+				this.get_Pages().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>(V_0.u003cLoadParentPageu003eb__0));
 			}
 			return;
 		}
@@ -756,7 +756,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			V_1 = this.get_SysTags().GetEnumerator();
 			try
@@ -776,7 +776,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -818,7 +818,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -882,7 +882,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -946,7 +946,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -1009,7 +1009,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}
@@ -1117,7 +1117,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 		Label0:
 			return V_0;

@@ -39,7 +39,7 @@ namespace OrchardCore.Environment.Shell
 
 		private void FireApplyChangesIfNeeded()
 		{
-			ShellScope.AddDeferredTask(new Func<ShellScope, Task>(this, ShellStateCoordinator.u003cFireApplyChangesIfNeededu003eb__4_0));
+			ShellScope.AddDeferredTask(new Func<ShellScope, Task>(this.u003cFireApplyChangesIfNeededu003eb__4_0));
 			return;
 		}
 

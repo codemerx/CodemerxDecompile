@@ -283,10 +283,10 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 					if (stackVariable47 == null)
 					{
 						dummyVar0 = stackVariable47;
-						stackVariable47 = new Func<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.NavigationViewModel, int>(Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cu003ec.u003cParseValueu003eb__62_0);
+						stackVariable47 = new Func<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.NavigationViewModel, int>(Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cu003ec.u003cu003e9.u003cParseValueu003eb__62_0);
 						Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cu003ec.u003cu003e9__62_0 = stackVariable47;
 					}
-					V_2 = Enumerable.OrderBy<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.NavigationViewModel, int>(stackVariable46, stackVariable47).GetEnumerator();
+					V_2 = stackVariable46.OrderBy<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.NavigationViewModel, int>(stackVariable47).GetEnumerator();
 					try
 					{
 						while (V_2.MoveNext())

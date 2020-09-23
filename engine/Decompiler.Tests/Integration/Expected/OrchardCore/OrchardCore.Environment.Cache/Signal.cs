@@ -25,7 +25,7 @@ namespace OrchardCore.Environment.Cache
 			if (stackVariable3 == null)
 			{
 				dummyVar0 = stackVariable3;
-				stackVariable3 = new Func<string, Signal.ChangeTokenInfo>(Signal.u003cu003ec.u003cu003e9, Signal.u003cu003ec.u003cGetTokenu003eb__2_0);
+				stackVariable3 = new Func<string, Signal.ChangeTokenInfo>(Signal.u003cu003ec.u003cu003e9.u003cGetTokenu003eb__2_0);
 				Signal.u003cu003ec.u003cu003e9__2_0 = stackVariable3;
 			}
 			return stackVariable1.GetOrAdd(stackVariable2, stackVariable3).get_ChangeToken();
@@ -33,7 +33,7 @@ namespace OrchardCore.Environment.Cache
 
 		public void SignalToken(string key)
 		{
-			if (this._changeTokens.TryRemove(key, ref V_0))
+			if (this._changeTokens.TryRemove(key, out V_0))
 			{
 				V_0.get_TokenSource().Cancel();
 			}

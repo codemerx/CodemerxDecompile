@@ -22,7 +22,7 @@ namespace OrchardCore.Environment.Extensions.Features
 		public IEnumerable<IFeatureInfo> GetFeatures(IExtensionInfo extensionInfo, IManifestInfo manifestInfo)
 		{
 			V_0 = new List<IFeatureInfo>();
-			V_1 = Enumerable.ToList<FeatureAttribute>(manifestInfo.get_ModuleInfo().get_Features());
+			V_1 = manifestInfo.get_ModuleInfo().get_Features().ToList<FeatureAttribute>();
 			if (V_1.get_Count() <= 0)
 			{
 				V_15 = extensionInfo.get_Id();
@@ -32,11 +32,11 @@ namespace OrchardCore.Environment.Extensions.Features
 				if (stackVariable15 == null)
 				{
 					dummyVar5 = stackVariable15;
-					stackVariable15 = new Func<string, string>(FeaturesProvider.u003cu003ec.u003cu003e9, FeaturesProvider.u003cu003ec.u003cGetFeaturesu003eb__3_1);
+					stackVariable15 = new Func<string, string>(FeaturesProvider.u003cu003ec.u003cu003e9.u003cGetFeaturesu003eb__3_1);
 					FeaturesProvider.u003cu003ec.u003cu003e9__3_1 = stackVariable15;
 				}
-				V_17 = Enumerable.ToArray<string>(Enumerable.Select<string, string>(stackVariable14, stackVariable15));
-				if (!int.TryParse(manifestInfo.get_ModuleInfo().get_Priority(), ref V_18))
+				V_17 = stackVariable14.Select<string, string>(stackVariable15).ToArray<string>();
+				if (!int.TryParse(manifestInfo.get_ModuleInfo().get_Priority(), out V_18))
 				{
 					V_18 = 0;
 				}
@@ -114,17 +114,17 @@ namespace OrchardCore.Environment.Extensions.Features
 						if (stackVariable102 == null)
 						{
 							dummyVar1 = stackVariable102;
-							stackVariable102 = new Func<string, string>(FeaturesProvider.u003cu003ec.u003cu003e9, FeaturesProvider.u003cu003ec.u003cGetFeaturesu003eb__3_0);
+							stackVariable102 = new Func<string, string>(FeaturesProvider.u003cu003ec.u003cu003e9.u003cGetFeaturesu003eb__3_0);
 							FeaturesProvider.u003cu003ec.u003cu003e9__3_0 = stackVariable102;
 						}
-						V_6 = Enumerable.ToArray<string>(Enumerable.Select<string, string>(stackVariable101, stackVariable102));
+						V_6 = stackVariable101.Select<string, string>(stackVariable102).ToArray<string>();
 						stackVariable106 = V_3.get_Priority();
 						if (stackVariable106 == null)
 						{
 							dummyVar2 = stackVariable106;
 							stackVariable106 = manifestInfo.get_ModuleInfo().get_Priority();
 						}
-						if (!int.TryParse(stackVariable106, ref V_7))
+						if (!int.TryParse(stackVariable106, out V_7))
 						{
 							V_7 = 0;
 						}
@@ -192,7 +192,7 @@ namespace OrchardCore.Environment.Extensions.Features
 				}
 				finally
 				{
-					V_2.Dispose();
+					((IDisposable)V_2).Dispose();
 				}
 			}
 			return V_0;

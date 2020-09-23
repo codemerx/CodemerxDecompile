@@ -20,7 +20,7 @@ namespace Mix.Cms.Lib.MiddleWares
 				{
 					return new List<string>();
 				}
-				return Enumerable.ToList<string>(this.get_AllowedIps().Split(',', 0));
+				return this.get_AllowedIps().Split(',', 0).ToList<string>();
 			}
 		}
 

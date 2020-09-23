@@ -168,10 +168,10 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 			if (stackVariable13 == null)
 			{
 				dummyVar0 = stackVariable13;
-				stackVariable13 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel, int>(Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cu003ec.u003cu003e9, Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cu003ec.u003cParseDatau003eb__69_0);
+				stackVariable13 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel, int>(Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cu003ec.u003cu003e9.u003cParseDatau003eb__69_0);
 				Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cu003ec.u003cu003e9__69_0 = stackVariable13;
 			}
-			V_0 = Enumerable.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel, int>(stackVariable12, stackVariable13).GetEnumerator();
+			V_0 = stackVariable12.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel, int>(stackVariable13).GetEnumerator();
 			try
 			{
 				while (V_0.MoveNext())
@@ -231,7 +231,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return this.ParseModel(_context, _transaction);
 		}

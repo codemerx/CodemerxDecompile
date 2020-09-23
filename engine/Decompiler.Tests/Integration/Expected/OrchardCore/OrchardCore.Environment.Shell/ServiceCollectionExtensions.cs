@@ -21,7 +21,7 @@ namespace OrchardCore.Environment.Shell
 			if (stackVariable3 == null)
 			{
 				dummyVar1 = stackVariable3;
-				stackVariable3 = new Func<IServiceProvider, IShellDescriptorManagerEventHandler>(OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cAddHostingShellServicesu003eb__0_0);
+				stackVariable3 = new Func<IServiceProvider, IShellDescriptorManagerEventHandler>(OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddHostingShellServicesu003eb__0_0);
 				OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__0_0 = stackVariable3;
 			}
 			dummyVar2 = ServiceCollectionServiceExtensions.AddSingleton<IShellDescriptorManagerEventHandler>(stackVariable2, stackVariable3);
@@ -41,7 +41,7 @@ namespace OrchardCore.Environment.Shell
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Func<IServiceProvider, IShellDescriptorManager>(OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cu003e9, OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cAddSetFeaturesDescriptoru003eb__2_0);
+				stackVariable1 = new Func<IServiceProvider, IShellDescriptorManager>(OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddSetFeaturesDescriptoru003eb__2_0);
 				OrchardCore.Environment.Shell.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__2_0 = stackVariable1;
 			}
 			dummyVar1 = ServiceCollectionServiceExtensions.AddSingleton<IShellDescriptorManager>(stackVariable0, stackVariable1);

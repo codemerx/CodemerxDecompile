@@ -13,7 +13,7 @@ namespace OrchardCore.Environment.Extensions
 
 		public bool HasDependency(IFeatureInfo observer, IFeatureInfo subject)
 		{
-			return Enumerable.Contains<string>(observer.get_Dependencies(), subject.get_Id());
+			return observer.get_Dependencies().Contains<string>(subject.get_Id());
 		}
 	}
 }

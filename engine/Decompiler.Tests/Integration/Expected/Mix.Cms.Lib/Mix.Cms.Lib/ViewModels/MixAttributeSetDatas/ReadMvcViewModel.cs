@@ -186,7 +186,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 					}
 					finally
 					{
-						V_2.Dispose();
+						((IDisposable)V_2).Dispose();
 					}
 					return new JProperty(item.get_AttributeFieldName(), V_0);
 				}

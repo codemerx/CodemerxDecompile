@@ -40,7 +40,7 @@ namespace Mix.Cms.Lib
 				return false;
 			}
 			number = number.Replace(",", "");
-			return double.TryParse(number, ref V_0);
+			return double.TryParse(number, out V_0);
 		}
 
 		public static Expression<Func<TModel, bool>> FilterObjectSet<TModel, T>(string propName, T data2, MixEnums.CompareType filterType)
@@ -89,14 +89,17 @@ namespace Mix.Cms.Lib
 
 		public static List<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> GetCategory(IUrlHelper Url, string culture, MixEnums.MixPageType cateType, string activePath = "")
 		{
-			// 
+			V_0 = new MixCmsHelper.u003cu003ec__DisplayClass3_0();
+			V_0.culture = culture;
+			V_0.cateType = cateType;
+			stackVariable5 = ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel>.Repository;
+			V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
 			// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> Mix.Cms.Lib.MixCmsHelper::GetCategory(Microsoft.AspNetCore.Mvc.IUrlHelper,System.String,Mix.Cms.Lib.MixEnums/MixPageType,System.String)
 			// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> GetCategory(Microsoft.AspNetCore.Mvc.IUrlHelper,System.String,Mix.Cms.Lib.MixEnums/MixPageType,System.String)
-			// Queue empty.
+			// Specified method is not supported.
 			// 
 			// mailto: JustDecompilePublicFeedback@telerik.com
 
-		}
 
 		public static async Task<RepositoryResponse<PaginationModel<TView>>> GetListPostByAddictionalField<TView>(string fieldName, object fieldValue, string culture, MixEnums.MixDataType dataType, MixEnums.CompareType filterType = 1, string orderByPropertyName = null, MixHeartEnums.DisplayDirection direction = 0, int? pageSize = null, int? pageIndex = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		where TView : ViewModelBase<MixCmsContext, MixPost, TView>
@@ -253,7 +256,7 @@ namespace Mix.Cms.Lib
 				case 2:
 				case 3:
 				{
-					if (!DateTime.TryParse(fieldValue, ref V_1))
+					if (!DateTime.TryParse(fieldValue, out V_1))
 					{
 						goto Label0;
 					}
@@ -262,7 +265,7 @@ namespace Mix.Cms.Lib
 				}
 				case 6:
 				{
-					if (!double.TryParse(fieldValue, ref V_2))
+					if (!double.TryParse(fieldValue, out V_2))
 					{
 						goto Label0;
 					}
@@ -271,7 +274,7 @@ namespace Mix.Cms.Lib
 				}
 				case 18:
 				{
-					if (!bool.TryParse(fieldValue, ref V_3))
+					if (!bool.TryParse(fieldValue, out V_3))
 					{
 						goto Label0;
 					}
@@ -280,7 +283,7 @@ namespace Mix.Cms.Lib
 				}
 				case 22:
 				{
-					if (!int.TryParse(fieldValue, ref V_4))
+					if (!int.TryParse(fieldValue, out V_4))
 					{
 						goto Label0;
 					}
@@ -328,7 +331,7 @@ namespace Mix.Cms.Lib
 					{
 						if (V_6 != null)
 						{
-							V_6.Dispose();
+							((IDisposable)V_6).Dispose();
 						}
 					}
 					File.Delete(V_1);
@@ -348,7 +351,7 @@ namespace Mix.Cms.Lib
 				{
 					if (V_7 != null)
 					{
-						V_7.Dispose();
+						((IDisposable)V_7).Dispose();
 					}
 				}
 			}

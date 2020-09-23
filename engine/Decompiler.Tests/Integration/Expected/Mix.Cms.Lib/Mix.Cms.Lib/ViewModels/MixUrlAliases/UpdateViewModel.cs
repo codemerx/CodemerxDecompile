@@ -181,7 +181,7 @@ namespace Mix.Cms.Lib.ViewModels.MixUrlAliases
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
 			this.Validate(_context, _transaction);
-			if (this.get_IsValid() && ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository.CheckIsExists(new Func<MixUrlAlias, bool>(this, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel.u003cValidateu003eb__56_0), null, null))
+			if (this.get_IsValid() && ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository.CheckIsExists(new Func<MixUrlAlias, bool>(this.u003cValidateu003eb__56_0), null, null))
 			{
 				this.get_Errors().Add("Alias Existed");
 				this.set_IsValid(false);

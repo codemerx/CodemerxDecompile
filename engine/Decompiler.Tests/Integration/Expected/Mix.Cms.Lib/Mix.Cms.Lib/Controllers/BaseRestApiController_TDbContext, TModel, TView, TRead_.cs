@@ -90,7 +90,7 @@ namespace Mix.Cms.Lib.Controllers
 			{
 				if (V_0 != null)
 				{
-					V_0.Dispose();
+					((IDisposable)(object)V_0).Dispose();
 				}
 			}
 			return V_3;
@@ -322,10 +322,10 @@ namespace Mix.Cms.Lib.Controllers
 				if (stackVariable18 == null)
 				{
 					dummyVar5 = stackVariable18;
-					stackVariable18 = new Func<JToken, bool>(BaseRestApiController<TDbContext, TModel, TView, TRead>.u003cu003ec.u003cu003e9, BaseRestApiController<TDbContext, TModel, TView, TRead>.u003cu003ec.u003cOnActionExecutingu003eb__14_0);
+					stackVariable18 = new Func<JToken, bool>(BaseRestApiController<TDbContext, TModel, TView, TRead>.u003cu003ec.u003cu003e9.u003cOnActionExecutingu003eb__14_0);
 					BaseRestApiController<TDbContext, TModel, TView, TRead>.u003cu003ec.u003cu003e9__14_0 = stackVariable18;
 				}
-				if (!Enumerable.Any<JToken>(stackVariable17, stackVariable18) && !V_1.Contains(JToken.op_Implicit(V_0.remoteIp)) || Enumerable.Any<JToken>(V_2, new Func<JToken, bool>(V_0, BaseRestApiController<TDbContext, TModel, TView, TRead>.u003cu003ec__DisplayClass14_0.u003cOnActionExecutingu003eb__1)))
+				if (!stackVariable17.Any<JToken>(stackVariable18) && !V_1.Contains(JToken.op_Implicit(V_0.remoteIp)) || V_2.Any<JToken>(new Func<JToken, bool>(V_0.u003cOnActionExecutingu003eb__1)))
 				{
 					this._forbidden = true;
 				}
@@ -401,7 +401,7 @@ namespace Mix.Cms.Lib.Controllers
 			}
 			finally
 			{
-				V_1.Dispose();
+				((IDisposable)V_1).Dispose();
 			}
 			return V_0;
 		}

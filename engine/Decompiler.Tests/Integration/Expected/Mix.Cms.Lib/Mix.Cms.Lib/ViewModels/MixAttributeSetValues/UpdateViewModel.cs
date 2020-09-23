@@ -224,7 +224,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 				}
 				case 5:
 				{
-					dummyVar0 = double.TryParse(defaultValue, ref V_0);
+					dummyVar0 = double.TryParse(defaultValue, out V_0);
 					this.set_DoubleValue(this.get_DoubleValue());
 					return;
 				}
@@ -232,7 +232,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 				{
 					if (V_3 == 18)
 					{
-						dummyVar1 = bool.TryParse(defaultValue, ref V_1);
+						dummyVar1 = bool.TryParse(defaultValue, out V_1);
 						this.set_BooleanValue(new bool?(V_1));
 						return;
 					}
@@ -240,7 +240,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 					{
 						return;
 					}
-					dummyVar2 = int.TryParse(defaultValue, ref V_2);
+					dummyVar2 = int.TryParse(defaultValue, out V_2);
 					this.set_IntegerValue(new int?(V_2));
 					goto Label0;
 				}

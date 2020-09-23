@@ -141,7 +141,7 @@ namespace Mix.Cms.Lib.Services
 			base();
 			this.watcher.set_Path(Directory.GetCurrentDirectory());
 			this.watcher.set_Filter("");
-			this.watcher.add_Changed(new FileSystemEventHandler(this, MixService.OnChanged));
+			this.watcher.add_Changed(new FileSystemEventHandler(this.OnChanged));
 			this.watcher.set_EnableRaisingEvents(true);
 			return;
 		}
@@ -161,10 +161,10 @@ namespace Mix.Cms.Lib.Services
 					if (stackVariable19 == null)
 					{
 						dummyVar0 = stackVariable19;
-						stackVariable19 = new Func<UpdateViewModel, string>(MixService.u003cu003ec.u003cu003e9, MixService.u003cu003ec.u003cCheckValidCultureu003eb__46_1);
+						stackVariable19 = new Func<UpdateViewModel, string>(MixService.u003cu003ec.u003cu003e9.u003cCheckValidCultureu003eb__46_1);
 						MixService.u003cu003ec.u003cu003e9__46_1 = stackVariable19;
 					}
-					stackVariable21 = Enumerable.ToList<string>(Enumerable.Select<UpdateViewModel, string>(stackVariable18, stackVariable19));
+					stackVariable21 = stackVariable18.Select<UpdateViewModel, string>(stackVariable19).ToList<string>();
 				}
 				else
 				{
@@ -175,9 +175,9 @@ namespace Mix.Cms.Lib.Services
 					dummyVar1 = stackVariable21;
 					stackVariable21 = new List<string>();
 				}
-				stackVariable16.set_Cultures(stackVariable21);
+				stackVariable16.set_Cultures((List<string>)stackVariable21);
 			}
-			return Enumerable.Any<string>(MixService.get_Instance().get_Cultures(), new Func<string, bool>(V_0, MixService.u003cu003ec__DisplayClass46_0.u003cCheckValidCultureu003eb__0));
+			return MixService.get_Instance().get_Cultures().Any<string>(new Func<string, bool>(V_0.u003cCheckValidCultureu003eb__0));
 		}
 
 		public static T GetAuthConfig<T>(string name)
@@ -318,8 +318,8 @@ namespace Mix.Cms.Lib.Services
 				try
 				{
 					MixService.get_Instance().set_Translator(new JObject());
-					V_3 = Enumerable.ToList<MixLanguage>(V_0.get_MixLanguage());
-					V_4 = Enumerable.ToList<MixCulture>(V_0.get_MixCulture());
+					V_3 = V_0.get_MixLanguage().ToList<MixLanguage>();
+					V_4 = V_0.get_MixCulture().ToList<MixCulture>();
 					V_6 = V_4.GetEnumerator();
 					try
 					{
@@ -333,12 +333,12 @@ namespace Mix.Cms.Lib.Services
 							if (stackVariable24 == null)
 							{
 								dummyVar0 = stackVariable24;
-								stackVariable50 = new Func<MixLanguage, bool>(V_7, MixService.u003cu003ec__DisplayClass63_0.u003cLoadFromDatabaseu003eb__0);
+								stackVariable50 = new Func<MixLanguage, bool>(V_7.u003cLoadFromDatabaseu003eb__0);
 								V_10 = stackVariable50;
 								V_7.u003cu003e9__0 = stackVariable50;
 								stackVariable24 = V_10;
 							}
-							V_9 = Enumerable.ToList<MixLanguage>(Enumerable.Where<MixLanguage>(stackVariable22, stackVariable24)).GetEnumerator();
+							V_9 = stackVariable22.Where<MixLanguage>(stackVariable24).ToList<MixLanguage>().GetEnumerator();
 							try
 							{
 								while (V_9.MoveNext())
@@ -356,17 +356,17 @@ namespace Mix.Cms.Lib.Services
 							}
 							finally
 							{
-								V_9.Dispose();
+								((IDisposable)V_9).Dispose();
 							}
 							MixService.get_Instance().get_Translator().Add(new JProperty(V_7.culture.get_Specificulture(), V_8));
 						}
 					}
 					finally
 					{
-						V_6.Dispose();
+						((IDisposable)V_6).Dispose();
 					}
 					MixService.get_Instance().set_LocalSettings(new JObject());
-					V_5 = Enumerable.ToList<MixConfiguration>(V_0.get_MixConfiguration());
+					V_5 = V_0.get_MixConfiguration().ToList<MixConfiguration>();
 					V_6 = V_4.GetEnumerator();
 					try
 					{
@@ -380,12 +380,12 @@ namespace Mix.Cms.Lib.Services
 							if (stackVariable67 == null)
 							{
 								dummyVar2 = stackVariable67;
-								stackVariable92 = new Func<MixConfiguration, bool>(V_13, MixService.u003cu003ec__DisplayClass63_1.u003cLoadFromDatabaseu003eb__1);
+								stackVariable92 = new Func<MixConfiguration, bool>(V_13.u003cLoadFromDatabaseu003eb__1);
 								V_16 = stackVariable92;
 								V_13.u003cu003e9__1 = stackVariable92;
 								stackVariable67 = V_16;
 							}
-							V_15 = Enumerable.ToList<MixConfiguration>(Enumerable.Where<MixConfiguration>(stackVariable65, stackVariable67)).GetEnumerator();
+							V_15 = stackVariable65.Where<MixConfiguration>(stackVariable67).ToList<MixConfiguration>().GetEnumerator();
 							try
 							{
 								while (V_15.MoveNext())
@@ -397,14 +397,14 @@ namespace Mix.Cms.Lib.Services
 							}
 							finally
 							{
-								V_15.Dispose();
+								((IDisposable)V_15).Dispose();
 							}
 							MixService.get_Instance().get_LocalSettings().Add(new JProperty(V_13.culture.get_Specificulture(), V_14));
 						}
 					}
 					finally
 					{
-						V_6.Dispose();
+						((IDisposable)V_6).Dispose();
 					}
 					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(true, V_2, V_1);
 				}
@@ -450,7 +450,7 @@ namespace Mix.Cms.Lib.Services
 					{
 						if (V_6 != null)
 						{
-							V_6.Dispose();
+							((IDisposable)V_6).Dispose();
 						}
 					}
 					File.Delete(V_1);
@@ -470,7 +470,7 @@ namespace Mix.Cms.Lib.Services
 				{
 					if (V_7 != null)
 					{
-						V_7.Dispose();
+						((IDisposable)V_7).Dispose();
 					}
 				}
 			}
@@ -540,7 +540,7 @@ namespace Mix.Cms.Lib.Services
 			stackVariable0.culture = culture;
 			stackVariable0.subject = subject;
 			stackVariable0.from = from;
-			return Task.Run(new Action(stackVariable0, MixService.u003cu003ec__DisplayClass64_0.u003cSendEdmu003eb__0));
+			return Task.Run(new Action(stackVariable0.u003cSendEdmu003eb__0));
 		}
 
 		public static void SendMail(string subject, string message, string to, string from = null)

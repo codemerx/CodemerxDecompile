@@ -32,10 +32,10 @@ namespace OrchardCore.Environment.Shell.Descriptor.Settings
 				if (stackVariable10 == null)
 				{
 					dummyVar0 = stackVariable10;
-					stackVariable10 = new Func<IFeatureInfo, ShellFeature>(AllFeaturesShellDescriptorManager.u003cu003ec.u003cu003e9, AllFeaturesShellDescriptorManager.u003cu003ec.u003cGetShellDescriptorAsyncu003eb__3_0);
+					stackVariable10 = new Func<IFeatureInfo, ShellFeature>(AllFeaturesShellDescriptorManager.u003cu003ec.u003cu003e9.u003cGetShellDescriptorAsyncu003eb__3_0);
 					AllFeaturesShellDescriptorManager.u003cu003ec.u003cu003e9__3_0 = stackVariable10;
 				}
-				stackVariable6.set_Features(Enumerable.ToList<ShellFeature>(Enumerable.Select<IFeatureInfo, ShellFeature>(stackVariable9, stackVariable10)));
+				stackVariable6.set_Features(stackVariable9.Select<IFeatureInfo, ShellFeature>(stackVariable10).ToList<ShellFeature>());
 				this._shellDescriptor = stackVariable6;
 			}
 			return Task.FromResult<ShellDescriptor>(this._shellDescriptor);

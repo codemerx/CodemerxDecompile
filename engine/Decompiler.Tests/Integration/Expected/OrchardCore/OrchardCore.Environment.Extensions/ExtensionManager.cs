@@ -54,8 +54,8 @@ namespace OrchardCore.Environment.Extensions
 
 		static ExtensionManager()
 		{
-			ExtensionManager.GetDependentFeaturesFunc = new Func<IFeatureInfo, IFeatureInfo[], IFeatureInfo[]>(ExtensionManager.u003cu003ec.u003cu003e9, ExtensionManager.u003cu003ec.u003cu002ecctoru003eb__38_0);
-			ExtensionManager.GetFeatureDependenciesFunc = new Func<IFeatureInfo, IFeatureInfo[], IFeatureInfo[]>(ExtensionManager.u003cu003ec.u003cu003e9, ExtensionManager.u003cu003ec.u003cu002ecctoru003eb__38_1);
+			ExtensionManager.GetDependentFeaturesFunc = new Func<IFeatureInfo, IFeatureInfo[], IFeatureInfo[]>(ExtensionManager.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__38_0);
+			ExtensionManager.GetFeatureDependenciesFunc = new Func<IFeatureInfo, IFeatureInfo[], IFeatureInfo[]>(ExtensionManager.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__38_1);
 			return;
 		}
 
@@ -96,7 +96,7 @@ namespace OrchardCore.Environment.Extensions
 		public IEnumerable<IFeatureInfo> GetDependentFeatures(string featureId)
 		{
 			this.EnsureInitialized();
-			return this._dependentFeatures.GetOrAdd(featureId, new Func<string, Lazy<IEnumerable<IFeatureInfo>>>(this, ExtensionManager.u003cGetDependentFeaturesu003eb__27_0)).get_Value();
+			return this._dependentFeatures.GetOrAdd(featureId, new Func<string, Lazy<IEnumerable<IFeatureInfo>>>(this.u003cGetDependentFeaturesu003eb__27_0)).get_Value();
 		}
 
 		private IEnumerable<IFeatureInfo> GetDependentFeatures(IFeatureInfo feature, IFeatureInfo[] features)
@@ -114,12 +114,12 @@ namespace OrchardCore.Environment.Extensions
 				if (stackVariable17 == null)
 				{
 					dummyVar1 = stackVariable17;
-					stackVariable36 = new Func<IFeatureInfo, bool>(V_0, ExtensionManager.u003cu003ec__DisplayClass29_0.u003cGetDependentFeaturesu003eb__1);
+					stackVariable36 = new Func<IFeatureInfo, bool>(V_0.u003cGetDependentFeaturesu003eb__1);
 					V_3 = stackVariable36;
 					V_0.u003cu003e9__1 = stackVariable36;
 					stackVariable17 = V_3;
 				}
-				V_2 = Enumerable.Where<IFeatureInfo>(stackVariable15, stackVariable17).GetEnumerator();
+				V_2 = stackVariable15.Where<IFeatureInfo>(stackVariable17).GetEnumerator();
 				try
 				{
 					while (V_2.MoveNext())
@@ -137,13 +137,13 @@ namespace OrchardCore.Environment.Extensions
 					}
 				}
 			}
-			return Enumerable.Where<IFeatureInfo>(this._featureInfos, new Func<IFeatureInfo, bool>(V_0, ExtensionManager.u003cu003ec__DisplayClass29_0.u003cGetDependentFeaturesu003eb__0));
+			return this._featureInfos.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetDependentFeaturesu003eb__0));
 		}
 
 		public IExtensionInfo GetExtension(string extensionId)
 		{
 			this.EnsureInitialized();
-			if (!string.IsNullOrEmpty(extensionId) && this._extensions.TryGetValue(extensionId, ref V_0))
+			if (!string.IsNullOrEmpty(extensionId) && this._extensions.TryGetValue(extensionId, out V_0))
 			{
 				return V_0.get_ExtensionInfo();
 			}
@@ -159,7 +159,7 @@ namespace OrchardCore.Environment.Extensions
 		public IEnumerable<IFeatureInfo> GetFeatureDependencies(string featureId)
 		{
 			this.EnsureInitialized();
-			return this._featureDependencies.GetOrAdd(featureId, new Func<string, Lazy<IEnumerable<IFeatureInfo>>>(this, ExtensionManager.u003cGetFeatureDependenciesu003eb__26_0)).get_Value();
+			return this._featureDependencies.GetOrAdd(featureId, new Func<string, Lazy<IEnumerable<IFeatureInfo>>>(this.u003cGetFeatureDependenciesu003eb__26_0)).get_Value();
 		}
 
 		private IEnumerable<IFeatureInfo> GetFeatureDependencies(IFeatureInfo feature, IFeatureInfo[] features)
@@ -177,12 +177,12 @@ namespace OrchardCore.Environment.Extensions
 				if (stackVariable17 == null)
 				{
 					dummyVar1 = stackVariable17;
-					stackVariable36 = new Func<IFeatureInfo, bool>(V_0, ExtensionManager.u003cu003ec__DisplayClass28_0.u003cGetFeatureDependenciesu003eb__1);
+					stackVariable36 = new Func<IFeatureInfo, bool>(V_0.u003cGetFeatureDependenciesu003eb__1);
 					V_3 = stackVariable36;
 					V_0.u003cu003e9__1 = stackVariable36;
 					stackVariable17 = V_3;
 				}
-				V_2 = Enumerable.Where<IFeatureInfo>(stackVariable15, stackVariable17).GetEnumerator();
+				V_2 = stackVariable15.Where<IFeatureInfo>(stackVariable17).GetEnumerator();
 				try
 				{
 					while (V_2.MoveNext())
@@ -200,7 +200,7 @@ namespace OrchardCore.Environment.Extensions
 					}
 				}
 			}
-			return Enumerable.Where<IFeatureInfo>(this._featureInfos, new Func<IFeatureInfo, bool>(V_0, ExtensionManager.u003cu003ec__DisplayClass28_0.u003cGetFeatureDependenciesu003eb__0));
+			return this._featureInfos.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeatureDependenciesu003eb__0));
 		}
 
 		public IEnumerable<IFeatureInfo> GetFeatures(string[] featureIdsToLoad)
@@ -208,8 +208,8 @@ namespace OrchardCore.Environment.Extensions
 			V_0 = new ExtensionManager.u003cu003ec__DisplayClass22_0();
 			V_0.u003cu003e4__this = this;
 			this.EnsureInitialized();
-			V_0.allDependencies = Enumerable.Distinct<IFeatureInfo>(Enumerable.SelectMany<string, IFeatureInfo>(featureIdsToLoad, new Func<string, IEnumerable<IFeatureInfo>>(V_0, ExtensionManager.u003cu003ec__DisplayClass22_0.u003cGetFeaturesu003eb__0)));
-			return Enumerable.Where<IFeatureInfo>(this._featureInfos, new Func<IFeatureInfo, bool>(V_0, ExtensionManager.u003cu003ec__DisplayClass22_0.u003cGetFeaturesu003eb__1));
+			V_0.allDependencies = featureIdsToLoad.SelectMany<string, IFeatureInfo>(new Func<string, IEnumerable<IFeatureInfo>>(V_0.u003cGetFeaturesu003eb__0)).Distinct<IFeatureInfo>();
+			return this._featureInfos.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesu003eb__1));
 		}
 
 		public IEnumerable<IFeatureInfo> GetFeatures()
@@ -222,12 +222,12 @@ namespace OrchardCore.Environment.Extensions
 		{
 			V_0 = new ExtensionManager.u003cu003ec__DisplayClass37_0();
 			V_0.feature = feature;
-			return Enumerable.Sum<IExtensionPriorityStrategy>(this._extensionPriorityStrategies, new Func<IExtensionPriorityStrategy, int>(V_0, ExtensionManager.u003cu003ec__DisplayClass37_0.u003cGetPriorityu003eb__0));
+			return this._extensionPriorityStrategies.Sum<IExtensionPriorityStrategy>(new Func<IExtensionPriorityStrategy, int>(V_0.u003cGetPriorityu003eb__0));
 		}
 
 		private static string GetSourceFeatureNameForType(Type type, string extensionId)
 		{
-			stackVariable3 = Enumerable.FirstOrDefault<FeatureAttribute>(CustomAttributeExtensions.GetCustomAttributes<FeatureAttribute>(type, false));
+			stackVariable3 = type.GetCustomAttributes<FeatureAttribute>(false).FirstOrDefault<FeatureAttribute>();
 			if (stackVariable3 != null)
 			{
 				stackVariable4 = stackVariable3.get_FeatureName();
@@ -250,7 +250,7 @@ namespace OrchardCore.Environment.Extensions
 			V_0 = new ExtensionManager.u003cu003ec__DisplayClass36_0();
 			V_0.f1 = f1;
 			V_0.f2 = f2;
-			return Enumerable.Any<IExtensionDependencyStrategy>(this._extensionDependencyStrategies, new Func<IExtensionDependencyStrategy, bool>(V_0, ExtensionManager.u003cu003ec__DisplayClass36_0.u003cHasDependencyu003eb__0));
+			return this._extensionDependencyStrategies.Any<IExtensionDependencyStrategy>(new Func<IExtensionDependencyStrategy, bool>(V_0.u003cHasDependencyu003eb__0));
 		}
 
 		private bool IsComponentType(Type type)
@@ -265,7 +265,7 @@ namespace OrchardCore.Environment.Extensions
 		public Task<ExtensionEntry> LoadExtensionAsync(IExtensionInfo extensionInfo)
 		{
 			this.EnsureInitialized();
-			if (this._extensions.TryGetValue(extensionInfo.get_Id(), ref V_0))
+			if (this._extensions.TryGetValue(extensionInfo.get_Id(), out V_0))
 			{
 				return Task.FromResult<ExtensionEntry>(V_0);
 			}
@@ -298,10 +298,10 @@ namespace OrchardCore.Environment.Extensions
 			if (stackVariable1 == null)
 			{
 				dummyVar0 = stackVariable1;
-				stackVariable1 = new Func<IFeatureInfo, string>(ExtensionManager.u003cu003ec.u003cu003e9, ExtensionManager.u003cu003ec.u003cOrderu003eb__35_0);
+				stackVariable1 = new Func<IFeatureInfo, string>(ExtensionManager.u003cu003ec.u003cu003e9.u003cOrderu003eb__35_0);
 				ExtensionManager.u003cu003ec.u003cu003e9__35_0 = stackVariable1;
 			}
-			return Enumerable.ToArray<IFeatureInfo>(DependencyOrdering.OrderByDependenciesAndPriorities<IFeatureInfo>(Enumerable.OrderBy<IFeatureInfo, string>(stackVariable0, stackVariable1), new Func<IFeatureInfo, IFeatureInfo, bool>(this, ExtensionManager.HasDependency), new Func<IFeatureInfo, int>(this, ExtensionManager.GetPriority)));
+			return DependencyOrdering.OrderByDependenciesAndPriorities<IFeatureInfo>(stackVariable0.OrderBy<IFeatureInfo, string>(stackVariable1), new Func<IFeatureInfo, IFeatureInfo, bool>(this.HasDependency), new Func<IFeatureInfo, int>(this.GetPriority)).ToArray<IFeatureInfo>();
 		}
 	}
 }

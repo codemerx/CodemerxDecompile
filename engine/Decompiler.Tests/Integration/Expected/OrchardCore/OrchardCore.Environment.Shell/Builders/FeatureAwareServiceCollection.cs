@@ -114,7 +114,7 @@ namespace OrchardCore.Environment.Shell.Builders
 
 		public void SetCurrentFeature(IFeatureInfo feature)
 		{
-			if (!this._featureServiceCollections.TryGetValue(feature, ref this._currentFeatureServiceCollection))
+			if (!this._featureServiceCollections.TryGetValue(feature, out this._currentFeatureServiceCollection))
 			{
 				stackVariable7 = this._featureServiceCollections;
 				stackVariable10 = new ServiceCollection();

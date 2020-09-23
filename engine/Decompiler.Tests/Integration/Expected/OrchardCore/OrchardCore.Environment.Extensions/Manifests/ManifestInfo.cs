@@ -93,13 +93,13 @@ namespace OrchardCore.Environment.Extensions.Manifests
 		{
 			base();
 			this._moduleInfo = moduleInfo;
-			this._version = new Lazy<System.Version>(new Func<System.Version>(this, ManifestInfo.ParseVersion));
+			this._version = new Lazy<System.Version>(new Func<System.Version>(this.ParseVersion));
 			return;
 		}
 
 		private System.Version ParseVersion()
 		{
-			if (System.Version.TryParse(this._moduleInfo.get_Version(), ref V_0))
+			if (System.Version.TryParse(this._moduleInfo.get_Version(), out V_0))
 			{
 				return V_0;
 			}

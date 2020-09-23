@@ -95,19 +95,8 @@ namespace Mono.Cecil.PE {
 
 		TargetArchitecture ReadArchitecture ()
 		{
-			var machine = ReadUInt16 ();
-			switch (machine) {
-			case 0x014c:
-				return TargetArchitecture.I386;
-			case 0x8664:
-				return TargetArchitecture.AMD64;
-			case 0x0200:
-				return TargetArchitecture.IA64;
-			case 0x01c4:
-				return TargetArchitecture.ARMv7;
-			}
-
-			throw new NotSupportedException ();
+			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
+			return (TargetArchitecture)ReadUInt16 ();
 		}
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)

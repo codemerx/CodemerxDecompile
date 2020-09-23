@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{21E0C506-1786-4355-AEDB-4581F6C731EE}</ProjectGuid>
+    <ProjectGuid>{CACB79B0-DF1C-4C85-A991-9D19FCE4FFB4}</ProjectGuid>
     <SchemaVersion>2</SchemaVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -30,61 +30,33 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Runtime">
-      <HintPath>.\Mix.Cms.LibReferences\System.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Diagnostics.Debug">
-      <HintPath>.\Mix.Cms.LibReferences\System.Diagnostics.Debug.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Runtime, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Diagnostics.Debug, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.EntityFrameworkCore, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
-    <Reference Include="System.Linq.Expressions">
-      <HintPath>.\Mix.Cms.LibReferences\System.Linq.Expressions.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Linq.Expressions, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.EntityFrameworkCore.Relational, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
-    <Reference Include="System.Collections">
-      <HintPath>.\Mix.Cms.LibReferences\System.Collections.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Collections, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.AspNetCore.Mvc.Abstractions, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
-    <Reference Include="System.Text.RegularExpressions">
-      <HintPath>.\Mix.Cms.LibReferences\System.Text.RegularExpressions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.FileSystem">
-      <HintPath>.\Mix.Cms.LibReferences\System.IO.FileSystem.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Text.RegularExpressions, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.IO.FileSystem, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed" />
-    <Reference Include="System.Runtime.Extensions">
-      <HintPath>.\Mix.Cms.LibReferences\System.Runtime.Extensions.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Runtime.Extensions, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Mix.Heart, Version=0.0.6.5, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="System.Threading.Tasks">
-      <HintPath>.\Mix.Cms.LibReferences\System.Threading.Tasks.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Threading.Tasks, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.AspNetCore.Http.Features, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
-    <Reference Include="System.ComponentModel.Annotations">
-      <HintPath>.\Mix.Cms.LibReferences\System.ComponentModel.Annotations.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.XDocument">
-      <HintPath>.\Mix.Cms.LibReferences\System.Xml.XDocument.dll</HintPath>
-    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.3.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Xml.XDocument, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="EPPlus, Version=5.0.4.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1" />
-    <Reference Include="System.Data.Common">
-      <HintPath>.\Mix.Cms.LibReferences\System.Data.Common.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Data.Common, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Mix.Identity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="System.IO.FileSystem.Watcher">
-      <HintPath>.\Mix.Cms.LibReferences\System.IO.FileSystem.Watcher.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Mail">
-      <HintPath>.\Mix.Cms.LibReferences\System.Net.Mail.dll</HintPath>
-    </Reference>
+    <Reference Include="System.IO.FileSystem.Watcher, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Net.Mail, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.Extensions.Options, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.OData.Core, Version=7.6.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
-    <Reference Include="System.ComponentModel">
-      <HintPath>.\Mix.Cms.LibReferences\System.ComponentModel.dll</HintPath>
-    </Reference>
+    <Reference Include="System.ComponentModel, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=3.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.AspNetCore.Mvc.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.AspNetCore.Mvc.ViewFeatures, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
@@ -95,60 +67,28 @@
     <Reference Include="Microsoft.Data.SqlClient, Version=1.0.19269.1, Culture=neutral, PublicKeyToken=23ec7fc2d6eaa4a5" />
     <Reference Include="MySqlConnector, Version=0.61.0.0, Culture=neutral, PublicKeyToken=d33d3e53aa5f8c92" />
     <Reference Include="Npgsql, Version=4.1.3.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7" />
-    <Reference Include="System.Linq.Queryable">
-      <HintPath>.\Mix.Cms.LibReferences\System.Linq.Queryable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Linq">
-      <HintPath>.\Mix.Cms.LibReferences\System.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Console">
-      <HintPath>.\Mix.Cms.LibReferences\System.Console.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading">
-      <HintPath>.\Mix.Cms.LibReferences\System.Threading.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Thread">
-      <HintPath>.\Mix.Cms.LibReferences\System.Threading.Thread.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Primitives">
-      <HintPath>.\Mix.Cms.LibReferences\System.Net.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Compression.ZipFile">
-      <HintPath>.\Mix.Cms.LibReferences\System.IO.Compression.ZipFile.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Linq.Queryable, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Linq, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Console, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Threading, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Threading.Thread, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Net.Primitives, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.IO.Compression.ZipFile, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
     <Reference Include="Microsoft.Extensions.Identity.Stores, Version=3.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.OData.Edm, Version=7.6.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
-    <Reference Include="System.ComponentModel.TypeConverter">
-      <HintPath>.\Mix.Cms.LibReferences\System.ComponentModel.TypeConverter.dll</HintPath>
-    </Reference>
+    <Reference Include="System.ComponentModel.TypeConverter, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.AspNetCore.SignalR, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Microsoft.AspNetCore.SignalR.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
     <Reference Include="Mix.Heart.NetCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Microsoft.AspNetCore.Routing.Abstractions, Version=3.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
-    <Reference Include="System.Security.Claims">
-      <HintPath>.\Mix.Cms.LibReferences\System.Security.Claims.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Security.Principal">
-      <HintPath>.\Mix.Cms.LibReferences\System.Security.Principal.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Private.CoreLib">
-      <HintPath>.\Mix.Cms.LibReferences\System.Private.CoreLib.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Private.Xml.Linq">
-      <HintPath>.\Mix.Cms.LibReferences\System.Private.Xml.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Private.Xml">
-      <HintPath>.\Mix.Cms.LibReferences\System.Private.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Primitives">
-      <HintPath>.\Mix.Cms.LibReferences\System.ComponentModel.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.ReaderWriter">
-      <HintPath>.\Mix.Cms.LibReferences\System.Xml.ReaderWriter.dll</HintPath>
-    </Reference>
-    <Reference Include="netstandard">
-      <HintPath>.\Mix.Cms.LibReferences\netstandard.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Security.Claims, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Security.Principal, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" />
+    <Reference Include="System.Private.Xml.Linq, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
+    <Reference Include="System.Private.Xml, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
+    <Reference Include="System.ComponentModel.Primitives, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Xml.ReaderWriter, Version=4.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -167,11 +107,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixInit\InitCmsViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetRoles.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixCultures\SystemCultureViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -183,7 +127,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixCultures\SystemCultureViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixInit\InitCmsViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserClaims.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -191,7 +139,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Messenger.Models.Data\MixMessengerMessage.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\Helper.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -199,11 +147,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\Helper.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\UpdateViewModel.cs">
+    <Compile Include="Mix.Cms.Messenger.Models.Data\MixMessengerMessage.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserLogins.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -223,15 +175,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserRoles.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Messenger.Models.Data\MixMessengerNavTeamUser.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\NavigationViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetRoles.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -243,7 +195,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserClaims.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixTemplates\DeleteViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -251,7 +203,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixTemplates\DeleteViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -263,11 +215,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserLogins.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\UpdateViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPortalPages\ReadViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -275,27 +223,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\ImportViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPortalPages\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\ReadMvcViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPortalPageNavigation.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\Account\MixRegisterViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserRoles.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUsers.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -307,7 +239,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPortalPageRole.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPortalPageNavigation.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\Account\MixRegisterViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\ImportViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserTokens.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -315,19 +259,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\Account\NavUserRoleViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\ReadViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\Account\RefreshTokenViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\ReadListItemViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Account\Clients.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -335,7 +271,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\Account\NavUserRoleViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\Models.Cms\MixAttributeSetData.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPortalPageRole.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -343,11 +287,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MobileComponent.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\Account\RefreshTokenViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\Account\RoleViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MobileComponent.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -355,11 +299,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\SiteMap.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\ReadListItemViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUsers.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\Account\RoleViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\SiteMap.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -371,11 +319,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixTemplates\ImportViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\SitemapLanguage.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\AspNetUserTokens.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixAttributeSetValue.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -387,23 +339,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\Clients.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixCache.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\DashboardViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixTemplates\ImportViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixAttributeSetValue.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPostMedia.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -419,23 +359,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixCache.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPostMedia.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\Account\UserRoleViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPostModule.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPortalPages\UpdateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\ExportViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -447,11 +375,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedAttributeData.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\ExportViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\ReadMvcViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPortalPages\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixPostModule.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixConfiguration.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -459,11 +395,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedAttributeSet.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\ReadMvcViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixConfiguration.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Account\mix_structure_accountContext.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedAttributeData.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixCulture.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -475,7 +419,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedData.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Account\RefreshTokens.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedAttributeSet.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -487,11 +435,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixCulture.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixFile.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\mix_structure_accountContext.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedData.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -499,19 +447,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedPost.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\RefreshTokens.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixFile.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixTemplate.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixLanguage.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -519,19 +455,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixLanguage.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixTheme.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixMedia.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\SiteStructureViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixRelatedPost.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -539,15 +463,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixMedia.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixCultures\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixUrlAlias.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\Account\MixRoles\UpdateViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixTemplate.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -555,7 +479,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\FormPortalViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\Account\MixRoles\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\SiteStructureViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -563,7 +491,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixUrlAliases\UpdateViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixTheme.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Account\MixCmsAccountContext.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -571,7 +503,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\DeleteViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Models.Account\MixDbContext.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixUrlAlias.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -579,7 +515,27 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\MixCmsAccountContext.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\FormPortalViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixUrlAliases\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\DeleteViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixTemplates\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixConfigurations\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\Models.Cms\MixModulePost.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -591,11 +547,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Account\MixDbContext.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixConfigurations\ReadViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedDatas\DeleteViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -603,27 +555,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Models.Cms\MixModulePost.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixTemplates\UpdateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\UpdateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Mix.Cms.Messenger.Migrations\init.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedDatas\DeleteViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixConfigurations\SystemConfigurationViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -631,27 +563,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModulePosts\ReadMvcViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Messenger.Migrations\MixChatServiceContextModelSnapshot.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Mix.Cms.Lib\Models.Cms\MixPage.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\MiddleWares\IpRestrictionMiddleware.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixConfigurations\SystemConfigurationViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\ImportViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\DeleteViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModules\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -659,19 +579,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\MiddleWares\IpRestrictionMiddleware.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Messenger.Migrations\MixChatServiceContextModelSnapshot.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\MiddleWares\IpSecuritySettings.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\CreateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixConfigurations\UpdateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\Services\MixService.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -679,15 +595,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\Repositories\CommonRepository.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\ImportViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModulePosts\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\Helper.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixConfigurations\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -695,19 +607,31 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\Services\MixService.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\DeleteViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModulePosts\ReadMvcViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\Helpers\ODataHelper_TModel_.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\DeleteViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\Repositories\CommonRepository.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\Helper.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\CreateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\FormViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeSets\ReadMvcViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -719,15 +643,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\ReadListItemViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\DeleteViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeSets\ReadMvcViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\MixCmsHelper.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\Helper.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -735,15 +655,35 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModulePosts\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\ReadListItemViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\Helper.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\FormViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeSets\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\MixCmsHelper.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\MixConstants.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\InitViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\ImportViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\DeleteViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -755,27 +695,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeSets\UpdateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\DeleteViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\DeleteViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\GlobalSettingsViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\FilePageViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\InitViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -783,19 +703,35 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\ImportViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\FilePageViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\GlobalSettingsViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixThemes\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\InitCulture.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\DeleteViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\FormViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\ReadMvcViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPostModules\ReadViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -804,10 +740,6 @@
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixPageModules\ImportViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixRelatedAttributeDatas\FormViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -823,11 +755,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPostMedias\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\UpdateViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\ReadViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -835,15 +763,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\ImportViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixLanguages\UpdateViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -851,7 +775,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixMedias\ReadViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\ReadMvcViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSets\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -859,15 +787,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixModuleDatas\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\Helper.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\ReadMvcViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\ImportViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -875,15 +803,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\ImportViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetDatas\NavigationViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixMedias\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -891,7 +811,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\ImportViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixMedias\ReadViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -899,11 +819,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\ReadListItemViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\ImportViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixLanguages\ReadMvcViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeSetValues\ImportViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -911,7 +831,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixLanguages\SystemLanguageViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixMedias\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\ReadListItemViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -919,7 +843,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\UpdateViewModel.cs">
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixLanguages\ReadMvcViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -928,6 +852,14 @@
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\Attributes\RequestFormSizeLimitAttribute.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPages\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixLanguages\SystemLanguageViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -943,10 +875,6 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\ReadViewModel.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeFields\DeleteViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
@@ -955,15 +883,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPosts\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeFields\UpdateViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Mix.Cms.Lib\Models.Cms\MixCmsContext.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\Models.Account\AspNetRoleClaims.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Mix.Cms.Lib\ViewModels\MixAttributeFields\UpdateViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -976,6 +908,14 @@
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Mix.Cms.Lib\ViewModels\MixPostPosts\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPostModules\ReadViewModel.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Mix.Cms.Lib\ViewModels\MixPostMedias\ReadViewModel.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>

@@ -20,11 +20,14 @@ namespace Mono.Cecil {
 	}
 
 	public enum TargetArchitecture {
-		I386,
-		AMD64,
-		IA64,
+		// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
+		I386 = 0x014c,
+		AMD64 = 0x8664,
+		IA64 = 0x0200,
 		AnyCPU, /*Telerik Authorship*/
-		ARMv7,
+		ARM = 0x01c0,
+		ARMv7 = 0x01c4,
+		ARM64 = 0xaa64
 	}
 
 	[Flags]

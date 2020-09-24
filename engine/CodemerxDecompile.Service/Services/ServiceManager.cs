@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -14,17 +14,23 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-syntax = "proto3";
+using System.Threading;
 
-import "common.proto";
+using CodemerxDecompile.Service.Interfaces;
 
-option csharp_namespace = "CodemerxDecompile.Service";
+namespace CodemerxDecompile.Service.Services
+{
+    internal class ServiceManager : IServiceManager
+    {
+        private readonly CancellationTokenSource cancellationTokenSource;
 
-service RpcManager {
-  rpc GetServerStatus (Empty) returns (GetServerStatusResponse);
-  rpc ShutdownServer (Empty) returns (Empty);
-}
+        public ServiceManager()
+        {
+            this.cancellationTokenSource = new CancellationTokenSource();
+        }
 
-message GetServerStatusResponse {
-  string status = 1;
+        public CancellationToken CancellationToken => this.cancellationTokenSource.Token;
+
+        public void Shutdown() => this.cancellationTokenSource.Cancel();
+    }
 }

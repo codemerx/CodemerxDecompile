@@ -4,6 +4,7 @@
 // file: main.proto
 
 import * as main_pb from "./main_pb";
+import * as common_pb from "./common_pb";
 import * as grpc from "@grpc/grpc-js";
 
 interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
@@ -12,7 +13,7 @@ interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServi
   decompileType: grpc.MethodDefinition<main_pb.DecompileTypeRequest, main_pb.DecompileTypeResponse>;
   getMemberReferenceMetadata: grpc.MethodDefinition<main_pb.GetMemberReferenceMetadataRequest, main_pb.GetMemberReferenceMetadataResponse>;
   getMemberDefinitionPosition: grpc.MethodDefinition<main_pb.GetMemberDefinitionPositionRequest, main_pb.Selection>;
-  addResolvedAssembly: grpc.MethodDefinition<main_pb.AddResolvedAssemblyRequest, main_pb.Empty>;
+  addResolvedAssembly: grpc.MethodDefinition<main_pb.AddResolvedAssemblyRequest, common_pb.Empty>;
 }
 
 export const RpcDecompilerService: IRpcDecompilerService;
@@ -34,7 +35,7 @@ export class RpcDecompilerClient extends grpc.Client {
   getMemberDefinitionPosition(argument: main_pb.GetMemberDefinitionPositionRequest, callback: grpc.requestCallback<main_pb.Selection>): grpc.ClientUnaryCall;
   getMemberDefinitionPosition(argument: main_pb.GetMemberDefinitionPositionRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.Selection>): grpc.ClientUnaryCall;
   getMemberDefinitionPosition(argument: main_pb.GetMemberDefinitionPositionRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.Selection>): grpc.ClientUnaryCall;
-  addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, callback: grpc.requestCallback<main_pb.Empty>): grpc.ClientUnaryCall;
-  addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.Empty>): grpc.ClientUnaryCall;
-  addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.Empty>): grpc.ClientUnaryCall;
+  addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
 }

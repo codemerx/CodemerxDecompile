@@ -19,17 +19,17 @@
 //
 'use strict';
 
-define(['exports', '@grpc/grpc-js', './manager_pb'], function (exports, grpc, manager_pb) {
+define(['exports', '@grpc/grpc-js', './manager_pb', './common_pb'], function (exports, grpc, manager_pb, common_pb) {
 
-function serialize_GetServerStatusRequest(arg) {
-  if (!(arg instanceof manager_pb.GetServerStatusRequest)) {
-    throw new Error('Expected argument of type GetServerStatusRequest');
+function serialize_Empty(arg) {
+  if (!(arg instanceof common_pb.Empty)) {
+    throw new Error('Expected argument of type Empty');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_GetServerStatusRequest(buffer_arg) {
-  return manager_pb.GetServerStatusRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_Empty(buffer_arg) {
+  return common_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_GetServerStatusResponse(arg) {
@@ -49,12 +49,23 @@ var RpcManagerService = exports.RpcManagerService = {
     path: '/RpcManager/GetServerStatus',
     requestStream: false,
     responseStream: false,
-    requestType: manager_pb.GetServerStatusRequest,
+    requestType: common_pb.Empty,
     responseType: manager_pb.GetServerStatusResponse,
-    requestSerialize: serialize_GetServerStatusRequest,
-    requestDeserialize: deserialize_GetServerStatusRequest,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
     responseSerialize: serialize_GetServerStatusResponse,
     responseDeserialize: deserialize_GetServerStatusResponse,
+  },
+  shutdownServer: {
+    path: '/RpcManager/ShutdownServer',
+    requestStream: false,
+    responseStream: false,
+    requestType: common_pb.Empty,
+    responseType: common_pb.Empty,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
   },
 };
 

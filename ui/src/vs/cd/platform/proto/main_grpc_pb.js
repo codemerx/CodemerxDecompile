@@ -18,7 +18,7 @@
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 //
 'use strict';
-define(['exports', '@grpc/grpc-js', './main_pb'], function (exports, grpc, main_pb) {
+define(['exports', '@grpc/grpc-js', './main_pb', './common_pb'], function (exports, grpc, main_pb, common_pb) {
 
 function serialize_AddResolvedAssemblyRequest(arg) {
   if (!(arg instanceof main_pb.AddResolvedAssemblyRequest)) {
@@ -54,14 +54,14 @@ function deserialize_DecompileTypeResponse(buffer_arg) {
 }
 
 function serialize_Empty(arg) {
-  if (!(arg instanceof main_pb.Empty)) {
+  if (!(arg instanceof common_pb.Empty)) {
     throw new Error('Expected argument of type Empty');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
 function deserialize_Empty(buffer_arg) {
-  return main_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
+  return common_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_GetAllTypeFilePathsRequest(arg) {
@@ -214,7 +214,7 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestStream: false,
     responseStream: false,
     requestType: main_pb.AddResolvedAssemblyRequest,
-    responseType: main_pb.Empty,
+    responseType: common_pb.Empty,
     requestSerialize: serialize_AddResolvedAssemblyRequest,
     requestDeserialize: deserialize_AddResolvedAssemblyRequest,
     responseSerialize: serialize_Empty,

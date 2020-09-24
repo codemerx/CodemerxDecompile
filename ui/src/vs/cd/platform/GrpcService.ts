@@ -19,12 +19,12 @@ import { join } from 'path';
 import { spawn } from 'child_process';
 import * as grpc from "@grpc/grpc-js";
 import { RpcManagerClient } from 'vs/cd/platform/proto/manager_grpc_pb';
-import { GetServerStatusRequest } from 'vs/cd/platform/proto/manager_pb';
+import { Empty } from 'vs/cd/platform/proto/common_pb';
 import { ILoggerService, ILogService } from 'vs/platform/log/common/log';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
 import { ILifecycleMainService } from 'vs/platform/lifecycle/electron-main/lifecycleMainService';
 
-const SERVER_PATH = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.exe');
+const SERVER_PATH = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.dll');
 const MAX_RETRIES = 10;
 const RUNNING_STATUS = 'Running';
 const WAIT_TIME_MILLISECONDS = 200;
@@ -70,7 +70,10 @@ export class GrpcService implements IGrpcService {
 				if (status === RUNNING_STATUS) {
 					logService.info(`CodemerxDecompile.Service is listening on port ${this.port}.`);
 
-					this.lifecycleMainService.onWillShutdown(() => /* TODO Handle shutdown */ null);
+					this.lifecycleMainService.onWillShutdown(async e => {
+						logService.info(`Shutting down CodemerxDecompile.Service.`);
+						e.join(this.shutdownServer());
+					});
 
 					return;
 				} else {
@@ -95,11 +98,10 @@ export class GrpcService implements IGrpcService {
 	}
 
 	private async getServerStatus(): Promise<string> {
-		const url = await this.getServiceUrl();
-		const statusService = new RpcManagerClient(url, grpc.credentials.createInsecure());
+		const client = await this.createGrpcClient();
 
 		const status = await new Promise<string>((resolve, reject) => {
-			statusService.getServerStatus(new GetServerStatusRequest(), (error, response) => {
+			client.getServerStatus(new Empty(), (error, response) => {
 				if (!error) {
 					resolve(response?.getStatus());
 				}
@@ -110,6 +112,25 @@ export class GrpcService implements IGrpcService {
 		});
 
 		return status;
+	}
+
+	private async shutdownServer(): Promise<void> {
+		const client = await this.createGrpcClient();
+		await new Promise<void>((resolve, reject) => {
+			client.shutdownServer(new Empty(), (err, response) => {
+				if (err) {
+					reject(`ShutdownServer() failed. Error: ${err}`);
+					return;
+				}
+
+				resolve();
+			});
+		});
+	}
+
+	private async createGrpcClient(): Promise<RpcManagerClient> {
+		const url = await this.getServiceUrl();
+		return new RpcManagerClient(url, grpc.credentials.createInsecure());
 	}
 
 	private sleep(millisecond: number): Promise<void> {

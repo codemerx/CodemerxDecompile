@@ -24,14 +24,7 @@ PROTO_OUT_PATH=./src/vs/cd/platform/proto
 PROTOC_GEN_TS_PATH=node_modules\\.bin\\protoc-gen-ts.cmd
 PROTOC_GEN_GRPC_PATH=node_modules\\.bin\\grpc_tools_node_protoc_plugin.cmd
 
-protoc -I=$PROTO_PATH main.proto \
-  --plugin=protoc-gen-ts=${PROTOC_GEN_TS_PATH} \
-  --plugin=protoc-gen-grpc=${PROTOC_GEN_GRPC_PATH} \
-  --js_out=import_style=commonjs:${PROTO_OUT_PATH} \
-  --ts_out=service=grpc-node:${PROTO_OUT_PATH} \
-  --grpc_out="${PROTO_OUT_PATH}"
-
-protoc -I=$PROTO_PATH manager.proto \
+protoc -I=$PROTO_PATH common.proto main.proto manager.proto \
   --plugin=protoc-gen-ts=${PROTOC_GEN_TS_PATH} \
   --plugin=protoc-gen-grpc=${PROTOC_GEN_GRPC_PATH} \
   --js_out=import_style=commonjs:${PROTO_OUT_PATH} \

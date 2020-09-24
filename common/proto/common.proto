@@ -16,15 +16,6 @@
 
 syntax = "proto3";
 
-import "common.proto";
-
 option csharp_namespace = "CodemerxDecompile.Service";
 
-service RpcManager {
-  rpc GetServerStatus (Empty) returns (GetServerStatusResponse);
-  rpc ShutdownServer (Empty) returns (Empty);
-}
-
-message GetServerStatusResponse {
-  string status = 1;
-}
+message Empty { }

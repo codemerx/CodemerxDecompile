@@ -14,19 +14,28 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
+
+using CodemerxDecompile.Service.Extensions;
+using CodemerxDecompile.Service.Interfaces;
 
 namespace CodemerxDecompile.Service
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             CommandLineParameters parameters = CommandLineParameters.Parse(args);
 
-            CreateHostBuilder(args, parameters).Build().Run();
+            IHost host = CreateHostBuilder(args, parameters).Build();
+
+            IServiceManager serviceManager = host.Services.GetService<IServiceManager>();
+
+            await host.RunAsync(serviceManager.CancellationToken);
         }
 
         // Additional configuration is required to successfully run gRPC on macOS.

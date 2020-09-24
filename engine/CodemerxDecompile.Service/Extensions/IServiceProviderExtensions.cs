@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -14,17 +14,12 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-syntax = "proto3";
+using System;
 
-import "common.proto";
-
-option csharp_namespace = "CodemerxDecompile.Service";
-
-service RpcManager {
-  rpc GetServerStatus (Empty) returns (GetServerStatusResponse);
-  rpc ShutdownServer (Empty) returns (Empty);
-}
-
-message GetServerStatusResponse {
-  string status = 1;
+namespace CodemerxDecompile.Service.Extensions
+{
+    internal static class IServiceProviderExtensions
+    {
+        public static T GetService<T>(this IServiceProvider serviceProvider) => (T)serviceProvider.GetService(typeof(T));
+    }
 }

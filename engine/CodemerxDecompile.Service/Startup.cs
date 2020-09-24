@@ -14,12 +14,14 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-using CodemerxDecompile.Service.Interfaces;
-using CodemerxDecompile.Service.Services.DecompilationContext;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using CodemerxDecompile.Service.Interfaces;
+using CodemerxDecompile.Service.Services;
+using CodemerxDecompile.Service.Services.DecompilationContext;
 
 namespace CodemerxDecompile.Service
 {
@@ -29,8 +31,10 @@ namespace CodemerxDecompile.Service
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IDecompilationContext, DecompilationContextService>();
             services.AddGrpc();
+
+            services.AddSingleton<IDecompilationContext, DecompilationContextService>();
+            services.AddSingleton<IServiceManager, ServiceManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

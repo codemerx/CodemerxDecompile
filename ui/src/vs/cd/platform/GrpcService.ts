@@ -41,34 +41,40 @@ export interface IGrpcService {
 export class GrpcService implements IGrpcService {
 	readonly _serviceBrand: undefined;
 
-	private readonly port = 5000;
+	private port: number | undefined;
 
 	constructor(
 		@ILoggerService private readonly loggerService: ILoggerService,
 		@IEnvironmentService private readonly environmentService: IEnvironmentService,
 		@ILifecycleMainService private readonly lifecycleMainService: ILifecycleMainService) { }
 
-	getServiceUrl(): Promise<string> {
-		return Promise.resolve(`localhost:${this.port}`);
+	public async getServiceUrl(): Promise<string>
+	public async getServiceUrl(port: number): Promise<string>
+	public async getServiceUrl(port?: number): Promise<string> {
+		port = port || this.port;
+		return `localhost:${port}`;
 	}
 
-	async initialize(): Promise<void> {
+	public async initialize(): Promise<void> {
 		const logService: ILogService = this.loggerService.getLogger(this.environmentService.codemerxDecompileLogResource);
 
 		for (let count = 0; count < MAX_RETRIES; count += 1) {
-			logService.info(`Starting CodemerxDecompile.Service on port ${this.port}.`);
+			const randomPort = this.getRandomPort();
+			logService.info(`Starting CodemerxDecompile.Service on port ${randomPort}.`);
 
-			const serverProcess = spawn('dotnet', [SERVER_PATH, `--port=${this.port}`]);
+			const serverProcess = spawn('dotnet', [SERVER_PATH, `--port=${randomPort}`]);
 
 			const milliseconds = count * WAIT_TIME_MILLISECONDS;
 			logService.info(`Waiting CodemerxDecompile.Service response for ${milliseconds} Milliseconds.`);
 			await this.sleep(milliseconds);
 
 			try {
-				const status = await this.getServerStatus();
+				const status = await this.getServerStatus(randomPort);
 
 				if (status === RUNNING_STATUS) {
-					logService.info(`CodemerxDecompile.Service is listening on port ${this.port}.`);
+					logService.info(`CodemerxDecompile.Service is listening on port ${randomPort}.`);
+
+					this.port = randomPort;
 
 					this.lifecycleMainService.onWillShutdown(async e => {
 						logService.info(`Shutting down CodemerxDecompile.Service.`);
@@ -77,10 +83,10 @@ export class GrpcService implements IGrpcService {
 
 					return;
 				} else {
-					logService.error(`Failed starting CodemerxDecompile.Service on port "${this.port}". Status returned: ${status}.`);
+					logService.error(`Failed starting CodemerxDecompile.Service on port "${randomPort}". Status returned: ${status}.`);
 				}
 			} catch (error) {
-				logService.error(`Failed starting CodemerxDecompile.Service on port "${this.port}". Error: ${error}.`);
+				logService.error(`Failed starting CodemerxDecompile.Service on port "${randomPort}". Error: ${error}.`);
 			}
 
 			serverProcess.kill();
@@ -97,8 +103,9 @@ export class GrpcService implements IGrpcService {
 		}
 	}
 
-	private async getServerStatus(): Promise<string> {
-		const client = await this.createGrpcClient();
+	private async getServerStatus(port: number): Promise<string> {
+		const url = await this.getServiceUrl(port);
+		const client = new RpcManagerClient(url, grpc.credentials.createInsecure());
 
 		const status = await new Promise<string>((resolve, reject) => {
 			client.getServerStatus(new Empty(), (error, response) => {
@@ -115,7 +122,9 @@ export class GrpcService implements IGrpcService {
 	}
 
 	private async shutdownServer(): Promise<void> {
-		const client = await this.createGrpcClient();
+		const url = await this.getServiceUrl();
+		const client = new RpcManagerClient(url, grpc.credentials.createInsecure());
+
 		await new Promise<void>((resolve, reject) => {
 			client.shutdownServer(new Empty(), (err, response) => {
 				if (err) {
@@ -128,12 +137,18 @@ export class GrpcService implements IGrpcService {
 		});
 	}
 
-	private async createGrpcClient(): Promise<RpcManagerClient> {
-		const url = await this.getServiceUrl();
-		return new RpcManagerClient(url, grpc.credentials.createInsecure());
-	}
-
 	private sleep(millisecond: number): Promise<void> {
 		return new Promise(resolve => setTimeout(resolve, millisecond));
+	}
+
+	private getRandomPort(): number {
+		return this.getRandomInt(1024, 65535 + 1);
+	}
+
+	// The minimum is inclusive, the maximum is exclusive
+	private getRandomInt(min: number, max: number): number {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min) + min);
 	}
 };

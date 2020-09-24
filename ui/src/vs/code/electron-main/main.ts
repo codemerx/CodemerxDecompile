@@ -19,7 +19,9 @@ import { ServicesAccessor, IInstantiationService } from 'vs/platform/instantiati
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 import { ServiceCollection } from 'vs/platform/instantiation/common/serviceCollection';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
+/* AGPL */
 import { ILogService, ConsoleLogMainService, MultiplexLogService, getLogLevel, ILoggerService } from 'vs/platform/log/common/log';
+/* End AGPL */
 import { StateService } from 'vs/platform/state/node/stateService';
 import { IStateService } from 'vs/platform/state/node/state';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';

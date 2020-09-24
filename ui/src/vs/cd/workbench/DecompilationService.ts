@@ -17,19 +17,22 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IMainProcessService } from 'vs/platform/ipc/electron-sandbox/mainProcessService';
 import { createChannelSender } from 'vs/base/parts/ipc/common/ipc';
-import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection } from 'vs/cd/common/DecompilationTypes';
+import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
 
 export const IDecompilationService = createDecorator<IDecompilationService>('IDecompilationService');
 
 export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
-	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
-	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
-	decompileType(filePath: string) : Promise<string>;
-	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
-	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
-	addResolvedAssembly(filePath: string) : Promise<void>;
+	getAssemblyRelatedFilePaths(assemblyPath: string): Promise<AssemblyRelatedFilePaths>;
+	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: number): Promise<ProjectCreationMetadata>;
+	getAllTypeFilePaths(assemblyPath: string): Promise<string[]>;
+	decompileType(filePath: string): Promise<string>;
+	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number): Promise<ReferenceMetadata>;
+	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string): Promise<Selection>;
+	addResolvedAssembly(filePath: string): Promise<void>;
+	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: number): Promise<CreateProjectResult>;
+	getLegacyVisualStudioVersions() : string[];
 }
 
 export class DecompilationService {

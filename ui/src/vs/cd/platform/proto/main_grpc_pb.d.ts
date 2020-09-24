@@ -9,11 +9,13 @@ import * as grpc from "@grpc/grpc-js";
 
 interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
   getAssemblyRelatedFilePaths: grpc.MethodDefinition<main_pb.GetAssemblyRelatedFilePathsRequest, main_pb.GetAssemblyRelatedFilePathsResponse>;
+  getProjectCreationMetadataFromTypeFilePath: grpc.MethodDefinition<main_pb.GetProjectCreationMetadataFromTypeFilePathRequest, main_pb.GetProjectCreationMetadataFromTypeFilePathResponse>;
   getAllTypeFilePaths: grpc.MethodDefinition<main_pb.GetAllTypeFilePathsRequest, main_pb.GetAllTypeFilePathsResponse>;
   decompileType: grpc.MethodDefinition<main_pb.DecompileTypeRequest, main_pb.DecompileTypeResponse>;
   getMemberReferenceMetadata: grpc.MethodDefinition<main_pb.GetMemberReferenceMetadataRequest, main_pb.GetMemberReferenceMetadataResponse>;
   getMemberDefinitionPosition: grpc.MethodDefinition<main_pb.GetMemberDefinitionPositionRequest, main_pb.Selection>;
   addResolvedAssembly: grpc.MethodDefinition<main_pb.AddResolvedAssemblyRequest, common_pb.Empty>;
+  createProject: grpc.MethodDefinition<main_pb.CreateProjectRequest, main_pb.CreateProjectResponse>;
 }
 
 export const RpcDecompilerService: IRpcDecompilerService;
@@ -23,6 +25,9 @@ export class RpcDecompilerClient extends grpc.Client {
   getAssemblyRelatedFilePaths(argument: main_pb.GetAssemblyRelatedFilePathsRequest, callback: grpc.requestCallback<main_pb.GetAssemblyRelatedFilePathsResponse>): grpc.ClientUnaryCall;
   getAssemblyRelatedFilePaths(argument: main_pb.GetAssemblyRelatedFilePathsRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetAssemblyRelatedFilePathsResponse>): grpc.ClientUnaryCall;
   getAssemblyRelatedFilePaths(argument: main_pb.GetAssemblyRelatedFilePathsRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetAssemblyRelatedFilePathsResponse>): grpc.ClientUnaryCall;
+  getProjectCreationMetadataFromTypeFilePath(argument: main_pb.GetProjectCreationMetadataFromTypeFilePathRequest, callback: grpc.requestCallback<main_pb.GetProjectCreationMetadataFromTypeFilePathResponse>): grpc.ClientUnaryCall;
+  getProjectCreationMetadataFromTypeFilePath(argument: main_pb.GetProjectCreationMetadataFromTypeFilePathRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetProjectCreationMetadataFromTypeFilePathResponse>): grpc.ClientUnaryCall;
+  getProjectCreationMetadataFromTypeFilePath(argument: main_pb.GetProjectCreationMetadataFromTypeFilePathRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetProjectCreationMetadataFromTypeFilePathResponse>): grpc.ClientUnaryCall;
   getAllTypeFilePaths(argument: main_pb.GetAllTypeFilePathsRequest, callback: grpc.requestCallback<main_pb.GetAllTypeFilePathsResponse>): grpc.ClientUnaryCall;
   getAllTypeFilePaths(argument: main_pb.GetAllTypeFilePathsRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetAllTypeFilePathsResponse>): grpc.ClientUnaryCall;
   getAllTypeFilePaths(argument: main_pb.GetAllTypeFilePathsRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetAllTypeFilePathsResponse>): grpc.ClientUnaryCall;
@@ -38,4 +43,7 @@ export class RpcDecompilerClient extends grpc.Client {
   addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
   addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
   addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  createProject(argument: main_pb.CreateProjectRequest, callback: grpc.requestCallback<main_pb.CreateProjectResponse>): grpc.ClientUnaryCall;
+  createProject(argument: main_pb.CreateProjectRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.CreateProjectResponse>): grpc.ClientUnaryCall;
+  createProject(argument: main_pb.CreateProjectRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.CreateProjectResponse>): grpc.ClientUnaryCall;
 }

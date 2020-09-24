@@ -38,3 +38,21 @@ export interface ReferenceMetadata {
     referencedAssemblyFullName?: string;
     referencedAssemblyFilePath?: string;
 }
+
+export interface CreateProjectResult {
+	errorMessage?: string;
+}
+
+export interface ProjectCreationMetadata {
+	assemblyFilePath: string;
+	containsDangerousResources: boolean;
+	projectFileMetadata: ProjectFileMetadata | null
+}
+
+export interface ProjectFileMetadata {
+	isDecompilerSupportedProjectType: boolean;
+	isVSSupportedProjectType: boolean;
+	projectTypeNotSupportedErrorMessage: string;
+	projectFileName: string;
+	projectFileExtension: string;
+}

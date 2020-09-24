@@ -288,7 +288,14 @@ export class Menubar {
 		menubar.append(editMenuItem);
 
 		/* AGPL */
-		// // Selection
+		// Tools
+		const toolsMenu = new Menu();
+		const toolsMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mTools', comment: ['&& denotes a mnemonic'] }, "&&Tools")), submenu: toolsMenu });
+
+		this.setMenuById(toolsMenu, 'Tools');
+		menubar.append(toolsMenuItem);
+
+		// Selection
 		// const selectionMenu = new Menu();
 		// const selectionMenuItem = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'mSelection', comment: ['&& denotes a mnemonic'] }, "&&Selection")), submenu: selectionMenu });
 

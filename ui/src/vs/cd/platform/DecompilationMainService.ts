@@ -21,12 +21,14 @@ import {
 	GetAssemblyRelatedFilePathsRequest,
 	GetMemberReferenceMetadataRequest,
 	GetMemberDefinitionPositionRequest,
-	AddResolvedAssemblyRequest
+	AddResolvedAssemblyRequest,
+	CreateProjectRequest,
+	GetProjectCreationMetadataFromTypeFilePathRequest
 } from './proto/main_pb';
 import * as grpc from "@grpc/grpc-js";
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IGrpcService } from 'vs/cd/platform/GrpcService';
-import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection } from 'vs/cd/common/DecompilationTypes';
+import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
 
 export const IDecompilationMainService = createDecorator<IDecompilationMainService>('IDecompilationMainService');
 
@@ -34,11 +36,14 @@ export interface IDecompilationMainService {
 	readonly _serviceBrand: undefined;
 
 	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
+	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
 	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
 	decompileType(filePath: string) : Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
 	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
 	addResolvedAssembly(filePath: string) : Promise<void>;
+	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
+	getLegacyVisualStudioVersions() : Promise<string[]>;
 }
 
 export class DecompilationMainService implements IDecompilationMainService {
@@ -170,4 +175,60 @@ export class DecompilationMainService implements IDecompilationMainService {
 			});
 		})
 	}
+
+	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata> {
+		const request = new GetProjectCreationMetadataFromTypeFilePathRequest();
+		request.setTypefilepath(typeFilePath);
+		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? '');
+
+		return new Promise<ProjectCreationMetadata>((resolve, reject) => {
+			this.client?.getProjectCreationMetadataFromTypeFilePath(request, {}, (err, response) => {
+				if (err) {
+					reject(`getProjectCreationMetadataFromTypeFilePath failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				const projectFileMetadata = response!.getProjectfilemetadata();
+
+				const assemblyMetadata: ProjectCreationMetadata = {
+					assemblyFilePath: response!.getAssemblyfilepath(),
+					containsDangerousResources: response!.getContainsdangerousresources(),
+					projectFileMetadata: projectFileMetadata ? {
+						isDecompilerSupportedProjectType: projectFileMetadata?.getIsdecompilersupportedprojecttype(),
+						isVSSupportedProjectType: projectFileMetadata?.getIsvssupportedprojecttype(),
+						projectTypeNotSupportedErrorMessage: projectFileMetadata?.getProjecttypenotsupportederrormessage(),
+						projectFileName: projectFileMetadata?.getProjectfilename(),
+						projectFileExtension: projectFileMetadata?.getProjectfileextension()
+					} : null
+				};
+
+				resolve(assemblyMetadata);
+			});
+		});
+	}
+
+	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult> {
+		const request = new CreateProjectRequest();
+		request.setAssemblyfilepath(assemblyFilePath);
+		request.setOutputpath(outputPath);
+		request.setDecompiledangerousresources(decompileDangerousResources);
+		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? '');
+
+		return new Promise<CreateProjectResult>((resolve, reject) => {
+			this.client?.createProject(request, {}, (err, response) => {
+				if (err) {
+					reject(`createProject failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				const createProjectResult: CreateProjectResult = {
+					errorMessage: response!.getErrormessage()
+				};
+
+				resolve(createProjectResult);
+			});
+		});
+	}
+
+	getLegacyVisualStudioVersions = async () => ['2010', '2012', '2013', '2015'];
 }

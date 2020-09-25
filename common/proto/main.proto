@@ -22,11 +22,43 @@ option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
+  rpc GetProjectCreationMetadataFromTypeFilePath (GetProjectCreationMetadataFromTypeFilePathRequest) returns (GetProjectCreationMetadataFromTypeFilePathResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
   rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
   rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
+  rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
+}
+
+message GetProjectCreationMetadataFromTypeFilePathRequest {
+  string typeFilePath = 1;
+  string projectVisualStudioVersion = 2;
+}
+
+message GetProjectCreationMetadataFromTypeFilePathResponse {
+  string assemblyFilePath = 1;
+  bool containsDangerousResources = 2;
+  ProjectFileMetadata projectFileMetadata = 3;
+}
+
+message ProjectFileMetadata {
+  bool isDecompilerSupportedProjectType = 1;
+  bool isVSSupportedProjectType = 2;
+  string projectTypeNotSupportedErrorMessage = 3;
+  string projectFileName = 4;
+  string projectFileExtension = 5;
+}
+
+message CreateProjectRequest {
+  string assemblyFilePath = 1;
+  string outputPath = 2;
+  bool decompileDangerousResources = 3;
+  string projectVisualStudioVersion = 4;
+}
+
+message CreateProjectResponse {
+  string errorMessage = 1;
 }
 
 message GetAssemblyRelatedFilePathsRequest {

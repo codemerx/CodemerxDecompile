@@ -18,23 +18,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using CodemerxDecompile.Service.Extensions;
-using CodemerxDecompile.Service.Interfaces;
-using CodemerxDecompile.Service.Services;
-using Grpc.Core;
 
-using JustDecompile.Tools.MSBuildProjectBuilder;
-using JustDecompile.Tools.MSBuildProjectBuilder.FilePathsServices;
+using Grpc.Core;
 using Mono.Cecil;
 using Mono.Cecil.AssemblyResolver;
 using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
+
 using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
+using Telerik.JustDecompiler.External.Interfaces;
+using JustDecompile.Tools.MSBuildProjectBuilder;
+using JustDecompile.Tools.MSBuildProjectBuilder.FilePathsServices;
+using JustDecompile.EngineInfrastructure;
+using JustDecompile.Tools.MSBuildProjectBuilder.NetCore;
+using CodemerxDecompile.Service.Extensions;
+using CodemerxDecompile.Service.Interfaces;
+using CodemerxDecompile.Service.Services;
 using CodemerxDecompile.Service.Services.DecompilationContext.Models;
 
 namespace CodemerxDecompile.Service
@@ -51,7 +56,7 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
 
             GetAssemblyRelatedFilePathsResponse response = new GetAssemblyRelatedFilePathsResponse()
             {
@@ -64,9 +69,7 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = ExternallyVisibleDecompilationUtilities.ResolveAssembly(new AssemblyIdentifier(request.AssemblyPath));
-            //SpecialTypeAssembly special = assembly.MainModule.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
-            //IAssemblyResolver assemblyResolver = assembly.MainModule.AssemblyResolver;
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
             Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
             Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
             DefaultFilePathsService filePathsService = new DefaultFilePathsService(
@@ -84,7 +87,6 @@ namespace CodemerxDecompile.Service
                                                                                           .ToDictionary(kvp => Path.Join(AssembliesDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
 
             this.decompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
-            //ICollection<AssemblyNameReference> assemblyReferencesNames = this.GetAssembliesDependingOn(assembly.MainModule, userDefinedTypes);
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
             response.TypeFilePaths.AddRange(filePathToTypeDefinition.Keys);
@@ -284,6 +286,112 @@ namespace CodemerxDecompile.Service
             }
 		}
 
+        public override Task<GetProjectCreationMetadataFromTypeFilePathResponse> GetProjectCreationMetadataFromTypeFilePath(GetProjectCreationMetadataFromTypeFilePathRequest request, ServerCallContext context)
+        {
+            string normalizedFilePath = this.NormalizeFilePath(request.TypeFilePath);
+
+            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
+            {
+                typeDefinition = this.decompilationContext.FilePathToType.FirstOrDefault(p => p.Key.StartsWith(normalizedFilePath)).Value;
+            }
+
+            if (typeDefinition == null || !this.TryResolveTypeAssemblyFilePath(typeDefinition, out string assemblyPath))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to resolve assembly from path"));
+            }
+
+            VisualStudioVersion visualStudioVersion = this.GetProjectCreationVSVersion(request.ProjectVisualStudioVersion);
+
+            AssemblyDefinition assemblyDefinition = typeDefinition.Module.Assembly;
+            ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
+            ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(assemblyPath, NoCacheAssemblyInfoService.Instance,
+                EmptyResolver.Instance, visualStudioVersion, language, TargetPlatformResolver.Instance);
+            bool containsDangerousResources = assemblyDefinition.Modules.SelectMany(m => m.Resources).Any(r => DangerousResourceIdentifier.IsDangerousResource(r));
+            string normalizedVSProjectFileExtension = language.VSProjectFileExtension.TrimStart('.');
+            string generatedProjectExtension = normalizedVSProjectFileExtension + (settings.JustDecompileSupportedProjectType ? string.Empty : MSBuildProjectBuilder.ErrorFileExtension);
+
+            return Task.FromResult(new GetProjectCreationMetadataFromTypeFilePathResponse()
+            {
+                AssemblyFilePath = assemblyPath,
+                ContainsDangerousResources = containsDangerousResources,
+                ProjectFileMetadata = new ProjectFileMetadata()
+                {
+                    IsDecompilerSupportedProjectType = settings.JustDecompileSupportedProjectType,
+                    IsVSSupportedProjectType = settings.VisualStudioSupportedProjectType,
+                    ProjectTypeNotSupportedErrorMessage = settings.ErrorMessage ?? string.Empty,
+                    ProjectFileName = assemblyDefinition.Name.Name,
+                    ProjectFileExtension = generatedProjectExtension
+                }
+            });
+        }
+
+        public override Task<CreateProjectResponse> CreateProject(CreateProjectRequest request, ServerCallContext context)
+        {
+            string outputPath = this.NormalizeFilePath(request.OutputPath);
+            string targetPath = this.NormalizeFilePath(request.AssemblyFilePath);
+
+            if (string.IsNullOrEmpty(outputPath) || string.IsNullOrEmpty(targetPath))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid argument"));
+            }
+
+            bool decompileDangerousResources = request.DecompileDangerousResources;
+            VisualStudioVersion visualStudioVersion = this.GetProjectCreationVSVersion(request.ProjectVisualStudioVersion);
+            ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
+
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(targetPath);
+            ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(targetPath, NoCacheAssemblyInfoService.Instance,
+                EmptyResolver.Instance, visualStudioVersion, language, TargetPlatformResolver.Instance);
+
+            DecompilationPreferences preferences = new DecompilationPreferences()
+            {
+                WriteFullNames = false,
+                WriteDocumentation = true,
+                RenameInvalidMembers = true,
+                WriteLargeNumbersInHex = true,
+                DecompileDangerousResources = decompileDangerousResources
+            };
+
+            BaseProjectBuilder projectBuilder = this.GetProjectBuilder(assembly, targetPath, visualStudioVersion, settings, language, outputPath, preferences, EmptyResolver.Instance, TargetPlatformResolver.Instance);
+            string generationErrorMessage = this.CreateProject(projectBuilder);
+
+            return Task.FromResult(new CreateProjectResponse() { ErrorMessage = generationErrorMessage });
+        }
+
+        private string CreateProject(BaseProjectBuilder projectBuilder)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            BaseProjectBuilder.ProjectGenerationFailureEventHandler OnProjectGenerationFailure = (s, e) =>
+            {
+                builder.AppendLine(e.Message);
+            };
+            projectBuilder.ProjectGenerationFailure += OnProjectGenerationFailure;
+
+            projectBuilder.BuildProject();
+
+            projectBuilder.ProjectGenerationFailure -= OnProjectGenerationFailure;
+
+            return builder.ToString();
+        }
+
+        private VisualStudioVersion GetProjectCreationVSVersion(string version)
+        {
+            switch (version)
+            {
+                case "2010":
+                    return VisualStudioVersion.VS2010;
+                case "2012":
+                    return VisualStudioVersion.VS2012;
+                case "2013":
+                    return VisualStudioVersion.VS2013;
+                case "2015":
+                    return VisualStudioVersion.VS2015;
+                default:
+                    return VisualStudioVersion.VS2017;
+            }
+        }
+
         private bool TryResolveTypeAssemblyFilePath(TypeReference typeReference, out string assemblyFilePath)
         {
             ModuleDefinition moduleDefinition = typeReference.Module;
@@ -292,7 +400,10 @@ namespace CodemerxDecompile.Service
             AssemblyName assemblyName = new AssemblyName(assemblyNameReference.Name,
                                                                 assemblyNameReference.FullName,
                                                                 assemblyNameReference.Version,
-                                                                assemblyNameReference.PublicKeyToken);
+                                                                assemblyNameReference.PublicKeyToken)
+            {
+                TargetArchitecture = moduleDefinition.GetModuleArchitecture()
+            };
 
             assemblyFilePath = moduleDefinition.AssemblyResolver.FindAssemblyPath(assemblyName, null, assemblyKey);
 
@@ -324,50 +435,25 @@ namespace CodemerxDecompile.Service
             return filePath;
         }
 
-        private ICollection<TypeReference> GetExpandedTypeDependanceList(ModuleDefinition module, Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes)
+        private BaseProjectBuilder GetProjectBuilder(AssemblyDefinition assembly, string targetPath, VisualStudioVersion visualStudioVersion, ProjectGenerationSettings settings, ILanguage language, string projFilePath, DecompilationPreferences preferences, IFrameworkResolver frameworkResolver, ITargetPlatformResolver targetPlatformResolver)
         {
-            Mono.Collections.Generic.Collection<TypeDefinition> moduleTypes;
-            if (!userDefinedTypes.TryGetValue(module, out moduleTypes))
+            TargetPlatform targetPlatform = targetPlatformResolver.GetTargetPlatform(assembly.MainModule.FilePath, assembly.MainModule);
+            BaseProjectBuilder projectBuilder;
+
+            if (targetPlatform == TargetPlatform.NetCore)
             {
-                throw new Exception("Module types not found.");
+                projectBuilder = new NetCoreProjectBuilder(targetPath, projFilePath, language, preferences, null, NoCacheAssemblyInfoService.Instance, visualStudioVersion, settings);
+            }
+            else if (targetPlatform == TargetPlatform.WinRT)
+            {
+                projectBuilder = new WinRTProjectBuilder(targetPath, projFilePath, language, preferences, null, NoCacheAssemblyInfoService.Instance, visualStudioVersion, settings);
+            }
+            else
+            {
+                projectBuilder = new MSBuildProjectBuilder(targetPath, projFilePath, language, frameworkResolver, preferences, null, NoCacheAssemblyInfoService.Instance, visualStudioVersion, settings);
             }
 
-            HashSet<TypeReference> firstLevelDependanceTypes = new HashSet<TypeReference>();
-            foreach (TypeReference type in moduleTypes)
-            {
-                if (!firstLevelDependanceTypes.Contains(type))
-                {
-                    firstLevelDependanceTypes.Add(type);
-                }
-            }
-
-            foreach (TypeReference type in module.GetTypeReferences())
-            {
-                if (!firstLevelDependanceTypes.Contains(type))
-                {
-                    firstLevelDependanceTypes.Add(type);
-                }
-            }
-
-            return Telerik.JustDecompiler.Decompiler.Utilities.GetExpandedTypeDependanceList(firstLevelDependanceTypes);
-        }
-
-        private ICollection<AssemblyNameReference> GetAssembliesDependingOn(ModuleDefinition module, Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes)
-        {
-            ICollection<AssemblyNameReference> result;
-
-            ICollection<TypeReference> expadendTypeDependanceList = this.GetExpandedTypeDependanceList(module, userDefinedTypes);
-            result = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembliesDependingOn(module, expadendTypeDependanceList);
-
-            foreach (AssemblyNameReference assemblyReference in module.AssemblyReferences)
-            {
-                if (!result.Contains(assemblyReference))
-                {
-                    result.Add(assemblyReference);
-                }
-            }
-
-            return result;
+            return projectBuilder;
         }
     }
 }

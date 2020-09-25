@@ -31,6 +31,28 @@ function deserialize_AddResolvedAssemblyRequest(buffer_arg) {
   return main_pb.AddResolvedAssemblyRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_CreateProjectRequest(arg) {
+  if (!(arg instanceof main_pb.CreateProjectRequest)) {
+    throw new Error('Expected argument of type CreateProjectRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_CreateProjectRequest(buffer_arg) {
+  return main_pb.CreateProjectRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_CreateProjectResponse(arg) {
+  if (!(arg instanceof main_pb.CreateProjectResponse)) {
+    throw new Error('Expected argument of type CreateProjectResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_CreateProjectResponse(buffer_arg) {
+  return main_pb.CreateProjectResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_DecompileTypeRequest(arg) {
   if (!(arg instanceof main_pb.DecompileTypeRequest)) {
     throw new Error('Expected argument of type DecompileTypeRequest');
@@ -141,6 +163,28 @@ function deserialize_GetMemberReferenceMetadataResponse(buffer_arg) {
   return main_pb.GetMemberReferenceMetadataResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_GetProjectCreationMetadataFromTypeFilePathRequest(arg) {
+  if (!(arg instanceof main_pb.GetProjectCreationMetadataFromTypeFilePathRequest)) {
+    throw new Error('Expected argument of type GetProjectCreationMetadataFromTypeFilePathRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetProjectCreationMetadataFromTypeFilePathRequest(buffer_arg) {
+  return main_pb.GetProjectCreationMetadataFromTypeFilePathRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_GetProjectCreationMetadataFromTypeFilePathResponse(arg) {
+  if (!(arg instanceof main_pb.GetProjectCreationMetadataFromTypeFilePathResponse)) {
+    throw new Error('Expected argument of type GetProjectCreationMetadataFromTypeFilePathResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetProjectCreationMetadataFromTypeFilePathResponse(buffer_arg) {
+  return main_pb.GetProjectCreationMetadataFromTypeFilePathResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_Selection(arg) {
   if (!(arg instanceof main_pb.Selection)) {
     throw new Error('Expected argument of type Selection');
@@ -164,6 +208,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestDeserialize: deserialize_GetAssemblyRelatedFilePathsRequest,
     responseSerialize: serialize_GetAssemblyRelatedFilePathsResponse,
     responseDeserialize: deserialize_GetAssemblyRelatedFilePathsResponse,
+  },
+  getProjectCreationMetadataFromTypeFilePath: {
+    path: '/RpcDecompiler/GetProjectCreationMetadataFromTypeFilePath',
+    requestStream: false,
+    responseStream: false,
+    requestType: main_pb.GetProjectCreationMetadataFromTypeFilePathRequest,
+    responseType: main_pb.GetProjectCreationMetadataFromTypeFilePathResponse,
+    requestSerialize: serialize_GetProjectCreationMetadataFromTypeFilePathRequest,
+    requestDeserialize: deserialize_GetProjectCreationMetadataFromTypeFilePathRequest,
+    responseSerialize: serialize_GetProjectCreationMetadataFromTypeFilePathResponse,
+    responseDeserialize: deserialize_GetProjectCreationMetadataFromTypeFilePathResponse,
   },
   getAllTypeFilePaths: {
     path: '/RpcDecompiler/GetAllTypeFilePaths',
@@ -219,6 +274,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestDeserialize: deserialize_AddResolvedAssemblyRequest,
     responseSerialize: serialize_Empty,
     responseDeserialize: deserialize_Empty,
+  },
+  createProject: {
+    path: '/RpcDecompiler/CreateProject',
+    requestStream: false,
+    responseStream: false,
+    requestType: main_pb.CreateProjectRequest,
+    responseType: main_pb.CreateProjectResponse,
+    requestSerialize: serialize_CreateProjectRequest,
+    requestDeserialize: deserialize_CreateProjectRequest,
+    responseSerialize: serialize_CreateProjectResponse,
+    responseDeserialize: deserialize_CreateProjectResponse,
   },
 };
 

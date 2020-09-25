@@ -12,6 +12,7 @@ define(['exports', 'google-protobuf', './common_pb'], function (exports, jspb, c
 var goog = jspb;
 var global = Function('return this')();
 
+goog.object.extend(proto, common_pb);
 goog.exportSymbol('proto.AddResolvedAssemblyRequest', null, global);
 goog.exportSymbol('proto.CreateProjectRequest', null, global);
 goog.exportSymbol('proto.CreateProjectResponse', null, global);
@@ -419,7 +420,7 @@ proto.GetProjectCreationMetadataFromTypeFilePathRequest.prototype.toObject = fun
 proto.GetProjectCreationMetadataFromTypeFilePathRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     typefilepath: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    projectvisualstudioversion: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    projectvisualstudioversion: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -461,7 +462,7 @@ proto.GetProjectCreationMetadataFromTypeFilePathRequest.deserializeBinaryFromRea
       msg.setTypefilepath(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt32());
+      var value = /** @type {string} */ (reader.readString());
       msg.setProjectvisualstudioversion(value);
       break;
     default:
@@ -501,8 +502,8 @@ proto.GetProjectCreationMetadataFromTypeFilePathRequest.serializeBinaryToWriter 
     );
   }
   f = message.getProjectvisualstudioversion();
-  if (f !== 0) {
-    writer.writeInt32(
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
@@ -529,20 +530,20 @@ proto.GetProjectCreationMetadataFromTypeFilePathRequest.prototype.setTypefilepat
 
 
 /**
- * optional int32 projectVisualStudioVersion = 2;
- * @return {number}
+ * optional string projectVisualStudioVersion = 2;
+ * @return {string}
  */
 proto.GetProjectCreationMetadataFromTypeFilePathRequest.prototype.getProjectvisualstudioversion = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /**
- * @param {number} value
+ * @param {string} value
  * @return {!proto.GetProjectCreationMetadataFromTypeFilePathRequest} returns this
  */
 proto.GetProjectCreationMetadataFromTypeFilePathRequest.prototype.setProjectvisualstudioversion = function(value) {
-  return jspb.Message.setProto3IntField(this, 2, value);
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
@@ -1042,7 +1043,7 @@ proto.CreateProjectRequest.toObject = function(includeInstance, msg) {
     assemblyfilepath: jspb.Message.getFieldWithDefault(msg, 1, ""),
     outputpath: jspb.Message.getFieldWithDefault(msg, 2, ""),
     decompiledangerousresources: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
-    projectvisualstudioversion: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    projectvisualstudioversion: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -1092,7 +1093,7 @@ proto.CreateProjectRequest.deserializeBinaryFromReader = function(msg, reader) {
       msg.setDecompiledangerousresources(value);
       break;
     case 4:
-      var value = /** @type {number} */ (reader.readInt32());
+      var value = /** @type {string} */ (reader.readString());
       msg.setProjectvisualstudioversion(value);
       break;
     default:
@@ -1146,8 +1147,8 @@ proto.CreateProjectRequest.serializeBinaryToWriter = function(message, writer) {
     );
   }
   f = message.getProjectvisualstudioversion();
-  if (f !== 0) {
-    writer.writeInt32(
+  if (f.length > 0) {
+    writer.writeString(
       4,
       f
     );
@@ -1210,20 +1211,20 @@ proto.CreateProjectRequest.prototype.setDecompiledangerousresources = function(v
 
 
 /**
- * optional int32 projectVisualStudioVersion = 4;
- * @return {number}
+ * optional string projectVisualStudioVersion = 4;
+ * @return {string}
  */
 proto.CreateProjectRequest.prototype.getProjectvisualstudioversion = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /**
- * @param {number} value
+ * @param {string} value
  * @return {!proto.CreateProjectRequest} returns this
  */
 proto.CreateProjectRequest.prototype.setProjectvisualstudioversion = function(value) {
-  return jspb.Message.setProto3IntField(this, 4, value);
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 

@@ -36,14 +36,14 @@ export interface IDecompilationMainService {
 	readonly _serviceBrand: undefined;
 
 	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
-	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: number): Promise<ProjectCreationMetadata>;
+	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
 	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
 	decompileType(filePath: string) : Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
 	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
 	addResolvedAssembly(filePath: string) : Promise<void>;
-	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: number): Promise<CreateProjectResult>;
-	getLegacyVisualStudioVersions() : string[];
+	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
+	getLegacyVisualStudioVersions() : Promise<string[]>;
 }
 
 export class DecompilationMainService implements IDecompilationMainService {
@@ -176,23 +176,23 @@ export class DecompilationMainService implements IDecompilationMainService {
 		})
 	}
 
-	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: number): Promise<ProjectCreationMetadata> {
+	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata> {
 		const request = new GetProjectCreationMetadataFromTypeFilePathRequest();
 		request.setTypefilepath(typeFilePath);
-		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? 0);
+		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? '');
 
 		return new Promise<ProjectCreationMetadata>((resolve, reject) => {
-			this.client?.getProjectCreationMetadataFromTypeFilePath(request, null, (err, response) => {
+			this.client?.getProjectCreationMetadataFromTypeFilePath(request, {}, (err, response) => {
 				if (err) {
 					reject(`getProjectCreationMetadataFromTypeFilePath failed. Error: ${JSON.stringify(err)}`);
 					return;
 				}
 
-				const projectFileMetadata = response.getProjectfilemetadata();
+				const projectFileMetadata = response!.getProjectfilemetadata();
 
 				const assemblyMetadata: ProjectCreationMetadata = {
-					assemblyFilePath: response.getAssemblyfilepath(),
-					containsDangerousResources: response.getContainsdangerousresources(),
+					assemblyFilePath: response!.getAssemblyfilepath(),
+					containsDangerousResources: response!.getContainsdangerousresources(),
 					projectFileMetadata: projectFileMetadata ? {
 						isDecompilerSupportedProjectType: projectFileMetadata?.getIsdecompilersupportedprojecttype(),
 						isVSSupportedProjectType: projectFileMetadata?.getIsvssupportedprojecttype(),
@@ -207,22 +207,22 @@ export class DecompilationMainService implements IDecompilationMainService {
 		});
 	}
 
-	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: number): Promise<CreateProjectResult> {
+	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult> {
 		const request = new CreateProjectRequest();
 		request.setAssemblyfilepath(assemblyFilePath);
 		request.setOutputpath(outputPath);
 		request.setDecompiledangerousresources(decompileDangerousResources);
-		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? 0);
+		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? '');
 
 		return new Promise<CreateProjectResult>((resolve, reject) => {
-			this.client?.createProject(request, null, (err, response) => {
+			this.client?.createProject(request, {}, (err, response) => {
 				if (err) {
 					reject(`createProject failed. Error: ${JSON.stringify(err)}`);
 					return;
 				}
 
 				const createProjectResult: CreateProjectResult = {
-					errorMessage: response.getErrormessage()
+					errorMessage: response!.getErrormessage()
 				};
 
 				resolve(createProjectResult);
@@ -230,5 +230,5 @@ export class DecompilationMainService implements IDecompilationMainService {
 		});
 	}
 
-	getLegacyVisualStudioVersions = () => ['2010', '2012', '2013', '2015'];
+	getLegacyVisualStudioVersions = async () => ['2010', '2012', '2013', '2015'];
 }

@@ -25,14 +25,14 @@ export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
 	getAssemblyRelatedFilePaths(assemblyPath: string): Promise<AssemblyRelatedFilePaths>;
-	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: number): Promise<ProjectCreationMetadata>;
+	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
 	getAllTypeFilePaths(assemblyPath: string): Promise<string[]>;
 	decompileType(filePath: string): Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number): Promise<ReferenceMetadata>;
 	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string): Promise<Selection>;
 	addResolvedAssembly(filePath: string): Promise<void>;
-	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: number): Promise<CreateProjectResult>;
-	getLegacyVisualStudioVersions() : string[];
+	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
+	getLegacyVisualStudioVersions() : Promise<string[]>;
 }
 
 export class DecompilationService {

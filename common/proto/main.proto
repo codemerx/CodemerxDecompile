@@ -33,7 +33,7 @@ service RpcDecompiler {
 
 message GetProjectCreationMetadataFromTypeFilePathRequest {
   string typeFilePath = 1;
-  int32 projectVisualStudioVersion = 2;
+  string projectVisualStudioVersion = 2;
 }
 
 message GetProjectCreationMetadataFromTypeFilePathResponse {
@@ -54,7 +54,7 @@ message CreateProjectRequest {
   string assemblyFilePath = 1;
   string outputPath = 2;
   bool decompileDangerousResources = 3;
-  int32 projectVisualStudioVersion = 4;
+  string projectVisualStudioVersion = 4;
 }
 
 message CreateProjectResponse {

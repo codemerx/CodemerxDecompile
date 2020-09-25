@@ -49,7 +49,7 @@ abstract class BaseCreateProjectAction extends Action {
 		super(id, label);
 	}
 
-	protected abstract get projectVsStudioVersion(): number | undefined;
+	protected abstract get projectVsStudioVersion(): string | undefined;
 
 	async run(): Promise<void> {
 		const selectedExplorerItems = this.explorerService.getContext(false);
@@ -130,7 +130,7 @@ class CreateProjectAction extends BaseCreateProjectAction {
 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
 	}
 
-	protected get projectVsStudioVersion(): number | undefined {
+	protected get projectVsStudioVersion(): string | undefined {
 		return undefined;
 	}
 }
@@ -151,9 +151,9 @@ abstract class CreateLegacyProjectAction extends BaseCreateProjectAction {
 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
 	}
 
-	protected get projectVsStudioVersion(): number | undefined {
+	protected get projectVsStudioVersion(): string | undefined {
 		const idParts = this._id.split('.');
-		return +idParts[idParts.length - 1];
+		return idParts[idParts.length - 1];
 	}
 }
 
@@ -240,8 +240,8 @@ class ToolsActionsProvider extends Disposable implements IWorkbenchContribution 
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2015ProjectAction), 'Legacy Project Visual Studio 2015', nls.localize('tools', "Tools"));
 	}
 
-	private appendMenuItems() : void {
-		const legacyVsStudioVersions: string[] = this.decompilationService.getLegacyVisualStudioVersions();
+	private async appendMenuItems() : Promise<void> {
+		const legacyVsStudioVersions: string[] = await this.decompilationService.getLegacyVisualStudioVersions();
 
 		const menuItems: { id: MenuId, item: IMenuItem | ISubmenuItem }[] = [];
 

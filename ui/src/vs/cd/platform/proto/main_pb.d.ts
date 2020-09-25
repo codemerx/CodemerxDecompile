@@ -8,8 +8,8 @@ export class GetProjectCreationMetadataFromTypeFilePathRequest extends jspb.Mess
   getTypefilepath(): string;
   setTypefilepath(value: string): void;
 
-  getProjectvisualstudioversion(): number;
-  setProjectvisualstudioversion(value: number): void;
+  getProjectvisualstudioversion(): string;
+  setProjectvisualstudioversion(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetProjectCreationMetadataFromTypeFilePathRequest.AsObject;
@@ -24,7 +24,7 @@ export class GetProjectCreationMetadataFromTypeFilePathRequest extends jspb.Mess
 export namespace GetProjectCreationMetadataFromTypeFilePathRequest {
   export type AsObject = {
     typefilepath: string,
-    projectvisualstudioversion: number,
+    projectvisualstudioversion: string,
   }
 }
 
@@ -104,8 +104,8 @@ export class CreateProjectRequest extends jspb.Message {
   getDecompiledangerousresources(): boolean;
   setDecompiledangerousresources(value: boolean): void;
 
-  getProjectvisualstudioversion(): number;
-  setProjectvisualstudioversion(value: number): void;
+  getProjectvisualstudioversion(): string;
+  setProjectvisualstudioversion(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreateProjectRequest.AsObject;
@@ -122,7 +122,7 @@ export namespace CreateProjectRequest {
     assemblyfilepath: string,
     outputpath: string,
     decompiledangerousresources: boolean,
-    projectvisualstudioversion: number,
+    projectvisualstudioversion: string,
   }
 }
 

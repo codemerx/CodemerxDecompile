@@ -56,7 +56,7 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(request.AssemblyPath);
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
 
             GetAssemblyRelatedFilePathsResponse response = new GetAssemblyRelatedFilePathsResponse()
             {
@@ -69,7 +69,7 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = ExternallyVisibleDecompilationUtilities.ResolveAssembly(new AssemblyIdentifier(request.AssemblyPath));
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
             Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
             Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
             DefaultFilePathsService filePathsService = new DefaultFilePathsService(
@@ -339,7 +339,7 @@ namespace CodemerxDecompile.Service
             VisualStudioVersion visualStudioVersion = this.GetProjectCreationVSVersion(request.ProjectVisualStudioVersion);
             ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
 
-            AssemblyDefinition assembly = Telerik.JustDecompiler.Decompiler.Utilities.GetAssembly(targetPath);
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(targetPath);
             ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(targetPath, NoCacheAssemblyInfoService.Instance,
                 EmptyResolver.Instance, visualStudioVersion, language, TargetPlatformResolver.Instance);
 
@@ -375,17 +375,17 @@ namespace CodemerxDecompile.Service
             return builder.ToString();
         }
 
-        private VisualStudioVersion GetProjectCreationVSVersion(int version)
+        private VisualStudioVersion GetProjectCreationVSVersion(string version)
         {
             switch (version)
             {
-                case 2010:
+                case "2010":
                     return VisualStudioVersion.VS2010;
-                case 2012:
+                case "2012":
                     return VisualStudioVersion.VS2012;
-                case 2013:
+                case "2013":
                     return VisualStudioVersion.VS2013;
-                case 2015:
+                case "2015":
                     return VisualStudioVersion.VS2015;
                 default:
                     return VisualStudioVersion.VS2017;
@@ -401,7 +401,7 @@ namespace CodemerxDecompile.Service
                                                                 assemblyNameReference.FullName,
                                                                 assemblyNameReference.Version,
                                                                 assemblyNameReference.PublicKeyToken)
-            { 
+            {
                 TargetArchitecture = moduleDefinition.GetModuleArchitecture()
             };
 

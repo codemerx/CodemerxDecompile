@@ -14,22 +14,27 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-import { IMainProcessService } from 'vs/platform/ipc/electron-sandbox/mainProcessService';
-import { createChannelSender } from 'vs/base/parts/ipc/common/ipc';
-import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-
-export const IGrpcService = createDecorator<IGrpcService>('grpcService');
-
-export interface IGrpcService {
-	readonly _serviceBrand: undefined;
-
-	getServiceUrl(): Promise<string>;
+export interface AssemblyRelatedFilePaths {
+	decompiledAssemblyDirectory: string;
+	decompiledAssemblyPath: string;
 }
 
-export class GrpcService {
-	readonly _serviceBrand: undefined;
+export interface TypeFilePath {
+	typeFullName: string;
+	absoluteFilePath: string;
+}
 
-	constructor(@IMainProcessService mainProcessService: IMainProcessService) {
-		return createChannelSender<IGrpcService>(mainProcessService.getChannel('grpc'));
-	}
+export interface Selection {
+	startLineNumber: number;
+	endLineNumber: number;
+	startColumn: number;
+	endColumn: number;
+}
+
+export interface ReferenceMetadata {
+	memberFullName: string;
+	definitionFilePath?: string;
+	isCrossAssemblyReference: boolean;
+    referencedAssemblyFullName?: string;
+    referencedAssemblyFilePath?: string;
 }

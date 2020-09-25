@@ -28,14 +28,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Protobuf Include="..\..\common\proto\common.proto" GrpcServices="Server">
+      <Link>proto\common.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\..\common\proto\main.proto" GrpcServices="Server">
       <Link>proto\main.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\common\proto\manager.proto" GrpcServices="Server">
+      <Link>proto\manager.proto</Link>
     </Protobuf>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
-    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.30.0" />
   </ItemGroup>
 
   <ItemGroup>

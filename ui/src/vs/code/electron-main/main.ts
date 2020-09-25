@@ -19,7 +19,9 @@ import { ServicesAccessor, IInstantiationService } from 'vs/platform/instantiati
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 import { ServiceCollection } from 'vs/platform/instantiation/common/serviceCollection';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
-import { ILogService, ConsoleLogMainService, MultiplexLogService, getLogLevel } from 'vs/platform/log/common/log';
+/* AGPL */
+import { ILogService, ConsoleLogMainService, MultiplexLogService, getLogLevel, ILoggerService } from 'vs/platform/log/common/log';
+/* End AGPL */
 import { StateService } from 'vs/platform/state/node/stateService';
 import { IStateService } from 'vs/platform/state/node/state';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
@@ -51,7 +53,9 @@ import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IProductService } from 'vs/platform/product/common/productService';
 /* AGPL */
-import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
+import { GrpcService, IGrpcService } from 'vs/cd/platform/GrpcService';
+import { IDecompilationMainService, DecompilationMainService } from 'vs/cd/platform/DecompilationMainService';
+import { FileLoggerService } from 'vs/platform/log/common/fileLogService';
 /* End AGPL */
 
 class ExpectedError extends Error {
@@ -112,12 +116,12 @@ class CodeMain {
 				const configurationService = accessor.get(IConfigurationService);
 				const stateService = accessor.get(IStateService);
 				/* AGPL */
-				const grpcService = accessor.get(IGrpcMainService);
+				const grpcService = accessor.get(IGrpcService);
 				/* End AGPL */
 
 				try {
 					/* AGPL */
-					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService, grpcService as GrpcMainService);
+					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService, grpcService as GrpcService);
 					/* End AGPL */
 				} catch (error) {
 
@@ -177,14 +181,17 @@ class CodeMain {
 		services.set(ITunnelService, new SyncDescriptor(TunnelService));
 
 		/* AGPL */
-		services.set(IGrpcMainService, new GrpcMainService());
+		services.set(ILoggerService, new SyncDescriptor(FileLoggerService));
+
+		services.set(IGrpcService, new SyncDescriptor(GrpcService));
+		services.set(IDecompilationMainService, new SyncDescriptor(DecompilationMainService));
 		/* End AGPL */
 
 		return [new InstantiationService(services, true), instanceEnvironment, environmentService];
 	}
 
 	/* AGPL */
-	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService, grpcService: GrpcMainService): Promise<unknown> {
+	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService, grpcService: GrpcService): Promise<unknown> {
 	/* End AGPL */
 
 		// Environment service (paths)

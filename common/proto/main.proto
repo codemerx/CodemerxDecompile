@@ -16,6 +16,8 @@
 
 syntax = "proto3";
 
+import "common.proto";
+
 option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
@@ -26,8 +28,6 @@ service RpcDecompiler {
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
   rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
 }
-
-message Empty { }
 
 message GetAssemblyRelatedFilePathsRequest {
   string assemblyPath = 1;

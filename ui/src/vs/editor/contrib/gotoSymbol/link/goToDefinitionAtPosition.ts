@@ -20,7 +20,8 @@ import { Position } from 'vs/editor/common/core/position';
 import { withNullAsUndefined } from 'vs/base/common/types';
 import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 /* AGPL */
-import { IDecompilationService, ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
 import { ICodeEditorService } from 'vs/editor/browser/services/codeEditorService';
 import { URI } from 'vs/base/common/uri';
 import { INotificationService, Severity, IPromptChoice } from 'vs/platform/notification/common/notification';

@@ -55,6 +55,11 @@ export interface IEnvironmentService {
 	extensionEnabledProposedApi?: string[];
 	logExtensionHostCommunication?: boolean;
 
+	/* AGPL */
+	// --- CodemerxDecompile
+	codemerxDecompileLogResource: URI;
+	/* End AGPL */
+
 	// --- logging
 	logsPath: string;
 	logLevel?: string;

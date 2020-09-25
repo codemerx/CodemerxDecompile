@@ -11,7 +11,7 @@ import { IResourceEditorInput } from 'vs/platform/editor/common/editor';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { URI } from 'vs/base/common/uri';
 /* AGPL */
-import { ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
+import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
 /* End AGPL */
 
 export const ICodeEditorService = createDecorator<ICodeEditorService>('codeEditorService');

@@ -12,7 +12,7 @@ import { IEditorGroup, IEditorReplacement, OpenEditorContext } from 'vs/workbenc
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { URI } from 'vs/base/common/uri';
 /* AGPL */
-import { ReferenceMetadata } from 'vs/cd/workbench/DecompilationService';
+import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
 /* End AGPL */
 
 export const IEditorService = createDecorator<IEditorService>('editorService');

@@ -141,6 +141,28 @@ function deserialize_GetMemberReferenceMetadataResponse(buffer_arg) {
   return main_pb.GetMemberReferenceMetadataResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_SearchRequest(arg) {
+  if (!(arg instanceof main_pb.SearchRequest)) {
+    throw new Error('Expected argument of type SearchRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_SearchRequest(buffer_arg) {
+  return main_pb.SearchRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_SearchResult(arg) {
+  if (!(arg instanceof main_pb.SearchResult)) {
+    throw new Error('Expected argument of type SearchResult');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_SearchResult(buffer_arg) {
+  return main_pb.SearchResult.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_Selection(arg) {
   if (!(arg instanceof main_pb.Selection)) {
     throw new Error('Expected argument of type Selection');
@@ -219,6 +241,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestDeserialize: deserialize_AddResolvedAssemblyRequest,
     responseSerialize: serialize_Empty,
     responseDeserialize: deserialize_Empty,
+  },
+  search: {
+    path: '/RpcDecompiler/Search',
+    requestStream: false,
+    responseStream: true,
+    requestType: main_pb.SearchRequest,
+    responseType: main_pb.SearchResult,
+    requestSerialize: serialize_SearchRequest,
+    requestDeserialize: deserialize_SearchRequest,
+    responseSerialize: serialize_SearchResult,
+    responseDeserialize: deserialize_SearchResult,
   },
 };
 

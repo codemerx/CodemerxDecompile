@@ -53,7 +53,7 @@ import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IProductService } from 'vs/platform/product/common/productService';
 /* AGPL */
-import { GrpcService, IGrpcService } from 'vs/cd/platform/GrpcService';
+import { GrpcMainService, IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { IDecompilationMainService, DecompilationMainService } from 'vs/cd/platform/DecompilationMainService';
 import { FileLoggerService } from 'vs/platform/log/common/fileLogService';
 /* End AGPL */
@@ -116,12 +116,12 @@ class CodeMain {
 				const configurationService = accessor.get(IConfigurationService);
 				const stateService = accessor.get(IStateService);
 				/* AGPL */
-				const grpcService = accessor.get(IGrpcService);
+				const grpcService = accessor.get(IGrpcMainService);
 				/* End AGPL */
 
 				try {
 					/* AGPL */
-					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService, grpcService as GrpcService);
+					await this.initServices(environmentService, configurationService as ConfigurationService, stateService as StateService, grpcService as GrpcMainService);
 					/* End AGPL */
 				} catch (error) {
 
@@ -183,7 +183,7 @@ class CodeMain {
 		/* AGPL */
 		services.set(ILoggerService, new SyncDescriptor(FileLoggerService));
 
-		services.set(IGrpcService, new SyncDescriptor(GrpcService));
+		services.set(IGrpcMainService, new SyncDescriptor(GrpcMainService));
 		services.set(IDecompilationMainService, new SyncDescriptor(DecompilationMainService));
 		/* End AGPL */
 
@@ -191,7 +191,7 @@ class CodeMain {
 	}
 
 	/* AGPL */
-	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService, grpcService: GrpcService): Promise<unknown> {
+	private initServices(environmentService: INativeEnvironmentService, configurationService: ConfigurationService, stateService: StateService, grpcService: GrpcMainService): Promise<unknown> {
 	/* End AGPL */
 
 		// Environment service (paths)

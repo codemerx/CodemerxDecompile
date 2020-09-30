@@ -25,7 +25,7 @@ import {
 } from './proto/main_pb';
 import * as grpc from "@grpc/grpc-js";
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-import { IGrpcService } from 'vs/cd/platform/GrpcService';
+import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection } from 'vs/cd/common/DecompilationTypes';
 
 export const IDecompilationMainService = createDecorator<IDecompilationMainService>('IDecompilationMainService');
@@ -46,7 +46,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 
 	private client: RpcDecompilerClient | undefined;
 
-	constructor(@IGrpcService grpcService: IGrpcService) {
+	constructor(@IGrpcMainService grpcService: IGrpcMainService) {
 		grpcService.getServiceUrl().then(url => {
 			this.client = new RpcDecompilerClient(url, grpc.credentials.createInsecure());
 		});

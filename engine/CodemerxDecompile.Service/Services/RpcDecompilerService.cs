@@ -282,7 +282,20 @@ namespace CodemerxDecompile.Service
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = commentedExceptionMessage });
             }
-		}
+        }
+
+        public override async Task Search(SearchRequest request, IServerStreamWriter<SearchResult> responseStream, ServerCallContext context)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                await Task.Delay(200);
+                await responseStream.WriteAsync(new SearchResult()
+                {
+                    FilePath = @"C:\Users\User\AppData\Local\Temp\CD\JustDecompiler, Version = 2019.1.118.0, Culture = neutral, PublicKeyToken = null\JustDecompiler.dll\Mono.Cecil\GenericHelper.cs",
+                    Preview = $"Result #{i + 1}"
+                });
+            }
+        }
 
         private bool TryResolveTypeAssemblyFilePath(TypeReference typeReference, out string assemblyFilePath)
         {

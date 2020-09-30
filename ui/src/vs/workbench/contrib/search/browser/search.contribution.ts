@@ -28,9 +28,7 @@ import { Registry } from 'vs/platform/registry/common/platform';
 import { defaultQuickAccessContextKeyValue } from 'vs/workbench/browser/quickaccess';
 import { Extensions as ActionExtensions, IWorkbenchActionRegistry } from 'vs/workbench/common/actions';
 import { Extensions as WorkbenchExtensions, IWorkbenchContribution, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
-/* AGPL */
-import { ViewContainerLocation, IViewDescriptorService, IViewsService } from 'vs/workbench/common/views';
-/* End AGPL */
+import { Extensions as ViewExtensions, IViewsRegistry, IViewContainersRegistry, ViewContainerLocation, IViewDescriptorService, IViewsService } from 'vs/workbench/common/views';
 import { getMultiSelectedResources } from 'vs/workbench/contrib/files/browser/files';
 /* AGPL */
 import { ExplorerFolderContext, FilesExplorerFocusCondition, IExplorerService, VIEWLET_ID as VIEWLET_ID_FILES } from 'vs/workbench/contrib/files/common/files';
@@ -54,12 +52,14 @@ import { ExplorerViewPaneContainer } from 'vs/workbench/contrib/files/browser/ex
 import { assertType, assertIsDefined } from 'vs/base/common/types';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { SearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditor';
+import { ViewPaneContainer } from 'vs/workbench/browser/parts/views/viewPaneContainer';
 import { IQuickAccessRegistry, Extensions as QuickAccessExtensions } from 'vs/platform/quickinput/common/quickAccess';
 import { SymbolsQuickAccessProvider } from 'vs/workbench/contrib/search/browser/symbolsQuickAccess';
 import { AnythingQuickAccessProvider } from 'vs/workbench/contrib/search/browser/anythingQuickAccess';
 import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
 import { AbstractGotoLineQuickAccessProvider } from 'vs/editor/contrib/quickAccess/gotoLineQuickAccess';
 import { GotoSymbolQuickAccessProvider } from 'vs/workbench/contrib/codeEditor/browser/quickaccess/gotoSymbolQuickAccess';
+import { searchViewIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
 
 registerSingleton(ISearchWorkbenchService, SearchWorkbenchService, true);
 registerSingleton(ISearchHistoryService, SearchHistoryService, true);
@@ -103,9 +103,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.FirstMatchFocusKey),
 	primary: KeyMod.CtrlCmd | KeyCode.UpArrow,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			searchView.focusPreviousInputBox();
@@ -121,9 +119,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	mac: {
 		primary: KeyMod.WinCtrl | KeyCode.Enter
 	},
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			const tree: WorkbenchObjectTree<RenderableMatch> = searchView.getControl();
@@ -137,9 +133,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, WorkbenchListFocusContextKey),
 	primary: KeyCode.Escape,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			searchView.cancelSearch();
@@ -155,9 +149,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	mac: {
 		primary: KeyMod.CtrlCmd | KeyCode.Backspace,
 	},
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			const tree: WorkbenchObjectTree<RenderableMatch> = searchView.getControl();
@@ -171,9 +163,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.ReplaceActiveKey, Constants.MatchFocusKey),
 	primary: KeyMod.Shift | KeyMod.CtrlCmd | KeyCode.KEY_1,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			const tree: WorkbenchObjectTree<RenderableMatch> = searchView.getControl();
@@ -188,9 +178,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.ReplaceActiveKey, Constants.FileFocusKey),
 	primary: KeyMod.Shift | KeyMod.CtrlCmd | KeyCode.KEY_1,
 	secondary: [KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Enter],
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			const tree: WorkbenchObjectTree<RenderableMatch> = searchView.getControl();
@@ -205,9 +193,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.ReplaceActiveKey, Constants.FolderFocusKey),
 	primary: KeyMod.Shift | KeyMod.CtrlCmd | KeyCode.KEY_1,
 	secondary: [KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.Enter],
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			const tree: WorkbenchObjectTree<RenderableMatch> = searchView.getControl();
@@ -221,9 +207,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.ReplaceInputBoxFocusedKey),
 	primary: KeyCode.Escape,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		accessor.get(IInstantiationService).createInstance(CloseReplaceAction, Constants.CloseReplaceWidgetActionId, '').run();
 	}
 });
@@ -235,9 +219,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, Constants.InputBoxFocusedKey),
 		ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.InputBoxFocusedKey)),
 	primary: KeyMod.CtrlCmd | KeyCode.DownArrow,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		accessor.get(IInstantiationService).createInstance(FocusNextInputAction, FocusNextInputAction.ID, '').run();
 	}
 });
@@ -249,9 +231,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, Constants.InputBoxFocusedKey),
 		ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.InputBoxFocusedKey, Constants.SearchInputBoxFocusedKey.toNegated())),
 	primary: KeyMod.CtrlCmd | KeyCode.UpArrow,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		accessor.get(IInstantiationService).createInstance(FocusPreviousInputAction, FocusPreviousInputAction.ID, '').run();
 	}
 });
@@ -462,18 +442,14 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 
 CommandsRegistry.registerCommand({
 	id: ClearSearchResultsAction.ID,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		accessor.get(IInstantiationService).createInstance(ClearSearchResultsAction, ClearSearchResultsAction.ID, '').run();
 	}
 });
 
 CommandsRegistry.registerCommand({
 	id: RefreshAction.ID,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		accessor.get(IInstantiationService).createInstance(RefreshAction, RefreshAction.ID, '').run();
 	}
 });
@@ -532,23 +508,19 @@ class ShowAllSymbolsAction extends Action {
 	}
 }
 
-/* AGPL */
-// const viewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
-// 	id: VIEWLET_ID,
-// 	name: nls.localize('name', "Search"),
-// 	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [VIEWLET_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
-// 	hideIfEmpty: true,
-// 	icon: searchViewIcon.classNames,
-// 	order: 1
-// }, ViewContainerLocation.Sidebar);
-/* End AGPL */
+const viewContainer = Registry.as<IViewContainersRegistry>(ViewExtensions.ViewContainersRegistry).registerViewContainer({
+	id: VIEWLET_ID,
+	name: nls.localize('name', "Search"),
+	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [VIEWLET_ID, { mergeViewWithContainerWhenSingleView: true, donotShowContainerTitleWhenMergedWithContainer: true }]),
+	hideIfEmpty: true,
+	icon: searchViewIcon.classNames,
+	order: 1
+}, ViewContainerLocation.Sidebar);
 
 const viewDescriptor = { id: VIEW_ID, containerIcon: 'codicon-search', name: nls.localize('search', "Search"), ctorDescriptor: new SyncDescriptor(SearchView), canToggleVisibility: false, canMoveView: true };
 
-/* AGPL */
-// // Register search default location to sidebar
-// Registry.as<IViewsRegistry>(ViewExtensions.ViewsRegistry).registerViews([viewDescriptor], viewContainer);
-/* End AGPL */
+// Register search default location to sidebar
+Registry.as<IViewsRegistry>(ViewExtensions.ViewsRegistry).registerViews([viewDescriptor], viewContainer);
 
 
 // Migrate search location setting to new model
@@ -683,9 +655,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: ContextKeyExpr.and(Constants.SearchViewVisibleKey, Constants.FileMatchOrMatchFocusKey),
 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_L,
-	/* AGPL */
-	handler: (accessor) => {
-	/* End AGPL */
+	handler: (accessor, args: any) => {
 		const searchView = getSearchView(accessor.get(IViewsService));
 		if (searchView) {
 			const tree: WorkbenchObjectTree<RenderableMatch> = searchView.getControl();

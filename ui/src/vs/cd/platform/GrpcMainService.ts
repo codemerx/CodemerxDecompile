@@ -29,16 +29,16 @@ const MAX_RETRIES = 10;
 const RUNNING_STATUS = 'Running';
 const WAIT_TIME_MILLISECONDS = 200;
 
-export const IGrpcService = createDecorator<IGrpcService>('grpcService');
+export const IGrpcMainService = createDecorator<IGrpcMainService>('IGrpcMainService');
 
-export interface IGrpcService {
+export interface IGrpcMainService {
 	readonly _serviceBrand: undefined;
 
 	initialize(): Promise<void>;
 	getServiceUrl(): Promise<string>;
 };
 
-export class GrpcService implements IGrpcService {
+export class GrpcMainService implements IGrpcMainService {
 	readonly _serviceBrand: undefined;
 
 	private port: number | undefined;

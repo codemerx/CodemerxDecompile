@@ -294,3 +294,47 @@ export namespace AddResolvedAssemblyRequest {
   }
 }
 
+export class SearchRequest extends jspb.Message {
+  getQuery(): string;
+  setQuery(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SearchRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: SearchRequest): SearchRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SearchRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SearchRequest;
+  static deserializeBinaryFromReader(message: SearchRequest, reader: jspb.BinaryReader): SearchRequest;
+}
+
+export namespace SearchRequest {
+  export type AsObject = {
+    query: string,
+  }
+}
+
+export class SearchResult extends jspb.Message {
+  getFilepath(): string;
+  setFilepath(value: string): void;
+
+  getPreview(): string;
+  setPreview(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SearchResult.AsObject;
+  static toObject(includeInstance: boolean, msg: SearchResult): SearchResult.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SearchResult, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SearchResult;
+  static deserializeBinaryFromReader(message: SearchResult, reader: jspb.BinaryReader): SearchResult;
+}
+
+export namespace SearchResult {
+  export type AsObject = {
+    filepath: string,
+    preview: string,
+  }
+}
+

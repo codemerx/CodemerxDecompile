@@ -27,6 +27,7 @@ service RpcDecompiler {
   rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
   rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
+  rpc Search (SearchRequest) returns (stream SearchResult);
 }
 
 message GetAssemblyRelatedFilePathsRequest {
@@ -87,4 +88,13 @@ message DecompileTypeResponse {
 
 message AddResolvedAssemblyRequest {
   string filePath = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+}
+
+message SearchResult {
+  string filePath = 1;
+  string preview = 2;
 }

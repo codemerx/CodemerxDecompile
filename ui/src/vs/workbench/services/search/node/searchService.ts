@@ -25,6 +25,9 @@ import { IEditorService } from 'vs/workbench/services/editor/common/editorServic
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
+/* AGPL */
+import { IGrpcService } from 'vs/cd/workbench/GrpcService';
+/* End AGPL */
 
 export class LocalSearchService extends SearchService {
 	constructor(
@@ -44,49 +47,63 @@ export class LocalSearchService extends SearchService {
 }
 
 export class DiskSearch implements ISearchResultProvider {
-	private raw: IRawSearchService;
+	/* AGPL */
+	private raw!: IRawSearchService;
+	/* End AGPL */
 
 	constructor(
 		verboseLogging: boolean,
 		searchDebug: IDebugParams | undefined,
 		@ILogService private readonly logService: ILogService,
 		@IConfigurationService private readonly configService: IConfigurationService,
+		/* AGPL */
+		@IGrpcService grpcService: IGrpcService
+		/* End AGPL */
 	) {
-		const timeout = this.configService.getValue<ISearchConfiguration>().search.maintainFileSearchCache ?
-			Number.MAX_VALUE :
-			60 * 60 * 1000;
+		/* AGPL */
+		grpcService.getServiceUrl().then(grpcServiceUrl => {
+		/* End AGPL */
+			const timeout = this.configService.getValue<ISearchConfiguration>().search.maintainFileSearchCache ?
+				Number.MAX_VALUE :
+				60 * 60 * 1000;
 
-		const opts: IIPCOptions = {
-			serverName: 'Search',
-			timeout,
-			args: ['--type=searchService'],
-			// See https://github.com/Microsoft/vscode/issues/27665
-			// Pass in fresh execArgv to the forked process such that it doesn't inherit them from `process.execArgv`.
-			// e.g. Launching the extension host process with `--inspect-brk=xxx` and then forking a process from the extension host
-			// results in the forked process inheriting `--inspect-brk=xxx`.
-			freshExecArgv: true,
-			env: {
-				AMD_ENTRYPOINT: 'vs/workbench/services/search/node/searchApp',
-				PIPE_LOGGING: 'true',
-				VERBOSE_LOGGING: verboseLogging
-			},
-			useQueue: true
-		};
+			const opts: IIPCOptions = {
+				serverName: 'Search',
+				timeout,
+				args: ['--type=searchService'],
+				// See https://github.com/Microsoft/vscode/issues/27665
+				// Pass in fresh execArgv to the forked process such that it doesn't inherit them from `process.execArgv`.
+				// e.g. Launching the extension host process with `--inspect-brk=xxx` and then forking a process from the extension host
+				// results in the forked process inheriting `--inspect-brk=xxx`.
+				freshExecArgv: true,
+				env: {
+					AMD_ENTRYPOINT: 'vs/workbench/services/search/node/searchApp',
+					PIPE_LOGGING: 'true',
+					VERBOSE_LOGGING: verboseLogging,
+					/* AGPL */
+					CD_GRPC_URL: grpcServiceUrl
+					/* End AGPL */
+				},
+				useQueue: true
+			};
 
-		if (searchDebug) {
-			if (searchDebug.break && searchDebug.port) {
-				opts.debugBrk = searchDebug.port;
-			} else if (!searchDebug.break && searchDebug.port) {
-				opts.debug = searchDebug.port;
+			if (searchDebug) {
+				if (searchDebug.break && searchDebug.port) {
+					opts.debugBrk = searchDebug.port;
+				} else if (!searchDebug.break && searchDebug.port) {
+					opts.debug = searchDebug.port;
+				}
 			}
-		}
 
-		const client = new Client(
-			getPathFromAmdModule(require, 'bootstrap-fork'),
-			opts);
+			const client = new Client(
+				getPathFromAmdModule(require, 'bootstrap-fork'),
+				opts);
 
-		const channel = getNextTickChannel(client.getChannel('search'));
-		this.raw = new SearchChannelClient(channel);
+			const channel = getNextTickChannel(client.getChannel('search'));
+			this.raw = new SearchChannelClient(channel);
+		/* AGPL */
+		});
+		/* End AGPL */
 	}
 
 	textSearch(query: ITextQuery, onProgress?: (p: ISearchProgressItem) => void, token?: CancellationToken): Promise<ISearchComplete> {

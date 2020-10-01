@@ -19,7 +19,7 @@ import { RpcDecompilerClient } from 'vs/cd/platform/proto/main_grpc_pb';
 import { ISerializedSearchSuccess, ITextQuery, SerializableFileMatch } from 'vs/workbench/services/search/common/search';
 import { IProgressCallback } from 'vs/workbench/services/search/node/rawSearchService';
 import * as grpc from "@grpc/grpc-js";
-import { SearchRequest, SearchResult } from 'vs/cd/platform/proto/main_pb';
+import { SearchRequest, SearchResultResponse } from 'vs/cd/platform/proto/main_pb';
 
 export class DecompilerSearchEngine {
 	constructor(private readonly serviceUrl: string, private readonly query: ITextQuery) {
@@ -34,7 +34,7 @@ export class DecompilerSearchEngine {
 
 			const stream = client.search(request, {});
 			let counter = 0;
-			stream.on('data', (searchResult: SearchResult) => {
+			stream.on('data', (searchResult: SearchResultResponse) => {
 				counter++;
 				const match = new SerializableFileMatch(searchResult.getFilepath());
 				match.addMatch({

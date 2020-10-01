@@ -53,6 +53,7 @@ export abstract class MenubarControl extends Disposable {
 		'File': IMenu;
 		'Edit': IMenu;
 		/* AGPL */
+		'Tools': IMenu;
 		// 'Selection': IMenu;
 		// 'View': IMenu;
 		// 'Go': IMenu;
@@ -68,6 +69,7 @@ export abstract class MenubarControl extends Disposable {
 		'File': nls.localize({ key: 'mFile', comment: ['&& denotes a mnemonic'] }, "&&File"),
 		'Edit': nls.localize({ key: 'mEdit', comment: ['&& denotes a mnemonic'] }, "&&Edit"),
 		/* AGPL */
+		'Tools': nls.localize({ key: 'mTools', comment: ['&& denotes a mnemonic'] }, "&&Tools")
 		// 'Selection': nls.localize({ key: 'mSelection', comment: ['&& denotes a mnemonic'] }, "&&Selection"),
 		// 'View': nls.localize({ key: 'mView', comment: ['&& denotes a mnemonic'] }, "&&View"),
 		// 'Go': nls.localize({ key: 'mGoto', comment: ['&& denotes a mnemonic'] }, "&&Go"),
@@ -105,6 +107,7 @@ export abstract class MenubarControl extends Disposable {
 			'File': this._register(this.menuService.createMenu(MenuId.MenubarFileMenu, this.contextKeyService)),
 			'Edit': this._register(this.menuService.createMenu(MenuId.MenubarEditMenu, this.contextKeyService)),
 			/* AGPL */
+			'Tools': this._register(this.menuService.createMenu(MenuId.MenubarToolsMenu, this.contextKeyService)),
 			// 'Selection': this._register(this.menuService.createMenu(MenuId.MenubarSelectionMenu, this.contextKeyService)),
 			// 'View': this._register(this.menuService.createMenu(MenuId.MenubarViewMenu, this.contextKeyService)),
 			// 'Go': this._register(this.menuService.createMenu(MenuId.MenubarGoMenu, this.contextKeyService)),

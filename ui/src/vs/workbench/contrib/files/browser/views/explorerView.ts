@@ -55,6 +55,9 @@ import { SIDE_BAR_BACKGROUND } from 'vs/workbench/common/theme';
 import { IViewDescriptorService } from 'vs/workbench/common/views';
 import { IOpenerService } from 'vs/platform/opener/common/opener';
 import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/uriIdentity';
+/* AGPL */
+import { PROJECT_CREATION_ENABLED_STATE } from 'vs/workbench/browser/actions/toolsActions';
+/* End AGPL */
 
 interface IExplorerViewColors extends IColorMapping {
 	listDropBackground?: ColorValue | undefined;
@@ -150,6 +153,9 @@ export class ExplorerView extends ViewPane {
 	private autoReveal: boolean | 'focusNoScroll' = false;
 	private actions: IAction[] | undefined;
 	private decorationsProvider: ExplorerDecorationsProvider | undefined;
+	/* AGPL */
+	protected projectCreationEnabledState: IContextKey<boolean>;
+	/* End AGPL */
 
 	constructor(
 		options: IViewPaneOptions,
@@ -188,6 +194,9 @@ export class ExplorerView extends ViewPane {
 		this.compressedFocusContext = ExplorerCompressedFocusContext.bindTo(contextKeyService);
 		this.compressedFocusFirstContext = ExplorerCompressedFirstFocusContext.bindTo(contextKeyService);
 		this.compressedFocusLastContext = ExplorerCompressedLastFocusContext.bindTo(contextKeyService);
+		/* AGPL */
+		this.projectCreationEnabledState = PROJECT_CREATION_ENABLED_STATE.bindTo(contextKeyService);
+		/* End AGPL */
 
 		this.explorerService.registerView(this);
 	}
@@ -553,6 +562,9 @@ export class ExplorerView extends ViewPane {
 	private onFocusChanged(elements: ExplorerItem[]): void {
 		const stat = elements && elements.length ? elements[0] : undefined;
 		this.setContextKeys(stat);
+		/* AGPL */
+		this.projectCreationEnabledState.set(!!stat);
+		/* End AGPL */
 
 		if (stat) {
 			const enableTrash = this.configurationService.getValue<IFilesConfiguration>().files.enableTrash;

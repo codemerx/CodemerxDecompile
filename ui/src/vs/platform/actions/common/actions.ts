@@ -93,6 +93,10 @@ export class MenuId {
 	static readonly MenubarSwitchEditorMenu = new MenuId('MenubarSwitchEditorMenu');
 	static readonly MenubarSwitchGroupMenu = new MenuId('MenubarSwitchGroupMenu');
 	static readonly MenubarTerminalMenu = new MenuId('MenubarTerminalMenu');
+	/* AGPL */
+	static readonly MenubarToolsMenu = new MenuId('MenubarToolsMenu');
+	static readonly MenubarCreateLegacyProjectMenu = new MenuId('MenubarCreateLegacyProjectMenu');
+	/* End AGPL */
 	static readonly MenubarViewMenu = new MenuId('MenubarViewMenu');
 	static readonly MenubarWebNavigationMenu = new MenuId('MenubarWebNavigationMenu');
 	static readonly OpenEditorsContext = new MenuId('OpenEditorsContext');

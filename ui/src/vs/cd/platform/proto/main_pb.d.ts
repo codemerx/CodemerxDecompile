@@ -4,6 +4,148 @@
 import * as jspb from "google-protobuf";
 import * as common_pb from "./common_pb";
 
+export class GetProjectCreationMetadataFromTypeFilePathRequest extends jspb.Message {
+  getTypefilepath(): string;
+  setTypefilepath(value: string): void;
+
+  getProjectvisualstudioversion(): string;
+  setProjectvisualstudioversion(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetProjectCreationMetadataFromTypeFilePathRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetProjectCreationMetadataFromTypeFilePathRequest): GetProjectCreationMetadataFromTypeFilePathRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GetProjectCreationMetadataFromTypeFilePathRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetProjectCreationMetadataFromTypeFilePathRequest;
+  static deserializeBinaryFromReader(message: GetProjectCreationMetadataFromTypeFilePathRequest, reader: jspb.BinaryReader): GetProjectCreationMetadataFromTypeFilePathRequest;
+}
+
+export namespace GetProjectCreationMetadataFromTypeFilePathRequest {
+  export type AsObject = {
+    typefilepath: string,
+    projectvisualstudioversion: string,
+  }
+}
+
+export class GetProjectCreationMetadataFromTypeFilePathResponse extends jspb.Message {
+  getAssemblyfilepath(): string;
+  setAssemblyfilepath(value: string): void;
+
+  getContainsdangerousresources(): boolean;
+  setContainsdangerousresources(value: boolean): void;
+
+  hasProjectfilemetadata(): boolean;
+  clearProjectfilemetadata(): void;
+  getProjectfilemetadata(): ProjectFileMetadata | undefined;
+  setProjectfilemetadata(value?: ProjectFileMetadata): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetProjectCreationMetadataFromTypeFilePathResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetProjectCreationMetadataFromTypeFilePathResponse): GetProjectCreationMetadataFromTypeFilePathResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GetProjectCreationMetadataFromTypeFilePathResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetProjectCreationMetadataFromTypeFilePathResponse;
+  static deserializeBinaryFromReader(message: GetProjectCreationMetadataFromTypeFilePathResponse, reader: jspb.BinaryReader): GetProjectCreationMetadataFromTypeFilePathResponse;
+}
+
+export namespace GetProjectCreationMetadataFromTypeFilePathResponse {
+  export type AsObject = {
+    assemblyfilepath: string,
+    containsdangerousresources: boolean,
+    projectfilemetadata?: ProjectFileMetadata.AsObject,
+  }
+}
+
+export class ProjectFileMetadata extends jspb.Message {
+  getIsdecompilersupportedprojecttype(): boolean;
+  setIsdecompilersupportedprojecttype(value: boolean): void;
+
+  getIsvssupportedprojecttype(): boolean;
+  setIsvssupportedprojecttype(value: boolean): void;
+
+  getProjecttypenotsupportederrormessage(): string;
+  setProjecttypenotsupportederrormessage(value: string): void;
+
+  getProjectfilename(): string;
+  setProjectfilename(value: string): void;
+
+  getProjectfileextension(): string;
+  setProjectfileextension(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ProjectFileMetadata.AsObject;
+  static toObject(includeInstance: boolean, msg: ProjectFileMetadata): ProjectFileMetadata.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ProjectFileMetadata, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ProjectFileMetadata;
+  static deserializeBinaryFromReader(message: ProjectFileMetadata, reader: jspb.BinaryReader): ProjectFileMetadata;
+}
+
+export namespace ProjectFileMetadata {
+  export type AsObject = {
+    isdecompilersupportedprojecttype: boolean,
+    isvssupportedprojecttype: boolean,
+    projecttypenotsupportederrormessage: string,
+    projectfilename: string,
+    projectfileextension: string,
+  }
+}
+
+export class CreateProjectRequest extends jspb.Message {
+  getAssemblyfilepath(): string;
+  setAssemblyfilepath(value: string): void;
+
+  getOutputpath(): string;
+  setOutputpath(value: string): void;
+
+  getDecompiledangerousresources(): boolean;
+  setDecompiledangerousresources(value: boolean): void;
+
+  getProjectvisualstudioversion(): string;
+  setProjectvisualstudioversion(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateProjectRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateProjectRequest): CreateProjectRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: CreateProjectRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateProjectRequest;
+  static deserializeBinaryFromReader(message: CreateProjectRequest, reader: jspb.BinaryReader): CreateProjectRequest;
+}
+
+export namespace CreateProjectRequest {
+  export type AsObject = {
+    assemblyfilepath: string,
+    outputpath: string,
+    decompiledangerousresources: boolean,
+    projectvisualstudioversion: string,
+  }
+}
+
+export class CreateProjectResponse extends jspb.Message {
+  getErrormessage(): string;
+  setErrormessage(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateProjectResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateProjectResponse): CreateProjectResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: CreateProjectResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateProjectResponse;
+  static deserializeBinaryFromReader(message: CreateProjectResponse, reader: jspb.BinaryReader): CreateProjectResponse;
+}
+
+export namespace CreateProjectResponse {
+  export type AsObject = {
+    errormessage: string,
+  }
+}
+
 export class GetAssemblyRelatedFilePathsRequest extends jspb.Message {
   getAssemblypath(): string;
   setAssemblypath(value: string): void;
@@ -314,7 +456,7 @@ export namespace SearchRequest {
   }
 }
 
-export class SearchResult extends jspb.Message {
+export class SearchResultResponse extends jspb.Message {
   getFilepath(): string;
   setFilepath(value: string): void;
 
@@ -322,16 +464,16 @@ export class SearchResult extends jspb.Message {
   setPreview(value: string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): SearchResult.AsObject;
-  static toObject(includeInstance: boolean, msg: SearchResult): SearchResult.AsObject;
+  toObject(includeInstance?: boolean): SearchResultResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: SearchResultResponse): SearchResultResponse.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: SearchResult, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): SearchResult;
-  static deserializeBinaryFromReader(message: SearchResult, reader: jspb.BinaryReader): SearchResult;
+  static serializeBinaryToWriter(message: SearchResultResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SearchResultResponse;
+  static deserializeBinaryFromReader(message: SearchResultResponse, reader: jspb.BinaryReader): SearchResultResponse;
 }
 
-export namespace SearchResult {
+export namespace SearchResultResponse {
   export type AsObject = {
     filepath: string,
     preview: string,

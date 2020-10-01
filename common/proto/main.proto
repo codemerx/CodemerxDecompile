@@ -21,8 +21,9 @@ import "common.proto";
 option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
+  rpc GetContextAssembly (GetContextAssemblyRequest) returns (GetContextAssemblyResponse);
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
-  rpc GetProjectCreationMetadataFromTypeFilePath (GetProjectCreationMetadataFromTypeFilePathRequest) returns (GetProjectCreationMetadataFromTypeFilePathResponse);
+  rpc GetProjectCreationMetadata (GetProjectCreationMetadataRequest) returns (GetProjectCreationMetadataResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
   rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
@@ -32,13 +33,21 @@ service RpcDecompiler {
   rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
 }
 
-message GetProjectCreationMetadataFromTypeFilePathRequest {
-  string typeFilePath = 1;
+message GetContextAssemblyRequest {
+  string contextUri = 1;
+}
+
+message GetContextAssemblyResponse {
+  string assemblyName = 1;
+  string assemblyFilePath = 2;
+}
+
+message GetProjectCreationMetadataRequest {
+  string assemblyFilePath = 1;
   string projectVisualStudioVersion = 2;
 }
 
-message GetProjectCreationMetadataFromTypeFilePathResponse {
-  string assemblyFilePath = 1;
+message GetProjectCreationMetadataResponse {
   bool containsDangerousResources = 2;
   ProjectFileMetadata projectFileMetadata = 3;
 }
@@ -123,10 +132,17 @@ message AddResolvedAssemblyRequest {
 }
 
 message SearchRequest {
-  string query = 1;
+  string assemblyFilePath = 1;
+  string query = 2;
 }
 
 message SearchResultResponse {
   string filePath = 1;
   string preview = 2;
+  PreviewHighlightRange highlightRange = 3;
+}
+
+message PreviewHighlightRange {
+  int32 startIndex = 1;
+  int32 endIndex = 2;
 }

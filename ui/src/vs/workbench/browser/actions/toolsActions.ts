@@ -56,13 +56,14 @@ abstract class BaseCreateProjectAction extends Action {
 		const currentOpenCodeEditorResourceUri = selectedExplorerItems.length ? selectedExplorerItems[0].resource : null;
 
 		if (currentOpenCodeEditorResourceUri?.fsPath) {
-			const { containsDangerousResources, assemblyFilePath, projectFileMetadata } = await this.decompilationService.getProjectCreationMetadataFromTypeFilePath(currentOpenCodeEditorResourceUri.fsPath, this.projectVsStudioVersion);
-			
+			const { assemblyFilePath } = await this.decompilationService.getContextAssembly(currentOpenCodeEditorResourceUri.fsPath);
+			const { containsDangerousResources, projectFileMetadata } = await this.decompilationService.getProjectCreationMetadata(assemblyFilePath, this.projectVsStudioVersion);
+
 			if (!projectFileMetadata || !projectFileMetadata.isVSSupportedProjectType) {
 				this.notificationService.error(projectFileMetadata?.projectTypeNotSupportedErrorMessage ?? 'Failed to generate project');
 				return;
 			}
-			
+
 			let decompileDangerousResources = false;
 
 			if (containsDangerousResources) {
@@ -232,7 +233,7 @@ class ToolsActionsProvider extends Disposable implements IWorkbenchContribution 
 
 	private registerActions() : void {
 		const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
-		
+
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(CreateProjectAction, { primary: KeyChord(KeyMod.CtrlCmd, KeyMod.Shift & KeyCode.KEY_G) }), 'Tools: Create Project...', nls.localize('tools', "Tools"));
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2010ProjectAction), 'Legacy Project Visual Studio 2010', nls.localize('tools', "Tools"));
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2012ProjectAction), 'Legacy Project Visual Studio 2012', nls.localize('tools', "Tools"));

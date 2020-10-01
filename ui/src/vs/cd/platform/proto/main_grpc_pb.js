@@ -130,6 +130,28 @@ function deserialize_GetAssemblyRelatedFilePathsResponse(buffer_arg) {
   return main_pb.GetAssemblyRelatedFilePathsResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_GetContextAssemblyRequest(arg) {
+  if (!(arg instanceof main_pb.GetContextAssemblyRequest)) {
+    throw new Error('Expected argument of type GetContextAssemblyRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetContextAssemblyRequest(buffer_arg) {
+  return main_pb.GetContextAssemblyRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_GetContextAssemblyResponse(arg) {
+  if (!(arg instanceof main_pb.GetContextAssemblyResponse)) {
+    throw new Error('Expected argument of type GetContextAssemblyResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetContextAssemblyResponse(buffer_arg) {
+  return main_pb.GetContextAssemblyResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_GetMemberDefinitionPositionRequest(arg) {
   if (!(arg instanceof main_pb.GetMemberDefinitionPositionRequest)) {
     throw new Error('Expected argument of type GetMemberDefinitionPositionRequest');
@@ -163,26 +185,26 @@ function deserialize_GetMemberReferenceMetadataResponse(buffer_arg) {
   return main_pb.GetMemberReferenceMetadataResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_GetProjectCreationMetadataFromTypeFilePathRequest(arg) {
-  if (!(arg instanceof main_pb.GetProjectCreationMetadataFromTypeFilePathRequest)) {
-    throw new Error('Expected argument of type GetProjectCreationMetadataFromTypeFilePathRequest');
+function serialize_GetProjectCreationMetadataRequest(arg) {
+  if (!(arg instanceof main_pb.GetProjectCreationMetadataRequest)) {
+    throw new Error('Expected argument of type GetProjectCreationMetadataRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_GetProjectCreationMetadataFromTypeFilePathRequest(buffer_arg) {
-  return main_pb.GetProjectCreationMetadataFromTypeFilePathRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_GetProjectCreationMetadataRequest(buffer_arg) {
+  return main_pb.GetProjectCreationMetadataRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_GetProjectCreationMetadataFromTypeFilePathResponse(arg) {
-  if (!(arg instanceof main_pb.GetProjectCreationMetadataFromTypeFilePathResponse)) {
-    throw new Error('Expected argument of type GetProjectCreationMetadataFromTypeFilePathResponse');
+function serialize_GetProjectCreationMetadataResponse(arg) {
+  if (!(arg instanceof main_pb.GetProjectCreationMetadataResponse)) {
+    throw new Error('Expected argument of type GetProjectCreationMetadataResponse');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_GetProjectCreationMetadataFromTypeFilePathResponse(buffer_arg) {
-  return main_pb.GetProjectCreationMetadataFromTypeFilePathResponse.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_GetProjectCreationMetadataResponse(buffer_arg) {
+  return main_pb.GetProjectCreationMetadataResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_SearchRequest(arg) {
@@ -220,6 +242,17 @@ function deserialize_Selection(buffer_arg) {
 
 
 var RpcDecompilerService = exports.RpcDecompilerService = {
+  getContextAssembly: {
+    path: '/RpcDecompiler/GetContextAssembly',
+    requestStream: false,
+    responseStream: false,
+    requestType: main_pb.GetContextAssemblyRequest,
+    responseType: main_pb.GetContextAssemblyResponse,
+    requestSerialize: serialize_GetContextAssemblyRequest,
+    requestDeserialize: deserialize_GetContextAssemblyRequest,
+    responseSerialize: serialize_GetContextAssemblyResponse,
+    responseDeserialize: deserialize_GetContextAssemblyResponse,
+  },
   getAssemblyRelatedFilePaths: {
     path: '/RpcDecompiler/GetAssemblyRelatedFilePaths',
     requestStream: false,
@@ -231,16 +264,16 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     responseSerialize: serialize_GetAssemblyRelatedFilePathsResponse,
     responseDeserialize: deserialize_GetAssemblyRelatedFilePathsResponse,
   },
-  getProjectCreationMetadataFromTypeFilePath: {
-    path: '/RpcDecompiler/GetProjectCreationMetadataFromTypeFilePath',
+  getProjectCreationMetadata: {
+    path: '/RpcDecompiler/GetProjectCreationMetadata',
     requestStream: false,
     responseStream: false,
-    requestType: main_pb.GetProjectCreationMetadataFromTypeFilePathRequest,
-    responseType: main_pb.GetProjectCreationMetadataFromTypeFilePathResponse,
-    requestSerialize: serialize_GetProjectCreationMetadataFromTypeFilePathRequest,
-    requestDeserialize: deserialize_GetProjectCreationMetadataFromTypeFilePathRequest,
-    responseSerialize: serialize_GetProjectCreationMetadataFromTypeFilePathResponse,
-    responseDeserialize: deserialize_GetProjectCreationMetadataFromTypeFilePathResponse,
+    requestType: main_pb.GetProjectCreationMetadataRequest,
+    responseType: main_pb.GetProjectCreationMetadataResponse,
+    requestSerialize: serialize_GetProjectCreationMetadataRequest,
+    requestDeserialize: deserialize_GetProjectCreationMetadataRequest,
+    responseSerialize: serialize_GetProjectCreationMetadataResponse,
+    responseDeserialize: deserialize_GetProjectCreationMetadataResponse,
   },
   getAllTypeFilePaths: {
     path: '/RpcDecompiler/GetAllTypeFilePaths',

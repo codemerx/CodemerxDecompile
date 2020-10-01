@@ -287,6 +287,27 @@ namespace CodemerxDecompile.Service
             }
         }
 
+        public override Task<GetContextAssemblyResponse> GetContextAssembly(GetContextAssemblyRequest request, ServerCallContext context)
+        {
+            string normalizedFilePath = this.NormalizeFilePath(request.ContextUri);
+
+            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
+            {
+                typeDefinition = this.decompilationContext.FilePathToType.FirstOrDefault(p => p.Key.StartsWith(normalizedFilePath)).Value;
+            }
+
+            if (typeDefinition == null || !this.TryResolveTypeAssemblyFilePath(typeDefinition, out string assemblyPath))
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to resolve assembly from path"));
+            }
+
+            return Task.FromResult(new GetContextAssemblyResponse()
+            {
+                AssemblyName = typeDefinition.Module.Assembly.FullName,
+                AssemblyFilePath = assemblyPath
+            });
+        }
+
         public override async Task Search(SearchRequest request, IServerStreamWriter<SearchResultResponse> responseStream, ServerCallContext context)
         {
             for (int i = 0; i < 10; i++)
@@ -300,33 +321,20 @@ namespace CodemerxDecompile.Service
             }
         }
 
-        public override Task<GetProjectCreationMetadataFromTypeFilePathResponse> GetProjectCreationMetadataFromTypeFilePath(GetProjectCreationMetadataFromTypeFilePathRequest request, ServerCallContext context)
+        public override Task<GetProjectCreationMetadataResponse> GetProjectCreationMetadata(GetProjectCreationMetadataRequest request, ServerCallContext context)
         {
-            string normalizedFilePath = this.NormalizeFilePath(request.TypeFilePath);
-
-            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
-            {
-                typeDefinition = this.decompilationContext.FilePathToType.FirstOrDefault(p => p.Key.StartsWith(normalizedFilePath)).Value;
-            }
-
-            if (typeDefinition == null || !this.TryResolveTypeAssemblyFilePath(typeDefinition, out string assemblyPath))
-            {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to resolve assembly from path"));
-            }
-
+            string normalizedFilePath = this.NormalizeFilePath(request.AssemblyFilePath);
             VisualStudioVersion visualStudioVersion = this.GetProjectCreationVSVersion(request.ProjectVisualStudioVersion);
-
-            AssemblyDefinition assemblyDefinition = typeDefinition.Module.Assembly;
+            AssemblyDefinition assemblyDefinition = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(normalizedFilePath);
             ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
-            ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(assemblyPath, NoCacheAssemblyInfoService.Instance,
+            ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(normalizedFilePath, NoCacheAssemblyInfoService.Instance,
                 EmptyResolver.Instance, visualStudioVersion, language, TargetPlatformResolver.Instance);
             bool containsDangerousResources = assemblyDefinition.Modules.SelectMany(m => m.Resources).Any(r => DangerousResourceIdentifier.IsDangerousResource(r));
             string normalizedVSProjectFileExtension = language.VSProjectFileExtension.TrimStart('.');
             string generatedProjectExtension = normalizedVSProjectFileExtension + (settings.JustDecompileSupportedProjectType ? string.Empty : MSBuildProjectBuilder.ErrorFileExtension);
 
-            return Task.FromResult(new GetProjectCreationMetadataFromTypeFilePathResponse()
+            return Task.FromResult(new GetProjectCreationMetadataResponse()
             {
-                AssemblyFilePath = assemblyPath,
                 ContainsDangerousResources = containsDangerousResources,
                 ProjectFileMetadata = new ProjectFileMetadata()
                 {

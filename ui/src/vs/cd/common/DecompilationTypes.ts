@@ -44,7 +44,6 @@ export interface CreateProjectResult {
 }
 
 export interface ProjectCreationMetadata {
-	assemblyFilePath: string;
 	containsDangerousResources: boolean;
 	projectFileMetadata: ProjectFileMetadata | null
 }
@@ -55,4 +54,9 @@ export interface ProjectFileMetadata {
 	projectTypeNotSupportedErrorMessage: string;
 	projectFileName: string;
 	projectFileExtension: string;
+}
+
+export interface AssemblyMetadata {
+	assemblyFullName: string;
+	assemblyFilePath: string;
 }

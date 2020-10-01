@@ -17,15 +17,16 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IMainProcessService } from 'vs/platform/ipc/electron-sandbox/mainProcessService';
 import { createChannelSender } from 'vs/base/parts/ipc/common/ipc';
-import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
+import { AssemblyMetadata, AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
 
 export const IDecompilationService = createDecorator<IDecompilationService>('IDecompilationService');
 
 export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
+	getContextAssembly(contextUri: string) : Promise<AssemblyMetadata>;
 	getAssemblyRelatedFilePaths(assemblyPath: string): Promise<AssemblyRelatedFilePaths>;
-	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
+	getProjectCreationMetadata(assemblyFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
 	getAllTypeFilePaths(assemblyPath: string): Promise<string[]>;
 	decompileType(filePath: string): Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number): Promise<ReferenceMetadata>;

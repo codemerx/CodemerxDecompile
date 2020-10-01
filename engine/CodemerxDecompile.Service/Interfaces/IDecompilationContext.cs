@@ -27,6 +27,10 @@ namespace CodemerxDecompile.Service.Interfaces
     {
         Dictionary<string, TypeDefinition> FilePathToType { get; set; }
 
+        void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath);
+
+        IEnumerable<string> GetOpenedAssemliesPaths();
+
         bool TryGetTypeFilePathFromCache(TypeReference type, out string filePath);
 
         bool TryGetTypeMetadataFromCache(TypeReference type, out DecompiledTypeMetadata typeMetadata);

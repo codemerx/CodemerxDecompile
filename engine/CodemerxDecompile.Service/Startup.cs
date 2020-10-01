@@ -22,6 +22,7 @@ using Microsoft.Extensions.Hosting;
 using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services;
 using CodemerxDecompile.Service.Services.DecompilationContext;
+using CodemerxDecompile.Service.Services.Search;
 
 namespace CodemerxDecompile.Service
 {
@@ -33,6 +34,7 @@ namespace CodemerxDecompile.Service
         {
             services.AddGrpc();
 
+            services.AddSingleton<ISearchService, SearchService>();
             services.AddSingleton<IDecompilationContext, DecompilationContextService>();
             services.AddSingleton<IServiceManager, ServiceManager>();
         }

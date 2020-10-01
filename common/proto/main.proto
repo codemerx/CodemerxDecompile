@@ -132,8 +132,7 @@ message AddResolvedAssemblyRequest {
 }
 
 message SearchRequest {
-  string assemblyFilePath = 1;
-  string query = 2;
+  string query = 1;
 }
 
 message SearchResultResponse {

@@ -477,9 +477,6 @@ export namespace AddResolvedAssemblyRequest {
 }
 
 export class SearchRequest extends jspb.Message {
-  getAssemblyfilepath(): string;
-  setAssemblyfilepath(value: string): void;
-
   getQuery(): string;
   setQuery(value: string): void;
 
@@ -495,7 +492,6 @@ export class SearchRequest extends jspb.Message {
 
 export namespace SearchRequest {
   export type AsObject = {
-    assemblyfilepath: string,
     query: string,
   }
 }

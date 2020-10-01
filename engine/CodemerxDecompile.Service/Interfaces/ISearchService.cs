@@ -9,6 +9,6 @@ namespace CodemerxDecompile.Service.Interfaces
 {
     public interface ISearchService
     {
-        IEnumerable<SearchResult> Search(AssemblyDefinition assembly, string searchString, bool matchCase = false);
+        IEnumerable<SearchResult> Search(string searchString, bool matchCase = false);
     }
 }

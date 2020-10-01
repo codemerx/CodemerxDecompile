@@ -3706,8 +3706,7 @@ proto.SearchRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.SearchRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    assemblyfilepath: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    query: jspb.Message.getFieldWithDefault(msg, 2, "")
+    query: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -3746,10 +3745,6 @@ proto.SearchRequest.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setAssemblyfilepath(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
       msg.setQuery(value);
       break;
     default:
@@ -3781,17 +3776,10 @@ proto.SearchRequest.prototype.serializeBinary = function() {
  */
 proto.SearchRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getAssemblyfilepath();
-  if (f.length > 0) {
-    writer.writeString(
-      1,
-      f
-    );
-  }
   f = message.getQuery();
   if (f.length > 0) {
     writer.writeString(
-      2,
+      1,
       f
     );
   }
@@ -3799,10 +3787,10 @@ proto.SearchRequest.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string assemblyFilePath = 1;
+ * optional string query = 1;
  * @return {string}
  */
-proto.SearchRequest.prototype.getAssemblyfilepath = function() {
+proto.SearchRequest.prototype.getQuery = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
@@ -3811,26 +3799,8 @@ proto.SearchRequest.prototype.getAssemblyfilepath = function() {
  * @param {string} value
  * @return {!proto.SearchRequest} returns this
  */
-proto.SearchRequest.prototype.setAssemblyfilepath = function(value) {
-  return jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional string query = 2;
- * @return {string}
- */
-proto.SearchRequest.prototype.getQuery = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.SearchRequest} returns this
- */
 proto.SearchRequest.prototype.setQuery = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 

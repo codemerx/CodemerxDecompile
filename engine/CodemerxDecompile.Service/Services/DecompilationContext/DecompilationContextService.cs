@@ -11,14 +11,24 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
 {
     public class DecompilationContextService : IDecompilationContext
     {
+        private Dictionary<string, string> openedAssemblyNamesToFilePathsMap;
+
         public DecompilationContextService()
         {
+            this.openedAssemblyNamesToFilePathsMap = new Dictionary<string, string>();
             this.FilePathToType = new Dictionary<string, TypeDefinition>();
             this.AssemblyStrongNameToAssemblyMetadata = new Dictionary<string, DecompiledAssemblyMetadata>();
         }
 
         public Dictionary<string, TypeDefinition> FilePathToType { get; set; }
         public Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; set; }
+
+        public void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath)
+        {
+            this.openedAssemblyNamesToFilePathsMap[assembly.FullName] = assemblyFilePath;
+        }
+
+        public IEnumerable<string> GetOpenedAssemliesPaths() => this.openedAssemblyNamesToFilePathsMap.Values;
 
         public bool TryGetTypeFilePathFromCache(TypeReference type, out string filePath)
         {

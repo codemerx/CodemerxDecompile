@@ -37,14 +37,16 @@ export class DecompilerSearchEngine {
 			stream.on('data', (searchResult: SearchResultResponse) => {
 				counter++;
 				const match = new SerializableFileMatch(searchResult.getFilepath());
+				const highlightRange = searchResult.getHighlightrange();
+				console.log('RESULT ' + searchResult.getHighlightrange()?.getStartindex() + searchResult.getHighlightrange()?.getEndindex())
 				match.addMatch({
 					preview: {
 						text: searchResult.getPreview(),
 						matches: {
 							startLineNumber: 0,
-							startColumn: 1,
+							startColumn: highlightRange?.getStartindex() ?? 0,
 							endLineNumber: 0,
-							endColumn: 3
+							endColumn: highlightRange?.getEndindex() ?? searchResult.getPreview().length
 						}
 					},
 					ranges: {

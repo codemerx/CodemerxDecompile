@@ -47,12 +47,15 @@ namespace CodemerxDecompile.Service
 {
     public class RpcDecompilerService : RpcDecompiler.RpcDecompilerBase
     {
-        private readonly IDecompilationContext decompilationContext;
         private readonly string AssembliesDirectory = Path.Join(Path.GetTempPath(), "CD");
 
-        public RpcDecompilerService(IDecompilationContext decompilationContext)
+        private readonly IDecompilationContext decompilationContext;
+        private readonly ISearchService searchService;
+
+        public RpcDecompilerService(IDecompilationContext decompilationContext, ISearchService searchService)
         {
             this.decompilationContext = decompilationContext;
+            this.searchService = searchService;
         }
 
         public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
@@ -70,12 +73,13 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
+            string normalizedAssemblyFilePath = this.NormalizeFilePath(request.AssemblyPath);
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(normalizedAssemblyFilePath);
             Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
             Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
             DefaultFilePathsService filePathsService = new DefaultFilePathsService(
                 assembly,
-                request.AssemblyPath,
+                normalizedAssemblyFilePath,
                 null,
                 userDefinedTypes,
                 resources,
@@ -87,6 +91,7 @@ namespace CodemerxDecompile.Service
             Dictionary<string, TypeDefinition> filePathToTypeDefinition = filePathsService.GetTypesToFilePathsMap()
                                                                                           .ToDictionary(kvp => Path.Join(AssembliesDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
 
+            this.decompilationContext.SaveAssemblyToCache(assembly, normalizedAssemblyFilePath);
             this.decompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
@@ -310,13 +315,19 @@ namespace CodemerxDecompile.Service
 
         public override async Task Search(SearchRequest request, IServerStreamWriter<SearchResultResponse> responseStream, ServerCallContext context)
         {
-            for (int i = 0; i < 10; i++)
+            foreach (SearchResult searchResult in this.searchService.Search(request.Query))
             {
-                await Task.Delay(200);
+                int highlightStartIndex = searchResult.MatchedString.IndexOf(request.Query, StringComparison.InvariantCultureIgnoreCase);
+
                 await responseStream.WriteAsync(new SearchResultResponse()
                 {
-                    FilePath = @"C:\Users\User\AppData\Local\Temp\CD\JustDecompiler, Version = 2019.1.118.0, Culture = neutral, PublicKeyToken = null\JustDecompiler.dll\Mono.Cecil\GenericHelper.cs",
-                    Preview = $"Result #{i + 1}"
+                    FilePath = searchResult.DeclaringTypeFilePath,
+                    Preview = searchResult.MatchedString,
+                    HighlightRange = new PreviewHighlightRange()
+                    {
+                        StartIndex = highlightStartIndex,
+                        EndIndex = highlightStartIndex + request.Query.Length
+                    }
                 });
             }
         }

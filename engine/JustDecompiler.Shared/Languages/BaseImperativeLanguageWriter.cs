@@ -737,21 +737,22 @@ namespace Telerik.JustDecompiler.Languages
 				WriteToken("=");
 				WriteSpace();
 
-                int start = this.formatter.CurrentPosition;
-
-                TypeDefinition fieldType = field.FieldType.Resolve();
-				if (fieldType != null && fieldType.IsEnum)
+				CodeSpan codeSpan = this.Write(() =>
 				{
-					LiteralExpression fieldConstant = new LiteralExpression(field.Constant.Value, field.DeclaringType.Module.TypeSystem, null);
-					Expression constant = EnumHelper.GetEnumExpression(fieldType, fieldConstant, field.DeclaringType.Module.TypeSystem);
-					Write(constant);
-				}
-				else
-                {
-                    WriteLiteralInLanguageSyntax(field.Constant.Value);
-				}
+					TypeDefinition fieldType = field.FieldType.Resolve();
+					if (fieldType != null && fieldType.IsEnum)
+					{
+						LiteralExpression fieldConstant = new LiteralExpression(field.Constant.Value, field.DeclaringType.Module.TypeSystem, null);
+						Expression constant = EnumHelper.GetEnumExpression(fieldType, fieldConstant, field.DeclaringType.Module.TypeSystem);
+						Write(constant);
+					}
+					else
+					{
+						WriteLiteralInLanguageSyntax(field.Constant.Value);
+					}
+				});
 
-                this.currentWritingInfo.CodeMappingInfo.Add(field, new OffsetSpan(start, this.formatter.CurrentPosition));
+                this.currentWritingInfo.CodeMappingInfo.Add(field, codeSpan);
 			}
 		}
 
@@ -1086,11 +1087,11 @@ namespace Telerik.JustDecompiler.Languages
 				if (node != null &&
 					node.CodeNodeType != CodeNodeType.EmptyStatement)
 				{
-                    OffsetSpan span = ExecuteAndGetOffsetSpan(() => base.Visit(node));
+                    CodeSpan codeSpan = this.Write(() => base.Visit(node));
 
 					if (node != null)
 					{
-						this.currentWritingInfo.CodeMappingInfo.Add(node, new OffsetSpan(span.StartOffset, span.EndOffset - 1));
+						this.currentWritingInfo.CodeMappingInfo.Add(node, codeSpan);
 
                         if (node is Expression)
                         {
@@ -1098,7 +1099,7 @@ namespace Telerik.JustDecompiler.Languages
                             {
                                 foreach (Instruction instruction in (node as Expression).MappedInstructions)
                                 {
-                                    this.currentWritingInfo.CodeMappingInfo.Add(instruction, span);
+                                    this.currentWritingInfo.CodeMappingInfo.Add(instruction, codeSpan);
                                 }
                             }
                             catch (ArgumentException ex)
@@ -5020,15 +5021,11 @@ namespace Telerik.JustDecompiler.Languages
 
         protected void WriteAndMapVariableToCode(Action write, VariableDefinition variable)
         {
-            int start = this.formatter.CurrentPosition;
-
-            write();
-            
-            OffsetSpan span = new OffsetSpan(start, this.formatter.CurrentPosition);
+			CodeSpan codeSpan = this.Write(() => write());
 
             try
             {
-                this.currentWritingInfo.CodeMappingInfo.Add(variable, span);
+                this.currentWritingInfo.CodeMappingInfo.Add(variable, codeSpan);
             }
             catch (ArgumentException ex)
             {
@@ -5038,13 +5035,10 @@ namespace Telerik.JustDecompiler.Languages
 
         protected void WriteAndMapParameterToCode(Action write, int index)
         {
-            int start = this.formatter.CurrentPosition;
+			CodeSpan codeSpan = this.Write(() => write());
+			IMemberDefinition currentMember = this.membersStack.Peek();
 
-            write();
-
-            IMemberDefinition currentMember = this.membersStack.Peek();
-            OffsetSpan span = new OffsetSpan(start, this.formatter.CurrentPosition);
-            this.currentWritingInfo.CodeMappingInfo.Add(currentMember, index, span);
+			this.currentWritingInfo.CodeMappingInfo.Add(currentMember, index, codeSpan);
         }
 	}
 }

@@ -39,6 +39,10 @@ export interface ReferenceMetadata {
     referencedAssemblyFilePath?: string;
 }
 
+export interface SearchResultMetadata {
+	id?: number;
+}
+
 export interface CreateProjectResult {
 	errorMessage?: string;
 }

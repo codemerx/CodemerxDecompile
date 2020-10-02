@@ -2,17 +2,11 @@
 {
     public enum SearchResultType
     {
-        MemberReference,
-        MethodReturnType,
         ParameterDefinition,
-        ParameterDefinitionType,
         TypeDefinition,
-        MemberDefinitionType,
         MemberDefinition,
         VariableDefinition,
-        VariableDefinitionType,
-        VariableReference,
-        Literal,
+        TypeReference,
         Instruction
     }
 }

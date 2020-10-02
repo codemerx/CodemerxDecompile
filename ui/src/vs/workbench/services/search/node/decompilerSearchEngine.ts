@@ -33,13 +33,14 @@ export class DecompilerSearchEngine {
 			request.setQuery(this.query.contentPattern.pattern);
 
 			const stream = client.search(request, {});
-			let counter = 0;
+
 			stream.on('data', (searchResult: SearchResultResponse) => {
-				counter++;
 				const match = new SerializableFileMatch(searchResult.getFilepath());
 				const highlightRange = searchResult.getHighlightrange();
-				console.log('RESULT ' + searchResult.getHighlightrange()?.getStartindex() + searchResult.getHighlightrange()?.getEndindex())
+				const searchResultId = searchResult.getId();
+
 				match.addMatch({
+					searchResultId,
 					preview: {
 						text: searchResult.getPreview(),
 						matches: {
@@ -50,10 +51,10 @@ export class DecompilerSearchEngine {
 						}
 					},
 					ranges: {
-						startLineNumber: counter,
-						startColumn: counter,
-						endLineNumber: counter,
-						endColumn: counter
+						startLineNumber: searchResultId,
+						startColumn: searchResultId,
+						endLineNumber: searchResultId,
+						endColumn: searchResultId
 					}
 				});
 

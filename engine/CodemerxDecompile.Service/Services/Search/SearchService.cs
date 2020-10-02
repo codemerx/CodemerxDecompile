@@ -7,6 +7,7 @@ using Telerik.JustDecompiler.Languages;
 using Mono.Cecil.Extensions;
 using Mono.Cecil.Cil;
 using CodemerxDecompile.Service.Services.Search.Models;
+using CodemerxDecompile.Service.Services.DecompilationContext.Models;
 
 namespace CodemerxDecompile.Service.Services.Search
 {
@@ -55,21 +56,21 @@ namespace CodemerxDecompile.Service.Services.Search
 
                         if (member is EventDefinition eventDefinition && eventDefinition.EventType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.MemberDefinitionType, type, eventDefinition.EventType.Name, eventDefinition);
+                            yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, eventDefinition.EventType.Name, eventDefinition.EventType);
                         }
                         else if (member is FieldDefinition fieldDefinition && fieldDefinition.FieldType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.MemberDefinitionType, type, fieldDefinition.FieldType.Name, fieldDefinition);
+                            yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, fieldDefinition.FieldType.Name, fieldDefinition.FieldType);
                         }
                         else if (member is PropertyDefinition propertyDefinition && propertyDefinition.PropertyType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.MemberDefinitionType, type, propertyDefinition.PropertyType.Name, propertyDefinition);
+                            yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, propertyDefinition.PropertyType.Name, propertyDefinition.PropertyType);
                         }
                         else if (member is MethodDefinition methodDefinition)
                         {
                             if (methodDefinition.ReturnType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                yield return this.AddSearchResultToCache(SearchResultType.MethodReturnType, type, methodDefinition.ReturnType.Name, methodDefinition);
+                                yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, methodDefinition.ReturnType.Name, methodDefinition.ReturnType);
                             }
 
                             if (methodDefinition.HasBody && methodDefinition.Body.HasVariables)
@@ -82,7 +83,7 @@ namespace CodemerxDecompile.Service.Services.Search
                                     }
                                     else if (variable.VariableType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.VariableDefinitionType, type, variable.VariableType.Name, variable);
+                                        yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, variable.VariableType.Name, variable.VariableType);
                                     }
                                 }
                             }
@@ -93,11 +94,11 @@ namespace CodemerxDecompile.Service.Services.Search
                                 {
                                     if (parameter.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.ParameterDefinition, type, parameter.Name, parameter);
+                                        yield return this.AddSearchResultToCache(SearchResultType.ParameterDefinition, type, parameter.Name, methodDefinition);
                                     }
                                     else if (parameter.ParameterType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.ParameterDefinitionType, type, parameter.ParameterType.Name, parameter);
+                                        yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, parameter.ParameterType.Name, parameter.ParameterType);
                                     }
                                 }
                             }
@@ -181,13 +182,70 @@ namespace CodemerxDecompile.Service.Services.Search
             }
         }
 
+        public CodeSpan? GetSearchResultPosition(int searchResultIndex)
+        {
+            if (!this.cachedSearchResults.TryGetValue(searchResultIndex, out SearchResult searchResult) ||
+                !this.decompilationContext.FilePathToType.TryGetValue(searchResult.DeclaringTypeFilePath, out TypeDefinition typeDefinition) ||
+                !this.decompilationContext.TryGetTypeMetadataFromCache(typeDefinition, out DecompiledTypeMetadata typeMetadata))
+            {
+                return null;
+            }
+
+            CodeSpan codeSpan = default;
+
+            switch (searchResult.Type)
+            {
+                case SearchResultType.ParameterDefinition:
+                    {
+                        MethodDefinition methodDefinition = searchResult.ObjectReference as MethodDefinition;
+                        int? parameterIndex = methodDefinition.Parameters.Select((p, i) => new { Item = p, Index = i })
+                                                                         .FirstOrDefault(p => p.Item.Name == searchResult.MatchedString)?.Index;
+                        
+                        if (parameterIndex.HasValue)
+                        {
+                            typeMetadata.CodeMappingInfo.TryGetValue((IMemberDefinition)searchResult.ObjectReference, parameterIndex.Value, out codeSpan);
+                        }
+
+                        break;
+                    }
+                case SearchResultType.TypeReference:
+                    {
+                        KeyValuePair<CodeSpan, MemberReference> result = typeMetadata.CodeSpanToMemberReference.FirstOrDefault(kvp => kvp.Value.MetadataToken == ((MemberReference)searchResult.ObjectReference).MetadataToken);
+
+                        if (result.Value != null)
+                        {
+                            codeSpan = result.Key;
+                        }
+
+                        break;
+                    }
+                case SearchResultType.TypeDefinition:
+                case SearchResultType.MemberDefinition:
+                    typeMetadata.MemberDeclarationToCodeSpan.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.VariableDefinition:
+                    typeMetadata.CodeMappingInfo.TryGetValue((VariableDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                //case SearchResultType.Literal:
+                //    break;
+                case SearchResultType.Instruction:
+                    typeMetadata.CodeMappingInfo.TryGetValue((Instruction)searchResult.ObjectReference, out codeSpan);
+                    break;
+                default:
+                    return null;
+            }
+
+            return codeSpan;
+        }
+
         private SearchResult AddSearchResultToCache(SearchResultType type, TypeDefinition declaringType, string matchedString, object objectReference)
         {
             if (this.decompilationContext.TryGetTypeFilePathFromCache(this.GetTopTypeDefinition(declaringType), out string typeFilePath))
             {
-                SearchResult searchResult = new SearchResult(type, typeFilePath, matchedString, objectReference);
+                int searchResultId = this.cachedSearchResults.Count + 1;
+                SearchResult searchResult = new SearchResult(searchResultId, type, typeFilePath, matchedString, objectReference);
 
-                this.cachedSearchResults[this.cachedSearchResults.Count] = searchResult;
+                this.cachedSearchResults[searchResultId] = searchResult;
 
                 return searchResult;
             }

@@ -41,7 +41,7 @@ import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/ur
 import { IModelService } from 'vs/editor/common/services/modelService';
 /* AGPL */
 import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
+import { ReferenceMetadata, SearchResultMetadata, Selection } from 'vs/cd/common/DecompilationTypes';
 import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
 
@@ -534,31 +534,38 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	/* End AGPL */
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
 	/* AGPL */
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata): Promise<IEditorPane | undefined> {
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrNavigationData?: OpenInEditorGroup | ReferenceMetadata | SearchResultMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
 			await this.decompilationHelper.ensureTypeIsDecompiled(resourceEditorInput.resource);
 
-			const referenceMetadata = (groupOrReferenceMetadata as ReferenceMetadata);
+			const referenceMetadata = (groupOrNavigationData as ReferenceMetadata);
+			let selection: Selection | undefined = undefined;
 
 			if (referenceMetadata?.memberFullName && referenceMetadata?.definitionFilePath) {
-				const selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+				selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+			} else {
+				const searchResultMetadata = (groupOrNavigationData as SearchResultMetadata);
 
-				if (selection.startLineNumber && selection.endLineNumber && selection.startColumn && selection.endColumn) {
-					resourceEditorInput.options = {
-						...resourceEditorInput.options,
-						selection: {
-							startLineNumber: selection.startLineNumber,
-							startColumn: selection.startColumn,
-							endLineNumber: selection.endLineNumber,
-							endColumn: selection.endColumn
-						}
+				if (searchResultMetadata?.id) {
+					selection = await this.decompilationService.getSearchResultPosition(searchResultMetadata.id);
+				}
+			}
+
+			if (selection) {
+				resourceEditorInput.options = {
+					...resourceEditorInput.options,
+					selection: {
+						startLineNumber: selection.startLineNumber,
+						startColumn: selection.startColumn,
+						endLineNumber: selection.endLineNumber,
+						endColumn: selection.endColumn
 					}
 				}
 			}
 		}
 
-		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrReferenceMetadata as OpenInEditorGroup);
+		const result = this.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrNavigationData as OpenInEditorGroup);
 		/* End AGPL */
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;
@@ -1324,31 +1331,38 @@ export class DelegatingEditorService implements IEditorService {
 	/* End AGPL */
 	openEditor(editor: IResourceDiffEditorInput, group?: OpenInEditorGroup): Promise<ITextDiffEditorPane | undefined>;
 	/* AGPL */
-	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrReferenceMetadata?: OpenInEditorGroup | ReferenceMetadata): Promise<IEditorPane | undefined> {
+	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrNavigationData?: OpenInEditorGroup | ReferenceMetadata | SearchResultMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
 			await this.decompilationHelper.ensureTypeIsDecompiled(resourceEditorInput.resource);
 
-			const referenceMetadata = (groupOrReferenceMetadata as ReferenceMetadata);
+			const referenceMetadata = (groupOrNavigationData as ReferenceMetadata);
+			let selection: Selection | undefined = undefined;
 
 			if (referenceMetadata?.memberFullName && referenceMetadata?.definitionFilePath) {
-				const selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+				selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+			} else {
+				const searchResultMetadata = (groupOrNavigationData as SearchResultMetadata);
 
-				if (selection.startLineNumber && selection.endLineNumber && selection.startColumn && selection.endColumn) {
-					resourceEditorInput.options = {
-						...resourceEditorInput.options,
-						selection: {
-							startLineNumber: selection.startLineNumber,
-							startColumn: selection.startColumn,
-							endLineNumber: selection.endLineNumber,
-							endColumn: selection.endColumn
-						}
+				if (searchResultMetadata?.id) {
+					selection = await this.decompilationService.getSearchResultPosition(searchResultMetadata.id);
+				}
+			}
+
+			if (selection) {
+				resourceEditorInput.options = {
+					...resourceEditorInput.options,
+					selection: {
+						startLineNumber: selection.startLineNumber,
+						startColumn: selection.startColumn,
+						endLineNumber: selection.endLineNumber,
+						endColumn: selection.endColumn
 					}
 				}
 			}
 		}
 
-		const result = this.editorService.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrReferenceMetadata as OpenInEditorGroup);
+		const result = this.editorService.doResolveEditorOpenRequest(editor, optionsOrGroup, groupOrNavigationData as OpenInEditorGroup);
 		/* End AGPL */
 		if (result) {
 			const [resolvedGroup, resolvedEditor, resolvedOptions] = result;

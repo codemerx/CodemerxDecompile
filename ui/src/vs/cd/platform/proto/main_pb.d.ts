@@ -497,6 +497,9 @@ export namespace SearchRequest {
 }
 
 export class SearchResultResponse extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
   getFilepath(): string;
   setFilepath(value: string): void;
 
@@ -520,6 +523,7 @@ export class SearchResultResponse extends jspb.Message {
 
 export namespace SearchResultResponse {
   export type AsObject = {
+    id: number,
     filepath: string,
     preview: string,
     highlightrange?: PreviewHighlightRange.AsObject,
@@ -547,6 +551,26 @@ export namespace PreviewHighlightRange {
   export type AsObject = {
     startindex: number,
     endindex: number,
+  }
+}
+
+export class GetSearchResultPositionRequest extends jspb.Message {
+  getSearchresultid(): number;
+  setSearchresultid(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetSearchResultPositionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetSearchResultPositionRequest): GetSearchResultPositionRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GetSearchResultPositionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetSearchResultPositionRequest;
+  static deserializeBinaryFromReader(message: GetSearchResultPositionRequest, reader: jspb.BinaryReader): GetSearchResultPositionRequest;
+}
+
+export namespace GetSearchResultPositionRequest {
+  export type AsObject = {
+    searchresultid: number,
   }
 }
 

@@ -61,7 +61,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
             return true;
         }
 
-        public void AddTypeMetadataToCache(TypeDefinition type, Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan, Dictionary<CodeSpan, MemberReference> codeSpanToMemberReference)
+        public void AddTypeMetadataToCache(TypeDefinition type, Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan, Dictionary<CodeSpan, MemberReference> codeSpanToMemberReference, CodeMappingInfo<CodeSpan> codeMappingInfo)
         {
             ModuleDefinition moduleDefinition = type.Module;
             AssemblyDefinition assemblyDefinition = moduleDefinition.Assembly;
@@ -88,6 +88,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
 
             typeMetadataCache.MemberDeclarationToCodeSpan = memberDeclarationToCodeSpan;
             typeMetadataCache.CodeSpanToMemberReference = codeSpanToMemberReference;
+            typeMetadataCache.CodeMappingInfo = codeMappingInfo;
         }
     }
 }

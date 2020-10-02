@@ -23,7 +23,7 @@ import {
 	GetMemberDefinitionPositionRequest,
 	AddResolvedAssemblyRequest,
 	CreateProjectRequest,
-	GetProjectCreationMetadataRequest, GetContextAssemblyRequest
+	GetProjectCreationMetadataRequest, GetContextAssemblyRequest, GetSearchResultPositionRequest
 } from './proto/main_pb';
 import * as grpc from "@grpc/grpc-js";
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
@@ -45,6 +45,7 @@ export interface IDecompilationMainService {
 	addResolvedAssembly(filePath: string) : Promise<void>;
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;
+	getSearchResultPosition(searchResultId: number) : Promise<Selection>;
 }
 
 export class DecompilationMainService implements IDecompilationMainService {
@@ -252,4 +253,27 @@ export class DecompilationMainService implements IDecompilationMainService {
 	}
 
 	getLegacyVisualStudioVersions = async () => ['2010', '2012', '2013', '2015'];
+
+	getSearchResultPosition(searchResultId: number) : Promise<Selection> {
+		const request = new GetSearchResultPositionRequest();
+		request.setSearchresultid(searchResultId);
+
+		return new Promise<Selection>((resolve, reject) => {
+			this.client?.getSearchResultPosition(request, {}, (err, response) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				const selection: Selection = {
+					startLineNumber: response!.getStartlinenumber(),
+					startColumn: response!.getStartcolumn(),
+					endLineNumber: response!.getEndlinenumber(),
+					endColumn: response!.getEndcolumn()
+				};
+
+				resolve(selection);
+			});
+		});
+	}
 }

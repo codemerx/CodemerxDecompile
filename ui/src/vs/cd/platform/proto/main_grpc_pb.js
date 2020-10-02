@@ -207,6 +207,17 @@ function deserialize_GetProjectCreationMetadataResponse(buffer_arg) {
   return main_pb.GetProjectCreationMetadataResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_GetSearchResultPositionRequest(arg) {
+  if (!(arg instanceof main_pb.GetSearchResultPositionRequest)) {
+    throw new Error('Expected argument of type GetSearchResultPositionRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetSearchResultPositionRequest(buffer_arg) {
+  return main_pb.GetSearchResultPositionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_SearchRequest(arg) {
   if (!(arg instanceof main_pb.SearchRequest)) {
     throw new Error('Expected argument of type SearchRequest');
@@ -340,6 +351,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestDeserialize: deserialize_SearchRequest,
     responseSerialize: serialize_SearchResultResponse,
     responseDeserialize: deserialize_SearchResultResponse,
+  },
+  getSearchResultPosition: {
+    path: '/RpcDecompiler/GetSearchResultPosition',
+    requestStream: false,
+    responseStream: false,
+    requestType: main_pb.GetSearchResultPositionRequest,
+    responseType: main_pb.Selection,
+    requestSerialize: serialize_GetSearchResultPositionRequest,
+    requestDeserialize: deserialize_GetSearchResultPositionRequest,
+    responseSerialize: serialize_Selection,
+    responseDeserialize: deserialize_Selection,
   },
   createProject: {
     path: '/RpcDecompiler/CreateProject',

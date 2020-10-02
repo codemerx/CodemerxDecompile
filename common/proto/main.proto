@@ -30,6 +30,7 @@ service RpcDecompiler {
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
   rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
   rpc Search (SearchRequest) returns (stream SearchResultResponse);
+  rpc GetSearchResultPosition (GetSearchResultPositionRequest) returns (Selection);
   rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
 }
 
@@ -136,12 +137,17 @@ message SearchRequest {
 }
 
 message SearchResultResponse {
-  string filePath = 1;
-  string preview = 2;
-  PreviewHighlightRange highlightRange = 3;
+  int32 id = 1;
+  string filePath = 2;
+  string preview = 3;
+  PreviewHighlightRange highlightRange = 4;
 }
 
 message PreviewHighlightRange {
   int32 startIndex = 1;
   int32 endIndex = 2;
+}
+
+message GetSearchResultPositionRequest {
+  int32 searchResultId = 1;
 }

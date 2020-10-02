@@ -22,13 +22,13 @@ namespace Telerik.JustDecompiler.Languages
 			this.MemberDeclarationToCodePostionMap = new Dictionary<IMemberDefinition, OffsetSpan>();
 			/* AGPL */
 			this.MemberDeclarationToCodeSpan = new Dictionary<IMemberDefinition, CodeSpan>();
+			this.CodeMappingInfo = new CodeMappingInfo<CodeSpan>();
 			/* End AGPL */
 			this.MemberTokenToAttributesMap = new Dictionary<uint, OffsetSpan>();
 			this.MemberTokenToDocumentationMap = new Dictionary<uint, OffsetSpan>();
 			this.MemberTokenToDecompiledCodeMap = new Dictionary<uint, OffsetSpan>();
 			this.MembersWithExceptions = new HashSet<uint>();
             this.GeneratedFilterMethods = new List<MethodDefinition>();
-            this.CodeMappingInfo = new CodeMappingInfo();
         }
 
         public IMemberDefinition Member { get; private set; }
@@ -51,6 +51,6 @@ namespace Telerik.JustDecompiler.Languages
 		public HashSet<IMemberDefinition> ExceptionsWhileWriting;
 		public HashSet<uint> MembersWithExceptions { get; private set; }
         public IList<MethodDefinition> GeneratedFilterMethods { get; private set; }
-        public CodeMappingInfo CodeMappingInfo { get; private set; }
+        public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; private set; }
     }
 }

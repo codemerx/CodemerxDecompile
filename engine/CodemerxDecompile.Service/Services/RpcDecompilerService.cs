@@ -272,13 +272,20 @@ namespace CodemerxDecompile.Service
                 List<WritingInfo> infos = (writer as INamespaceLanguageWriter).WriteTypeAndNamespaces(type, writerContextService);
 
                 Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = new Dictionary<IMemberDefinition, CodeSpan>();
+                CodeMappingInfo<CodeSpan> codeMappingInfo = new CodeMappingInfo<CodeSpan>();
 
                 foreach (WritingInfo info in infos)
                 {
                     memberDeclarationToCodeSpan.AddRange(info.MemberDeclarationToCodeSpan);
+
+                    codeMappingInfo.NodeToCodeMap.AddRange(info.CodeMappingInfo.NodeToCodeMap);
+                    codeMappingInfo.InstructionToCodeMap.AddRange(info.CodeMappingInfo.InstructionToCodeMap);
+                    codeMappingInfo.FieldConstantValueToCodeMap.AddRange(info.CodeMappingInfo.FieldConstantValueToCodeMap);
+                    codeMappingInfo.VariableToCodeMap.AddRange(info.CodeMappingInfo.VariableToCodeMap);
+                    codeMappingInfo.ParameterToCodeMap.AddRange(info.CodeMappingInfo.ParameterToCodeMap);
                 }
 
-                this.decompilationContext.AddTypeMetadataToCache(type, memberDeclarationToCodeSpan, formatter.CodeSpanToMemberReference);
+                this.decompilationContext.AddTypeMetadataToCache(type, memberDeclarationToCodeSpan, formatter.CodeSpanToMemberReference, codeMappingInfo);
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = theWriter.ToString() });
             }
@@ -321,6 +328,7 @@ namespace CodemerxDecompile.Service
 
                 await responseStream.WriteAsync(new SearchResultResponse()
                 {
+                    Id = searchResult.Id,
                     FilePath = searchResult.DeclaringTypeFilePath,
                     Preview = searchResult.MatchedString,
                     HighlightRange = new PreviewHighlightRange()
@@ -330,6 +338,29 @@ namespace CodemerxDecompile.Service
                     }
                 });
             }
+        }
+
+        public override Task<Selection> GetSearchResultPosition(GetSearchResultPositionRequest request, ServerCallContext context)
+        {
+            if (request.SearchResultId <= 0)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid search result id"));
+            }
+
+            CodeSpan? searchResultCodeSpan = this.searchService.GetSearchResultPosition(request.SearchResultId);
+
+            if (!searchResultCodeSpan.HasValue)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Failed to find search result code position"));
+            }
+
+            return Task.FromResult(new Selection()
+            {
+                StartLineNumber = searchResultCodeSpan.Value.Start.Line + 1,
+                StartColumn = searchResultCodeSpan.Value.Start.Column + 1,
+                EndLineNumber = searchResultCodeSpan.Value.End.Line + 1,
+                EndColumn = searchResultCodeSpan.Value.End.Column + 1
+            });
         }
 
         public override Task<GetProjectCreationMetadataResponse> GetProjectCreationMetadata(GetProjectCreationMetadataRequest request, ServerCallContext context)

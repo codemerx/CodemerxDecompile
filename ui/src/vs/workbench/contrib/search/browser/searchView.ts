@@ -70,6 +70,7 @@ import { ServiceCollection } from 'vs/platform/instantiation/common/serviceColle
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { Orientation } from 'vs/base/browser/ui/sash/sash';
 import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
+import { SearchResultMetadata } from 'vs/cd/common/DecompilationTypes';
 
 const $ = dom.$;
 
@@ -1666,6 +1667,7 @@ export class SearchView extends ViewPane {
 	open(element: FileMatchOrMatch, preserveFocus?: boolean, sideBySide?: boolean, pinned?: boolean): Promise<void> {
 		const selection = this.getSelectionFrom(element);
 		const resource = element instanceof Match ? element.parent().resource : (<FileMatch>element).resource;
+		const searchResultMetadata: SearchResultMetadata | undefined = element instanceof Match ? { id: element.searchResultId() } : undefined;
 		return this.editorService.openEditor({
 			resource: resource,
 			options: {
@@ -1674,7 +1676,7 @@ export class SearchView extends ViewPane {
 				selection,
 				revealIfVisible: true
 			}
-		}, sideBySide ? SIDE_GROUP : ACTIVE_GROUP).then(editor => {
+		}, sideBySide ? SIDE_GROUP : ACTIVE_GROUP, searchResultMetadata).then(editor => {
 			if (element instanceof Match && preserveFocus && isCodeEditor(editor)) {
 				this.viewModel.searchResult.rangeHighlightDecorations.highlightRange(
 					(<ICodeEditor>editor.getControl()).getModel()!,

@@ -44,7 +44,7 @@ export class Match {
 	// For replace
 	private _fullPreviewRange: ISearchRange;
 
-	constructor(private _parent: FileMatch, private _fullPreviewLines: string[], _fullPreviewRange: ISearchRange, _documentRange: ISearchRange) {
+	constructor(private _parent: FileMatch, private _fullPreviewLines: string[], _fullPreviewRange: ISearchRange, _documentRange: ISearchRange, private _searchResultId?: number) {
 		this._oneLinePreviewText = _fullPreviewLines[_fullPreviewRange.startLineNumber];
 		const adjustedEndCol = _fullPreviewRange.startLineNumber === _fullPreviewRange.endLineNumber ?
 			_fullPreviewRange.endColumn :
@@ -76,6 +76,10 @@ export class Match {
 
 	range(): Range {
 		return this._range;
+	}
+
+	searchResultId(): number | undefined {
+		return this._searchResultId;
 	}
 
 	@memoize
@@ -1285,11 +1289,11 @@ function textSearchResultToMatches(rawMatch: ITextSearchMatch, fileMatch: FileMa
 	if (Array.isArray(rawMatch.ranges)) {
 		return rawMatch.ranges.map((r, i) => {
 			const previewRange: ISearchRange = (<ISearchRange[]>rawMatch.preview.matches)[i];
-			return new Match(fileMatch, previewLines, previewRange, r);
+			return new Match(fileMatch, previewLines, previewRange, r, rawMatch.searchResultId);
 		});
 	} else {
 		const previewRange = <ISearchRange>rawMatch.preview.matches;
-		const match = new Match(fileMatch, previewLines, previewRange, rawMatch.ranges);
+		const match = new Match(fileMatch, previewLines, previewRange, rawMatch.ranges, rawMatch.searchResultId);
 		return [match];
 	}
 }

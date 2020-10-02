@@ -26,5 +26,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext.Models
         public Dictionary<IMemberDefinition, CodeSpan> MemberDeclarationToCodeSpan { get; set; }
 
         public Dictionary<CodeSpan, MemberReference> CodeSpanToMemberReference { get; set; }
+
+        public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; set; }
     }
 }

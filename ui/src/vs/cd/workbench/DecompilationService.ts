@@ -34,6 +34,7 @@ export interface IDecompilationService {
 	addResolvedAssembly(filePath: string): Promise<void>;
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;
+	getSearchResultPosition(searchResultId: number) : Promise<Selection>;
 }
 
 export class DecompilationService {

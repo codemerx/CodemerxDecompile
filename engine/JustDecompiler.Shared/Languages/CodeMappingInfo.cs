@@ -5,34 +5,32 @@ using Telerik.JustDecompiler.Ast;
 
 namespace Telerik.JustDecompiler.Languages
 {
-    public class CodeMappingInfo
+    public class CodeMappingInfo<T>
     {
-        private Dictionary<ICodeNode, OffsetSpan> nodeToCodeMap;
-        private Dictionary<IMemberDefinition, OffsetSpan> fieldConstantValueToCodeMap;
-        private Dictionary<VariableDefinition, OffsetSpan> variableToCodeMap;
-        private Dictionary<IMemberDefinition, Dictionary<int, OffsetSpan>> parameterToCodeMap;
-
         public CodeMappingInfo()
         {
-            this.nodeToCodeMap = new Dictionary<ICodeNode, OffsetSpan>();
-            this.InstructionToCodeMap = new Dictionary<Instruction, OffsetSpan>(new InstructionEqualityComparer());
-            this.fieldConstantValueToCodeMap = new Dictionary<IMemberDefinition, OffsetSpan>();
-            this.variableToCodeMap = new Dictionary<VariableDefinition, OffsetSpan>(new VariableDefinitionEqualityComparer());
-            this.parameterToCodeMap = new Dictionary<IMemberDefinition, Dictionary<int, OffsetSpan>>();
+            this.NodeToCodeMap = new Dictionary<ICodeNode, T>();
+            this.InstructionToCodeMap = new Dictionary<Instruction, T>(new InstructionEqualityComparer());
+            this.FieldConstantValueToCodeMap = new Dictionary<IMemberDefinition, T>();
+            this.VariableToCodeMap = new Dictionary<VariableDefinition, T>(new VariableDefinitionEqualityComparer());
+            this.ParameterToCodeMap = new Dictionary<IMemberDefinition, Dictionary<int, T>>();
         }
 
-        // Exposed as internal for testing purposes
-        internal Dictionary<Instruction, OffsetSpan> InstructionToCodeMap { get; private set; }
+        public Dictionary<ICodeNode, T> NodeToCodeMap { get; private set; }
+        public Dictionary<Instruction, T> InstructionToCodeMap { get; private set; }
+        public Dictionary<IMemberDefinition, T> FieldConstantValueToCodeMap { get; private set; }
+        public Dictionary<VariableDefinition, T> VariableToCodeMap { get; private set; }
+        public Dictionary<IMemberDefinition, Dictionary<int, T>> ParameterToCodeMap { get; private set; }
 
-        public OffsetSpan this[ICodeNode node]
+        public T this[ICodeNode node]
         {
             get
             {
-                return this.nodeToCodeMap[node];
+                return this.NodeToCodeMap[node];
             }
         }
 
-        public OffsetSpan this[Instruction instruction]
+        public T this[Instruction instruction]
         {
             get
             {
@@ -40,39 +38,39 @@ namespace Telerik.JustDecompiler.Languages
             }
         }
 
-        public void Add(ICodeNode node, OffsetSpan span)
+        public void Add(ICodeNode node, T span)
         {
-            this.nodeToCodeMap.Add(node, span);
+            this.NodeToCodeMap.Add(node, span);
         }
 
-        public void Add(Instruction instruction, OffsetSpan span)
+        public void Add(Instruction instruction, T span)
         {
             this.InstructionToCodeMap.Add(instruction, span);
         }
 
-        public void Add(FieldDefinition field, OffsetSpan span)
+        public void Add(FieldDefinition field, T span)
         {
-            this.fieldConstantValueToCodeMap.Add(field, span);
+            this.FieldConstantValueToCodeMap.Add(field, span);
         }
 
-        public void Add(VariableDefinition variable, OffsetSpan span)
+        public void Add(VariableDefinition variable, T span)
         {
-            this.variableToCodeMap.Add(variable, span);
+            this.VariableToCodeMap.Add(variable, span);
         }
 
-        public void Add(IMemberDefinition member, int index, OffsetSpan span)
+        public void Add(IMemberDefinition member, int index, T span)
         {
-            if (!this.parameterToCodeMap.ContainsKey(member))
+            if (!this.ParameterToCodeMap.ContainsKey(member))
             {
-                this.parameterToCodeMap.Add(member, new Dictionary<int, OffsetSpan>());
+                this.ParameterToCodeMap.Add(member, new Dictionary<int, T>());
             }
 
-            this.parameterToCodeMap[member].Add(index, span);
+            this.ParameterToCodeMap[member].Add(index, span);
         }
 
         public bool ContainsKey(ICodeNode node)
         {
-            return this.nodeToCodeMap.ContainsKey(node);
+            return this.NodeToCodeMap.ContainsKey(node);
         }
 
         public bool ContainsKey(Instruction instruction)
@@ -80,27 +78,27 @@ namespace Telerik.JustDecompiler.Languages
             return this.InstructionToCodeMap.ContainsKey(instruction);
         }
         
-        public bool TryGetValue(Instruction instruction, out OffsetSpan span)
+        public bool TryGetValue(Instruction instruction, out T span)
         {
             return this.InstructionToCodeMap.TryGetValue(instruction, out span);
         }
 
-        public bool TryGetValue(IMemberDefinition field, out OffsetSpan span)
+        public bool TryGetValue(IMemberDefinition field, out T span)
         {
-            return this.fieldConstantValueToCodeMap.TryGetValue(field, out span);
+            return this.FieldConstantValueToCodeMap.TryGetValue(field, out span);
         }
 
-        public bool TryGetValue(VariableDefinition variable, out OffsetSpan span)
+        public bool TryGetValue(VariableDefinition variable, out T span)
         {
-            return this.variableToCodeMap.TryGetValue(variable, out span);
+            return this.VariableToCodeMap.TryGetValue(variable, out span);
         }
 
-        public bool TryGetValue(IMemberDefinition member, int parameterIndex, out OffsetSpan span)
+        public bool TryGetValue(IMemberDefinition member, int parameterIndex, out T span)
         {
-            span = default(OffsetSpan);
+            span = default;
 
-            Dictionary<int, OffsetSpan> indexToCodeMap;
-            if (this.parameterToCodeMap.TryGetValue(member, out indexToCodeMap))
+            Dictionary<int, T> indexToCodeMap;
+            if (this.ParameterToCodeMap.TryGetValue(member, out indexToCodeMap))
             {
                 return indexToCodeMap.TryGetValue(parameterIndex, out span);
             }

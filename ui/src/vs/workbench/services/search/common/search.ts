@@ -164,6 +164,7 @@ export interface ITextSearchResultPreview {
 }
 
 export interface ITextSearchMatch {
+	searchResultId?: number,
 	uri?: URI;
 	ranges: ISearchRange | ISearchRange[];
 	preview: ITextSearchResultPreview;

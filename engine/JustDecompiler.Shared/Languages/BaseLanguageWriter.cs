@@ -286,7 +286,24 @@ namespace Telerik.JustDecompiler.Languages
             int startLine = this.formatter.CurrentLineNumber;
             int startColumn = this.formatter.CurrentColumnIndex;
 
+            EventHandler<int> onFirstNonWhiteSpaceCharacter = (sender, currentPosition) =>
+            {
+                startLine = this.formatter.CurrentLineNumber;
+                startColumn = this.formatter.CurrentColumnIndex;
+            };
+
+            EventHandler onNewLine = (sender, args) =>
+            {
+                this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten -= onFirstNonWhiteSpaceCharacter;
+            };
+
+            this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten += onFirstNonWhiteSpaceCharacter;
+            this.formatter.NewLineWritten += onNewLine;
+
             writeEntity();
+
+            this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten -= onFirstNonWhiteSpaceCharacter;
+            this.formatter.NewLineWritten -= onNewLine;
 
             return new CodeSpan(new CodePosition(startLine, startColumn), new CodePosition(this.formatter.CurrentLineNumber, this.formatter.CurrentColumnIndex));
         }

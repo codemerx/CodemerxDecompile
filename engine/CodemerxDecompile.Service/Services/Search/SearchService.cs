@@ -32,7 +32,7 @@ namespace CodemerxDecompile.Service.Services.Search
             {
                 AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(assemblyFilePath);
 
-                IEnumerable<TypeDefinition> types = assembly.Modules.SelectMany(m => m.GetTypes());
+                IEnumerable<TypeDefinition> types = assembly.Modules.SelectMany(m => m.GetTypes()).Where(t => !t.IsCompilerGenerated());
 
                 foreach (TypeDefinition type in types)
                 {

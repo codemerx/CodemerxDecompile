@@ -8,7 +8,7 @@ import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { alert } from 'vs/base/browser/ui/aria/aria';
 import { Delayer } from 'vs/base/common/async';
 import { CancellationToken } from 'vs/base/common/cancellation';
-import { KeyCode, KeyMod } from 'vs/base/common/keyCodes';
+import { KeyCode } from 'vs/base/common/keyCodes';
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import { assertIsDefined } from 'vs/base/common/types';
 import { URI } from 'vs/base/common/uri';
@@ -126,7 +126,6 @@ export class SearchEditor extends BaseTextEditor {
 	private createQueryEditor(parent: HTMLElement) {
 		this.queryEditorContainer = DOM.append(parent, DOM.$('.query-container'));
 		this.queryEditorWidget = this._register(this.instantiationService.createInstance(SearchWidget, this.queryEditorContainer, { _hideReplaceToggle: true, showContextToggle: true }));
-		this._register(this.queryEditorWidget.onReplaceToggled(() => this.reLayout()));
 		this._register(this.queryEditorWidget.onDidHeightChange(() => this.reLayout()));
 		this.queryEditorWidget.onSearchSubmit(({ delay }) => this.triggerSearch({ delay }));
 		this.queryEditorWidget.searchInput.onDidOptionChange(() => this.triggerSearch({ resetCursor: false }));
@@ -146,18 +145,6 @@ export class SearchEditor extends BaseTextEditor {
 			if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
 				DOM.EventHelper.stop(e);
 				this.toggleIncludesExcludes();
-			}
-		}));
-		this._register(DOM.addDisposableListener(this.toggleQueryDetailsButton, DOM.EventType.KEY_DOWN, (e: KeyboardEvent) => {
-			const event = new StandardKeyboardEvent(e);
-			if (event.equals(KeyMod.Shift | KeyCode.Tab)) {
-				if (this.queryEditorWidget.isReplaceActive()) {
-					this.queryEditorWidget.focusReplaceAllAction();
-				}
-				else {
-					this.queryEditorWidget.isReplaceShown() ? this.queryEditorWidget.replaceInput.focusOnPreserve() : this.queryEditorWidget.focusRegexAction();
-				}
-				DOM.EventHelper.stop(e);
 			}
 		}));
 
@@ -227,7 +214,7 @@ export class SearchEditor extends BaseTextEditor {
 
 		this._register(this.searchResultEditor.onDidChangeModelContent(() => this.getInput()?.setDirty(true)));
 
-		[this.queryEditorWidget.searchInputFocusTracker, this.queryEditorWidget.replaceInputFocusTracker, this.inputPatternExcludes.inputFocusTracker, this.inputPatternIncludes.inputFocusTracker]
+		[this.queryEditorWidget.searchInputFocusTracker, this.inputPatternExcludes.inputFocusTracker, this.inputPatternIncludes.inputFocusTracker]
 			.map(tracker => {
 				this._register(tracker.onDidFocus(() => setTimeout(() => this.inputFocusContextKey.set(true), 0)));
 				this._register(tracker.onDidBlur(() => this.inputFocusContextKey.set(false)));

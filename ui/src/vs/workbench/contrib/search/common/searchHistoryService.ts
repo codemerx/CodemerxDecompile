@@ -20,7 +20,6 @@ export const ISearchHistoryService = createDecorator<ISearchHistoryService>('sea
 
 export interface ISearchHistoryValues {
 	search?: string[];
-	replace?: string[];
 	include?: string[];
 	exclude?: string[];
 }

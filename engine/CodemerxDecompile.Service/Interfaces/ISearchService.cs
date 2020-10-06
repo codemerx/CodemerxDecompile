@@ -6,7 +6,7 @@ namespace CodemerxDecompile.Service.Interfaces
 {
     public interface ISearchService
     {
-        IEnumerable<SearchResult> Search(string searchString, bool matchCase = false);
+        IEnumerable<SearchResult> Search(string query, bool matchCase = false, bool matchWholeWord = false);
 
         CodeSpan? GetSearchResultPosition(int searchResultIndex);
     }

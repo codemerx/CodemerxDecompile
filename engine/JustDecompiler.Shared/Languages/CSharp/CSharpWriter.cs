@@ -37,7 +37,7 @@ using Telerik.JustDecompiler.Common;
 using System.Linq;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Cecil.Cil;
-
+using JustDecompiler.Shared;
 
 namespace Telerik.JustDecompiler.Languages.CSharp
 {
@@ -96,7 +96,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                 int lastDotIndex = property.Name.LastIndexOf(".");
                 propertyName = property.Name.Replace(property.Name.Substring(lastDotIndex + 1), KeyWordWriter.This);
             }
-            WriteTypeAndName(property.PropertyType, propertyName, property);
+            WriteTypeAndName(property.PropertyType, propertyName, property, TypeReferenceType.PropertyType);
 
             Write(IndexLeftBracket);
             WritePropertyParameters(property);
@@ -271,13 +271,32 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             return GetGenericNameFromMemberReference(type);
         }
 
-        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference)
+        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
         {
-            WriteReferenceAndNamespaceIfInCollision(typeReference);
+            CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(typeReference));
+            if (reference is IMemberDefinition memberDefinition)
+            {
+                this.AddMemberDefinitionTypeCodeSpanToCache(memberDefinition, typeReferenceType, typeCodeSpan);
+            }
+            else if (reference is VariableDefinition variableReference)
+            {
+                this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variableReference] = typeCodeSpan;
+            }
+
             WriteSpace();
             int startIndex = this.formatter.CurrentPosition;
             /* AGPL */
-            CodeSpan codeSpan = this.Write(() => WriteReference(name, reference));
+            CodeSpan codeSpan = this.Write(() =>
+            {
+                if (reference != null)
+                {
+                    WriteReference(name, reference);
+                }
+                else
+                {
+                    Write(name);
+                }
+            });
             /* End AGPL */
             if (reference is IMemberDefinition)
             {
@@ -289,7 +308,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             }
         }
 
-        protected override void DoWriteTypeAndName(TypeReference typeReference, string name)
+        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
         {
             WriteReferenceAndNamespaceIfInCollision(typeReference);
             WriteSpace();
@@ -298,7 +317,11 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
         protected override void DoWriteVariableTypeAndName(VariableDefinition variable)
         {
-            WriteReferenceAndNamespaceIfInCollision(variable.VariableType);
+            CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(variable.VariableType));
+            if (variable != null)
+            {
+                this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variable] = typeCodeSpan;
+            }
             WriteSpace();
             WriteVariableName(variable);
         }
@@ -352,7 +375,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             }
             else
             {
-                WriteTypeAndName(fieldType, fieldName, field);
+                WriteTypeAndName(fieldType, fieldName, field, TypeReferenceType.FieldType);
             }
         }
 
@@ -381,7 +404,11 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                     }
                 }
 
-                WriteDynamicType(type, positioningFlagsEnumerator);
+                CodeSpan typeCodeSpan = this.Write(() => WriteDynamicType(type, positioningFlagsEnumerator));
+                if (type != null)
+                {
+                    this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
+                }
                 WriteSpace();
             }
             else
@@ -389,7 +416,11 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                 // undocumented C# keyword like __arglist
                 if (!string.IsNullOrEmpty(ToTypeString(type)))
                 {
-                    WriteReferenceAndNamespaceIfInCollision(type);
+                    CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(type));
+                    if (type != null)
+                    {
+                        this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
+                    }
                     WriteSpace();
                 }
             }
@@ -1564,7 +1595,8 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             CustomAttribute dynamicAttribute;
             if (method.MethodReturnType.TryGetDynamicAttribute(out dynamicAttribute))
             {
-                WriteDynamicType(method.ReturnType, dynamicAttribute);
+                CodeSpan returnTypeCodeSpan = this.Write(() => WriteDynamicType(method.ReturnType, dynamicAttribute));
+                this.AddMemberDefinitionTypeCodeSpanToCache(method, TypeReferenceType.MethodReturnType, returnTypeCodeSpan);
                 return;
             }
 
@@ -1572,7 +1604,9 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             {
                 this.WriteKeyword(this.KeyWordWriter.ByRef);
                 this.WriteSpace();
-                WriteReferenceAndNamespaceIfInCollision(method.ReturnType.GetElementType());
+
+                CodeSpan returnTypeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(method.ReturnType.GetElementType()));
+                this.AddMemberDefinitionTypeCodeSpanToCache(method, TypeReferenceType.MethodReturnType, returnTypeCodeSpan);
 
                 return;
             }
@@ -1587,12 +1621,13 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             CustomAttribute dynamicAttribute;
             if (property.TryGetDynamicAttribute(out dynamicAttribute))
             {
-                WriteDynamicType(property.PropertyType, dynamicAttribute);
+                CodeSpan propertyTypeCodeSpan = this.Write(() => WriteDynamicType(property.PropertyType, dynamicAttribute));
+                this.AddMemberDefinitionTypeCodeSpanToCache(property, TypeReferenceType.PropertyType, propertyTypeCodeSpan);
                 WriteSpace();
                 WriteReference(name, property);
                 return;
             }
-            base.WriteTypeAndName(property.PropertyType, name, property);
+            base.WriteTypeAndName(property.PropertyType, name, property, TypeReferenceType.PropertyType);
 
             if (HasArguments(property))
             {

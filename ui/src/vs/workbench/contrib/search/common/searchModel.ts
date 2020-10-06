@@ -14,7 +14,7 @@ import * as objects from 'vs/base/common/objects';
 import { lcut } from 'vs/base/common/strings';
 import { URI } from 'vs/base/common/uri';
 import { Range } from 'vs/editor/common/core/range';
-import { FindMatch, IModelDeltaDecoration, ITextModel, OverviewRulerLane, TrackedRangeStickiness, MinimapPosition } from 'vs/editor/common/model';
+import { FindMatch, ITextModel, TrackedRangeStickiness } from 'vs/editor/common/model';
 import { ModelDecorationOptions } from 'vs/editor/common/model/textModel';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { createDecorator, IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
@@ -22,8 +22,8 @@ import { IProgress, IProgressStep } from 'vs/platform/progress/common/progress';
 import { ReplacePattern } from 'vs/workbench/services/search/common/replace';
 import { IFileMatch, IPatternInfo, ISearchComplete, ISearchProgressItem, ISearchConfigurationProperties, ISearchService, ITextQuery, ITextSearchPreviewOptions, ITextSearchMatch, ITextSearchStats, resultIsMatch, ISearchRange, OneLineRange, ITextSearchContext, ITextSearchResult, SearchSortOrder, SearchCompletionExitCode } from 'vs/workbench/services/search/common/search';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import { overviewRulerFindMatchForeground, minimapFindMatch } from 'vs/platform/theme/common/colorRegistry';
-import { themeColorFromId } from 'vs/platform/theme/common/themeService';
+// import { overviewRulerFindMatchForeground, minimapFindMatch } from 'vs/platform/theme/common/colorRegistry';
+// import { themeColorFromId } from 'vs/platform/theme/common/themeService';
 import { IReplaceService } from 'vs/workbench/contrib/search/common/replace';
 import { editorMatchesToTextSearchResults, addContextToEditorMatches } from 'vs/workbench/services/search/common/searchHelpers';
 import { withNullAsUndefined } from 'vs/base/common/types';
@@ -165,36 +165,36 @@ export class Match {
 
 export class FileMatch extends Disposable implements IFileMatch {
 
-	private static readonly _CURRENT_FIND_MATCH = ModelDecorationOptions.register({
-		stickiness: TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-		zIndex: 13,
-		className: 'currentFindMatch',
-		overviewRuler: {
-			color: themeColorFromId(overviewRulerFindMatchForeground),
-			position: OverviewRulerLane.Center
-		},
-		minimap: {
-			color: themeColorFromId(minimapFindMatch),
-			position: MinimapPosition.Inline
-		}
-	});
+	// private static readonly _CURRENT_FIND_MATCH = ModelDecorationOptions.register({
+	// 	stickiness: TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+	// 	zIndex: 13,
+	// 	className: 'currentFindMatch',
+	// 	overviewRuler: {
+	// 		color: themeColorFromId(overviewRulerFindMatchForeground),
+	// 		position: OverviewRulerLane.Center
+	// 	},
+	// 	minimap: {
+	// 		color: themeColorFromId(minimapFindMatch),
+	// 		position: MinimapPosition.Inline
+	// 	}
+	// });
 
-	private static readonly _FIND_MATCH = ModelDecorationOptions.register({
-		stickiness: TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-		className: 'findMatch',
-		overviewRuler: {
-			color: themeColorFromId(overviewRulerFindMatchForeground),
-			position: OverviewRulerLane.Center
-		},
-		minimap: {
-			color: themeColorFromId(minimapFindMatch),
-			position: MinimapPosition.Inline
-		}
-	});
+	// private static readonly _FIND_MATCH = ModelDecorationOptions.register({
+	// 	stickiness: TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+	// 	className: 'findMatch',
+	// 	overviewRuler: {
+	// 		color: themeColorFromId(overviewRulerFindMatchForeground),
+	// 		position: OverviewRulerLane.Center
+	// 	},
+	// 	minimap: {
+	// 		color: themeColorFromId(minimapFindMatch),
+	// 		position: MinimapPosition.Inline
+	// 	}
+	// });
 
-	private static getDecorationOption(selected: boolean): ModelDecorationOptions {
-		return (selected ? FileMatch._CURRENT_FIND_MATCH : FileMatch._FIND_MATCH);
-	}
+	// private static getDecorationOption(selected: boolean): ModelDecorationOptions {
+	// 	return (selected ? FileMatch._CURRENT_FIND_MATCH : FileMatch._FIND_MATCH);
+	// }
 
 	private _onChange = this._register(new Emitter<{ didRemove?: boolean; forceUpdateModel?: boolean }>());
 	readonly onChange: Event<{ didRemove?: boolean; forceUpdateModel?: boolean }> = this._onChange.event;
@@ -211,7 +211,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 	private _selectedMatch: Match | null = null;
 
 	private _updateScheduler: RunOnceScheduler;
-	private _modelDecorations: string[] = [];
+	// private _modelDecorations: string[] = [];
 
 	private _context: Map<number, string> = new Map();
 	public get context(): Map<number, string> {
@@ -265,7 +265,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 	private unbindModel(): void {
 		if (this._model) {
 			this._updateScheduler.cancel();
-			this._model.deltaDecorations(this._modelDecorations, []);
+			// this._model.deltaDecorations(this._modelDecorations, []);
 			this._model = null;
 			this._modelListener!.dispose();
 		}
@@ -336,14 +336,14 @@ export class FileMatch extends Disposable implements IFileMatch {
 			return;
 		}
 
-		if (this.parent().showHighlights) {
-			this._modelDecorations = this._model.deltaDecorations(this._modelDecorations, this.matches().map(match => <IModelDeltaDecoration>{
-				range: match.range(),
-				options: FileMatch.getDecorationOption(this.isMatchSelected(match))
-			}));
-		} else {
-			this._modelDecorations = this._model.deltaDecorations(this._modelDecorations, []);
-		}
+		// if (this.parent().showHighlights) {
+		// 	this._modelDecorations = this._model.deltaDecorations(this._modelDecorations, this.matches().map(match => <IModelDeltaDecoration>{
+		// 		range: match.range(),
+		// 		options: FileMatch.getDecorationOption(this.isMatchSelected(match))
+		// 	}));
+		// } else {
+		// 	this._modelDecorations = this._model.deltaDecorations(this._modelDecorations, []);
+		// }
 	}
 
 	id(): string {

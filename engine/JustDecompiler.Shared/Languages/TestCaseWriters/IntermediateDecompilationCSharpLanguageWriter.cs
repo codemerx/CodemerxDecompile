@@ -5,6 +5,7 @@ using Telerik.JustDecompiler.Languages.CSharp;
 using Mono.Cecil;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Decompiler;
+using JustDecompiler.Shared;
 
 namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 {
@@ -25,7 +26,7 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
 
         public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
         {
-            WriteTypeAndName(node.Variable.VariableType, node.Variable.Name);
+            WriteTypeAndName(node.Variable.VariableType, node.Variable.Name, node.Variable, TypeReferenceType.VariableType);
         }
 
 		protected override string GetMethodName(MethodReference method)

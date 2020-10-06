@@ -2,11 +2,19 @@
 {
     public enum SearchResultType
     {
-        ParameterDefinition,
-        TypeDefinition,
-        MemberDefinition,
-        VariableDefinition,
-        TypeReference,
-        Instruction
+        DeclaringType,
+        Instruction,
+        FieldType,
+        FieldName,
+        PropertyType,
+        PropertyName,
+        MethodName,
+        MethodReturnType,
+        ParameterType,
+        ParameterName,
+        EventType,
+        EventName,
+        VariableType,
+        VariableName
     }
 }

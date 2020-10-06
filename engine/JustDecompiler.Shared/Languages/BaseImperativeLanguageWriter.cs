@@ -37,6 +37,7 @@ using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Statements;
 using System.Linq;
 using Telerik.JustDecompiler.Steps;
+using JustDecompiler.Shared;
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -612,7 +613,8 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected virtual void WriteMethodReturnType(MethodDefinition method)
 		{
-			WriteReferenceAndNamespaceIfInCollision(method.ReturnType);
+			CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(method.ReturnType));
+			this.AddMemberDefinitionTypeCodeSpanToCache(method, TypeReferenceType.MethodReturnType, typeCodeSpan);
 		}
 
 		protected void WriteMethodVisibilityAndSpace(MethodDefinition currentMethod)
@@ -763,7 +765,7 @@ namespace Telerik.JustDecompiler.Languages
 			//{
 			//	fieldName = Language.ReplaceInvalidCharactersInIdentifier(fieldName);
 			//}
-			WriteTypeAndName(field.FieldType, fieldName, field);
+			WriteTypeAndName(field.FieldType, fieldName, field, TypeReferenceType.FieldType);
 		}
 
 		protected void WritePropertyMethods(PropertyDefinition property, bool inline = false)
@@ -1253,7 +1255,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected virtual void WriteEventTypeAndName(EventDefinition @event)
 		{
-			WriteTypeAndName(@event.EventType, @event.Name, @event);
+			WriteTypeAndName(@event.EventType, @event.Name, @event, TypeReferenceType.EventType);
 		}
 
 		protected virtual void WriteEventInterfaceImplementations(EventDefinition @event)
@@ -1485,7 +1487,7 @@ namespace Telerik.JustDecompiler.Languages
 				WriteToken("(");
 				WriteKeyword(KeyWordWriter.ByVal);
 				WriteSpace();
-				WriteTypeAndName(property.PropertyType, "value", null);
+				WriteTypeAndName(property.PropertyType, "value", null, TypeReferenceType.PropertyType);
 				WriteToken(")");
 			}
 			if (property.SetMethod.Body == null || SupportsAutoProperties && isAutoImplemented)
@@ -4288,11 +4290,11 @@ namespace Telerik.JustDecompiler.Languages
 		{
 		}
 
-		protected virtual void WriteTypeAndName(TypeReference typeReference, string name, object reference)
+		protected virtual void WriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
 		{
 		}
 
-		protected virtual void WriteTypeAndName(TypeReference typeReference, string name)
+		protected virtual void WriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
 		{
 		}
 
@@ -4463,7 +4465,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			if (node.DisplayType)
 			{
-				WriteTypeAndName(node.ExpressionType, GetArgumentName(node.Parameter));
+				WriteTypeAndName(node.ExpressionType, GetArgumentName(node.Parameter), TypeReferenceType.ParameterType);
 			}
 			else
 			{

@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using JustDecompiler.Shared;
 using Mono.Cecil;
 using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
@@ -250,7 +251,33 @@ namespace Telerik.JustDecompiler.Languages
 			return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(@event.Name), this.Language);
 		}
 
-		protected string GetMemberName(MemberReference member)
+        protected void AddMemberDefinitionTypeCodeSpanToCache(IMemberDefinition memberDefinition, TypeReferenceType typeReferenceType, CodeSpan codeSpan)
+        {
+            if (memberDefinition == null)
+            {
+                return;
+            }
+
+            switch (typeReferenceType)
+            {
+                case TypeReferenceType.FieldType:
+                    this.currentWritingInfo.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                case TypeReferenceType.PropertyType:
+                    this.currentWritingInfo.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                case TypeReferenceType.MethodReturnType:
+                    this.currentWritingInfo.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                case TypeReferenceType.EventType:
+                    this.currentWritingInfo.CodeMappingInfo.EventDefinitionToEventTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        protected string GetMemberName(MemberReference member)
 		{
 			if (member is MethodReference)
 			{

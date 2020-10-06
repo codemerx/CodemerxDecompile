@@ -37,7 +37,7 @@ namespace CodemerxDecompile.Service.Services.Search
                 {
                     if (type.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        yield return this.AddSearchResultToCache(SearchResultType.TypeDefinition, type, type.Name, type);
+                        yield return this.AddSearchResultToCache(SearchResultType.DeclaringType, type, type.Name, type);
                     }
 
                     IEnumerable<IMemberDefinition> members = type.GetMembersSorted(false, LanguageFactory.GetLanguage(Telerik.JustDecompiler.Languages.CSharp.CSharpVersion.V7));
@@ -51,26 +51,32 @@ namespace CodemerxDecompile.Service.Services.Search
                     {
                         if (member.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.MemberDefinition, type, member.Name, member);
+                            SearchResultType memberSearchResultType = this.GetSearchResultTypeFromMemberDefinitionType(member);
+
+                            // Skip adding nested types when traversing the type members as they are added when traversing the module types
+                            if (memberSearchResultType != SearchResultType.DeclaringType)
+                            {
+                                yield return this.AddSearchResultToCache(memberSearchResultType, type, member.Name, member);
+                            }
                         }
 
                         if (member is EventDefinition eventDefinition && eventDefinition.EventType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, eventDefinition.EventType.Name, eventDefinition.EventType);
+                            yield return this.AddSearchResultToCache(SearchResultType.EventType, type, eventDefinition.EventType.Name, eventDefinition);
                         }
-                        else if (member is FieldDefinition fieldDefinition && fieldDefinition.FieldType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
+                        else if (member is FieldDefinition fieldDefinition && !fieldDefinition.DeclaringType.IsEnum && fieldDefinition.FieldType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, fieldDefinition.FieldType.Name, fieldDefinition.FieldType);
+                            yield return this.AddSearchResultToCache(SearchResultType.FieldType, type, fieldDefinition.FieldType.Name, fieldDefinition);
                         }
                         else if (member is PropertyDefinition propertyDefinition && propertyDefinition.PropertyType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, propertyDefinition.PropertyType.Name, propertyDefinition.PropertyType);
+                            yield return this.AddSearchResultToCache(SearchResultType.PropertyType, type, propertyDefinition.PropertyType.Name, propertyDefinition);
                         }
                         else if (member is MethodDefinition methodDefinition)
                         {
                             if (methodDefinition.ReturnType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, methodDefinition.ReturnType.Name, methodDefinition.ReturnType);
+                                yield return this.AddSearchResultToCache(SearchResultType.MethodReturnType, type, methodDefinition.ReturnType.Name, methodDefinition);
                             }
 
                             if (methodDefinition.HasBody && methodDefinition.Body.HasVariables)
@@ -79,11 +85,11 @@ namespace CodemerxDecompile.Service.Services.Search
                                 {
                                     if (variable.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.VariableDefinition, type, variable.Name, variable);
+                                        yield return this.AddSearchResultToCache(SearchResultType.VariableName, type, variable.Name, variable);
                                     }
                                     else if (variable.VariableType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, variable.VariableType.Name, variable.VariableType);
+                                        yield return this.AddSearchResultToCache(SearchResultType.VariableType, type, variable.VariableType.Name, variable);
                                     }
                                 }
                             }
@@ -94,11 +100,11 @@ namespace CodemerxDecompile.Service.Services.Search
                                 {
                                     if (parameter.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.ParameterDefinition, type, parameter.Name, methodDefinition);
+                                        yield return this.AddSearchResultToCache(SearchResultType.ParameterName, type, parameter.Name, methodDefinition);
                                     }
                                     else if (parameter.ParameterType.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.TypeReference, type, parameter.ParameterType.Name, parameter.ParameterType);
+                                        yield return this.AddSearchResultToCache(SearchResultType.ParameterType, type, parameter.ParameterType.Name, parameter);
                                     }
                                 }
                             }
@@ -172,7 +178,11 @@ namespace CodemerxDecompile.Service.Services.Search
                             {
                                 yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, variableReference.Name, instruction);
                             }
-                            else if ((operand as string) != null && ((string)operand).Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
+                            else if (operand is ParameterReference parameterReference && parameterReference.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, parameterReference.Name, instruction);
+                            }
+                            else if (operand is string stringLiteral && stringLiteral.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, operand as string, instruction);
                             }
@@ -195,12 +205,12 @@ namespace CodemerxDecompile.Service.Services.Search
 
             switch (searchResult.Type)
             {
-                case SearchResultType.ParameterDefinition:
+                case SearchResultType.ParameterName:
                     {
                         MethodDefinition methodDefinition = searchResult.ObjectReference as MethodDefinition;
                         int? parameterIndex = methodDefinition.Parameters.Select((p, i) => new { Item = p, Index = i })
                                                                          .FirstOrDefault(p => p.Item.Name == searchResult.MatchedString)?.Index;
-                        
+
                         if (parameterIndex.HasValue)
                         {
                             typeMetadata.CodeMappingInfo.TryGetValue((IMemberDefinition)searchResult.ObjectReference, parameterIndex.Value, out codeSpan);
@@ -208,26 +218,34 @@ namespace CodemerxDecompile.Service.Services.Search
 
                         break;
                     }
-                case SearchResultType.TypeReference:
-                    {
-                        KeyValuePair<CodeSpan, MemberReference> result = typeMetadata.CodeSpanToMemberReference.FirstOrDefault(kvp => kvp.Value.MetadataToken == ((MemberReference)searchResult.ObjectReference).MetadataToken);
-
-                        if (result.Value != null)
-                        {
-                            codeSpan = result.Key;
-                        }
-
-                        break;
-                    }
-                case SearchResultType.TypeDefinition:
-                case SearchResultType.MemberDefinition:
+                case SearchResultType.EventType:
+                    typeMetadata.CodeMappingInfo.EventDefinitionToEventTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.PropertyType:
+                    typeMetadata.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.FieldType:
+                    typeMetadata.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.MethodReturnType:
+                    typeMetadata.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.ParameterType:
+                    typeMetadata.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.TryGetValue((ParameterDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.VariableType:
+                    typeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.TryGetValue((VariableDefinition)searchResult.ObjectReference, out codeSpan);
+                    break;
+                case SearchResultType.DeclaringType:
+                case SearchResultType.EventName:
+                case SearchResultType.PropertyName:
+                case SearchResultType.FieldName:
+                case SearchResultType.MethodName:
                     typeMetadata.MemberDeclarationToCodeSpan.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
                     break;
-                case SearchResultType.VariableDefinition:
+                case SearchResultType.VariableName:
                     typeMetadata.CodeMappingInfo.TryGetValue((VariableDefinition)searchResult.ObjectReference, out codeSpan);
                     break;
-                //case SearchResultType.Literal:
-                //    break;
                 case SearchResultType.Instruction:
                     typeMetadata.CodeMappingInfo.TryGetValue((Instruction)searchResult.ObjectReference, out codeSpan);
                     break;
@@ -252,6 +270,30 @@ namespace CodemerxDecompile.Service.Services.Search
             else
             {
                 throw new ArgumentException("Could not find type file path");
+            }
+        }
+
+        private SearchResultType GetSearchResultTypeFromMemberDefinitionType(IMemberDefinition memberDefinition)
+        {
+            if (memberDefinition is EventDefinition)
+            {
+                return SearchResultType.EventName;
+            }
+            else if (memberDefinition is FieldDefinition)
+            {
+                return SearchResultType.FieldName;
+            }
+            else if (memberDefinition is MethodDefinition)
+            {
+                return SearchResultType.MethodName;
+            }
+            else if (memberDefinition is PropertyDefinition)
+            {
+                return SearchResultType.PropertyName;
+            }
+            else
+            {
+                return SearchResultType.DeclaringType;
             }
         }
 

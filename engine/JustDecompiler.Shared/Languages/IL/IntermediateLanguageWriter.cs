@@ -8,6 +8,7 @@ using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using Telerik.JustDecompiler.Decompiler;
 using System.Text;
+using JustDecompiler.Shared;
 
 namespace Telerik.JustDecompiler.Languages.IL
 {
@@ -150,7 +151,9 @@ namespace Telerik.JustDecompiler.Languages.IL
             {
                 WriteKeyWordPostSpace("instance");
             }
-            WriteTypeReference(property.PropertyType);
+
+            CodeSpan propertyTypeCodeSpan = this.Write(() => WriteTypeReference(property.PropertyType));
+            this.AddMemberDefinitionTypeCodeSpanToCache(property, TypeReferenceType.PropertyType, propertyTypeCodeSpan);
             WriteSpace();
 
             int startIndex = this.formatter.CurrentPosition;

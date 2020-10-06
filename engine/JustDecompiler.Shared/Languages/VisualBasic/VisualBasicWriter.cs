@@ -37,6 +37,7 @@ using Mono.Cecil.Extensions;
 using Mono.Cecil.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Collections.Generic;
+using JustDecompiler.Shared;
 
 namespace Telerik.JustDecompiler.Languages.VisualBasic
 {
@@ -370,11 +371,21 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             }
         }
 
-        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference)
+        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
         {
             int startIndex = this.formatter.CurrentPosition;
             /* AGPL */
-            CodeSpan codeSpan = this.Write(() => WriteReference(name, reference));
+            CodeSpan codeSpan = this.Write(() =>
+            {
+                if (reference != null)
+                {
+                    WriteReference(name, reference);
+                }
+                else
+                {
+                    Write(name);
+                }
+            });
             /* End AGPL */
             if (reference is IMemberDefinition)
             {
@@ -385,10 +396,20 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
                 this.currentWritingInfo.MemberDeclarationToCodePostionMap[(IMemberDefinition)reference] = new OffsetSpan(startIndex, endIndex);
             }
             WriteAsBetweenSpaces();
-            WriteReferenceAndNamespaceIfInCollision(typeReference);
+
+            CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(typeReference));
+
+            if (reference is IMemberDefinition referenceAsMemberDefinition)
+            {
+                this.AddMemberDefinitionTypeCodeSpanToCache(referenceAsMemberDefinition, typeReferenceType, typeCodeSpan);
+            }
+            else if (reference is VariableDefinition variableReference)
+            {
+                this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variableReference] = typeCodeSpan;
+            }
         }
 
-        protected override void DoWriteTypeAndName(TypeReference typeReference, string name)
+        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
         {
             Write(name);
             WriteAsBetweenSpaces();
@@ -407,7 +428,9 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             }
 
             WriteAsBetweenSpaces();
-            WriteReferenceAndNamespaceIfInCollision(variable.VariableType);
+
+            CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(variable.VariableType));
+            this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variable] = typeCodeSpan;
         }
 
         protected override void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference)
@@ -442,7 +465,8 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             if (!string.IsNullOrEmpty(ToTypeString(type)))
             {
                 WriteAsBetweenSpaces();
-                WriteReferenceAndNamespaceIfInCollision(type);
+                CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(type));
+                this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
             }
         }
 
@@ -614,7 +638,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			if (@event.IsExplicitImplementation())
 			{
 				string eventName = GetEventName(@event);
-				WriteTypeAndName(@event.EventType, eventName, @event);
+				WriteTypeAndName(@event.EventType, eventName, @event, TypeReferenceType.EventType);
 			}
 			else
 			{

@@ -14,6 +14,13 @@ namespace Telerik.JustDecompiler.Languages
             this.FieldConstantValueToCodeMap = new Dictionary<IMemberDefinition, T>();
             this.VariableToCodeMap = new Dictionary<VariableDefinition, T>(new VariableDefinitionEqualityComparer());
             this.ParameterToCodeMap = new Dictionary<IMemberDefinition, Dictionary<int, T>>();
+
+            this.MethodDefinitionToMethodReturnTypeCodeMap = new Dictionary<IMemberDefinition, T>();
+            this.FieldDefinitionToFieldTypeCodeMap = new Dictionary<IMemberDefinition, T>();
+            this.PropertyDefinitionToPropertyTypeCodeMap = new Dictionary<IMemberDefinition, T>();
+            this.ParameterDefinitionToParameterTypeCodeMap = new Dictionary<ParameterDefinition, T>();
+            this.EventDefinitionToEventTypeCodeMap = new Dictionary<IMemberDefinition, T>();
+            this.VariableDefinitionToVariableTypeCodeMap = new Dictionary<VariableDefinition, T>();
         }
 
         public Dictionary<ICodeNode, T> NodeToCodeMap { get; private set; }
@@ -21,6 +28,13 @@ namespace Telerik.JustDecompiler.Languages
         public Dictionary<IMemberDefinition, T> FieldConstantValueToCodeMap { get; private set; }
         public Dictionary<VariableDefinition, T> VariableToCodeMap { get; private set; }
         public Dictionary<IMemberDefinition, Dictionary<int, T>> ParameterToCodeMap { get; private set; }
+
+        public Dictionary<IMemberDefinition, T> MethodDefinitionToMethodReturnTypeCodeMap { get; private set; }
+        public Dictionary<IMemberDefinition, T> FieldDefinitionToFieldTypeCodeMap { get; private set; }
+        public Dictionary<IMemberDefinition, T> PropertyDefinitionToPropertyTypeCodeMap { get; private set; }
+        public Dictionary<ParameterDefinition, T> ParameterDefinitionToParameterTypeCodeMap { get; private set; }
+        public Dictionary<IMemberDefinition, T> EventDefinitionToEventTypeCodeMap { get; private set; }
+        public Dictionary<VariableDefinition, T> VariableDefinitionToVariableTypeCodeMap { get; private set; }
 
         public T this[ICodeNode node]
         {

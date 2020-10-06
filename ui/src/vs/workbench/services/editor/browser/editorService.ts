@@ -554,7 +554,6 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 
 			if (selection) {
 				resourceEditorInput.options = {
-					...resourceEditorInput.options,
 					selection: {
 						startLineNumber: selection.startLineNumber,
 						startColumn: selection.startColumn,

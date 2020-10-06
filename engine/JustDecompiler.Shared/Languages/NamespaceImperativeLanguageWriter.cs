@@ -6,6 +6,7 @@ using Mono.Cecil.Extensions;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Cecil.Cil;
+using JustDecompiler.Shared;
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -231,14 +232,14 @@ namespace Telerik.JustDecompiler.Languages
 			}
 		}
 
-		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name, object reference)
+		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
 		{
-			DoWriteTypeAndName(typeReference, name, reference);
+			DoWriteTypeAndName(typeReference, name, reference, typeReferenceType);
 		}
 
-		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name)
+		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
 		{
-			DoWriteTypeAndName(typeReference, name);			
+			DoWriteTypeAndName(typeReference, name, typeReferenceType);			
 		}
 
         protected override sealed void WriteVariableTypeAndName(VariableDefinition variable)
@@ -354,8 +355,8 @@ namespace Telerik.JustDecompiler.Languages
 			return reference.Name != ToTypeString(reference);
 		}
 		
-		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name, object reference);
-		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name);
+		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType);
+		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType);
         protected abstract void DoWriteVariableTypeAndName(VariableDefinition variable);
         protected abstract void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference);
 	}

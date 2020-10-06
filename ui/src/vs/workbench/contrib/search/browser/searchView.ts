@@ -133,7 +133,6 @@ export class SearchView extends ViewPane {
 
 	private currentSelectedFileMatch: FileMatch | undefined;
 
-	private delayedRefresh: Delayer<void>;
 	private changedWhileHidden: boolean = false;
 	private updatedActionsWhileHidden = false;
 
@@ -220,8 +219,6 @@ export class SearchView extends ViewPane {
 		this._register(this.textFileService.untitled.onDidDispose(model => this.onUntitledDidDispose(model.resource)));
 		this._register(this.contextService.onDidChangeWorkbenchState(() => this.onDidChangeWorkbenchState()));
 		this._register(this.searchHistoryService.onDidClearHistory(() => this.clearHistory()));
-
-		this.delayedRefresh = this._register(new Delayer<void>(250));
 
 		this.addToSearchHistoryDelayer = this._register(new Delayer<void>(2000));
 		this.toggleCollapseStateDelayer = this._register(new Delayer<void>(100));

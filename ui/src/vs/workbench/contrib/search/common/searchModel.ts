@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RunOnceScheduler } from 'vs/base/common/async';
+// import { RunOnceScheduler } from 'vs/base/common/async';
 import { CancellationTokenSource } from 'vs/base/common/cancellation';
 import * as errors from 'vs/base/common/errors';
 import { Emitter, Event } from 'vs/base/common/event';
@@ -210,7 +210,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 	private _removedMatches: Set<string>;
 	private _selectedMatch: Match | null = null;
 
-	private _updateScheduler: RunOnceScheduler;
+	// private _updateScheduler: RunOnceScheduler;
 	// private _modelDecorations: string[] = [];
 
 	private _context: Map<number, string> = new Map();
@@ -225,7 +225,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 		this._resource = this.rawMatch.resource;
 		this._matches = new Map<string, Match>();
 		this._removedMatches = new Set<string>();
-		this._updateScheduler = new RunOnceScheduler(this.updateMatchesForModel.bind(this), 250);
+		// this._updateScheduler = new RunOnceScheduler(this.updateMatchesForModel.bind(this), 250);
 
 		this.createMatches();
 	}
@@ -233,8 +233,8 @@ export class FileMatch extends Disposable implements IFileMatch {
 	private createMatches(): void {
 		const model = this.modelService.getModel(this._resource);
 		if (model) {
-			this.bindModel(model);
-			this.updateMatchesForModel();
+			// this.bindModel(model);
+			// this.updateMatchesForModel();
 		} else {
 			this.rawMatch.results!
 				.filter(resultIsMatch)
@@ -249,42 +249,42 @@ export class FileMatch extends Disposable implements IFileMatch {
 
 	bindModel(model: ITextModel): void {
 		this._model = model;
-		this._modelListener = this._model.onDidChangeContent(() => {
-			this._updateScheduler.schedule();
-		});
+		// this._modelListener = this._model.onDidChangeContent(() => {
+		// 	this._updateScheduler.schedule();
+		// });
 		this._model.onWillDispose(() => this.onModelWillDispose());
 		this.updateHighlights();
 	}
 
 	private onModelWillDispose(): void {
 		// Update matches because model might have some dirty changes
-		this.updateMatchesForModel();
+		// this.updateMatchesForModel();
 		this.unbindModel();
 	}
 
 	private unbindModel(): void {
 		if (this._model) {
-			this._updateScheduler.cancel();
+			// this._updateScheduler.cancel();
 			// this._model.deltaDecorations(this._modelDecorations, []);
 			this._model = null;
 			this._modelListener!.dispose();
 		}
 	}
 
-	private updateMatchesForModel(): void {
-		// this is called from a timeout and might fire
-		// after the model has been disposed
-		if (!this._model) {
-			return;
-		}
-		this._matches = new Map<string, Match>();
+	// private updateMatchesForModel(): void {
+	// 	// this is called from a timeout and might fire
+	// 	// after the model has been disposed
+	// 	if (!this._model) {
+	// 		return;
+	// 	}
+	// 	this._matches = new Map<string, Match>();
 
-		const wordSeparators = this._query.isWordMatch && this._query.wordSeparators ? this._query.wordSeparators : null;
-		const matches = this._model
-			.findMatches(this._query.pattern, this._model.getFullModelRange(), !!this._query.isRegExp, !!this._query.isCaseSensitive, wordSeparators, false, this._maxResults);
+	// 	const wordSeparators = this._query.isWordMatch && this._query.wordSeparators ? this._query.wordSeparators : null;
+	// 	const matches = this._model
+	// 		.findMatches(this._query.pattern, this._model.getFullModelRange(), !!this._query.isRegExp, !!this._query.isCaseSensitive, wordSeparators, false, this._maxResults);
 
-		this.updateMatches(matches, true);
-	}
+	// 	this.updateMatches(matches, true);
+	// }
 
 	private updatesMatchesForLineAfterReplace(lineNumber: number, modelChange: boolean): void {
 		if (!this._model) {

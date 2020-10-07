@@ -329,7 +329,7 @@ namespace CodemerxDecompile.Service
 
         public override async Task Search(SearchRequest request, IServerStreamWriter<SearchResultResponse> responseStream, ServerCallContext context)
         {
-            foreach (SearchResult searchResult in this.searchService.Search(request.Query))
+            foreach (SearchResult searchResult in this.searchService.Search(request.Query, request.MatchCasing, request.MatchWholeWord))
             {
                 int highlightStartIndex = searchResult.MatchedString.IndexOf(request.Query, StringComparison.InvariantCultureIgnoreCase);
 

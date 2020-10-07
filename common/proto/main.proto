@@ -135,6 +135,8 @@ message AddResolvedAssemblyRequest {
 
 message SearchRequest {
   string query = 1;
+  bool matchCasing = 2;
+  bool matchWholeWord = 3;
 }
 
 message SearchResultResponse {

@@ -3728,7 +3728,9 @@ proto.SearchRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.SearchRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    query: jspb.Message.getFieldWithDefault(msg, 1, "")
+    query: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    matchcasing: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
+    matchwholeword: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
   };
 
   if (includeInstance) {
@@ -3769,6 +3771,14 @@ proto.SearchRequest.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setQuery(value);
       break;
+    case 2:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMatchcasing(value);
+      break;
+    case 3:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMatchwholeword(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -3805,6 +3815,20 @@ proto.SearchRequest.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getMatchcasing();
+  if (f) {
+    writer.writeBool(
+      2,
+      f
+    );
+  }
+  f = message.getMatchwholeword();
+  if (f) {
+    writer.writeBool(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -3823,6 +3847,42 @@ proto.SearchRequest.prototype.getQuery = function() {
  */
 proto.SearchRequest.prototype.setQuery = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional bool matchCasing = 2;
+ * @return {boolean}
+ */
+proto.SearchRequest.prototype.getMatchcasing = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 2, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.SearchRequest} returns this
+ */
+proto.SearchRequest.prototype.setMatchcasing = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 2, value);
+};
+
+
+/**
+ * optional bool matchWholeWord = 3;
+ * @return {boolean}
+ */
+proto.SearchRequest.prototype.getMatchwholeword = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 3, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.SearchRequest} returns this
+ */
+proto.SearchRequest.prototype.setMatchwholeword = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 3, value);
 };
 
 

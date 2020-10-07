@@ -480,6 +480,12 @@ export class SearchRequest extends jspb.Message {
   getQuery(): string;
   setQuery(value: string): void;
 
+  getMatchcasing(): boolean;
+  setMatchcasing(value: boolean): void;
+
+  getMatchwholeword(): boolean;
+  setMatchwholeword(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SearchRequest.AsObject;
   static toObject(includeInstance: boolean, msg: SearchRequest): SearchRequest.AsObject;
@@ -493,6 +499,8 @@ export class SearchRequest extends jspb.Message {
 export namespace SearchRequest {
   export type AsObject = {
     query: string,
+    matchcasing: boolean,
+    matchwholeword: boolean,
   }
 }
 

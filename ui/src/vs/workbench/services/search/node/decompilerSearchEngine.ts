@@ -32,6 +32,8 @@ export class DecompilerSearchEngine {
 
 			const request = new SearchRequest();
 			request.setQuery(this.query.contentPattern.pattern);
+			request.setMatchcasing(this.query.contentPattern.isCaseSensitive ?? false);
+			request.setMatchwholeword(this.query.contentPattern.isWordMatch ?? false);
 
 			const stream = client.search(request, {});
 

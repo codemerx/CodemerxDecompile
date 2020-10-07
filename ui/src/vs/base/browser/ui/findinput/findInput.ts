@@ -206,11 +206,11 @@ export class FindInput extends Widget {
 		}));
 
 		if (this._showOptionButtons) {
-			this.inputBox.paddingRight = this.caseSensitive.width() + this.wholeWords.width() + this.regex.width();
+			this.inputBox.paddingRight = this.caseSensitive.width() + this.wholeWords.width(); // + this.regex.width();
 		}
 
 		// Arrow-Key support to navigate between options
-		let indexes = [this.caseSensitive.domNode, this.wholeWords.domNode, this.regex.domNode];
+		let indexes = [this.caseSensitive.domNode, this.wholeWords.domNode]; //, this.regex.domNode];
 		this.onkeydown(this.domNode, (event: IKeyboardEvent) => {
 			if (event.equals(KeyCode.LeftArrow) || event.equals(KeyCode.RightArrow) || event.equals(KeyCode.Escape)) {
 				let index = indexes.indexOf(<HTMLElement>document.activeElement);
@@ -243,7 +243,7 @@ export class FindInput extends Widget {
 		controls.style.display = this._showOptionButtons ? 'block' : 'none';
 		controls.appendChild(this.caseSensitive.domNode);
 		controls.appendChild(this.wholeWords.domNode);
-		controls.appendChild(this.regex.domNode);
+		// controls.appendChild(this.regex.domNode);
 
 		this.domNode.appendChild(controls);
 
@@ -333,7 +333,7 @@ export class FindInput extends Widget {
 				inputActiveOptionForeground: this.inputActiveOptionForeground,
 				inputActiveOptionBackground: this.inputActiveOptionBackground,
 			};
-			this.regex.style(checkBoxStyles);
+			// this.regex.style(checkBoxStyles);
 			this.wholeWords.style(checkBoxStyles);
 			this.caseSensitive.style(checkBoxStyles);
 

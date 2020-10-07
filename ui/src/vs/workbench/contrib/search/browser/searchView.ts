@@ -53,7 +53,7 @@ import { ACTIVE_GROUP, IEditorService, SIDE_GROUP } from 'vs/workbench/services/
 import { IPreferencesService, ISettingsEditorOptions } from 'vs/workbench/services/preferences/common/preferences';
 import { ITextFileService } from 'vs/workbench/services/textfile/common/textfiles';
 import { relativePath } from 'vs/base/common/resources';
-import { IAccessibilityService } from 'vs/platform/accessibility/common/accessibility';
+// import { IAccessibilityService } from 'vs/platform/accessibility/common/accessibility';
 import { ViewPane, IViewPaneOptions } from 'vs/workbench/browser/parts/views/viewPaneContainer';
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
 import { Memento, MementoObject } from 'vs/workbench/common/memento';
@@ -65,8 +65,8 @@ import { Color, RGBA } from 'vs/base/common/color';
 import { IViewDescriptorService } from 'vs/workbench/common/views';
 import { ServiceCollection } from 'vs/platform/instantiation/common/serviceCollection';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import { Orientation } from 'vs/base/browser/ui/sash/sash';
-import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
+// import { Orientation } from 'vs/base/browser/ui/sash/sash';
+// import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
 import { SearchResultMetadata } from 'vs/cd/common/DecompilationTypes';
 
 const $ = dom.$;
@@ -126,7 +126,7 @@ export class SearchView extends ViewPane {
 	private searchWidget!: SearchWidget;
 	private size!: dom.Dimension;
 	private queryDetails!: HTMLElement;
-	private toggleQueryDetailsButton!: HTMLElement;
+	// private toggleQueryDetailsButton!: HTMLElement;
 	private inputPatternExcludes!: ExcludePatternInputWidget;
 	private inputPatternIncludes!: PatternInputWidget;
 	private resultsElement!: HTMLElement;
@@ -167,7 +167,7 @@ export class SearchView extends ViewPane {
 		@ISearchHistoryService private readonly searchHistoryService: ISearchHistoryService,
 		@IContextMenuService contextMenuService: IContextMenuService,
 		@IMenuService private readonly menuService: IMenuService,
-		@IAccessibilityService private readonly accessibilityService: IAccessibilityService,
+		// @IAccessibilityService private readonly accessibilityService: IAccessibilityService,
 		@IKeybindingService keybindingService: IKeybindingService,
 		@IStorageService storageService: IStorageService,
 		@IOpenerService openerService: IOpenerService,
@@ -260,33 +260,33 @@ export class SearchView extends ViewPane {
 		this.createSearchWidget(this.searchWidgetsContainerElement);
 
 		const history = this.searchHistoryService.load();
-		const filePatterns = this.viewletState['query.filePatterns'] || '';
+		// const filePatterns = this.viewletState['query.filePatterns'] || '';
 		const patternExclusions = this.viewletState['query.folderExclusions'] || '';
 		const patternExclusionsHistory: string[] = history.exclude || [];
 		const patternIncludes = this.viewletState['query.folderIncludes'] || '';
 		const patternIncludesHistory: string[] = history.include || [];
-		const queryDetailsExpanded = this.viewletState['query.queryDetailsExpanded'] || '';
+		// const queryDetailsExpanded = this.viewletState['query.queryDetailsExpanded'] || '';
 		const useExcludesAndIgnoreFiles = typeof this.viewletState['query.useExcludesAndIgnoreFiles'] === 'boolean' ?
 			this.viewletState['query.useExcludesAndIgnoreFiles'] : true;
 
 		this.queryDetails = dom.append(this.searchWidgetsContainerElement, $('.query-details'));
 
 		// Toggle query details button
-		this.toggleQueryDetailsButton = dom.append(this.queryDetails,
-			$('.more' + searchDetailsIcon.cssSelector, { tabindex: 0, role: 'button', title: nls.localize('moreSearch', "Toggle Search Details") }));
+		// this.toggleQueryDetailsButton = dom.append(this.queryDetails,
+		// 	$('.more' + searchDetailsIcon.cssSelector, { tabindex: 0, role: 'button', title: nls.localize('moreSearch', "Toggle Search Details") }));
 
-		this._register(dom.addDisposableListener(this.toggleQueryDetailsButton, dom.EventType.CLICK, e => {
-			dom.EventHelper.stop(e);
-			this.toggleQueryDetails(!this.accessibilityService.isScreenReaderOptimized());
-		}));
-		this._register(dom.addDisposableListener(this.toggleQueryDetailsButton, dom.EventType.KEY_UP, (e: KeyboardEvent) => {
-			const event = new StandardKeyboardEvent(e);
+		// this._register(dom.addDisposableListener(this.toggleQueryDetailsButton, dom.EventType.CLICK, e => {
+		// 	dom.EventHelper.stop(e);
+		// 	this.toggleQueryDetails(!this.accessibilityService.isScreenReaderOptimized());
+		// }));
+		// this._register(dom.addDisposableListener(this.toggleQueryDetailsButton, dom.EventType.KEY_UP, (e: KeyboardEvent) => {
+		// 	const event = new StandardKeyboardEvent(e);
 
-			if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
-				dom.EventHelper.stop(e);
-				this.toggleQueryDetails(false);
-			}
-		}));
+		// 	if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
+		// 		dom.EventHelper.stop(e);
+		// 		this.toggleQueryDetails(false);
+		// 	}
+		// }));
 
 		// folder includes list
 		const folderIncludesList = dom.append(this.queryDetails,
@@ -329,9 +329,9 @@ export class SearchView extends ViewPane {
 
 		this.createSearchResultsView(this.container);
 
-		if (filePatterns !== '' || patternExclusions !== '' || patternIncludes !== '' || queryDetailsExpanded !== '' || !useExcludesAndIgnoreFiles) {
-			this.toggleQueryDetails(true, true, true);
-		}
+		// if (filePatterns !== '' || patternExclusions !== '' || patternIncludes !== '' || queryDetailsExpanded !== '' || !useExcludesAndIgnoreFiles) {
+		// 	this.toggleQueryDetails(true, true, true);
+		// }
 
 		this._register(this.viewModel.searchResult.onChange((event) => this.onSearchResultsChanged(event)));
 
@@ -425,9 +425,9 @@ export class SearchView extends ViewPane {
 			this.refreshTree();
 		}));
 
-		this._register(this.searchWidget.onBlur(() => {
-			this.toggleQueryDetailsButton.focus();
-		}));
+		// this._register(this.searchWidget.onBlur(() => {
+		// 	this.toggleQueryDetailsButton.focus();
+		// }));
 
 		this.trackInputBox(this.searchWidget.searchInputFocusTracker);
 	}
@@ -775,7 +775,7 @@ export class SearchView extends ViewPane {
 
 	private moveFocusFromSearchOrReplace() {
 		if (this.showsFileTypes()) {
-			this.toggleQueryDetails(true, this.showsFileTypes());
+			// this.toggleQueryDetails(true, this.showsFileTypes());
 		} else {
 			this.selectTreeIfNotSelected();
 		}
@@ -805,7 +805,7 @@ export class SearchView extends ViewPane {
 
 	private moveFocusFromResults(): void {
 		if (this.showsFileTypes()) {
-			this.toggleQueryDetails(true, true, false, true);
+			// this.toggleQueryDetails(true, true, false, true);
 		} else {
 			this.searchWidget.focus(true, true);
 		}
@@ -999,36 +999,36 @@ export class SearchView extends ViewPane {
 		}
 	}
 
-	toggleQueryDetails(moveFocus = true, show?: boolean, skipLayout?: boolean, reverse?: boolean): void {
-		const cls = 'more';
-		show = typeof show === 'undefined' ? !dom.hasClass(this.queryDetails, cls) : Boolean(show);
-		this.viewletState['query.queryDetailsExpanded'] = show;
-		skipLayout = Boolean(skipLayout);
+	// toggleQueryDetails(moveFocus = true, show?: boolean, skipLayout?: boolean, reverse?: boolean): void {
+	// 	const cls = 'more';
+	// 	show = typeof show === 'undefined' ? !dom.hasClass(this.queryDetails, cls) : Boolean(show);
+	// 	this.viewletState['query.queryDetailsExpanded'] = show;
+	// 	skipLayout = Boolean(skipLayout);
 
-		if (show) {
-			this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'true');
-			dom.addClass(this.queryDetails, cls);
-			if (moveFocus) {
-				if (reverse) {
-					this.inputPatternExcludes.focus();
-					this.inputPatternExcludes.select();
-				} else {
-					this.inputPatternIncludes.focus();
-					this.inputPatternIncludes.select();
-				}
-			}
-		} else {
-			this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'false');
-			dom.removeClass(this.queryDetails, cls);
-			if (moveFocus) {
-				this.searchWidget.focus();
-			}
-		}
+	// 	if (show) {
+	// 		this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'true');
+	// 		dom.addClass(this.queryDetails, cls);
+	// 		if (moveFocus) {
+	// 			if (reverse) {
+	// 				this.inputPatternExcludes.focus();
+	// 				this.inputPatternExcludes.select();
+	// 			} else {
+	// 				this.inputPatternIncludes.focus();
+	// 				this.inputPatternIncludes.select();
+	// 			}
+	// 		}
+	// 	} else {
+	// 		this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'false');
+	// 		dom.removeClass(this.queryDetails, cls);
+	// 		if (moveFocus) {
+	// 			this.searchWidget.focus();
+	// 		}
+	// 	}
 
-		if (!skipLayout && this.size) {
-			this.layout(this._orientation === Orientation.VERTICAL ? this.size.height : this.size.width);
-		}
-	}
+	// 	if (!skipLayout && this.size) {
+	// 		this.layout(this._orientation === Orientation.VERTICAL ? this.size.height : this.size.width);
+	// 	}
+	// }
 
 	searchInFolders(resources?: URI[]): void {
 		const folderPaths: string[] = [];
@@ -1076,9 +1076,9 @@ export class SearchView extends ViewPane {
 		}
 
 		// Show 'files to include' box
-		if (!this.showsFileTypes()) {
-			this.toggleQueryDetails(true, true);
-		}
+		// if (!this.showsFileTypes()) {
+		// 	this.toggleQueryDetails(true, true);
+		// }
 
 		this.inputPatternIncludes.setValue(folderPaths.join(', '));
 		this.searchWidget.focus(false);
@@ -1411,7 +1411,7 @@ export class SearchView extends ViewPane {
 				resultMsg += nls.localize('useIgnoresAndExcludesDisabled', " - exclude settings and ignore files are disabled");
 			}
 
-			dom.append(messageEl, $('span', undefined, resultMsg + ' - '));
+			dom.append(messageEl, $('span', undefined, resultMsg));
 
 			/* AGPL */
 			// const span = dom.append(messageEl, $('span'));

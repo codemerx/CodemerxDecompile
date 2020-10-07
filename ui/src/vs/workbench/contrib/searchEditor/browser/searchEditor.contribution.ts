@@ -9,7 +9,7 @@ import { extname } from 'vs/base/common/resources';
 import { URI } from 'vs/base/common/uri';
 import { ServicesAccessor } from 'vs/editor/browser/editorExtensions';
 import { Range } from 'vs/editor/common/core/range';
-import { ToggleCaseSensitiveKeybinding, ToggleRegexKeybinding, ToggleWholeWordKeybinding } from 'vs/editor/contrib/find/findModel';
+import { ToggleCaseSensitiveKeybinding, ToggleWholeWordKeybinding } from 'vs/editor/contrib/find/findModel';
 import { localize } from 'vs/nls';
 import { Action2, MenuId, registerAction2 } from 'vs/platform/actions/common/actions';
 import { CommandsRegistry } from 'vs/platform/commands/common/commands';
@@ -29,7 +29,7 @@ import { searchRefreshIcon } from 'vs/workbench/contrib/search/browser/searchIco
 import * as SearchConstants from 'vs/workbench/contrib/search/common/constants';
 import * as SearchEditorConstants from 'vs/workbench/contrib/searchEditor/browser/constants';
 import { SearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditor';
-import { modifySearchEditorContextLinesCommand, openNewSearchEditor, selectAllSearchEditorMatchesCommand, toggleSearchEditorCaseSensitiveCommand, toggleSearchEditorContextLinesCommand, toggleSearchEditorRegexCommand, toggleSearchEditorWholeWordCommand } from 'vs/workbench/contrib/searchEditor/browser/searchEditorActions';
+import { modifySearchEditorContextLinesCommand, openNewSearchEditor, selectAllSearchEditorMatchesCommand, toggleSearchEditorCaseSensitiveCommand, toggleSearchEditorContextLinesCommand, toggleSearchEditorWholeWordCommand } from 'vs/workbench/contrib/searchEditor/browser/searchEditorActions';
 import { getOrMakeSearchEditorInput, SearchConfiguration, SearchEditorInput, SEARCH_EDITOR_EXT } from 'vs/workbench/contrib/searchEditor/browser/searchEditorInput';
 import { parseSavedSearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditorSerialization';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
@@ -41,7 +41,7 @@ const FocusQueryEditorWidgetCommandId = 'search.action.focusQueryEditorWidget';
 
 const ToggleSearchEditorCaseSensitiveCommandId = 'toggleSearchEditorCaseSensitive';
 const ToggleSearchEditorWholeWordCommandId = 'toggleSearchEditorWholeWord';
-const ToggleSearchEditorRegexCommandId = 'toggleSearchEditorRegex';
+// const ToggleSearchEditorRegexCommandId = 'toggleSearchEditorRegex';
 const ToggleSearchEditorContextLinesCommandId = 'toggleSearchEditorContextLines';
 const IncreaseSearchEditorContextLinesCommandId = 'increaseSearchEditorContextLines';
 const DecreaseSearchEditorContextLinesCommandId = 'decreaseSearchEditorContextLines';
@@ -162,12 +162,12 @@ KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 	handler: toggleSearchEditorWholeWordCommand
 }, ToggleWholeWordKeybinding));
 
-KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
-	id: ToggleSearchEditorRegexCommandId,
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, SearchConstants.SearchInputBoxFocusedKey),
-	handler: toggleSearchEditorRegexCommand
-}, ToggleRegexKeybinding));
+// KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
+// 	id: ToggleSearchEditorRegexCommandId,
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, SearchConstants.SearchInputBoxFocusedKey),
+// 	handler: toggleSearchEditorRegexCommand
+// }, ToggleRegexKeybinding));
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: ToggleSearchEditorContextLinesCommandId,

@@ -11,7 +11,7 @@ import * as objects from 'vs/base/common/objects';
 import * as platform from 'vs/base/common/platform';
 import { dirname } from 'vs/base/common/resources';
 import { URI } from 'vs/base/common/uri';
-import { ToggleCaseSensitiveKeybinding, ToggleRegexKeybinding, ToggleWholeWordKeybinding } from 'vs/editor/contrib/find/findModel';
+import { ToggleCaseSensitiveKeybinding, ToggleWholeWordKeybinding } from 'vs/editor/contrib/find/findModel';
 import * as nls from 'vs/nls';
 import { ICommandAction, MenuId, MenuRegistry, SyncActionDescriptor } from 'vs/platform/actions/common/actions';
 import { CommandsRegistry, ICommandHandler } from 'vs/platform/commands/common/commands';
@@ -35,7 +35,7 @@ import { ExplorerFolderContext, FilesExplorerFocusCondition, IExplorerService, V
 /* End AGPL */
 import { registerContributions as replaceContributions } from 'vs/workbench/contrib/search/browser/replaceContributions';
 /* AGPL */
-import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, copyAllCommand, copyMatchCommand, copyPathCommand, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, toggleCaseSensitiveCommand, toggleRegexCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
+import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, copyAllCommand, copyMatchCommand, copyPathCommand, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, toggleCaseSensitiveCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
 /* End AGPL */
 import { SearchView } from 'vs/workbench/contrib/search/browser/searchView';
 import { registerContributions as searchWidgetContributions } from 'vs/workbench/contrib/search/browser/searchWidget';
@@ -49,7 +49,7 @@ import { VIEWLET_ID, VIEW_ID, SEARCH_EXCLUDE_CONFIG, SearchSortOrder } from 'vs/
 import { IViewletService } from 'vs/workbench/services/viewlet/browser/viewlet';
 import { IWorkspaceContextService } from 'vs/platform/workspace/common/workspace';
 import { ExplorerViewPaneContainer } from 'vs/workbench/contrib/files/browser/explorerViewlet';
-import { assertType, assertIsDefined } from 'vs/base/common/types';
+import { assertType } from 'vs/base/common/types';
 import { SyncDescriptor } from 'vs/platform/instantiation/common/descriptors';
 import { SearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditor';
 import { ViewPaneContainer } from 'vs/workbench/browser/parts/views/viewPaneContainer';
@@ -69,21 +69,21 @@ searchWidgetContributions();
 
 const category = nls.localize('search', "Search");
 
-KeybindingsRegistry.registerCommandAndKeybindingRule({
-	id: 'workbench.action.search.toggleQueryDetails',
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: ContextKeyExpr.or(Constants.SearchViewFocusedKey, SearchEditorConstants.InSearchEditor),
-	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_J,
-	handler: accessor => {
-		const contextService = accessor.get(IContextKeyService).getContext(document.activeElement);
-		if (contextService.getValue(SearchEditorConstants.InSearchEditor.serialize())) {
-			(accessor.get(IEditorService).activeEditorPane as SearchEditor).toggleQueryDetails();
-		} else if (contextService.getValue(Constants.SearchViewFocusedKey.serialize())) {
-			const searchView = getSearchView(accessor.get(IViewsService));
-			assertIsDefined(searchView).toggleQueryDetails();
-		}
-	}
-});
+// KeybindingsRegistry.registerCommandAndKeybindingRule({
+// 	id: 'workbench.action.search.toggleQueryDetails',
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: ContextKeyExpr.or(Constants.SearchViewFocusedKey, SearchEditorConstants.InSearchEditor),
+// 	primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_J,
+// 	handler: accessor => {
+// 		const contextService = accessor.get(IContextKeyService).getContext(document.activeElement);
+// 		if (contextService.getValue(SearchEditorConstants.InSearchEditor.serialize())) {
+// 			(accessor.get(IEditorService).activeEditorPane as SearchEditor).toggleQueryDetails();
+// 		} else if (contextService.getValue(Constants.SearchViewFocusedKey.serialize())) {
+// 			const searchView = getSearchView(accessor.get(IViewsService));
+// 			assertIsDefined(searchView).toggleQueryDetails();
+// 		}
+// 	}
+// });
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: 'workbench.action.searchEditor.deleteResultBlock',
@@ -643,12 +643,12 @@ KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 	handler: toggleWholeWordCommand
 }, ToggleWholeWordKeybinding));
 
-KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
-	id: Constants.ToggleRegexCommandId,
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: Constants.SearchViewFocusedKey,
-	handler: toggleRegexCommand
-}, ToggleRegexKeybinding));
+// KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
+// 	id: Constants.ToggleRegexCommandId,
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: Constants.SearchViewFocusedKey,
+// 	handler: toggleRegexCommand
+// }, ToggleRegexKeybinding));
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: Constants.AddCursorsAtSearchResults,

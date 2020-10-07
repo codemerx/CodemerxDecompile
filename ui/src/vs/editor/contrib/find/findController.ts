@@ -12,7 +12,7 @@ import { ICodeEditor } from 'vs/editor/browser/editorBrowser';
 import { EditorAction, EditorCommand, ServicesAccessor, registerEditorAction, registerEditorCommand, registerEditorContribution } from 'vs/editor/browser/editorExtensions';
 import { IEditorContribution } from 'vs/editor/common/editorCommon';
 import { EditorContextKeys } from 'vs/editor/common/editorContextKeys';
-import { CONTEXT_FIND_INPUT_FOCUSED, CONTEXT_FIND_WIDGET_VISIBLE, FIND_IDS, FindModelBoundToEditorModel, ToggleCaseSensitiveKeybinding, ToggleRegexKeybinding, ToggleSearchScopeKeybinding, ToggleWholeWordKeybinding, CONTEXT_REPLACE_INPUT_FOCUSED } from 'vs/editor/contrib/find/findModel';
+import { CONTEXT_FIND_INPUT_FOCUSED, CONTEXT_FIND_WIDGET_VISIBLE, FIND_IDS, FindModelBoundToEditorModel, ToggleCaseSensitiveKeybinding, ToggleSearchScopeKeybinding, ToggleWholeWordKeybinding, CONTEXT_REPLACE_INPUT_FOCUSED } from 'vs/editor/contrib/find/findModel';
 import { FindOptionsWidget } from 'vs/editor/contrib/find/findOptionsWidget';
 import { FindReplaceState, FindReplaceStateChangedEvent, INewFindReplaceState } from 'vs/editor/contrib/find/findState';
 import { FindWidget, IFindController } from 'vs/editor/contrib/find/findWidget';
@@ -823,19 +823,19 @@ registerEditorCommand(new FindCommand({
 	}
 }));
 
-registerEditorCommand(new FindCommand({
-	id: FIND_IDS.ToggleRegexCommand,
-	precondition: undefined,
-	handler: x => x.toggleRegex(),
-	kbOpts: {
-		weight: KeybindingWeight.EditorContrib + 5,
-		kbExpr: EditorContextKeys.focus,
-		primary: ToggleRegexKeybinding.primary,
-		mac: ToggleRegexKeybinding.mac,
-		win: ToggleRegexKeybinding.win,
-		linux: ToggleRegexKeybinding.linux
-	}
-}));
+// registerEditorCommand(new FindCommand({
+// 	id: FIND_IDS.ToggleRegexCommand,
+// 	precondition: undefined,
+// 	handler: x => x.toggleRegex(),
+// 	kbOpts: {
+// 		weight: KeybindingWeight.EditorContrib + 5,
+// 		kbExpr: EditorContextKeys.focus,
+// 		primary: ToggleRegexKeybinding.primary,
+// 		mac: ToggleRegexKeybinding.mac,
+// 		win: ToggleRegexKeybinding.win,
+// 		linux: ToggleRegexKeybinding.linux
+// 	}
+// }));
 
 registerEditorCommand(new FindCommand({
 	id: FIND_IDS.ToggleSearchScopeCommand,

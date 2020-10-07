@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as DOM from 'vs/base/browser/dom';
-import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+// import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { alert } from 'vs/base/browser/ui/aria/aria';
 import { Delayer } from 'vs/base/common/async';
 import { CancellationToken } from 'vs/base/common/cancellation';
-import { KeyCode } from 'vs/base/common/keyCodes';
+// import { KeyCode } from 'vs/base/common/keyCodes';
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import { assertIsDefined } from 'vs/base/common/types';
 import { URI } from 'vs/base/common/uri';
@@ -50,7 +50,7 @@ import { serializeSearchResultForEditor } from 'vs/workbench/contrib/searchEdito
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { IPatternInfo, ISearchConfigurationProperties, ITextQuery } from 'vs/workbench/services/search/common/search';
-import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
+// import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
 
 const RESULT_LINE_REGEX = /^(\s+)(\d+)(:| )(\s+)(.*)$/;
 const FILE_LINE_REGEX = /^(\S.*):$/;
@@ -69,7 +69,7 @@ export class SearchEditor extends BaseTextEditor {
 	private inputPatternIncludes!: PatternInputWidget;
 	private inputPatternExcludes!: ExcludePatternInputWidget;
 	private includesExcludesContainer!: HTMLElement;
-	private toggleQueryDetailsButton!: HTMLElement;
+	// private toggleQueryDetailsButton!: HTMLElement;
 	private messageBox!: HTMLElement;
 
 	private runSearchDelayer = new Delayer(0);
@@ -135,18 +135,18 @@ export class SearchEditor extends BaseTextEditor {
 		this.includesExcludesContainer = DOM.append(this.queryEditorContainer, DOM.$('.includes-excludes'));
 
 		// // Toggle query details button
-		this.toggleQueryDetailsButton = DOM.append(this.includesExcludesContainer, DOM.$('.expand' + searchDetailsIcon.cssSelector, { tabindex: 0, role: 'button', title: localize('moreSearch', "Toggle Search Details") }));
-		this._register(DOM.addDisposableListener(this.toggleQueryDetailsButton, DOM.EventType.CLICK, e => {
-			DOM.EventHelper.stop(e);
-			this.toggleIncludesExcludes();
-		}));
-		this._register(DOM.addDisposableListener(this.toggleQueryDetailsButton, DOM.EventType.KEY_UP, (e: KeyboardEvent) => {
-			const event = new StandardKeyboardEvent(e);
-			if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
-				DOM.EventHelper.stop(e);
-				this.toggleIncludesExcludes();
-			}
-		}));
+		// this.toggleQueryDetailsButton = DOM.append(this.includesExcludesContainer, DOM.$('.expand' + searchDetailsIcon.cssSelector, { tabindex: 0, role: 'button', title: localize('moreSearch', "Toggle Search Details") }));
+		// this._register(DOM.addDisposableListener(this.toggleQueryDetailsButton, DOM.EventType.CLICK, e => {
+		// 	DOM.EventHelper.stop(e);
+		// 	this.toggleIncludesExcludes();
+		// }));
+		// this._register(DOM.addDisposableListener(this.toggleQueryDetailsButton, DOM.EventType.KEY_UP, (e: KeyboardEvent) => {
+		// 	const event = new StandardKeyboardEvent(e);
+		// 	if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
+		// 		DOM.EventHelper.stop(e);
+		// 		this.toggleIncludesExcludes();
+		// 	}
+		// }));
 
 		// // Includes
 		const folderIncludesList = DOM.append(this.includesExcludesContainer, DOM.$('.file-types.includes'));
@@ -290,7 +290,7 @@ export class SearchEditor extends BaseTextEditor {
 	}
 
 	toggleQueryDetails() {
-		this.toggleIncludesExcludes();
+		// this.toggleIncludesExcludes();
 	}
 
 	deleteResultBlock() {
@@ -546,7 +546,7 @@ export class SearchEditor extends BaseTextEditor {
 		this.inputPatternExcludes.setValue(config.excludes);
 		this.inputPatternIncludes.setValue(config.includes);
 		this.inputPatternExcludes.setUseExcludesAndIgnoreFiles(config.useIgnores);
-		this.toggleIncludesExcludes(config.showIncludesExcludes);
+		// this.toggleIncludesExcludes(config.showIncludesExcludes);
 
 		this.restoreViewState();
 
@@ -557,22 +557,22 @@ export class SearchEditor extends BaseTextEditor {
 		this.pauseSearching = false;
 	}
 
-	private toggleIncludesExcludes(_shouldShow?: boolean): void {
-		const cls = 'expanded';
-		const shouldShow = _shouldShow ?? !DOM.hasClass(this.includesExcludesContainer, cls);
+	// private toggleIncludesExcludes(_shouldShow?: boolean): void {
+	// 	const cls = 'expanded';
+	// 	const shouldShow = _shouldShow ?? !DOM.hasClass(this.includesExcludesContainer, cls);
 
-		if (shouldShow) {
-			this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'true');
-			DOM.addClass(this.includesExcludesContainer, cls);
-		} else {
-			this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'false');
-			DOM.removeClass(this.includesExcludesContainer, cls);
-		}
+	// 	if (shouldShow) {
+	// 		this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'true');
+	// 		DOM.addClass(this.includesExcludesContainer, cls);
+	// 	} else {
+	// 		this.toggleQueryDetailsButton.setAttribute('aria-expanded', 'false');
+	// 		DOM.removeClass(this.includesExcludesContainer, cls);
+	// 	}
 
-		this.showingIncludesExcludes = DOM.hasClass(this.includesExcludesContainer, cls);
+	// 	this.showingIncludesExcludes = DOM.hasClass(this.includesExcludesContainer, cls);
 
-		this.reLayout();
-	}
+	// 	this.reLayout();
+	// }
 
 	saveState() {
 		this.saveViewState();

@@ -20,7 +20,7 @@ import { IContextViewService } from 'vs/platform/contextview/browser/contextView
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
 import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
 import { ISearchConfigurationProperties } from 'vs/workbench/services/search/common/search';
-import { attachInputBoxStyler } from 'vs/platform/theme/common/styler';
+import { attachFindReplaceInputBoxStyler, attachInputBoxStyler } from 'vs/platform/theme/common/styler';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
 import { ContextScopedFindInput } from 'vs/platform/browser/contextScopedHistoryWidget';
 import { appendKeyBindingLabel, isSearchViewFocused, getSearchView } from 'vs/workbench/contrib/search/browser/searchActions';
@@ -212,6 +212,7 @@ export class SearchWidget extends Widget {
 
 		const searchInputContainer = dom.append(parent, dom.$('.search-container.input-box'));
 		this.searchInput = this._register(new ContextScopedFindInput(searchInputContainer, this.contextViewService, inputOptions, this.contextKeyService, true));
+		this._register(attachFindReplaceInputBoxStyler(this.searchInput, this.themeService));
 		this.searchInput.onKeyDown((keyboardEvent: IKeyboardEvent) => this.onSearchInputKeyDown(keyboardEvent));
 		this.searchInput.setValue(options.value || '');
 		this.searchInput.setRegex(!!options.isRegex);

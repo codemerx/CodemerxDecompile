@@ -17,6 +17,7 @@ interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServi
   getMemberDefinitionPosition: grpc.MethodDefinition<main_pb.GetMemberDefinitionPositionRequest, main_pb.Selection>;
   addResolvedAssembly: grpc.MethodDefinition<main_pb.AddResolvedAssemblyRequest, common_pb.Empty>;
   search: grpc.MethodDefinition<main_pb.SearchRequest, main_pb.SearchResultResponse>;
+  cancelSearch: grpc.MethodDefinition<common_pb.Empty, common_pb.Empty>;
   getSearchResultPosition: grpc.MethodDefinition<main_pb.GetSearchResultPositionRequest, main_pb.Selection>;
   createProject: grpc.MethodDefinition<main_pb.CreateProjectRequest, main_pb.CreateProjectResponse>;
 }
@@ -51,6 +52,9 @@ export class RpcDecompilerClient extends grpc.Client {
   addResolvedAssembly(argument: main_pb.AddResolvedAssemblyRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
   search(argument: main_pb.SearchRequest, metadataOrOptions?: grpc.Metadata | grpc.CallOptions | null): grpc.ClientReadableStream<main_pb.SearchResultResponse>;
   search(argument: main_pb.SearchRequest, metadata?: grpc.Metadata | null, options?: grpc.CallOptions | null): grpc.ClientReadableStream<main_pb.SearchResultResponse>;
+  cancelSearch(argument: common_pb.Empty, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  cancelSearch(argument: common_pb.Empty, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  cancelSearch(argument: common_pb.Empty, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
   getSearchResultPosition(argument: main_pb.GetSearchResultPositionRequest, callback: grpc.requestCallback<main_pb.Selection>): grpc.ClientUnaryCall;
   getSearchResultPosition(argument: main_pb.GetSearchResultPositionRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.Selection>): grpc.ClientUnaryCall;
   getSearchResultPosition(argument: main_pb.GetSearchResultPositionRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.Selection>): grpc.ClientUnaryCall;

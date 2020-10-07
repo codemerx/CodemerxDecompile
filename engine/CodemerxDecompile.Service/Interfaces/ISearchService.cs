@@ -8,6 +8,8 @@ namespace CodemerxDecompile.Service.Interfaces
     {
         IEnumerable<SearchResult> Search(string query, bool matchCase = false, bool matchWholeWord = false);
 
+        void CancelSearch();
+
         CodeSpan? GetSearchResultPosition(int searchResultIndex);
     }
 }

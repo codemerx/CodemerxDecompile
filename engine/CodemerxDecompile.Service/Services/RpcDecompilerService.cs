@@ -347,6 +347,13 @@ namespace CodemerxDecompile.Service
             }
         }
 
+        public override Task<Empty> CancelSearch(Empty request, ServerCallContext context)
+        {
+            this.searchService.CancelSearch();
+
+            return Task.FromResult(new Empty());
+        }
+
         public override Task<Selection> GetSearchResultPosition(GetSearchResultPositionRequest request, ServerCallContext context)
         {
             if (request.SearchResultId <= 0)

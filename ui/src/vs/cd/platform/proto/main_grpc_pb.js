@@ -352,6 +352,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     responseSerialize: serialize_SearchResultResponse,
     responseDeserialize: deserialize_SearchResultResponse,
   },
+  cancelSearch: {
+    path: '/RpcDecompiler/CancelSearch',
+    requestStream: false,
+    responseStream: false,
+    requestType: common_pb.Empty,
+    responseType: common_pb.Empty,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
+  },
   getSearchResultPosition: {
     path: '/RpcDecompiler/GetSearchResultPosition',
     requestStream: false,

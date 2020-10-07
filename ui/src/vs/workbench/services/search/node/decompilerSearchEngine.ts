@@ -20,6 +20,7 @@ import { ISerializedSearchSuccess, ITextQuery, SerializableFileMatch } from 'vs/
 import { IProgressCallback } from 'vs/workbench/services/search/node/rawSearchService';
 import * as grpc from "@grpc/grpc-js";
 import { SearchRequest, SearchResultResponse } from 'vs/cd/platform/proto/main_pb';
+import { Empty } from 'vs/cd/platform/proto/common_pb';
 
 export class DecompilerSearchEngine {
 	constructor(private readonly serviceUrl: string, private readonly query: ITextQuery) {
@@ -33,6 +34,10 @@ export class DecompilerSearchEngine {
 			request.setQuery(this.query.contentPattern.pattern);
 
 			const stream = client.search(request, {});
+
+			token.onCancellationRequested(() => {
+				client.cancelSearch(new Empty(), () => {});
+			});
 
 			stream.on('data', (searchResult: SearchResultResponse) => {
 				const match = new SerializableFileMatch(searchResult.getFilepath());

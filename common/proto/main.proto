@@ -30,6 +30,7 @@ service RpcDecompiler {
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
   rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
   rpc Search (SearchRequest) returns (stream SearchResultResponse);
+  rpc CancelSearch (Empty) returns (Empty);
   rpc GetSearchResultPosition (GetSearchResultPositionRequest) returns (Selection);
   rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
 }

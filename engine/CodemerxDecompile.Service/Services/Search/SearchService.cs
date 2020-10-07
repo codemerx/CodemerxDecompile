@@ -263,7 +263,13 @@ namespace CodemerxDecompile.Service.Services.Search
                     typeMetadata.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.TryGetValue((ParameterDefinition)searchResult.ObjectReference, out codeSpan);
                     break;
                 case SearchResultType.VariableType:
-                    typeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.TryGetValue((VariableDefinition)searchResult.ObjectReference, out codeSpan);
+                    {
+                        VariableDefinition variableDefinition = searchResult.ObjectReference as VariableDefinition;
+                        if (!typeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.TryGetValue(variableDefinition, out codeSpan))
+                        {
+                            typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(variableDefinition.ContainingMethod, out codeSpan);
+                        }
+                    };
                     break;
                 case SearchResultType.DeclaringType:
                 case SearchResultType.EventName:

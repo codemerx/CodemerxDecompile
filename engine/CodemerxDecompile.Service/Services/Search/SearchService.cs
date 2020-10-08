@@ -83,21 +83,21 @@ namespace CodemerxDecompile.Service.Services.Search
 
                             if (member is EventDefinition eventDefinition && this.DoesMatchSearchCriteria(query, eventDefinition.EventType, matchCasing, matchWholeWord))
                             {
-                                yield return this.AddSearchResultToCache(SearchResultType.EventType, type, this.GetFriendlyFullName(eventDefinition.EventType), eventDefinition);
+                                yield return this.AddSearchResultToCache(SearchResultType.EventType, type, this.GetFriendlyName(eventDefinition.EventType), eventDefinition);
                             }
                             else if (member is FieldDefinition fieldDefinition && !fieldDefinition.DeclaringType.IsEnum && this.DoesMatchSearchCriteria(query, fieldDefinition.FieldType, matchCasing, matchWholeWord))
                             {
-                                yield return this.AddSearchResultToCache(SearchResultType.FieldType, type, this.GetFriendlyFullName(fieldDefinition.FieldType), fieldDefinition);
+                                yield return this.AddSearchResultToCache(SearchResultType.FieldType, type, this.GetFriendlyName(fieldDefinition.FieldType), fieldDefinition);
                             }
                             else if (member is PropertyDefinition propertyDefinition && this.DoesMatchSearchCriteria(query, propertyDefinition.PropertyType, matchCasing, matchWholeWord))
                             {
-                                yield return this.AddSearchResultToCache(SearchResultType.PropertyType, type, this.GetFriendlyFullName(propertyDefinition.PropertyType), propertyDefinition);
+                                yield return this.AddSearchResultToCache(SearchResultType.PropertyType, type, this.GetFriendlyName(propertyDefinition.PropertyType), propertyDefinition);
                             }
                             else if (member is MethodDefinition methodDefinition)
                             {
                                 if (this.DoesMatchSearchCriteria(query, methodDefinition.ReturnType, matchCasing, matchWholeWord))
                                 {
-                                    yield return this.AddSearchResultToCache(SearchResultType.MethodReturnType, type, this.GetFriendlyFullName(methodDefinition.ReturnType), methodDefinition);
+                                    yield return this.AddSearchResultToCache(SearchResultType.MethodReturnType, type, this.GetFriendlyName(methodDefinition.ReturnType), methodDefinition);
                                 }
 
                                 if (methodDefinition.HasBody && methodDefinition.Body.HasVariables)
@@ -110,7 +110,7 @@ namespace CodemerxDecompile.Service.Services.Search
                                         }
                                         else if (this.DoesMatchSearchCriteria(query, variable.VariableType, matchCasing, matchWholeWord))
                                         {
-                                            yield return this.AddSearchResultToCache(SearchResultType.VariableType, type, this.GetFriendlyFullName(variable.VariableType), variable);
+                                            yield return this.AddSearchResultToCache(SearchResultType.VariableType, type, this.GetFriendlyName(variable.VariableType), variable);
                                         }
                                     }
                                 }
@@ -125,7 +125,7 @@ namespace CodemerxDecompile.Service.Services.Search
                                         }
                                         else if (this.DoesMatchSearchCriteria(query, parameter.ParameterType, matchCasing, matchWholeWord))
                                         {
-                                            yield return this.AddSearchResultToCache(SearchResultType.ParameterType, type, this.GetFriendlyFullName(parameter.ParameterType), parameter);
+                                            yield return this.AddSearchResultToCache(SearchResultType.ParameterType, type, this.GetFriendlyName(parameter.ParameterType), parameter);
                                         }
                                     }
                                 }
@@ -138,61 +138,70 @@ namespace CodemerxDecompile.Service.Services.Search
                                 object operand = instruction.Operand;
                                 bool shouldCheckDeclaringTypeName = false;
 
-                                if (operand is TypeReference)
-                                {
-                                    TypeDefinition resolvedTypeReference = (operand as TypeReference).Resolve();
-
-                                    if (resolvedTypeReference != null)
-                                    {
-                                        shouldCheckDeclaringTypeName = resolvedTypeReference.IsStaticClass || resolvedTypeReference.IsEnum;
-                                    }
-                                }
-                                else if (operand is EventReference)
-                                {
-                                    EventDefinition resolvedEventReference = (operand as EventReference).Resolve();
-
-                                    if (resolvedEventReference != null)
-                                    {
-                                        shouldCheckDeclaringTypeName = resolvedEventReference.IsStatic();
-                                    }
-                                }
-                                else if (operand is FieldReference)
-                                {
-                                    FieldDefinition resolvedFieldReference = (operand as FieldReference).Resolve();
-
-                                    if (resolvedFieldReference != null)
-                                    {
-                                        shouldCheckDeclaringTypeName = resolvedFieldReference.IsStatic;
-                                    }
-                                }
-                                else if (operand is MethodReference)
-                                {
-                                    MethodDefinition resolvedMethodReference = (operand as MethodReference).Resolve();
-
-                                    if (resolvedMethodReference != null)
-                                    {
-                                        shouldCheckDeclaringTypeName = resolvedMethodReference.IsStatic || resolvedMethodReference.IsConstructor;
-                                    }
-                                }
-                                else if (operand is PropertyReference)
-                                {
-                                    PropertyDefinition resolvedPropertyReference = (operand as PropertyReference).Resolve();
-
-                                    if (resolvedPropertyReference != null)
-                                    {
-                                        shouldCheckDeclaringTypeName = resolvedPropertyReference.IsStatic();
-                                    }
-                                }
-
                                 if (operand is MemberReference memberReference)
                                 {
-                                    if (this.DoesMatchSearchCriteria(query, memberReference.Name, matchCasing, matchWholeWord))
+                                    if (memberReference.DeclaringType != null)
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, memberReference.Name, instruction);
+                                        TypeDefinition declaringTypeDefinition = memberReference.DeclaringType.Resolve();
+
+                                        if (declaringTypeDefinition != null && declaringTypeDefinition.IsCompilerGenerated())
+                                        {
+                                            continue;
+                                        }
+
+                                        if (operand is EventReference)
+                                        {
+                                            EventDefinition resolvedEventReference = (operand as EventReference).Resolve();
+
+                                            if (resolvedEventReference != null)
+                                            {
+                                                shouldCheckDeclaringTypeName = resolvedEventReference.IsStatic();
+                                            }
+                                        }
+                                        else if (operand is FieldReference)
+                                        {
+                                            FieldDefinition resolvedFieldReference = (operand as FieldReference).Resolve();
+
+                                            if (resolvedFieldReference != null)
+                                            {
+                                                shouldCheckDeclaringTypeName = resolvedFieldReference.IsStatic;
+                                            }
+                                        }
+                                        else if (operand is PropertyReference)
+                                        {
+                                            PropertyDefinition resolvedPropertyReference = (operand as PropertyReference).Resolve();
+
+                                            if (resolvedPropertyReference != null)
+                                            {
+                                                shouldCheckDeclaringTypeName = resolvedPropertyReference.IsStatic();
+                                            }
+                                        }
+                                        else if (operand is MethodReference)
+                                        {
+                                            MethodDefinition resolvedMethodReference = (operand as MethodReference).Resolve();
+
+                                            if (resolvedMethodReference != null)
+                                            {
+                                                shouldCheckDeclaringTypeName = resolvedMethodReference.IsStatic || resolvedMethodReference.IsConstructor;
+                                            }
+                                        }
+
+                                        if (shouldCheckDeclaringTypeName && this.DoesMatchSearchCriteria(query, memberReference.DeclaringType, matchCasing, matchWholeWord))
+                                        {
+                                            yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, this.GetFriendlyName(memberReference.DeclaringType), instruction);
+                                        }
                                     }
-                                    else if (shouldCheckDeclaringTypeName && memberReference.DeclaringType != null && this.DoesMatchSearchCriteria(query, memberReference.DeclaringType, matchCasing, matchWholeWord))
+
+                                    string memberReferenceName = memberReference.Name;
+
+                                    if (memberReference is MethodReference methodReference && this.TryGetFriendlyPropertyName(methodReference, out string friendlyPropertyName))
                                     {
-                                        yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, this.GetFriendlyFullName(memberReference.DeclaringType), instruction);
+                                        memberReferenceName = friendlyPropertyName;
+                                    }
+
+                                    if (this.DoesMatchSearchCriteria(query, memberReferenceName, matchCasing, matchWholeWord))
+                                    {
+                                        yield return this.AddSearchResultToCache(SearchResultType.Instruction, type, memberReferenceName, instruction);
                                     }
                                 }
                                 else if (operand is VariableReference variableReference && this.DoesMatchSearchCriteria(query, variableReference.Name, matchCasing, matchWholeWord))
@@ -297,52 +306,33 @@ namespace CodemerxDecompile.Service.Services.Search
             return codeSpan;
         }
 
-        private string GetFriendlyFullName(TypeReference memberReference) => memberReference.GetFriendlyTypeName(LanguageFactory.GetLanguage(CSharpVersion.V7));
+        private string GetFriendlyName(TypeReference typeReference) => typeReference.GetFriendlyTypeName(LanguageFactory.GetLanguage(CSharpVersion.V7));
+
+        private bool TryGetFriendlyPropertyName(MethodReference methodReference, out string friendlyPropertyName)
+        {
+            MethodDefinition methodDefinition = methodReference.Resolve();
+
+            if (methodDefinition != null && (methodDefinition.IsGetter || methodDefinition.IsSetter) && (methodDefinition.Name.StartsWith("get_") || methodDefinition.Name.StartsWith("set_")))
+            {
+                // strip the "get_" or "set_" from method name
+                friendlyPropertyName = methodDefinition.Name.Substring(4);
+                return true;
+            }
+
+            friendlyPropertyName = null;
+            return false;
+        }
 
         private bool DoesMatchSearchCriteria(string query, TypeReference typeReference, bool matchCasing, bool matchWholeWord)
         {
-            return this.DoesMatchSearchCriteria(query, () => this.GetTypeAssociatedNames(typeReference, t => t.Name), matchCasing, matchWholeWord);
-        }
-
-        private List<string> GetTypeAssociatedNames(TypeReference typeReference, Func<TypeReference, string> getTypeName)
-        {
-            List<string> names = new List<string>() { getTypeName(typeReference) };
-
-            if (typeReference.IsGenericInstance)
-            {
-                GenericInstanceType genericInstanceType = typeReference as GenericInstanceType;
-
-                foreach (TypeReference argument in genericInstanceType.GenericArguments)
-                {
-                    names.AddRange(this.GetTypeAssociatedNames(argument, getTypeName));
-                }
-            }
-
-            return names;
+            return this.DoesMatchSearchCriteria(query, this.GetFriendlyName(typeReference), matchCasing, matchWholeWord);
         }
 
         private bool DoesMatchSearchCriteria(string query, string entityName, bool matchCasing, bool matchWholeWord)
         {
-            return this.DoesMatchSearchCriteria(query, () => new List<string> { entityName }, matchCasing, matchWholeWord);
-        }
-
-        private bool DoesMatchSearchCriteria(string query, Func<IEnumerable<string>> getEntityAssociatedNames, bool matchCasing, bool matchWholeWord)
-        {
-            IEnumerable<string> names = getEntityAssociatedNames();
-
             StringComparison stringComparisonType = matchCasing ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
 
-            foreach (string name in names)
-            {
-                bool isAMatch = matchWholeWord ? name.Equals(query, stringComparisonType) : name.Contains(query, stringComparisonType);
-
-                if (isAMatch)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return matchWholeWord ? entityName.Equals(query, stringComparisonType) : entityName.Contains(query, stringComparisonType);
         }
 
         private SearchResult AddSearchResultToCache(SearchResultType type, TypeDefinition declaringType, string matchedString, object objectReference)

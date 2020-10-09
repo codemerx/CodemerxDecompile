@@ -4,11 +4,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as DOM from 'vs/base/browser/dom';
+/* AGPL */
 // import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+/* End AGPL */
 import { alert } from 'vs/base/browser/ui/aria/aria';
 import { Delayer } from 'vs/base/common/async';
 import { CancellationToken } from 'vs/base/common/cancellation';
+/* AGPL */
 // import { KeyCode } from 'vs/base/common/keyCodes';
+/* End AGPL */
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import { assertIsDefined } from 'vs/base/common/types';
 import { URI } from 'vs/base/common/uri';
@@ -50,7 +54,9 @@ import { serializeSearchResultForEditor } from 'vs/workbench/contrib/searchEdito
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { IPatternInfo, ISearchConfigurationProperties, ITextQuery } from 'vs/workbench/services/search/common/search';
+/* AGPL */
 // import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
+/* End AGPL */
 
 const RESULT_LINE_REGEX = /^(\s+)(\d+)(:| )(\s+)(.*)$/;
 const FILE_LINE_REGEX = /^(\S.*):$/;
@@ -69,7 +75,9 @@ export class SearchEditor extends BaseTextEditor {
 	private inputPatternIncludes!: PatternInputWidget;
 	private inputPatternExcludes!: ExcludePatternInputWidget;
 	private includesExcludesContainer!: HTMLElement;
+	/* AGPL */
 	// private toggleQueryDetailsButton!: HTMLElement;
+	/* End AGPL */
 	private messageBox!: HTMLElement;
 
 	private runSearchDelayer = new Delayer(0);
@@ -135,6 +143,7 @@ export class SearchEditor extends BaseTextEditor {
 		this.includesExcludesContainer = DOM.append(this.queryEditorContainer, DOM.$('.includes-excludes'));
 
 		// // Toggle query details button
+		/* AGPL */
 		// this.toggleQueryDetailsButton = DOM.append(this.includesExcludesContainer, DOM.$('.expand' + searchDetailsIcon.cssSelector, { tabindex: 0, role: 'button', title: localize('moreSearch', "Toggle Search Details") }));
 		// this._register(DOM.addDisposableListener(this.toggleQueryDetailsButton, DOM.EventType.CLICK, e => {
 		// 	DOM.EventHelper.stop(e);
@@ -147,6 +156,7 @@ export class SearchEditor extends BaseTextEditor {
 		// 		this.toggleIncludesExcludes();
 		// 	}
 		// }));
+		/* End AGPL */
 
 		// // Includes
 		const folderIncludesList = DOM.append(this.includesExcludesContainer, DOM.$('.file-types.includes'));
@@ -290,7 +300,9 @@ export class SearchEditor extends BaseTextEditor {
 	}
 
 	toggleQueryDetails() {
+		/* AGPL */
 		// this.toggleIncludesExcludes();
+		/* End AGPL */
 	}
 
 	deleteResultBlock() {
@@ -546,7 +558,9 @@ export class SearchEditor extends BaseTextEditor {
 		this.inputPatternExcludes.setValue(config.excludes);
 		this.inputPatternIncludes.setValue(config.includes);
 		this.inputPatternExcludes.setUseExcludesAndIgnoreFiles(config.useIgnores);
+		/* AGPL */
 		// this.toggleIncludesExcludes(config.showIncludesExcludes);
+		/* End AGPL */
 
 		this.restoreViewState();
 
@@ -557,6 +571,7 @@ export class SearchEditor extends BaseTextEditor {
 		this.pauseSearching = false;
 	}
 
+	/* AGPL */
 	// private toggleIncludesExcludes(_shouldShow?: boolean): void {
 	// 	const cls = 'expanded';
 	// 	const shouldShow = _shouldShow ?? !DOM.hasClass(this.includesExcludesContainer, cls);
@@ -573,6 +588,7 @@ export class SearchEditor extends BaseTextEditor {
 
 	// 	this.reLayout();
 	// }
+	/* End AGPL */
 
 	saveState() {
 		this.saveViewState();

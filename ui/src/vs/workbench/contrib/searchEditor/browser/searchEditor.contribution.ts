@@ -23,8 +23,10 @@ import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { EditorDescriptor, Extensions as EditorExtensions, IEditorRegistry } from 'vs/workbench/browser/editor';
 import { Extensions as WorkbenchExtensions, IWorkbenchContribution, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
 import { ActiveEditorContext, Extensions as EditorInputExtensions, IEditorInputFactory, IEditorInputFactoryRegistry } from 'vs/workbench/common/editor';
+/* AGPL */
 // import { IViewsService } from 'vs/workbench/common/views';
 // import { getSearchView } from 'vs/workbench/contrib/search/browser/searchActions';
+/* End AGPL */
 import { searchRefreshIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
 import * as SearchConstants from 'vs/workbench/contrib/search/common/constants';
 import * as SearchEditorConstants from 'vs/workbench/contrib/searchEditor/browser/constants';
@@ -34,14 +36,17 @@ import { getOrMakeSearchEditorInput, SearchConfiguration, SearchEditorInput, SEA
 import { parseSavedSearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditorSerialization';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 
-
+/* AGPL */
 // const OpenInEditorCommandId = 'search.action.openInEditor';
+/* End AGPL */
 const OpenNewEditorToSideCommandId = 'search.action.openNewEditorToSide';
 const FocusQueryEditorWidgetCommandId = 'search.action.focusQueryEditorWidget';
 
 const ToggleSearchEditorCaseSensitiveCommandId = 'toggleSearchEditorCaseSensitive';
 const ToggleSearchEditorWholeWordCommandId = 'toggleSearchEditorWholeWord';
+/* AGPL */
 // const ToggleSearchEditorRegexCommandId = 'toggleSearchEditorRegex';
+/* End AGPL */
 const ToggleSearchEditorContextLinesCommandId = 'toggleSearchEditorContextLines';
 const IncreaseSearchEditorContextLinesCommandId = 'increaseSearchEditorContextLines';
 const DecreaseSearchEditorContextLinesCommandId = 'decreaseSearchEditorContextLines';
@@ -162,12 +167,14 @@ KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 	handler: toggleSearchEditorWholeWordCommand
 }, ToggleWholeWordKeybinding));
 
+/* AGPL */
 // KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 // 	id: ToggleSearchEditorRegexCommandId,
 // 	weight: KeybindingWeight.WorkbenchContrib,
 // 	when: ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, SearchConstants.SearchInputBoxFocusedKey),
 // 	handler: toggleSearchEditorRegexCommand
 // }, ToggleRegexKeybinding));
+/* End AGPL */
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: ToggleSearchEditorContextLinesCommandId,
@@ -276,6 +283,7 @@ registerAction2(class extends Action2 {
 	}
 });
 
+/* AGPL */
 // registerAction2(class extends Action2 {
 // 	constructor() {
 // 		super({
@@ -304,6 +312,7 @@ registerAction2(class extends Action2 {
 // 		}
 // 	}
 // });
+/* End AGPL */
 
 registerAction2(class extends Action2 {
 	constructor() {

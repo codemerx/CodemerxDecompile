@@ -51,6 +51,8 @@ namespace Telerik.JustDecompiler.Languages
 		public HashSet<IMemberDefinition> ExceptionsWhileWriting;
 		public HashSet<uint> MembersWithExceptions { get; private set; }
         public IList<MethodDefinition> GeneratedFilterMethods { get; private set; }
-        public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; private set; }
-    }
+		/* AGPL */
+		public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; private set; }
+		/* End AGPL */
+	}
 }

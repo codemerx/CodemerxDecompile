@@ -8,7 +8,9 @@ using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using Telerik.JustDecompiler.Decompiler;
 using System.Text;
+/* AGPL */
 using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages.IL
 {
@@ -152,8 +154,10 @@ namespace Telerik.JustDecompiler.Languages.IL
                 WriteKeyWordPostSpace("instance");
             }
 
+            /* AGPL */
             CodeSpan propertyTypeCodeSpan = this.Write(() => WriteTypeReference(property.PropertyType));
             this.AddMemberDefinitionTypeCodeSpanToCache(property, TypeReferenceType.PropertyType, propertyTypeCodeSpan);
+            /* End AGPL */
             WriteSpace();
 
             int startIndex = this.formatter.CurrentPosition;

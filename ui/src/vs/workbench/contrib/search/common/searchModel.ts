@@ -3,7 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* AGPL */
 // import { RunOnceScheduler } from 'vs/base/common/async';
+/* End AGPL */
 import { CancellationTokenSource } from 'vs/base/common/cancellation';
 import * as errors from 'vs/base/common/errors';
 import { Emitter, Event } from 'vs/base/common/event';
@@ -22,8 +24,10 @@ import { IProgress, IProgressStep } from 'vs/platform/progress/common/progress';
 import { ReplacePattern } from 'vs/workbench/services/search/common/replace';
 import { IFileMatch, IPatternInfo, ISearchComplete, ISearchProgressItem, ISearchConfigurationProperties, ISearchService, ITextQuery, ITextSearchPreviewOptions, ITextSearchMatch, ITextSearchStats, resultIsMatch, ISearchRange, OneLineRange, ITextSearchContext, ITextSearchResult, SearchSortOrder, SearchCompletionExitCode } from 'vs/workbench/services/search/common/search';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
+/* AGPL */
 // import { overviewRulerFindMatchForeground, minimapFindMatch } from 'vs/platform/theme/common/colorRegistry';
 // import { themeColorFromId } from 'vs/platform/theme/common/themeService';
+/* End AGPL */
 import { IReplaceService } from 'vs/workbench/contrib/search/common/replace';
 import { editorMatchesToTextSearchResults, addContextToEditorMatches } from 'vs/workbench/services/search/common/searchHelpers';
 import { withNullAsUndefined } from 'vs/base/common/types';
@@ -44,7 +48,9 @@ export class Match {
 	// For replace
 	private _fullPreviewRange: ISearchRange;
 
+	/* AGPL */
 	constructor(private _parent: FileMatch, private _fullPreviewLines: string[], _fullPreviewRange: ISearchRange, _documentRange: ISearchRange, private _searchResultId?: number) {
+	/* End AGPL */
 		this._oneLinePreviewText = _fullPreviewLines[_fullPreviewRange.startLineNumber];
 		const adjustedEndCol = _fullPreviewRange.startLineNumber === _fullPreviewRange.endLineNumber ?
 			_fullPreviewRange.endColumn :
@@ -78,9 +84,11 @@ export class Match {
 		return this._range;
 	}
 
+	/* AGPL */
 	searchResultId(): number | undefined {
 		return this._searchResultId;
 	}
+	/* End AGPL */
 
 	@memoize
 	preview(): { before: string; inside: string; after: string; } {
@@ -165,6 +173,7 @@ export class Match {
 
 export class FileMatch extends Disposable implements IFileMatch {
 
+	/* AGPL */
 	// private static readonly _CURRENT_FIND_MATCH = ModelDecorationOptions.register({
 	// 	stickiness: TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
 	// 	zIndex: 13,
@@ -195,6 +204,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 	// private static getDecorationOption(selected: boolean): ModelDecorationOptions {
 	// 	return (selected ? FileMatch._CURRENT_FIND_MATCH : FileMatch._FIND_MATCH);
 	// }
+	/* End AGPL */
 
 	private _onChange = this._register(new Emitter<{ didRemove?: boolean; forceUpdateModel?: boolean }>());
 	readonly onChange: Event<{ didRemove?: boolean; forceUpdateModel?: boolean }> = this._onChange.event;
@@ -210,8 +220,10 @@ export class FileMatch extends Disposable implements IFileMatch {
 	private _removedMatches: Set<string>;
 	private _selectedMatch: Match | null = null;
 
+	/* AGPL */
 	// private _updateScheduler: RunOnceScheduler;
 	// private _modelDecorations: string[] = [];
+	/* End AGPL */
 
 	private _context: Map<number, string> = new Map();
 	public get context(): Map<number, string> {
@@ -225,7 +237,9 @@ export class FileMatch extends Disposable implements IFileMatch {
 		this._resource = this.rawMatch.resource;
 		this._matches = new Map<string, Match>();
 		this._removedMatches = new Set<string>();
+		/* AGPL */
 		// this._updateScheduler = new RunOnceScheduler(this.updateMatchesForModel.bind(this), 250);
+		/* End AGPL */
 
 		this.createMatches();
 	}
@@ -233,8 +247,10 @@ export class FileMatch extends Disposable implements IFileMatch {
 	private createMatches(): void {
 		const model = this.modelService.getModel(this._resource);
 		if (model) {
+			/* AGPL */
 			// this.bindModel(model);
 			// this.updateMatchesForModel();
+			/* End AGPL */
 		} else {
 			this.rawMatch.results!
 				.filter(resultIsMatch)
@@ -249,28 +265,35 @@ export class FileMatch extends Disposable implements IFileMatch {
 
 	bindModel(model: ITextModel): void {
 		this._model = model;
+		/* AGPL */
 		// this._modelListener = this._model.onDidChangeContent(() => {
 		// 	this._updateScheduler.schedule();
 		// });
+		/* End AGPL */
 		this._model.onWillDispose(() => this.onModelWillDispose());
 		this.updateHighlights();
 	}
 
 	private onModelWillDispose(): void {
 		// Update matches because model might have some dirty changes
+		/* AGPL */
 		// this.updateMatchesForModel();
+		/* End AGPL */
 		this.unbindModel();
 	}
 
 	private unbindModel(): void {
 		if (this._model) {
+			/* AGPL */
 			// this._updateScheduler.cancel();
 			// this._model.deltaDecorations(this._modelDecorations, []);
+			/* End AGPL */
 			this._model = null;
 			this._modelListener!.dispose();
 		}
 	}
 
+	/* AGPL */
 	// private updateMatchesForModel(): void {
 	// 	// this is called from a timeout and might fire
 	// 	// after the model has been disposed
@@ -285,6 +308,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 
 	// 	this.updateMatches(matches, true);
 	// }
+	/* End AGPL */
 
 	private updatesMatchesForLineAfterReplace(lineNumber: number, modelChange: boolean): void {
 		if (!this._model) {
@@ -336,6 +360,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 			return;
 		}
 
+		/* AGPL */
 		// if (this.parent().showHighlights) {
 		// 	this._modelDecorations = this._model.deltaDecorations(this._modelDecorations, this.matches().map(match => <IModelDeltaDecoration>{
 		// 		range: match.range(),
@@ -344,6 +369,7 @@ export class FileMatch extends Disposable implements IFileMatch {
 		// } else {
 		// 	this._modelDecorations = this._model.deltaDecorations(this._modelDecorations, []);
 		// }
+		/* End AGPL */
 	}
 
 	id(): string {
@@ -1289,11 +1315,15 @@ function textSearchResultToMatches(rawMatch: ITextSearchMatch, fileMatch: FileMa
 	if (Array.isArray(rawMatch.ranges)) {
 		return rawMatch.ranges.map((r, i) => {
 			const previewRange: ISearchRange = (<ISearchRange[]>rawMatch.preview.matches)[i];
+			/* AGPL */
 			return new Match(fileMatch, previewLines, previewRange, r, rawMatch.searchResultId);
+			/* End AGPL */
 		});
 	} else {
 		const previewRange = <ISearchRange>rawMatch.preview.matches;
+		/* AGPL */
 		const match = new Match(fileMatch, previewLines, previewRange, rawMatch.ranges, rawMatch.searchResultId);
+		/* End AGPL */
 		return [match];
 	}
 }

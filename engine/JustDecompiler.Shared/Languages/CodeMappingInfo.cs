@@ -5,10 +5,13 @@ using Telerik.JustDecompiler.Ast;
 
 namespace Telerik.JustDecompiler.Languages
 {
+    /* AGPL */
     public class CodeMappingInfo<T>
+    /* End AGPL */
     {
         public CodeMappingInfo()
         {
+        /* AGPL */
             this.NodeToCodeMap = new Dictionary<ICodeNode, T>();
             this.InstructionToCodeMap = new Dictionary<Instruction, T>(new InstructionEqualityComparer());
             this.FieldConstantValueToCodeMap = new Dictionary<IMemberDefinition, T>();
@@ -45,6 +48,7 @@ namespace Telerik.JustDecompiler.Languages
         }
 
         public T this[Instruction instruction]
+        /* End AGPL */
         {
             get
             {
@@ -52,6 +56,7 @@ namespace Telerik.JustDecompiler.Languages
             }
         }
 
+        /* AGPL */
         public void Add(ICodeNode node, T span)
         {
             this.NodeToCodeMap.Add(node, span);
@@ -81,38 +86,49 @@ namespace Telerik.JustDecompiler.Languages
 
             this.ParameterToCodeMap[member].Add(index, span);
         }
+        /* End AGPL */
 
         public bool ContainsKey(ICodeNode node)
         {
+            /* AGPL */
             return this.NodeToCodeMap.ContainsKey(node);
+            /* End AGPL */
         }
 
         public bool ContainsKey(Instruction instruction)
         {
             return this.InstructionToCodeMap.ContainsKey(instruction);
         }
-        
+
+        /* AGPL */
         public bool TryGetValue(Instruction instruction, out T span)
+        /* End AGPL */
         {
             return this.InstructionToCodeMap.TryGetValue(instruction, out span);
         }
 
+        /* AGPL */
         public bool TryGetValue(IMemberDefinition field, out T span)
         {
             return this.FieldConstantValueToCodeMap.TryGetValue(field, out span);
+        /* End AGPL */
         }
 
+        /* AGPL */
         public bool TryGetValue(VariableDefinition variable, out T span)
         {
             return this.VariableToCodeMap.TryGetValue(variable, out span);
+        /* End AGPL */
         }
 
+        /* AGPL */
         public bool TryGetValue(IMemberDefinition member, int parameterIndex, out T span)
         {
             span = default;
 
             Dictionary<int, T> indexToCodeMap;
             if (this.ParameterToCodeMap.TryGetValue(member, out indexToCodeMap))
+        /* End AGPL */
             {
                 return indexToCodeMap.TryGetValue(parameterIndex, out span);
             }

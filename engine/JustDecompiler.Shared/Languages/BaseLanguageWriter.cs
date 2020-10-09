@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using JustDecompiler.Shared;
 using Mono.Cecil;
 using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
@@ -37,6 +36,9 @@ using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
+/* AGPL */
+using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -251,6 +253,7 @@ namespace Telerik.JustDecompiler.Languages
 			return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(@event.Name), this.Language);
 		}
 
+        /* AGPL */
         protected void AddMemberDefinitionTypeCodeSpanToCache(IMemberDefinition memberDefinition, TypeReferenceType typeReferenceType, CodeSpan codeSpan)
         {
             if (memberDefinition == null)
@@ -276,6 +279,7 @@ namespace Telerik.JustDecompiler.Languages
                     break;
             }
         }
+        /* End AGPL */
 
         protected string GetMemberName(MemberReference member)
 		{

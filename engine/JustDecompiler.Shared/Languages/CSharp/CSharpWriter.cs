@@ -37,7 +37,9 @@ using Telerik.JustDecompiler.Common;
 using System.Linq;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Cecil.Cil;
+/* AGPL */
 using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages.CSharp
 {
@@ -96,7 +98,9 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                 int lastDotIndex = property.Name.LastIndexOf(".");
                 propertyName = property.Name.Replace(property.Name.Substring(lastDotIndex + 1), KeyWordWriter.This);
             }
+            /* AGPL */
             WriteTypeAndName(property.PropertyType, propertyName, property, TypeReferenceType.PropertyType);
+            /* End AGPL */
 
             Write(IndexLeftBracket);
             WritePropertyParameters(property);
@@ -271,6 +275,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             return GetGenericNameFromMemberReference(type);
         }
 
+        /* AGPL */
         protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
         {
             CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(typeReference));
@@ -282,6 +287,7 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             {
                 this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variableReference] = typeCodeSpan;
             }
+            /* End AGPL */
 
             WriteSpace();
             int startIndex = this.formatter.CurrentPosition;
@@ -308,7 +314,9 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             }
         }
 
+        /* AGPL */
         protected override void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
+        /* End AGPL */
         {
             WriteReferenceAndNamespaceIfInCollision(typeReference);
             WriteSpace();
@@ -317,11 +325,10 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
         protected override void DoWriteVariableTypeAndName(VariableDefinition variable)
         {
+            /* AGPL */
             CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(variable.VariableType));
-            if (variable != null)
-            {
-                this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variable] = typeCodeSpan;
-            }
+            this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variable] = typeCodeSpan;
+            /* End AGPL */
             WriteSpace();
             WriteVariableName(variable);
         }
@@ -375,7 +382,9 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             }
             else
             {
+                /* AGPL */
                 WriteTypeAndName(fieldType, fieldName, field, TypeReferenceType.FieldType);
+                /* End AGPL */
             }
         }
 
@@ -404,11 +413,13 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                     }
                 }
 
+                /* AGPL */
                 CodeSpan typeCodeSpan = this.Write(() => WriteDynamicType(type, positioningFlagsEnumerator));
                 if (type != null)
                 {
                     this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
                 }
+                /* End AGPL */
                 WriteSpace();
             }
             else
@@ -416,11 +427,13 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                 // undocumented C# keyword like __arglist
                 if (!string.IsNullOrEmpty(ToTypeString(type)))
                 {
+                    /* AGPL */
                     CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(type));
                     if (type != null)
                     {
                         this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
                     }
+                    /* End AGPL */
                     WriteSpace();
                 }
             }
@@ -1595,8 +1608,11 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             CustomAttribute dynamicAttribute;
             if (method.MethodReturnType.TryGetDynamicAttribute(out dynamicAttribute))
             {
+                /* AGPL */
                 CodeSpan returnTypeCodeSpan = this.Write(() => WriteDynamicType(method.ReturnType, dynamicAttribute));
                 this.AddMemberDefinitionTypeCodeSpanToCache(method, TypeReferenceType.MethodReturnType, returnTypeCodeSpan);
+                /* End AGPL */
+
                 return;
             }
 
@@ -1605,8 +1621,10 @@ namespace Telerik.JustDecompiler.Languages.CSharp
                 this.WriteKeyword(this.KeyWordWriter.ByRef);
                 this.WriteSpace();
 
+                /* AGPL */
                 CodeSpan returnTypeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(method.ReturnType.GetElementType()));
                 this.AddMemberDefinitionTypeCodeSpanToCache(method, TypeReferenceType.MethodReturnType, returnTypeCodeSpan);
+                /* End AGPL */
 
                 return;
             }
@@ -1621,13 +1639,17 @@ namespace Telerik.JustDecompiler.Languages.CSharp
             CustomAttribute dynamicAttribute;
             if (property.TryGetDynamicAttribute(out dynamicAttribute))
             {
+                /* AGPL */
                 CodeSpan propertyTypeCodeSpan = this.Write(() => WriteDynamicType(property.PropertyType, dynamicAttribute));
                 this.AddMemberDefinitionTypeCodeSpanToCache(property, TypeReferenceType.PropertyType, propertyTypeCodeSpan);
+                /* End AGPL */
                 WriteSpace();
                 WriteReference(name, property);
                 return;
             }
+            /* AGPL */
             base.WriteTypeAndName(property.PropertyType, name, property, TypeReferenceType.PropertyType);
+            /* End AGPL */
 
             if (HasArguments(property))
             {

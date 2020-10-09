@@ -4,7 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as dom from 'vs/base/browser/dom';
+/* AGPL */
 // import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+/* End AGPL */
 import * as aria from 'vs/base/browser/ui/aria/aria';
 import { MessageType } from 'vs/base/browser/ui/inputbox/inputBox';
 import { IIdentityProvider } from 'vs/base/browser/ui/list/list';
@@ -14,7 +16,9 @@ import { Delayer } from 'vs/base/common/async';
 import * as errors from 'vs/base/common/errors';
 import { Event } from 'vs/base/common/event';
 import { Iterable } from 'vs/base/common/iterator';
+/* AGPL */
 // import { KeyCode } from 'vs/base/common/keyCodes';
+/* End AGPL */
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import * as env from 'vs/base/common/platform';
 import * as strings from 'vs/base/common/strings';
@@ -39,7 +43,9 @@ import { ICssStyleCollector, IColorTheme, IThemeService, registerThemingParticip
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { OpenFileFolderAction, OpenFolderAction } from 'vs/workbench/browser/actions/workspaceActions';
 import { ResourceLabels } from 'vs/workbench/browser/labels';
+/* AGPL */
 // import { IEditorPane } from 'vs/workbench/common/editor';
+/* End AGPL */
 import { ExcludePatternInputWidget, PatternInputWidget } from 'vs/workbench/contrib/search/browser/patternInputWidget';
 import { CancelSearchAction, ClearSearchResultsAction, CollapseDeepestExpandedLevelAction, RefreshAction, IFindInFilesArgs, ExpandAllAction, ToggleCollapseAndExpandAction } from 'vs/workbench/contrib/search/browser/searchActions';
 import { FileMatchRenderer, FolderMatchRenderer, MatchRenderer, SearchAccessibilityProvider, SearchDelegate, SearchDND } from 'vs/workbench/contrib/search/browser/searchResultsView';
@@ -50,10 +56,12 @@ import { IReplaceService } from 'vs/workbench/contrib/search/common/replace';
 import { getOutOfWorkspaceEditorResources } from 'vs/workbench/contrib/search/common/search';
 import { FileMatch, FileMatchOrMatch, IChangeEvent, ISearchWorkbenchService, Match, RenderableMatch, searchMatchComparer, SearchModel, SearchResult, FolderMatch, FolderMatchWithResource } from 'vs/workbench/contrib/search/common/searchModel';
 import { ACTIVE_GROUP, IEditorService, SIDE_GROUP } from 'vs/workbench/services/editor/common/editorService';
-// import { IPreferencesService, ISettingsEditorOptions } from 'vs/workbench/services/preferences/common/preferences';
 import { ITextFileService } from 'vs/workbench/services/textfile/common/textfiles';
 import { relativePath } from 'vs/base/common/resources';
+/* AGPL */
+// import { IPreferencesService, ISettingsEditorOptions } from 'vs/workbench/services/preferences/common/preferences';
 // import { IAccessibilityService } from 'vs/platform/accessibility/common/accessibility';
+/* End AGPL */
 import { ViewPane, IViewPaneOptions } from 'vs/workbench/browser/parts/views/viewPaneContainer';
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
 import { Memento, MementoObject } from 'vs/workbench/common/memento';
@@ -65,9 +73,11 @@ import { Color, RGBA } from 'vs/base/common/color';
 import { IViewDescriptorService } from 'vs/workbench/common/views';
 import { ServiceCollection } from 'vs/platform/instantiation/common/serviceCollection';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
+/* AGPL */
 // import { Orientation } from 'vs/base/browser/ui/sash/sash';
 // import { searchDetailsIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
 import { SearchResultMetadata } from 'vs/cd/common/DecompilationTypes';
+/* End AGPL */
 
 const $ = dom.$;
 
@@ -111,7 +121,9 @@ export class SearchView extends ViewPane {
 
 	private state: SearchUIState = SearchUIState.Idle;
 
+	/* AGPL */
 	private actions: Array<CollapseDeepestExpandedLevelAction | ClearSearchResultsAction> = [];
+	/* End AGPL */
 	private toggleCollapseAction: ToggleCollapseAndExpandAction;
 	private cancelAction: CancelSearchAction;
 	private refreshAction: RefreshAction;
@@ -126,7 +138,9 @@ export class SearchView extends ViewPane {
 	private searchWidget!: SearchWidget;
 	private size!: dom.Dimension;
 	private queryDetails!: HTMLElement;
+	/* AGPL */
 	// private toggleQueryDetailsButton!: HTMLElement;
+	/* End AGPL */
 	private inputPatternExcludes!: ExcludePatternInputWidget;
 	private inputPatternIncludes!: PatternInputWidget;
 	private resultsElement!: HTMLElement;
@@ -162,12 +176,16 @@ export class SearchView extends ViewPane {
 		@IContextKeyService readonly contextKeyService: IContextKeyService,
 		@IReplaceService private readonly replaceService: IReplaceService,
 		@ITextFileService private readonly textFileService: ITextFileService,
+		/* AGPL */
 		// @IPreferencesService private readonly preferencesService: IPreferencesService,
+		/* End AGPL */
 		@IThemeService themeService: IThemeService,
 		@ISearchHistoryService private readonly searchHistoryService: ISearchHistoryService,
 		@IContextMenuService contextMenuService: IContextMenuService,
 		@IMenuService private readonly menuService: IMenuService,
+		/* AGPL */
 		// @IAccessibilityService private readonly accessibilityService: IAccessibilityService,
+		/* End AGPL */
 		@IKeybindingService keybindingService: IKeybindingService,
 		@IStorageService storageService: IStorageService,
 		@IOpenerService openerService: IOpenerService,
@@ -260,18 +278,23 @@ export class SearchView extends ViewPane {
 		this.createSearchWidget(this.searchWidgetsContainerElement);
 
 		const history = this.searchHistoryService.load();
+		/* AGPL */
 		// const filePatterns = this.viewletState['query.filePatterns'] || '';
+		/* End AGPL */
 		const patternExclusions = this.viewletState['query.folderExclusions'] || '';
 		const patternExclusionsHistory: string[] = history.exclude || [];
 		const patternIncludes = this.viewletState['query.folderIncludes'] || '';
 		const patternIncludesHistory: string[] = history.include || [];
+		/* AGPL */
 		// const queryDetailsExpanded = this.viewletState['query.queryDetailsExpanded'] || '';
+		/* End AGPL */
 		const useExcludesAndIgnoreFiles = typeof this.viewletState['query.useExcludesAndIgnoreFiles'] === 'boolean' ?
 			this.viewletState['query.useExcludesAndIgnoreFiles'] : true;
 
 		this.queryDetails = dom.append(this.searchWidgetsContainerElement, $('.query-details'));
 
 		// Toggle query details button
+		/* AGPL */
 		// this.toggleQueryDetailsButton = dom.append(this.queryDetails,
 		// 	$('.more' + searchDetailsIcon.cssSelector, { tabindex: 0, role: 'button', title: nls.localize('moreSearch', "Toggle Search Details") }));
 
@@ -287,6 +310,7 @@ export class SearchView extends ViewPane {
 		// 		this.toggleQueryDetails(false);
 		// 	}
 		// }));
+		/* End AGPL */
 
 		// folder includes list
 		const folderIncludesList = dom.append(this.queryDetails,
@@ -329,9 +353,11 @@ export class SearchView extends ViewPane {
 
 		this.createSearchResultsView(this.container);
 
+		/* AGPL */
 		// if (filePatterns !== '' || patternExclusions !== '' || patternIncludes !== '' || queryDetailsExpanded !== '' || !useExcludesAndIgnoreFiles) {
 		// 	this.toggleQueryDetails(true, true, true);
 		// }
+		/* End AGPL */
 
 		this._register(this.viewModel.searchResult.onChange((event) => this.onSearchResultsChanged(event)));
 
@@ -425,9 +451,11 @@ export class SearchView extends ViewPane {
 			this.refreshTree();
 		}));
 
+		/* AGPL */
 		// this._register(this.searchWidget.onBlur(() => {
 		// 	this.toggleQueryDetailsButton.focus();
 		// }));
+		/* End AGPL */
 
 		this.trackInputBox(this.searchWidget.searchInputFocusTracker);
 	}
@@ -775,7 +803,9 @@ export class SearchView extends ViewPane {
 
 	private moveFocusFromSearchOrReplace() {
 		if (this.showsFileTypes()) {
+			/* AGPL */
 			// this.toggleQueryDetails(true, this.showsFileTypes());
+			/* End AGPL */
 		} else {
 			this.selectTreeIfNotSelected();
 		}
@@ -805,7 +835,9 @@ export class SearchView extends ViewPane {
 
 	private moveFocusFromResults(): void {
 		if (this.showsFileTypes()) {
+			/* AGPL */
 			// this.toggleQueryDetails(true, true, false, true);
+			/* End AGPL */
 		} else {
 			this.searchWidget.focus(true, true);
 		}
@@ -852,7 +884,9 @@ export class SearchView extends ViewPane {
 	}
 
 	allSearchFieldsClear(): boolean {
+		/* AGPL */
 		return this.searchWidget.searchInput.getValue() === '';
+		/* End AGPL */
 	}
 
 	hasSearchResults(): boolean {
@@ -999,6 +1033,7 @@ export class SearchView extends ViewPane {
 		}
 	}
 
+	/* AGPL */
 	// toggleQueryDetails(moveFocus = true, show?: boolean, skipLayout?: boolean, reverse?: boolean): void {
 	// 	const cls = 'more';
 	// 	show = typeof show === 'undefined' ? !dom.hasClass(this.queryDetails, cls) : Boolean(show);
@@ -1029,6 +1064,7 @@ export class SearchView extends ViewPane {
 	// 		this.layout(this._orientation === Orientation.VERTICAL ? this.size.height : this.size.width);
 	// 	}
 	// }
+	/* End AGPL */
 
 	searchInFolders(resources?: URI[]): void {
 		const folderPaths: string[] = [];
@@ -1076,9 +1112,11 @@ export class SearchView extends ViewPane {
 		}
 
 		// Show 'files to include' box
+		/* AGPL */
 		// if (!this.showsFileTypes()) {
 		// 	this.toggleQueryDetails(true, true);
 		// }
+		/* End AGPL */
 
 		this.inputPatternIncludes.setValue(folderPaths.join(', '));
 		this.searchWidget.focus(false);
@@ -1264,7 +1302,9 @@ export class SearchView extends ViewPane {
 				} else if (hasExcludes) {
 					message = nls.localize('noResultsExcludes', "No results found excluding '{0}' - ", excludePatternText);
 				} else {
+					/* AGPL */
 					message = nls.localize('noResultsFound', "No results found.");
+					/* End AGPL */
 				}
 
 				// Indicate as status to ARIA
@@ -1290,16 +1330,20 @@ export class SearchView extends ViewPane {
 						this.triggerQueryChange({ preserveFocus: false });
 					}));
 				} else {
+					/* AGPL */
 					// const openSettingsLink = dom.append(p, $('a.pointer.prominent', { tabindex: 0 }, nls.localize('openSettings.message', "Open Settings")));
 					// this.addClickEvents(openSettingsLink, this.onOpenSettings);
+					/* End AGPL */
 				}
 
+				/* AGPL */
 				// if (completed) {
 				// 	dom.append(p, $('span', undefined, ' - '));
 
 				// 	const learnMoreLink = dom.append(p, $('a.pointer.prominent', { tabindex: 0 }, nls.localize('openSettings.learnMore', "Learn More")));
 				// 	this.addClickEvents(learnMoreLink, this.onLearnMore);
 				// }
+				/* End AGPL */
 
 				if (this.contextService.getWorkbenchState() === WorkbenchState.EMPTY) {
 					this.showSearchWithoutFolderMessage();
@@ -1358,6 +1402,7 @@ export class SearchView extends ViewPane {
 			.then(onComplete, onError);
 	}
 
+	/* AGPL */
 	// private addClickEvents = (element: HTMLElement, handler: (event: any) => void): void => {
 	// 	this.messageDisposables.push(dom.addDisposableListener(element, dom.EventType.CLICK, handler));
 	// 	this.messageDisposables.push(dom.addDisposableListener(element, dom.EventType.KEY_DOWN, e => {
@@ -1395,6 +1440,7 @@ export class SearchView extends ViewPane {
 
 	// 	this.openerService.open(URI.parse('https://go.microsoft.com/fwlink/?linkid=853977'));
 	// };
+	/* End AGPL */
 
 	private updateSearchResultCount(disregardExcludesAndIgnores?: boolean): void {
 		const fileCount = this.viewModel.searchResult.fileCount();
@@ -1500,7 +1546,9 @@ export class SearchView extends ViewPane {
 	open(element: FileMatchOrMatch, preserveFocus?: boolean, sideBySide?: boolean, pinned?: boolean): Promise<void> {
 		const selection = this.getSelectionFrom(element);
 		const resource = element instanceof Match ? element.parent().resource : (<FileMatch>element).resource;
+		/* AGPL */
 		const searchResultMetadata: SearchResultMetadata | undefined = element instanceof Match ? { id: element.searchResultId() } : undefined;
+		/* End AGPL */
 		return this.editorService.openEditor({
 			resource: resource,
 			options: {
@@ -1509,7 +1557,9 @@ export class SearchView extends ViewPane {
 				selection,
 				revealIfVisible: true
 			}
+		/* AGPL */
 		}, sideBySide ? SIDE_GROUP : ACTIVE_GROUP, searchResultMetadata).then(editor => {
+		/* End AGPL */
 			if (element instanceof Match && preserveFocus && isCodeEditor(editor)) {
 				this.viewModel.searchResult.rangeHighlightDecorations.highlightRange(
 					(<ICodeEditor>editor.getControl()).getModel()!,

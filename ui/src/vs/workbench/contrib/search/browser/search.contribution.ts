@@ -32,9 +32,7 @@ import { Extensions as ViewExtensions, IViewsRegistry, IViewContainersRegistry, 
 import { getMultiSelectedResources } from 'vs/workbench/contrib/files/browser/files';
 /* AGPL */
 import { ExplorerFolderContext, FilesExplorerFocusCondition, IExplorerService, VIEWLET_ID as VIEWLET_ID_FILES } from 'vs/workbench/contrib/files/common/files';
-/* End AGPL */
 import { registerContributions as replaceContributions } from 'vs/workbench/contrib/search/browser/replaceContributions';
-/* AGPL */
 import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, copyAllCommand, copyMatchCommand, copyPathCommand, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, toggleCaseSensitiveCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
 /* End AGPL */
 import { SearchView } from 'vs/workbench/contrib/search/browser/searchView';
@@ -69,6 +67,7 @@ searchWidgetContributions();
 
 const category = nls.localize('search', "Search");
 
+/* AGPL */
 // KeybindingsRegistry.registerCommandAndKeybindingRule({
 // 	id: 'workbench.action.search.toggleQueryDetails',
 // 	weight: KeybindingWeight.WorkbenchContrib,
@@ -84,6 +83,7 @@ const category = nls.localize('search', "Search");
 // 		}
 // 	}
 // });
+/* End AGPL */
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: 'workbench.action.searchEditor.deleteResultBlock',
@@ -643,12 +643,14 @@ KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 	handler: toggleWholeWordCommand
 }, ToggleWholeWordKeybinding));
 
+/* AGPL */
 // KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 // 	id: Constants.ToggleRegexCommandId,
 // 	weight: KeybindingWeight.WorkbenchContrib,
 // 	when: Constants.SearchViewFocusedKey,
 // 	handler: toggleRegexCommand
 // }, ToggleRegexKeybinding));
+/* End AGPL */
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: Constants.AddCursorsAtSearchResults,

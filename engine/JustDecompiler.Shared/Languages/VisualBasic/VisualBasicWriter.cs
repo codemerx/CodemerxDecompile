@@ -37,7 +37,9 @@ using Mono.Cecil.Extensions;
 using Mono.Cecil.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Collections.Generic;
+/* AGPL */
 using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages.VisualBasic
 {
@@ -371,7 +373,9 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             }
         }
 
+        /* AGPL */
         protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
+        /* End AGPL */
         {
             int startIndex = this.formatter.CurrentPosition;
             /* AGPL */
@@ -397,6 +401,7 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             }
             WriteAsBetweenSpaces();
 
+            /* AGPL */
             CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(typeReference));
 
             if (reference is IMemberDefinition referenceAsMemberDefinition)
@@ -407,9 +412,12 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             {
                 this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variableReference] = typeCodeSpan;
             }
+            /* End AGPL */
         }
 
+        /* AGPL */
         protected override void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
+        /* End AGPL */
         {
             Write(name);
             WriteAsBetweenSpaces();
@@ -429,8 +437,10 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
             WriteAsBetweenSpaces();
 
+            /* AGPL */
             CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(variable.VariableType));
             this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variable] = typeCodeSpan;
+            /* End AGPL */
         }
 
         protected override void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference)
@@ -465,8 +475,10 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             if (!string.IsNullOrEmpty(ToTypeString(type)))
             {
                 WriteAsBetweenSpaces();
+                /* AGPL */
                 CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(type));
                 this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
+                /* End AGPL */
             }
         }
 
@@ -638,9 +650,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			if (@event.IsExplicitImplementation())
 			{
 				string eventName = GetEventName(@event);
-				WriteTypeAndName(@event.EventType, eventName, @event, TypeReferenceType.EventType);
-			}
-			else
+                /* AGPL */
+                WriteTypeAndName(@event.EventType, eventName, @event, TypeReferenceType.EventType);
+                /* End AGPL */
+            }
+            else
 			{
 				base.WriteEventTypeAndName(@event);
 			}

@@ -823,6 +823,7 @@ registerEditorCommand(new FindCommand({
 	}
 }));
 
+/* AGPL */
 // registerEditorCommand(new FindCommand({
 // 	id: FIND_IDS.ToggleRegexCommand,
 // 	precondition: undefined,
@@ -836,6 +837,7 @@ registerEditorCommand(new FindCommand({
 // 		linux: ToggleRegexKeybinding.linux
 // 	}
 // }));
+/* End AGPL */
 
 registerEditorCommand(new FindCommand({
 	id: FIND_IDS.ToggleSearchScopeCommand,

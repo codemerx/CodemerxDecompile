@@ -37,7 +37,9 @@ using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Statements;
 using System.Linq;
 using Telerik.JustDecompiler.Steps;
+/* AGPL */
 using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -613,8 +615,10 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected virtual void WriteMethodReturnType(MethodDefinition method)
 		{
+			/* AGPL */
 			CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(method.ReturnType));
 			this.AddMemberDefinitionTypeCodeSpanToCache(method, TypeReferenceType.MethodReturnType, typeCodeSpan);
+			/* End AGPL */
 		}
 
 		protected void WriteMethodVisibilityAndSpace(MethodDefinition currentMethod)
@@ -739,6 +743,7 @@ namespace Telerik.JustDecompiler.Languages
 				WriteToken("=");
 				WriteSpace();
 
+				/* AGPL */
 				CodeSpan codeSpan = this.Write(() =>
 				{
 					TypeDefinition fieldType = field.FieldType.Resolve();
@@ -755,6 +760,7 @@ namespace Telerik.JustDecompiler.Languages
 				});
 
                 this.currentWritingInfo.CodeMappingInfo.Add(field, codeSpan);
+				/* End AGPL */
 			}
 		}
 
@@ -765,7 +771,9 @@ namespace Telerik.JustDecompiler.Languages
 			//{
 			//	fieldName = Language.ReplaceInvalidCharactersInIdentifier(fieldName);
 			//}
+			/* AGPL */
 			WriteTypeAndName(field.FieldType, fieldName, field, TypeReferenceType.FieldType);
+			/* End AGPL */
 		}
 
 		protected void WritePropertyMethods(PropertyDefinition property, bool inline = false)
@@ -1089,21 +1097,27 @@ namespace Telerik.JustDecompiler.Languages
 				if (node != null &&
 					node.CodeNodeType != CodeNodeType.EmptyStatement)
 				{
-                    CodeSpan codeSpan = this.Write(() => base.Visit(node));
+					/* AGPL */
+					CodeSpan codeSpan = this.Write(() => base.Visit(node));
+					/* End AGPL */
 
 					if (node != null)
 					{
+						/* AGPL */
 						this.currentWritingInfo.CodeMappingInfo.Add(node, codeSpan);
+						/* End AGPL */
 
-                        if (node is Expression)
+						if (node is Expression)
                         {
                             try
                             {
                                 foreach (Instruction instruction in (node as Expression).MappedInstructions)
                                 {
-                                    this.currentWritingInfo.CodeMappingInfo.Add(instruction, codeSpan);
-                                }
-                            }
+									/* AGPL */
+									this.currentWritingInfo.CodeMappingInfo.Add(instruction, codeSpan);
+									/* End AGPL */
+								}
+							}
                             catch (ArgumentException ex)
                             {
                                 this.OnExceptionThrown(ex);
@@ -1255,7 +1269,9 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected virtual void WriteEventTypeAndName(EventDefinition @event)
 		{
+			/* AGPL */
 			WriteTypeAndName(@event.EventType, @event.Name, @event, TypeReferenceType.EventType);
+			/* End AGPL */
 		}
 
 		protected virtual void WriteEventInterfaceImplementations(EventDefinition @event)
@@ -4290,11 +4306,15 @@ namespace Telerik.JustDecompiler.Languages
 		{
 		}
 
+		/* AGPL */
 		protected virtual void WriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
+		/* End AGPL */
 		{
 		}
 
+		/* AGPL */
 		protected virtual void WriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
+		/* End AGPL */
 		{
 		}
 
@@ -4465,7 +4485,9 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			if (node.DisplayType)
 			{
+				/* AGPL */
 				WriteTypeAndName(node.ExpressionType, GetArgumentName(node.Parameter), TypeReferenceType.ParameterType);
+				/* End AGPL */
 			}
 			else
 			{
@@ -5023,13 +5045,17 @@ namespace Telerik.JustDecompiler.Languages
 
         protected void WriteAndMapVariableToCode(Action write, VariableDefinition variable)
         {
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => write());
+			/* End AGPL */
 
-            try
-            {
-                this.currentWritingInfo.CodeMappingInfo.Add(variable, codeSpan);
-            }
-            catch (ArgumentException ex)
+			try
+			{
+				/* AGPL */
+				this.currentWritingInfo.CodeMappingInfo.Add(variable, codeSpan);
+				/* End AGPL */
+			}
+			catch (ArgumentException ex)
             {
                 this.OnExceptionThrown(ex);
             }
@@ -5037,10 +5063,12 @@ namespace Telerik.JustDecompiler.Languages
 
         protected void WriteAndMapParameterToCode(Action write, int index)
         {
+			/* AGPL */
 			CodeSpan codeSpan = this.Write(() => write());
 			IMemberDefinition currentMember = this.membersStack.Peek();
 
 			this.currentWritingInfo.CodeMappingInfo.Add(currentMember, index, codeSpan);
-        }
+			/* End AGPL */
+		}
 	}
 }

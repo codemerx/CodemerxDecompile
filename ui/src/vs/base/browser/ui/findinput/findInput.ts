@@ -206,11 +206,15 @@ export class FindInput extends Widget {
 		}));
 
 		if (this._showOptionButtons) {
+			/* AGPL */
 			this.inputBox.paddingRight = this.caseSensitive.width() + this.wholeWords.width(); // + this.regex.width();
+			/* End AGPL */
 		}
 
 		// Arrow-Key support to navigate between options
+		/* AGPL */
 		let indexes = [this.caseSensitive.domNode, this.wholeWords.domNode]; //, this.regex.domNode];
+		/* End AGPL */
 		this.onkeydown(this.domNode, (event: IKeyboardEvent) => {
 			if (event.equals(KeyCode.LeftArrow) || event.equals(KeyCode.RightArrow) || event.equals(KeyCode.Escape)) {
 				let index = indexes.indexOf(<HTMLElement>document.activeElement);
@@ -243,7 +247,9 @@ export class FindInput extends Widget {
 		controls.style.display = this._showOptionButtons ? 'block' : 'none';
 		controls.appendChild(this.caseSensitive.domNode);
 		controls.appendChild(this.wholeWords.domNode);
+		/* AGPL */
 		// controls.appendChild(this.regex.domNode);
+		/* End AGPL */
 
 		this.domNode.appendChild(controls);
 
@@ -333,7 +339,9 @@ export class FindInput extends Widget {
 				inputActiveOptionForeground: this.inputActiveOptionForeground,
 				inputActiveOptionBackground: this.inputActiveOptionBackground,
 			};
+			/* AGPL */
 			// this.regex.style(checkBoxStyles);
+			/* End AGPL */
 			this.wholeWords.style(checkBoxStyles);
 			this.caseSensitive.style(checkBoxStyles);
 

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as dom from 'vs/base/browser/dom';
-import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+// import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import * as aria from 'vs/base/browser/ui/aria/aria';
 import { MessageType } from 'vs/base/browser/ui/inputbox/inputBox';
 import { IIdentityProvider } from 'vs/base/browser/ui/list/list';
@@ -14,7 +14,7 @@ import { Delayer } from 'vs/base/common/async';
 import * as errors from 'vs/base/common/errors';
 import { Event } from 'vs/base/common/event';
 import { Iterable } from 'vs/base/common/iterator';
-import { KeyCode } from 'vs/base/common/keyCodes';
+// import { KeyCode } from 'vs/base/common/keyCodes';
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import * as env from 'vs/base/common/platform';
 import * as strings from 'vs/base/common/strings';
@@ -39,7 +39,7 @@ import { ICssStyleCollector, IColorTheme, IThemeService, registerThemingParticip
 import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { OpenFileFolderAction, OpenFolderAction } from 'vs/workbench/browser/actions/workspaceActions';
 import { ResourceLabels } from 'vs/workbench/browser/labels';
-import { IEditorPane } from 'vs/workbench/common/editor';
+// import { IEditorPane } from 'vs/workbench/common/editor';
 import { ExcludePatternInputWidget, PatternInputWidget } from 'vs/workbench/contrib/search/browser/patternInputWidget';
 import { CancelSearchAction, ClearSearchResultsAction, CollapseDeepestExpandedLevelAction, RefreshAction, IFindInFilesArgs, ExpandAllAction, ToggleCollapseAndExpandAction } from 'vs/workbench/contrib/search/browser/searchActions';
 import { FileMatchRenderer, FolderMatchRenderer, MatchRenderer, SearchAccessibilityProvider, SearchDelegate, SearchDND } from 'vs/workbench/contrib/search/browser/searchResultsView';
@@ -50,7 +50,7 @@ import { IReplaceService } from 'vs/workbench/contrib/search/common/replace';
 import { getOutOfWorkspaceEditorResources } from 'vs/workbench/contrib/search/common/search';
 import { FileMatch, FileMatchOrMatch, IChangeEvent, ISearchWorkbenchService, Match, RenderableMatch, searchMatchComparer, SearchModel, SearchResult, FolderMatch, FolderMatchWithResource } from 'vs/workbench/contrib/search/common/searchModel';
 import { ACTIVE_GROUP, IEditorService, SIDE_GROUP } from 'vs/workbench/services/editor/common/editorService';
-import { IPreferencesService, ISettingsEditorOptions } from 'vs/workbench/services/preferences/common/preferences';
+// import { IPreferencesService, ISettingsEditorOptions } from 'vs/workbench/services/preferences/common/preferences';
 import { ITextFileService } from 'vs/workbench/services/textfile/common/textfiles';
 import { relativePath } from 'vs/base/common/resources';
 // import { IAccessibilityService } from 'vs/platform/accessibility/common/accessibility';
@@ -162,7 +162,7 @@ export class SearchView extends ViewPane {
 		@IContextKeyService readonly contextKeyService: IContextKeyService,
 		@IReplaceService private readonly replaceService: IReplaceService,
 		@ITextFileService private readonly textFileService: ITextFileService,
-		@IPreferencesService private readonly preferencesService: IPreferencesService,
+		// @IPreferencesService private readonly preferencesService: IPreferencesService,
 		@IThemeService themeService: IThemeService,
 		@ISearchHistoryService private readonly searchHistoryService: ISearchHistoryService,
 		@IContextMenuService contextMenuService: IContextMenuService,
@@ -1264,7 +1264,7 @@ export class SearchView extends ViewPane {
 				} else if (hasExcludes) {
 					message = nls.localize('noResultsExcludes', "No results found excluding '{0}' - ", excludePatternText);
 				} else {
-					message = nls.localize('noResultsFound', "No results found. Review your settings for configured exclusions and check your gitignore files - ");
+					message = nls.localize('noResultsFound', "No results found.");
 				}
 
 				// Indicate as status to ARIA
@@ -1290,16 +1290,16 @@ export class SearchView extends ViewPane {
 						this.triggerQueryChange({ preserveFocus: false });
 					}));
 				} else {
-					const openSettingsLink = dom.append(p, $('a.pointer.prominent', { tabindex: 0 }, nls.localize('openSettings.message', "Open Settings")));
-					this.addClickEvents(openSettingsLink, this.onOpenSettings);
+					// const openSettingsLink = dom.append(p, $('a.pointer.prominent', { tabindex: 0 }, nls.localize('openSettings.message', "Open Settings")));
+					// this.addClickEvents(openSettingsLink, this.onOpenSettings);
 				}
 
-				if (completed) {
-					dom.append(p, $('span', undefined, ' - '));
+				// if (completed) {
+				// 	dom.append(p, $('span', undefined, ' - '));
 
-					const learnMoreLink = dom.append(p, $('a.pointer.prominent', { tabindex: 0 }, nls.localize('openSettings.learnMore', "Learn More")));
-					this.addClickEvents(learnMoreLink, this.onLearnMore);
-				}
+				// 	const learnMoreLink = dom.append(p, $('a.pointer.prominent', { tabindex: 0 }, nls.localize('openSettings.learnMore', "Learn More")));
+				// 	this.addClickEvents(learnMoreLink, this.onLearnMore);
+				// }
 
 				if (this.contextService.getWorkbenchState() === WorkbenchState.EMPTY) {
 					this.showSearchWithoutFolderMessage();
@@ -1358,43 +1358,43 @@ export class SearchView extends ViewPane {
 			.then(onComplete, onError);
 	}
 
-	private addClickEvents = (element: HTMLElement, handler: (event: any) => void): void => {
-		this.messageDisposables.push(dom.addDisposableListener(element, dom.EventType.CLICK, handler));
-		this.messageDisposables.push(dom.addDisposableListener(element, dom.EventType.KEY_DOWN, e => {
-			const event = new StandardKeyboardEvent(e);
-			let eventHandled = true;
+	// private addClickEvents = (element: HTMLElement, handler: (event: any) => void): void => {
+	// 	this.messageDisposables.push(dom.addDisposableListener(element, dom.EventType.CLICK, handler));
+	// 	this.messageDisposables.push(dom.addDisposableListener(element, dom.EventType.KEY_DOWN, e => {
+	// 		const event = new StandardKeyboardEvent(e);
+	// 		let eventHandled = true;
 
-			if (event.equals(KeyCode.Space) || event.equals(KeyCode.Enter)) {
-				handler(e);
-			} else {
-				eventHandled = false;
-			}
+	// 		if (event.equals(KeyCode.Space) || event.equals(KeyCode.Enter)) {
+	// 			handler(e);
+	// 		} else {
+	// 			eventHandled = false;
+	// 		}
 
-			if (eventHandled) {
-				event.preventDefault();
-				event.stopPropagation();
-			}
-		}));
-	};
+	// 		if (eventHandled) {
+	// 			event.preventDefault();
+	// 			event.stopPropagation();
+	// 		}
+	// 	}));
+	// };
 
-	private onOpenSettings = (e: dom.EventLike): void => {
-		dom.EventHelper.stop(e, false);
+	// private onOpenSettings = (e: dom.EventLike): void => {
+	// 	dom.EventHelper.stop(e, false);
 
-		this.openSettings('.exclude');
-	};
+	// 	this.openSettings('.exclude');
+	// };
 
-	private openSettings(query: string): Promise<IEditorPane | undefined> {
-		const options: ISettingsEditorOptions = { query };
-		return this.contextService.getWorkbenchState() !== WorkbenchState.EMPTY ?
-			this.preferencesService.openWorkspaceSettings(undefined, options) :
-			this.preferencesService.openGlobalSettings(undefined, options);
-	}
+	// private openSettings(query: string): Promise<IEditorPane | undefined> {
+	// 	const options: ISettingsEditorOptions = { query };
+	// 	return this.contextService.getWorkbenchState() !== WorkbenchState.EMPTY ?
+	// 		this.preferencesService.openWorkspaceSettings(undefined, options) :
+	// 		this.preferencesService.openGlobalSettings(undefined, options);
+	// }
 
-	private onLearnMore = (e: MouseEvent): void => {
-		dom.EventHelper.stop(e, false);
+	// private onLearnMore = (e: MouseEvent): void => {
+	// 	dom.EventHelper.stop(e, false);
 
-		this.openerService.open(URI.parse('https://go.microsoft.com/fwlink/?linkid=853977'));
-	};
+	// 	this.openerService.open(URI.parse('https://go.microsoft.com/fwlink/?linkid=853977'));
+	// };
 
 	private updateSearchResultCount(disregardExcludesAndIgnores?: boolean): void {
 		const fileCount = this.viewModel.searchResult.fileCount();

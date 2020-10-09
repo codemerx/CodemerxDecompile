@@ -171,7 +171,15 @@ namespace Mono.Cecil.Cil {
 
 			var name = new SR.AssemblyName {
 				/*Telerik Authorship*/
+/* AGPL */
+#if NETSTANDARD
+				Name = "Telerik.JustDecompile.Mono.Cecil." + symbol_kind + ".NetStandard",
+#else
+/* End AGPL */
 				Name = "Telerik.JustDecompile.Mono.Cecil." + symbol_kind,
+/* AGPL */
+#endif
+/* End AGPL */
 				Version = cecil_name.Version,
 			};
 

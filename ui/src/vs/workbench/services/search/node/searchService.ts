@@ -20,8 +20,6 @@ import { FileMatch, IFileMatch, IFileQuery, IProgressMessage, IRawSearchService,
 import { SearchChannelClient } from './searchIpc';
 import { SearchService } from 'vs/workbench/services/search/common/searchService';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
-import { IModelService } from 'vs/editor/common/services/modelService';
-import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
@@ -31,8 +29,6 @@ import { IGrpcService } from 'vs/cd/workbench/GrpcService';
 
 export class LocalSearchService extends SearchService {
 	constructor(
-		@IModelService modelService: IModelService,
-		@IEditorService editorService: IEditorService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@ILogService logService: ILogService,
 		@IExtensionService extensionService: IExtensionService,
@@ -40,7 +36,7 @@ export class LocalSearchService extends SearchService {
 		@IEnvironmentService readonly environmentService: INativeEnvironmentService,
 		@IInstantiationService readonly instantiationService: IInstantiationService
 	) {
-		super(modelService, editorService, telemetryService, logService, extensionService, fileService);
+		super(telemetryService, logService, extensionService, fileService);
 
 		this.diskSearch = instantiationService.createInstance(DiskSearch, !environmentService.isBuilt || environmentService.verbose, parseSearchPort(environmentService.args, environmentService.isBuilt));
 	}

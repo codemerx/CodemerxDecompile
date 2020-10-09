@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <!--
     Copyright CodeMerx 2020
     This file is part of CodemerxDecompile.
@@ -17,7 +16,6 @@
     You should have received a copy of the GNU Affero General Public License
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 -->
-
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>

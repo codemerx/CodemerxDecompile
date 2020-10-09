@@ -149,36 +149,36 @@ namespace CodemerxDecompile.Service.Services.Search
                                             continue;
                                         }
 
-                                        if (operand is EventReference)
+                                        if (operand is EventReference eventReference)
                                         {
-                                            EventDefinition resolvedEventReference = (operand as EventReference).Resolve();
+                                            EventDefinition resolvedEventReference = eventReference.Resolve();
 
                                             if (resolvedEventReference != null)
                                             {
                                                 shouldCheckDeclaringTypeName = resolvedEventReference.IsStatic();
                                             }
                                         }
-                                        else if (operand is FieldReference)
+                                        else if (operand is FieldReference fieldReference)
                                         {
-                                            FieldDefinition resolvedFieldReference = (operand as FieldReference).Resolve();
+                                            FieldDefinition resolvedFieldReference = fieldReference.Resolve();
 
                                             if (resolvedFieldReference != null)
                                             {
                                                 shouldCheckDeclaringTypeName = resolvedFieldReference.IsStatic;
                                             }
                                         }
-                                        else if (operand is PropertyReference)
+                                        else if (operand is PropertyReference propertyReference)
                                         {
-                                            PropertyDefinition resolvedPropertyReference = (operand as PropertyReference).Resolve();
+                                            PropertyDefinition resolvedPropertyReference = propertyReference.Resolve();
 
                                             if (resolvedPropertyReference != null)
                                             {
                                                 shouldCheckDeclaringTypeName = resolvedPropertyReference.IsStatic();
                                             }
                                         }
-                                        else if (operand is MethodReference)
+                                        else if (operand is MethodReference methodReference)
                                         {
-                                            MethodDefinition resolvedMethodReference = (operand as MethodReference).Resolve();
+                                            MethodDefinition resolvedMethodReference = methodReference.Resolve();
 
                                             if (resolvedMethodReference != null)
                                             {
@@ -194,7 +194,11 @@ namespace CodemerxDecompile.Service.Services.Search
 
                                     string memberReferenceName = memberReference.Name;
 
-                                    if (memberReference is MethodReference methodReference && this.TryGetFriendlyPropertyName(methodReference, out string friendlyPropertyName))
+                                    if (memberReference is TypeReference typeReference)
+                                    {
+                                        memberReferenceName = this.GetFriendlyName(typeReference);
+                                    }
+                                    else if (memberReference is MethodReference methodReference && this.TryGetFriendlyPropertyName(methodReference, out string friendlyPropertyName))
                                     {
                                         memberReferenceName = friendlyPropertyName;
                                     }
@@ -306,7 +310,7 @@ namespace CodemerxDecompile.Service.Services.Search
             return codeSpan;
         }
 
-        private string GetFriendlyName(TypeReference typeReference) => typeReference.GetFriendlyTypeName(LanguageFactory.GetLanguage(CSharpVersion.V7));
+        private string GetFriendlyName(MemberReference memberReference) => memberReference.GetFriendlyFullName(LanguageFactory.GetLanguage(CSharpVersion.V7), false);
 
         private bool TryGetFriendlyPropertyName(MethodReference methodReference, out string friendlyPropertyName)
         {

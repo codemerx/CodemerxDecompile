@@ -27,39 +27,39 @@ namespace Mono.Cecil.Extensions
             return genericFriendlyName.Replace("[]", "()");
         }
 
-        public static string GetFriendlyFullName(this MemberReference self, ILanguage language)
+        public static string GetFriendlyFullName(this MemberReference self, ILanguage language, bool includeNamespace = true)
         {
             if (self is ArrayType)
             {
-                return GetFriendlyFullArrayTypeName(self as ArrayType, language);
+                return GetFriendlyFullArrayTypeName(self as ArrayType, language, includeNamespace);
             }
             else if (self is FunctionPointerType)
             {
-                return GetFriendlyFullFunctionPointerTypeName(self as FunctionPointerType, language);
+                return GetFriendlyFullFunctionPointerTypeName(self as FunctionPointerType, language, includeNamespace);
             }
             else if (self is GenericInstanceType)
             {
-                return GetFriendlyFullGenericInstanceTypeName(self as GenericInstanceType, language);
+                return GetFriendlyFullGenericInstanceTypeName(self as GenericInstanceType, language, includeNamespace);
             }
             else if (self is OptionalModifierType)
             {
-                return GetFriendlyFullOptionalModifierTypeName(self as OptionalModifierType, language);
+                return GetFriendlyFullOptionalModifierTypeName(self as OptionalModifierType, language, includeNamespace);
             }
             else if (self is RequiredModifierType)
             {
-                return GetFriendlyFullRequiredModifierTypeName(self as RequiredModifierType, language);
+                return GetFriendlyFullRequiredModifierTypeName(self as RequiredModifierType, language, includeNamespace);
             }
             else if (self is PointerType)
             {
-                return GetFriendlyFullPointerTypeName(self as PointerType, language);
+                return GetFriendlyFullPointerTypeName(self as PointerType, language, includeNamespace);
             }
             else if (self is ByReferenceType)
             {
-                return GetFriendlyFullByReferenceTypeName(self as ByReferenceType, language);
+                return GetFriendlyFullByReferenceTypeName(self as ByReferenceType, language, includeNamespace);
             }
             else if (self is TypeSpecification) // + Pinned + Sentinel
             {
-                return GetFriendlyFullTypeSpecificationName(self as TypeSpecification, language);
+                return GetFriendlyFullTypeSpecificationName(self as TypeSpecification, language, includeNamespace);
             }
             else if (self is GenericParameter)
             {
@@ -67,27 +67,27 @@ namespace Mono.Cecil.Extensions
             }
             else if (self is TypeReference) // + TypeDefinition
             {
-                return GetFriendlyFullTypeReferenceName(self as TypeReference, language);
+                return GetFriendlyFullTypeReferenceName(self as TypeReference, language, includeNamespace);
             }
             else if (self is PropertyDefinition)
             {
-                return GetFriendlyFullPropertyDefinitionName(self as PropertyDefinition, language);
+                return GetFriendlyFullPropertyDefinitionName(self as PropertyDefinition, language, includeNamespace);
             }
             else if (self is GenericInstanceMethod)
             {
-                return GetFriendlyFullGenericInstanceMethodName(self as GenericInstanceMethod, language);
+                return GetFriendlyFullGenericInstanceMethodName(self as GenericInstanceMethod, language, includeNamespace);
             }
             else if (self is MethodReference) // + MethodDefinition
             {
-                return GetFriendlyFullMethodReferenceName(self as MethodReference, language);
+                return GetFriendlyFullMethodReferenceName(self as MethodReference, language, includeNamespace);
             }
             else if (self is FieldReference) // + FieldDefinition
             {
-                return GetFriendlyFullFieldReferenceName(self as FieldReference, language);
+                return GetFriendlyFullFieldReferenceName(self as FieldReference, language, includeNamespace);
             }
             else if (self is EventReference) // + EventDefinition
             {
-                return GetFriendlyFullEventReferenceName(self as EventReference, language);
+                return GetFriendlyFullEventReferenceName(self as EventReference, language, includeNamespace);
             }
 
             throw new Exception("Invalid member type.");
@@ -121,31 +121,31 @@ namespace Mono.Cecil.Extensions
         #endregion
 
         #region Private methods
-        private static string GetFriendlyFullArrayTypeName(this ArrayType self, ILanguage language)
+        private static string GetFriendlyFullArrayTypeName(this ArrayType self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullTypeSpecificationName(language) + self.Suffix;
+            return self.GetFriendlyFullTypeSpecificationName(language, includeNamespace) + self.Suffix;
         }
 
-        private static string GetFriendlyFullFunctionPointerTypeName(this FunctionPointerType self, ILanguage language)
+        private static string GetFriendlyFullFunctionPointerTypeName(this FunctionPointerType self, ILanguage language, bool includeNamespace = true)
         {
             StringBuilder signature = new StringBuilder();
             signature.Append(self.Function.Name);
             signature.Append(" ");
-            signature.Append(self.Function.FixedReturnType.GetFriendlyFullName(language));
+            signature.Append(self.Function.FixedReturnType.GetFriendlyFullName(language, includeNamespace));
             signature.Append(" *");
-            self.MethodSignatureFriendlyFullName(language, signature, false);
+            self.MethodSignatureFriendlyFullName(language, signature, false, includeNamespace);
             return signature.ToString();
         }
 
-        private static string GetFriendlyFullGenericInstanceTypeName(this GenericInstanceType self, ILanguage language)
+        private static string GetFriendlyFullGenericInstanceTypeName(this GenericInstanceType self, ILanguage language, bool includeNamespace = true)
         {
             StringBuilder name = new StringBuilder();
-            name.Append(self.GetFriendlyFullTypeSpecificationName(language));
+            name.Append(self.GetFriendlyFullTypeSpecificationName(language, includeNamespace));
             int indexOfBracket = name.ToString().LastIndexOf('<');
             if (indexOfBracket >= 0 && indexOfBracket < name.Length)
             {
                 name.Remove(indexOfBracket, name.Length - indexOfBracket);
-                self.GenericInstanceFriendlyFullName(language, name, false, "<", ">");
+                self.GenericInstanceFriendlyFullName(language, name, false, "<", ">", includeNamespace);
 
                 int count = 0;
                 for (int i = 0; i < name.Length; i++)
@@ -169,29 +169,29 @@ namespace Mono.Cecil.Extensions
             return name.ToString();
         }
 
-        private static string GetFriendlyFullOptionalModifierTypeName(this OptionalModifierType self, ILanguage language)
+        private static string GetFriendlyFullOptionalModifierTypeName(this OptionalModifierType self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullTypeSpecificationName(language) + self.Suffix;
+            return self.GetFriendlyFullTypeSpecificationName(language, includeNamespace) + self.Suffix;
         }
 
-        private static string GetFriendlyFullRequiredModifierTypeName(this RequiredModifierType self, ILanguage language)
+        private static string GetFriendlyFullRequiredModifierTypeName(this RequiredModifierType self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullTypeSpecificationName(language) + self.Suffix;
+            return self.GetFriendlyFullTypeSpecificationName(language, includeNamespace) + self.Suffix;
         }
 
-        private static string GetFriendlyFullPointerTypeName(this PointerType self, ILanguage language)
+        private static string GetFriendlyFullPointerTypeName(this PointerType self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullTypeSpecificationName(language) + "*";
+            return self.GetFriendlyFullTypeSpecificationName(language, includeNamespace) + "*";
         }
 
-        private static string GetFriendlyFullByReferenceTypeName(this ByReferenceType self, ILanguage language)
+        private static string GetFriendlyFullByReferenceTypeName(this ByReferenceType self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullTypeSpecificationName(language) + "&";
+            return self.GetFriendlyFullTypeSpecificationName(language, includeNamespace) + "&";
         }
 
-        private static string GetFriendlyFullTypeSpecificationName(this TypeSpecification self, ILanguage language)
+        private static string GetFriendlyFullTypeSpecificationName(this TypeSpecification self, ILanguage language, bool includeNamespace = true)
         {
-            return self.ElementType.GetFriendlyFullName(language);
+            return self.ElementType.GetFriendlyFullName(language, includeNamespace);
         }
 
         private static string GetFriendlyFullGenericParameterName(this GenericParameter self)
@@ -199,48 +199,54 @@ namespace Mono.Cecil.Extensions
             return self.Name;
         }
 
-        private static string GetFriendlyFullTypeReferenceName(this TypeReference self, ILanguage language)
+        private static string GetFriendlyFullTypeReferenceName(this TypeReference self, ILanguage language, bool includeNamespace = true)
         {
             if (self.IsNested)
             {
-                return self.DeclaringType.GetFriendlyFullName(language) + "/" + self.GetGenericName(language);
+                return self.DeclaringType.GetFriendlyFullName(language, includeNamespace) + "/" + self.GetGenericName(language);
             }
             if (string.IsNullOrEmpty(self.Namespace))
             {
                 return self.GetGenericName(language);
             }
-            return self.Namespace + "." + self.GetGenericName(language);
+
+            if (includeNamespace)
+            {
+                return self.Namespace + "." + self.GetGenericName(language);
+            }
+
+            return self.GetGenericName(language);
         }
 
-        private static string GetFriendlyFullPropertyDefinitionName(this PropertyDefinition self, ILanguage language)
+        private static string GetFriendlyFullPropertyDefinitionName(this PropertyDefinition self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullPropertyDefinitionName(language, self.MemberFriendlyFullName(language));
+            return self.GetFriendlyFullPropertyDefinitionName(language, self.MemberFriendlyFullName(language, includeNamespace), includeNamespace);
         }
 
-        private static string GetFriendlyFullGenericInstanceMethodName(this GenericInstanceMethod self, ILanguage language)
+        private static string GetFriendlyFullGenericInstanceMethodName(this GenericInstanceMethod self, ILanguage language, bool includeNamespace = true)
         {
             StringBuilder signature = new StringBuilder();
             signature.Append(self.FixedReturnType.FullName)
             .Append(" ")
-            .Append(self.MemberFriendlyFullName(language));
-            self.GenericInstanceFriendlyFullName(language, signature, false, "<", ">");
-            self.MethodSignatureFriendlyFullName(language, signature, false);
+            .Append(self.MemberFriendlyFullName(language, includeNamespace));
+            self.GenericInstanceFriendlyFullName(language, signature, false, "<", ">", includeNamespace);
+            self.MethodSignatureFriendlyFullName(language, signature, false, includeNamespace);
             return signature.ToString();
         }
 
-        private static string GetFriendlyFullMethodReferenceName(this MethodReference self, ILanguage language)
+        private static string GetFriendlyFullMethodReferenceName(this MethodReference self, ILanguage language, bool includeNamespace = true)
         {
-            return self.GetFriendlyFullMethodReferenceName(language, self.MemberFriendlyFullName(language), false);
+            return self.GetFriendlyFullMethodReferenceName(language, self.MemberFriendlyFullName(language, includeNamespace), false, includeNamespace);
         }
 
-        private static string GetFriendlyFullFieldReferenceName(this FieldReference self, ILanguage language)
+        private static string GetFriendlyFullFieldReferenceName(this FieldReference self, ILanguage language, bool includeNamespace = true)
         {
-            return self.FieldType.GetFriendlyFullName(language) + " " + self.MemberFriendlyFullName(language);
+            return self.FieldType.GetFriendlyFullName(language, includeNamespace) + " " + self.MemberFriendlyFullName(language, includeNamespace);
         }
 
-        private static string GetFriendlyFullEventReferenceName(this EventReference self, ILanguage language)
+        private static string GetFriendlyFullEventReferenceName(this EventReference self, ILanguage language, bool includeNamespace = true)
         {
-            return self.EventType.GetFriendlyFullName(language) + " " + self.MemberFriendlyFullName(language);
+            return self.EventType.GetFriendlyFullName(language, includeNamespace) + " " + self.MemberFriendlyFullName(language, includeNamespace);
         }
         #endregion
         #endregion
@@ -368,26 +374,26 @@ namespace Mono.Cecil.Extensions
             throw new Exception("Invalid generic member definition type.");
         }
 
-        public static string GetGenericFullName(this IGenericDefinition self, ILanguage language)
+        public static string GetGenericFullName(this IGenericDefinition self, ILanguage language, bool includeNamespace = true)
         {
             if (self is TypeDefinition)
             {
-                return (self as TypeDefinition).GetGenericFullTypeDefinitionName(language);
+                return (self as TypeDefinition).GetGenericFullTypeDefinitionName(language, includeNamespace);
             }
             else if (self is MethodDefinition)
             {
                 MethodDefinition methodDef = self as MethodDefinition;
-                return methodDef.GetFriendlyFullMethodReferenceName(language, methodDef.GenericMemberFullName(language), true);
+                return methodDef.GetFriendlyFullMethodReferenceName(language, methodDef.GenericMemberFullName(language, includeNamespace), true, includeNamespace);
             }
             throw new Exception("Invalid generic member definition type.");
         }
 
-        private static string GetGenericFullTypeDefinitionName(this TypeDefinition self, ILanguage language)
+        private static string GetGenericFullTypeDefinitionName(this TypeDefinition self, ILanguage language, bool includeNamespace = true)
         {
             string name = (self as IGenericDefinition).GetGenericName(language);
             if (self.IsNested)
             {
-                return self.DeclaringType.GetGenericFullName(language) + "/" + name;
+                return self.DeclaringType.GetGenericFullName(language, includeNamespace) + "/" + name;
             }
             if (string.IsNullOrEmpty(self.Namespace))
             {
@@ -396,13 +402,13 @@ namespace Mono.Cecil.Extensions
             return self.Namespace + "." + name;
         }
 
-        private static string GenericMemberFullName(this MethodDefinition self, ILanguage language)
+        private static string GenericMemberFullName(this MethodDefinition self, ILanguage language, bool includeNamespace = true)
         {
             if (self.DeclaringType == null)
             {
                 return self.GetGenericName(language);
             }
-            return self.DeclaringType.GetGenericFullName(language) + "::" + self.GetGenericName(language);
+            return self.DeclaringType.GetGenericFullName(language, includeNamespace) + "::" + self.GetGenericName(language);
         }
         #endregion
 
@@ -448,7 +454,7 @@ namespace Mono.Cecil.Extensions
         #endregion
 
         #region Common
-        private static void MethodSignatureFriendlyFullName(this IMethodSignature self, ILanguage language, StringBuilder builder, bool useGenericName)
+        private static void MethodSignatureFriendlyFullName(this IMethodSignature self, ILanguage language, StringBuilder builder, bool useGenericName, bool includeNamespace = true)
         {
             builder.Append("(");
 
@@ -469,18 +475,18 @@ namespace Mono.Cecil.Extensions
                         var typeDefinition = parameter.ParameterType.Resolve();
                         if (typeDefinition != null)
                         {
-                            builder.Append(typeDefinition.GetGenericFullName(language));
+                            builder.Append(typeDefinition.GetGenericFullName(language, includeNamespace));
                             continue;
                         }
                     }
-                    builder.Append(parameter.ParameterType.GetFriendlyFullName(language));
+                    builder.Append(parameter.ParameterType.GetFriendlyFullName(language, includeNamespace));
                 }
             }
 
             builder.Append(")");
         }
 
-        private static void GenericInstanceFriendlyFullName(this IGenericInstance self, ILanguage language, StringBuilder builder, bool useGenericName, string leftBracket, string rightBracket)
+        private static void GenericInstanceFriendlyFullName(this IGenericInstance self, ILanguage language, StringBuilder builder, bool useGenericName, string leftBracket, string rightBracket, bool includeNamespace = true)
         {
             builder.Append(leftBracket);
             var arguments = self.GenericArguments;
@@ -495,7 +501,7 @@ namespace Mono.Cecil.Extensions
                 {
                     builder.Append(",");
                 }
-                var fullName = currentArgument.GetFriendlyFullName(language);
+                var fullName = currentArgument.GetFriendlyFullName(language, includeNamespace);
 
                 if (useGenericName)
                 {
@@ -510,19 +516,19 @@ namespace Mono.Cecil.Extensions
             builder.Append(rightBracket);
         }
 
-        private static string MemberFriendlyFullName(this MemberReference self, ILanguage language)
+        private static string MemberFriendlyFullName(this MemberReference self, ILanguage language, bool includeNamespace = true)
         {
             if (self.DeclaringType == null)
             {
                 return GenericHelper.ReplaceInvalidCharactersName(language, self.Name);
             }
-            return self.DeclaringType.GetFriendlyFullName(language) + "::" + self.Name;
+            return self.DeclaringType.GetFriendlyFullName(language, includeNamespace) + "::" + self.Name;
         }
 
-        private static string GetFriendlyFullPropertyDefinitionName(this PropertyDefinition self, ILanguage language, string memberFriendlyFullName)
+        private static string GetFriendlyFullPropertyDefinitionName(this PropertyDefinition self, ILanguage language, string memberFriendlyFullName, bool includeNamespace = true)
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append(self.PropertyType.GetFriendlyFullName(language));
+            builder.Append(self.PropertyType.GetFriendlyFullName(language, includeNamespace));
             builder.Append(' ');
             builder.Append(memberFriendlyFullName);
             builder.Append('(');
@@ -533,29 +539,29 @@ namespace Mono.Cecil.Extensions
                 {
                     if (i > 0)
                         builder.Append(',');
-                    builder.Append(parameters[i].ParameterType.GetFriendlyFullName(language));
+                    builder.Append(parameters[i].ParameterType.GetFriendlyFullName(language, includeNamespace));
                 }
             }
             builder.Append(')');
             return builder.ToString();
         }
 
-        private static string GetFriendlyFullMethodReferenceName(this MethodReference self, ILanguage language, string memberFriendlyFullName, bool useGenericName)
+        private static string GetFriendlyFullMethodReferenceName(this MethodReference self, ILanguage language, string memberFriendlyFullName, bool useGenericName, bool includeNamespace = true)
         {
             StringBuilder builder = new StringBuilder();
-            string typeFullName = self.FixedReturnType.GetFriendlyFullName(language);
+            string typeFullName = self.FixedReturnType.GetFriendlyFullName(language, includeNamespace);
             if (useGenericName)
             {
                 TypeDefinition typeDefinition = self.FixedReturnType.Resolve();
                 if (typeDefinition != null)
                 {
-                    typeFullName = typeDefinition.GetGenericFullName(language);
+                    typeFullName = typeDefinition.GetGenericFullName(language, includeNamespace);
                 }
             }
             builder.Append(typeFullName)
                 .Append(" ")
                 .Append(memberFriendlyFullName);
-            self.MethodSignatureFriendlyFullName(language, builder, useGenericName);
+            self.MethodSignatureFriendlyFullName(language, builder, useGenericName, includeNamespace);
             return builder.ToString();
         }
         #endregion

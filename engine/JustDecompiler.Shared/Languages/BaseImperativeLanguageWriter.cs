@@ -1503,7 +1503,9 @@ namespace Telerik.JustDecompiler.Languages
 				WriteToken("(");
 				WriteKeyword(KeyWordWriter.ByVal);
 				WriteSpace();
+				/* AGPL */
 				WriteTypeAndName(property.PropertyType, "value", null, TypeReferenceType.PropertyType);
+				/* End AGPL */
 				WriteToken(")");
 			}
 			if (property.SetMethod.Body == null || SupportsAutoProperties && isAutoImplemented)

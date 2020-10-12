@@ -47,14 +47,14 @@ namespace CodemerxDecompile.Service
 {
     public class RpcDecompilerService : RpcDecompiler.RpcDecompilerBase
     {
-        private readonly string AssembliesDirectory = Path.Join(Path.GetTempPath(), "CD");
-
-        private readonly IDecompilationContext decompilationContext;
+        private readonly IDecompilationContextService decompilationContext;
+        private readonly IPathService pathService;
         private readonly ISearchService searchService;
 
-        public RpcDecompilerService(IDecompilationContext decompilationContext, ISearchService searchService)
+        public RpcDecompilerService(IDecompilationContextService decompilationContext, IPathService pathService, ISearchService searchService)
         {
             this.decompilationContext = decompilationContext;
+            this.pathService = pathService;
             this.searchService = searchService;
         }
 
@@ -64,8 +64,8 @@ namespace CodemerxDecompile.Service
 
             GetAssemblyRelatedFilePathsResponse response = new GetAssemblyRelatedFilePathsResponse()
             {
-                DecompiledAssemblyDirectory = AssembliesDirectory,
-                DecompiledAssemblyPath = Path.Join(AssembliesDirectory, assembly.FullName)
+                DecompiledAssemblyDirectory = this.pathService.WorkingDirectory,
+                DecompiledAssemblyPath = Path.Join(this.pathService.WorkingDirectory, assembly.FullName)
             };
 
             return Task.FromResult(response);
@@ -85,14 +85,14 @@ namespace CodemerxDecompile.Service
                 resources,
                 assembly.BuildNamespaceHierarchyTree(),
                 LanguageFactory.GetLanguage(CSharpVersion.V7),
-                Utilities.GetMaxRelativePathLength(AssembliesDirectory),
+                Utilities.GetMaxRelativePathLength(this.pathService.WorkingDirectory),
                 true);
 
             Dictionary<string, TypeDefinition> filePathToTypeDefinition = filePathsService.GetTypesToFilePathsMap()
-                                                                                          .ToDictionary(kvp => Path.Join(AssembliesDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
+                                                                                          .ToDictionary(kvp => Path.Join(this.pathService.WorkingDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
 
             this.decompilationContext.SaveAssemblyToCache(assembly, normalizedAssemblyFilePath);
-            this.decompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
+            this.decompilationContext.DecompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
             response.TypeFilePaths.AddRange(filePathToTypeDefinition.Keys);
@@ -124,7 +124,7 @@ namespace CodemerxDecompile.Service
 
             string normalizedFilePath = this.NormalizeFilePath(request.AbsoluteFilePath);
 
-            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
+            if (!this.decompilationContext.DecompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
             {
                 throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path"));
             }
@@ -213,7 +213,7 @@ namespace CodemerxDecompile.Service
 
             string normalizedFilePath = this.NormalizeFilePath(request.AbsoluteFilePath);
 
-            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
+            if (!this.decompilationContext.DecompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
             {
                 throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path"));
             }
@@ -248,12 +248,12 @@ namespace CodemerxDecompile.Service
         {
             string normalizedFilePath = this.NormalizeFilePath(request.FilePath);
 
-            if (!this.decompilationContext.FilePathToType.ContainsKey(normalizedFilePath))
+            if (!this.decompilationContext.DecompilationContext.FilePathToType.ContainsKey(normalizedFilePath))
             {
                 throw new RpcException(new Status(StatusCode.NotFound, "No type to corresponding file path"));
             }
 
-            TypeDefinition type = this.decompilationContext.FilePathToType[normalizedFilePath];
+            TypeDefinition type = this.decompilationContext.DecompilationContext.FilePathToType[normalizedFilePath];
             IExceptionFormatter exceptionFormatter = SimpleExceptionFormatter.Instance;
             ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             StringWriter theWriter = new StringWriter();
@@ -271,28 +271,29 @@ namespace CodemerxDecompile.Service
             {
                 List<WritingInfo> infos = (writer as INamespaceLanguageWriter).WriteTypeAndNamespaces(type, writerContextService);
 
-                Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = new Dictionary<IMemberDefinition, CodeSpan>();
-                CodeMappingInfo<CodeSpan> codeMappingInfo = new CodeMappingInfo<CodeSpan>();
+                DecompiledTypeMetadata decompiledTypeMetadata = new DecompiledTypeMetadata();
+
+                decompiledTypeMetadata.CodeSpanToMemberReference.AddRange(formatter.CodeSpanToMemberReference);
 
                 foreach (WritingInfo info in infos)
                 {
-                    memberDeclarationToCodeSpan.AddRange(info.MemberDeclarationToCodeSpan);
+                    decompiledTypeMetadata.MemberDeclarationToCodeSpan.AddRange(info.MemberDeclarationToCodeSpan);
 
-                    codeMappingInfo.NodeToCodeMap.AddRange(info.CodeMappingInfo.NodeToCodeMap);
-                    codeMappingInfo.InstructionToCodeMap.AddRange(info.CodeMappingInfo.InstructionToCodeMap);
-                    codeMappingInfo.FieldConstantValueToCodeMap.AddRange(info.CodeMappingInfo.FieldConstantValueToCodeMap);
-                    codeMappingInfo.VariableToCodeMap.AddRange(info.CodeMappingInfo.VariableToCodeMap);
-                    codeMappingInfo.ParameterToCodeMap.AddRange(info.CodeMappingInfo.ParameterToCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.NodeToCodeMap.AddRange(info.CodeMappingInfo.NodeToCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.InstructionToCodeMap.AddRange(info.CodeMappingInfo.InstructionToCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.FieldConstantValueToCodeMap.AddRange(info.CodeMappingInfo.FieldConstantValueToCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.VariableToCodeMap.AddRange(info.CodeMappingInfo.VariableToCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.ParameterToCodeMap.AddRange(info.CodeMappingInfo.ParameterToCodeMap);
 
-                    codeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.AddRange(info.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap);
-                    codeMappingInfo.FieldDefinitionToFieldTypeCodeMap.AddRange(info.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap);
-                    codeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.AddRange(info.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap);
-                    codeMappingInfo.EventDefinitionToEventTypeCodeMap.AddRange(info.CodeMappingInfo.EventDefinitionToEventTypeCodeMap);
-                    codeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.AddRange(info.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap);
-                    codeMappingInfo.VariableDefinitionToVariableTypeCodeMap.AddRange(info.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.AddRange(info.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap.AddRange(info.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.AddRange(info.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.EventDefinitionToEventTypeCodeMap.AddRange(info.CodeMappingInfo.EventDefinitionToEventTypeCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.AddRange(info.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap);
+                    decompiledTypeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.AddRange(info.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap);
                 }
 
-                this.decompilationContext.AddTypeMetadataToCache(type, memberDeclarationToCodeSpan, formatter.CodeSpanToMemberReference, codeMappingInfo);
+                this.decompilationContext.AddTypeMetadataToCache(type, decompiledTypeMetadata);
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = theWriter.ToString() });
             }
@@ -310,9 +311,9 @@ namespace CodemerxDecompile.Service
         {
             string normalizedFilePath = this.NormalizeFilePath(request.ContextUri);
 
-            if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
+            if (!this.decompilationContext.DecompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
             {
-                typeDefinition = this.decompilationContext.FilePathToType.FirstOrDefault(p => p.Key.StartsWith(normalizedFilePath)).Value;
+                typeDefinition = this.decompilationContext.DecompilationContext.FilePathToType.FirstOrDefault(p => p.Key.StartsWith(normalizedFilePath)).Value;
             }
 
             if (typeDefinition == null || !this.TryResolveTypeAssemblyFilePath(typeDefinition, out string assemblyPath))

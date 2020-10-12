@@ -14,41 +14,50 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Mono.Cecil;
 
 using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services.DecompilationContext.Models;
-using Telerik.JustDecompiler.Languages;
-using System.Linq;
 
 namespace CodemerxDecompile.Service.Services.DecompilationContext
 {
-    public class DecompilationContextService : IDecompilationContext
+    public class DecompilationContextService : IDecompilationContextService
     {
-        private Dictionary<string, string> openedAssemblyNamesToFilePathsMap;
+        private IDecompilationContext decompilationContext;
 
-        public DecompilationContextService()
+        public DecompilationContextService(IDecompilationContext decompilationContext)
         {
-            this.openedAssemblyNamesToFilePathsMap = new Dictionary<string, string>();
-            this.FilePathToType = new Dictionary<string, TypeDefinition>();
-            this.AssemblyStrongNameToAssemblyMetadata = new Dictionary<string, DecompiledAssemblyMetadata>();
+            this.DecompilationContext = decompilationContext;
         }
 
-        public Dictionary<string, TypeDefinition> FilePathToType { get; set; }
-        public Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; set; }
+        public IDecompilationContext DecompilationContext
+        {
+            get => this.decompilationContext;
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException();
+                }
+
+                this.decompilationContext = value;
+            }
+        }
 
         public void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath)
         {
-            this.openedAssemblyNamesToFilePathsMap[assembly.FullName] = assemblyFilePath;
+            this.decompilationContext.OpenedAssemblyNamesToFilePathsMap[assembly.FullName] = assemblyFilePath;
         }
 
-        public IEnumerable<string> GetOpenedAssemliesPaths() => this.openedAssemblyNamesToFilePathsMap.Values;
+        public IEnumerable<string> GetOpenedAssemliesPaths() => this.decompilationContext.OpenedAssemblyNamesToFilePathsMap.Values;
 
         public bool TryGetTypeFilePathFromCache(TypeReference type, out string filePath)
         {
-            KeyValuePair<string, TypeDefinition> entry = this.FilePathToType.FirstOrDefault(kvp =>
+            KeyValuePair<string, TypeDefinition> entry = this.decompilationContext.FilePathToType.FirstOrDefault(kvp =>
             {
                 TypeDefinition def = kvp.Value;
 
@@ -66,7 +75,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
             ModuleDefinition moduleDefinition = type.Module;
             AssemblyDefinition assemblyDefinition = moduleDefinition.Assembly;
 
-            if (!this.AssemblyStrongNameToAssemblyMetadata.TryGetValue(assemblyDefinition.FullName, out DecompiledAssemblyMetadata assemblyMetadata) ||
+            if (!this.decompilationContext.AssemblyStrongNameToAssemblyMetadata.TryGetValue(assemblyDefinition.FullName, out DecompiledAssemblyMetadata assemblyMetadata) ||
                 !assemblyMetadata.ModuleNameToModuleMetadata.TryGetValue(moduleDefinition.Name, out DecompiledAssemblyModuleMetadata moduleMetadata) ||
                 !moduleMetadata.TypeNameToTypeMetadata.TryGetValue(type.FullName, out typeMetadata))
             {
@@ -77,17 +86,17 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
             return true;
         }
 
-        public void AddTypeMetadataToCache(TypeDefinition type, Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan, Dictionary<CodeSpan, MemberReference> codeSpanToMemberReference, CodeMappingInfo<CodeSpan> codeMappingInfo)
+        public void AddTypeMetadataToCache(TypeDefinition type, DecompiledTypeMetadata decompiledTypeMetadata)
         {
             ModuleDefinition moduleDefinition = type.Module;
             AssemblyDefinition assemblyDefinition = moduleDefinition.Assembly;
 
-            if (!this.AssemblyStrongNameToAssemblyMetadata.ContainsKey(assemblyDefinition.FullName))
+            if (!this.decompilationContext.AssemblyStrongNameToAssemblyMetadata.ContainsKey(assemblyDefinition.FullName))
             {
-                this.AssemblyStrongNameToAssemblyMetadata.Add(assemblyDefinition.FullName, new DecompiledAssemblyMetadata());
+                this.decompilationContext.AssemblyStrongNameToAssemblyMetadata.Add(assemblyDefinition.FullName, new DecompiledAssemblyMetadata());
             }
 
-            DecompiledAssemblyMetadata assemblyMetadataCache = this.AssemblyStrongNameToAssemblyMetadata[assemblyDefinition.FullName];
+            DecompiledAssemblyMetadata assemblyMetadataCache = this.decompilationContext.AssemblyStrongNameToAssemblyMetadata[assemblyDefinition.FullName];
             if (!assemblyMetadataCache.ModuleNameToModuleMetadata.ContainsKey(moduleDefinition.Name))
             {
                 assemblyMetadataCache.ModuleNameToModuleMetadata.Add(moduleDefinition.Name, new DecompiledAssemblyModuleMetadata());
@@ -95,16 +104,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
 
             DecompiledAssemblyModuleMetadata moduleMetadataCache = assemblyMetadataCache.ModuleNameToModuleMetadata[moduleDefinition.Name];
 
-            if (!moduleMetadataCache.TypeNameToTypeMetadata.ContainsKey(type.FullName))
-            {
-                moduleMetadataCache.TypeNameToTypeMetadata.Add(type.FullName, new DecompiledTypeMetadata());
-            }
-
-            DecompiledTypeMetadata typeMetadataCache = moduleMetadataCache.TypeNameToTypeMetadata[type.FullName];
-
-            typeMetadataCache.MemberDeclarationToCodeSpan = memberDeclarationToCodeSpan;
-            typeMetadataCache.CodeSpanToMemberReference = codeSpanToMemberReference;
-            typeMetadataCache.CodeMappingInfo = codeMappingInfo;
+            moduleMetadataCache.TypeNameToTypeMetadata[type.FullName] = decompiledTypeMetadata;
         }
     }
 }

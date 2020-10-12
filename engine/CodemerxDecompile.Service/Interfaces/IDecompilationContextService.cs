@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -22,12 +22,18 @@ using CodemerxDecompile.Service.Services.DecompilationContext.Models;
 
 namespace CodemerxDecompile.Service.Interfaces
 {
-    public interface IDecompilationContext
+    public interface IDecompilationContextService
     {
-        Dictionary<string, string> OpenedAssemblyNamesToFilePathsMap { get; }
+        IDecompilationContext DecompilationContext { get; set; }
 
-        Dictionary<string, TypeDefinition> FilePathToType { get; }
+        void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath);
 
-        Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; }
+        IEnumerable<string> GetOpenedAssemliesPaths();
+
+        bool TryGetTypeFilePathFromCache(TypeReference type, out string filePath);
+
+        bool TryGetTypeMetadataFromCache(TypeReference type, out DecompiledTypeMetadata typeMetadata);
+
+        void AddTypeMetadataToCache(TypeDefinition type, DecompiledTypeMetadata decompiledTypeMetadata);
     }
 }

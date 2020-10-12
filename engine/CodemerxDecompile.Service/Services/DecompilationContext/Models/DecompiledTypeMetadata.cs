@@ -23,10 +23,10 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext.Models
 {
     public class DecompiledTypeMetadata
     {
-        public Dictionary<IMemberDefinition, CodeSpan> MemberDeclarationToCodeSpan { get; set; }
+        public Dictionary<IMemberDefinition, CodeSpan> MemberDeclarationToCodeSpan { get; } = new Dictionary<IMemberDefinition, CodeSpan>();
 
-        public Dictionary<CodeSpan, MemberReference> CodeSpanToMemberReference { get; set; }
+        public Dictionary<CodeSpan, MemberReference> CodeSpanToMemberReference { get; } = new Dictionary<CodeSpan, MemberReference>();
 
-        public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; set; }
+        public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; } = new CodeMappingInfo<CodeSpan>();
     }
 }

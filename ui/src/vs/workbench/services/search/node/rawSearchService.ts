@@ -16,10 +16,11 @@ import { StopWatch } from 'vs/base/common/stopwatch';
 import * as strings from 'vs/base/common/strings';
 import { URI, UriComponents } from 'vs/base/common/uri';
 import { compareItemsByFuzzyScore, IItemAccessor, prepareQuery, FuzzyScorerCache } from 'vs/base/common/fuzzyScorer';
-import { MAX_FILE_SIZE } from 'vs/base/node/pfs';
 import { ICachedSearchStats, IFileQuery, IFileSearchStats, IFolderQuery, IProgressMessage, IRawFileQuery, IRawQuery, IRawTextQuery, ITextQuery, IFileSearchProgressItem, IRawFileMatch, IRawSearchService, ISearchEngine, ISearchEngineSuccess, ISerializedFileMatch, ISerializedSearchComplete, ISerializedSearchProgressItem, ISerializedSearchSuccess, isFilePatternMatch } from 'vs/workbench/services/search/common/search';
 import { Engine as FileSearchEngine } from 'vs/workbench/services/search/node/fileSearch';
-import { TextSearchEngineAdapter } from 'vs/workbench/services/search/node/textSearchAdapter';
+/* AGPL */
+import { DecompilerSearchEngine } from 'vs/workbench/services/search/node/decompilerSearchEngine';
+/* End AGPL */
 
 gracefulFs.gracefulify(fs);
 
@@ -61,7 +62,11 @@ export class SearchService implements IRawSearchService {
 		const emitter = new Emitter<ISerializedSearchProgressItem | ISerializedSearchComplete>({
 			onFirstListenerDidAdd: () => {
 				promise = createCancelablePromise(token => {
-					return this.ripgrepTextSearch(query, p => emitter.fire(p), token);
+					/* AGPL */
+					const grpcUrl = process.env['CD_GRPC_URL'];
+					const engine = new DecompilerSearchEngine(grpcUrl!, query);
+					return engine.search(p => emitter.fire(p), token);
+					/* End AGPL */
 				});
 
 				promise.then(
@@ -74,13 +79,6 @@ export class SearchService implements IRawSearchService {
 		});
 
 		return emitter.event;
-	}
-
-	private ripgrepTextSearch(config: ITextQuery, progressCallback: IProgressCallback, token: CancellationToken): Promise<ISerializedSearchSuccess> {
-		config.maxFileSize = MAX_FILE_SIZE;
-		const engine = new TextSearchEngineAdapter(config);
-
-		return engine.search(token, progressCallback, progressCallback);
 	}
 
 	doFileSearch(config: IFileQuery, progressCallback: IProgressCallback, token?: CancellationToken): Promise<ISerializedSearchSuccess> {

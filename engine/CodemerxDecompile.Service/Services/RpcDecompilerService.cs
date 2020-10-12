@@ -41,17 +41,21 @@ using CodemerxDecompile.Service.Extensions;
 using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services;
 using CodemerxDecompile.Service.Services.DecompilationContext.Models;
+using CodemerxDecompile.Service.Services.Search.Models;
 
 namespace CodemerxDecompile.Service
 {
     public class RpcDecompilerService : RpcDecompiler.RpcDecompilerBase
     {
-        private readonly IDecompilationContext decompilationContext;
         private readonly string AssembliesDirectory = Path.Join(Path.GetTempPath(), "CD");
 
-        public RpcDecompilerService(IDecompilationContext decompilationContext)
+        private readonly IDecompilationContext decompilationContext;
+        private readonly ISearchService searchService;
+
+        public RpcDecompilerService(IDecompilationContext decompilationContext, ISearchService searchService)
         {
             this.decompilationContext = decompilationContext;
+            this.searchService = searchService;
         }
 
         public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
@@ -69,12 +73,13 @@ namespace CodemerxDecompile.Service
 
         public override Task<GetAllTypeFilePathsResponse> GetAllTypeFilePaths(GetAllTypeFilePathsRequest request, ServerCallContext context)
         {
-            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
+            string normalizedAssemblyFilePath = this.NormalizeFilePath(request.AssemblyPath);
+            AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(normalizedAssemblyFilePath);
             Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
             Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
             DefaultFilePathsService filePathsService = new DefaultFilePathsService(
                 assembly,
-                request.AssemblyPath,
+                normalizedAssemblyFilePath,
                 null,
                 userDefinedTypes,
                 resources,
@@ -86,6 +91,7 @@ namespace CodemerxDecompile.Service
             Dictionary<string, TypeDefinition> filePathToTypeDefinition = filePathsService.GetTypesToFilePathsMap()
                                                                                           .ToDictionary(kvp => Path.Join(AssembliesDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
 
+            this.decompilationContext.SaveAssemblyToCache(assembly, normalizedAssemblyFilePath);
             this.decompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
 
             GetAllTypeFilePathsResponse response = new GetAllTypeFilePathsResponse();
@@ -266,13 +272,27 @@ namespace CodemerxDecompile.Service
                 List<WritingInfo> infos = (writer as INamespaceLanguageWriter).WriteTypeAndNamespaces(type, writerContextService);
 
                 Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = new Dictionary<IMemberDefinition, CodeSpan>();
+                CodeMappingInfo<CodeSpan> codeMappingInfo = new CodeMappingInfo<CodeSpan>();
 
                 foreach (WritingInfo info in infos)
                 {
                     memberDeclarationToCodeSpan.AddRange(info.MemberDeclarationToCodeSpan);
+
+                    codeMappingInfo.NodeToCodeMap.AddRange(info.CodeMappingInfo.NodeToCodeMap);
+                    codeMappingInfo.InstructionToCodeMap.AddRange(info.CodeMappingInfo.InstructionToCodeMap);
+                    codeMappingInfo.FieldConstantValueToCodeMap.AddRange(info.CodeMappingInfo.FieldConstantValueToCodeMap);
+                    codeMappingInfo.VariableToCodeMap.AddRange(info.CodeMappingInfo.VariableToCodeMap);
+                    codeMappingInfo.ParameterToCodeMap.AddRange(info.CodeMappingInfo.ParameterToCodeMap);
+
+                    codeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.AddRange(info.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap);
+                    codeMappingInfo.FieldDefinitionToFieldTypeCodeMap.AddRange(info.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap);
+                    codeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.AddRange(info.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap);
+                    codeMappingInfo.EventDefinitionToEventTypeCodeMap.AddRange(info.CodeMappingInfo.EventDefinitionToEventTypeCodeMap);
+                    codeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.AddRange(info.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap);
+                    codeMappingInfo.VariableDefinitionToVariableTypeCodeMap.AddRange(info.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap);
                 }
 
-                this.decompilationContext.AddTypeMetadataToCache(type, memberDeclarationToCodeSpan, formatter.CodeSpanToMemberReference);
+                this.decompilationContext.AddTypeMetadataToCache(type, memberDeclarationToCodeSpan, formatter.CodeSpanToMemberReference, codeMappingInfo);
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = theWriter.ToString() });
             }
@@ -284,11 +304,11 @@ namespace CodemerxDecompile.Service
 
                 return Task.FromResult(new DecompileTypeResponse() { SourceCode = commentedExceptionMessage });
             }
-		}
+        }
 
-        public override Task<GetProjectCreationMetadataFromTypeFilePathResponse> GetProjectCreationMetadataFromTypeFilePath(GetProjectCreationMetadataFromTypeFilePathRequest request, ServerCallContext context)
+        public override Task<GetContextAssemblyResponse> GetContextAssembly(GetContextAssemblyRequest request, ServerCallContext context)
         {
-            string normalizedFilePath = this.NormalizeFilePath(request.TypeFilePath);
+            string normalizedFilePath = this.NormalizeFilePath(request.ContextUri);
 
             if (!this.decompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition))
             {
@@ -300,19 +320,77 @@ namespace CodemerxDecompile.Service
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to resolve assembly from path"));
             }
 
-            VisualStudioVersion visualStudioVersion = this.GetProjectCreationVSVersion(request.ProjectVisualStudioVersion);
+            return Task.FromResult(new GetContextAssemblyResponse()
+            {
+                AssemblyName = typeDefinition.Module.Assembly.FullName,
+                AssemblyFilePath = assemblyPath
+            });
+        }
 
-            AssemblyDefinition assemblyDefinition = typeDefinition.Module.Assembly;
+        public override async Task Search(SearchRequest request, IServerStreamWriter<SearchResultResponse> responseStream, ServerCallContext context)
+        {
+            foreach (SearchResult searchResult in this.searchService.Search(request.Query, request.MatchCasing, request.MatchWholeWord))
+            {
+                int highlightStartIndex = searchResult.MatchedString.IndexOf(request.Query, StringComparison.InvariantCultureIgnoreCase);
+
+                await responseStream.WriteAsync(new SearchResultResponse()
+                {
+                    Id = searchResult.Id,
+                    FilePath = searchResult.DeclaringTypeFilePath,
+                    Preview = searchResult.MatchedString,
+                    HighlightRange = new PreviewHighlightRange()
+                    {
+                        StartIndex = highlightStartIndex,
+                        EndIndex = highlightStartIndex + request.Query.Length
+                    }
+                });
+            }
+        }
+
+        public override Task<Empty> CancelSearch(Empty request, ServerCallContext context)
+        {
+            this.searchService.CancelSearch();
+
+            return Task.FromResult(new Empty());
+        }
+
+        public override Task<Selection> GetSearchResultPosition(GetSearchResultPositionRequest request, ServerCallContext context)
+        {
+            if (request.SearchResultId <= 0)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid search result id"));
+            }
+
+            CodeSpan? searchResultCodeSpan = this.searchService.GetSearchResultPosition(request.SearchResultId);
+
+            if (!searchResultCodeSpan.HasValue)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Failed to find search result code position"));
+            }
+
+            return Task.FromResult(new Selection()
+            {
+                StartLineNumber = searchResultCodeSpan.Value.Start.Line + 1,
+                StartColumn = searchResultCodeSpan.Value.Start.Column + 1,
+                EndLineNumber = searchResultCodeSpan.Value.End.Line + 1,
+                EndColumn = searchResultCodeSpan.Value.End.Column + 1
+            });
+        }
+
+        public override Task<GetProjectCreationMetadataResponse> GetProjectCreationMetadata(GetProjectCreationMetadataRequest request, ServerCallContext context)
+        {
+            string normalizedFilePath = this.NormalizeFilePath(request.AssemblyFilePath);
+            VisualStudioVersion visualStudioVersion = this.GetProjectCreationVSVersion(request.ProjectVisualStudioVersion);
+            AssemblyDefinition assemblyDefinition = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(normalizedFilePath);
             ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
-            ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(assemblyPath, NoCacheAssemblyInfoService.Instance,
+            ProjectGenerationSettings settings = ProjectGenerationSettingsProvider.GetProjectGenerationSettings(normalizedFilePath, NoCacheAssemblyInfoService.Instance,
                 EmptyResolver.Instance, visualStudioVersion, language, TargetPlatformResolver.Instance);
             bool containsDangerousResources = assemblyDefinition.Modules.SelectMany(m => m.Resources).Any(r => DangerousResourceIdentifier.IsDangerousResource(r));
             string normalizedVSProjectFileExtension = language.VSProjectFileExtension.TrimStart('.');
             string generatedProjectExtension = normalizedVSProjectFileExtension + (settings.JustDecompileSupportedProjectType ? string.Empty : MSBuildProjectBuilder.ErrorFileExtension);
 
-            return Task.FromResult(new GetProjectCreationMetadataFromTypeFilePathResponse()
+            return Task.FromResult(new GetProjectCreationMetadataResponse()
             {
-                AssemblyFilePath = assemblyPath,
                 ContainsDangerousResources = containsDangerousResources,
                 ProjectFileMetadata = new ProjectFileMetadata()
                 {

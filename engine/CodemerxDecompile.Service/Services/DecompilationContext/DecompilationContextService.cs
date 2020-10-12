@@ -1,4 +1,20 @@
-﻿using System.Collections.Generic;
+﻿//    Copyright CodeMerx 2020
+//    This file is part of CodemerxDecompile.
+
+//    CodemerxDecompile is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU Affero General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+
+//    CodemerxDecompile is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+
+//    You should have received a copy of the GNU Affero General Public License
+//    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
+
+using System.Collections.Generic;
 
 using Mono.Cecil;
 
@@ -11,14 +27,24 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
 {
     public class DecompilationContextService : IDecompilationContext
     {
+        private Dictionary<string, string> openedAssemblyNamesToFilePathsMap;
+
         public DecompilationContextService()
         {
+            this.openedAssemblyNamesToFilePathsMap = new Dictionary<string, string>();
             this.FilePathToType = new Dictionary<string, TypeDefinition>();
             this.AssemblyStrongNameToAssemblyMetadata = new Dictionary<string, DecompiledAssemblyMetadata>();
         }
 
         public Dictionary<string, TypeDefinition> FilePathToType { get; set; }
         public Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; set; }
+
+        public void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath)
+        {
+            this.openedAssemblyNamesToFilePathsMap[assembly.FullName] = assemblyFilePath;
+        }
+
+        public IEnumerable<string> GetOpenedAssemliesPaths() => this.openedAssemblyNamesToFilePathsMap.Values;
 
         public bool TryGetTypeFilePathFromCache(TypeReference type, out string filePath)
         {
@@ -51,7 +77,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
             return true;
         }
 
-        public void AddTypeMetadataToCache(TypeDefinition type, Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan, Dictionary<CodeSpan, MemberReference> codeSpanToMemberReference)
+        public void AddTypeMetadataToCache(TypeDefinition type, Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan, Dictionary<CodeSpan, MemberReference> codeSpanToMemberReference, CodeMappingInfo<CodeSpan> codeMappingInfo)
         {
             ModuleDefinition moduleDefinition = type.Module;
             AssemblyDefinition assemblyDefinition = moduleDefinition.Assembly;
@@ -78,6 +104,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
 
             typeMetadataCache.MemberDeclarationToCodeSpan = memberDeclarationToCodeSpan;
             typeMetadataCache.CodeSpanToMemberReference = codeSpanToMemberReference;
+            typeMetadataCache.CodeMappingInfo = codeMappingInfo;
         }
     }
 }

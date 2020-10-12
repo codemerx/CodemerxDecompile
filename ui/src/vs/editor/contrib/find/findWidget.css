@@ -49,7 +49,9 @@
 
 .monaco-editor .find-widget > .find-part,
 .monaco-editor .find-widget > .replace-part {
-	margin: 4px 0 0 17px;
+	/* AGPL */
+	margin: 4px 0 0 4px;
+	/* End AGPL */
 	font-size: 12px;
 	display: flex;
 }

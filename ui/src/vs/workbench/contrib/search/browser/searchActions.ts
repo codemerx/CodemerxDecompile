@@ -143,9 +143,6 @@ export abstract class FindOrReplaceInFilesAction extends Action {
 	run(): Promise<any> {
 		return openSearchView(this.viewsService, false).then(openedView => {
 			if (openedView) {
-				const searchAndReplaceWidget = openedView.searchAndReplaceWidget;
-				searchAndReplaceWidget.toggleReplace(this.expandSearchReplaceWidget);
-
 				const updatedText = openedView.updateTextFromSelection({ allowUnselectedWord: !this.expandSearchReplaceWidget });
 				openedView.searchAndReplaceWidget.focus(undefined, updatedText, updatedText);
 			}
@@ -167,8 +164,6 @@ export const FindInFilesCommand: ICommandHandler = (accessor, args: IFindInFiles
 	const viewsService = accessor.get(IViewsService);
 	openSearchView(viewsService, false).then(openedView => {
 		if (openedView) {
-			const searchAndReplaceWidget = openedView.searchAndReplaceWidget;
-			searchAndReplaceWidget.toggleReplace(typeof args.replace === 'string');
 			let updatedText = false;
 			if (typeof args.query === 'string') {
 				openedView.setSearchParameters(args);
@@ -231,7 +226,6 @@ export class CloseReplaceAction extends Action {
 	run(): Promise<any> {
 		const searchView = getSearchView(this.viewsService);
 		if (searchView) {
-			searchView.searchAndReplaceWidget.toggleReplace(false);
 			searchView.searchAndReplaceWidget.focus();
 		}
 		return Promise.resolve(null);

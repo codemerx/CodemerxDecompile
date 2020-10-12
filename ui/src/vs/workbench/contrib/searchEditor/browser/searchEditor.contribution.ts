@@ -9,7 +9,7 @@ import { extname } from 'vs/base/common/resources';
 import { URI } from 'vs/base/common/uri';
 import { ServicesAccessor } from 'vs/editor/browser/editorExtensions';
 import { Range } from 'vs/editor/common/core/range';
-import { ToggleCaseSensitiveKeybinding, ToggleRegexKeybinding, ToggleWholeWordKeybinding } from 'vs/editor/contrib/find/findModel';
+import { ToggleCaseSensitiveKeybinding, ToggleWholeWordKeybinding } from 'vs/editor/contrib/find/findModel';
 import { localize } from 'vs/nls';
 import { Action2, MenuId, registerAction2 } from 'vs/platform/actions/common/actions';
 import { CommandsRegistry } from 'vs/platform/commands/common/commands';
@@ -23,25 +23,30 @@ import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { EditorDescriptor, Extensions as EditorExtensions, IEditorRegistry } from 'vs/workbench/browser/editor';
 import { Extensions as WorkbenchExtensions, IWorkbenchContribution, IWorkbenchContributionsRegistry } from 'vs/workbench/common/contributions';
 import { ActiveEditorContext, Extensions as EditorInputExtensions, IEditorInputFactory, IEditorInputFactoryRegistry } from 'vs/workbench/common/editor';
-import { IViewsService } from 'vs/workbench/common/views';
-import { getSearchView } from 'vs/workbench/contrib/search/browser/searchActions';
+/* AGPL */
+// import { IViewsService } from 'vs/workbench/common/views';
+// import { getSearchView } from 'vs/workbench/contrib/search/browser/searchActions';
+/* End AGPL */
 import { searchRefreshIcon } from 'vs/workbench/contrib/search/browser/searchIcons';
 import * as SearchConstants from 'vs/workbench/contrib/search/common/constants';
 import * as SearchEditorConstants from 'vs/workbench/contrib/searchEditor/browser/constants';
 import { SearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditor';
-import { createEditorFromSearchResult, modifySearchEditorContextLinesCommand, openNewSearchEditor, selectAllSearchEditorMatchesCommand, toggleSearchEditorCaseSensitiveCommand, toggleSearchEditorContextLinesCommand, toggleSearchEditorRegexCommand, toggleSearchEditorWholeWordCommand } from 'vs/workbench/contrib/searchEditor/browser/searchEditorActions';
+import { modifySearchEditorContextLinesCommand, openNewSearchEditor, selectAllSearchEditorMatchesCommand, toggleSearchEditorCaseSensitiveCommand, toggleSearchEditorContextLinesCommand, toggleSearchEditorWholeWordCommand } from 'vs/workbench/contrib/searchEditor/browser/searchEditorActions';
 import { getOrMakeSearchEditorInput, SearchConfiguration, SearchEditorInput, SEARCH_EDITOR_EXT } from 'vs/workbench/contrib/searchEditor/browser/searchEditorInput';
 import { parseSavedSearchEditor } from 'vs/workbench/contrib/searchEditor/browser/searchEditorSerialization';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 
-
-const OpenInEditorCommandId = 'search.action.openInEditor';
+/* AGPL */
+// const OpenInEditorCommandId = 'search.action.openInEditor';
+/* End AGPL */
 const OpenNewEditorToSideCommandId = 'search.action.openNewEditorToSide';
 const FocusQueryEditorWidgetCommandId = 'search.action.focusQueryEditorWidget';
 
 const ToggleSearchEditorCaseSensitiveCommandId = 'toggleSearchEditorCaseSensitive';
 const ToggleSearchEditorWholeWordCommandId = 'toggleSearchEditorWholeWord';
-const ToggleSearchEditorRegexCommandId = 'toggleSearchEditorRegex';
+/* AGPL */
+// const ToggleSearchEditorRegexCommandId = 'toggleSearchEditorRegex';
+/* End AGPL */
 const ToggleSearchEditorContextLinesCommandId = 'toggleSearchEditorContextLines';
 const IncreaseSearchEditorContextLinesCommandId = 'increaseSearchEditorContextLines';
 const DecreaseSearchEditorContextLinesCommandId = 'decreaseSearchEditorContextLines';
@@ -162,12 +167,14 @@ KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
 	handler: toggleSearchEditorWholeWordCommand
 }, ToggleWholeWordKeybinding));
 
-KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
-	id: ToggleSearchEditorRegexCommandId,
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, SearchConstants.SearchInputBoxFocusedKey),
-	handler: toggleSearchEditorRegexCommand
-}, ToggleRegexKeybinding));
+/* AGPL */
+// KeybindingsRegistry.registerCommandAndKeybindingRule(objects.assign({
+// 	id: ToggleSearchEditorRegexCommandId,
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: ContextKeyExpr.and(SearchEditorConstants.InSearchEditor, SearchConstants.SearchInputBoxFocusedKey),
+// 	handler: toggleSearchEditorRegexCommand
+// }, ToggleRegexKeybinding));
+/* End AGPL */
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	id: ToggleSearchEditorContextLinesCommandId,
@@ -276,34 +283,36 @@ registerAction2(class extends Action2 {
 	}
 });
 
-registerAction2(class extends Action2 {
-	constructor() {
-		super({
-			id: OpenInEditorCommandId,
-			/* AGPL */
-			title: localize('search.openResultsInEditor', "Open Results in Code Viewer"),
-			/* End AGPL */
-			category,
-			f1: true,
-			keybinding: {
-				primary: KeyMod.Alt | KeyCode.Enter,
-				when: ContextKeyExpr.and(SearchConstants.HasSearchResults, SearchConstants.SearchViewFocusedKey),
-				weight: KeybindingWeight.WorkbenchContrib,
-				mac: {
-					primary: KeyMod.CtrlCmd | KeyCode.Enter
-				}
-			},
-		});
-	}
-	async run(accessor: ServicesAccessor) {
-		const viewsService = accessor.get(IViewsService);
-		const instantiationService = accessor.get(IInstantiationService);
-		const searchView = getSearchView(viewsService);
-		if (searchView) {
-			await instantiationService.invokeFunction(createEditorFromSearchResult, searchView.searchResult, searchView.searchIncludePattern.getValue(), searchView.searchExcludePattern.getValue());
-		}
-	}
-});
+/* AGPL */
+// registerAction2(class extends Action2 {
+// 	constructor() {
+// 		super({
+// 			id: OpenInEditorCommandId,
+// 			/* AGPL */
+// 			title: localize('search.openResultsInEditor', "Open Results in Code Viewer"),
+// 			/* End AGPL */
+// 			category,
+// 			f1: true,
+// 			keybinding: {
+// 				primary: KeyMod.Alt | KeyCode.Enter,
+// 				when: ContextKeyExpr.and(SearchConstants.HasSearchResults, SearchConstants.SearchViewFocusedKey),
+// 				weight: KeybindingWeight.WorkbenchContrib,
+// 				mac: {
+// 					primary: KeyMod.CtrlCmd | KeyCode.Enter
+// 				}
+// 			},
+// 		});
+// 	}
+// 	async run(accessor: ServicesAccessor) {
+// 		const viewsService = accessor.get(IViewsService);
+// 		const instantiationService = accessor.get(IInstantiationService);
+// 		const searchView = getSearchView(viewsService);
+// 		if (searchView) {
+// 			await instantiationService.invokeFunction(createEditorFromSearchResult, searchView.searchResult, searchView.searchIncludePattern.getValue(), searchView.searchExcludePattern.getValue());
+// 		}
+// 	}
+// });
+/* End AGPL */
 
 registerAction2(class extends Action2 {
 	constructor() {

@@ -23,20 +23,21 @@ import {
 	GetMemberDefinitionPositionRequest,
 	AddResolvedAssemblyRequest,
 	CreateProjectRequest,
-	GetProjectCreationMetadataFromTypeFilePathRequest
+	GetProjectCreationMetadataRequest, GetContextAssemblyRequest, GetSearchResultPositionRequest
 } from './proto/main_pb';
 import * as grpc from "@grpc/grpc-js";
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-import { IGrpcService } from 'vs/cd/platform/GrpcService';
-import { AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
+import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
+import { AssemblyMetadata, AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
 
 export const IDecompilationMainService = createDecorator<IDecompilationMainService>('IDecompilationMainService');
 
 export interface IDecompilationMainService {
 	readonly _serviceBrand: undefined;
 
+	getContextAssembly(contextUri: string) : Promise<AssemblyMetadata>;
 	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
-	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
+	getProjectCreationMetadata(assemblyFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
 	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
 	decompileType(filePath: string) : Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
@@ -44,6 +45,7 @@ export interface IDecompilationMainService {
 	addResolvedAssembly(filePath: string) : Promise<void>;
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;
+	getSearchResultPosition(searchResultId: number) : Promise<Selection>;
 }
 
 export class DecompilationMainService implements IDecompilationMainService {
@@ -51,9 +53,30 @@ export class DecompilationMainService implements IDecompilationMainService {
 
 	private client: RpcDecompilerClient | undefined;
 
-	constructor(@IGrpcService grpcService: IGrpcService) {
+	constructor(@IGrpcMainService grpcService: IGrpcMainService) {
 		grpcService.getServiceUrl().then(url => {
 			this.client = new RpcDecompilerClient(url, grpc.credentials.createInsecure());
+		});
+	}
+
+	getContextAssembly(contextUri: string) : Promise<AssemblyMetadata> {
+		const request = new GetContextAssemblyRequest();
+		request.setContexturi(contextUri);
+
+		return new Promise<AssemblyMetadata>((resolve, reject) => {
+			this.client?.getContextAssembly(request, {}, (err, response) => {
+				if (err) {
+					reject(`getContextAssembly failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				const assemblyMetadata: AssemblyMetadata = {
+					assemblyFullName: response!.getAssemblyname(),
+					assemblyFilePath: response!.getAssemblyfilepath()
+				};
+
+				resolve(assemblyMetadata);
+			});
 		});
 	}
 
@@ -176,22 +199,21 @@ export class DecompilationMainService implements IDecompilationMainService {
 		})
 	}
 
-	getProjectCreationMetadataFromTypeFilePath(typeFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata> {
-		const request = new GetProjectCreationMetadataFromTypeFilePathRequest();
-		request.setTypefilepath(typeFilePath);
+	getProjectCreationMetadata(assemblyFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata> {
+		const request = new GetProjectCreationMetadataRequest();
+		request.setAssemblyfilepath(assemblyFilePath);
 		request.setProjectvisualstudioversion(projectVisualStudioVersion ?? '');
 
 		return new Promise<ProjectCreationMetadata>((resolve, reject) => {
-			this.client?.getProjectCreationMetadataFromTypeFilePath(request, {}, (err, response) => {
+			this.client?.getProjectCreationMetadata(request, {}, (err, response) => {
 				if (err) {
-					reject(`getProjectCreationMetadataFromTypeFilePath failed. Error: ${JSON.stringify(err)}`);
+					reject(`getProjectCreationMetadata failed. Error: ${JSON.stringify(err)}`);
 					return;
 				}
 
 				const projectFileMetadata = response!.getProjectfilemetadata();
 
-				const assemblyMetadata: ProjectCreationMetadata = {
-					assemblyFilePath: response!.getAssemblyfilepath(),
+				const projectCreationMetadata: ProjectCreationMetadata = {
 					containsDangerousResources: response!.getContainsdangerousresources(),
 					projectFileMetadata: projectFileMetadata ? {
 						isDecompilerSupportedProjectType: projectFileMetadata?.getIsdecompilersupportedprojecttype(),
@@ -202,7 +224,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 					} : null
 				};
 
-				resolve(assemblyMetadata);
+				resolve(projectCreationMetadata);
 			});
 		});
 	}
@@ -231,4 +253,27 @@ export class DecompilationMainService implements IDecompilationMainService {
 	}
 
 	getLegacyVisualStudioVersions = async () => ['2010', '2012', '2013', '2015'];
+
+	getSearchResultPosition(searchResultId: number) : Promise<Selection> {
+		const request = new GetSearchResultPositionRequest();
+		request.setSearchresultid(searchResultId);
+
+		return new Promise<Selection>((resolve, reject) => {
+			this.client?.getSearchResultPosition(request, {}, (err, response) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				const selection: Selection = {
+					startLineNumber: response!.getStartlinenumber(),
+					startColumn: response!.getStartcolumn(),
+					endLineNumber: response!.getEndlinenumber(),
+					endColumn: response!.getEndcolumn()
+				};
+
+				resolve(selection);
+			});
+		});
+	}
 }

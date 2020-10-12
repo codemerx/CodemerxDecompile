@@ -36,6 +36,9 @@ using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
+/* AGPL */
+using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -250,7 +253,35 @@ namespace Telerik.JustDecompiler.Languages
 			return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(@event.Name), this.Language);
 		}
 
-		protected string GetMemberName(MemberReference member)
+        /* AGPL */
+        protected void AddMemberDefinitionTypeCodeSpanToCache(IMemberDefinition memberDefinition, TypeReferenceType typeReferenceType, CodeSpan codeSpan)
+        {
+            if (memberDefinition == null)
+            {
+                return;
+            }
+
+            switch (typeReferenceType)
+            {
+                case TypeReferenceType.FieldType:
+                    this.currentWritingInfo.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                case TypeReferenceType.PropertyType:
+                    this.currentWritingInfo.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                case TypeReferenceType.MethodReturnType:
+                    this.currentWritingInfo.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                case TypeReferenceType.EventType:
+                    this.currentWritingInfo.CodeMappingInfo.EventDefinitionToEventTypeCodeMap[memberDefinition] = codeSpan;
+                    break;
+                default:
+                    break;
+            }
+        }
+        /* End AGPL */
+
+        protected string GetMemberName(MemberReference member)
 		{
 			if (member is MethodReference)
 			{
@@ -286,7 +317,24 @@ namespace Telerik.JustDecompiler.Languages
             int startLine = this.formatter.CurrentLineNumber;
             int startColumn = this.formatter.CurrentColumnIndex;
 
+            EventHandler<int> onFirstNonWhiteSpaceCharacter = (sender, currentPosition) =>
+            {
+                startLine = this.formatter.CurrentLineNumber;
+                startColumn = this.formatter.CurrentColumnIndex;
+            };
+
+            EventHandler onNewLine = (sender, args) =>
+            {
+                this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten -= onFirstNonWhiteSpaceCharacter;
+            };
+
+            this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten += onFirstNonWhiteSpaceCharacter;
+            this.formatter.NewLineWritten += onNewLine;
+
             writeEntity();
+
+            this.formatter.FirstNonWhiteSpaceCharacterOnLineWritten -= onFirstNonWhiteSpaceCharacter;
+            this.formatter.NewLineWritten -= onNewLine;
 
             return new CodeSpan(new CodePosition(startLine, startColumn), new CodePosition(this.formatter.CurrentLineNumber, this.formatter.CurrentColumnIndex));
         }

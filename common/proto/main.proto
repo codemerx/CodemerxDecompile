@@ -21,23 +21,35 @@ import "common.proto";
 option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
+  rpc GetContextAssembly (GetContextAssemblyRequest) returns (GetContextAssemblyResponse);
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
-  rpc GetProjectCreationMetadataFromTypeFilePath (GetProjectCreationMetadataFromTypeFilePathRequest) returns (GetProjectCreationMetadataFromTypeFilePathResponse);
+  rpc GetProjectCreationMetadata (GetProjectCreationMetadataRequest) returns (GetProjectCreationMetadataResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
   rpc DecompileType (DecompileTypeRequest) returns (DecompileTypeResponse);
   rpc GetMemberReferenceMetadata (GetMemberReferenceMetadataRequest) returns (GetMemberReferenceMetadataResponse);
   rpc GetMemberDefinitionPosition (GetMemberDefinitionPositionRequest) returns (Selection);
   rpc AddResolvedAssembly (AddResolvedAssemblyRequest) returns (Empty);
+  rpc Search (SearchRequest) returns (stream SearchResultResponse);
+  rpc CancelSearch (Empty) returns (Empty);
+  rpc GetSearchResultPosition (GetSearchResultPositionRequest) returns (Selection);
   rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
 }
 
-message GetProjectCreationMetadataFromTypeFilePathRequest {
-  string typeFilePath = 1;
+message GetContextAssemblyRequest {
+  string contextUri = 1;
+}
+
+message GetContextAssemblyResponse {
+  string assemblyName = 1;
+  string assemblyFilePath = 2;
+}
+
+message GetProjectCreationMetadataRequest {
+  string assemblyFilePath = 1;
   string projectVisualStudioVersion = 2;
 }
 
-message GetProjectCreationMetadataFromTypeFilePathResponse {
-  string assemblyFilePath = 1;
+message GetProjectCreationMetadataResponse {
   bool containsDangerousResources = 2;
   ProjectFileMetadata projectFileMetadata = 3;
 }
@@ -119,4 +131,26 @@ message DecompileTypeResponse {
 
 message AddResolvedAssemblyRequest {
   string filePath = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+  bool matchCasing = 2;
+  bool matchWholeWord = 3;
+}
+
+message SearchResultResponse {
+  int32 id = 1;
+  string filePath = 2;
+  string preview = 3;
+  PreviewHighlightRange highlightRange = 4;
+}
+
+message PreviewHighlightRange {
+  int32 startIndex = 1;
+  int32 endIndex = 2;
+}
+
+message GetSearchResultPositionRequest {
+  int32 searchResultId = 1;
 }

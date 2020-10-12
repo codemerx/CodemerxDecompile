@@ -37,6 +37,9 @@ using Mono.Cecil.Extensions;
 using Mono.Cecil.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Collections.Generic;
+/* AGPL */
+using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages.VisualBasic
 {
@@ -370,11 +373,23 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             }
         }
 
-        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference)
+        /* AGPL */
+        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
+        /* End AGPL */
         {
             int startIndex = this.formatter.CurrentPosition;
             /* AGPL */
-            CodeSpan codeSpan = this.Write(() => WriteReference(name, reference));
+            CodeSpan codeSpan = this.Write(() =>
+            {
+                if (reference != null)
+                {
+                    WriteReference(name, reference);
+                }
+                else
+                {
+                    Write(name);
+                }
+            });
             /* End AGPL */
             if (reference is IMemberDefinition)
             {
@@ -385,10 +400,24 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
                 this.currentWritingInfo.MemberDeclarationToCodePostionMap[(IMemberDefinition)reference] = new OffsetSpan(startIndex, endIndex);
             }
             WriteAsBetweenSpaces();
-            WriteReferenceAndNamespaceIfInCollision(typeReference);
+
+            /* AGPL */
+            CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(typeReference));
+
+            if (reference is IMemberDefinition referenceAsMemberDefinition)
+            {
+                this.AddMemberDefinitionTypeCodeSpanToCache(referenceAsMemberDefinition, typeReferenceType, typeCodeSpan);
+            }
+            else if (reference is VariableDefinition variableReference)
+            {
+                this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variableReference] = typeCodeSpan;
+            }
+            /* End AGPL */
         }
 
-        protected override void DoWriteTypeAndName(TypeReference typeReference, string name)
+        /* AGPL */
+        protected override void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
+        /* End AGPL */
         {
             Write(name);
             WriteAsBetweenSpaces();
@@ -407,7 +436,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             }
 
             WriteAsBetweenSpaces();
-            WriteReferenceAndNamespaceIfInCollision(variable.VariableType);
+
+            /* AGPL */
+            CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(variable.VariableType));
+            this.currentWritingInfo.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap[variable] = typeCodeSpan;
+            /* End AGPL */
         }
 
         protected override void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference)
@@ -442,7 +475,10 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
             if (!string.IsNullOrEmpty(ToTypeString(type)))
             {
                 WriteAsBetweenSpaces();
-                WriteReferenceAndNamespaceIfInCollision(type);
+                /* AGPL */
+                CodeSpan typeCodeSpan = this.Write(() => WriteReferenceAndNamespaceIfInCollision(type));
+                this.currentWritingInfo.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap[reference] = typeCodeSpan;
+                /* End AGPL */
             }
         }
 
@@ -614,9 +650,11 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 			if (@event.IsExplicitImplementation())
 			{
 				string eventName = GetEventName(@event);
-				WriteTypeAndName(@event.EventType, eventName, @event);
-			}
-			else
+                /* AGPL */
+                WriteTypeAndName(@event.EventType, eventName, @event, TypeReferenceType.EventType);
+                /* End AGPL */
+            }
+            else
 			{
 				base.WriteEventTypeAndName(@event);
 			}

@@ -12,7 +12,7 @@ import { IEditorGroup, IEditorReplacement, OpenEditorContext } from 'vs/workbenc
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { URI } from 'vs/base/common/uri';
 /* AGPL */
-import { ReferenceMetadata } from 'vs/cd/common/DecompilationTypes';
+import { ReferenceMetadata, SearchResultMetadata } from 'vs/cd/common/DecompilationTypes';
 /* End AGPL */
 
 export const IEditorService = createDecorator<IEditorService>('editorService');
@@ -196,7 +196,7 @@ export interface IEditorService {
 	 */
 	openEditor(editor: IEditorInput, options?: IEditorOptions | ITextEditorOptions, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE): Promise<IEditorPane | undefined>;
 	/* AGPL */
-	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE, navigationData?: ReferenceMetadata): Promise<ITextEditorPane | undefined>;
+	openEditor(editor: IResourceEditorInput | IUntitledTextResourceEditorInput, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE, navigationData?: ReferenceMetadata | SearchResultMetadata): Promise<ITextEditorPane | undefined>;
 	/* End AGPL */
 	openEditor(editor: IResourceDiffEditorInput, group?: IEditorGroup | GroupIdentifier | SIDE_GROUP_TYPE | ACTIVE_GROUP_TYPE): Promise<ITextDiffEditorPane | undefined>;
 

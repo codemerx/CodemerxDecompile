@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -16,25 +16,17 @@
 
 using System.Collections.Generic;
 
-using Mono.Cecil;
+using CodemerxDecompile.Service.Services.Search.Models;
 using Telerik.JustDecompiler.Languages;
-
-using CodemerxDecompile.Service.Services.DecompilationContext.Models;
 
 namespace CodemerxDecompile.Service.Interfaces
 {
-    public interface IDecompilationContext 
+    public interface ISearchService
     {
-        Dictionary<string, TypeDefinition> FilePathToType { get; set; }
+        IEnumerable<SearchResult> Search(string query, bool matchCase = false, bool matchWholeWord = false);
 
-        void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath);
+        void CancelSearch();
 
-        IEnumerable<string> GetOpenedAssemliesPaths();
-
-        bool TryGetTypeFilePathFromCache(TypeReference type, out string filePath);
-
-        bool TryGetTypeMetadataFromCache(TypeReference type, out DecompiledTypeMetadata typeMetadata);
-
-        void AddTypeMetadataToCache(TypeDefinition type, Dictionary<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan, Dictionary<CodeSpan, MemberReference> codeSpanToMemberReference, CodeMappingInfo<CodeSpan> codeMappingInfo);
+        CodeSpan? GetSearchResultPosition(int searchResultIndex);
     }
 }

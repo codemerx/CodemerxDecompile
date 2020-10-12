@@ -39,12 +39,15 @@ export interface ReferenceMetadata {
     referencedAssemblyFilePath?: string;
 }
 
+export interface SearchResultMetadata {
+	id?: number;
+}
+
 export interface CreateProjectResult {
 	errorMessage?: string;
 }
 
 export interface ProjectCreationMetadata {
-	assemblyFilePath: string;
 	containsDangerousResources: boolean;
 	projectFileMetadata: ProjectFileMetadata | null
 }
@@ -55,4 +58,9 @@ export interface ProjectFileMetadata {
 	projectTypeNotSupportedErrorMessage: string;
 	projectFileName: string;
 	projectFileExtension: string;
+}
+
+export interface AssemblyMetadata {
+	assemblyFullName: string;
+	assemblyFilePath: string;
 }

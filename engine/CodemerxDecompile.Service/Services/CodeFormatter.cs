@@ -25,7 +25,7 @@ namespace CodemerxDecompile.Service.Services
 {
     public class CodeFormatter : PlainTextFormatter
     {
-        public CodeFormatter(StringWriter writer) : base(writer) 
+        public CodeFormatter(StringWriter writer) : base(writer)
         {
             this.CodeSpanToMemberReference = new Dictionary<CodeSpan, MemberReference>();
         }

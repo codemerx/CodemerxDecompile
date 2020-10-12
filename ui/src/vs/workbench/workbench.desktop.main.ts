@@ -67,6 +67,7 @@ import { UserDataAutoSyncService } from 'vs/workbench/contrib/userDataSync/elect
 import { ITunnelService } from 'vs/platform/remote/common/tunnel';
 import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 /* AGPL */
+import { IGrpcService, GrpcService } from 'vs/cd/workbench/GrpcService';
 import { IDecompilationService, DecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { IDecompilationHelper, DecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
 /* End AGPL */
@@ -75,6 +76,7 @@ registerSingleton(ICredentialsService, KeytarCredentialsService, true);
 registerSingleton(IUserDataAutoSyncService, UserDataAutoSyncService);
 registerSingleton(ITunnelService, TunnelService);
 /* AGPL */
+registerSingleton(IGrpcService, GrpcService);
 registerSingleton(IDecompilationService, DecompilationService);
 registerSingleton(IDecompilationHelper, DecompilationHelper);
 /* End AGPL */

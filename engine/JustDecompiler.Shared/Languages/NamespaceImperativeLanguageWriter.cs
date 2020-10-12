@@ -6,6 +6,9 @@ using Mono.Cecil.Extensions;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Decompiler;
 using Mono.Cecil.Cil;
+/* AGPL */
+using JustDecompiler.Shared;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -231,17 +234,19 @@ namespace Telerik.JustDecompiler.Languages
 			}
 		}
 
-		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name, object reference)
+		/* AGPL */
+		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType)
 		{
-			DoWriteTypeAndName(typeReference, name, reference);
+			DoWriteTypeAndName(typeReference, name, reference, typeReferenceType);
 		}
 
-		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name)
+		protected override sealed void WriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType)
 		{
-			DoWriteTypeAndName(typeReference, name);			
+			DoWriteTypeAndName(typeReference, name, typeReferenceType);			
 		}
+		/* End AGPL */
 
-        protected override sealed void WriteVariableTypeAndName(VariableDefinition variable)
+		protected override sealed void WriteVariableTypeAndName(VariableDefinition variable)
         {
             DoWriteVariableTypeAndName(variable);
         }
@@ -353,10 +358,12 @@ namespace Telerik.JustDecompiler.Languages
 			}
 			return reference.Name != ToTypeString(reference);
 		}
-		
-		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name, object reference);
-		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name);
-        protected abstract void DoWriteVariableTypeAndName(VariableDefinition variable);
+
+		/* AGPL */
+		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name, object reference, TypeReferenceType typeReferenceType);
+		protected abstract void DoWriteTypeAndName(TypeReference typeReference, string name, TypeReferenceType typeReferenceType);
+		/* End AGPL */
+		protected abstract void DoWriteVariableTypeAndName(VariableDefinition variable);
         protected abstract void DoWriteParameterTypeAndName(TypeReference type, string name, ParameterDefinition reference);
 	}
 }

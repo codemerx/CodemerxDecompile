@@ -14,19 +14,15 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
-
-using Mono.Cecil;
-using Telerik.JustDecompiler.Languages;
-
-namespace CodemerxDecompile.Service.Services.DecompilationContext.Models
+namespace JustDecompiler.Shared
 {
-    public class DecompiledTypeMetadata
+    public enum TypeReferenceType
     {
-        public Dictionary<IMemberDefinition, CodeSpan> MemberDeclarationToCodeSpan { get; set; }
-
-        public Dictionary<CodeSpan, MemberReference> CodeSpanToMemberReference { get; set; }
-
-        public CodeMappingInfo<CodeSpan> CodeMappingInfo { get; set; }
+        FieldType,
+        PropertyType,
+        MethodReturnType,
+        ParameterType,
+        EventType,
+        VariableType
     }
 }

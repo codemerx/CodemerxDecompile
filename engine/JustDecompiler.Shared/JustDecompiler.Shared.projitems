@@ -526,6 +526,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ThreadSafeWeakAssemblyResolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TwoDimensionalString.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeGeneratedInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeReferenceType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UniqueMemberIdentifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WeakAssemblyResolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XmlDocumentationReaders\DocumentationCache.cs" />

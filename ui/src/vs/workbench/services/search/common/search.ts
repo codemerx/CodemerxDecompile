@@ -164,6 +164,9 @@ export interface ITextSearchResultPreview {
 }
 
 export interface ITextSearchMatch {
+	/* AGPL */
+	searchResultId?: number,
+	/* End AGPL */
 	uri?: URI;
 	ranges: ISearchRange | ISearchRange[];
 	preview: ITextSearchResultPreview;

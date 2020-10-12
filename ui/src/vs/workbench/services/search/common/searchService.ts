@@ -7,18 +7,14 @@ import * as arrays from 'vs/base/common/arrays';
 import { CancellationToken } from 'vs/base/common/cancellation';
 import { canceled } from 'vs/base/common/errors';
 import { Disposable, IDisposable, toDisposable } from 'vs/base/common/lifecycle';
-import { keys, ResourceMap } from 'vs/base/common/map';
+import { keys } from 'vs/base/common/map';
 import { Schemas } from 'vs/base/common/network';
 import { StopWatch } from 'vs/base/common/stopwatch';
-import { URI as uri } from 'vs/base/common/uri';
-import { IModelService } from 'vs/editor/common/services/modelService';
 import { IFileService } from 'vs/platform/files/common/files';
 import { ILogService } from 'vs/platform/log/common/log';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
-import { deserializeSearchError, FileMatch, ICachedSearchStats, IFileMatch, IFileQuery, IFileSearchStats, IFolderQuery, IProgressMessage, ISearchComplete, ISearchEngineStats, ISearchProgressItem, ISearchQuery, ISearchResultProvider, ISearchService, ITextQuery, pathIncludedInQuery, QueryType, SearchError, SearchErrorCode, SearchProviderType, isFileMatch, isProgressMessage } from 'vs/workbench/services/search/common/search';
-import { addContextToEditorMatches, editorMatchesToTextSearchResults } from 'vs/workbench/services/search/common/searchHelpers';
+import { deserializeSearchError, ICachedSearchStats, IFileQuery, IFileSearchStats, IFolderQuery, IProgressMessage, ISearchComplete, ISearchEngineStats, ISearchProgressItem, ISearchQuery, ISearchResultProvider, ISearchService, ITextQuery, QueryType, SearchError, SearchErrorCode, SearchProviderType, isFileMatch, isProgressMessage } from 'vs/workbench/services/search/common/search';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { DeferredPromise } from 'vs/base/test/common/utils';
 
@@ -34,8 +30,6 @@ export class SearchService extends Disposable implements ISearchService {
 	private deferredTextSearchesByScheme = new Map<string, DeferredPromise<ISearchResultProvider>>();
 
 	constructor(
-		private readonly modelService: IModelService,
-		private readonly editorService: IEditorService,
 		private readonly telemetryService: ITelemetryService,
 		private readonly logService: ILogService,
 		private readonly extensionService: IExtensionService,
@@ -70,17 +64,10 @@ export class SearchService extends Disposable implements ISearchService {
 	}
 
 	async textSearch(query: ITextQuery, token?: CancellationToken, onProgress?: (item: ISearchProgressItem) => void): Promise<ISearchComplete> {
-		// Get local results from dirty/untitled
-		const localResults = this.getLocalResults(query);
-
-		if (onProgress) {
-			arrays.coalesce([...localResults.results.values()]).forEach(onProgress);
-		}
-
 		const onProviderProgress = (progress: ISearchProgressItem) => {
 			if (isFileMatch(progress)) {
 				// Match
-				if (!localResults.results.has(progress.resource) && onProgress) { // don't override local results
+				if (onProgress) {
 					onProgress(progress);
 				}
 			} else if (onProgress) {
@@ -97,9 +84,9 @@ export class SearchService extends Disposable implements ISearchService {
 		return {
 			...otherResults,
 			...{
-				limitHit: otherResults.limitHit || localResults.limitHit
+				limitHit: otherResults.limitHit
 			},
-			results: [...otherResults.results, ...arrays.coalesce([...localResults.results.values()])]
+			results: [...otherResults.results]
 		};
 	}
 
@@ -419,77 +406,6 @@ export class SearchService extends Disposable implements ISearchService {
 		}
 	}
 
-	private getLocalResults(query: ITextQuery): { results: ResourceMap<IFileMatch | null>; limitHit: boolean } {
-		const localResults = new ResourceMap<IFileMatch | null>();
-		let limitHit = false;
-
-		if (query.type === QueryType.Text) {
-			const models = this.modelService.getModels();
-			models.forEach((model) => {
-				const resource = model.uri;
-				if (!resource) {
-					return;
-				}
-
-				if (limitHit) {
-					return;
-				}
-
-				// Skip files that are not opened as text file
-				if (!this.editorService.isOpen({ resource })) {
-					return;
-				}
-
-				// Skip search results
-				if (model.getModeId() === 'search-result' && !(query.includePattern && query.includePattern['**/*.code-search'])) {
-					// TODO: untitled search editors will be excluded from search even when include *.code-search is specified
-					return;
-				}
-
-				// Block walkthrough, webview, etc.
-				if (resource.scheme !== Schemas.untitled && !this.fileService.canHandleResource(resource)) {
-					return;
-				}
-
-				// Exclude files from the git FileSystemProvider, e.g. to prevent open staged files from showing in search results
-				if (resource.scheme === 'git') {
-					return;
-				}
-
-				if (!this.matches(resource, query)) {
-					return; // respect user filters
-				}
-
-				// Use editor API to find matches
-				const askMax = typeof query.maxResults === 'number' ? query.maxResults + 1 : undefined;
-				let matches = model.findMatches(query.contentPattern.pattern, false, !!query.contentPattern.isRegExp, !!query.contentPattern.isCaseSensitive, query.contentPattern.isWordMatch ? query.contentPattern.wordSeparators! : null, false, askMax);
-				if (matches.length) {
-					if (askMax && matches.length >= askMax) {
-						limitHit = true;
-						matches = matches.slice(0, askMax - 1);
-					}
-
-					const fileMatch = new FileMatch(resource);
-					localResults.set(resource, fileMatch);
-
-					const textSearchResults = editorMatchesToTextSearchResults(matches, model, query.previewOptions);
-					fileMatch.results = addContextToEditorMatches(textSearchResults, model, query);
-				} else {
-					localResults.set(resource, null);
-				}
-			});
-		}
-
-		return {
-			results: localResults,
-			limitHit
-		};
-	}
-
-	private matches(resource: uri, query: ITextQuery): boolean {
-		return pathIncludedInQuery(query, resource.fsPath);
-	}
-
 	clearCache(cacheKey: string): Promise<void> {
 		const clearPs = [
 			this.diskSearch,
@@ -503,14 +419,12 @@ export class SearchService extends Disposable implements ISearchService {
 
 export class RemoteSearchService extends SearchService {
 	constructor(
-		@IModelService modelService: IModelService,
-		@IEditorService editorService: IEditorService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@ILogService logService: ILogService,
 		@IExtensionService extensionService: IExtensionService,
 		@IFileService fileService: IFileService
 	) {
-		super(modelService, editorService, telemetryService, logService, extensionService, fileService);
+		super(telemetryService, logService, extensionService, fileService);
 	}
 }
 

@@ -85,7 +85,9 @@ export class FindOptionsWidget extends Widget implements IOverlayWidget {
 			inputActiveOptionForeground: inputActiveOptionForegroundColor,
 			inputActiveOptionBackground: inputActiveOptionBackgroundColor
 		}));
-		this._domNode.appendChild(this.regex.domNode);
+		/* AGPL */
+		// this._domNode.appendChild(this.regex.domNode);
+		/* End AGPL */
 		this._register(this.regex.onChange(() => {
 			this._state.change({
 				isRegex: this.regex.checked
@@ -194,7 +196,9 @@ export class FindOptionsWidget extends Widget implements IOverlayWidget {
 		};
 		this.caseSensitive.style(inputStyles);
 		this.wholeWords.style(inputStyles);
-		this.regex.style(inputStyles);
+		/* AGPL */
+		// this.regex.style(inputStyles);
+		/* End AGPL */
 	}
 }
 

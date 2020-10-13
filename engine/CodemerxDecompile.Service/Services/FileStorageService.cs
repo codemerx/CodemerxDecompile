@@ -40,12 +40,12 @@ namespace CodemerxDecompile.Service.Services
             File.WriteAllText(filePath, serialized);
         }
 
-        public T Retrieve<T>()
+        public K Retrieve<T, K>()
         {
             string filePath = this.GetFilePathForType<T>();
             string serialized = File.ReadAllText(filePath);
             File.Delete(filePath);
-            return this.serializationService.Deserialize<T>(serialized);
+            return this.serializationService.Deserialize<K>(serialized);
         }
 
         public bool HasStored<T>()

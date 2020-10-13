@@ -58,6 +58,31 @@ namespace CodemerxDecompile.Service
             this.searchService = searchService;
         }
 
+        public override Task<Empty> RestoreDecompilationContext(Empty request, ServerCallContext context)
+        {
+            foreach (string assemblyFilePath in this.decompilationContext.GetOpenedAssemliesPaths())
+            {
+                AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(assemblyFilePath);
+                Dictionary<string, TypeDefinition> filePathToTypeDefinition = this.GetAllTypeFilePathsForAssembly(assembly, assemblyFilePath);
+
+                this.decompilationContext.DecompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
+            }
+
+            return Task.FromResult(new Empty());
+        }
+
+        public override Task<ShouldDecompileFileResponse> ShouldDecompileFile(ShouldDecompileFileRequest request, ServerCallContext context)
+        {
+            string normalizedFilePath = this.NormalizeFilePath(request.FilePath);
+            if (!this.decompilationContext.DecompilationContext.FilePathToType.TryGetValue(normalizedFilePath, out TypeDefinition typeDefinition) ||
+                this.decompilationContext.TryGetTypeMetadataFromCache(typeDefinition, out _))
+            {
+                return Task.FromResult(new ShouldDecompileFileResponse() { ShouldDecompileFile = false });
+            }
+
+            return Task.FromResult(new ShouldDecompileFileResponse() { ShouldDecompileFile = true });
+        }
+
         public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
@@ -75,21 +100,8 @@ namespace CodemerxDecompile.Service
         {
             string normalizedAssemblyFilePath = this.NormalizeFilePath(request.AssemblyPath);
             AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(normalizedAssemblyFilePath);
-            Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
-            Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
-            DefaultFilePathsService filePathsService = new DefaultFilePathsService(
-                assembly,
-                normalizedAssemblyFilePath,
-                null,
-                userDefinedTypes,
-                resources,
-                assembly.BuildNamespaceHierarchyTree(),
-                LanguageFactory.GetLanguage(CSharpVersion.V7),
-                Utilities.GetMaxRelativePathLength(this.pathService.WorkingDirectory),
-                true);
 
-            Dictionary<string, TypeDefinition> filePathToTypeDefinition = filePathsService.GetTypesToFilePathsMap()
-                                                                                          .ToDictionary(kvp => Path.Join(this.pathService.WorkingDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
+            Dictionary<string, TypeDefinition> filePathToTypeDefinition = this.GetAllTypeFilePathsForAssembly(assembly, normalizedAssemblyFilePath);
 
             this.decompilationContext.SaveAssemblyToCache(assembly, normalizedAssemblyFilePath);
             this.decompilationContext.DecompilationContext.FilePathToType.AddRange(filePathToTypeDefinition);
@@ -98,6 +110,25 @@ namespace CodemerxDecompile.Service
             response.TypeFilePaths.AddRange(filePathToTypeDefinition.Keys);
 
             return Task.FromResult(response);
+        }
+
+        private Dictionary<string, TypeDefinition> GetAllTypeFilePathsForAssembly(AssemblyDefinition assembly, string assemblyFilePath)
+        {
+            Dictionary<ModuleDefinition, Collection<TypeDefinition>> userDefinedTypes = Utilities.GetUserDefinedTypes(assembly, true);
+            Dictionary<ModuleDefinition, Collection<Resource>> resources = Utilities.GetResources(assembly);
+            DefaultFilePathsService filePathsService = new DefaultFilePathsService(
+                assembly,
+                assemblyFilePath,
+                null,
+                userDefinedTypes,
+                resources,
+                assembly.BuildNamespaceHierarchyTree(),
+                LanguageFactory.GetLanguage(CSharpVersion.V7),
+                Utilities.GetMaxRelativePathLength(this.pathService.WorkingDirectory),
+                true);
+
+            return filePathsService.GetTypesToFilePathsMap()
+                                   .ToDictionary(kvp => Path.Join(this.pathService.WorkingDirectory, assembly.FullName, assembly.MainModule.Name, kvp.Value), kvp => kvp.Key);
         }
 
         public override Task<Empty> AddResolvedAssembly(AddResolvedAssemblyRequest request, ServerCallContext context)

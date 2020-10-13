@@ -20,7 +20,7 @@ namespace CodemerxDecompile.Service.Interfaces
     {
         void Store<T>(T obj);
 
-        T Retrieve<T>();
+        K Retrieve<T, K>();
 
         bool HasStored<T>();
     }

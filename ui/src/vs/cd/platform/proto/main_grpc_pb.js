@@ -251,8 +251,52 @@ function deserialize_Selection(buffer_arg) {
   return main_pb.Selection.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_ShouldDecompileFileRequest(arg) {
+  if (!(arg instanceof main_pb.ShouldDecompileFileRequest)) {
+    throw new Error('Expected argument of type ShouldDecompileFileRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ShouldDecompileFileRequest(buffer_arg) {
+  return main_pb.ShouldDecompileFileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_ShouldDecompileFileResponse(arg) {
+  if (!(arg instanceof main_pb.ShouldDecompileFileResponse)) {
+    throw new Error('Expected argument of type ShouldDecompileFileResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_ShouldDecompileFileResponse(buffer_arg) {
+  return main_pb.ShouldDecompileFileResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var RpcDecompilerService = exports.RpcDecompilerService = {
+  restoreDecompilationContext: {
+    path: '/RpcDecompiler/RestoreDecompilationContext',
+    requestStream: false,
+    responseStream: false,
+    requestType: common_pb.Empty,
+    responseType: common_pb.Empty,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
+  },
+  shouldDecompileFile: {
+    path: '/RpcDecompiler/ShouldDecompileFile',
+    requestStream: false,
+    responseStream: false,
+    requestType: main_pb.ShouldDecompileFileRequest,
+    responseType: main_pb.ShouldDecompileFileResponse,
+    requestSerialize: serialize_ShouldDecompileFileRequest,
+    requestDeserialize: deserialize_ShouldDecompileFileRequest,
+    responseSerialize: serialize_ShouldDecompileFileResponse,
+    responseDeserialize: deserialize_ShouldDecompileFileResponse,
+  },
   getContextAssembly: {
     path: '/RpcDecompiler/GetContextAssembly',
     requestStream: false,

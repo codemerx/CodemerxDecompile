@@ -4,6 +4,46 @@
 import * as jspb from "google-protobuf";
 import * as common_pb from "./common_pb";
 
+export class ShouldDecompileFileRequest extends jspb.Message {
+  getFilepath(): string;
+  setFilepath(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ShouldDecompileFileRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ShouldDecompileFileRequest): ShouldDecompileFileRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ShouldDecompileFileRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ShouldDecompileFileRequest;
+  static deserializeBinaryFromReader(message: ShouldDecompileFileRequest, reader: jspb.BinaryReader): ShouldDecompileFileRequest;
+}
+
+export namespace ShouldDecompileFileRequest {
+  export type AsObject = {
+    filepath: string,
+  }
+}
+
+export class ShouldDecompileFileResponse extends jspb.Message {
+  getShoulddecompilefile(): boolean;
+  setShoulddecompilefile(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ShouldDecompileFileResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ShouldDecompileFileResponse): ShouldDecompileFileResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ShouldDecompileFileResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ShouldDecompileFileResponse;
+  static deserializeBinaryFromReader(message: ShouldDecompileFileResponse, reader: jspb.BinaryReader): ShouldDecompileFileResponse;
+}
+
+export namespace ShouldDecompileFileResponse {
+  export type AsObject = {
+    shoulddecompilefile: boolean,
+  }
+}
+
 export class GetContextAssemblyRequest extends jspb.Message {
   getContexturi(): string;
   setContexturi(value: string): void;

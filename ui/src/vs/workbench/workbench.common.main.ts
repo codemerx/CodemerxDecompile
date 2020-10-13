@@ -27,6 +27,7 @@ import 'vs/workbench/browser/actions/workspaceCommands';
 import 'vs/workbench/browser/actions/quickAccessActions';
 /* AGPL */
 import 'vs/workbench/browser/actions/toolsActions';
+import 'vs/cd/workbench/actions/decompilationActions';
 /* End AGPL */
 //#endregion
 

@@ -21,6 +21,8 @@ import "common.proto";
 option csharp_namespace = "CodemerxDecompile.Service";
 
 service RpcDecompiler {
+  rpc RestoreDecompilationContext (Empty) returns (Empty);
+  rpc ShouldDecompileFile (ShouldDecompileFileRequest) returns (ShouldDecompileFileResponse);
   rpc GetContextAssembly (GetContextAssemblyRequest) returns (GetContextAssemblyResponse);
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
   rpc GetProjectCreationMetadata (GetProjectCreationMetadataRequest) returns (GetProjectCreationMetadataResponse);
@@ -33,6 +35,14 @@ service RpcDecompiler {
   rpc CancelSearch (Empty) returns (Empty);
   rpc GetSearchResultPosition (GetSearchResultPositionRequest) returns (Selection);
   rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
+}
+
+message ShouldDecompileFileRequest {
+  string filePath = 1;
+}
+
+message ShouldDecompileFileResponse {
+  bool shouldDecompileFile = 1;
 }
 
 message GetContextAssemblyRequest {

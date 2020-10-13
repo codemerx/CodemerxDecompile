@@ -29,7 +29,7 @@ export interface IDecompilationHelper {
 	readonly _serviceBrand: undefined;
 
 	createAssemblyFileHierarchy(assemblyPath: URI | UriComponents) : Promise<{ hierarchyDirectory: string } | null>;
-	ensureTypeIsDecompiled(typeUri: URI) : Promise<void>
+	decompileTypeAndUpdateFileContents(typeUri: URI) : Promise<void>
 }
 
 export class DecompilationHelper implements IDecompilationHelper {
@@ -70,17 +70,12 @@ export class DecompilationHelper implements IDecompilationHelper {
 		return null;
 	}
 
-	async ensureTypeIsDecompiled(typeUri: URI) : Promise<void> {
-		const fileContent = await this.fileService.readFile(typeUri);
-		const str = fileContent.value.toString();
+	async decompileTypeAndUpdateFileContents(typeUri: URI) : Promise<void> {
+		await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+			progress.report({ message: 'Loading type...'});
 
-		if (str === CODEMERX_FILE_IDENTIFICATOR) {
-			await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
-				progress.report({ message: 'Loading type...'});
-
-				const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
-				await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
-			});
-		}
+			const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
+			await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
+		});
 	}
 }

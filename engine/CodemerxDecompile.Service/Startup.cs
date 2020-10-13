@@ -14,6 +14,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,6 @@ using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services;
 using CodemerxDecompile.Service.Services.DecompilationContext;
 using CodemerxDecompile.Service.Services.Search;
-using System;
 
 namespace CodemerxDecompile.Service
 {
@@ -71,7 +71,7 @@ namespace CodemerxDecompile.Service
             IStorageService storageService = services.GetService<IStorageService>();
             if (storageService.HasStored<IDecompilationContext>())
             {
-                IDecompilationContext decompilationContext = storageService.Retrieve<IDecompilationContext>();
+                IDecompilationContext decompilationContext = storageService.Retrieve<IDecompilationContext, JsonSerializableDecompilationContext>();
 
                 IDecompilationContextService decompilationContextService = services.GetService<IDecompilationContextService>();
                 decompilationContextService.DecompilationContext = decompilationContext;

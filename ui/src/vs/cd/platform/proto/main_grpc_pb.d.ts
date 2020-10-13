@@ -11,6 +11,7 @@ interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServi
   restoreDecompilationContext: grpc.MethodDefinition<common_pb.Empty, common_pb.Empty>;
   shouldDecompileFile: grpc.MethodDefinition<main_pb.ShouldDecompileFileRequest, main_pb.ShouldDecompileFileResponse>;
   getContextAssembly: grpc.MethodDefinition<main_pb.GetContextAssemblyRequest, main_pb.GetContextAssemblyResponse>;
+  getWorkspaceDirectory: grpc.MethodDefinition<common_pb.Empty, main_pb.GetWorkspaceDirectoryResponse>;
   getAssemblyRelatedFilePaths: grpc.MethodDefinition<main_pb.GetAssemblyRelatedFilePathsRequest, main_pb.GetAssemblyRelatedFilePathsResponse>;
   getProjectCreationMetadata: grpc.MethodDefinition<main_pb.GetProjectCreationMetadataRequest, main_pb.GetProjectCreationMetadataResponse>;
   getAllTypeFilePaths: grpc.MethodDefinition<main_pb.GetAllTypeFilePathsRequest, main_pb.GetAllTypeFilePathsResponse>;
@@ -22,6 +23,7 @@ interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServi
   cancelSearch: grpc.MethodDefinition<common_pb.Empty, common_pb.Empty>;
   getSearchResultPosition: grpc.MethodDefinition<main_pb.GetSearchResultPositionRequest, main_pb.Selection>;
   createProject: grpc.MethodDefinition<main_pb.CreateProjectRequest, main_pb.CreateProjectResponse>;
+  clearAssemblyList: grpc.MethodDefinition<common_pb.Empty, common_pb.Empty>;
 }
 
 export const RpcDecompilerService: IRpcDecompilerService;
@@ -37,6 +39,9 @@ export class RpcDecompilerClient extends grpc.Client {
   getContextAssembly(argument: main_pb.GetContextAssemblyRequest, callback: grpc.requestCallback<main_pb.GetContextAssemblyResponse>): grpc.ClientUnaryCall;
   getContextAssembly(argument: main_pb.GetContextAssemblyRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetContextAssemblyResponse>): grpc.ClientUnaryCall;
   getContextAssembly(argument: main_pb.GetContextAssemblyRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetContextAssemblyResponse>): grpc.ClientUnaryCall;
+  getWorkspaceDirectory(argument: common_pb.Empty, callback: grpc.requestCallback<main_pb.GetWorkspaceDirectoryResponse>): grpc.ClientUnaryCall;
+  getWorkspaceDirectory(argument: common_pb.Empty, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetWorkspaceDirectoryResponse>): grpc.ClientUnaryCall;
+  getWorkspaceDirectory(argument: common_pb.Empty, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetWorkspaceDirectoryResponse>): grpc.ClientUnaryCall;
   getAssemblyRelatedFilePaths(argument: main_pb.GetAssemblyRelatedFilePathsRequest, callback: grpc.requestCallback<main_pb.GetAssemblyRelatedFilePathsResponse>): grpc.ClientUnaryCall;
   getAssemblyRelatedFilePaths(argument: main_pb.GetAssemblyRelatedFilePathsRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetAssemblyRelatedFilePathsResponse>): grpc.ClientUnaryCall;
   getAssemblyRelatedFilePaths(argument: main_pb.GetAssemblyRelatedFilePathsRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetAssemblyRelatedFilePathsResponse>): grpc.ClientUnaryCall;
@@ -69,4 +74,7 @@ export class RpcDecompilerClient extends grpc.Client {
   createProject(argument: main_pb.CreateProjectRequest, callback: grpc.requestCallback<main_pb.CreateProjectResponse>): grpc.ClientUnaryCall;
   createProject(argument: main_pb.CreateProjectRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.CreateProjectResponse>): grpc.ClientUnaryCall;
   createProject(argument: main_pb.CreateProjectRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.CreateProjectResponse>): grpc.ClientUnaryCall;
+  clearAssemblyList(argument: common_pb.Empty, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  clearAssemblyList(argument: common_pb.Empty, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  clearAssemblyList(argument: common_pb.Empty, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
 }

@@ -35,5 +35,7 @@ namespace CodemerxDecompile.Service.Interfaces
         bool TryGetTypeMetadataFromCache(TypeReference type, out DecompiledTypeMetadata typeMetadata);
 
         void AddTypeMetadataToCache(TypeDefinition type, DecompiledTypeMetadata decompiledTypeMetadata);
+
+        void ClearMetadataCache();
     }
 }

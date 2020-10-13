@@ -106,5 +106,12 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
 
             moduleMetadataCache.TypeNameToTypeMetadata[type.FullName] = decompiledTypeMetadata;
         }
+
+        public void ClearMetadataCache()
+        {
+            this.DecompilationContext.OpenedAssemblyNamesToFilePathsMap.Clear();
+            this.DecompilationContext.FilePathToType.Clear();
+            this.DecompilationContext.AssemblyStrongNameToAssemblyMetadata.Clear();
+        }
     }
 }

@@ -111,14 +111,16 @@ import { IJSONSchema } from 'vs/base/common/jsonSchema';
 
 // Menu
 (function registerMenu(): void {
-	MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-		group: '6_close',
-		command: {
-			id: CloseCurrentWindowAction.ID,
-			title: nls.localize({ key: 'miCloseWindow', comment: ['&& denotes a mnemonic'] }, "Clos&&e Window")
-		},
-		order: 4
-	});
+	/* AGPL */
+	// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+	// 	group: '6_close',
+	// 	command: {
+	// 		id: CloseCurrentWindowAction.ID,
+	// 		title: nls.localize({ key: 'miCloseWindow', comment: ['&& denotes a mnemonic'] }, "Clos&&e Window")
+	// 	},
+	// 	order: 4
+	// });
+	/* End AGPL */
 
 	MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 		group: 'z_Exit',

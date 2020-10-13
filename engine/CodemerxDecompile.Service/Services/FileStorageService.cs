@@ -29,13 +29,14 @@ namespace CodemerxDecompile.Service.Services
         {
             this.pathService = pathService;
             this.serializationService = serializationService;
-
-            this.EnsureFileStorageDirectoryIsPresent();
         }
 
         public void Store<T>(T obj)
         {
             string filePath = this.GetFilePathForType<T>();
+
+            this.EnsureStoredFileDirectoryIsPresent(Path.GetDirectoryName(filePath));
+
             string serialized = this.serializationService.Serialize(obj);
             File.WriteAllText(filePath, serialized);
         }
@@ -56,11 +57,11 @@ namespace CodemerxDecompile.Service.Services
 
         private string GetFilePathForType<T>() => Path.Join(this.pathService.MetadataStorageDirectory, $"{typeof(T).Name}.{this.serializationService.SerializedFileExtension}");
 
-        private void EnsureFileStorageDirectoryIsPresent()
+        private void EnsureStoredFileDirectoryIsPresent(string directory)
         {
-            if (!Directory.Exists(this.pathService.MetadataStorageDirectory))
+            if (!Directory.Exists(directory))
             {
-                Directory.CreateDirectory(this.pathService.MetadataStorageDirectory);
+                Directory.CreateDirectory(directory);
             }
         }
     }

@@ -49,6 +49,8 @@ export interface IDecompilationMainService {
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;
 	getSearchResultPosition(searchResultId: number) : Promise<Selection>;
+	getWorkspaceDirectory() : Promise<string>;
+	clearAssemblyList() : Promise<void>;
 }
 
 export class DecompilationMainService implements IDecompilationMainService {
@@ -108,6 +110,19 @@ export class DecompilationMainService implements IDecompilationMainService {
 				};
 
 				resolve(assemblyMetadata);
+			});
+		});
+	}
+
+	getWorkspaceDirectory() : Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			this.client?.getWorkspaceDirectory(new Empty(), {}, (err, response) => {
+				if (err) {
+					reject(`getWorkspaceDirectory failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				resolve(response!.getDirectorypath());
 			});
 		});
 	}
@@ -305,6 +320,19 @@ export class DecompilationMainService implements IDecompilationMainService {
 				};
 
 				resolve(selection);
+			});
+		});
+	}
+
+	clearAssemblyList() : Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			this.client?.clearAssemblyList(new Empty(), {}, (err) => {
+				if (err) {
+					reject(`clearAssemblyList failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				resolve();
 			});
 		});
 	}

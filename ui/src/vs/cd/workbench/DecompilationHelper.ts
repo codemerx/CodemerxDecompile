@@ -21,8 +21,6 @@ import { IFileService } from 'vs/platform/files/common/files';
 import { VSBuffer } from 'vs/base/common/buffer';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 
-const CODEMERX_FILE_IDENTIFICATOR = 'CodemerxDecompile';
-
 export const IDecompilationHelper = createDecorator<IDecompilationHelper>('IDecompilationHelper');
 
 export interface IDecompilationHelper {
@@ -56,8 +54,7 @@ export class DecompilationHelper implements IDecompilationHelper {
 				}
 
 				for (const typeFilePath of typeFilePaths) {
-					const content = VSBuffer.fromString(CODEMERX_FILE_IDENTIFICATOR);
-					await this.fileService.createFile(URI.file(typeFilePath), content);
+					await this.fileService.createFile(URI.file(typeFilePath));
 				}
 
 				return {

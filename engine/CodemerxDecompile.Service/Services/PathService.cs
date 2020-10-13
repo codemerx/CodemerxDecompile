@@ -25,7 +25,7 @@ namespace CodemerxDecompile.Service.Services
         public PathService()
         {
             this.WorkingDirectory = Path.Join(Path.GetTempPath(), "CD");
-            this.MetadataStorageDirectory = Path.Join(this.WorkingDirectory, "metadata");
+            this.MetadataStorageDirectory = Path.Join(this.WorkingDirectory, ".decompilation-metadata");
         }
 
         public string WorkingDirectory { get; }

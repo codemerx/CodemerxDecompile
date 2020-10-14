@@ -27,6 +27,7 @@ export interface IDecompilationService {
 	restoreDecompilationContext() : Promise<void>;
 	shouldDecompileFile(filePath: string) : Promise<boolean>;
 	getContextAssembly(contextUri: string) : Promise<AssemblyMetadata>;
+	getWorkspaceDirectory() : Promise<string>
 	getAssemblyRelatedFilePaths(assemblyPath: string): Promise<AssemblyRelatedFilePaths>;
 	getProjectCreationMetadata(assemblyFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
 	getAllTypeFilePaths(assemblyPath: string): Promise<string[]>;
@@ -37,6 +38,7 @@ export interface IDecompilationService {
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;
 	getSearchResultPosition(searchResultId: number) : Promise<Selection>;
+	clearAssemblyList() : Promise<void>;
 }
 
 export class DecompilationService {

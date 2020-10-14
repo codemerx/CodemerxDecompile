@@ -704,18 +704,18 @@ if (isMacintosh) {
 // 	},
 // 	order: 1
 // });
-/* End AGPL */
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '6_close',
-	command: {
-		id: CLOSE_EDITOR_COMMAND_ID,
-		/* AGPL */
-		title: nls.localize({ key: 'miCloseEditor', comment: ['&& denotes a mnemonic'] }, "&&Close Code Viewer")
-		/* End AGPL */
-	},
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	group: '6_close',
+// 	command: {
+// 		id: CLOSE_EDITOR_COMMAND_ID,
+// 		/* AGPL */
+// 		title: nls.localize({ key: 'miCloseEditor', comment: ['&& denotes a mnemonic'] }, "&&Close Code Viewer")
+// 		/* End AGPL */
+// 	},
+// 	order: 2
+// });
+/* End AGPL */
 
 // Go to menu
 

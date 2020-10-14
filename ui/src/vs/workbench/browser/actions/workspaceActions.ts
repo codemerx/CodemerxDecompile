@@ -8,13 +8,12 @@ import * as nls from 'vs/nls';
 import { ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
 import { IWorkspaceContextService, WorkbenchState, IWorkspaceFolder } from 'vs/platform/workspace/common/workspace';
 import { IWorkspaceEditingService } from 'vs/workbench/services/workspaces/common/workspaceEditing';
-import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 /* AGPL */
+import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { ICommandService } from 'vs/platform/commands/common/commands';
 /* End AGPL */
 import { ADD_ROOT_FOLDER_COMMAND_ID, ADD_ROOT_FOLDER_LABEL, PICK_WORKSPACE_FOLDER_COMMAND_ID } from 'vs/workbench/browser/actions/workspaceCommands';
 import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
-import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IHostService } from 'vs/workbench/services/host/browser/host';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
 import { IWorkspacesService, hasWorkspaceFileExtension } from 'vs/platform/workspaces/common/workspaces';
@@ -23,7 +22,11 @@ import { MenuRegistry, MenuId, SyncActionDescriptor } from 'vs/platform/actions/
 import { WorkspaceFolderCountContext, WorkbenchStateContext } from 'vs/workbench/browser/contextkeys';
 import { Registry } from 'vs/platform/registry/common/platform';
 import { IWorkbenchActionRegistry, Extensions } from 'vs/workbench/common/actions';
-import { KeyChord, KeyMod, KeyCode } from 'vs/base/common/keyCodes';
+import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+import { IFileService } from 'vs/platform/files/common/files';
+import { INotificationService } from 'vs/platform/notification/common/notification';
+import { URI } from 'vs/base/common/uri';
 /* End AGPL */
 
 export class OpenFileAction extends Action {
@@ -100,31 +103,58 @@ export class OpenWorkspaceAction extends Action {
 	}
 }
 
-export class CloseWorkspaceAction extends Action {
+/* AGPL */
+export class ClearAssemblyListAction extends Action {
 
-	static readonly ID = 'workbench.action.closeFolder';
-	static readonly LABEL = nls.localize('closeWorkspace', "Close Workspace");
+	static readonly ID = 'workbench.action.clearAssemblyList';
+	static readonly LABEL = nls.localize('clearAssemblyList', "Clear Assembly List");
 
 	constructor(
 		id: string,
 		label: string,
-		@IWorkspaceContextService private readonly contextService: IWorkspaceContextService,
-		@INotificationService private readonly notificationService: INotificationService,
-		@IHostService private readonly hostService: IHostService,
-		@IWorkbenchEnvironmentService private readonly environmentService: IWorkbenchEnvironmentService
+		@IFileService private readonly fileService: IFileService,
+		@IEditorService private readonly editorService: IEditorService,
+		@IProgressService private readonly progressService: IProgressService,
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@INotificationService private readonly notificationService: INotificationService
 	) {
 		super(id, label);
 	}
 
 	async run(): Promise<void> {
-		if (this.contextService.getWorkbenchState() === WorkbenchState.EMPTY) {
-			this.notificationService.info(nls.localize('noWorkspaceOpened', "There is currently no workspace opened in this instance to close."));
-			return;
-		}
+		await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+			progress.report({ message: 'Clearing assembly list...' });
 
-		return this.hostService.openWindow({ forceReuseWindow: true, remoteAuthority: this.environmentService.configuration.remoteAuthority });
+			try {
+				await this.decompilationService.clearAssemblyList();
+				this.closeOpenedEditorTabs();
+				await this.clearWorkspaceDirectory();
+			} catch (err) {
+				this.notificationService.error(err.message || 'Failed to clear assembly list');
+			}
+		});
+	}
+
+	private closeOpenedEditorTabs() : void {
+		for(const editor of this.editorService.editors) {
+			editor.dispose();
+		}
+	}
+
+	private async clearWorkspaceDirectory() : Promise<void> {
+		const directoryPath = await this.decompilationService.getWorkspaceDirectory();
+		const resolvedDirectory = await this.fileService.resolve(URI.file(directoryPath));
+
+		if (resolvedDirectory.children) {
+			for(const entry of resolvedDirectory.children) {
+				if (await this.fileService.exists(entry.resource)) {
+					await this.fileService.del(entry.resource, { useTrash: false, recursive: true });
+				}
+			}
+		}
 	}
 }
+/* End AGPL */
 
 export class OpenWorkspaceConfigFileAction extends Action {
 
@@ -262,9 +292,7 @@ const workspacesCategory = nls.localize('workspaces', "Workspaces");
 /* AGPL */
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(AddRootFolderAction), 'Workspaces: Add Folder to Workspace...', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(GlobalRemoveRootFolderAction), 'Workspaces: Remove Folder from Workspace...', workspacesCategory);
-/* End AGPL */
-registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction, { primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KEY_K, KeyCode.KEY_F) }), 'Workspaces: Close Workspace', workspacesCategory);
-/* AGPL */
+registry.registerWorkbenchAction(SyncActionDescriptor.from(ClearAssemblyListAction), 'Workspaces: Clear Assembly List', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(SaveWorkspaceAsAction), 'Workspaces: Save Workspace As...', workspacesCategory);
 // registry.registerWorkbenchAction(SyncActionDescriptor.from(DuplicateWorkspaceInNewWindowAction), 'Workspaces: Duplicate Workspace in New Window', workspacesCategory);
 /* End AGPL */
@@ -306,9 +334,9 @@ registry.registerWorkbenchAction(SyncActionDescriptor.from(CloseWorkspaceAction,
 MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 	group: '6_close',
 	command: {
-		id: CloseWorkspaceAction.ID,
 		/* AGPL */
-		title: nls.localize({ key: 'miCloseFolder', comment: ['&& denotes a mnemonic'] }, "Clear &&Assembly List"),
+		id: ClearAssemblyListAction.ID,
+		title: nls.localize({ key: 'miClearAssemblyList', comment: ['&& denotes a mnemonic'] }, "Clear &&Assembly List"),
 		/* End AGPL */
 		precondition: WorkspaceFolderCountContext.notEqualsTo('0')
 	},

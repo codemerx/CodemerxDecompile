@@ -226,6 +226,26 @@ export namespace CreateProjectResponse {
   }
 }
 
+export class GetWorkspaceDirectoryResponse extends jspb.Message {
+  getDirectorypath(): string;
+  setDirectorypath(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetWorkspaceDirectoryResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: GetWorkspaceDirectoryResponse): GetWorkspaceDirectoryResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GetWorkspaceDirectoryResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetWorkspaceDirectoryResponse;
+  static deserializeBinaryFromReader(message: GetWorkspaceDirectoryResponse, reader: jspb.BinaryReader): GetWorkspaceDirectoryResponse;
+}
+
+export namespace GetWorkspaceDirectoryResponse {
+  export type AsObject = {
+    directorypath: string,
+  }
+}
+
 export class GetAssemblyRelatedFilePathsRequest extends jspb.Message {
   getAssemblypath(): string;
   setAssemblypath(value: string): void;

@@ -218,6 +218,17 @@ function deserialize_GetSearchResultPositionRequest(buffer_arg) {
   return main_pb.GetSearchResultPositionRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_GetWorkspaceDirectoryResponse(arg) {
+  if (!(arg instanceof main_pb.GetWorkspaceDirectoryResponse)) {
+    throw new Error('Expected argument of type GetWorkspaceDirectoryResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_GetWorkspaceDirectoryResponse(buffer_arg) {
+  return main_pb.GetWorkspaceDirectoryResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_SearchRequest(arg) {
   if (!(arg instanceof main_pb.SearchRequest)) {
     throw new Error('Expected argument of type SearchRequest');
@@ -307,6 +318,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestDeserialize: deserialize_GetContextAssemblyRequest,
     responseSerialize: serialize_GetContextAssemblyResponse,
     responseDeserialize: deserialize_GetContextAssemblyResponse,
+  },
+  getWorkspaceDirectory: {
+    path: '/RpcDecompiler/GetWorkspaceDirectory',
+    requestStream: false,
+    responseStream: false,
+    requestType: common_pb.Empty,
+    responseType: main_pb.GetWorkspaceDirectoryResponse,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
+    responseSerialize: serialize_GetWorkspaceDirectoryResponse,
+    responseDeserialize: deserialize_GetWorkspaceDirectoryResponse,
   },
   getAssemblyRelatedFilePaths: {
     path: '/RpcDecompiler/GetAssemblyRelatedFilePaths',
@@ -428,6 +450,17 @@ var RpcDecompilerService = exports.RpcDecompilerService = {
     requestDeserialize: deserialize_CreateProjectRequest,
     responseSerialize: serialize_CreateProjectResponse,
     responseDeserialize: deserialize_CreateProjectResponse,
+  },
+  clearAssemblyList: {
+    path: '/RpcDecompiler/ClearAssemblyList',
+    requestStream: false,
+    responseStream: false,
+    requestType: common_pb.Empty,
+    responseType: common_pb.Empty,
+    requestSerialize: serialize_Empty,
+    requestDeserialize: deserialize_Empty,
+    responseSerialize: serialize_Empty,
+    responseDeserialize: deserialize_Empty,
   },
 };
 

@@ -24,6 +24,7 @@ service RpcDecompiler {
   rpc RestoreDecompilationContext (Empty) returns (Empty);
   rpc ShouldDecompileFile (ShouldDecompileFileRequest) returns (ShouldDecompileFileResponse);
   rpc GetContextAssembly (GetContextAssemblyRequest) returns (GetContextAssemblyResponse);
+  rpc GetWorkspaceDirectory (Empty) returns (GetWorkspaceDirectoryResponse);
   rpc GetAssemblyRelatedFilePaths (GetAssemblyRelatedFilePathsRequest) returns (GetAssemblyRelatedFilePathsResponse);
   rpc GetProjectCreationMetadata (GetProjectCreationMetadataRequest) returns (GetProjectCreationMetadataResponse);
   rpc GetAllTypeFilePaths (GetAllTypeFilePathsRequest) returns (GetAllTypeFilePathsResponse);
@@ -35,6 +36,7 @@ service RpcDecompiler {
   rpc CancelSearch (Empty) returns (Empty);
   rpc GetSearchResultPosition (GetSearchResultPositionRequest) returns (Selection);
   rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse);
+  rpc ClearAssemblyList (Empty) returns (Empty);
 }
 
 message ShouldDecompileFileRequest {
@@ -81,6 +83,10 @@ message CreateProjectRequest {
 
 message CreateProjectResponse {
   string errorMessage = 1;
+}
+
+message GetWorkspaceDirectoryResponse {
+  string directoryPath = 1;
 }
 
 message GetAssemblyRelatedFilePathsRequest {

@@ -83,6 +83,11 @@ namespace CodemerxDecompile.Service
             return Task.FromResult(new ShouldDecompileFileResponse() { ShouldDecompileFile = true });
         }
 
+        public override Task<GetWorkspaceDirectoryResponse> GetWorkspaceDirectory(Empty request, ServerCallContext context)
+        {
+            return Task.FromResult(new GetWorkspaceDirectoryResponse() { DirectoryPath = this.pathService.WorkingDirectory });
+        }
+
         public override Task<GetAssemblyRelatedFilePathsResponse> GetAssemblyRelatedFilePaths(GetAssemblyRelatedFilePathsRequest request, ServerCallContext context)
         {
             AssemblyDefinition assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(request.AssemblyPath);
@@ -500,6 +505,14 @@ namespace CodemerxDecompile.Service
                 default:
                     return VisualStudioVersion.VS2017;
             }
+        }
+
+        public override Task<Empty> ClearAssemblyList(Empty request, ServerCallContext context)
+        {
+            GlobalAssemblyResolver.Instance.ClearCache();
+            this.decompilationContext.ClearMetadataCache();
+
+            return Task.FromResult(new Empty());
         }
 
         private bool TryResolveTypeAssemblyFilePath(TypeReference typeReference, out string assemblyFilePath)

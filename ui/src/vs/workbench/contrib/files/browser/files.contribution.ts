@@ -213,7 +213,9 @@ configurationRegistry.registerConfiguration({
 		[FILES_EXCLUDE_CONFIG]: {
 			'type': 'object',
 			'markdownDescription': nls.localize('exclude', "Configure glob patterns for excluding files and folders. For example, the file Explorer decides which files and folders to show or hide based on this setting. Refer to the `#search.exclude#` setting to define search specific excludes. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options)."),
+			/* AGPL */
 			'default': { '**/.git': true, '**/.svn': true, '**/.hg': true, '**/CVS': true, '**/.DS_Store': true, '**/.decompilation-metadata': true },
+			/* End AGPL */
 			'scope': ConfigurationScope.RESOURCE,
 			'additionalProperties': {
 				'anyOf': [

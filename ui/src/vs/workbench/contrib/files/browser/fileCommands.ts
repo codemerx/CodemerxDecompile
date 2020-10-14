@@ -46,6 +46,7 @@ import { IUriIdentityService } from 'vs/workbench/services/uriIdentity/common/ur
 import { openEditorWith } from 'vs/workbench/services/editor/common/editorOpenWith';
 /* AGPL */
 import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 /* End AGPL */
 
 // Commands
@@ -131,6 +132,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		const fileService = accessor.get(IFileService);
 		const explorerService = accessor.get(IExplorerService);
 		/* AGPL */
+		const decompilationService = accessor.get(IDecompilationService);
 		const decompilationHelper = accessor.get(IDecompilationHelper);
 		/* End AGPL */
 		const resources = getMultiSelectedResources(resource, listService, editorService, explorerService);
@@ -142,7 +144,9 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 
 			/* AGPL */
 			for(const fileResource of fileResources) {
-				await decompilationHelper.ensureTypeIsDecompiled(fileResource);
+				if (await decompilationService.shouldDecompileFile(fileResource.fsPath)) {
+					await decompilationHelper.decompileTypeAndUpdateFileContents(fileResource);
+				}
 			}
 			/* End AGPL */
 

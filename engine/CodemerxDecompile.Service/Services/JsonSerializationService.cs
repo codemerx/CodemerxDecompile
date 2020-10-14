@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -14,20 +14,20 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
-using Mono.Cecil;
+using CodemerxDecompile.Service.Interfaces;
 
-using CodemerxDecompile.Service.Services.DecompilationContext.Models;
-
-namespace CodemerxDecompile.Service.Interfaces
+namespace CodemerxDecompile.Service.Services
 {
-    public interface IDecompilationContext
+    internal class JsonSerializationService : ISerializationService
     {
-        Dictionary<string, string> OpenedAssemblyNamesToFilePathsMap { get; }
+        public string SerializedFileExtension => "json";
 
-        Dictionary<string, TypeDefinition> FilePathToType { get; }
+        public string Serialize<T>(T obj) =>
+            JsonConvert.SerializeObject(obj);
 
-        Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; }
+        public T Deserialize<T>(string str) =>
+            JsonConvert.DeserializeObject<T>(str);
     }
 }

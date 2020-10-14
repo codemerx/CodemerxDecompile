@@ -537,7 +537,9 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrNavigationData?: OpenInEditorGroup | ReferenceMetadata | SearchResultMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
-			await this.decompilationHelper.ensureTypeIsDecompiled(resourceEditorInput.resource);
+			if (await this.decompilationService.shouldDecompileFile(resourceEditorInput.resource.fsPath)) {
+				await this.decompilationHelper.decompileTypeAndUpdateFileContents(resourceEditorInput.resource);
+			}
 
 			const referenceMetadata = (groupOrNavigationData as ReferenceMetadata);
 			let selection: Selection | undefined = undefined;
@@ -1333,7 +1335,9 @@ export class DelegatingEditorService implements IEditorService {
 	async openEditor(editor: IEditorInput | IResourceEditorInputType, optionsOrGroup?: IEditorOptions | ITextEditorOptions | OpenInEditorGroup, groupOrNavigationData?: OpenInEditorGroup | ReferenceMetadata | SearchResultMetadata): Promise<IEditorPane | undefined> {
 		const resourceEditorInput = editor as IResourceEditorInput;
 		if (resourceEditorInput) {
-			await this.decompilationHelper.ensureTypeIsDecompiled(resourceEditorInput.resource);
+			if (await this.decompilationService.shouldDecompileFile(resourceEditorInput.resource.fsPath)) {
+				await this.decompilationHelper.decompileTypeAndUpdateFileContents(resourceEditorInput.resource);
+			}
 
 			const referenceMetadata = (groupOrNavigationData as ReferenceMetadata);
 			let selection: Selection | undefined = undefined;

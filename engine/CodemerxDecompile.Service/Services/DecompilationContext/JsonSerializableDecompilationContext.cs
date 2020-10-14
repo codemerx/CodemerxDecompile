@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -15,19 +15,21 @@
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
-
-using Mono.Cecil;
-
+using CodemerxDecompile.Service.Interfaces;
 using CodemerxDecompile.Service.Services.DecompilationContext.Models;
+using Mono.Cecil;
+using Newtonsoft.Json;
 
-namespace CodemerxDecompile.Service.Interfaces
+namespace CodemerxDecompile.Service.Services.DecompilationContext
 {
-    public interface IDecompilationContext
+    internal class JsonSerializableDecompilationContext : IDecompilationContext
     {
-        Dictionary<string, string> OpenedAssemblyNamesToFilePathsMap { get; }
+        public Dictionary<string, string> OpenedAssemblyNamesToFilePathsMap { get; } = new Dictionary<string, string>();
 
-        Dictionary<string, TypeDefinition> FilePathToType { get; }
+        [JsonIgnore]
+        public Dictionary<string, TypeDefinition> FilePathToType { get; } = new Dictionary<string, TypeDefinition>();
 
-        Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; }
+        [JsonIgnore]
+        public Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; } = new Dictionary<string, DecompiledAssemblyMetadata>();
     }
 }

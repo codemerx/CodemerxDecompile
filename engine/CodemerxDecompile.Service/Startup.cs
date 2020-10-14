@@ -14,6 +14,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,12 +36,16 @@ namespace CodemerxDecompile.Service
             services.AddGrpc();
 
             services.AddSingleton<ISearchService, SearchService>();
-            services.AddSingleton<IDecompilationContext, DecompilationContextService>();
+            services.AddSingleton<IDecompilationContextService, DecompilationContextService>();
             services.AddSingleton<IServiceManager, ServiceManager>();
+            services.AddSingleton<IPathService, PathService>();
+            services.AddSingleton<IStorageService, FileStorageService>();
+            services.AddSingleton<IDecompilationContext, JsonSerializableDecompilationContext>();
+            services.AddSingleton<ISerializationService, JsonSerializationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -54,6 +59,31 @@ namespace CodemerxDecompile.Service
                 endpoints.MapGrpcService<RpcDecompilerService>();
                 endpoints.MapGrpcService<RpcManagerService>();
             });
+
+            IServiceProvider serviceProvider = app.ApplicationServices;
+
+            applicationLifetime.ApplicationStarted.Register(() => this.InitializeServices(serviceProvider));
+            applicationLifetime.ApplicationStopping.Register(() => this.DisposeServices(serviceProvider));
+        }
+
+        private void InitializeServices(IServiceProvider services)
+        {
+            IStorageService storageService = services.GetService<IStorageService>();
+            if (storageService.HasStored<IDecompilationContext>())
+            {
+                IDecompilationContext decompilationContext = storageService.Retrieve<IDecompilationContext, JsonSerializableDecompilationContext>();
+
+                IDecompilationContextService decompilationContextService = services.GetService<IDecompilationContextService>();
+                decompilationContextService.DecompilationContext = decompilationContext;
+            }
+        }
+
+        private void DisposeServices(IServiceProvider services)
+        {
+            IStorageService storageService = services.GetService<IStorageService>();
+            IDecompilationContextService decompilationContextService = services.GetService<IDecompilationContextService>();
+
+            storageService.Store(decompilationContextService.DecompilationContext);
         }
     }
 }

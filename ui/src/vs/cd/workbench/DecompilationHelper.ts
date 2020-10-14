@@ -21,15 +21,13 @@ import { IFileService } from 'vs/platform/files/common/files';
 import { VSBuffer } from 'vs/base/common/buffer';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 
-const CODEMERX_FILE_IDENTIFICATOR = 'CodemerxDecompile';
-
 export const IDecompilationHelper = createDecorator<IDecompilationHelper>('IDecompilationHelper');
 
 export interface IDecompilationHelper {
 	readonly _serviceBrand: undefined;
 
 	createAssemblyFileHierarchy(assemblyPath: URI | UriComponents) : Promise<{ hierarchyDirectory: string } | null>;
-	ensureTypeIsDecompiled(typeUri: URI) : Promise<void>
+	decompileTypeAndUpdateFileContents(typeUri: URI) : Promise<void>
 }
 
 export class DecompilationHelper implements IDecompilationHelper {
@@ -56,8 +54,7 @@ export class DecompilationHelper implements IDecompilationHelper {
 				}
 
 				for (const typeFilePath of typeFilePaths) {
-					const content = VSBuffer.fromString(CODEMERX_FILE_IDENTIFICATOR);
-					await this.fileService.createFile(URI.file(typeFilePath), content);
+					await this.fileService.createFile(URI.file(typeFilePath));
 				}
 
 				return {
@@ -70,17 +67,12 @@ export class DecompilationHelper implements IDecompilationHelper {
 		return null;
 	}
 
-	async ensureTypeIsDecompiled(typeUri: URI) : Promise<void> {
-		const fileContent = await this.fileService.readFile(typeUri);
-		const str = fileContent.value.toString();
+	async decompileTypeAndUpdateFileContents(typeUri: URI) : Promise<void> {
+		await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+			progress.report({ message: 'Loading type...'});
 
-		if (str === CODEMERX_FILE_IDENTIFICATOR) {
-			await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
-				progress.report({ message: 'Loading type...'});
-
-				const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
-				await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
-			});
-		}
+			const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);
+			await this.fileService.writeFile(typeUri, VSBuffer.fromString(sourceCode));
+		});
 	}
 }

@@ -33,11 +33,11 @@ namespace CodemerxDecompile.Service.Services.Search
 {
     public class SearchService : ISearchService
     {
-        private readonly IDecompilationContext decompilationContext;
+        private readonly IDecompilationContextService decompilationContext;
         private Dictionary<int, SearchResult> cachedSearchResults;
         private CancellationTokenSource searchOperationCancellationTokenSource;
 
-        public SearchService(IDecompilationContext decompilationContext)
+        public SearchService(IDecompilationContextService decompilationContext)
         {
             this.decompilationContext = decompilationContext;
         }
@@ -253,7 +253,7 @@ namespace CodemerxDecompile.Service.Services.Search
         public CodeSpan? GetSearchResultPosition(int searchResultIndex)
         {
             if (!this.cachedSearchResults.TryGetValue(searchResultIndex, out SearchResult searchResult) ||
-                !this.decompilationContext.FilePathToType.TryGetValue(searchResult.DeclaringTypeFilePath, out TypeDefinition typeDefinition) ||
+                !this.decompilationContext.DecompilationContext.FilePathToType.TryGetValue(searchResult.DeclaringTypeFilePath, out TypeDefinition typeDefinition) ||
                 !this.decompilationContext.TryGetTypeMetadataFromCache(typeDefinition, out DecompiledTypeMetadata typeMetadata))
             {
                 return null;

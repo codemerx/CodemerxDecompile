@@ -8,6 +8,8 @@ import * as common_pb from "./common_pb";
 import * as grpc from "@grpc/grpc-js";
 
 interface IRpcDecompilerService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
+  restoreDecompilationContext: grpc.MethodDefinition<common_pb.Empty, common_pb.Empty>;
+  shouldDecompileFile: grpc.MethodDefinition<main_pb.ShouldDecompileFileRequest, main_pb.ShouldDecompileFileResponse>;
   getContextAssembly: grpc.MethodDefinition<main_pb.GetContextAssemblyRequest, main_pb.GetContextAssemblyResponse>;
   getAssemblyRelatedFilePaths: grpc.MethodDefinition<main_pb.GetAssemblyRelatedFilePathsRequest, main_pb.GetAssemblyRelatedFilePathsResponse>;
   getProjectCreationMetadata: grpc.MethodDefinition<main_pb.GetProjectCreationMetadataRequest, main_pb.GetProjectCreationMetadataResponse>;
@@ -26,6 +28,12 @@ export const RpcDecompilerService: IRpcDecompilerService;
 
 export class RpcDecompilerClient extends grpc.Client {
   constructor(address: string, credentials: grpc.ChannelCredentials, options?: object);
+  restoreDecompilationContext(argument: common_pb.Empty, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  restoreDecompilationContext(argument: common_pb.Empty, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  restoreDecompilationContext(argument: common_pb.Empty, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<common_pb.Empty>): grpc.ClientUnaryCall;
+  shouldDecompileFile(argument: main_pb.ShouldDecompileFileRequest, callback: grpc.requestCallback<main_pb.ShouldDecompileFileResponse>): grpc.ClientUnaryCall;
+  shouldDecompileFile(argument: main_pb.ShouldDecompileFileRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.ShouldDecompileFileResponse>): grpc.ClientUnaryCall;
+  shouldDecompileFile(argument: main_pb.ShouldDecompileFileRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.ShouldDecompileFileResponse>): grpc.ClientUnaryCall;
   getContextAssembly(argument: main_pb.GetContextAssemblyRequest, callback: grpc.requestCallback<main_pb.GetContextAssemblyResponse>): grpc.ClientUnaryCall;
   getContextAssembly(argument: main_pb.GetContextAssemblyRequest, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetContextAssemblyResponse>): grpc.ClientUnaryCall;
   getContextAssembly(argument: main_pb.GetContextAssemblyRequest, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<main_pb.GetContextAssemblyResponse>): grpc.ClientUnaryCall;

@@ -24,6 +24,8 @@ export const IDecompilationService = createDecorator<IDecompilationService>('IDe
 export interface IDecompilationService {
 	readonly _serviceBrand: undefined;
 
+	restoreDecompilationContext() : Promise<void>;
+	shouldDecompileFile(filePath: string) : Promise<boolean>;
 	getContextAssembly(contextUri: string) : Promise<AssemblyMetadata>;
 	getAssemblyRelatedFilePaths(assemblyPath: string): Promise<AssemblyRelatedFilePaths>;
 	getProjectCreationMetadata(assemblyFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;

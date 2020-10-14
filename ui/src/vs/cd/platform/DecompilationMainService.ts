@@ -23,18 +23,21 @@ import {
 	GetMemberDefinitionPositionRequest,
 	AddResolvedAssemblyRequest,
 	CreateProjectRequest,
-	GetProjectCreationMetadataRequest, GetContextAssemblyRequest, GetSearchResultPositionRequest
+	GetProjectCreationMetadataRequest, GetContextAssemblyRequest, GetSearchResultPositionRequest, ShouldDecompileFileRequest
 } from './proto/main_pb';
 import * as grpc from "@grpc/grpc-js";
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { AssemblyMetadata, AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
+import { Empty } from 'vs/cd/platform/proto/common_pb';
 
 export const IDecompilationMainService = createDecorator<IDecompilationMainService>('IDecompilationMainService');
 
 export interface IDecompilationMainService {
 	readonly _serviceBrand: undefined;
 
+	restoreDecompilationContext() : Promise<void>;
+	shouldDecompileFile(filePath: string) : Promise<boolean>;
 	getContextAssembly(contextUri: string) : Promise<AssemblyMetadata>;
 	getAssemblyRelatedFilePaths(assemblyPath: string) : Promise<AssemblyRelatedFilePaths>;
 	getProjectCreationMetadata(assemblyFilePath: string, projectVisualStudioVersion?: string): Promise<ProjectCreationMetadata>;
@@ -56,6 +59,35 @@ export class DecompilationMainService implements IDecompilationMainService {
 	constructor(@IGrpcMainService grpcService: IGrpcMainService) {
 		grpcService.getServiceUrl().then(url => {
 			this.client = new RpcDecompilerClient(url, grpc.credentials.createInsecure());
+		});
+	}
+
+	restoreDecompilationContext() : Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			this.client?.restoreDecompilationContext(new Empty(), {}, (err) => {
+				if (err) {
+					reject(`initialize failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				resolve();
+			});
+		});
+	}
+
+	shouldDecompileFile(filePath: string) : Promise<boolean> {
+		const request = new ShouldDecompileFileRequest();
+		request.setFilepath(filePath);
+
+		return new Promise<boolean>((resolve, reject) => {
+			this.client?.shouldDecompileFile(request, {}, (err, response) => {
+				if (err) {
+					reject(`shouldDecompileFile failed. Error: ${JSON.stringify(err)}`);
+					return;
+				}
+
+				resolve(response!.getShoulddecompilefile());
+			});
 		});
 	}
 

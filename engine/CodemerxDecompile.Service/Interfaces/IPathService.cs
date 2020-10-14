@@ -1,4 +1,4 @@
-//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -14,20 +14,12 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
-
-using Mono.Cecil;
-
-using CodemerxDecompile.Service.Services.DecompilationContext.Models;
-
 namespace CodemerxDecompile.Service.Interfaces
 {
-    public interface IDecompilationContext
+    public interface IPathService
     {
-        Dictionary<string, string> OpenedAssemblyNamesToFilePathsMap { get; }
+        string WorkingDirectory { get; }
 
-        Dictionary<string, TypeDefinition> FilePathToType { get; }
-
-        Dictionary<string, DecompiledAssemblyMetadata> AssemblyStrongNameToAssemblyMetadata { get; }
+        string MetadataStorageDirectory { get; }
     }
 }

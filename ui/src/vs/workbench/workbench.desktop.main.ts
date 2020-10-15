@@ -70,6 +70,7 @@ import { TunnelService } from 'vs/platform/remote/node/tunnelService';
 import { IGrpcService, GrpcService } from 'vs/cd/workbench/GrpcService';
 import { IDecompilationService, DecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { IDecompilationHelper, DecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
+import { IAnalyticsService, AnalyticsService } from 'vs/cd/workbench/AnalyticsService';
 /* End AGPL */
 
 registerSingleton(ICredentialsService, KeytarCredentialsService, true);
@@ -79,6 +80,7 @@ registerSingleton(ITunnelService, TunnelService);
 registerSingleton(IGrpcService, GrpcService);
 registerSingleton(IDecompilationService, DecompilationService);
 registerSingleton(IDecompilationHelper, DecompilationHelper);
+registerSingleton(IAnalyticsService, AnalyticsService);
 /* End AGPL */
 
 //#endregion

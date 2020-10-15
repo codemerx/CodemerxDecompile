@@ -25,6 +25,7 @@ import { IExtensionService } from 'vs/workbench/services/extensions/common/exten
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 /* AGPL */
 import { IGrpcService } from 'vs/cd/workbench/GrpcService';
+import { IAnalyticsService } from 'vs/cd/workbench/AnalyticsService';
 /* End AGPL */
 
 export class LocalSearchService extends SearchService {
@@ -53,7 +54,8 @@ export class DiskSearch implements ISearchResultProvider {
 		@ILogService private readonly logService: ILogService,
 		@IConfigurationService private readonly configService: IConfigurationService,
 		/* AGPL */
-		@IGrpcService grpcService: IGrpcService
+		@IGrpcService grpcService: IGrpcService,
+		@IAnalyticsService private readonly analyticsService: IAnalyticsService
 		/* End AGPL */
 	) {
 		/* AGPL */
@@ -106,6 +108,10 @@ export class DiskSearch implements ISearchResultProvider {
 		if (token && token.isCancellationRequested) {
 			throw canceled();
 		}
+
+		/* AGPL */
+		this.analyticsService.trackEvent('Search', 'Initiate');
+		/* End AGPL */
 
 		const event: Event<ISerializedSearchProgressItem | ISerializedSearchComplete> = this.raw.textSearch(query);
 

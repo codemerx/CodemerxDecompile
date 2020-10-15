@@ -27,6 +27,7 @@ import { URI } from 'vs/base/common/uri';
 import { INotificationService, Severity, IPromptChoice } from 'vs/platform/notification/common/notification';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
+import { IAnalyticsService } from 'vs/cd/workbench/AnalyticsService';
 /* End AGPL */
 
 export class GotoDefinitionAtPositionEditorContribution implements IEditorContribution {
@@ -51,7 +52,8 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		@ICodeEditorService private readonly codeEditorService: ICodeEditorService,
 		@INotificationService private readonly notificationService: INotificationService,
 		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper,
-		@IProgressService private readonly progressService: IProgressService
+		@IProgressService private readonly progressService: IProgressService,
+		@IAnalyticsService private readonly analyticsService: IAnalyticsService
 		/* End AGPL */
 	) {
 		this.editor = editor;
@@ -160,6 +162,9 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 	/* AGPL */
 	private async goToDefinition(memberReferenceMetadata: ReferenceMetadata) : Promise<void> {
 		if (memberReferenceMetadata?.definitionFilePath) {
+
+			await this.analyticsService.trackEvent('Editor', 'NavigateToDefinition');
+
 			await this.codeEditorService.openCodeEditor({
 				resource: URI.file(memberReferenceMetadata.definitionFilePath)
 			}, null, undefined, memberReferenceMetadata);

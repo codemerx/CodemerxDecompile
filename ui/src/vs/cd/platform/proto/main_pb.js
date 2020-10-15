@@ -3005,10 +3005,11 @@ proto.GetMemberReferenceMetadataResponse.prototype.toObject = function(opt_inclu
 proto.GetMemberReferenceMetadataResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     definitionfilepath: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    memberfullname: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    iscrossassemblyreference: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
-    referencedassemblyfullname: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    referencedassemblyfilepath: jspb.Message.getFieldWithDefault(msg, 5, "")
+    declaringtypename: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    membername: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    iscrossassemblyreference: jspb.Message.getBooleanFieldWithDefault(msg, 4, false),
+    referencedassemblyfullname: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    referencedassemblyfilepath: jspb.Message.getFieldWithDefault(msg, 6, "")
   };
 
   if (includeInstance) {
@@ -3051,17 +3052,21 @@ proto.GetMemberReferenceMetadataResponse.deserializeBinaryFromReader = function(
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setMemberfullname(value);
+      msg.setDeclaringtypename(value);
       break;
     case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMembername(value);
+      break;
+    case 4:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIscrossassemblyreference(value);
       break;
-    case 4:
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setReferencedassemblyfullname(value);
       break;
-    case 5:
+    case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.setReferencedassemblyfilepath(value);
       break;
@@ -3101,31 +3106,38 @@ proto.GetMemberReferenceMetadataResponse.serializeBinaryToWriter = function(mess
       f
     );
   }
-  f = message.getMemberfullname();
+  f = message.getDeclaringtypename();
   if (f.length > 0) {
     writer.writeString(
       2,
       f
     );
   }
+  f = message.getMembername();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
   f = message.getIscrossassemblyreference();
   if (f) {
     writer.writeBool(
-      3,
+      4,
       f
     );
   }
   f = message.getReferencedassemblyfullname();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      5,
       f
     );
   }
   f = message.getReferencedassemblyfilepath();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      6,
       f
     );
   }
@@ -3151,10 +3163,10 @@ proto.GetMemberReferenceMetadataResponse.prototype.setDefinitionfilepath = funct
 
 
 /**
- * optional string memberFullName = 2;
+ * optional string declaringTypeName = 2;
  * @return {string}
  */
-proto.GetMemberReferenceMetadataResponse.prototype.getMemberfullname = function() {
+proto.GetMemberReferenceMetadataResponse.prototype.getDeclaringtypename = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -3163,17 +3175,35 @@ proto.GetMemberReferenceMetadataResponse.prototype.getMemberfullname = function(
  * @param {string} value
  * @return {!proto.GetMemberReferenceMetadataResponse} returns this
  */
-proto.GetMemberReferenceMetadataResponse.prototype.setMemberfullname = function(value) {
+proto.GetMemberReferenceMetadataResponse.prototype.setDeclaringtypename = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
 /**
- * optional bool isCrossAssemblyReference = 3;
+ * optional string memberName = 3;
+ * @return {string}
+ */
+proto.GetMemberReferenceMetadataResponse.prototype.getMembername = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.GetMemberReferenceMetadataResponse} returns this
+ */
+proto.GetMemberReferenceMetadataResponse.prototype.setMembername = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional bool isCrossAssemblyReference = 4;
  * @return {boolean}
  */
 proto.GetMemberReferenceMetadataResponse.prototype.getIscrossassemblyreference = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 3, false));
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 4, false));
 };
 
 
@@ -3182,33 +3212,15 @@ proto.GetMemberReferenceMetadataResponse.prototype.getIscrossassemblyreference =
  * @return {!proto.GetMemberReferenceMetadataResponse} returns this
  */
 proto.GetMemberReferenceMetadataResponse.prototype.setIscrossassemblyreference = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 3, value);
+  return jspb.Message.setProto3BooleanField(this, 4, value);
 };
 
 
 /**
- * optional string referencedAssemblyFullName = 4;
+ * optional string referencedAssemblyFullName = 5;
  * @return {string}
  */
 proto.GetMemberReferenceMetadataResponse.prototype.getReferencedassemblyfullname = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.GetMemberReferenceMetadataResponse} returns this
- */
-proto.GetMemberReferenceMetadataResponse.prototype.setReferencedassemblyfullname = function(value) {
-  return jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional string referencedAssemblyFilePath = 5;
- * @return {string}
- */
-proto.GetMemberReferenceMetadataResponse.prototype.getReferencedassemblyfilepath = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
@@ -3217,8 +3229,26 @@ proto.GetMemberReferenceMetadataResponse.prototype.getReferencedassemblyfilepath
  * @param {string} value
  * @return {!proto.GetMemberReferenceMetadataResponse} returns this
  */
-proto.GetMemberReferenceMetadataResponse.prototype.setReferencedassemblyfilepath = function(value) {
+proto.GetMemberReferenceMetadataResponse.prototype.setReferencedassemblyfullname = function(value) {
   return jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional string referencedAssemblyFilePath = 6;
+ * @return {string}
+ */
+proto.GetMemberReferenceMetadataResponse.prototype.getReferencedassemblyfilepath = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.GetMemberReferenceMetadataResponse} returns this
+ */
+proto.GetMemberReferenceMetadataResponse.prototype.setReferencedassemblyfilepath = function(value) {
+  return jspb.Message.setProto3StringField(this, 6, value);
 };
 
 
@@ -3255,7 +3285,8 @@ proto.GetMemberDefinitionPositionRequest.prototype.toObject = function(opt_inclu
 proto.GetMemberDefinitionPositionRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     absolutefilepath: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    memberfullname: jspb.Message.getFieldWithDefault(msg, 2, "")
+    declaringtypename: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    membername: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -3298,7 +3329,11 @@ proto.GetMemberDefinitionPositionRequest.deserializeBinaryFromReader = function(
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setMemberfullname(value);
+      msg.setDeclaringtypename(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMembername(value);
       break;
     default:
       reader.skipField();
@@ -3336,10 +3371,17 @@ proto.GetMemberDefinitionPositionRequest.serializeBinaryToWriter = function(mess
       f
     );
   }
-  f = message.getMemberfullname();
+  f = message.getDeclaringtypename();
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getMembername();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
       f
     );
   }
@@ -3365,10 +3407,10 @@ proto.GetMemberDefinitionPositionRequest.prototype.setAbsolutefilepath = functio
 
 
 /**
- * optional string memberFullName = 2;
+ * optional string declaringTypeName = 2;
  * @return {string}
  */
-proto.GetMemberDefinitionPositionRequest.prototype.getMemberfullname = function() {
+proto.GetMemberDefinitionPositionRequest.prototype.getDeclaringtypename = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -3377,8 +3419,26 @@ proto.GetMemberDefinitionPositionRequest.prototype.getMemberfullname = function(
  * @param {string} value
  * @return {!proto.GetMemberDefinitionPositionRequest} returns this
  */
-proto.GetMemberDefinitionPositionRequest.prototype.setMemberfullname = function(value) {
+proto.GetMemberDefinitionPositionRequest.prototype.setDeclaringtypename = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string memberName = 3;
+ * @return {string}
+ */
+proto.GetMemberDefinitionPositionRequest.prototype.getMembername = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.GetMemberDefinitionPositionRequest} returns this
+ */
+proto.GetMemberDefinitionPositionRequest.prototype.setMembername = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 

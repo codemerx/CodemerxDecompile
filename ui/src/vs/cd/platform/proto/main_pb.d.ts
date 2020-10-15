@@ -364,8 +364,11 @@ export class GetMemberReferenceMetadataResponse extends jspb.Message {
   getDefinitionfilepath(): string;
   setDefinitionfilepath(value: string): void;
 
-  getMemberfullname(): string;
-  setMemberfullname(value: string): void;
+  getDeclaringtypename(): string;
+  setDeclaringtypename(value: string): void;
+
+  getMembername(): string;
+  setMembername(value: string): void;
 
   getIscrossassemblyreference(): boolean;
   setIscrossassemblyreference(value: boolean): void;
@@ -389,7 +392,8 @@ export class GetMemberReferenceMetadataResponse extends jspb.Message {
 export namespace GetMemberReferenceMetadataResponse {
   export type AsObject = {
     definitionfilepath: string,
-    memberfullname: string,
+    declaringtypename: string,
+    membername: string,
     iscrossassemblyreference: boolean,
     referencedassemblyfullname: string,
     referencedassemblyfilepath: string,
@@ -400,8 +404,11 @@ export class GetMemberDefinitionPositionRequest extends jspb.Message {
   getAbsolutefilepath(): string;
   setAbsolutefilepath(value: string): void;
 
-  getMemberfullname(): string;
-  setMemberfullname(value: string): void;
+  getDeclaringtypename(): string;
+  setDeclaringtypename(value: string): void;
+
+  getMembername(): string;
+  setMembername(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetMemberDefinitionPositionRequest.AsObject;
@@ -416,7 +423,8 @@ export class GetMemberDefinitionPositionRequest extends jspb.Message {
 export namespace GetMemberDefinitionPositionRequest {
   export type AsObject = {
     absolutefilepath: string,
-    memberfullname: string,
+    declaringtypename: string,
+    membername: string,
   }
 }
 

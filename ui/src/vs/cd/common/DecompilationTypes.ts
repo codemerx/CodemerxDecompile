@@ -32,7 +32,8 @@ export interface Selection {
 }
 
 export interface ReferenceMetadata {
-	memberFullName: string;
+	memberName: string;
+	declaringTypeName?: string;
 	definitionFilePath?: string;
 	isCrossAssemblyReference: boolean;
     referencedAssemblyFullName?: string;

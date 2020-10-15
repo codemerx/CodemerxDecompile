@@ -65,7 +65,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
                          this.visualStudioVersion == VisualStudioVersion.VS2015 ||
                          this.visualStudioVersion == VisualStudioVersion.VS2017 ||
 						 /* AGPL */
-						 this.visualStudioVersion == VisualStudioVersion.VS2019
+						 this.visualStudioVersion == VisualStudioVersion.VS2019)
 						 /* End AGPL */
                 {
                     formatVersion = "12.00";

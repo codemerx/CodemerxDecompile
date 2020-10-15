@@ -31,8 +31,8 @@ export interface IAnalyticsMainService {
 	trackEvent(category: string, action: string, label?: string, value?: string | number): Promise<void>;
 };
 
-const ANALYTICS_USER_ID_KEY = 'decompiler-user-id';
-const ANALYTICS_TRACKING_ID = 'UA-134764144-2';
+const CLIENT_ID_KEY_NAME = 'decompiler-client-id';
+const TRACKING_ID = 'UA-134764144-2';
 
 export class AnalyticsMainService implements IAnalyticsMainService {
 	readonly _serviceBrand: undefined;
@@ -44,7 +44,8 @@ export class AnalyticsMainService implements IAnalyticsMainService {
 				@IProductService private readonly productService: IProductService) {
 		if (environmentService.isBuilt) {
 			(async () => {
-				await this.initializeAnalyticsClient();
+				await this.storageService.initialize();
+				await this.initializeAnalyticsClient(this.storageService);
 
 				this.visitor?.pageview('/').send();
 			})();
@@ -61,24 +62,22 @@ export class AnalyticsMainService implements IAnalyticsMainService {
 		.send();
 	}
 
-	private async initializeAnalyticsClient() : Promise<void> {
-		await this.storageService.initialize();
+	private async initializeAnalyticsClient(storageService: IStorageMainService) : Promise<void> {
+		const userId = this.ensureClientUniqueIdIsPresent(storageService);
 
-		const userId = this.ensureUserUniqueIdIsPresent(this.storageService);
-
-		this.visitor = ua(ANALYTICS_TRACKING_ID, userId);
+		this.visitor = ua(TRACKING_ID, userId);
 		this.visitor.set('cd1', this.productService.version);
 		this.visitor.set('cd2', os.platform());
 		this.visitor.set('cd3', os.arch());
 		this.visitor.set('cd4', os.release());
 	}
 
-	private ensureUserUniqueIdIsPresent(storageService: IStorageMainService) : string {
-		let userId = storageService.get(ANALYTICS_USER_ID_KEY);
+	private ensureClientUniqueIdIsPresent(storageService: IStorageMainService) : string {
+		let userId = storageService.get(CLIENT_ID_KEY_NAME);
 
 		if (!userId) {
 			userId = generateUuid();
-			storageService.store(ANALYTICS_USER_ID_KEY, userId);
+			storageService.store(CLIENT_ID_KEY_NAME, userId);
 		}
 
 		return userId;

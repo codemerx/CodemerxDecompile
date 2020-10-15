@@ -23,7 +23,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 		private readonly Guid languageGuid;
         private readonly VisualStudioVersion visualStudioVersion;
 
-		internal SolutionWriter(AssemblyDefinition assembly, string targetDir, string solutionFileName, 
+		internal SolutionWriter(AssemblyDefinition assembly, string targetDir, string solutionFileName,
 			Dictionary<ModuleDefinition, string> modulesProjectsRelativePaths, Dictionary<ModuleDefinition, Guid> modulesProjectsGuids,
             VisualStudioVersion visualStudioVersion, ILanguage language)
 		{
@@ -48,7 +48,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 
             this.visualStudioVersion = visualStudioVersion;
 		}
-		
+
 		public void WriteSolutionFile()
 		{
 			string solutionPath = Path.Combine(targetDir, solutionFileName);
@@ -63,7 +63,10 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
                 else if (this.visualStudioVersion == VisualStudioVersion.VS2012 ||
                          this.visualStudioVersion == VisualStudioVersion.VS2013 ||
                          this.visualStudioVersion == VisualStudioVersion.VS2015 ||
-                         this.visualStudioVersion == VisualStudioVersion.VS2017)
+                         this.visualStudioVersion == VisualStudioVersion.VS2017 ||
+						 /* AGPL */
+						 this.visualStudioVersion == VisualStudioVersion.VS2019
+						 /* End AGPL */
                 {
                     formatVersion = "12.00";
                 }
@@ -83,16 +86,27 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
                 {
                     visualStudioVersionString = "15";
                 }
-                else
+				/* AGPL */
+				else if (this.visualStudioVersion == VisualStudioVersion.VS2019)
+				{
+					visualStudioVersionString = "16";
+				}
+				/* End AGPL */
+				else
                 {
                     visualStudioVersionString = this.visualStudioVersion.ToFriendlyString();
                 }
 
-                writer.WriteLine("# Visual Studio " + visualStudioVersionString);
+				/* AGPL */
+                writer.WriteLine("# Visual Studio " + (this.visualStudioVersion == VisualStudioVersion.VS2019 ? "Version " : string.Empty) + visualStudioVersionString);
+				/* End AGPL */
 
                 if (this.visualStudioVersion == VisualStudioVersion.VS2013 ||
                     this.visualStudioVersion == VisualStudioVersion.VS2015 ||
-                    this.visualStudioVersion == VisualStudioVersion.VS2017)
+                    this.visualStudioVersion == VisualStudioVersion.VS2017 ||
+					/* AGPL */
+					this.visualStudioVersion == VisualStudioVersion.VS2019)
+					/* End AGPL */
                 {
                     string visualStudioLongVersionString = string.Empty;
                     if (this.visualStudioVersion == VisualStudioVersion.VS2013)
@@ -103,11 +117,19 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
                     {
                         visualStudioLongVersionString = "14.0.24720.0";
                     }
-                    else
+					/* AGPL */
+					else if (this.visualStudioVersion == VisualStudioVersion.VS2017)
+					{
+						visualStudioLongVersionString = "15.0.26020.0";
+					}
+					/* End AGPL */
+					else
                     {
-                        visualStudioLongVersionString = "15.0.26020.0";
+						/* AGPL */
+                        visualStudioLongVersionString = "16.0.29728.190";
+						/* End AGPL */
                     }
-                    
+
                     writer.WriteLine("VisualStudioVersion = " + visualStudioLongVersionString);
                     writer.WriteLine("MinimumVisualStudioVersion = 10.0.40219.1");
                 }
@@ -211,7 +233,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 		private void WriteProjectInfo(ModuleDefinition module, StreamWriter writer)
 		{
 			string moduleName = GetModuleName(module);
-			
+
 			string moduleRelativeFilePath;
 			if (!modulesProjectsRelativePaths.TryGetValue(module, out moduleRelativeFilePath))
 			{

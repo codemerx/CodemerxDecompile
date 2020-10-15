@@ -463,7 +463,7 @@ namespace CodemerxDecompile.Service
                 WriteFullNames = false,
                 WriteDocumentation = true,
                 RenameInvalidMembers = true,
-                WriteLargeNumbersInHex = true,
+                WriteLargeNumbersInHex = false,
                 DecompileDangerousResources = decompileDangerousResources
             };
 
@@ -502,8 +502,10 @@ namespace CodemerxDecompile.Service
                     return VisualStudioVersion.VS2013;
                 case "2015":
                     return VisualStudioVersion.VS2015;
-                default:
+                case "2017":
                     return VisualStudioVersion.VS2017;
+                default:
+                    return VisualStudioVersion.VS2019;
             }
         }
 

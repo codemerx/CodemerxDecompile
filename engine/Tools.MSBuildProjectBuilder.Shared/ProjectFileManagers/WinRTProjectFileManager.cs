@@ -22,7 +22,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder.ProjectFileManagers
 		private bool isUWPProject;
 
 		public WinRTProjectFileManager(AssemblyDefinition assembly, AssemblyInfo assemblyInfo, ILanguage language, VisualStudioVersion visualStudioVersion,
-			NamespaceHierarchyTree namespaceHierarchyTree, Dictionary<ModuleDefinition, Guid> modulesProjectsGuids, WinRTProjectType projectType, bool isUWPProject, Version minInstalledUAPVersion, Version maxInstalledUAPVersion) 
+			NamespaceHierarchyTree namespaceHierarchyTree, Dictionary<ModuleDefinition, Guid> modulesProjectsGuids, WinRTProjectType projectType, bool isUWPProject, Version minInstalledUAPVersion, Version maxInstalledUAPVersion)
 			: base(assembly, assemblyInfo, visualStudioVersion, modulesProjectsGuids, language, namespaceHierarchyTree)
 		{
 			this.projectType = projectType;
@@ -163,6 +163,12 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder.ProjectFileManagers
 			{
 				visualStudioProductVersion = "15.0";
 			}
+			/* AGPL */
+			else if (this.visualStudioVersion == VisualStudioVersion.VS2019)
+            {
+				visualStudioProductVersion = "16.0";
+            }
+			/* End AGPL */
 			else
 			{
 				throw new NotSupportedException();

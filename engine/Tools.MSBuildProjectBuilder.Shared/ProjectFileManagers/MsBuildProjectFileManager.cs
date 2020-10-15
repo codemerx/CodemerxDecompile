@@ -83,7 +83,9 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder.ProjectFileManagers
 			{
 				project.ToolsVersion = 14.0M;
 			}
-			else if (this.visualStudioVersion == VisualStudioVersion.VS2017)
+			/* AGPL */
+			else if (this.visualStudioVersion == VisualStudioVersion.VS2017 || this.visualStudioVersion == VisualStudioVersion.VS2019)
+			/* End AGPL */
 			{
 				project.ToolsVersion = 15.0M;
 			}
@@ -429,7 +431,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder.ProjectFileManagers
 				Include = relativeWinFormPath,
 				SubType = "Form"
 			};
-			
+
 			this.WinFormCodeEntries.Add(winFormEntry);
 		}
 
@@ -440,7 +442,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder.ProjectFileManagers
 				Include = relativeWinFormResourcePath,
 				DependentUpon = Path.GetFileName(relativeWinFormPath)
 			};
-			
+
 			this.WinFormResXEntries.Add(resourceEntry);
 		}
 
@@ -501,7 +503,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder.ProjectFileManagers
 				Generator = "MSBuild:Compile",
 				SubType = "Designer"
 			};
-			
+
 			this.XamlFileEntries.Add(pageItem);
 		}
 

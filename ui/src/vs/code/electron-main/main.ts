@@ -140,7 +140,9 @@ class CodeMain {
 				const lifecycleMainService = accessor.get(ILifecycleMainService);
 				const fileService = accessor.get(IFileService);
 				const configurationService = accessor.get(IConfigurationService);
+				/* AGPL */
 				const storageMainService = accessor.get(IStorageMainService);
+				/* End AGPL */
 
 				const mainIpcServer = await this.doStartup(args, logService, environmentService, lifecycleMainService, instantiationService, true);
 
@@ -148,7 +150,9 @@ class CodeMain {
 				once(lifecycleMainService.onWillShutdown)(() => {
 					fileService.dispose();
 					(configurationService as ConfigurationService).dispose();
+					/* AGPL */
 					(storageMainService as StorageMainService).close();
+					/* End AGPL */
 				});
 
 				return instantiationService.createInstance(CodeApplication, mainIpcServer, instanceEnvironment).startup();
@@ -174,8 +178,10 @@ class CodeMain {
 		const diskFileSystemProvider = new DiskFileSystemProvider(logService);
 		fileService.registerProvider(Schemas.file, diskFileSystemProvider);
 
+		/* AGPL */
 		const storageMainService = new StorageMainService(logService, environmentService);
 		services.set(IStorageMainService, storageMainService);
+		/* End AGPL */
 
 		services.set(IConfigurationService, new ConfigurationService(environmentService.settingsResource, fileService));
 		services.set(ILifecycleMainService, new SyncDescriptor(LifecycleMainService));

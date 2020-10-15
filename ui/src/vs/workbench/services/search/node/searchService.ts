@@ -109,7 +109,9 @@ export class DiskSearch implements ISearchResultProvider {
 			throw canceled();
 		}
 
+		/* AGPL */
 		this.analyticsService.trackEvent('Search', 'Initiate');
+		/* End AGPL */
 
 		const event: Event<ISerializedSearchProgressItem | ISerializedSearchComplete> = this.raw.textSearch(query);
 

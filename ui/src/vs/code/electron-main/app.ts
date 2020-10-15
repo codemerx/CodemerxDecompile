@@ -57,7 +57,9 @@ import { join, sep, posix } from 'vs/base/common/path';
 import { localize } from 'vs/nls';
 import { Schemas } from 'vs/base/common/network';
 import { SnapUpdateService } from 'vs/platform/update/electron-main/updateService.snap';
+/* AGPL */
 import { IStorageMainService } from 'vs/platform/storage/node/storageMainService';
+/* End AGPL */
 import { GlobalStorageDatabaseChannel } from 'vs/platform/storage/node/storageIpc';
 import { BackupMainService } from 'vs/platform/backup/electron-main/backupMainService';
 import { IBackupMainService } from 'vs/platform/backup/electron-main/backup';

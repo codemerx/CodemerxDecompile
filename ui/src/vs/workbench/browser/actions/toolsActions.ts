@@ -232,6 +232,22 @@ class Create2015ProjectAction extends CreateLegacyProjectAction {
 	}
 }
 
+class Create2017ProjectAction extends CreateLegacyProjectAction {
+	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2017';
+
+	constructor(
+		id: string,
+		label: string,
+		@IFileDialogService fileDialogService: IFileDialogService,
+		@INotificationService notificationService: INotificationService,
+		@IDecompilationService decompilationService: IDecompilationService,
+		@IProgressService progressService: IProgressService,
+		@IExplorerService explorerService: IExplorerService
+	) {
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+	}
+}
+
 class ToolsActionsProvider extends Disposable implements IWorkbenchContribution {
 
 	constructor(@IDecompilationService private readonly decompilationService: IDecompilationService) {
@@ -249,6 +265,7 @@ class ToolsActionsProvider extends Disposable implements IWorkbenchContribution 
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2012ProjectAction), 'Legacy Project Visual Studio 2012', nls.localize('tools', "Tools"));
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2013ProjectAction), 'Legacy Project Visual Studio 2013', nls.localize('tools', "Tools"));
 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2015ProjectAction), 'Legacy Project Visual Studio 2015', nls.localize('tools', "Tools"));
+		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2017ProjectAction), 'Legacy Project Visual Studio 2017', nls.localize('tools', "Tools"));
 	}
 
 	private async appendMenuItems() : Promise<void> {

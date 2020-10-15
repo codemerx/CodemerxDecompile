@@ -299,7 +299,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		});
 	}
 
-	getLegacyVisualStudioVersions = async () => ['2010', '2012', '2013', '2015'];
+	getLegacyVisualStudioVersions = async () => ['2010', '2012', '2013', '2015', '2017'];
 
 	getSearchResultPosition(searchResultId: number) : Promise<Selection> {
 		const request = new GetSearchResultPositionRequest();

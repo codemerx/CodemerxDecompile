@@ -273,6 +273,11 @@ namespace JustDecompileCmdShell
                     case "2017":
                         visualStudioVersion = VisualStudioVersion.VS2017;
                         return true;
+                    /* AGPL */
+                    case "2019":
+                        visualStudioVersion = VisualStudioVersion.VS2019;
+                        return true;
+                    /* End AGPL */
                     default:
                         isInvalidVisualStudioVersion = true;
                         break;
@@ -429,7 +434,9 @@ namespace JustDecompileCmdShell
             Console.CursorLeft = 12;
             WriteLine(SupportedLanguagesMessage);
 
-            WriteLine("[/vs:]      [/vs:2017]. The target Visual Studio(r) project version.");
+            /* AGPL */
+            WriteLine("[/vs:]      [/vs:2019]. The target Visual Studio(r) project version.");
+            /* End AGPL */
             Console.CursorLeft = 12;
             WriteLine("Supported Visual Studio(r) versions: 2010 and later.");
 
@@ -452,7 +459,7 @@ namespace JustDecompileCmdShell
             WriteLine("WARNING: Enabling this might result in code that fails to compile.");
 
             WriteLine("[/nohex]    Disable output of large numbers in HEX format.");
-            
+
             WriteLine("[/decompileDangerousResources] Enable decompilation of dangerous resources,");
             Console.CursorLeft = 12;
             WriteLine("which may contain malicious code. Decompilation of such resources will result");

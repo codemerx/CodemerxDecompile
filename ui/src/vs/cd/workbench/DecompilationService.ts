@@ -33,7 +33,7 @@ export interface IDecompilationService {
 	getAllTypeFilePaths(assemblyPath: string): Promise<string[]>;
 	decompileType(filePath: string): Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number): Promise<ReferenceMetadata>;
-	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string): Promise<Selection>;
+	getMemberDefinitionPosition(absoluteFilePath: string, memberName: string, declaringTypeName?: string): Promise<Selection>;
 	addResolvedAssembly(filePath: string): Promise<void>;
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;

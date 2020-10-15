@@ -544,8 +544,8 @@ export class EditorService extends Disposable implements EditorServiceImpl {
 			const referenceMetadata = (groupOrNavigationData as ReferenceMetadata);
 			let selection: Selection | undefined = undefined;
 
-			if (referenceMetadata?.memberFullName && referenceMetadata?.definitionFilePath) {
-				selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+			if (referenceMetadata?.memberName && referenceMetadata?.definitionFilePath) {
+				selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberName, referenceMetadata.declaringTypeName);
 			} else {
 				const searchResultMetadata = (groupOrNavigationData as SearchResultMetadata);
 
@@ -1342,8 +1342,8 @@ export class DelegatingEditorService implements IEditorService {
 			const referenceMetadata = (groupOrNavigationData as ReferenceMetadata);
 			let selection: Selection | undefined = undefined;
 
-			if (referenceMetadata?.memberFullName && referenceMetadata?.definitionFilePath) {
-				selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberFullName);
+			if (referenceMetadata?.memberName && referenceMetadata?.definitionFilePath) {
+				selection = await this.decompilationService.getMemberDefinitionPosition(referenceMetadata.definitionFilePath, referenceMetadata.memberName, referenceMetadata.declaringTypeName);
 			} else {
 				const searchResultMetadata = (groupOrNavigationData as SearchResultMetadata);
 

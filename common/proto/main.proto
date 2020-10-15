@@ -114,15 +114,17 @@ message GetMemberReferenceMetadataRequest {
 
 message GetMemberReferenceMetadataResponse {
   string definitionFilePath = 1;
-  string memberFullName = 2;
-  bool isCrossAssemblyReference = 3;
-  string referencedAssemblyFullName = 4;
-  string referencedAssemblyFilePath = 5;
+  string declaringTypeName = 2;
+  string memberName = 3;
+  bool isCrossAssemblyReference = 4;
+  string referencedAssemblyFullName = 5;
+  string referencedAssemblyFilePath = 6;
 }
 
 message GetMemberDefinitionPositionRequest {
   string absoluteFilePath = 1;
-  string memberFullName = 2;
+  string declaringTypeName = 2;
+  string memberName = 3;
 }
 
 message Selection {

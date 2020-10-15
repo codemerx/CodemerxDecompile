@@ -235,7 +235,12 @@ namespace CodemerxDecompile.Service
                 response.DefinitionFilePath = typeFilePath;
             }
 
-            response.MemberFullName = memberReference.FullName;
+            response.MemberName = memberReference.Name;
+
+            if (memberReference.DeclaringType != null)
+            {
+                response.DeclaringTypeName = memberReference.DeclaringType.Name;
+            }
 
             return Task.FromResult(response);
         }
@@ -260,7 +265,10 @@ namespace CodemerxDecompile.Service
             }
             else
             {
-                KeyValuePair<IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = typeMetadata.MemberDeclarationToCodeSpan.FirstOrDefault(kvp => kvp.Key.FullName == request.MemberFullName);
+                Func<KeyValuePair<IMemberDefinition, CodeSpan>, bool> findMemberDeclaration = kvp => !string.IsNullOrEmpty(request.DeclaringTypeName) ?
+                    kvp.Key.Name == request.MemberName && kvp.Key.DeclaringType?.Name == request.DeclaringTypeName :
+                    kvp.Key.Name == request.MemberName;
+                KeyValuePair <IMemberDefinition, CodeSpan> memberDeclarationToCodeSpan = typeMetadata.MemberDeclarationToCodeSpan.FirstOrDefault(findMemberDeclaration);
                 if (memberDeclarationToCodeSpan.Key == null)
                 {
                     throw new RpcException(new Status(StatusCode.NotFound, "No coordinates found for the supplied member reference"));

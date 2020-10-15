@@ -44,7 +44,7 @@ export interface IDecompilationMainService {
 	getAllTypeFilePaths(assemblyPath: string) : Promise<string[]>;
 	decompileType(filePath: string) : Promise<string>;
 	getMemberReferenceMetadata(absoluteFilePath: string, lineNumber: number, column: number) : Promise<ReferenceMetadata>;
-	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection>;
+	getMemberDefinitionPosition(absoluteFilePath: string, memberName: string, declaringTypeName?: string) : Promise<Selection>;
 	addResolvedAssembly(filePath: string) : Promise<void>;
 	createProject(assemblyFilePath: string, outputPath: string, decompileDangerousResources: boolean, projectVisualStudioVersion?: string): Promise<CreateProjectResult>;
 	getLegacyVisualStudioVersions() : Promise<string[]>;
@@ -210,7 +210,8 @@ export class DecompilationMainService implements IDecompilationMainService {
 				}
 
 				const memberReferenceMetadata: ReferenceMetadata = {
-					memberFullName: response!.getMemberfullname(),
+					memberName: response!.getMembername(),
+					declaringTypeName: response!.getDeclaringtypename(),
 					definitionFilePath: response!.getDefinitionfilepath(),
 					isCrossAssemblyReference: response!.getIscrossassemblyreference(),
 					referencedAssemblyFullName: response!.getReferencedassemblyfullname(),
@@ -222,9 +223,12 @@ export class DecompilationMainService implements IDecompilationMainService {
 		})
 	}
 
-	getMemberDefinitionPosition(absoluteFilePath: string, memberFullName: string) : Promise<Selection> {
+	getMemberDefinitionPosition(absoluteFilePath: string, memberName: string, declaringTypeName?: string) : Promise<Selection> {
 		const request = new GetMemberDefinitionPositionRequest();
-		request.setMemberfullname(memberFullName);
+		request.setMembername(memberName);
+		if (declaringTypeName) {
+			request.setDeclaringtypename(declaringTypeName);
+		}
 		request.setAbsolutefilepath(absoluteFilePath);
 
 		return new Promise<Selection>((resolve, reject) => {

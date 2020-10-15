@@ -242,9 +242,10 @@ class Create2017ProjectAction extends CreateLegacyProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 }
 

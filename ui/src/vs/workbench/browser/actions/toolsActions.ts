@@ -30,6 +30,7 @@ import { Disposable } from 'vs/base/common/lifecycle';
 import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { IExplorerService } from 'vs/workbench/contrib/files/common/files';
 import { RawContextKey } from 'vs/platform/contextkey/common/contextkey';
+import { IAnalyticsService } from 'vs/cd/workbench/AnalyticsService';
 
 export const PROJECT_CREATION_ENABLED_STATE = new RawContextKey<boolean>('areProjectCreationCommandsEnabled', false);
 
@@ -44,7 +45,8 @@ abstract class BaseCreateProjectAction extends Action {
 		private readonly notificationService: INotificationService,
 		private readonly decompilationService: IDecompilationService,
 		private readonly progressService: IProgressService,
-		private readonly explorerService: IExplorerService
+		private readonly explorerService: IExplorerService,
+		private readonly analyticsService: IAnalyticsService
 	) {
 		super(id, label);
 	}
@@ -52,6 +54,8 @@ abstract class BaseCreateProjectAction extends Action {
 	protected abstract get projectVsStudioVersion(): string | undefined;
 
 	async run(): Promise<void> {
+		await this.analyticsService.trackEvent('CreateProject', this.projectVsStudioVersion ?? 'Latest');
+
 		const selectedExplorerItems = this.explorerService.getContext(false);
 		const currentOpenCodeEditorResourceUri = selectedExplorerItems.length ? selectedExplorerItems[0].resource : null;
 
@@ -126,9 +130,10 @@ class CreateProjectAction extends BaseCreateProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 
 	protected get projectVsStudioVersion(): string | undefined {
@@ -147,9 +152,10 @@ abstract class CreateLegacyProjectAction extends BaseCreateProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 
 	protected get projectVsStudioVersion(): string | undefined {
@@ -168,9 +174,10 @@ class Create2010ProjectAction extends CreateLegacyProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 }
 
@@ -184,9 +191,10 @@ class Create2012ProjectAction extends CreateLegacyProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 }
 
@@ -200,9 +208,10 @@ class Create2013ProjectAction extends CreateLegacyProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 }
 
@@ -216,9 +225,10 @@ class Create2015ProjectAction extends CreateLegacyProjectAction {
 		@INotificationService notificationService: INotificationService,
 		@IDecompilationService decompilationService: IDecompilationService,
 		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService
+		@IExplorerService explorerService: IExplorerService,
+		@IAnalyticsService analyticsService: IAnalyticsService
 	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService);
+		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
 	}
 }
 

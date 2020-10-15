@@ -27,6 +27,7 @@ import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { IFileService } from 'vs/platform/files/common/files';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { URI } from 'vs/base/common/uri';
+import { IAnalyticsService } from 'vs/cd/workbench/AnalyticsService';
 /* End AGPL */
 
 export class OpenFileAction extends Action {
@@ -116,13 +117,16 @@ export class ClearAssemblyListAction extends Action {
 		@IEditorService private readonly editorService: IEditorService,
 		@IProgressService private readonly progressService: IProgressService,
 		@IDecompilationService private readonly decompilationService: IDecompilationService,
-		@INotificationService private readonly notificationService: INotificationService
+		@INotificationService private readonly notificationService: INotificationService,
+		@IAnalyticsService private readonly analyticsService: IAnalyticsService
 	) {
 		super(id, label);
 	}
 
 	async run(): Promise<void> {
 		await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+			await this.analyticsService.trackEvent('AssemblyList', 'Clear');
+
 			progress.report({ message: 'Clearing assembly list...' });
 
 			try {

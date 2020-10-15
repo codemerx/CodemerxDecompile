@@ -57,7 +57,7 @@ import { join, sep, posix } from 'vs/base/common/path';
 import { localize } from 'vs/nls';
 import { Schemas } from 'vs/base/common/network';
 import { SnapUpdateService } from 'vs/platform/update/electron-main/updateService.snap';
-import { IStorageMainService, StorageMainService } from 'vs/platform/storage/node/storageMainService';
+import { IStorageMainService } from 'vs/platform/storage/node/storageMainService';
 import { GlobalStorageDatabaseChannel } from 'vs/platform/storage/node/storageIpc';
 import { BackupMainService } from 'vs/platform/backup/electron-main/backupMainService';
 import { IBackupMainService } from 'vs/platform/backup/electron-main/backup';
@@ -85,6 +85,7 @@ import { IOpenExtensionWindowResult } from 'vs/platform/debug/common/extensionHo
 /* AGPL */
 import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { IDecompilationMainService } from 'vs/cd/platform/DecompilationMainService';
+import { IAnalyticsMainService } from 'vs/cd/platform/AnalyticsMainService';
 /* End AGPL */
 
 export class CodeApplication extends Disposable {
@@ -458,10 +459,6 @@ export class CodeApplication extends Disposable {
 		services.set(IWorkspacesService, new SyncDescriptor(WorkspacesService));
 		services.set(IMenubarMainService, new SyncDescriptor(MenubarMainService));
 
-		const storageMainService = new StorageMainService(this.logService, this.environmentService);
-		services.set(IStorageMainService, storageMainService);
-		this.lifecycleMainService.onWillShutdown(e => e.join(storageMainService.close()));
-
 		const backupMainService = new BackupMainService(this.environmentService, this.configurationService, this.logService);
 		services.set(IBackupMainService, backupMainService);
 
@@ -588,6 +585,10 @@ export class CodeApplication extends Disposable {
 		const decompilationMainService = accessor.get(IDecompilationMainService);
 		const decompilationChannel = createChannelReceiver(decompilationMainService);
 		electronIpcServer.registerChannel('decompilationService', decompilationChannel);
+
+		const analyticsMainService = accessor.get(IAnalyticsMainService);
+		const analyticsChannel = createChannelReceiver(analyticsMainService);
+		electronIpcServer.registerChannel('analyticsService', analyticsChannel);
 		/* End AGPL */
 
 		// ExtensionHost Debug broadcast service

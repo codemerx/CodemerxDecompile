@@ -281,7 +281,7 @@ class ToolsActionsProvider extends Disposable implements IWorkbenchContribution 
 					command: {
 						id: `${CreateLegacyProjectAction.BASE_ID}.${legacyVsStudioVersions[i]}`,
 						precondition: PROJECT_CREATION_ENABLED_STATE,
-						title: nls.localize({ key: `miDecompilerCreateLegacyProject${legacyVsStudioVersions[i]}`, comment: ['&& denotes a mnemonic'] }, `&&Visual Studio ${legacyVsStudioVersions[i]}`)
+						title: nls.localize({ key: 'miDecompilerCreateLegacyProject', comment: ['&& denotes a mnemonic'] }, '&&Visual Studio {0}', legacyVsStudioVersions[i])
 					},
 					order: i + 1
 				}

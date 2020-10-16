@@ -24,6 +24,11 @@ const task = require('./lib/task');
 const buildfile = require('../src/buildfile');
 const common = require('./lib/optimize');
 const root = path.dirname(__dirname);
+/* AGPL */
+const engineDirectory = path.join(path.dirname(root), 'engine');
+const decompilerServicePath = path.join(engineDirectory, 'CodemerxDecompile.Service', 'CodemerxDecompile.Service.csproj');
+const serverOutputDirectory = path.join(root, 'out-build', 'server');
+/* End AGPL */
 const commit = util.getVersion(root);
 const packageJson = require('../package.json');
 const product = require('../product.json');
@@ -85,6 +90,9 @@ const vscodeResources = [
 	'out-build/vs/code/electron-browser/issue/issueReporter.js',
 	'out-build/vs/code/electron-browser/processExplorer/processExplorer.js',
 	'out-build/vs/platform/auth/common/auth.css',
+	/* AGPL */
+	'out-build/server/**/*.*',
+	/* End AGPL */
 	'!**/test/**'
 ];
 
@@ -331,6 +339,39 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 
 const buildRoot = path.dirname(root);
 
+/* AGPL */
+const buildServerTask = (platform, architecture) => task.define('build-server', () => {
+	if (!fs.existsSync(serverOutputDirectory)) {
+		fs.mkdirSync(serverOutputDirectory);
+	}
+
+	return new Promise((resolve, reject) => {
+		const proc = cp.exec(`dotnet publish "${decompilerServicePath}" -c Release --self-contained true --runtime ${platform}-${architecture} -o "${serverOutputDirectory}"`, (err, stdout, stderr) => {
+			if (err) {
+				reject(err);
+			}
+
+			resolve();
+		});
+
+		proc.on('error', (err) => {
+			reject(err);
+		});
+	});
+});
+
+const translatePlatform = platform => {
+	switch (platform) {
+		case 'win32':
+			return 'win';
+		case 'darwin':
+			return 'osx';
+		default:
+			return platform;
+	}
+};
+/* End AGPL */
+
 const BUILD_TARGETS = [
 	{ platform: 'win32', arch: 'ia32' },
 	{ platform: 'win32', arch: 'x64' },
@@ -360,6 +401,9 @@ BUILD_TARGETS.forEach(buildTarget => {
 		const vscodeTask = task.define(`vscode${dashed(platform)}${dashed(arch)}${dashed(minified)}`, task.series(
 			compileBuildTask,
 			compileExtensionsBuildTask,
+			/* AGPL */
+			buildServerTask(translatePlatform(platform), arch),
+			/* End AGPL */
 			minified ? minifyVSCodeTask : optimizeVSCodeTask,
 			vscodeTaskCI
 		));

@@ -16,13 +16,12 @@ import { IConfigurationService, IConfigurationChangeEvent } from 'vs/platform/co
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { DisposableStore, dispose } from 'vs/base/common/lifecycle';
 import * as nls from 'vs/nls';
-import { toResource, Verbosity, SideBySideEditor } from 'vs/workbench/common/editor';
+import { toResource, Verbosity } from 'vs/workbench/common/editor';
 import { IWorkbenchEnvironmentService } from 'vs/workbench/services/environment/common/environmentService';
-import { IWorkspaceContextService, WorkbenchState, IWorkspaceFolder } from 'vs/platform/workspace/common/workspace';
+import { IWorkspaceContextService } from 'vs/platform/workspace/common/workspace';
 import { IThemeService, registerThemingParticipant, IColorTheme, ICssStyleCollector } from 'vs/platform/theme/common/themeService';
 import { TITLE_BAR_ACTIVE_BACKGROUND, TITLE_BAR_ACTIVE_FOREGROUND, TITLE_BAR_INACTIVE_FOREGROUND, TITLE_BAR_INACTIVE_BACKGROUND, TITLE_BAR_BORDER, WORKBENCH_BACKGROUND } from 'vs/workbench/common/theme';
 import { isMacintosh, isWindows, isLinux, isWeb } from 'vs/base/common/platform';
-import { URI } from 'vs/base/common/uri';
 import { Color } from 'vs/base/common/color';
 import { trim } from 'vs/base/common/strings';
 import { EventType, EventHelper, Dimension, isAncestor, removeClass, addClass, append, $, addDisposableListener, runAtThisOrScheduleAtNextAnimationFrame, removeNode } from 'vs/base/browser/dom';
@@ -247,15 +246,6 @@ export class TitlebarPart extends Part implements ITitleService {
 	 */
 	private doGetWindowTitle(): string {
 		const editor = this.editorService.activeEditor;
-		const workspace = this.contextService.getWorkspace();
-
-		// Compute root
-		let root: URI | undefined;
-		if (workspace.configuration) {
-			root = workspace.configuration;
-		} else if (workspace.folders.length) {
-			root = workspace.folders[0].uri;
-		}
 
 		// Compute active editor folder
 		const editorResource = editor ? toResource(editor) : undefined;
@@ -267,27 +257,11 @@ export class TitlebarPart extends Part implements ITitleService {
 		// Compute folder resource
 		// Single Root Workspace: always the root single workspace in this case
 		// Otherwise: root folder of the currently active file if any
-		let folder: IWorkspaceFolder | null = null;
-		if (this.contextService.getWorkbenchState() === WorkbenchState.FOLDER) {
-			folder = workspace.folders[0];
-		} else {
-			const resource = toResource(editor, { supportSideBySide: SideBySideEditor.PRIMARY });
-			if (resource) {
-				folder = this.contextService.getWorkspaceFolder(resource);
-			}
-		}
 
 		// Variables
 		const activeEditorShort = editor ? editor.getTitle(Verbosity.SHORT) : '';
 		const activeEditorMedium = editor ? editor.getTitle(Verbosity.MEDIUM) : activeEditorShort;
 		const activeEditorLong = editor ? editor.getTitle(Verbosity.LONG) : activeEditorMedium;
-		const activeFolderShort = editorFolderResource ? resources.basename(editorFolderResource) : '';
-		const activeFolderMedium = editorFolderResource ? this.labelService.getUriLabel(editorFolderResource, { relative: true }) : '';
-		const activeFolderLong = editorFolderResource ? this.labelService.getUriLabel(editorFolderResource) : '';
-		const rootName = this.labelService.getWorkspaceLabel(workspace);
-		const rootPath = root ? this.labelService.getUriLabel(root) : '';
-		const folderName = folder ? folder.name : '';
-		const folderPath = folder ? this.labelService.getUriLabel(folder.uri) : '';
 		const dirty = editor?.isDirty() && !editor.isSaving() ? TitlebarPart.TITLE_DIRTY : '';
 		const appName = this.productService.nameLong;
 		const remoteName = this.labelService.getHostLabel(REMOTE_HOST_SCHEME, this.environmentService.configuration.remoteAuthority);
@@ -298,13 +272,6 @@ export class TitlebarPart extends Part implements ITitleService {
 			activeEditorShort,
 			activeEditorLong,
 			activeEditorMedium,
-			activeFolderShort,
-			activeFolderMedium,
-			activeFolderLong,
-			rootName,
-			rootPath,
-			folderName,
-			folderPath,
 			dirty,
 			appName,
 			remoteName,

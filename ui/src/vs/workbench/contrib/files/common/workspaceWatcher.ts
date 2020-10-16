@@ -14,6 +14,11 @@ import { INotificationService, Severity, NeverShowAgainScope } from 'vs/platform
 import { localize } from 'vs/nls';
 import { FileService } from 'vs/platform/files/common/fileService';
 import { IOpenerService } from 'vs/platform/opener/common/opener';
+/* AGPL */
+import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
+import { MarkdownPreviewEditor } from 'vs/cd/workbench/markdownPreviewEditor';
+import getContents from 'vs/cd/files/instructions_fix_enospc';
+/* End AGPL */
 
 export class WorkspaceWatcher extends Disposable {
 
@@ -24,7 +29,10 @@ export class WorkspaceWatcher extends Disposable {
 		@IConfigurationService private readonly configurationService: IConfigurationService,
 		@IWorkspaceContextService private readonly contextService: IWorkspaceContextService,
 		@INotificationService private readonly notificationService: INotificationService,
-		@IOpenerService private readonly openerService: IOpenerService
+		@IOpenerService private readonly openerService: IOpenerService,
+		/* AGPL */
+		@IInstantiationService private readonly instantiationService: IInstantiationService
+		/* End AGPL */
 	) {
 		super();
 
@@ -92,7 +100,13 @@ export class WorkspaceWatcher extends Disposable {
 				localize('enospcError', "Unable to watch for file changes in this large workspace. Please follow the instructions link to resolve this issue."),
 				[{
 					label: localize('learnMore', "Instructions"),
-					run: () => this.openerService.open(URI.parse('https://go.microsoft.com/fwlink/?linkid=867693'))
+					run: () => {
+						/* AGPL */
+						const markdownPreviewEditor = this.instantiationService.createInstance(MarkdownPreviewEditor);
+
+						markdownPreviewEditor.show(getContents(), 'Instructions');
+						/* End AGPL */
+					}
 				}],
 				{
 					sticky: true,

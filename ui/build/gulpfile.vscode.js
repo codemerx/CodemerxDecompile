@@ -25,9 +25,10 @@ const buildfile = require('../src/buildfile');
 const common = require('./lib/optimize');
 const root = path.dirname(__dirname);
 /* AGPL */
+const { promisify } = require('util');
+const chmod = (path, mode) => promisify(fs.chmod, path, mode);
 const engineDirectory = path.join(path.dirname(root), 'engine');
 const decompilerServicePath = path.join(engineDirectory, 'CodemerxDecompile.Service', 'CodemerxDecompile.Service.csproj');
-const serverOutputDirectory = path.join(root, 'out-build', 'server');
 /* End AGPL */
 const commit = util.getVersion(root);
 const packageJson = require('../package.json');
@@ -340,13 +341,13 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 const buildRoot = path.dirname(root);
 
 /* AGPL */
-const buildServerTask = (platform, architecture) => task.define('build-server', () => {
-	if (!fs.existsSync(serverOutputDirectory)) {
-		fs.mkdirSync(serverOutputDirectory);
+const buildServerTask = (destination, platform, architecture) => task.define('build-server', () => {
+	if (!fs.existsSync(destination)) {
+		fs.mkdirSync(destination);
 	}
 
 	return new Promise((resolve, reject) => {
-		const proc = cp.exec(`dotnet publish "${decompilerServicePath}" -c Release --self-contained true --runtime ${platform}-${architecture} -o "${serverOutputDirectory}"`, (err, stdout, stderr) => {
+		const proc = cp.exec(`dotnet publish "${decompilerServicePath}" -c Release --self-contained true --runtime ${platform}-${architecture} -o "${destination}"`, err => {
 			if (err) {
 				reject(err);
 			}
@@ -357,7 +358,8 @@ const buildServerTask = (platform, architecture) => task.define('build-server', 
 		proc.on('error', (err) => {
 			reject(err);
 		});
-	});
+	})
+	.then(() => os.platform() !== 'win32' ? chmod(path.join(destination, 'CodemerxDecompile.Service'), 0o755) : Promise.resolve());
 });
 
 const translatePlatform = platform => {
@@ -391,19 +393,20 @@ BUILD_TARGETS.forEach(buildTarget => {
 	['', 'min'].forEach(minified => {
 		const sourceFolderName = `out-vscode${dashed(minified)}`;
 		const destinationFolderName = `VSCode${dashed(platform)}${dashed(arch)}`;
+		const serverOutputPath = path.join(path.dirname(root), destinationFolderName, 'resources', 'app', 'out', 'server');
 
 		const vscodeTaskCI = task.define(`vscode${dashed(platform)}${dashed(arch)}${dashed(minified)}-ci`, task.series(
 			util.rimraf(path.join(buildRoot, destinationFolderName)),
-			packageTask(platform, arch, sourceFolderName, destinationFolderName, opts)
+			packageTask(platform, arch, sourceFolderName, destinationFolderName, opts),
+			/* AGPL */
+			buildServerTask(serverOutputPath, translatePlatform(platform), arch || 'x64')
+			/* End AGPL */
 		));
 		gulp.task(vscodeTaskCI);
 
 		const vscodeTask = task.define(`vscode${dashed(platform)}${dashed(arch)}${dashed(minified)}`, task.series(
 			compileBuildTask,
 			compileExtensionsBuildTask,
-			/* AGPL */
-			buildServerTask(translatePlatform(platform), arch),
-			/* End AGPL */
 			minified ? minifyVSCodeTask : optimizeVSCodeTask,
 			vscodeTaskCI
 		));

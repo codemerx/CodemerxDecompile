@@ -14,8 +14,9 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+import * as platform from 'vs/base/common/platform';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-import { join } from 'path';
+import { resolve } from 'path';
 import { spawn } from 'child_process';
 import * as grpc from "@grpc/grpc-js";
 import { RpcManagerClient } from 'vs/cd/platform/proto/manager_grpc_pb';
@@ -24,7 +25,7 @@ import { ILoggerService, ILogService } from 'vs/platform/log/common/log';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
 import { ILifecycleMainService } from 'vs/platform/lifecycle/electron-main/lifecycleMainService';
 
-const SERVER_PATH = join(__dirname, '..', '..', '..', 'server', 'CodemerxDecompile.Service.dll');
+const SERVER_DIRECTORY = resolve(__dirname, '..', '..', '..', 'server');
 const MAX_RETRIES = 10;
 const RUNNING_STATUS = 'Running';
 const WAIT_TIME_MILLISECONDS = 200;
@@ -62,7 +63,10 @@ export class GrpcMainService implements IGrpcMainService {
 			const randomPort = this.getRandomPort();
 			logService.info(`Starting CodemerxDecompile.Service on port ${randomPort}.`);
 
-			const serverProcess = spawn('dotnet', [SERVER_PATH, `--port=${randomPort}`]);
+			const executeCommand = platform.isWindows ? 'CodemerxDecompile.Service.exe' : './CodemerxDecompile.Service';
+			const serverProcess = spawn(executeCommand, [`--port=${randomPort}`], {
+				cwd: SERVER_DIRECTORY
+			});
 
 			const milliseconds = count * WAIT_TIME_MILLISECONDS;
 			logService.info(`Waiting CodemerxDecompile.Service response for ${milliseconds} Milliseconds.`);

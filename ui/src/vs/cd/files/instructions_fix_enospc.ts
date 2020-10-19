@@ -24,13 +24,13 @@ cat /proc/sys/fs/inotify/max_user_watches
 
 The limit can be increased to its maximum (except on Arch based distros) by executing the following commands:
 |||
-sudo echo fs.inotify.max_user_watches=524288 >> /etc/sysctl.conf
+echo fs.inotify.max_user_watches=524288 | sudo tee /etc/sysctl.conf
 sudo sysctl -p
 |||
 
 To increase the limit on Arch based distros execute the following commands:
 |||
-sudo echo fs.inotify.max_user_watches=16382 >> /etc/sysctl.d/99-inotify-max-watches.conf
+echo fs.inotify.max_user_watches=16382 | sudo tee /etc/sysctl.d/99-inotify-max-watches.conf
 sudo sysctl --system
 |||
 

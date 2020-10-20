@@ -45,7 +45,6 @@ namespace CodemerxDecompile.Service.Services
         {
             string filePath = this.GetFilePathForType<T>();
             string serialized = File.ReadAllText(filePath);
-            File.Delete(filePath);
             return this.serializationService.Deserialize<K>(serialized);
         }
 

@@ -29,6 +29,8 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
     {
         private IDecompilationContext decompilationContext;
 
+        public event EventHandler OpenedAssembliesUpdated;
+
         public DecompilationContextService(IDecompilationContext decompilationContext)
         {
             this.DecompilationContext = decompilationContext;
@@ -51,6 +53,7 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
         public void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath)
         {
             this.decompilationContext.OpenedAssemblyNamesToFilePathsMap[assembly.FullName] = assemblyFilePath;
+            this.OpenedAssembliesUpdated?.Invoke(this, null);
         }
 
         public IEnumerable<string> GetOpenedAssemliesPaths() => this.decompilationContext.OpenedAssemblyNamesToFilePathsMap.Values;
@@ -112,6 +115,8 @@ namespace CodemerxDecompile.Service.Services.DecompilationContext
             this.DecompilationContext.OpenedAssemblyNamesToFilePathsMap.Clear();
             this.DecompilationContext.FilePathToType.Clear();
             this.DecompilationContext.AssemblyStrongNameToAssemblyMetadata.Clear();
+
+            this.OpenedAssembliesUpdated?.Invoke(this, null);
         }
     }
 }

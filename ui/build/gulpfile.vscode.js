@@ -25,6 +25,7 @@ const buildfile = require('../src/buildfile');
 const common = require('./lib/optimize');
 const root = path.dirname(__dirname);
 /* AGPL */
+const rcedit = require('rcedit');
 const { promisify } = require('util');
 const chmod = (path, mode) => promisify(fs.chmod, path, mode);
 const engineDirectory = path.join(path.dirname(root), 'engine');
@@ -268,6 +269,7 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 				'resources/win32/xml.ico',
 				'resources/win32/yaml.ico',
 				/* AGPL */
+				'resources/win32/codemerx-logo.ico',
 				'resources/win32/codemerx-logo-70x70.png',
 				'resources/win32/codemerx-logo-150x150.png'
 				/* End AGPL */
@@ -384,6 +386,16 @@ const BUILD_TARGETS = [
 	{ platform: 'linux', arch: 'arm' },
 	{ platform: 'linux', arch: 'arm64' },
 ];
+
+/* AGPL */
+function updateIcon(executablePath) {
+	return cb => {
+		const icon = path.join(root, 'resources', 'win32', 'codemerx-logo.ico');
+		rcedit(executablePath, { icon }, cb);
+	};
+}
+/* End AGPL */
+
 BUILD_TARGETS.forEach(buildTarget => {
 	const dashed = (str) => (str ? `-${str}` : ``);
 	const platform = buildTarget.platform;
@@ -393,12 +405,15 @@ BUILD_TARGETS.forEach(buildTarget => {
 	['', 'min'].forEach(minified => {
 		const sourceFolderName = `out-vscode${dashed(minified)}`;
 		const destinationFolderName = `VSCode${dashed(platform)}${dashed(arch)}`;
+		/* AGPL */
 		const serverOutputPath = path.join(path.dirname(root), destinationFolderName, 'resources', 'app', 'out', 'server');
+		/* End AGPL */
 
 		const vscodeTaskCI = task.define(`vscode${dashed(platform)}${dashed(arch)}${dashed(minified)}-ci`, task.series(
 			util.rimraf(path.join(buildRoot, destinationFolderName)),
 			packageTask(platform, arch, sourceFolderName, destinationFolderName, opts),
 			/* AGPL */
+			platform === 'win32' ? updateIcon(path.join(path.dirname(root), destinationFolderName, 'CodemerxDecompile.exe')) : Promise.resolve(),
 			buildServerTask(serverOutputPath, translatePlatform(platform), arch || 'x64')
 			/* End AGPL */
 		));

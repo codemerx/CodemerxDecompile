@@ -175,10 +175,6 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../JDKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug EngineOnly|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug EngineOnly\</OutputPath>
@@ -194,7 +190,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release EngineOnly|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Release EngineOnly\</OutputPath>
-    <DefineConstants>TRACE;MonoDecompilerVersion;ENGINEONLYBUILD</DefineConstants>
+    <!-- AGPL -->
+    <DefineConstants>TRACE;MonoDecompilerVersion;ENGINEONLYBUILD;RELEASE</DefineConstants>
+    <!-- End AGPL -->
     <BaseAddress>285212672</BaseAddress>
     <Optimize>true</Optimize>
     <FileAlignment>4096</FileAlignment>
@@ -203,6 +201,10 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <!-- AGPL -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../common/CDKey.snk</AssemblyOriginatorKeyFile>
+    <!-- End AGPL -->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug JustAssembly|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -238,8 +240,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../BuildUtilities/JDKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
     <Compile Include="..\..\CommonAssemblyInfo.cs">

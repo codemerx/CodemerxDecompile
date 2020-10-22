@@ -92,9 +92,6 @@ const vscodeResources = [
 	'out-build/vs/code/electron-browser/issue/issueReporter.js',
 	'out-build/vs/code/electron-browser/processExplorer/processExplorer.js',
 	'out-build/vs/platform/auth/common/auth.css',
-	/* AGPL */
-	'out-build/server/**/*.*',
-	/* End AGPL */
 	'!**/test/**'
 ];
 
@@ -388,10 +385,22 @@ const BUILD_TARGETS = [
 ];
 
 /* AGPL */
-function updateIcon(executablePath) {
+function updateExecutableMetadata(executablePath) {
 	return cb => {
-		const icon = path.join(root, 'resources', 'win32', 'codemerx-logo.ico');
-		rcedit(executablePath, { icon }, cb);
+		const metadata = {
+			'version-string': {
+				CompanyName: product.companyName,
+				FileDescription: product.applicationName,
+				LegalCopyright: product.copyright,
+				ProductName: product.applicationName,
+				ProductVersion: packageJson.version
+			},
+			'file-version': packageJson.version,
+			'product-version': packageJson.version,
+			icon: path.join(root, 'resources', 'win32', 'codemerx-logo.ico')
+		};
+
+		rcedit(executablePath, metadata, cb);
 	};
 }
 /* End AGPL */
@@ -406,14 +415,19 @@ BUILD_TARGETS.forEach(buildTarget => {
 		const sourceFolderName = `out-vscode${dashed(minified)}`;
 		const destinationFolderName = `VSCode${dashed(platform)}${dashed(arch)}`;
 		/* AGPL */
-		const serverOutputPath = path.join(path.dirname(root), destinationFolderName, 'resources', 'app', 'out', 'server');
+		let serverOutputPath;
+		if (platform === 'darwin') {
+			serverOutputPath = path.join(path.dirname(root), destinationFolderName, `${product.applicationName}.app`, 'Contents', 'Resources', 'app', 'out', 'server');
+		} else {
+			serverOutputPath = path.join(path.dirname(root), destinationFolderName, 'resources', 'app', 'out', 'server');
+		}
 		/* End AGPL */
 
 		const vscodeTaskCI = task.define(`vscode${dashed(platform)}${dashed(arch)}${dashed(minified)}-ci`, task.series(
 			util.rimraf(path.join(buildRoot, destinationFolderName)),
 			packageTask(platform, arch, sourceFolderName, destinationFolderName, opts),
 			/* AGPL */
-			platform === 'win32' ? updateIcon(path.join(path.dirname(root), destinationFolderName, 'CodemerxDecompile.exe')) : Promise.resolve(),
+			platform === 'win32' ? updateExecutableMetadata(path.join(path.dirname(root), destinationFolderName, 'CodemerxDecompile.exe')) : () => Promise.resolve(),
 			buildServerTask(serverOutputPath, translatePlatform(platform), arch || 'x64')
 			/* End AGPL */
 		));

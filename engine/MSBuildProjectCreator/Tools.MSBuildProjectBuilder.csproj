@@ -68,19 +68,21 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../JDKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release EngineOnly|AnyCPU'">
     <OutputPath>bin\Release EngineOnly\</OutputPath>
-    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+    <!-- AGPL -->
+    <DefineConstants>TRACE;ENGINEONLYBUILD;RELEASE</DefineConstants>
+    <!-- End AGPL -->
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <!-- AGPL -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../common/CDKey.snk</AssemblyOriginatorKeyFile>
+    <!-- End AGPL -->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug EngineOnly|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -118,8 +120,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../BuildUtilities/JDKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -174,7 +174,7 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

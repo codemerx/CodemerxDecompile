@@ -14,6 +14,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 
 using Mono.Cecil;
@@ -24,6 +25,8 @@ namespace CodemerxDecompile.Service.Interfaces
 {
     public interface IDecompilationContextService
     {
+        event EventHandler OpenedAssembliesUpdated;
+
         IDecompilationContext DecompilationContext { get; set; }
 
         void SaveAssemblyToCache(AssemblyDefinition assembly, string assemblyFilePath);

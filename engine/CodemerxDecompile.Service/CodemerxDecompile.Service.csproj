@@ -29,6 +29,12 @@
     <OutputPath>..\..\ui\out\server</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>RELEASE</DefineConstants>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../common/CDKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Protobuf Include="..\..\common\proto\common.proto" GrpcServices="Server">
       <Link>proto\common.proto</Link>

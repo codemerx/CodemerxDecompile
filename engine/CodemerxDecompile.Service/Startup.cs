@@ -63,27 +63,23 @@ namespace CodemerxDecompile.Service
             IServiceProvider serviceProvider = app.ApplicationServices;
 
             applicationLifetime.ApplicationStarted.Register(() => this.InitializeServices(serviceProvider));
-            applicationLifetime.ApplicationStopping.Register(() => this.DisposeServices(serviceProvider));
         }
 
         private void InitializeServices(IServiceProvider services)
         {
             IStorageService storageService = services.GetService<IStorageService>();
+            IDecompilationContextService decompilationContextService = services.GetService<IDecompilationContextService>();
             if (storageService.HasStored<IDecompilationContext>())
             {
                 IDecompilationContext decompilationContext = storageService.Retrieve<IDecompilationContext, JsonSerializableDecompilationContext>();
 
-                IDecompilationContextService decompilationContextService = services.GetService<IDecompilationContextService>();
                 decompilationContextService.DecompilationContext = decompilationContext;
             }
-        }
 
-        private void DisposeServices(IServiceProvider services)
-        {
-            IStorageService storageService = services.GetService<IStorageService>();
-            IDecompilationContextService decompilationContextService = services.GetService<IDecompilationContextService>();
-
-            storageService.Store(decompilationContextService.DecompilationContext);
+            decompilationContextService.OpenedAssembliesUpdated += (obj, args) =>
+            {
+                storageService.Store(decompilationContextService.DecompilationContext);
+            };
         }
     }
 }

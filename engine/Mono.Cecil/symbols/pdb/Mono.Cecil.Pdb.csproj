@@ -16,10 +16,6 @@
     <!--End AGPL-->
   </PropertyGroup>
   <!--Telerik Authorship-->
-  <PropertyGroup Condition=" '$(Configuration)' != 'Debug EngineOnly' And '$(Configuration)' != 'Release EngineOnly' And '$(Configuration)' != 'Debug JustAssembly' And '$(Configuration)' != 'Release JustAssembly' And '$(Configuration)' != 'Release Server JustAssembly' ">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../../../JDKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <!--Telerik Authorship-->
   <PropertyGroup Condition=" $(Configuration.EndsWith('Debug')) ">
     <OutputPath>..\..\..\..\UI\DebugBuild\</OutputPath>
@@ -52,13 +48,19 @@
   <!--Telerik Authorship-->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release EngineOnly|AnyCPU'">
     <OutputPath>..\..\..\ConsoleRunner\bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NET_3_5;NET_4_0;ENGINEONLYBUILD</DefineConstants>
+    <!-- AGPL -->
+    <DefineConstants>TRACE;NET_3_5;NET_4_0;ENGINEONLYBUILD;RELEASE</DefineConstants>
+    <!-- End AGPL -->
     <Optimize>true</Optimize>
     <NoWarn>0649</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <!-- AGPL -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../../../common/CDKey.snk</AssemblyOriginatorKeyFile>
+    <!-- End AGPL -->
   </PropertyGroup>
   <!--Telerik Authorship-->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug JustAssembly|AnyCPU'">
@@ -92,8 +94,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../../../BuildUtilities/JDKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Mono.Cecil.csproj">

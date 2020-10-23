@@ -28,7 +28,9 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;ENGINEONLYBUILD</DefineConstants>
+    <DefineConstants>TRACE;ENGINEONLYBUILD;RELEASE</DefineConstants>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../common/CDKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="..\Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems" Label="Shared" />

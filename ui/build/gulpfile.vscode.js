@@ -159,7 +159,10 @@ function computeChecksum(filename) {
 function packageTask(platform, arch, sourceFolderName, destinationFolderName, opts) {
 	opts = opts || {};
 
-	const destination = path.join(path.dirname(root), destinationFolderName);
+	/* AGPL */
+	const repositoryRoot = path.dirname(root);
+	const destination = path.join(repositoryRoot, destinationFolderName);
+	/* End AGPL */
 	platform = platform || process.platform;
 
 	return () => {
@@ -212,6 +215,11 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 			.pipe(json(productJsonUpdate));
 
 		const license = gulp.src(['LICENSES.chromium.html', product.licenseFileName, 'ThirdPartyNotices.txt', 'licenses/**'], { base: '.', allowEmpty: true });
+
+		/* AGPL */
+		gulp.src('COPYING', { cwd: path.resolve(repositoryRoot), base: '.' }).pipe(rename('LICENSE'))
+			.pipe(vfs.dest(destination));
+		/* End AGPL */
 
 		// TODO the API should be copied to `out` during compile, not here
 		const api = gulp.src('src/vs/vscode.d.ts').pipe(rename('out/vs/vscode.d.ts'));
@@ -413,8 +421,8 @@ BUILD_TARGETS.forEach(buildTarget => {
 
 	['', 'min'].forEach(minified => {
 		const sourceFolderName = `out-vscode${dashed(minified)}`;
-		const destinationFolderName = `VSCode${dashed(platform)}${dashed(arch)}`;
 		/* AGPL */
+		const destinationFolderName = `CodemerxDecompile${dashed(platform)}${dashed(arch)}`;
 		let serverOutputPath;
 		if (platform === 'darwin') {
 			serverOutputPath = path.join(path.dirname(root), destinationFolderName, `${product.applicationName}.app`, 'Contents', 'Resources', 'app', 'out', 'server');

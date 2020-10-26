@@ -13,7 +13,7 @@ import { SyncActionDescriptor, MenuId, MenuRegistry, ILocalizedString } from 'vs
 import { IWorkbenchActionRegistry, Extensions as ActionExtensions } from 'vs/workbench/common/actions';
 import { KeyMod, KeyChord, KeyCode } from 'vs/base/common/keyCodes';
 /* AGPL */
-import { openWindowCommand, REVEAL_IN_EXPLORER_COMMAND_ID, OPEN_TO_SIDE_COMMAND_ID, OpenEditorsGroupContext, COMPARE_RESOURCE_COMMAND_ID, SELECT_FOR_COMPARE_COMMAND_ID, ResourceSelectedForCompareContext, COMPARE_SELECTED_COMMAND_ID, newWindowCommand, OPEN_WITH_EXPLORER_COMMAND_ID } from 'vs/workbench/contrib/files/browser/fileCommands';
+import { openWindowCommand, REVEAL_IN_EXPLORER_COMMAND_ID, OPEN_TO_SIDE_COMMAND_ID, OpenEditorsGroupContext, /* COMPARE_RESOURCE_COMMAND_ID, SELECT_FOR_COMPARE_COMMAND_ID, ResourceSelectedForCompareContext, COMPARE_SELECTED_COMMAND_ID */ newWindowCommand, OPEN_WITH_EXPLORER_COMMAND_ID } from 'vs/workbench/contrib/files/browser/fileCommands';
 /* End AGPL */
 import { CommandsRegistry, ICommandHandler } from 'vs/platform/commands/common/commands';
 import { ContextKeyExpr, ContextKeyExpression } from 'vs/platform/contextkey/common/contextkey';
@@ -24,9 +24,9 @@ import { FilesExplorerFocusCondition, ExplorerRootContext, ExplorerFolderContext
 import { CLOSE_EDITORS_IN_GROUP_COMMAND_ID, CLOSE_EDITOR_COMMAND_ID, CLOSE_OTHER_EDITORS_IN_GROUP_COMMAND_ID } from 'vs/workbench/browser/parts/editor/editorCommands';
 /* End AGPL */
 import { ResourceContextKey } from 'vs/workbench/common/resources';
-import { WorkbenchListDoubleSelection } from 'vs/platform/list/browser/listService';
 import { Schemas } from 'vs/base/common/network';
 /* AGPL */
+// import { WorkbenchListDoubleSelection } from 'vs/platform/list/browser/listService';
 import { OpenFileFolderAction, OpenFileAction } from 'vs/workbench/browser/actions/workspaceActions';
 /* End AGPL */
 import { ThemeIcon } from 'vs/platform/theme/common/themeService';
@@ -342,40 +342,40 @@ MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
 // 	},
 // 	when: ContextKeyExpr.and(ResourceContextKey.IsFileSystemResource, AutoSaveAfterShortDelayContext.toNegated(), WorkbenchListDoubleSelection.toNegated())
 // });
+
+// const compareResourceCommand = {
+// 	id: COMPARE_RESOURCE_COMMAND_ID,
+// 	title: nls.localize('compareWithSelected', "Compare with Selected")
+// };
+// MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
+// 	group: '3_compare',
+// 	order: 20,
+// 	command: compareResourceCommand,
+// 	when: ContextKeyExpr.and(ResourceContextKey.HasResource, ResourceSelectedForCompareContext, WorkbenchListDoubleSelection.toNegated())
+// });
+
+// const selectForCompareCommand = {
+// 	id: SELECT_FOR_COMPARE_COMMAND_ID,
+// 	title: nls.localize('compareSource', "Select for Compare")
+// };
+// MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
+// 	group: '3_compare',
+// 	order: 30,
+// 	command: selectForCompareCommand,
+// 	when: ContextKeyExpr.and(ResourceContextKey.HasResource, WorkbenchListDoubleSelection.toNegated())
+// });
+
+// const compareSelectedCommand = {
+// 	id: COMPARE_SELECTED_COMMAND_ID,
+// 	title: nls.localize('compareSelected', "Compare Selected")
+// };
+// MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
+// 	group: '3_compare',
+// 	order: 30,
+// 	command: compareSelectedCommand,
+// 	when: ContextKeyExpr.and(ResourceContextKey.HasResource, WorkbenchListDoubleSelection)
+// });
 /* End AGPL */
-
-const compareResourceCommand = {
-	id: COMPARE_RESOURCE_COMMAND_ID,
-	title: nls.localize('compareWithSelected', "Compare with Selected")
-};
-MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
-	group: '3_compare',
-	order: 20,
-	command: compareResourceCommand,
-	when: ContextKeyExpr.and(ResourceContextKey.HasResource, ResourceSelectedForCompareContext, WorkbenchListDoubleSelection.toNegated())
-});
-
-const selectForCompareCommand = {
-	id: SELECT_FOR_COMPARE_COMMAND_ID,
-	title: nls.localize('compareSource', "Select for Compare")
-};
-MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
-	group: '3_compare',
-	order: 30,
-	command: selectForCompareCommand,
-	when: ContextKeyExpr.and(ResourceContextKey.HasResource, WorkbenchListDoubleSelection.toNegated())
-});
-
-const compareSelectedCommand = {
-	id: COMPARE_SELECTED_COMMAND_ID,
-	title: nls.localize('compareSelected', "Compare Selected")
-};
-MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
-	group: '3_compare',
-	order: 30,
-	command: compareSelectedCommand,
-	when: ContextKeyExpr.and(ResourceContextKey.HasResource, WorkbenchListDoubleSelection)
-});
 
 MenuRegistry.appendMenuItem(MenuId.OpenEditorsContext, {
 	group: '4_close',
@@ -460,28 +460,28 @@ MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
 	when: ContextKeyExpr.and(ExplorerRootContext.toNegated(), ExplorerResourceAvailableEditorIdsContext),
 });
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
-	group: '3_compare',
-	order: 20,
-	command: compareResourceCommand,
-	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource, ResourceSelectedForCompareContext, WorkbenchListDoubleSelection.toNegated())
-});
-
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
-	group: '3_compare',
-	order: 30,
-	command: selectForCompareCommand,
-	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource, WorkbenchListDoubleSelection.toNegated())
-});
-
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
-	group: '3_compare',
-	order: 30,
-	command: compareSelectedCommand,
-	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource, WorkbenchListDoubleSelection)
-});
-
 /* AGPL */
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+// 	group: '3_compare',
+// 	order: 20,
+// 	command: compareResourceCommand,
+// 	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource, ResourceSelectedForCompareContext, WorkbenchListDoubleSelection.toNegated())
+// });
+
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+// 	group: '3_compare',
+// 	order: 30,
+// 	command: selectForCompareCommand,
+// 	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource, WorkbenchListDoubleSelection.toNegated())
+// });
+
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+// 	group: '3_compare',
+// 	order: 30,
+// 	command: compareSelectedCommand,
+// 	when: ContextKeyExpr.and(ExplorerFolderContext.toNegated(), ResourceContextKey.HasResource, WorkbenchListDoubleSelection)
+// });
+
 // MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
 // 	group: '5_cutcopypaste',
 // 	order: 8,

@@ -6,7 +6,7 @@
 import * as nls from 'vs/nls';
 import { Registry } from 'vs/platform/registry/common/platform';
 /* AGPL */
-import { GlobalCompareResourcesAction, ShowActiveFileInExplorer, CompareWithClipboardAction, COPY_FILE_LABEL, copyFileHandler, openFilePreserveFocusHandler, ShowOpenedFileInNewWindow } from 'vs/workbench/contrib/files/browser/fileActions';
+import { GlobalCompareResourcesAction, ShowActiveFileInExplorer, CompareWithClipboardAction, openFilePreserveFocusHandler, ShowOpenedFileInNewWindow } from 'vs/workbench/contrib/files/browser/fileActions';
 /* End AGPL */
 import { revertLocalChangesCommand, acceptLocalChangesCommand, CONFLICT_RESOLUTION_CONTEXT } from 'vs/workbench/contrib/files/browser/editors/textFileSaveErrorHandler';
 import { SyncActionDescriptor, MenuId, MenuRegistry, ILocalizedString } from 'vs/platform/actions/common/actions';
@@ -130,18 +130,16 @@ const explorerCommandsWeightBonus = 10; // give our commands a little bit more w
 // 	primary: KeyMod.CtrlCmd | KeyCode.KEY_X,
 // 	handler: cutFileHandler,
 // });
-/* End AGPL */
 
-const COPY_FILE_ID = 'filesExplorer.copy';
-KeybindingsRegistry.registerCommandAndKeybindingRule({
-	id: COPY_FILE_ID,
-	weight: KeybindingWeight.WorkbenchContrib + explorerCommandsWeightBonus,
-	when: ContextKeyExpr.and(FilesExplorerFocusCondition, ExplorerRootContext.toNegated()),
-	primary: KeyMod.CtrlCmd | KeyCode.KEY_C,
-	handler: copyFileHandler,
-});
+// const COPY_FILE_ID = 'filesExplorer.copy';
+// KeybindingsRegistry.registerCommandAndKeybindingRule({
+// 	id: COPY_FILE_ID,
+// 	weight: KeybindingWeight.WorkbenchContrib + explorerCommandsWeightBonus,
+// 	when: ContextKeyExpr.and(FilesExplorerFocusCondition, ExplorerRootContext.toNegated()),
+// 	primary: KeyMod.CtrlCmd | KeyCode.KEY_C,
+// 	handler: copyFileHandler,
+// });
 
-/* AGPL */
 // const PASTE_FILE_ID = 'filesExplorer.paste';
 
 // KeybindingsRegistry.registerCommandAndKeybindingRule({
@@ -491,19 +489,17 @@ MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
 // 	},
 // 	when: ExplorerRootContext.toNegated()
 // });
-/* End AGPL */
 
-MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
-	group: '5_cutcopypaste',
-	order: 10,
-	command: {
-		id: COPY_FILE_ID,
-		title: COPY_FILE_LABEL
-	},
-	when: ExplorerRootContext.toNegated()
-});
+// MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
+// 	group: '5_cutcopypaste',
+// 	order: 10,
+// 	command: {
+// 		id: COPY_FILE_ID,
+// 		title: COPY_FILE_LABEL
+// 	},
+// 	when: ExplorerRootContext.toNegated()
+// });
 
-/* AGPL */
 // MenuRegistry.appendMenuItem(MenuId.ExplorerContext, {
 // 	group: '5_cutcopypaste',
 // 	order: 20,

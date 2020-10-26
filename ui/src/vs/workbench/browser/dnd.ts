@@ -30,6 +30,10 @@ import { IHostService } from 'vs/workbench/services/host/browser/host';
 import { isStandalone } from 'vs/base/browser/browser';
 import { IBackupFileService } from 'vs/workbench/services/backup/common/backup';
 import { Emitter } from 'vs/base/common/event';
+/* AGPL */
+import { IDecompilationHelper } from 'vs/cd/workbench/DecompilationHelper';
+import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+/* End AGPL */
 
 export interface IDraggedResource {
 	resource: URI;
@@ -167,7 +171,11 @@ export class ResourcesDropHandler {
 		@IBackupFileService private readonly backupFileService: IBackupFileService,
 		@IEditorService private readonly editorService: IEditorService,
 		@IWorkspaceEditingService private readonly workspaceEditingService: IWorkspaceEditingService,
-		@IHostService private readonly hostService: IHostService
+		@IHostService private readonly hostService: IHostService,
+		/* AGPL */
+		@IDecompilationService private readonly decompilationService: IDecompilationService,
+		@IDecompilationHelper private readonly decompilationHelper: IDecompilationHelper
+		/* End AGPL */
 	) {
 	}
 
@@ -192,6 +200,14 @@ export class ResourcesDropHandler {
 		if (recentFiles.length) {
 			this.workspacesService.addRecentlyOpened(recentFiles);
 		}
+
+		/* AGPL */
+		for(const untitledOrFileResource of untitledOrFileResources) {
+			if (untitledOrFileResource.resource && await this.decompilationService.shouldDecompileFile(untitledOrFileResource.resource.fsPath)) {
+				await this.decompilationHelper.decompileTypeAndUpdateFileContents(untitledOrFileResource.resource);
+			}
+		}
+		/* End AGPL */
 
 		const editors: IResourceEditorInputType[] = untitledOrFileResources.map(untitledOrFileResource => ({
 			resource: untitledOrFileResource.resource,

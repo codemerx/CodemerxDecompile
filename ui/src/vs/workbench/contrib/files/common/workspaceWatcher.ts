@@ -97,7 +97,7 @@ export class WorkspaceWatcher extends Disposable {
 		if (msg.indexOf('ENOSPC') >= 0) {
 			this.notificationService.prompt(
 				Severity.Warning,
-				localize('enospcError', "Unable to watch for file changes in this large workspace. Please follow the instructions link to resolve this issue."),
+				localize('enospcError', "CodemerxDecompile is unable to work properly. Please, follow the instructions to resolve this issue."),
 				[{
 					label: localize('learnMore', "Instructions"),
 					run: () => {

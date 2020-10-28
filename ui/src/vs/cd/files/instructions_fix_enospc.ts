@@ -15,9 +15,9 @@
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
 export default () => `
-# Unable to watch for file changes in this large workspace
+# CodemerxDecompile is unable to work properly
 
-This error indicates that the file watcher is running out of handles because the workspace is large and contains many files. The current limit can be viewed by running:
+This error indicates that the file watcher is running out of handles. The current limit can be viewed by running:
 |||
 cat /proc/sys/fs/inotify/max_user_watches
 |||

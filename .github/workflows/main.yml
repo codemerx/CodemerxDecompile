@@ -29,6 +29,12 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Restore SNK
+      uses: RollyPeres/base64-to-path@v1
+      with:
+        filePath: ${{ github.workspace }}/common/CDKey.snk
+        encodedString: ${{ secrets.CD_SNK }}
+
     - name: Build Solution
       run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
 

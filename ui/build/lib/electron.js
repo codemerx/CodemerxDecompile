@@ -29,9 +29,11 @@ function darwinBundleDocumentType(extensions, icon) {
 exports.config = {
     version: util.getElectronVersion(),
     productAppName: product.nameLong,
-    companyName: 'Microsoft Corporation',
-    copyright: 'Copyright (C) 2019 Microsoft. All rights reserved',
-    darwinIcon: 'resources/darwin/code.icns',
+    /* AGPL */
+    companyName: 'CodeMerx',
+    copyright: 'Copyright (C) 2020 CodeMerx. All rights reserved.',
+    darwinIcon: 'resources/darwin/codemerx-logo.icns',
+    /* End AGPL */
     darwinBundleIdentifier: product.darwinBundleIdentifier,
     darwinApplicationCategoryType: 'public.app-category.developer-tools',
     darwinHelpBookFolder: 'VS Code HelpBook',

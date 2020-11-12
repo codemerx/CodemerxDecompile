@@ -34,9 +34,9 @@ function darwinBundleDocumentType(extensions: string[], icon: string) {
 export const config = {
 	version: util.getElectronVersion(),
 	productAppName: product.nameLong,
-	companyName: 'Microsoft Corporation',
-	copyright: 'Copyright (C) 2019 Microsoft. All rights reserved',
 	/* AGPL */
+	companyName: 'CodeMerx',
+	copyright: 'Copyright (C) 2020 CodeMerx. All rights reserved.',
 	darwinIcon: 'resources/darwin/codemerx-logo.icns',
 	/* End AGPL */
 	darwinBundleIdentifier: product.darwinBundleIdentifier,

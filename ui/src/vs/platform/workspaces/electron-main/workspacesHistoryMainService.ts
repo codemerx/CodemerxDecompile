@@ -3,23 +3,25 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as nls from 'vs/nls';
-import * as arrays from 'vs/base/common/arrays';
+/* AGPL */
+// import * as nls from 'vs/nls';
+// import * as arrays from 'vs/base/common/arrays';
+// import { getBaseLabel, getPathLabel, splitName } from 'vs/base/common/labels';
+// import { IEnvironmentService } from 'vs/platform/environment/common/environment';
+// import { INativeEnvironmentService } from 'vs/platform/environment/node/environmentService';
+// import { getSimpleWorkspaceLabel } from 'vs/platform/label/common/label';
+/* End AGPL */
 import { IStateService } from 'vs/platform/state/node/state';
-import { app, JumpListCategory } from 'electron';
+import { app } from 'electron';
 import { ILogService } from 'vs/platform/log/common/log';
-import { getBaseLabel, getPathLabel, splitName } from 'vs/base/common/labels';
 import { Event as CommonEvent, Emitter } from 'vs/base/common/event';
 import { isWindows, isMacintosh } from 'vs/base/common/platform';
-import { IWorkspaceIdentifier, ISingleFolderWorkspaceIdentifier, isSingleFolderWorkspaceIdentifier, IRecentlyOpened, isRecentWorkspace, isRecentFolder, IRecent, isRecentFile, IRecentFolder, IRecentWorkspace, IRecentFile, toStoreData, restoreRecentlyOpened, RecentlyOpenedStorageData } from 'vs/platform/workspaces/common/workspaces';
+import { IWorkspaceIdentifier, ISingleFolderWorkspaceIdentifier, IRecentlyOpened, isRecentWorkspace, isRecentFolder, IRecent, isRecentFile, IRecentFolder, IRecentWorkspace, IRecentFile, toStoreData, restoreRecentlyOpened, RecentlyOpenedStorageData } from 'vs/platform/workspaces/common/workspaces';
 import { IWorkspacesMainService } from 'vs/platform/workspaces/electron-main/workspacesMainService';
 import { ThrottledDelayer } from 'vs/base/common/async';
-import { isEqual, dirname, originalFSPath, basename } from 'vs/base/common/resources';
+import { isEqual, originalFSPath, basename } from 'vs/base/common/resources';
 import { URI } from 'vs/base/common/uri';
 import { Schemas } from 'vs/base/common/network';
-import { IEnvironmentService } from 'vs/platform/environment/common/environment';
-import { INativeEnvironmentService } from 'vs/platform/environment/node/environmentService';
-import { getSimpleWorkspaceLabel } from 'vs/platform/label/common/label';
 import { exists } from 'vs/base/node/pfs';
 import { ILifecycleMainService, LifecycleMainPhase } from 'vs/platform/lifecycle/electron-main/lifecycleMainService';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
@@ -68,7 +70,9 @@ export class WorkspacesHistoryMainService extends Disposable implements IWorkspa
 		@IStateService private readonly stateService: IStateService,
 		@ILogService private readonly logService: ILogService,
 		@IWorkspacesMainService private readonly workspacesMainService: IWorkspacesMainService,
-		@IEnvironmentService private readonly environmentService: INativeEnvironmentService,
+		/* AGPL */
+		// @IEnvironmentService private readonly environmentService: INativeEnvironmentService,
+		/* End AGPL */
 		@ILifecycleMainService private readonly lifecycleMainService: ILifecycleMainService
 	) {
 		super();
@@ -313,81 +317,83 @@ export class WorkspacesHistoryMainService extends Disposable implements IWorkspa
 			return; // only on windows
 		}
 
-		const jumpList: JumpListCategory[] = [];
+		/* AGPL */
+		// const jumpList: JumpListCategory[] = [];
 
 		// Tasks
-		jumpList.push({
-			type: 'tasks',
-			items: [
-				{
-					type: 'task',
-					title: nls.localize('newWindow', "New Window"),
-					description: nls.localize('newWindowDesc', "Opens a new window"),
-					program: process.execPath,
-					args: '-n', // force new window
-					iconPath: process.execPath,
-					iconIndex: 0
-				}
-			]
-		});
+		// jumpList.push({
+		// 	type: 'tasks',
+		// 	items: [
+		// 		{
+		// 			type: 'task',
+		// 			title: nls.localize('newWindow', "New Window"),
+		// 			description: nls.localize('newWindowDesc', "Opens a new window"),
+		// 			program: process.execPath,
+		// 			args: '-n', // force new window
+		// 			iconPath: process.execPath,
+		// 			iconIndex: 0
+		// 		}
+		// 	]
+		// });
 
 		// Recent Workspaces
-		if (this.getRecentlyOpened().workspaces.length > 0) {
+		// if (this.getRecentlyOpened().workspaces.length > 0) {
 
-			// The user might have meanwhile removed items from the jump list and we have to respect that
-			// so we need to update our list of recent paths with the choice of the user to not add them again
-			// Also: Windows will not show our custom category at all if there is any entry which was removed
-			// by the user! See https://github.com/Microsoft/vscode/issues/15052
-			let toRemove: URI[] = [];
-			for (let item of app.getJumpListSettings().removedItems) {
-				const args = item.args;
-				if (args) {
-					const match = /^--(folder|file)-uri\s+"([^"]+)"$/.exec(args);
-					if (match) {
-						toRemove.push(URI.parse(match[2]));
-					}
-				}
-			}
-			this.removeRecentlyOpened(toRemove);
+		// 	// The user might have meanwhile removed items from the jump list and we have to respect that
+		// 	// so we need to update our list of recent paths with the choice of the user to not add them again
+		// 	// Also: Windows will not show our custom category at all if there is any entry which was removed
+		// 	// by the user! See https://github.com/Microsoft/vscode/issues/15052
+		// 	let toRemove: URI[] = [];
+		// 	for (let item of app.getJumpListSettings().removedItems) {
+		// 		const args = item.args;
+		// 		if (args) {
+		// 			const match = /^--(folder|file)-uri\s+"([^"]+)"$/.exec(args);
+		// 			if (match) {
+		// 				toRemove.push(URI.parse(match[2]));
+		// 			}
+		// 		}
+		// 	}
+		// 	this.removeRecentlyOpened(toRemove);
 
 			// Add entries
-			jumpList.push({
-				type: 'custom',
-				name: nls.localize('recentFolders', "Recent Workspaces"),
-				items: arrays.coalesce(this.getRecentlyOpened().workspaces.slice(0, 7 /* limit number of entries here */).map(recent => {
-					const workspace = isRecentWorkspace(recent) ? recent.workspace : recent.folderUri;
-					const title = recent.label ? splitName(recent.label).name : getSimpleWorkspaceLabel(workspace, this.environmentService.untitledWorkspacesHome);
+			// jumpList.push({
+			// 	type: 'custom',
+			// 	name: nls.localize('recentFolders', "Recent Workspaces"),
+			// 	items: arrays.coalesce(this.getRecentlyOpened().workspaces.slice(0, 7 /* limit number of entries here */).map(recent => {
+			// 		const workspace = isRecentWorkspace(recent) ? recent.workspace : recent.folderUri;
+			// 		const title = recent.label ? splitName(recent.label).name : getSimpleWorkspaceLabel(workspace, this.environmentService.untitledWorkspacesHome);
 
-					let description;
-					let args;
-					if (isSingleFolderWorkspaceIdentifier(workspace)) {
-						description = nls.localize('folderDesc', "{0} {1}", getBaseLabel(workspace), getPathLabel(dirname(workspace), this.environmentService));
-						args = `--folder-uri "${workspace.toString()}"`;
-					} else {
-						description = nls.localize('workspaceDesc', "{0} {1}", getBaseLabel(workspace.configPath), getPathLabel(dirname(workspace.configPath), this.environmentService));
-						args = `--file-uri "${workspace.configPath.toString()}"`;
-					}
+			// 		let description;
+			// 		let args;
+			// 		if (isSingleFolderWorkspaceIdentifier(workspace)) {
+			// 			description = nls.localize('folderDesc', "{0} {1}", getBaseLabel(workspace), getPathLabel(dirname(workspace), this.environmentService));
+			// 			args = `--folder-uri "${workspace.toString()}"`;
+			// 		} else {
+			// 			description = nls.localize('workspaceDesc', "{0} {1}", getBaseLabel(workspace.configPath), getPathLabel(dirname(workspace.configPath), this.environmentService));
+			// 			args = `--file-uri "${workspace.configPath.toString()}"`;
+			// 		}
 
-					return {
-						type: 'task',
-						title,
-						description,
-						program: process.execPath,
-						args,
-						iconPath: 'explorer.exe', // simulate folder icon
-						iconIndex: 0
-					};
-				}))
-			});
-		}
+			// 		return {
+			// 			type: 'task',
+			// 			title,
+			// 			description,
+			// 			program: process.execPath,
+			// 			args,
+			// 			iconPath: 'explorer.exe', // simulate folder icon
+			// 			iconIndex: 0
+			// 		};
+			// 	}))
+			// });
+		// }
 
 		// Recent
-		jumpList.push({
-			type: 'recent' // this enables to show files in the "recent" category
-		});
+		// jumpList.push({
+		// 	type: 'recent' // this enables to show files in the "recent" category
+		// });
 
 		try {
-			app.setJumpList(jumpList);
+			app.setJumpList(null);
+		/* End AGPL */
 		} catch (error) {
 			this.logService.warn('#setJumpList', error); // since setJumpList is relatively new API, make sure to guard for errors
 		}

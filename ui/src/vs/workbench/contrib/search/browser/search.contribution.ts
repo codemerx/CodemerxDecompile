@@ -33,7 +33,7 @@ import { getMultiSelectedResources } from 'vs/workbench/contrib/files/browser/fi
 /* AGPL */
 import { ExplorerFolderContext, FilesExplorerFocusCondition, IExplorerService, VIEWLET_ID as VIEWLET_ID_FILES } from 'vs/workbench/contrib/files/common/files';
 import { registerContributions as replaceContributions } from 'vs/workbench/contrib/search/browser/replaceContributions';
-import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, copyAllCommand, copyMatchCommand, copyPathCommand, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, toggleCaseSensitiveCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
+import { clearHistoryCommand, ClearSearchResultsAction, CloseReplaceAction, CollapseDeepestExpandedLevelAction, FocusNextInputAction, FocusNextSearchResultAction, FocusPreviousInputAction, FocusPreviousSearchResultAction, focusSearchListCommand, getSearchView, openSearchView, OpenSearchViewletAction, RefreshAction, RemoveAction, ReplaceAction, ReplaceAllAction, ReplaceAllInFolderAction, toggleCaseSensitiveCommand, toggleWholeWordCommand, FindInFilesCommand, ToggleSearchOnTypeAction, ExpandAllAction } from 'vs/workbench/contrib/search/browser/searchActions';
 /* End AGPL */
 import { SearchView } from 'vs/workbench/contrib/search/browser/searchView';
 import { registerContributions as searchWidgetContributions } from 'vs/workbench/contrib/search/browser/searchWidget';
@@ -276,59 +276,61 @@ MenuRegistry.appendMenuItem(MenuId.SearchContext, {
 	order: 2
 });
 
-KeybindingsRegistry.registerCommandAndKeybindingRule({
-	id: Constants.CopyMatchCommandId,
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: Constants.FileMatchOrMatchFocusKey,
-	primary: KeyMod.CtrlCmd | KeyCode.KEY_C,
-	handler: copyMatchCommand
-});
+/* AGPL */
+// KeybindingsRegistry.registerCommandAndKeybindingRule({
+// 	id: Constants.CopyMatchCommandId,
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: Constants.FileMatchOrMatchFocusKey,
+// 	primary: KeyMod.CtrlCmd | KeyCode.KEY_C,
+// 	handler: copyMatchCommand
+// });
 
-MenuRegistry.appendMenuItem(MenuId.SearchContext, {
-	command: {
-		id: Constants.CopyMatchCommandId,
-		title: nls.localize('copyMatchLabel', "Copy")
-	},
-	when: Constants.FileMatchOrMatchFocusKey,
-	group: 'search_2',
-	order: 1
-});
+// MenuRegistry.appendMenuItem(MenuId.SearchContext, {
+// 	command: {
+// 		id: Constants.CopyMatchCommandId,
+// 		title: nls.localize('copyMatchLabel', "Copy")
+// 	},
+// 	when: Constants.FileMatchOrMatchFocusKey,
+// 	group: 'search_2',
+// 	order: 1
+// });
 
-KeybindingsRegistry.registerCommandAndKeybindingRule({
-	id: Constants.CopyPathCommandId,
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: Constants.FileMatchOrFolderMatchWithResourceFocusKey,
-	primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_C,
-	win: {
-		primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_C
-	},
-	handler: copyPathCommand
-});
+// KeybindingsRegistry.registerCommandAndKeybindingRule({
+// 	id: Constants.CopyPathCommandId,
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: Constants.FileMatchOrFolderMatchWithResourceFocusKey,
+// 	primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_C,
+// 	win: {
+// 		primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_C
+// 	},
+// 	handler: copyPathCommand
+// });
 
-MenuRegistry.appendMenuItem(MenuId.SearchContext, {
-	command: {
-		id: Constants.CopyPathCommandId,
-		title: nls.localize('copyPathLabel', "Copy Path")
-	},
-	when: Constants.FileMatchOrFolderMatchWithResourceFocusKey,
-	group: 'search_2',
-	order: 2
-});
+// MenuRegistry.appendMenuItem(MenuId.SearchContext, {
+// 	command: {
+// 		id: Constants.CopyPathCommandId,
+// 		title: nls.localize('copyPathLabel', "Copy Path")
+// 	},
+// 	when: Constants.FileMatchOrFolderMatchWithResourceFocusKey,
+// 	group: 'search_2',
+// 	order: 2
+// });
 
-MenuRegistry.appendMenuItem(MenuId.SearchContext, {
-	command: {
-		id: Constants.CopyAllCommandId,
-		title: nls.localize('copyAllLabel', "Copy All")
-	},
-	when: Constants.HasSearchResults,
-	group: 'search_2',
-	order: 3
-});
+// MenuRegistry.appendMenuItem(MenuId.SearchContext, {
+// 	command: {
+// 		id: Constants.CopyAllCommandId,
+// 		title: nls.localize('copyAllLabel', "Copy All")
+// 	},
+// 	when: Constants.HasSearchResults,
+// 	group: 'search_2',
+// 	order: 3
+// });
 
-CommandsRegistry.registerCommand({
-	id: Constants.CopyAllCommandId,
-	handler: copyAllCommand
-});
+// CommandsRegistry.registerCommand({
+// 	id: Constants.CopyAllCommandId,
+// 	handler: copyAllCommand
+// });
+/* End AGPL */
 
 CommandsRegistry.registerCommand({
 	id: Constants.ClearSearchHistoryCommandId,

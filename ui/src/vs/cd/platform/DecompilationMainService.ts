@@ -205,7 +205,12 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<ReferenceMetadata>((resolve, reject) => {
 			this.client?.getMemberReferenceMetadata(request, {}, (err, response) => {
 				if (err) {
-					reject(err);
+					reject({
+						...err,
+						metadata: {
+							unresolvedAssemblyName: err.metadata.get('unresolvedassemblyname')[0]
+						}
+					});
 					return;
 				}
 

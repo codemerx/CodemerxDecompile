@@ -17,7 +17,7 @@ import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService
 import { toErrorMessage } from 'vs/base/common/errorMessage';
 import { IListService } from 'vs/platform/list/browser/listService';
 import { CommandsRegistry } from 'vs/platform/commands/common/commands';
-import { RawContextKey, IContextKey, IContextKeyService, ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
+import { RawContextKey, ContextKeyExpr } from 'vs/platform/contextkey/common/contextkey';
 import { IFileService } from 'vs/platform/files/common/files';
 import { KeybindingsRegistry, KeybindingWeight } from 'vs/platform/keybinding/common/keybindingsRegistry';
 import { KeyMod, KeyCode, KeyChord } from 'vs/base/common/keyCodes';
@@ -55,12 +55,14 @@ export const REVEAL_IN_EXPLORER_COMMAND_ID = 'revealInExplorer';
 export const REVERT_FILE_COMMAND_ID = 'workbench.action.files.revert';
 export const OPEN_TO_SIDE_COMMAND_ID = 'explorer.openToSide';
 export const OPEN_WITH_EXPLORER_COMMAND_ID = 'explorer.openWith';
-export const SELECT_FOR_COMPARE_COMMAND_ID = 'selectForCompare';
+/* AGPL */
+// export const SELECT_FOR_COMPARE_COMMAND_ID = 'selectForCompare';
 
-export const COMPARE_SELECTED_COMMAND_ID = 'compareSelected';
-export const COMPARE_RESOURCE_COMMAND_ID = 'compareFiles';
+// export const COMPARE_SELECTED_COMMAND_ID = 'compareSelected';
+// export const COMPARE_RESOURCE_COMMAND_ID = 'compareFiles';
 export const COMPARE_WITH_SAVED_COMMAND_ID = 'workbench.files.action.compareWithSaved';
-export const COPY_PATH_COMMAND_ID = 'copyFilePath';
+// export const COPY_PATH_COMMAND_ID = 'copyFilePath';
+/* End AGPL */
 export const COPY_RELATIVE_PATH_COMMAND_ID = 'copyRelativeFilePath';
 
 export const SAVE_FILE_AS_COMMAND_ID = 'workbench.action.files.saveAs';
@@ -206,54 +208,56 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	}
 });
 
-let globalResourceToCompare: URI | undefined;
-let resourceSelectedForCompareContext: IContextKey<boolean>;
-CommandsRegistry.registerCommand({
-	id: SELECT_FOR_COMPARE_COMMAND_ID,
-	handler: (accessor, resource: URI | object) => {
-		const listService = accessor.get(IListService);
+/* AGPL */
+// let globalResourceToCompare: URI | undefined;
+// let resourceSelectedForCompareContext: IContextKey<boolean>;
+// CommandsRegistry.registerCommand({
+// 	id: SELECT_FOR_COMPARE_COMMAND_ID,
+// 	handler: (accessor, resource: URI | object) => {
+// 		const listService = accessor.get(IListService);
 
-		globalResourceToCompare = getResourceForCommand(resource, listService, accessor.get(IEditorService));
-		if (!resourceSelectedForCompareContext) {
-			resourceSelectedForCompareContext = ResourceSelectedForCompareContext.bindTo(accessor.get(IContextKeyService));
-		}
-		resourceSelectedForCompareContext.set(true);
-	}
-});
+// 		globalResourceToCompare = getResourceForCommand(resource, listService, accessor.get(IEditorService));
+// 		if (!resourceSelectedForCompareContext) {
+// 			resourceSelectedForCompareContext = ResourceSelectedForCompareContext.bindTo(accessor.get(IContextKeyService));
+// 		}
+// 		resourceSelectedForCompareContext.set(true);
+// 	}
+// });
 
-CommandsRegistry.registerCommand({
-	id: COMPARE_SELECTED_COMMAND_ID,
-	handler: async (accessor, resource: URI | object) => {
-		const editorService = accessor.get(IEditorService);
-		const explorerService = accessor.get(IExplorerService);
-		const resources = getMultiSelectedResources(resource, accessor.get(IListService), editorService, explorerService);
+// CommandsRegistry.registerCommand({
+// 	id: COMPARE_SELECTED_COMMAND_ID,
+// 	handler: async (accessor, resource: URI | object) => {
+// 		const editorService = accessor.get(IEditorService);
+// 		const explorerService = accessor.get(IExplorerService);
+// 		const resources = getMultiSelectedResources(resource, accessor.get(IListService), editorService, explorerService);
 
-		if (resources.length === 2) {
-			return editorService.openEditor({
-				leftResource: resources[0],
-				rightResource: resources[1]
-			});
-		}
+// 		if (resources.length === 2) {
+// 			return editorService.openEditor({
+// 				leftResource: resources[0],
+// 				rightResource: resources[1]
+// 			});
+// 		}
 
-		return true;
-	}
-});
+// 		return true;
+// 	}
+// });
 
-CommandsRegistry.registerCommand({
-	id: COMPARE_RESOURCE_COMMAND_ID,
-	handler: (accessor, resource: URI | object) => {
-		const editorService = accessor.get(IEditorService);
-		const listService = accessor.get(IListService);
+// CommandsRegistry.registerCommand({
+// 	id: COMPARE_RESOURCE_COMMAND_ID,
+// 	handler: (accessor, resource: URI | object) => {
+// 		const editorService = accessor.get(IEditorService);
+// 		const listService = accessor.get(IListService);
 
-		const rightResource = getResourceForCommand(resource, listService, editorService);
-		if (globalResourceToCompare && rightResource) {
-			editorService.openEditor({
-				leftResource: globalResourceToCompare,
-				rightResource
-			});
-		}
-	}
-});
+// 		const rightResource = getResourceForCommand(resource, listService, editorService);
+// 		if (globalResourceToCompare && rightResource) {
+// 			editorService.openEditor({
+// 				leftResource: globalResourceToCompare,
+// 				rightResource
+// 			});
+// 		}
+// 	}
+// });
+/* End AGPL */
 
 async function resourcesToClipboard(resources: URI[], relative: boolean, clipboardService: IClipboardService, notificationService: INotificationService, labelService: ILabelService): Promise<void> {
 	if (resources.length) {
@@ -267,19 +271,21 @@ async function resourcesToClipboard(resources: URI[], relative: boolean, clipboa
 	}
 }
 
-KeybindingsRegistry.registerCommandAndKeybindingRule({
-	weight: KeybindingWeight.WorkbenchContrib,
-	when: EditorContextKeys.focus.toNegated(),
-	primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_C,
-	win: {
-		primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_C
-	},
-	id: COPY_PATH_COMMAND_ID,
-	handler: async (accessor, resource: URI | object) => {
-		const resources = getMultiSelectedResources(resource, accessor.get(IListService), accessor.get(IEditorService), accessor.get(IExplorerService));
-		await resourcesToClipboard(resources, false, accessor.get(IClipboardService), accessor.get(INotificationService), accessor.get(ILabelService));
-	}
-});
+/* AGPL */
+// KeybindingsRegistry.registerCommandAndKeybindingRule({
+// 	weight: KeybindingWeight.WorkbenchContrib,
+// 	when: EditorContextKeys.focus.toNegated(),
+// 	primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KEY_C,
+// 	win: {
+// 		primary: KeyMod.Shift | KeyMod.Alt | KeyCode.KEY_C
+// 	},
+// 	id: COPY_PATH_COMMAND_ID,
+// 	handler: async (accessor, resource: URI | object) => {
+// 		const resources = getMultiSelectedResources(resource, accessor.get(IListService), accessor.get(IEditorService), accessor.get(IExplorerService));
+// 		await resourcesToClipboard(resources, false, accessor.get(IClipboardService), accessor.get(INotificationService), accessor.get(ILabelService));
+// 	}
+// });
+/* End AGPL */
 
 KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,

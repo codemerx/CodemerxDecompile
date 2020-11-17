@@ -227,6 +227,9 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 
 		return this.previousPromise.then(result => {
 			if (!result || !state.validate(this.editor)) {
+				/* AGPL */
+				this.lastMemberReferenceResult = null;
+				/* End AGPL */
 				this.removeLinkDecorations();
 				return;
 			}
@@ -242,8 +245,10 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 		})
 		.catch(err => {
 			/* AGPL */
-			if (err && err.metadata && err.metadata.unresolvedassemblyname) {
-				const tooltipContent: MarkdownString = new MarkdownString().appendMarkdown(`Ambiguous type reference. Please locate the assembly where the type is defined.\nAssemblyName: **${err.metadata.unresolvedassemblyname}**`);
+			this.lastMemberReferenceResult = null;
+
+			if (err && err.metadata && err.metadata.unresolvedAssemblyName) {
+				const tooltipContent: MarkdownString = new MarkdownString().appendMarkdown(`Ambiguous type reference. Please locate the assembly where the type is defined.\nAssemblyName: **${err.metadata.unresolvedAssemblyName}**`);
 				this.addDecoration(new Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn), tooltipContent, true);
 			} else {
 				throw err;

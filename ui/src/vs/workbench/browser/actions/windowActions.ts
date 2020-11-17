@@ -314,30 +314,34 @@ class ShowAboutDialogAction extends Action {
 	}
 }
 
-export class NewWindowAction extends Action {
+/* AGPL */
+// export class NewWindowAction extends Action {
 
-	static readonly ID = 'workbench.action.newWindow';
-	static readonly LABEL = nls.localize('newWindow', "New Window");
+// 	static readonly ID = 'workbench.action.newWindow';
+// 	static readonly LABEL = nls.localize('newWindow', "New Window");
 
-	constructor(
-		id: string,
-		label: string,
-		@IHostService private readonly hostService: IHostService
-	) {
-		super(id, label);
-	}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IHostService private readonly hostService: IHostService
+// 	) {
+// 		super(id, label);
+// 	}
 
-	run(): Promise<void> {
-		return this.hostService.openWindow();
-	}
-}
+// 	run(): Promise<void> {
+// 		return this.hostService.openWindow();
+// 	}
+// }
+/* End AGPL */
 
 const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
 
 // --- Actions Registration
 
 const fileCategory = nls.localize('file', "File");
-registry.registerWorkbenchAction(SyncActionDescriptor.from(NewWindowAction, { primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_N }), 'New Window');
+/* AGPL */
+// registry.registerWorkbenchAction(SyncActionDescriptor.from(NewWindowAction, { primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.KEY_N }), 'New Window');
+/* End AGPL */
 registry.registerWorkbenchAction(SyncActionDescriptor.from(QuickPickRecentAction), 'File: Quick Open Recent...', fileCategory);
 registry.registerWorkbenchAction(SyncActionDescriptor.from(OpenRecentAction, { primary: KeyMod.CtrlCmd | KeyCode.KEY_R, mac: { primary: KeyMod.WinCtrl | KeyCode.KEY_R } }), 'File: Open Recent...', fileCategory);
 
@@ -383,14 +387,16 @@ KeybindingsRegistry.registerKeybindingRule({
 
 // --- Menu Registration
 
-MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
-	group: '1_new',
-	command: {
-		id: NewWindowAction.ID,
-		title: nls.localize({ key: 'miNewWindow', comment: ['&& denotes a mnemonic'] }, "New &&Window")
-	},
-	order: 2
-});
+/* AGPL */
+// MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
+// 	group: '1_new',
+// 	command: {
+// 		id: NewWindowAction.ID,
+// 		title: nls.localize({ key: 'miNewWindow', comment: ['&& denotes a mnemonic'] }, "New &&Window")
+// 	},
+// 	order: 2
+// });
+/* End AGPL */
 
 MenuRegistry.appendMenuItem(MenuId.MenubarFileMenu, {
 	title: nls.localize({ key: 'miOpenRecent', comment: ['&& denotes a mnemonic'] }, "Open &&Recent"),

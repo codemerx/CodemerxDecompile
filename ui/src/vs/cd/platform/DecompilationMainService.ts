@@ -208,7 +208,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 					reject({
 						...err,
 						metadata: {
-							unresolvedAssemblyName: err.metadata.get('unresolvedassemblyname')
+							unresolvedAssemblyName: err.metadata.get('unresolvedassemblyname')[0]
 						}
 					});
 					return;

@@ -227,8 +227,9 @@ export class GotoDefinitionAtPositionEditorContribution implements IEditorContri
 
 		return this.previousPromise.then(result => {
 			if (!result || !state.validate(this.editor)) {
+				/* AGPL */
 				this.lastMemberReferenceResult = null;
-
+				/* End AGPL */
 				this.removeLinkDecorations();
 				return;
 			}

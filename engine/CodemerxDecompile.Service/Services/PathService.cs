@@ -14,6 +14,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
+using System;
 using System.IO;
 
 using CodemerxDecompile.Service.Interfaces;
@@ -22,14 +23,28 @@ namespace CodemerxDecompile.Service.Services
 {
     internal class PathService : IPathService
     {
-        public PathService()
+        private string workingDirectory;
+
+        public string WorkingDirectory
         {
-            this.WorkingDirectory = Path.Join(Path.GetTempPath(), "CD");
-            this.MetadataStorageDirectory = Path.Join(this.WorkingDirectory, ".decompilation-metadata");
+            get => this.workingDirectory;
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                if (this.workingDirectory != null)
+                {
+                    throw new InvalidOperationException($"{nameof(PathService)}.{nameof(WorkingDirectory)} can be set only once.");
+                }
+
+                this.workingDirectory = value;
+                this.MetadataStorageDirectory = Path.Join(this.WorkingDirectory, ".decompilation-metadata");
+            }
         }
 
-        public string WorkingDirectory { get; }
-
-        public string MetadataStorageDirectory { get; }
+        public string MetadataStorageDirectory { get; private set; }
     }
 }

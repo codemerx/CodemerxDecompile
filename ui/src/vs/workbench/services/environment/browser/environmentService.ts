@@ -168,6 +168,9 @@ export class BrowserWorkbenchEnvironmentService implements IWorkbenchEnvironment
 	/* AGPL */
 	@memoize
 	get codemerxDecompileLogResource(): URI { return joinPath(this.options.logsPath, 'CodemerxDecompile.log'); }
+	
+	@memoize
+	get sourcesDir(): URI { return joinPath(this.userRoamingDataHome, 'sources'); }
 	/* End AGPL */
 
 	private _extensionHostDebugEnvironment: IExtensionHostDebugEnvironment | undefined = undefined;

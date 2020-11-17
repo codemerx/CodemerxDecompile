@@ -259,6 +259,9 @@ export class EnvironmentService implements INativeEnvironmentService {
 	/* AGPL */
 	@memoize
 	get codemerxDecompileLogResource(): URI { return URI.file(path.join(this.logsPath, 'CodemerxDecompile.log')); }
+	
+	@memoize
+	get sourcesDir(): URI { return URI.file(path.join(this.userDataPath, 'sources')); }
 	/* End AGPL */
 
 	get disableUpdates(): boolean { return !!this._args['disable-updates']; }

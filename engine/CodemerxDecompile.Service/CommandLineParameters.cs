@@ -15,14 +15,19 @@
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
 using System;
+using System.Linq;
 
 namespace CodemerxDecompile.Service
 {
     public class CommandLineParameters
     {
+        private const char Quote = '\"';
+
         public string Port { get; private set; }
 
         public bool HasPort => !string.IsNullOrWhiteSpace(this.Port);
+
+        public string WorkingDir { get; private set; }
 
         public static CommandLineParameters Parse(string[] arguments)
         {
@@ -38,11 +43,30 @@ namespace CodemerxDecompile.Service
                         case "--port":
                             parameters.Port = parts[1];
                             break;
+                        case "--workingDir":
+                            parameters.WorkingDir = ParseStringParameterValue(parts[1]);
+                            break;
                     }
                 }
             }
 
             return parameters;
+        }
+
+        private static string ParseStringParameterValue(string value)
+        {
+            if (value.First() == Quote && value.Last() == Quote)
+            {
+                return value.Substring(1, value.Length - 2);
+            }
+            else if (!value.Any(c => c == Quote))
+            {
+                return value;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("String parameter values must either be surrounded in quotes or must not contain quotes at all.");
+            }
         }
     }
 }

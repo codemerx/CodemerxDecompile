@@ -18,7 +18,7 @@ namespace CodemerxDecompile.Service.Interfaces
 {
     public interface IPathService
     {
-        string WorkingDirectory { get; }
+        string WorkingDirectory { get; set; }
 
         string MetadataStorageDirectory { get; }
     }

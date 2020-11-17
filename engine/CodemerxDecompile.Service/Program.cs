@@ -33,6 +33,9 @@ namespace CodemerxDecompile.Service
 
             IHost host = CreateHostBuilder(args, parameters).Build();
 
+            IPathService pathService = host.Services.GetService<IPathService>();
+            pathService.WorkingDirectory = parameters.WorkingDir;
+
             IServiceManager serviceManager = host.Services.GetService<IServiceManager>();
 
             await host.RunAsync(serviceManager.CancellationToken);

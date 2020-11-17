@@ -58,6 +58,7 @@ export interface IEnvironmentService {
 	/* AGPL */
 	// --- CodemerxDecompile
 	codemerxDecompileLogResource: URI;
+	sourcesDir: URI;
 	/* End AGPL */
 
 	// --- logging

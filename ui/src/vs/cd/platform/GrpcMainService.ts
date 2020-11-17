@@ -63,8 +63,13 @@ export class GrpcMainService implements IGrpcMainService {
 			const randomPort = this.getRandomPort();
 			logService.info(`Starting CodemerxDecompile.Service on port ${randomPort}.`);
 
+			const args = [
+				`--port=${randomPort}`,
+				`--workingDir="${this.environmentService.sourcesDir.fsPath}"`
+			];
+
 			const executeCommand = platform.isWindows ? 'CodemerxDecompile.Service.exe' : './CodemerxDecompile.Service';
-			const serverProcess = spawn(executeCommand, [`--port=${randomPort}`], {
+			const serverProcess = spawn(executeCommand, args, {
 				cwd: SERVER_DIRECTORY
 			});
 

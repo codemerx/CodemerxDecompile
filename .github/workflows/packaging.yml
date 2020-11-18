@@ -69,7 +69,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: codemerxdecompile-linux-x64
-        path: VSCode-linux-x64
+        path: CodemerxDecompile-linux-x64
 
   package-windows:
     if: github.event.inputs.windows
@@ -103,7 +103,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: codemerxdecompile-win32-x64
-        path: VSCode-win32-x64
+        path: CodemerxDecompile-win32-x64
 
   package-macos:
     if: github.event.inputs.macos
@@ -140,4 +140,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: codemerxdecompile-macos
-        path: VSCode-darwin
+        path: CodemerxDecompile-darwin

@@ -4642,11 +4642,6 @@ grpc-tools@^1.9.1:
   dependencies:
     node-pre-gyp "^0.15.0"
 
-grpc-web@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/grpc-web/-/grpc-web-1.2.0.tgz#96402a1245ea834fedb1dd5a80f910476ddbbb1c"
-  integrity sha512-QS0RF+xiWnMEiHWyA0A0I8JYYJLOiF/DGEpRQ7vJDOzEZYfmNqI7d7d29sYBbNfTi+arVh2JpeGIX7ch24a+tA==
-
 grpc_tools_node_protoc_ts@^4.1.4:
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/grpc_tools_node_protoc_ts/-/grpc_tools_node_protoc_ts-4.1.4.tgz#5d8d30510139e866b57f08fba0510eb9536b300f"

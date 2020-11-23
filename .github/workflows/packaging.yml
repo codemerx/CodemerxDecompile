@@ -66,10 +66,13 @@ jobs:
         NODE_OPTIONS: --max-old-space-size=8192
 
     - name: Archive artifacts
+      run: tar -czpvf CodemerxDecompile-linux-x64.tar.gz ./CodemerxDecompile-linux-x64
+
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: codemerxdecompile-linux-x64
-        path: CodemerxDecompile-linux-x64
+        name: CodemerxDecompile-linux-x64
+        path: CodemerxDecompile-linux-x64.tar.gz
 
   package-windows:
     if: github.event.inputs.windows

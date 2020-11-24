@@ -30,6 +30,7 @@ const { promisify } = require('util');
 const chmod = (path, mode) => promisify(fs.chmod, path, mode);
 const engineDirectory = path.join(path.dirname(root), 'engine');
 const decompilerServicePath = path.join(engineDirectory, 'CodemerxDecompile.Service', 'CodemerxDecompile.Service.csproj');
+const gulpChmod = require("gulp-chmod");
 /* End AGPL */
 const commit = util.getVersion(root);
 const packageJson = require('../package.json');
@@ -329,7 +330,10 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 			result = es.merge(result, gulp.src('resources/linux/bin/code.sh', { base: '.' })
 				.pipe(replace('@@PRODNAME@@', product.nameLong))
 				.pipe(replace('@@NAME@@', product.applicationName))
-				.pipe(rename('bin/' + product.applicationName)));
+				.pipe(rename('bin/' + product.applicationName)
+				/* AGPL */
+				.pipe(gulpChmod(0o755))));
+				/* End AGPL */
 		}
 
 		// submit all stats that have been collected

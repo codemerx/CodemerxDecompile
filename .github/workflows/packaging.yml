@@ -105,7 +105,7 @@ jobs:
     - name: Archive artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: codemerxdecompile-win32-x64
+        name: CodemerxDecompile-win32-x64
         path: CodemerxDecompile-win32-x64
 
   package-macos:
@@ -140,7 +140,10 @@ jobs:
         NODE_OPTIONS: --max-old-space-size=8192
 
     - name: Archive artifacts
+      run: tar -czpvf CodemerxDecompile-darwin.tar.gz ./CodemerxDecompile-darwin
+
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: codemerxdecompile-macos
+        name: CodemerxDecompile-darwin
         path: CodemerxDecompile-darwin

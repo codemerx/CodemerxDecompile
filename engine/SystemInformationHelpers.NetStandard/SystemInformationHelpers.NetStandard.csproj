@@ -35,6 +35,8 @@
 
   <Import Project="..\SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems" Label="Shared" />
 
+  <Import Project="..\CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems" Label="Shared" />
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
   </ItemGroup>

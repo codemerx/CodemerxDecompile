@@ -35,6 +35,8 @@
 
   <Import Project="..\JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems" Label="Shared" />
 
+  <Import Project="..\CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems" Label="Shared" />
+
   <ItemGroup>
     <ProjectReference Include="..\JustDecompile.EngineInfrastructure.NetStandard\JustDecompile.EngineInfrastructure.NetStandard.csproj" />
     <ProjectReference Include="..\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj" />

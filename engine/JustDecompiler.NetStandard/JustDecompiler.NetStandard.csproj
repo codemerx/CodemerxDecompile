@@ -40,4 +40,6 @@
 
   <Import Project="..\JustDecompiler.Shared\JustDecompiler.Shared.projitems" Label="Shared" />
 
+  <Import Project="..\CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems" Label="Shared" />
+
 </Project>

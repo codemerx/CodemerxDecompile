@@ -107,6 +107,7 @@
     <Compile Include="..\CommonVersionAssemblyInfo.cs">
       <Link>Mono.Cecil\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ProjectInfo.cs" />
     <!--Telerik Authorship-->
     <!--Telerik Authorship-->
     <!--Telerik Authorship-->

@@ -107,7 +107,7 @@
     <Compile Include="..\..\..\CommonVersionAssemblyInfo.cs">
       <Link>Mono.Cecil.Mdb\CommonVersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Mono.Cecil.Shared\ProjectInfo.cs">
+    <Compile Include="..\..\ProjectInfo.cs">
       <Link>ProjectInfo.cs</Link>
     </Compile>
   </ItemGroup>

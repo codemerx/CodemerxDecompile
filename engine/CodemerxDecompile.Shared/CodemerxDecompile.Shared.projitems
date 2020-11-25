@@ -1,4 +1,6 @@
-﻿<!--
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!--
     Copyright CodeMerx 2020
     This file is part of CodemerxDecompile.
 
@@ -16,27 +18,17 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 -->
 
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>Telerik.JustDecompile.Mono.Cecil.Pdb.NetStandard</AssemblyName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>f82c685f-d633-4e27-b9a3-578418d1bf85</SharedGUID>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>RELEASE</DefineConstants>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../common/CDKey.snk</AssemblyOriginatorKeyFile>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>CodemerxDecompile.Shared</Import_RootNamespace>
   </PropertyGroup>
-
-  <Import Project="..\Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems" Label="Shared" />
-
-  <Import Project="..\CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems" Label="Shared" />
-
   <ItemGroup>
-    <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommonAssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommonVersionAssemblyInfo.cs" />
   </ItemGroup>
-
 </Project>

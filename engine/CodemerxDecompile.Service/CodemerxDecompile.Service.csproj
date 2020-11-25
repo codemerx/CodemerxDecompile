@@ -23,6 +23,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
     <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -55,5 +56,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Tools.MSBuildProjectBuilder.NetStandard\Tools.MSBuildProjectBuilder.NetStandard.csproj" />
   </ItemGroup>
+
+  <Import Project="..\CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems" Label="Shared" />
 
 </Project>

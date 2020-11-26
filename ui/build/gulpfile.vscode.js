@@ -330,9 +330,9 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 			result = es.merge(result, gulp.src('resources/linux/bin/code.sh', { base: '.' })
 				.pipe(replace('@@PRODNAME@@', product.nameLong))
 				.pipe(replace('@@NAME@@', product.applicationName))
-				.pipe(rename('bin/' + product.applicationName)
+				.pipe(rename('bin/' + product.applicationName))
 				/* AGPL */
-				.pipe(gulpChmod(0o755))));
+				.pipe(gulpChmod(0o755)));
 				/* End AGPL */
 		}
 

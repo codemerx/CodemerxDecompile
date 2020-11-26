@@ -146,4 +146,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: CodemerxDecompile-darwin
-        path: CodemerxDecompile-darwin
+        path: CodemerxDecompile-darwin.tar.gz

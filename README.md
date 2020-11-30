@@ -2,7 +2,9 @@
 
 ## Overview 
 
-This is a continuation of [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine) maintained by the original JustDecompile creators. We created JustDecompile while working for Telerik (now Progress). The original repo seems to have gone out of support after 2018 so we at CodeMerx will try to bring a good product back to life again.
+CodemerxDecompile is a truly multi-platform (Windows/MAC/Linux) .NET decompiler. It is based on the [fastest .NET decompiler engine](https://github.com/telerik/JustDecompileEngine) and [VS Code](https://github.com/microsoft/vscode) UI.
+
+CodemerxDecompile is maintained by the original JustDecompile creators and it is a continuation of [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine). Sadly, the original JustDecompile seems to have gone out of support after 2018. Now it returns big time with CodemerxDecompile.
 
 ## Quick Start Guide
 

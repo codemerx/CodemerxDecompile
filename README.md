@@ -17,7 +17,7 @@ CodemerxDecompile is maintained by the original JustDecompile creators and it is
 2. Start the app using `./CodemerxDecompile-linux-x64/bin/CodemerxDecompile`
 
 ### MacOS
-1. Extract the archive using `tar -xzpf ./CodemerxDecompile-darwin.tar.gz`
+1. Extract the archive using `tar -xzpf ./CodemerxDecompile-darwin.tar`
 2. Start `CodemerxDecompile.app`
 
 ## License

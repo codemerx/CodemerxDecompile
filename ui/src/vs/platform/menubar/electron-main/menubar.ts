@@ -362,17 +362,19 @@ export class Menubar {
 
 	private setMacApplicationMenu(macApplicationMenu: Menu): void {
 		const about = this.createMenuItem(nls.localize('mAbout', "About {0}", product.nameLong), 'workbench.action.showAboutDialog');
-		const checkForUpdates = this.getUpdateMenuItems();
+		/* AGPL */
+		// const checkForUpdates = this.getUpdateMenuItems();
 
-		let preferences;
-		if (this.shouldDrawMenu('Preferences')) {
-			const preferencesMenu = new Menu();
-			this.setMenuById(preferencesMenu, 'Preferences');
-			preferences = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'miPreferences', comment: ['&& denotes a mnemonic'] }, "&&Preferences")), submenu: preferencesMenu });
-		}
-
-		const servicesMenu = new Menu();
-		const services = new MenuItem({ label: nls.localize('mServices', "Services"), role: 'services', submenu: servicesMenu });
+		// let preferences;
+		// if (this.shouldDrawMenu('Preferences')) {
+		// 	const preferencesMenu = new Menu();
+		// 	this.setMenuById(preferencesMenu, 'Preferences');
+		// 	preferences = new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'miPreferences', comment: ['&& denotes a mnemonic'] }, "&&Preferences")), submenu: preferencesMenu });
+		// }
+		
+		// const servicesMenu = new Menu();
+		// const services = new MenuItem({ label: nls.localize('mServices', "Services"), role: 'services', submenu: servicesMenu });
+		/* End AGPL */
 		const hide = new MenuItem({ label: nls.localize('mHide', "Hide {0}", product.nameLong), role: 'hide', accelerator: 'Command+H' });
 		const hideOthers = new MenuItem({ label: nls.localize('mHideOthers', "Hide Others"), role: 'hideOthers', accelerator: 'Command+Alt+H' });
 		const showAll = new MenuItem({ label: nls.localize('mShowAll', "Show All"), role: 'unhide' });
@@ -390,18 +392,22 @@ export class Menubar {
 		}));
 
 		const actions = [about];
-		actions.push(...checkForUpdates);
-
-		if (preferences) {
-			actions.push(...[
-				__separator__(),
-				preferences
-			]);
-		}
+		/* AGPL */
+		// actions.push(...checkForUpdates);
+		
+		// if (preferences) {
+		// 	actions.push(...[
+		// 		__separator__(),
+		// 		preferences
+		// 	]);
+		// }
+		/* End AGPL */
 
 		actions.push(...[
-			__separator__(),
-			services,
+			/* AGPL */
+			// __separator__(),
+			// services,
+			/* End AGPL */
 			__separator__(),
 			hide,
 			hideOthers,
@@ -413,29 +419,30 @@ export class Menubar {
 		actions.forEach(i => macApplicationMenu.append(i));
 	}
 
-	private shouldDrawMenu(menuId: string): boolean {
-		// We need to draw an empty menu to override the electron default
-		if (!isMacintosh && getTitleBarStyle(this.configurationService, this.environmentService) === 'custom') {
-			return false;
-		}
+	/* AGPL */
+	// private shouldDrawMenu(menuId: string): boolean {
+	// 	// We need to draw an empty menu to override the electron default
+	// 	if (!isMacintosh && getTitleBarStyle(this.configurationService, this.environmentService) === 'custom') {
+	// 		return false;
+	// 	}
 
-		switch (menuId) {
-			case 'File':
-			case 'Help':
-				if (isMacintosh) {
-					return (this.windowsMainService.getWindowCount() === 0 && this.closedLastWindow) || (!!this.menubarMenus && !!this.menubarMenus[menuId]);
-				}
+	// 	switch (menuId) {
+	// 		case 'File':
+	// 		case 'Help':
+	// 			if (isMacintosh) {
+	// 				return (this.windowsMainService.getWindowCount() === 0 && this.closedLastWindow) || (!!this.menubarMenus && !!this.menubarMenus[menuId]);
+	// 			}
 
-			case 'Window':
-				if (isMacintosh) {
-					return (this.windowsMainService.getWindowCount() === 0 && this.closedLastWindow) || !!this.menubarMenus;
-				}
+	// 		case 'Window':
+	// 			if (isMacintosh) {
+	// 				return (this.windowsMainService.getWindowCount() === 0 && this.closedLastWindow) || !!this.menubarMenus;
+	// 			}
 
-			default:
-				return this.windowsMainService.getWindowCount() > 0 && (!!this.menubarMenus && !!this.menubarMenus[menuId]);
-		}
-	}
-
+	// 		default:
+	// 			return this.windowsMainService.getWindowCount() > 0 && (!!this.menubarMenus && !!this.menubarMenus[menuId]);
+	// 	}
+	// }
+	/* End AGPL */
 
 	private setMenu(menu: Menu, items: Array<MenubarMenuItem>) {
 		items.forEach((item: MenubarMenuItem) => {

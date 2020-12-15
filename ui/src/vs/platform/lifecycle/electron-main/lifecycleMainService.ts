@@ -360,7 +360,10 @@ export class LifecycleMainService extends Disposable implements ILifecycleMainSe
 			// if there are no more code windows opened, fire the onWillShutdown event, unless
 			// we are on macOS where it is perfectly fine to close the last window and
 			// the application continues running (unless quit was actually requested)
-			if (this.windowCounter === 0 && (!isMacintosh || this._quitRequested)) {
+			/* AGPL */
+			// Shutdown if there are no more windows opened. Even on Mac.
+			if (this.windowCounter === 0 /*&& (!isMacintosh || this._quitRequested)*/) {
+			/* End AGPL */
 				this.beginOnWillShutdown();
 			}
 		});

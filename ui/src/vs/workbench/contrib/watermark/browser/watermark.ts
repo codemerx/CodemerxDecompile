@@ -14,7 +14,7 @@ import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/
 import { IWorkbenchContribution, IWorkbenchContributionsRegistry, Extensions as WorkbenchExtensions } from 'vs/workbench/common/contributions';
 import { ILifecycleService, LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { OpenFolderAction, OpenFileFolderAction, OpenFileAction } from 'vs/workbench/browser/actions/workspaceActions';
+import { OpenFileFolderAction, OpenFileAction } from 'vs/workbench/browser/actions/workspaceActions';
 import { Parts, IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import * as dom from 'vs/base/browser/dom';
 import { KeybindingLabel } from 'vs/base/browser/ui/keybindingLabel/keybindingLabel';
@@ -35,9 +35,9 @@ interface WatermarkEntry {
 // const showCommands: WatermarkEntry = { text: nls.localize('watermark.showCommands', "Show All Commands"), id: ShowAllCommandsAction.ID };
 const quickAccess: WatermarkEntry = { text: nls.localize('watermark.quickAccess', "Go to Type"), id: 'workbench.action.quickOpen' };
 const openFileNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFile', "Open Assembly"), id: OpenFileAction.ID, mac: false };
+// const openFolderNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFolder', "Open Folder"), id: OpenFolderAction.ID, mac: false };
+const openFileOrFolderMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFileFolder', "Open Assembly"), id: OpenFileFolderAction.ID, mac: true };
 /* End AGPL */
-const openFolderNonMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFolder', "Open Folder"), id: OpenFolderAction.ID, mac: false };
-const openFileOrFolderMacOnly: WatermarkEntry = { text: nls.localize('watermark.openFileFolder', "Open File or Folder"), id: OpenFileFolderAction.ID, mac: true };
 const openRecent: WatermarkEntry = { text: nls.localize('watermark.openRecent', "Open Recent"), id: 'workbench.action.openRecent' };
 /* AGPL */
 // const newUntitledFile: WatermarkEntry = { text: nls.localize('watermark.newUntitledFile', "New Untitled File"), id: NEW_UNTITLED_FILE_COMMAND_ID };
@@ -52,7 +52,9 @@ const noFolderEntries = [
 	// showCommands,
 	/* End AGPL */
 	openFileNonMacOnly,
-	openFolderNonMacOnly,
+	/* AGPL */
+	// openFolderNonMacOnly,
+	/* End AGPL */
 	openFileOrFolderMacOnly,
 	openRecent,
 	/* AGPL */

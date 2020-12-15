@@ -131,7 +131,9 @@ export abstract class AbstractFileDialogService implements IFileDialogService {
 	protected abstract addFileSchemaIfNeeded(schema: string): string[];
 
 	protected async pickFileFolderAndOpenSimplified(schema: string, options: IPickAndOpenOptions, preferNewWindow: boolean): Promise<any> {
-		const title = nls.localize('openFileOrFolder.title', 'Open File Or Folder');
+		/* AGPL */
+		const title = nls.localize('openFileOrFolder.title', 'Open Assembly');
+		/* End AGPL */
 		const availableFileSystems = this.addFileSchemaIfNeeded(schema);
 
 		const uri = await this.pickResource({ canSelectFiles: true, canSelectFolders: true, canSelectMany: false, defaultUri: options.defaultUri, title, availableFileSystems });

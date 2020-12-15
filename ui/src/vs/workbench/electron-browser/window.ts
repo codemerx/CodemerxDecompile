@@ -505,6 +505,11 @@ export class NativeWindow extends Disposable {
 	}
 
 	private updateTouchbarMenu(): void {
+		/* AGPL */
+		// Disable touchbar support
+		return;
+		/* End AGPL */
+
 		if (!isMacintosh) {
 			return; // macOS only
 		}

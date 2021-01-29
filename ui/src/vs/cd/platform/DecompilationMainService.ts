@@ -30,6 +30,7 @@ import { createDecorator } from 'vs/platform/instantiation/common/instantiation'
 import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { AssemblyMetadata, AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
 import { Empty } from 'vs/cd/platform/proto/common_pb';
+import { IAnalyticsMainService } from './AnalyticsMainService';
 
 export const IDecompilationMainService = createDecorator<IDecompilationMainService>('IDecompilationMainService');
 
@@ -58,7 +59,8 @@ export class DecompilationMainService implements IDecompilationMainService {
 
 	private client: RpcDecompilerClient | undefined;
 
-	constructor(@IGrpcMainService grpcService: IGrpcMainService) {
+	constructor(@IGrpcMainService grpcService: IGrpcMainService,
+				@IAnalyticsMainService private readonly analyticsService: IAnalyticsMainService) {
 		grpcService.getServiceUrl().then(url => {
 			this.client = new RpcDecompilerClient(url, grpc.credentials.createInsecure());
 		});
@@ -68,7 +70,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<void>((resolve, reject) => {
 			this.client?.restoreDecompilationContext(new Empty(), {}, (err) => {
 				if (err) {
-					reject(`initialize failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `restoreDecompilationContext failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -84,7 +88,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<boolean>((resolve, reject) => {
 			this.client?.shouldDecompileFile(request, {}, (err, response) => {
 				if (err) {
-					reject(`shouldDecompileFile failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `shouldDecompileFile failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -100,7 +106,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<AssemblyMetadata>((resolve, reject) => {
 			this.client?.getContextAssembly(request, {}, (err, response) => {
 				if (err) {
-					reject(`getContextAssembly failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `getContextAssembly failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -118,7 +126,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<string>((resolve, reject) => {
 			this.client?.getWorkspaceDirectory(new Empty(), {}, (err, response) => {
 				if (err) {
-					reject(`getWorkspaceDirectory failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `getWorkspaceDirectory failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -134,7 +144,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<AssemblyRelatedFilePaths>((resolve, reject) => {
 			this.client?.getAssemblyRelatedFilePaths(request, {}, (err, response) => {
 				if (err) {
-					reject(`getAssemblyRelatedFilePaths failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `getAssemblyRelatedFilePaths failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -155,7 +167,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<string[]>((resolve, reject) => {
 			this.client?.getAllTypeFilePaths(request, {}, (err, response) => {
 				if (err) {
-					reject(`getAllTypeFilePaths failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `getAllTypeFilePaths failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -171,6 +185,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<string>((resolve, reject) => {
 			this.client?.decompileType(request, {}, (err, response) => {
 				if (err) {
+					this.trackError(`decompileType failed. Error: ${JSON.stringify(err)}`);
 					reject(err);
 					return;
 				}
@@ -187,7 +202,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<void>((resolve, reject) => {
 			this.client?.addResolvedAssembly(request, {}, (err, response) => {
 				if (err) {
-					reject(`addResolvedAssembly failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `addResolvedAssembly failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -205,10 +222,15 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<ReferenceMetadata>((resolve, reject) => {
 			this.client?.getMemberReferenceMetadata(request, {}, (err, response) => {
 				if (err) {
+					const unresolvedAssemblyName = err.metadata.get('unresolvedassemblyname')[0];
+					if (!unresolvedAssemblyName) {
+						this.trackError(`getMemberReferenceMetadata failed. Error: ${JSON.stringify(err)}`);
+					}
+
 					reject({
 						...err,
 						metadata: {
-							unresolvedAssemblyName: err.metadata.get('unresolvedassemblyname')[0]
+							unresolvedAssemblyName
 						}
 					});
 					return;
@@ -239,7 +261,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<Selection>((resolve, reject) => {
 			this.client?.getMemberDefinitionPosition(request, {}, (err, response) => {
 				if (err) {
-					reject(`getMemberDefinitionPosition failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `getMemberDefinitionPosition failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -263,7 +287,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<ProjectCreationMetadata>((resolve, reject) => {
 			this.client?.getProjectCreationMetadata(request, {}, (err, response) => {
 				if (err) {
-					reject(`getProjectCreationMetadata failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `getProjectCreationMetadata failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -295,7 +321,9 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<CreateProjectResult>((resolve, reject) => {
 			this.client?.createProject(request, {}, (err, response) => {
 				if (err) {
-					reject(`createProject failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `createProject failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
@@ -317,6 +345,7 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<Selection>((resolve, reject) => {
 			this.client?.getSearchResultPosition(request, {}, (err, response) => {
 				if (err) {
+					this.trackError(`getSearchResultPosition failed. Error: ${JSON.stringify(err)}`);
 					reject(err);
 					return;
 				}
@@ -337,12 +366,18 @@ export class DecompilationMainService implements IDecompilationMainService {
 		return new Promise<void>((resolve, reject) => {
 			this.client?.clearAssemblyList(new Empty(), {}, (err) => {
 				if (err) {
-					reject(`clearAssemblyList failed. Error: ${JSON.stringify(err)}`);
+					const errDescription = `clearAssemblyList failed. Error: ${JSON.stringify(err)}`;
+					this.trackError(errDescription);
+					reject(errDescription);
 					return;
 				}
 
 				resolve();
 			});
 		});
+	}
+
+	private async trackError(description: string) : Promise<void> {
+		await this.analyticsService.trackException(description);
 	}
 }

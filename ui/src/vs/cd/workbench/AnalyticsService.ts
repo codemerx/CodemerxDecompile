@@ -24,6 +24,7 @@ export interface IAnalyticsService {
 	readonly _serviceBrand: undefined;
 
 	trackEvent(category: string, action: string, label?: string, value?: string | number): Promise<void>;
+	trackException(description: string): Promise<void>;
 }
 
 export class AnalyticsService {

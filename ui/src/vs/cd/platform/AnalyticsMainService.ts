@@ -29,6 +29,7 @@ export interface IAnalyticsMainService {
 	readonly _serviceBrand: undefined;
 
 	trackEvent(category: string, action: string, label?: string, value?: string | number): Promise<void>;
+	trackException(description: string): Promise<void>;
 };
 
 const CLIENT_ID_KEY_NAME = 'decompiler-client-id';
@@ -60,6 +61,19 @@ export class AnalyticsMainService implements IAnalyticsMainService {
 			ev: value
 		})
 		.send();
+	}
+
+	public trackException(description: string): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.visitor?.exception(description, (err) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				resolve();
+			});
+		});
 	}
 
 	private async initializeAnalyticsClient(storageService: IStorageMainService) : Promise<void> {

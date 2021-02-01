@@ -17,9 +17,15 @@
 name: Build in Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      branchName:
+        description: 'Branch'
+        required: false
+        default: 'master'
   push:
     branches:
-      - master
+      - github.event.inputs.branchName
 
 jobs:
   build:
@@ -36,6 +42,9 @@ jobs:
         encodedString: ${{ secrets.CD_SNK }}
 
     - name: Build Solution
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.400'
       run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
 
     - name: Run Tests

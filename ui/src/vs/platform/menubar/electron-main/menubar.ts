@@ -6,7 +6,7 @@
 import * as nls from 'vs/nls';
 import { isMacintosh, language } from 'vs/base/common/platform';
 import { IEnvironmentService } from 'vs/platform/environment/common/environment';
-import { app, shell, Menu, MenuItem, BrowserWindow, MenuItemConstructorOptions, WebContents, Event, KeyboardEvent } from 'electron';
+import { shell, Menu, MenuItem, BrowserWindow, MenuItemConstructorOptions, WebContents, Event, KeyboardEvent } from 'electron';
 import { getTitleBarStyle, IWindowOpenable } from 'vs/platform/windows/common/windows';
 import { OpenContext, IRunActionInWindowRequest, IRunKeybindingInWindowRequest } from 'vs/platform/windows/node/window';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
@@ -267,10 +267,12 @@ export class Menubar {
 		if (isMacintosh && !this.appMenuInstalled) {
 			this.appMenuInstalled = true;
 
-			const dockMenu = new Menu();
-			dockMenu.append(new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'miNewWindow', comment: ['&& denotes a mnemonic'] }, "New &&Window")), click: () => this.windowsMainService.openEmptyWindow({ context: OpenContext.DOCK }) }));
+			/* AGPL */
+			// const dockMenu = new Menu();
+			// dockMenu.append(new MenuItem({ label: this.mnemonicLabel(nls.localize({ key: 'miNewWindow', comment: ['&& denotes a mnemonic'] }, "New &&Window")), click: () => this.windowsMainService.openEmptyWindow({ context: OpenContext.DOCK }) }));
 
-			app.dock.setMenu(dockMenu);
+			// app.dock.setMenu(dockMenu);
+			/* End AGPL */
 		}
 
 		// File

@@ -38,7 +38,7 @@ on:
 
 jobs:
   package-linux:
-    if: github.event.inputs.linux
+    if: ${{ github.event.inputs.linux }}
     runs-on: ubuntu-16.04
 
     steps:
@@ -75,7 +75,7 @@ jobs:
         path: CodemerxDecompile-linux-x64.tar.gz
 
   package-windows:
-    if: github.event.inputs.windows
+    if: ${{ github.event.inputs.windows }}
     runs-on: windows-2019
 
     steps:
@@ -109,7 +109,7 @@ jobs:
         path: CodemerxDecompile-win32-x64
 
   package-macos:
-    if: github.event.inputs.macos
+    if: ${{ github.event.inputs.macos }}
     runs-on: macos-10.15
 
     steps:

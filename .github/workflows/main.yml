@@ -18,14 +18,9 @@ name: Build in Release
 
 on:
   workflow_dispatch:
-    inputs:
-      branchName:
-        description: 'Branch'
-        required: false
-        default: 'master'
   push:
     branches:
-      - github.event.inputs.branchName
+      - master
 
 jobs:
   build:

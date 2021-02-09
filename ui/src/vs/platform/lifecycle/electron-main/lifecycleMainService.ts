@@ -210,7 +210,10 @@ export class LifecycleMainService extends Disposable implements ILifecycleMainSe
 			// macOS: can run without any window open. in that case we fire
 			// the onWillShutdown() event directly because there is no veto
 			// to be expected.
-			if (isMacintosh && this.windowCounter === 0) {
+			/* AGPL */
+			// Quit even on Mac.
+			if (this.windowCounter === 0) {
+			/* End AGPL */
 				this.beginOnWillShutdown();
 			}
 		};
@@ -224,8 +227,11 @@ export class LifecycleMainService extends Disposable implements ILifecycleMainSe
 
 			// Windows/Linux: we quit when all windows have closed
 			// Mac: we only quit when quit was requested
-			if (this._quitRequested || !isMacintosh) {
+			/* AGPL */
+			// Quit when all windows are closed even on Mac.
+			if (this._quitRequested || isMacintosh) {
 				app.quit();
+			/* End AGPL */
 			}
 		};
 		app.addListener('window-all-closed', windowAllClosedListener);

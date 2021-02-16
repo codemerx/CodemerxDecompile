@@ -114,11 +114,12 @@ export class ClearAssemblyListAction extends Action {
 		id: string,
 		label: string,
 		@IFileService private readonly fileService: IFileService,
-		@IEditorService private readonly editorService: IEditorService,
 		@IProgressService private readonly progressService: IProgressService,
 		@IDecompilationService private readonly decompilationService: IDecompilationService,
 		@INotificationService private readonly notificationService: INotificationService,
-		@IAnalyticsService private readonly analyticsService: IAnalyticsService
+		@IAnalyticsService private readonly analyticsService: IAnalyticsService,
+		@IHostService private readonly hostService: IHostService,
+		@IWorkbenchEnvironmentService private readonly environmentService: IWorkbenchEnvironmentService
 	) {
 		super(id, label);
 	}
@@ -131,18 +132,13 @@ export class ClearAssemblyListAction extends Action {
 
 			try {
 				await this.decompilationService.clearAssemblyList();
-				this.closeOpenedEditorTabs();
 				await this.clearWorkspaceDirectory();
+
+				return this.hostService.openWindow({ forceReuseWindow: true, remoteAuthority: this.environmentService.configuration.remoteAuthority });
 			} catch (err) {
 				this.notificationService.error(err.message || 'Failed to clear assembly list');
 			}
 		});
-	}
-
-	private closeOpenedEditorTabs() : void {
-		for(const editor of this.editorService.editors) {
-			editor.dispose();
-		}
 	}
 
 	private async clearWorkspaceDirectory() : Promise<void> {

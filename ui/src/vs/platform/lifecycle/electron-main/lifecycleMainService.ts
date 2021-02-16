@@ -10,7 +10,7 @@ import { Event, Emitter } from 'vs/base/common/event';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { ICodeWindow } from 'vs/platform/windows/electron-main/windows';
 import { handleVetos } from 'vs/platform/lifecycle/common/lifecycle';
-import { isMacintosh, isWindows } from 'vs/base/common/platform';
+import { isWindows } from 'vs/base/common/platform';
 import { Disposable } from 'vs/base/common/lifecycle';
 import { Barrier, timeout } from 'vs/base/common/async';
 import { ParsedArgs } from 'vs/platform/environment/node/argv';
@@ -229,10 +229,8 @@ export class LifecycleMainService extends Disposable implements ILifecycleMainSe
 			// Mac: we only quit when quit was requested
 			/* AGPL */
 			// Quit when all windows are closed even on Mac.
-			if (this._quitRequested || isMacintosh) {
-				app.quit();
+			app.quit();
 			/* End AGPL */
-			}
 		};
 		app.addListener('window-all-closed', windowAllClosedListener);
 

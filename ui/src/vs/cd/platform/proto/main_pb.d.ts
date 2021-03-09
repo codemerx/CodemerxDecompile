@@ -65,11 +65,17 @@ export namespace GetContextAssemblyRequest {
 }
 
 export class GetContextAssemblyResponse extends jspb.Message {
-  getAssemblyname(): string;
-  setAssemblyname(value: string): void;
+  getAssemblyfullname(): string;
+  setAssemblyfullname(value: string): void;
 
   getAssemblyfilepath(): string;
   setAssemblyfilepath(value: string): void;
+
+  getTargetplatform(): string;
+  setTargetplatform(value: string): void;
+
+  getTargetarchitecture(): string;
+  setTargetarchitecture(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetContextAssemblyResponse.AsObject;
@@ -83,8 +89,10 @@ export class GetContextAssemblyResponse extends jspb.Message {
 
 export namespace GetContextAssemblyResponse {
   export type AsObject = {
-    assemblyname: string,
+    assemblyfullname: string,
     assemblyfilepath: string,
+    targetplatform: string,
+    targetarchitecture: string,
   }
 }
 

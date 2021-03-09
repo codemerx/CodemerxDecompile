@@ -1007,8 +1007,10 @@ proto.GetContextAssemblyResponse.prototype.toObject = function(opt_includeInstan
  */
 proto.GetContextAssemblyResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    assemblyname: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    assemblyfilepath: jspb.Message.getFieldWithDefault(msg, 2, "")
+    assemblyfullname: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    assemblyfilepath: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    targetplatform: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    targetarchitecture: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -1047,11 +1049,19 @@ proto.GetContextAssemblyResponse.deserializeBinaryFromReader = function(msg, rea
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setAssemblyname(value);
+      msg.setAssemblyfullname(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setAssemblyfilepath(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setTargetplatform(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setTargetarchitecture(value);
       break;
     default:
       reader.skipField();
@@ -1082,7 +1092,7 @@ proto.GetContextAssemblyResponse.prototype.serializeBinary = function() {
  */
 proto.GetContextAssemblyResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getAssemblyname();
+  f = message.getAssemblyfullname();
   if (f.length > 0) {
     writer.writeString(
       1,
@@ -1096,14 +1106,28 @@ proto.GetContextAssemblyResponse.serializeBinaryToWriter = function(message, wri
       f
     );
   }
+  f = message.getTargetplatform();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = message.getTargetarchitecture();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
 };
 
 
 /**
- * optional string assemblyName = 1;
+ * optional string assemblyFullName = 1;
  * @return {string}
  */
-proto.GetContextAssemblyResponse.prototype.getAssemblyname = function() {
+proto.GetContextAssemblyResponse.prototype.getAssemblyfullname = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
@@ -1112,7 +1136,7 @@ proto.GetContextAssemblyResponse.prototype.getAssemblyname = function() {
  * @param {string} value
  * @return {!proto.GetContextAssemblyResponse} returns this
  */
-proto.GetContextAssemblyResponse.prototype.setAssemblyname = function(value) {
+proto.GetContextAssemblyResponse.prototype.setAssemblyfullname = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -1132,6 +1156,42 @@ proto.GetContextAssemblyResponse.prototype.getAssemblyfilepath = function() {
  */
 proto.GetContextAssemblyResponse.prototype.setAssemblyfilepath = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string targetPlatform = 3;
+ * @return {string}
+ */
+proto.GetContextAssemblyResponse.prototype.getTargetplatform = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.GetContextAssemblyResponse} returns this
+ */
+proto.GetContextAssemblyResponse.prototype.setTargetplatform = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string targetArchitecture = 4;
+ * @return {string}
+ */
+proto.GetContextAssemblyResponse.prototype.getTargetarchitecture = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.GetContextAssemblyResponse} returns this
+ */
+proto.GetContextAssemblyResponse.prototype.setTargetarchitecture = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 

@@ -3,9 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Event } from 'vs/base/common/event';
 import { IWorkspaceContextService } from 'vs/platform/workspace/common/workspace';
-import { DisposableStore } from 'vs/base/common/lifecycle';
+/* AGPL */
+import { Emitter, Event } from 'vs/base/common/event';
+import { DisposableStore, Disposable } from 'vs/base/common/lifecycle';
+/* End AGPL */
 import { IExplorerService, IFilesConfiguration, SortOrder, IExplorerView } from 'vs/workbench/contrib/files/common/files';
 import { ExplorerItem, ExplorerModel } from 'vs/workbench/contrib/files/common/explorerModel';
 import { URI } from 'vs/base/common/uri';
@@ -27,7 +29,9 @@ function getFileEventsExcludes(configurationService: IConfigurationService, root
 	return configuration?.files?.exclude || Object.create(null);
 }
 
-export class ExplorerService implements IExplorerService {
+/* AGPL */
+export class ExplorerService extends Disposable implements IExplorerService {
+/* End AGPL */
 	declare readonly _serviceBrand: undefined;
 
 	private static readonly EXPLORER_FILE_CHANGES_REACT_DELAY = 500; // delay in ms to react to file changes to give our internal events a chance to react first
@@ -38,6 +42,12 @@ export class ExplorerService implements IExplorerService {
 	private cutItems: ExplorerItem[] | undefined;
 	private view: IExplorerView | undefined;
 	private model: ExplorerModel;
+	/* AGPL */
+	private selectedItem: ExplorerItem | undefined;
+	
+	protected _onDidExplorerResourceChange = this._register(new Emitter<string>());
+	readonly onDidExplorerResourceChange: Event<string> = this._onDidExplorerResourceChange.event;
+	/* End AGPL */
 
 	constructor(
 		@IFileService private fileService: IFileService,
@@ -47,6 +57,9 @@ export class ExplorerService implements IExplorerService {
 		@IClipboardService private clipboardService: IClipboardService,
 		@IEditorService private editorService: IEditorService,
 	) {
+		/* AGPL */
+		super();
+		/* End AGPL */
 		this._sortOrder = this.configurationService.getValue('explorer.sortOrder');
 
 		this.model = new ExplorerModel(this.contextService, this.fileService);
@@ -82,6 +95,17 @@ export class ExplorerService implements IExplorerService {
 	get sortOrder(): SortOrder {
 		return this._sortOrder;
 	}
+
+	/* AGPL */
+	setSelectedItem(selectedItem: ExplorerItem | undefined) : void {
+		this.selectedItem = selectedItem;
+
+		if (this.selectedItem?.resource) {
+			this._onDidExplorerResourceChange.fire(this.selectedItem.resource.fsPath);
+		}
+	}
+	/* End AGPL */
+	
 
 	registerView(contextProvider: IExplorerView): void {
 		this.view = contextProvider;

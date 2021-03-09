@@ -1,0 +1,55 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* .monaco-workbench .assemblyMetadata-pane {
+	display: flex;
+	flex-direction: column;
+} */
+
+.metadata-key {
+	font-weight: 700;
+	color: white;
+}
+
+.metadata-container {
+	margin-bottom: 5px;
+}
+
+.monaco-workbench .assemblyMetadata-pane .assemblyMetadata-progress {
+	width: 100%;
+	height: 2px;
+	padding-bottom: 3px;
+	position: absolute;
+}
+
+.monaco-workbench .assemblyMetadata-pane .assemblyMetadata-progress .monaco-progress-container {
+	height: 2px;
+}
+
+.monaco-workbench .assemblyMetadata-pane .assemblyMetadata-progress .monaco-progress-container .progress-bit {
+	height: 2px;
+}
+
+.monaco-workbench .assemblyMetadata-pane .assemblyMetadata-tree {
+	height: 100%;
+}
+
+.monaco-workbench .assemblyMetadata-pane .assemblyMetadata-message {
+	display: none;
+	padding: 10px 22px 0 22px;
+	opacity: 0.5;
+}
+
+.monaco-workbench .assemblyMetadata-pane.message .assemblyMetadata-message {
+	display: inherit;
+}
+
+.monaco-workbench .assemblyMetadata-pane.message .assemblyMetadata-progress {
+	display: none;
+}
+
+.monaco-workbench .assemblyMetadata-pane.message .assemblyMetadata-tree {
+	display: none;
+}

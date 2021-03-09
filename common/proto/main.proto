@@ -52,8 +52,10 @@ message GetContextAssemblyRequest {
 }
 
 message GetContextAssemblyResponse {
-  string assemblyName = 1;
+  string assemblyFullName = 1;
   string assemblyFilePath = 2;
+	string targetPlatform = 3;
+	string targetArchitecture = 4;
 }
 
 message GetProjectCreationMetadataRequest {

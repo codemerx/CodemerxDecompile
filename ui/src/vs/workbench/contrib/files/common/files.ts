@@ -22,6 +22,9 @@ import { ExplorerItem } from 'vs/workbench/contrib/files/common/explorerModel';
 import { once } from 'vs/base/common/functional';
 import { ITextEditorOptions } from 'vs/platform/editor/common/editor';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
+/* AGPL */
+import { Event } from 'vs/base/common/event';
+/* End AGPL */
 
 /**
  * Explorer viewlet id.
@@ -37,7 +40,11 @@ export interface IExplorerService {
 	readonly _serviceBrand: undefined;
 	readonly roots: ExplorerItem[];
 	readonly sortOrder: SortOrder;
-
+	/* AGPL */
+	readonly onDidExplorerResourceChange: Event<string>;
+	
+	setSelectedItem(selectedItem: ExplorerItem | undefined) : void;
+	/* End AGPL */
 	getContext(respectMultiSelection: boolean): ExplorerItem[];
 	setEditable(stat: ExplorerItem, data: IEditableData | null): Promise<void>;
 	getEditable(): { stat: ExplorerItem, data: IEditableData } | undefined;

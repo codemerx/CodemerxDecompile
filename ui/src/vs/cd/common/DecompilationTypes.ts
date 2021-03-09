@@ -63,5 +63,7 @@ export interface ProjectFileMetadata {
 
 export interface AssemblyMetadata {
 	assemblyFullName: string;
+	targetPlatform: string;
+	targetArchitecture: string;
 	assemblyFilePath: string;
 }

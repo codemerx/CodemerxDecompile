@@ -26,16 +26,20 @@ import {
 	GetProjectCreationMetadataRequest, GetContextAssemblyRequest, GetSearchResultPositionRequest, ShouldDecompileFileRequest
 } from './proto/main_pb';
 import * as grpc from "@grpc/grpc-js";
+import { Event, Emitter } from 'vs/base/common/event';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IGrpcMainService } from 'vs/cd/platform/GrpcMainService';
 import { AssemblyMetadata, AssemblyRelatedFilePaths, ReferenceMetadata, Selection, ProjectCreationMetadata, CreateProjectResult } from 'vs/cd/common/DecompilationTypes';
 import { Empty } from 'vs/cd/platform/proto/common_pb';
 import { IAnalyticsMainService } from './AnalyticsMainService';
+import { IDisposable, Disposable } from 'vs/base/common/lifecycle';
 
 export const IDecompilationMainService = createDecorator<IDecompilationMainService>('IDecompilationMainService');
 
 export interface IDecompilationMainService {
 	readonly _serviceBrand: undefined;
+
+	readonly onDecompilationContextRestored: Event<void>;
 
 	restoreDecompilationContext() : Promise<void>;
 	shouldDecompileFile(filePath: string) : Promise<boolean>;
@@ -54,13 +58,17 @@ export interface IDecompilationMainService {
 	clearAssemblyList() : Promise<void>;
 }
 
-export class DecompilationMainService implements IDecompilationMainService {
+export class DecompilationMainService extends Disposable implements IDecompilationMainService, IDisposable {
 	readonly _serviceBrand: undefined;
 
 	private client: RpcDecompilerClient | undefined;
 
+	private readonly _onDecompilationContextRestored: Emitter<void> = this._register(new Emitter<void>());
+	readonly onDecompilationContextRestored: Event<void> = this._onDecompilationContextRestored.event;
+
 	constructor(@IGrpcMainService grpcService: IGrpcMainService,
 				@IAnalyticsMainService private readonly analyticsService: IAnalyticsMainService) {
+		super();
 		grpcService.getServiceUrl().then(url => {
 			this.client = new RpcDecompilerClient(url, grpc.credentials.createInsecure());
 		});
@@ -76,9 +84,13 @@ export class DecompilationMainService implements IDecompilationMainService {
 					return;
 				}
 
+				setTimeout(() => {}, 2000);
 				resolve();
-			});
-		});
+			})
+		})
+		.then(() => {
+			this._onDecompilationContextRestored.fire();
+		});;
 	}
 
 	shouldDecompileFile(filePath: string) : Promise<boolean> {
@@ -113,8 +125,10 @@ export class DecompilationMainService implements IDecompilationMainService {
 				}
 
 				const assemblyMetadata: AssemblyMetadata = {
-					assemblyFullName: response!.getAssemblyname(),
-					assemblyFilePath: response!.getAssemblyfilepath()
+					assemblyFullName: response!.getAssemblyfullname(),
+					assemblyFilePath: response!.getAssemblyfilepath(),
+					targetArchitecture: response!.getTargetarchitecture(),
+					targetPlatform: response!.getTargetplatform()
 				};
 
 				resolve(assemblyMetadata);

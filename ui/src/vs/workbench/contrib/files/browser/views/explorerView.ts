@@ -563,6 +563,7 @@ export class ExplorerView extends ViewPane {
 		const stat = elements && elements.length ? elements[0] : undefined;
 		this.setContextKeys(stat);
 		/* AGPL */
+		this.explorerService.setSelectedItem(stat);
 		this.projectCreationEnabledState.set(!!stat);
 		/* End AGPL */
 

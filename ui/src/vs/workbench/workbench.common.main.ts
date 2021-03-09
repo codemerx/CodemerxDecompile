@@ -262,6 +262,8 @@ import 'vs/workbench/contrib/welcome/walkThrough/browser/walkThrough.contributio
 // Call Hierarchy
 /* AGPL */
 // import 'vs/workbench/contrib/callHierarchy/browser/callHierarchy.contribution';
+// Assembly Metadata
+import 'vs/workbench/contrib/assemblyMetadata/browser/assemblyMetadata.contribution';
 /* End AGPL */
 
 // Outline

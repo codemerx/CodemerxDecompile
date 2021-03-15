@@ -353,9 +353,22 @@ namespace CodemerxDecompile.Service
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Failed to resolve assembly from path"));
             }
 
+            AssemblyDefinition assemblyDefinition = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(assemblyPath);
+            AssemblyInfo assemblyInfo = NoCacheAssemblyInfoService.Instance.GetAssemblyInfo(assemblyDefinition, EmptyResolver.Instance);
+
+            string GetFormattedFrameworkVersion(ModuleDefinition module, bool shortFormat = false)
+            {
+                TargetPlatform targetPlatform = TargetPlatformResolver.Instance.GetTargetPlatform(module.FilePath, module);
+
+                return assemblyInfo.ModulesFrameworkVersions.TryGetValue(module, out FrameworkVersion frameworkVersion) ?
+                    AssemblyMetadataFormatter.FormatTargetPlatform(targetPlatform, frameworkVersion, shortFormat) : (shortFormat ? "(Unknown)" : "Unknown");
+            }
+
             return Task.FromResult(new GetContextAssemblyResponse()
             {
-                AssemblyName = typeDefinition.Module.Assembly.FullName,
+                AssemblyFullName = typeDefinition.Module.Assembly.FullName,
+                TargetArchitecture = AssemblyMetadataFormatter.GetFormattedArchitecture(typeDefinition.Module.GetModuleArchitecture()),
+                TargetPlatform = GetFormattedFrameworkVersion(typeDefinition.Module),
                 AssemblyFilePath = assemblyPath
             });
         }

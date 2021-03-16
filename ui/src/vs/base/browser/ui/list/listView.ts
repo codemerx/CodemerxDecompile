@@ -4,7 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { getOrDefault } from 'vs/base/common/objects';
-import { IDisposable, dispose, Disposable, toDisposable, DisposableStore } from 'vs/base/common/lifecycle';
+/* AGPL */
+import { IDisposable, dispose, Disposable/* , toDisposable */, DisposableStore } from 'vs/base/common/lifecycle';
+/* End AGPL */
 import { Gesture, EventType as TouchEventType, GestureEvent } from 'vs/base/browser/touch';
 import * as DOM from 'vs/base/browser/dom';
 import { Event, Emitter } from 'vs/base/common/event';
@@ -12,14 +14,20 @@ import { domEvent } from 'vs/base/browser/event';
 import { SmoothScrollableElement } from 'vs/base/browser/ui/scrollbar/scrollableElement';
 import { ScrollEvent, ScrollbarVisibility, INewScrollDimensions, Scrollable } from 'vs/base/common/scrollable';
 import { RangeMap, shift } from './rangeMap';
-import { IListVirtualDelegate, IListRenderer, IListMouseEvent, IListTouchEvent, IListGestureEvent, IListDragEvent, IListDragAndDrop, ListDragOverEffect } from './list';
+/* AGPL */
+import { IListVirtualDelegate, IListRenderer, IListMouseEvent, IListTouchEvent, IListGestureEvent/* , IListDragEvent, ListDragOverEffect */, IListDragAndDrop } from './list';
+/* End AGPL */
 import { RowCache, IRow } from './rowCache';
 import { ISpliceable } from 'vs/base/common/sequence';
 import { memoize } from 'vs/base/common/decorators';
 import { Range, IRange } from 'vs/base/common/range';
-import { equals, distinct } from 'vs/base/common/arrays';
+/* AGPL */
+// import { equals, distinct } from 'vs/base/common/arrays';
+/* End AGPL */
 import { DataTransfers, StaticDND, IDragAndDropData } from 'vs/base/browser/dnd';
-import { disposableTimeout, Delayer } from 'vs/base/common/async';
+/* AGPL */
+import { /*disposableTimeout, */ Delayer } from 'vs/base/common/async';
+/* End AGPL */
 import { isFirefox } from 'vs/base/browser/browser';
 import { IMouseWheelEvent } from 'vs/base/browser/mouseEvent';
 
@@ -157,13 +165,15 @@ export class DesktopDragAndDropData implements IDragAndDropData {
 	}
 }
 
-function equalsDragFeedback(f1: number[] | undefined, f2: number[] | undefined): boolean {
-	if (Array.isArray(f1) && Array.isArray(f2)) {
-		return equals(f1, f2!);
-	}
-
-	return f1 === f2;
-}
+/* AGPL */
+// function equalsDragFeedback(f1: number[] | undefined, f2: number[] | undefined): boolean {
+	// 	if (Array.isArray(f1) && Array.isArray(f2)) {
+		// 		return equals(f1, f2!);
+		// 	}
+		
+		// 	return f1 === f2;
+		// }
+/* End AGPL */
 
 class ListViewAccessibilityProvider<T> implements Required<IListViewAccessibilityProvider<T>> {
 
@@ -221,9 +231,11 @@ export class ListView<T> implements ISpliceable<T>, IDisposable {
 	private scrollableElementUpdateDisposable: IDisposable | null = null;
 	private scrollableElementWidthDelayer = new Delayer<void>(50);
 	private splicing = false;
-	private dragOverAnimationDisposable: IDisposable | undefined;
-	private dragOverAnimationStopDisposable: IDisposable = Disposable.None;
-	private dragOverMouseY: number = 0;
+/* AGPL */
+// private dragOverAnimationDisposable: IDisposable | undefined;
+// private dragOverAnimationStopDisposable: IDisposable = Disposable.None;
+// private dragOverMouseY: number = 0;
+/* End AGPL */
 	private setRowLineHeight: boolean;
 	private setRowHeight: boolean;
 	private supportDynamicHeights: boolean;
@@ -232,11 +244,13 @@ export class ListView<T> implements ISpliceable<T>, IDisposable {
 	private scrollWidth: number | undefined;
 
 	private dnd: IListViewDragAndDrop<T>;
-	private canDrop: boolean = false;
 	private currentDragData: IDragAndDropData | undefined;
-	private currentDragFeedback: number[] | undefined;
-	private currentDragFeedbackDisposable: IDisposable = Disposable.None;
-	private onDragLeaveTimeout: IDisposable = Disposable.None;
+/* AGPL */
+// private canDrop: boolean = false;
+// private currentDragFeedback: number[] | undefined;
+// private currentDragFeedbackDisposable: IDisposable = Disposable.None;
+// private onDragLeaveTimeout: IDisposable = Disposable.None;
+/* End AGPL */
 
 	private readonly disposables: DisposableStore = new DisposableStore();
 
@@ -343,11 +357,12 @@ export class ListView<T> implements ISpliceable<T>, IDisposable {
 		// https://github.com/Microsoft/vscode/issues/44181
 		domEvent(this.scrollableElement.getDomNode(), 'scroll')
 			(e => (e.target as HTMLElement).scrollTop = 0, null, this.disposables);
-
-		Event.map(domEvent(this.domNode, 'dragover'), e => this.toDragEvent(e))(this.onDragOver, this, this.disposables);
-		Event.map(domEvent(this.domNode, 'drop'), e => this.toDragEvent(e))(this.onDrop, this, this.disposables);
-		domEvent(this.domNode, 'dragleave')(this.onDragLeave, this, this.disposables);
-		domEvent(window, 'dragend')(this.onDragEnd, this, this.disposables);
+		/* AGPL */
+		// Event.map(domEvent(this.domNode, 'dragover'), e => this.toDragEvent(e))(this.onDragOver, this, this.disposables);
+		// Event.map(domEvent(this.domNode, 'drop'), e => this.toDragEvent(e))(this.onDrop, this, this.disposables);
+		// domEvent(this.domNode, 'dragleave')(this.onDragLeave, this, this.disposables);
+		// domEvent(window, 'dragend')(this.onDragEnd, this, this.disposables);
+		/* End AGPL */
 
 		this.setRowLineHeight = getOrDefault(options, o => o.setRowLineHeight, DefaultOptions.setRowLineHeight);
 		this.setRowHeight = getOrDefault(options, o => o.setRowHeight, DefaultOptions.setRowHeight);
@@ -880,12 +895,14 @@ export class ListView<T> implements ISpliceable<T>, IDisposable {
 		return { browserEvent, index, element };
 	}
 
-	private toDragEvent(browserEvent: DragEvent): IListDragEvent<T> {
-		const index = this.getItemIndexFromEventTarget(browserEvent.target || null);
-		const item = typeof index === 'undefined' ? undefined : this.items[index];
-		const element = item && item.element;
-		return { browserEvent, index, element };
-	}
+	/* AGPL */
+	// private toDragEvent(browserEvent: DragEvent): IListDragEvent<T> {
+		// 	const index = this.getItemIndexFromEventTarget(browserEvent.target || null);
+		// 	const item = typeof index === 'undefined' ? undefined : this.items[index];
+		// 	const element = item && item.element;
+		// 	return { browserEvent, index, element };
+	// }
+	/* End AGPL */
 
 	private onScroll(e: ScrollEvent): void {
 		try {
@@ -946,188 +963,190 @@ export class ListView<T> implements ISpliceable<T>, IDisposable {
 		}
 	}
 
-	private onDragOver(event: IListDragEvent<T>): boolean {
-		event.browserEvent.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
+	/* AGPL */
+	// private onDragOver(event: IListDragEvent<T>): boolean {
+	// 	event.browserEvent.preventDefault(); // needed so that the drop event fires (https://stackoverflow.com/questions/21339924/drop-event-not-firing-in-chrome)
 
-		this.onDragLeaveTimeout.dispose();
+	// 	this.onDragLeaveTimeout.dispose();
 
-		if (StaticDND.CurrentDragAndDropData && StaticDND.CurrentDragAndDropData.getData() === 'vscode-ui') {
-			return false;
-		}
+	// 	if (StaticDND.CurrentDragAndDropData && StaticDND.CurrentDragAndDropData.getData() === 'vscode-ui') {
+	// 		return false;
+	// 	}
 
-		this.setupDragAndDropScrollTopAnimation(event.browserEvent);
+	// 	this.setupDragAndDropScrollTopAnimation(event.browserEvent);
 
-		if (!event.browserEvent.dataTransfer) {
-			return false;
-		}
+	// 	if (!event.browserEvent.dataTransfer) {
+	// 		return false;
+	// 	}
 
-		// Drag over from outside
-		if (!this.currentDragData) {
-			if (StaticDND.CurrentDragAndDropData) {
-				// Drag over from another list
-				this.currentDragData = StaticDND.CurrentDragAndDropData;
+	// 	// Drag over from outside
+	// 	if (!this.currentDragData) {
+	// 		if (StaticDND.CurrentDragAndDropData) {
+	// 			// Drag over from another list
+	// 			this.currentDragData = StaticDND.CurrentDragAndDropData;
 
-			} else {
-				// Drag over from the desktop
-				if (!event.browserEvent.dataTransfer.types) {
-					return false;
-				}
+	// 		} else {
+	// 			// Drag over from the desktop
+	// 			if (!event.browserEvent.dataTransfer.types) {
+	// 				return false;
+	// 			}
 
-				this.currentDragData = new DesktopDragAndDropData();
-			}
-		}
+	// 			this.currentDragData = new DesktopDragAndDropData();
+	// 		}
+	// 	}
 
-		const result = this.dnd.onDragOver(this.currentDragData, event.element, event.index, event.browserEvent);
-		this.canDrop = typeof result === 'boolean' ? result : result.accept;
+	// 	const result = this.dnd.onDragOver(this.currentDragData, event.element, event.index, event.browserEvent);
+	// 	this.canDrop = typeof result === 'boolean' ? result : result.accept;
 
-		if (!this.canDrop) {
-			this.currentDragFeedback = undefined;
-			this.currentDragFeedbackDisposable.dispose();
-			return false;
-		}
+	// 	if (!this.canDrop) {
+	// 		this.currentDragFeedback = undefined;
+	// 		this.currentDragFeedbackDisposable.dispose();
+	// 		return false;
+	// 	}
 
-		event.browserEvent.dataTransfer.dropEffect = (typeof result !== 'boolean' && result.effect === ListDragOverEffect.Copy) ? 'copy' : 'move';
+	// 	event.browserEvent.dataTransfer.dropEffect = (typeof result !== 'boolean' && result.effect === ListDragOverEffect.Copy) ? 'copy' : 'move';
 
-		let feedback: number[];
+	// 	let feedback: number[];
 
-		if (typeof result !== 'boolean' && result.feedback) {
-			feedback = result.feedback;
-		} else {
-			if (typeof event.index === 'undefined') {
-				feedback = [-1];
-			} else {
-				feedback = [event.index];
-			}
-		}
+	// 	if (typeof result !== 'boolean' && result.feedback) {
+	// 		feedback = result.feedback;
+	// 	} else {
+	// 		if (typeof event.index === 'undefined') {
+	// 			feedback = [-1];
+	// 		} else {
+	// 			feedback = [event.index];
+	// 		}
+	// 	}
 
-		// sanitize feedback list
-		feedback = distinct(feedback).filter(i => i >= -1 && i < this.length).sort((a, b) => a - b);
-		feedback = feedback[0] === -1 ? [-1] : feedback;
+	// 	// sanitize feedback list
+	// 	feedback = distinct(feedback).filter(i => i >= -1 && i < this.length).sort((a, b) => a - b);
+	// 	feedback = feedback[0] === -1 ? [-1] : feedback;
 
-		if (equalsDragFeedback(this.currentDragFeedback, feedback)) {
-			return true;
-		}
+	// 	if (equalsDragFeedback(this.currentDragFeedback, feedback)) {
+	// 		return true;
+	// 	}
 
-		this.currentDragFeedback = feedback;
-		this.currentDragFeedbackDisposable.dispose();
+	// 	this.currentDragFeedback = feedback;
+	// 	this.currentDragFeedbackDisposable.dispose();
 
-		if (feedback[0] === -1) { // entire list feedback
-			DOM.addClass(this.domNode, 'drop-target');
-			DOM.addClass(this.rowsContainer, 'drop-target');
-			this.currentDragFeedbackDisposable = toDisposable(() => {
-				DOM.removeClass(this.domNode, 'drop-target');
-				DOM.removeClass(this.rowsContainer, 'drop-target');
-			});
-		} else {
-			for (const index of feedback) {
-				const item = this.items[index]!;
-				item.dropTarget = true;
+	// 	if (feedback[0] === -1) { // entire list feedback
+	// 		DOM.addClass(this.domNode, 'drop-target');
+	// 		DOM.addClass(this.rowsContainer, 'drop-target');
+	// 		this.currentDragFeedbackDisposable = toDisposable(() => {
+	// 			DOM.removeClass(this.domNode, 'drop-target');
+	// 			DOM.removeClass(this.rowsContainer, 'drop-target');
+	// 		});
+	// 	} else {
+	// 		for (const index of feedback) {
+	// 			const item = this.items[index]!;
+	// 			item.dropTarget = true;
 
-				if (item.row && item.row.domNode) {
-					DOM.addClass(item.row.domNode, 'drop-target');
-				}
-			}
+	// 			if (item.row && item.row.domNode) {
+	// 				DOM.addClass(item.row.domNode, 'drop-target');
+	// 			}
+	// 		}
 
-			this.currentDragFeedbackDisposable = toDisposable(() => {
-				for (const index of feedback) {
-					const item = this.items[index]!;
-					item.dropTarget = false;
+	// 		this.currentDragFeedbackDisposable = toDisposable(() => {
+	// 			for (const index of feedback) {
+	// 				const item = this.items[index]!;
+	// 				item.dropTarget = false;
 
-					if (item.row && item.row.domNode) {
-						DOM.removeClass(item.row.domNode, 'drop-target');
-					}
-				}
-			});
-		}
+	// 				if (item.row && item.row.domNode) {
+	// 					DOM.removeClass(item.row.domNode, 'drop-target');
+	// 				}
+	// 			}
+	// 		});
+	// 	}
 
-		return true;
-	}
+	// 	return true;
+	// }
 
-	private onDragLeave(): void {
-		this.onDragLeaveTimeout.dispose();
-		this.onDragLeaveTimeout = disposableTimeout(() => this.clearDragOverFeedback(), 100);
-	}
+	// private onDragLeave(): void {
+	// 	this.onDragLeaveTimeout.dispose();
+	// 	this.onDragLeaveTimeout = disposableTimeout(() => this.clearDragOverFeedback(), 100);
+	// }
 
-	private onDrop(event: IListDragEvent<T>): void {
-		if (!this.canDrop) {
-			return;
-		}
+	// private onDrop(event: IListDragEvent<T>): void {
+	// 	if (!this.canDrop) {
+	// 		return;
+	// 	}
 
-		const dragData = this.currentDragData;
-		this.teardownDragAndDropScrollTopAnimation();
-		this.clearDragOverFeedback();
-		this.currentDragData = undefined;
-		StaticDND.CurrentDragAndDropData = undefined;
+	// 	const dragData = this.currentDragData;
+	// 	this.teardownDragAndDropScrollTopAnimation();
+	// 	this.clearDragOverFeedback();
+	// 	this.currentDragData = undefined;
+	// 	StaticDND.CurrentDragAndDropData = undefined;
 
-		if (!dragData || !event.browserEvent.dataTransfer) {
-			return;
-		}
+	// 	if (!dragData || !event.browserEvent.dataTransfer) {
+	// 		return;
+	// 	}
 
-		event.browserEvent.preventDefault();
-		dragData.update(event.browserEvent.dataTransfer);
-		this.dnd.drop(dragData, event.element, event.index, event.browserEvent);
-	}
+	// 	event.browserEvent.preventDefault();
+	// 	dragData.update(event.browserEvent.dataTransfer);
+	// 	this.dnd.drop(dragData, event.element, event.index, event.browserEvent);
+	// }
 
-	private onDragEnd(event: DragEvent): void {
-		this.canDrop = false;
-		this.teardownDragAndDropScrollTopAnimation();
-		this.clearDragOverFeedback();
-		this.currentDragData = undefined;
-		StaticDND.CurrentDragAndDropData = undefined;
+	// private onDragEnd(event: DragEvent): void {
+	// 	this.canDrop = false;
+	// 	this.teardownDragAndDropScrollTopAnimation();
+	// 	this.clearDragOverFeedback();
+	// 	this.currentDragData = undefined;
+	// 	StaticDND.CurrentDragAndDropData = undefined;
 
-		if (this.dnd.onDragEnd) {
-			this.dnd.onDragEnd(event);
-		}
-	}
+	// 	if (this.dnd.onDragEnd) {
+	// 		this.dnd.onDragEnd(event);
+	// 	}
+	// }
 
-	private clearDragOverFeedback(): void {
-		this.currentDragFeedback = undefined;
-		this.currentDragFeedbackDisposable.dispose();
-		this.currentDragFeedbackDisposable = Disposable.None;
-	}
+	// private clearDragOverFeedback(): void {
+	// 	this.currentDragFeedback = undefined;
+	// 	this.currentDragFeedbackDisposable.dispose();
+	// 	this.currentDragFeedbackDisposable = Disposable.None;
+	// }
 
-	// DND scroll top animation
+	// // DND scroll top animation
 
-	private setupDragAndDropScrollTopAnimation(event: DragEvent): void {
-		if (!this.dragOverAnimationDisposable) {
-			const viewTop = DOM.getTopLeftOffset(this.domNode).top;
-			this.dragOverAnimationDisposable = DOM.animate(this.animateDragAndDropScrollTop.bind(this, viewTop));
-		}
+	// private setupDragAndDropScrollTopAnimation(event: DragEvent): void {
+	// 	if (!this.dragOverAnimationDisposable) {
+	// 		const viewTop = DOM.getTopLeftOffset(this.domNode).top;
+	// 		this.dragOverAnimationDisposable = DOM.animate(this.animateDragAndDropScrollTop.bind(this, viewTop));
+	// 	}
 
-		this.dragOverAnimationStopDisposable.dispose();
-		this.dragOverAnimationStopDisposable = disposableTimeout(() => {
-			if (this.dragOverAnimationDisposable) {
-				this.dragOverAnimationDisposable.dispose();
-				this.dragOverAnimationDisposable = undefined;
-			}
-		}, 1000);
+	// 	this.dragOverAnimationStopDisposable.dispose();
+	// 	this.dragOverAnimationStopDisposable = disposableTimeout(() => {
+	// 		if (this.dragOverAnimationDisposable) {
+	// 			this.dragOverAnimationDisposable.dispose();
+	// 			this.dragOverAnimationDisposable = undefined;
+	// 		}
+	// 	}, 1000);
 
-		this.dragOverMouseY = event.pageY;
-	}
+	// 	this.dragOverMouseY = event.pageY;
+	// }
 
-	private animateDragAndDropScrollTop(viewTop: number): void {
-		if (this.dragOverMouseY === undefined) {
-			return;
-		}
+	// private animateDragAndDropScrollTop(viewTop: number): void {
+	// 	if (this.dragOverMouseY === undefined) {
+	// 		return;
+	// 	}
 
-		const diff = this.dragOverMouseY - viewTop;
-		const upperLimit = this.renderHeight - 35;
+	// 	const diff = this.dragOverMouseY - viewTop;
+	// 	const upperLimit = this.renderHeight - 35;
 
-		if (diff < 35) {
-			this.scrollTop += Math.max(-14, Math.floor(0.3 * (diff - 35)));
-		} else if (diff > upperLimit) {
-			this.scrollTop += Math.min(14, Math.floor(0.3 * (diff - upperLimit)));
-		}
-	}
+	// 	if (diff < 35) {
+	// 		this.scrollTop += Math.max(-14, Math.floor(0.3 * (diff - 35)));
+	// 	} else if (diff > upperLimit) {
+	// 		this.scrollTop += Math.min(14, Math.floor(0.3 * (diff - upperLimit)));
+	// 	}
+	// }
 
-	private teardownDragAndDropScrollTopAnimation(): void {
-		this.dragOverAnimationStopDisposable.dispose();
+	// private teardownDragAndDropScrollTopAnimation(): void {
+	// 	this.dragOverAnimationStopDisposable.dispose();
 
-		if (this.dragOverAnimationDisposable) {
-			this.dragOverAnimationDisposable.dispose();
-			this.dragOverAnimationDisposable = undefined;
-		}
-	}
+	// 	if (this.dragOverAnimationDisposable) {
+	// 		this.dragOverAnimationDisposable.dispose();
+	// 		this.dragOverAnimationDisposable = undefined;
+	// 	}
+	// }
+	/* End AGPL */
 
 	// Util
 

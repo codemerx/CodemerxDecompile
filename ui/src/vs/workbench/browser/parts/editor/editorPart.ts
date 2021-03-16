@@ -784,7 +784,9 @@ export class EditorPart extends Part implements IEditorGroupsService, IEditorGro
 	//#region IEditorDropService
 
 	createEditorDropTarget(container: HTMLElement, delegate: IEditorDropTargetDelegate): IDisposable {
-		return this.instantiationService.createInstance(EditorDropTarget, this, container, delegate);
+		/* AGPL */
+		return this.instantiationService.createInstance(EditorDropTarget);
+		/* End AGPL */
 	}
 
 	//#endregion

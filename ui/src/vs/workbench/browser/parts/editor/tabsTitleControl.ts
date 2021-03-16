@@ -4,12 +4,16 @@
  *--------------------------------------------------------------------------------------------*/
 
 import 'vs/css!./media/tabstitlecontrol';
-import { isMacintosh, isWindows } from 'vs/base/common/platform';
+/* AGPL */
+import { /*isMacintosh, */ isWindows } from 'vs/base/common/platform';
+/* End AGPL */
 import { shorten } from 'vs/base/common/labels';
-import { toResource, GroupIdentifier, IEditorInput, Verbosity, EditorCommandsContextActionRunner, IEditorPartOptions, SideBySideEditor, computeEditorAriaLabel } from 'vs/workbench/common/editor';
-import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+/* AGPL */
+import { toResource/* , GroupIdentifier */, IEditorInput, Verbosity, EditorCommandsContextActionRunner, IEditorPartOptions, SideBySideEditor, computeEditorAriaLabel } from 'vs/workbench/common/editor';
+// import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
+// import { KeyCode } from 'vs/base/common/keyCodes';
+/* End AGPL */
 import { EventType as TouchEventType, GestureEvent, Gesture } from 'vs/base/browser/touch';
-import { KeyCode } from 'vs/base/common/keyCodes';
 import { ResourceLabels, IResourceLabel, DEFAULT_LABELS_CONTAINER } from 'vs/workbench/browser/labels';
 import { ActionBar } from 'vs/base/browser/ui/actionbar/actionbar';
 import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
@@ -20,19 +24,25 @@ import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
 import { IMenuService } from 'vs/platform/actions/common/actions';
 import { TitleControl } from 'vs/workbench/browser/parts/editor/titleControl';
 import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
-import { IDisposable, dispose, DisposableStore, combinedDisposable, MutableDisposable } from 'vs/base/common/lifecycle';
+/* AGPL */
+import { IDisposable, dispose /* , DisposableStore */, combinedDisposable, MutableDisposable } from 'vs/base/common/lifecycle';
+/* End AGPL */
 import { ScrollableElement } from 'vs/base/browser/ui/scrollbar/scrollableElement';
 import { ScrollbarVisibility } from 'vs/base/common/scrollable';
 import { getOrSet } from 'vs/base/common/map';
 import { IThemeService, registerThemingParticipant, IColorTheme, ICssStyleCollector, HIGH_CONTRAST } from 'vs/platform/theme/common/themeService';
 import { TAB_INACTIVE_BACKGROUND, TAB_ACTIVE_BACKGROUND, TAB_ACTIVE_FOREGROUND, TAB_INACTIVE_FOREGROUND, TAB_BORDER, EDITOR_DRAG_AND_DROP_BACKGROUND, TAB_UNFOCUSED_ACTIVE_FOREGROUND, TAB_UNFOCUSED_INACTIVE_FOREGROUND, TAB_UNFOCUSED_ACTIVE_BACKGROUND, TAB_UNFOCUSED_ACTIVE_BORDER, TAB_ACTIVE_BORDER, TAB_HOVER_BACKGROUND, TAB_HOVER_BORDER, TAB_UNFOCUSED_HOVER_BACKGROUND, TAB_UNFOCUSED_HOVER_BORDER, EDITOR_GROUP_HEADER_TABS_BACKGROUND, WORKBENCH_BACKGROUND, TAB_ACTIVE_BORDER_TOP, TAB_UNFOCUSED_ACTIVE_BORDER_TOP, TAB_ACTIVE_MODIFIED_BORDER, TAB_INACTIVE_MODIFIED_BORDER, TAB_UNFOCUSED_ACTIVE_MODIFIED_BORDER, TAB_UNFOCUSED_INACTIVE_MODIFIED_BORDER, TAB_UNFOCUSED_INACTIVE_BACKGROUND, TAB_HOVER_FOREGROUND, TAB_UNFOCUSED_HOVER_FOREGROUND, EDITOR_GROUP_HEADER_TABS_BORDER } from 'vs/workbench/common/theme';
 import { activeContrastBorder, contrastBorder, editorBackground, breadcrumbsBackground } from 'vs/platform/theme/common/colorRegistry';
-import { ResourcesDropHandler, DraggedEditorIdentifier, DraggedEditorGroupIdentifier, DragAndDropObserver } from 'vs/workbench/browser/dnd';
+/* AGPL */
+// import { ResourcesDropHandler, DraggedEditorIdentifier, DraggedEditorGroupIdentifier /* , DragAndDropObserver */ } from 'vs/workbench/browser/dnd';
+/* End AGPL */
 import { Color } from 'vs/base/common/color';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
-import { MergeGroupMode, IMergeGroupOptions, GroupsArrangement, IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
-import { addClass, addDisposableListener, hasClass, EventType, EventHelper, removeClass, Dimension, scheduleAtNextAnimationFrame, findParentWithClass, clearNode } from 'vs/base/browser/dom';
+/* AGPL */
+import { /*MergeGroupMode, IMergeGroupOptions , GroupsArrangement, */ IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
+import { addClass, addDisposableListener, hasClass, EventType, EventHelper, removeClass, Dimension, scheduleAtNextAnimationFrame/* , findParentWithClass */, clearNode } from 'vs/base/browser/dom';
+/* End AGPL */
 import { localize } from 'vs/nls';
 import { IEditorGroupsAccessor, IEditorGroupView, EditorServiceImpl, EDITOR_TITLE_HEIGHT } from 'vs/workbench/browser/parts/editor/editor';
 import { CloseOneEditorAction } from 'vs/workbench/browser/parts/editor/editorActions';
@@ -253,76 +263,78 @@ export class TabsTitleControl extends TitleControl {
 			}
 		}));
 
-		// Drop support
-		this._register(new DragAndDropObserver(tabsContainer, {
-			onDragEnter: e => {
+		/* AGPL */
+		// // Drop support
+		// this._register(new DragAndDropObserver(tabsContainer, {
+			// 	onDragEnter: e => {
+				
+				// 		// Always enable support to scroll while dragging
+				// 		addClass(tabsContainer, 'scroll');
+				
+				// 		// Return if the target is not on the tabs container
+				// 		if (e.target !== tabsContainer) {
+					// 			this.updateDropFeedback(tabsContainer, false); // fixes https://github.com/Microsoft/vscode/issues/52093
+					// 			return;
+					// 		}
+					
+					// 		// Return if transfer is unsupported
+					// 		if (!this.isSupportedDropTransfer(e)) {
+						// 			if (e.dataTransfer) {
+							// 				e.dataTransfer.dropEffect = 'none';
+							// 			}
+							
+							// 			return;
+							// 		}
+							
+							// 		// Return if dragged editor is last tab because then this is a no-op
+							// 		let isLocalDragAndDrop = false;
+							// 		if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
+								// 			isLocalDragAndDrop = true;
+								
+								// 			const data = this.editorTransfer.getData(DraggedEditorIdentifier.prototype);
+								// 			if (Array.isArray(data)) {
+									// 				const localDraggedEditor = data[0].identifier;
+		// 				if (this.group.id === localDraggedEditor.groupId && this.group.getIndexOfEditor(localDraggedEditor.editor) === this.group.count - 1) {
+			// 					if (e.dataTransfer) {
+				// 						e.dataTransfer.dropEffect = 'none';
+				// 					}
+				
+				// 					return;
+				// 				}
+				// 			}
+				// 		}
 
-				// Always enable support to scroll while dragging
-				addClass(tabsContainer, 'scroll');
-
-				// Return if the target is not on the tabs container
-				if (e.target !== tabsContainer) {
-					this.updateDropFeedback(tabsContainer, false); // fixes https://github.com/Microsoft/vscode/issues/52093
-					return;
-				}
-
-				// Return if transfer is unsupported
-				if (!this.isSupportedDropTransfer(e)) {
-					if (e.dataTransfer) {
-						e.dataTransfer.dropEffect = 'none';
-					}
-
-					return;
-				}
-
-				// Return if dragged editor is last tab because then this is a no-op
-				let isLocalDragAndDrop = false;
-				if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
-					isLocalDragAndDrop = true;
-
-					const data = this.editorTransfer.getData(DraggedEditorIdentifier.prototype);
-					if (Array.isArray(data)) {
-						const localDraggedEditor = data[0].identifier;
-						if (this.group.id === localDraggedEditor.groupId && this.group.getIndexOfEditor(localDraggedEditor.editor) === this.group.count - 1) {
-							if (e.dataTransfer) {
-								e.dataTransfer.dropEffect = 'none';
-							}
-
-							return;
-						}
-					}
-				}
-
-				// Update the dropEffect to "copy" if there is no local data to be dragged because
-				// in that case we can only copy the data into and not move it from its source
-				if (!isLocalDragAndDrop) {
-					if (e.dataTransfer) {
-						e.dataTransfer.dropEffect = 'copy';
-					}
-				}
-
-				this.updateDropFeedback(tabsContainer, true);
-			},
-
-			onDragLeave: e => {
-				this.updateDropFeedback(tabsContainer, false);
-				removeClass(tabsContainer, 'scroll');
-			},
-
-			onDragEnd: e => {
-				this.updateDropFeedback(tabsContainer, false);
-				removeClass(tabsContainer, 'scroll');
-			},
-
-			onDrop: e => {
-				this.updateDropFeedback(tabsContainer, false);
-				removeClass(tabsContainer, 'scroll');
-
-				if (e.target === tabsContainer) {
-					this.onDrop(e, this.group.count, tabsContainer);
-				}
-			}
-		}));
+				// 		// Update the dropEffect to "copy" if there is no local data to be dragged because
+		// 		// in that case we can only copy the data into and not move it from its source
+		// 		if (!isLocalDragAndDrop) {
+		// 			if (e.dataTransfer) {
+			// 				e.dataTransfer.dropEffect = 'copy';
+			// 			}
+			// 		}
+			
+			// 		this.updateDropFeedback(tabsContainer, true);
+			// 	},
+			
+			// 	onDragLeave: e => {
+				// 		this.updateDropFeedback(tabsContainer, false);
+				// 		removeClass(tabsContainer, 'scroll');
+				// 	},
+				
+				// 	onDragEnd: e => {
+					// 		this.updateDropFeedback(tabsContainer, false);
+					// 		removeClass(tabsContainer, 'scroll');
+					// 	},
+					
+					// 	onDrop: e => {
+						// 		this.updateDropFeedback(tabsContainer, false);
+						// 		removeClass(tabsContainer, 'scroll');
+						
+						// 		if (e.target === tabsContainer) {
+							// 			this.onDrop(e, this.group.count, tabsContainer);
+							// 		}
+		// 	}
+		// }));
+		/* End AGPL */
 
 		// Mouse-wheel support to switch to tabs optionally
 		this._register(addDisposableListener(tabsContainer, EventType.MOUSE_WHEEL, (e: MouseWheelEvent) => {
@@ -590,297 +602,301 @@ export class TabsTitleControl extends TitleControl {
 		tabActionBar.onDidBeforeRun(() => this.blockRevealActiveTabOnce());
 
 		// Eventing
-		const eventsDisposable = this.registerTabListeners(tabContainer, index, tabsContainer, tabsScrollbar);
-
-		this.tabDisposables.push(combinedDisposable(eventsDisposable, tabActionBar, tabActionRunner, editorLabel));
+		/* AGPL */
+		// const eventsDisposable = this.registerTabListeners(tabContainer, index, tabsContainer, tabsScrollbar);
+		
+		this.tabDisposables.push(combinedDisposable(/*eventsDisposable, */tabActionBar, tabActionRunner, editorLabel));
+		/* End AGPL */
 
 		return tabContainer;
 	}
 
-	private registerTabListeners(tab: HTMLElement, index: number, tabsContainer: HTMLElement, tabsScrollbar: ScrollableElement): IDisposable {
-		const disposables = new DisposableStore();
+	/* AGPL */
+	// private registerTabListeners(tab: HTMLElement, index: number, tabsContainer: HTMLElement, tabsScrollbar: ScrollableElement): IDisposable {
+	// 	const disposables = new DisposableStore();
 
-		const handleClickOrTouch = (e: MouseEvent | GestureEvent): void => {
-			tab.blur(); // prevent flicker of focus outline on tab until editor got focus
+	// 	const handleClickOrTouch = (e: MouseEvent | GestureEvent): void => {
+	// 		tab.blur(); // prevent flicker of focus outline on tab until editor got focus
 
-			if (e instanceof MouseEvent && e.button !== 0) {
-				if (e.button === 1) {
-					e.preventDefault(); // required to prevent auto-scrolling (https://github.com/Microsoft/vscode/issues/16690)
-				}
+	// 		if (e instanceof MouseEvent && e.button !== 0) {
+	// 			if (e.button === 1) {
+	// 				e.preventDefault(); // required to prevent auto-scrolling (https://github.com/Microsoft/vscode/issues/16690)
+	// 			}
 
-				return undefined; // only for left mouse click
-			}
+	// 			return undefined; // only for left mouse click
+	// 		}
 
-			if (this.originatesFromTabActionBar(e)) {
-				return; // not when clicking on actions
-			}
+	// 		if (this.originatesFromTabActionBar(e)) {
+	// 			return; // not when clicking on actions
+	// 		}
 
-			// Open tabs editor
-			const input = this.group.getEditorByIndex(index);
-			if (input) {
-				this.group.openEditor(input);
-			}
+	// 		// Open tabs editor
+	// 		const input = this.group.getEditorByIndex(index);
+	// 		if (input) {
+	// 			this.group.openEditor(input);
+	// 		}
 
-			return undefined;
-		};
+	// 		return undefined;
+	// 	};
 
-		const showContextMenu = (e: Event) => {
-			EventHelper.stop(e);
+	// 	const showContextMenu = (e: Event) => {
+	// 		EventHelper.stop(e);
 
-			const input = this.group.getEditorByIndex(index);
-			if (input) {
-				this.onContextMenu(input, e, tab);
-			}
-		};
+	// 		const input = this.group.getEditorByIndex(index);
+	// 		if (input) {
+	// 			this.onContextMenu(input, e, tab);
+	// 		}
+	// 	};
 
-		// Open on Click / Touch
-		disposables.add(addDisposableListener(tab, EventType.MOUSE_DOWN, (e: MouseEvent) => handleClickOrTouch(e)));
-		disposables.add(addDisposableListener(tab, TouchEventType.Tap, (e: GestureEvent) => handleClickOrTouch(e)));
+	// 	// Open on Click / Touch
+	// 	disposables.add(addDisposableListener(tab, EventType.MOUSE_DOWN, (e: MouseEvent) => handleClickOrTouch(e)));
+	// 	disposables.add(addDisposableListener(tab, TouchEventType.Tap, (e: GestureEvent) => handleClickOrTouch(e)));
 
-		// Touch Scroll Support
-		disposables.add(addDisposableListener(tab, TouchEventType.Change, (e: GestureEvent) => {
-			tabsScrollbar.setScrollPosition({ scrollLeft: tabsScrollbar.getScrollPosition().scrollLeft - e.translationX });
-		}));
+	// 	// Touch Scroll Support
+	// 	disposables.add(addDisposableListener(tab, TouchEventType.Change, (e: GestureEvent) => {
+	// 		tabsScrollbar.setScrollPosition({ scrollLeft: tabsScrollbar.getScrollPosition().scrollLeft - e.translationX });
+	// 	}));
 
-		// Prevent flicker of focus outline on tab until editor got focus
-		disposables.add(addDisposableListener(tab, EventType.MOUSE_UP, (e: MouseEvent) => {
-			EventHelper.stop(e);
+	// 	// Prevent flicker of focus outline on tab until editor got focus
+	// 	disposables.add(addDisposableListener(tab, EventType.MOUSE_UP, (e: MouseEvent) => {
+	// 		EventHelper.stop(e);
 
-			tab.blur();
-		}));
+	// 		tab.blur();
+	// 	}));
 
-		// Close on mouse middle click
-		disposables.add(addDisposableListener(tab, EventType.AUXCLICK, (e: MouseEvent) => {
-			if (e.button === 1 /* Middle Button*/) {
-				EventHelper.stop(e, true /* for https://github.com/Microsoft/vscode/issues/56715 */);
+	// 	// Close on mouse middle click
+	// 	disposables.add(addDisposableListener(tab, EventType.AUXCLICK, (e: MouseEvent) => {
+	// 		if (e.button === 1 /* Middle Button*/) {
+	// 			EventHelper.stop(e, true /* for https://github.com/Microsoft/vscode/issues/56715 */);
 
-				this.blockRevealActiveTabOnce();
-				this.closeOneEditorAction.run({ groupId: this.group.id, editorIndex: index });
-			}
-		}));
+	// 			this.blockRevealActiveTabOnce();
+	// 			this.closeOneEditorAction.run({ groupId: this.group.id, editorIndex: index });
+	// 		}
+	// 	}));
 
-		// Context menu on Shift+F10
-		disposables.add(addDisposableListener(tab, EventType.KEY_DOWN, (e: KeyboardEvent) => {
-			const event = new StandardKeyboardEvent(e);
-			if (event.shiftKey && event.keyCode === KeyCode.F10) {
-				showContextMenu(e);
-			}
-		}));
+	// 	// Context menu on Shift+F10
+	// 	disposables.add(addDisposableListener(tab, EventType.KEY_DOWN, (e: KeyboardEvent) => {
+	// 		const event = new StandardKeyboardEvent(e);
+	// 		if (event.shiftKey && event.keyCode === KeyCode.F10) {
+	// 			showContextMenu(e);
+	// 		}
+	// 	}));
 
-		// Context menu on touch context menu gesture
-		disposables.add(addDisposableListener(tab, TouchEventType.Contextmenu, (e: GestureEvent) => {
-			showContextMenu(e);
-		}));
+	// 	// Context menu on touch context menu gesture
+	// 	disposables.add(addDisposableListener(tab, TouchEventType.Contextmenu, (e: GestureEvent) => {
+	// 		showContextMenu(e);
+	// 	}));
 
-		// Keyboard accessibility
-		disposables.add(addDisposableListener(tab, EventType.KEY_UP, (e: KeyboardEvent) => {
-			const event = new StandardKeyboardEvent(e);
-			let handled = false;
+	// 	// Keyboard accessibility
+	// 	disposables.add(addDisposableListener(tab, EventType.KEY_UP, (e: KeyboardEvent) => {
+	// 		const event = new StandardKeyboardEvent(e);
+	// 		let handled = false;
 
-			// Run action on Enter/Space
-			if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
-				handled = true;
-				const input = this.group.getEditorByIndex(index);
-				if (input) {
-					this.group.openEditor(input);
-				}
-			}
+	// 		// Run action on Enter/Space
+	// 		if (event.equals(KeyCode.Enter) || event.equals(KeyCode.Space)) {
+	// 			handled = true;
+	// 			const input = this.group.getEditorByIndex(index);
+	// 			if (input) {
+	// 				this.group.openEditor(input);
+	// 			}
+	// 		}
 
-			// Navigate in editors
-			else if ([KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Home, KeyCode.End].some(kb => event.equals(kb))) {
-				let targetIndex: number;
-				if (event.equals(KeyCode.LeftArrow) || event.equals(KeyCode.UpArrow)) {
-					targetIndex = index - 1;
-				} else if (event.equals(KeyCode.RightArrow) || event.equals(KeyCode.DownArrow)) {
-					targetIndex = index + 1;
-				} else if (event.equals(KeyCode.Home)) {
-					targetIndex = 0;
-				} else {
-					targetIndex = this.group.count - 1;
-				}
+	// 		// Navigate in editors
+	// 		else if ([KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Home, KeyCode.End].some(kb => event.equals(kb))) {
+	// 			let targetIndex: number;
+	// 			if (event.equals(KeyCode.LeftArrow) || event.equals(KeyCode.UpArrow)) {
+	// 				targetIndex = index - 1;
+	// 			} else if (event.equals(KeyCode.RightArrow) || event.equals(KeyCode.DownArrow)) {
+	// 				targetIndex = index + 1;
+	// 			} else if (event.equals(KeyCode.Home)) {
+	// 				targetIndex = 0;
+	// 			} else {
+	// 				targetIndex = this.group.count - 1;
+	// 			}
 
-				const target = this.group.getEditorByIndex(targetIndex);
-				if (target) {
-					handled = true;
-					this.group.openEditor(target, { preserveFocus: true });
-					(<HTMLElement>tabsContainer.childNodes[targetIndex]).focus();
-				}
-			}
+	// 			const target = this.group.getEditorByIndex(targetIndex);
+	// 			if (target) {
+	// 				handled = true;
+	// 				this.group.openEditor(target, { preserveFocus: true });
+	// 				(<HTMLElement>tabsContainer.childNodes[targetIndex]).focus();
+	// 			}
+	// 		}
 
-			if (handled) {
-				EventHelper.stop(e, true);
-			}
+	// 		if (handled) {
+	// 			EventHelper.stop(e, true);
+	// 		}
 
-			// moving in the tabs container can have an impact on scrolling position, so we need to update the custom scrollbar
-			tabsScrollbar.setScrollPosition({
-				scrollLeft: tabsContainer.scrollLeft
-			});
-		}));
+	// 		// moving in the tabs container can have an impact on scrolling position, so we need to update the custom scrollbar
+	// 		tabsScrollbar.setScrollPosition({
+	// 			scrollLeft: tabsContainer.scrollLeft
+	// 		});
+	// 	}));
 
-		// Double click: either pin or toggle maximized
-		[TouchEventType.Tap, EventType.DBLCLICK].forEach(eventType => {
-			disposables.add(addDisposableListener(tab, eventType, (e: MouseEvent | GestureEvent) => {
-				if (eventType === EventType.DBLCLICK) {
-					EventHelper.stop(e);
-				} else if ((<GestureEvent>e).tapCount !== 2) {
-					return; // ignore single taps
-				}
+	// 	// Double click: either pin or toggle maximized
+	// 	[TouchEventType.Tap, EventType.DBLCLICK].forEach(eventType => {
+	// 		disposables.add(addDisposableListener(tab, eventType, (e: MouseEvent | GestureEvent) => {
+	// 			if (eventType === EventType.DBLCLICK) {
+	// 				EventHelper.stop(e);
+	// 			} else if ((<GestureEvent>e).tapCount !== 2) {
+	// 				return; // ignore single taps
+	// 			}
 
-				const editor = this.group.getEditorByIndex(index);
-				if (editor && this.group.isPinned(editor)) {
-					this.accessor.arrangeGroups(GroupsArrangement.TOGGLE, this.group);
-				} else {
-					this.group.pinEditor(editor);
-				}
-			}));
-		});
+	// 			const editor = this.group.getEditorByIndex(index);
+	// 			if (editor && this.group.isPinned(editor)) {
+	// 				this.accessor.arrangeGroups(GroupsArrangement.TOGGLE, this.group);
+	// 			} else {
+	// 				this.group.pinEditor(editor);
+	// 			}
+	// 		}));
+	// 	});
 
-		// Context menu
-		disposables.add(addDisposableListener(tab, EventType.CONTEXT_MENU, (e: Event) => {
-			EventHelper.stop(e, true);
+	// 	// Context menu
+	// 	disposables.add(addDisposableListener(tab, EventType.CONTEXT_MENU, (e: Event) => {
+	// 		EventHelper.stop(e, true);
 
-			const input = this.group.getEditorByIndex(index);
-			if (input) {
-				this.onContextMenu(input, e, tab);
-			}
-		}, true /* use capture to fix https://github.com/Microsoft/vscode/issues/19145 */));
+	// 		const input = this.group.getEditorByIndex(index);
+	// 		if (input) {
+	// 			this.onContextMenu(input, e, tab);
+	// 		}
+	// 	}, true /* use capture to fix https://github.com/Microsoft/vscode/issues/19145 */));
 
-		// Drag support
-		disposables.add(addDisposableListener(tab, EventType.DRAG_START, (e: DragEvent) => {
-			const editor = this.group.getEditorByIndex(index);
-			if (!editor) {
-				return;
-			}
+	// 	// Drag support
+	// 	disposables.add(addDisposableListener(tab, EventType.DRAG_START, (e: DragEvent) => {
+	// 		const editor = this.group.getEditorByIndex(index);
+	// 		if (!editor) {
+	// 			return;
+	// 		}
 
-			this.editorTransfer.setData([new DraggedEditorIdentifier({ editor, groupId: this.group.id })], DraggedEditorIdentifier.prototype);
+	// 		this.editorTransfer.setData([new DraggedEditorIdentifier({ editor, groupId: this.group.id })], DraggedEditorIdentifier.prototype);
 
-			if (e.dataTransfer) {
-				e.dataTransfer.effectAllowed = 'copyMove';
-			}
+	// 		if (e.dataTransfer) {
+	// 			e.dataTransfer.effectAllowed = 'copyMove';
+	// 		}
 
-			// Apply some datatransfer types to allow for dragging the element outside of the application
-			this.doFillResourceDataTransfers(editor, e);
+	// 		// Apply some datatransfer types to allow for dragging the element outside of the application
+	// 		this.doFillResourceDataTransfers(editor, e);
 
-			// Fixes https://github.com/Microsoft/vscode/issues/18733
-			addClass(tab, 'dragged');
-			scheduleAtNextAnimationFrame(() => removeClass(tab, 'dragged'));
-		}));
+	// 		// Fixes https://github.com/Microsoft/vscode/issues/18733
+	// 		addClass(tab, 'dragged');
+	// 		scheduleAtNextAnimationFrame(() => removeClass(tab, 'dragged'));
+	// 	}));
 
-		// Drop support
-		disposables.add(new DragAndDropObserver(tab, {
-			onDragEnter: e => {
+	// 	// Drop support
+	// 	disposables.add(new DragAndDropObserver(tab, {
+	// 		onDragEnter: e => {
 
-				// Update class to signal drag operation
-				addClass(tab, 'dragged-over');
+	// 			// Update class to signal drag operation
+	// 			addClass(tab, 'dragged-over');
 
-				// Return if transfer is unsupported
-				if (!this.isSupportedDropTransfer(e)) {
-					if (e.dataTransfer) {
-						e.dataTransfer.dropEffect = 'none';
-					}
+	// 			// Return if transfer is unsupported
+	// 			if (!this.isSupportedDropTransfer(e)) {
+	// 				if (e.dataTransfer) {
+	// 					e.dataTransfer.dropEffect = 'none';
+	// 				}
 
-					return;
-				}
+	// 				return;
+	// 			}
 
-				// Return if dragged editor is the current tab dragged over
-				let isLocalDragAndDrop = false;
-				if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
-					isLocalDragAndDrop = true;
+	// 			// Return if dragged editor is the current tab dragged over
+	// 			let isLocalDragAndDrop = false;
+	// 			if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
+	// 				isLocalDragAndDrop = true;
 
-					const data = this.editorTransfer.getData(DraggedEditorIdentifier.prototype);
-					if (Array.isArray(data)) {
-						const localDraggedEditor = data[0].identifier;
-						if (localDraggedEditor.editor === this.group.getEditorByIndex(index) && localDraggedEditor.groupId === this.group.id) {
-							if (e.dataTransfer) {
-								e.dataTransfer.dropEffect = 'none';
-							}
+	// 				const data = this.editorTransfer.getData(DraggedEditorIdentifier.prototype);
+	// 				if (Array.isArray(data)) {
+	// 					const localDraggedEditor = data[0].identifier;
+	// 					if (localDraggedEditor.editor === this.group.getEditorByIndex(index) && localDraggedEditor.groupId === this.group.id) {
+	// 						if (e.dataTransfer) {
+	// 							e.dataTransfer.dropEffect = 'none';
+	// 						}
 
-							return;
-						}
-					}
-				}
+	// 						return;
+	// 					}
+	// 				}
+	// 			}
 
-				// Update the dropEffect to "copy" if there is no local data to be dragged because
-				// in that case we can only copy the data into and not move it from its source
-				if (!isLocalDragAndDrop) {
-					if (e.dataTransfer) {
-						e.dataTransfer.dropEffect = 'copy';
-					}
-				}
+	// 			// Update the dropEffect to "copy" if there is no local data to be dragged because
+	// 			// in that case we can only copy the data into and not move it from its source
+	// 			if (!isLocalDragAndDrop) {
+	// 				if (e.dataTransfer) {
+	// 					e.dataTransfer.dropEffect = 'copy';
+	// 				}
+	// 			}
 
-				this.updateDropFeedback(tab, true, index);
-			},
+	// 			this.updateDropFeedback(tab, true, index);
+	// 		},
 
-			onDragLeave: e => {
-				removeClass(tab, 'dragged-over');
-				this.updateDropFeedback(tab, false, index);
-			},
+	// 		onDragLeave: e => {
+	// 			removeClass(tab, 'dragged-over');
+	// 			this.updateDropFeedback(tab, false, index);
+	// 		},
 
-			onDragEnd: e => {
-				removeClass(tab, 'dragged-over');
-				this.updateDropFeedback(tab, false, index);
+	// 		onDragEnd: e => {
+	// 			removeClass(tab, 'dragged-over');
+	// 			this.updateDropFeedback(tab, false, index);
 
-				this.editorTransfer.clearData(DraggedEditorIdentifier.prototype);
-			},
+	// 			this.editorTransfer.clearData(DraggedEditorIdentifier.prototype);
+	// 		},
 
-			onDrop: e => {
-				removeClass(tab, 'dragged-over');
-				this.updateDropFeedback(tab, false, index);
+	// 		onDrop: e => {
+	// 			removeClass(tab, 'dragged-over');
+	// 			this.updateDropFeedback(tab, false, index);
 
-				this.onDrop(e, index, tabsContainer);
-			}
-		}));
+	// 			this.onDrop(e, index, tabsContainer);
+	// 		}
+	// 	}));
 
-		return disposables;
-	}
+	// 	return disposables;
+	// }
 
-	private isSupportedDropTransfer(e: DragEvent): boolean {
-		if (this.groupTransfer.hasData(DraggedEditorGroupIdentifier.prototype)) {
-			const data = this.groupTransfer.getData(DraggedEditorGroupIdentifier.prototype);
-			if (Array.isArray(data)) {
-				const group = data[0];
-				if (group.identifier === this.group.id) {
-					return false; // groups cannot be dropped on title area it originates from
-				}
-			}
+	// private isSupportedDropTransfer(e: DragEvent): boolean {
+	// 	if (this.groupTransfer.hasData(DraggedEditorGroupIdentifier.prototype)) {
+	// 		const data = this.groupTransfer.getData(DraggedEditorGroupIdentifier.prototype);
+	// 		if (Array.isArray(data)) {
+	// 			const group = data[0];
+	// 			if (group.identifier === this.group.id) {
+	// 				return false; // groups cannot be dropped on title area it originates from
+	// 			}
+	// 		}
 
-			return true;
-		}
+	// 		return true;
+	// 	}
 
-		if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
-			return true; // (local) editors can always be dropped
-		}
+	// 	if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
+	// 		return true; // (local) editors can always be dropped
+	// 	}
 
-		if (e.dataTransfer && e.dataTransfer.types.length > 0) {
-			return true; // optimistically allow external data (// see https://github.com/Microsoft/vscode/issues/25789)
-		}
+	// 	if (e.dataTransfer && e.dataTransfer.types.length > 0) {
+	// 		return true; // optimistically allow external data (// see https://github.com/Microsoft/vscode/issues/25789)
+	// 	}
 
-		return false;
-	}
+	// 	return false;
+	// }
 
-	private updateDropFeedback(element: HTMLElement, isDND: boolean, index?: number): void {
-		const isTab = (typeof index === 'number');
-		const editor = typeof index === 'number' ? this.group.getEditorByIndex(index) : undefined;
-		const isActiveTab = isTab && !!editor && this.group.isActive(editor);
+	// private updateDropFeedback(element: HTMLElement, isDND: boolean, index?: number): void {
+	// 	const isTab = (typeof index === 'number');
+	// 	const editor = typeof index === 'number' ? this.group.getEditorByIndex(index) : undefined;
+	// 	const isActiveTab = isTab && !!editor && this.group.isActive(editor);
 
-		// Background
-		const noDNDBackgroundColor = isTab ? this.getColor(isActiveTab ? TAB_ACTIVE_BACKGROUND : TAB_INACTIVE_BACKGROUND) : '';
-		element.style.backgroundColor = (isDND ? this.getColor(EDITOR_DRAG_AND_DROP_BACKGROUND) : noDNDBackgroundColor) || '';
+	// 	// Background
+	// 	const noDNDBackgroundColor = isTab ? this.getColor(isActiveTab ? TAB_ACTIVE_BACKGROUND : TAB_INACTIVE_BACKGROUND) : '';
+	// 	element.style.backgroundColor = (isDND ? this.getColor(EDITOR_DRAG_AND_DROP_BACKGROUND) : noDNDBackgroundColor) || '';
 
-		// Outline
-		const activeContrastBorderColor = this.getColor(activeContrastBorder);
-		if (activeContrastBorderColor && isDND) {
-			element.style.outlineWidth = '2px';
-			element.style.outlineStyle = 'dashed';
-			element.style.outlineColor = activeContrastBorderColor;
-			element.style.outlineOffset = isTab ? '-5px' : '-3px';
-		} else {
-			element.style.outlineWidth = '';
-			element.style.outlineStyle = '';
-			element.style.outlineColor = activeContrastBorderColor || '';
-			element.style.outlineOffset = '';
-		}
-	}
+	// 	// Outline
+	// 	const activeContrastBorderColor = this.getColor(activeContrastBorder);
+	// 	if (activeContrastBorderColor && isDND) {
+	// 		element.style.outlineWidth = '2px';
+	// 		element.style.outlineStyle = 'dashed';
+	// 		element.style.outlineColor = activeContrastBorderColor;
+	// 		element.style.outlineOffset = isTab ? '-5px' : '-3px';
+	// 	} else {
+	// 		element.style.outlineWidth = '';
+	// 		element.style.outlineStyle = '';
+	// 		element.style.outlineColor = activeContrastBorderColor || '';
+	// 		element.style.outlineOffset = '';
+	// 	}
+	// }
+	/* End AGPL */
 
 	private computeTabLabels(): void {
 		const { labelFormat } = this.accessor.partOptions;
@@ -1379,80 +1395,82 @@ export class TabsTitleControl extends TitleControl {
 		this.blockRevealActiveTab = true;
 	}
 
-	private originatesFromTabActionBar(e: MouseEvent | GestureEvent): boolean {
-		let element: HTMLElement;
-		if (e instanceof MouseEvent) {
-			element = (e.target || e.srcElement) as HTMLElement;
-		} else {
-			element = (e as GestureEvent).initialTarget as HTMLElement;
-		}
+	/* AGPL */
+	// private originatesFromTabActionBar(e: MouseEvent | GestureEvent): boolean {
+	// 	let element: HTMLElement;
+	// 	if (e instanceof MouseEvent) {
+	// 		element = (e.target || e.srcElement) as HTMLElement;
+	// 	} else {
+	// 		element = (e as GestureEvent).initialTarget as HTMLElement;
+	// 	}
 
-		return !!findParentWithClass(element, 'action-item', 'tab');
-	}
+	// 	return !!findParentWithClass(element, 'action-item', 'tab');
+	// }
 
-	private onDrop(e: DragEvent, targetIndex: number, tabsContainer: HTMLElement): void {
-		EventHelper.stop(e, true);
+	// private onDrop(e: DragEvent, targetIndex: number, tabsContainer: HTMLElement): void {
+	// 	EventHelper.stop(e, true);
 
-		this.updateDropFeedback(tabsContainer, false);
-		removeClass(tabsContainer, 'scroll');
+	// 	this.updateDropFeedback(tabsContainer, false);
+	// 	removeClass(tabsContainer, 'scroll');
 
-		// Local Editor DND
-		if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
-			const data = this.editorTransfer.getData(DraggedEditorIdentifier.prototype);
-			if (Array.isArray(data)) {
-				const draggedEditor = data[0].identifier;
-				const sourceGroup = this.accessor.getGroup(draggedEditor.groupId);
+	// 	// Local Editor DND
+	// 	if (this.editorTransfer.hasData(DraggedEditorIdentifier.prototype)) {
+	// 		const data = this.editorTransfer.getData(DraggedEditorIdentifier.prototype);
+	// 		if (Array.isArray(data)) {
+	// 			const draggedEditor = data[0].identifier;
+	// 			const sourceGroup = this.accessor.getGroup(draggedEditor.groupId);
 
-				if (sourceGroup) {
+	// 			if (sourceGroup) {
 
-					// Move editor to target position and index
-					if (this.isMoveOperation(e, draggedEditor.groupId)) {
-						sourceGroup.moveEditor(draggedEditor.editor, this.group, { index: targetIndex });
-					}
+	// 				// Move editor to target position and index
+	// 				if (this.isMoveOperation(e, draggedEditor.groupId)) {
+	// 					sourceGroup.moveEditor(draggedEditor.editor, this.group, { index: targetIndex });
+	// 				}
 
-					// Copy editor to target position and index
-					else {
-						sourceGroup.copyEditor(draggedEditor.editor, this.group, { index: targetIndex });
-					}
-				}
+	// 				// Copy editor to target position and index
+	// 				else {
+	// 					sourceGroup.copyEditor(draggedEditor.editor, this.group, { index: targetIndex });
+	// 				}
+	// 			}
 
-				this.group.focus();
-				this.editorTransfer.clearData(DraggedEditorIdentifier.prototype);
-			}
-		}
+	// 			this.group.focus();
+	// 			this.editorTransfer.clearData(DraggedEditorIdentifier.prototype);
+	// 		}
+	// 	}
 
-		// Local Editor Group DND
-		else if (this.groupTransfer.hasData(DraggedEditorGroupIdentifier.prototype)) {
-			const data = this.groupTransfer.getData(DraggedEditorGroupIdentifier.prototype);
-			if (data) {
-				const sourceGroup = this.accessor.getGroup(data[0].identifier);
+	// 	// Local Editor Group DND
+	// 	else if (this.groupTransfer.hasData(DraggedEditorGroupIdentifier.prototype)) {
+	// 		const data = this.groupTransfer.getData(DraggedEditorGroupIdentifier.prototype);
+	// 		if (data) {
+	// 			const sourceGroup = this.accessor.getGroup(data[0].identifier);
 
-				if (sourceGroup) {
-					const mergeGroupOptions: IMergeGroupOptions = { index: targetIndex };
-					if (!this.isMoveOperation(e, sourceGroup.id)) {
-						mergeGroupOptions.mode = MergeGroupMode.COPY_EDITORS;
-					}
+	// 			if (sourceGroup) {
+	// 				const mergeGroupOptions: IMergeGroupOptions = { index: targetIndex };
+	// 				if (!this.isMoveOperation(e, sourceGroup.id)) {
+	// 					mergeGroupOptions.mode = MergeGroupMode.COPY_EDITORS;
+	// 				}
 
-					this.accessor.mergeGroup(sourceGroup, this.group, mergeGroupOptions);
-				}
+	// 				this.accessor.mergeGroup(sourceGroup, this.group, mergeGroupOptions);
+	// 			}
 
-				this.group.focus();
-				this.groupTransfer.clearData(DraggedEditorGroupIdentifier.prototype);
-			}
-		}
+	// 			this.group.focus();
+	// 			this.groupTransfer.clearData(DraggedEditorGroupIdentifier.prototype);
+	// 		}
+	// 	}
 
-		// External DND
-		else {
-			const dropHandler = this.instantiationService.createInstance(ResourcesDropHandler, { allowWorkspaceOpen: false /* open workspace file as file if dropped */ });
-			dropHandler.handleDrop(e, () => this.group, () => this.group.focus(), targetIndex);
-		}
-	}
+	// 	// External DND
+	// 	else {
+	// 		const dropHandler = this.instantiationService.createInstance(ResourcesDropHandler, { allowWorkspaceOpen: false /* open workspace file as file if dropped */ });
+	// 		dropHandler.handleDrop(e, () => this.group, () => this.group.focus(), targetIndex);
+	// 	}
+	// }
 
-	private isMoveOperation(e: DragEvent, source: GroupIdentifier) {
-		const isCopy = (e.ctrlKey && !isMacintosh) || (e.altKey && isMacintosh);
+	// private isMoveOperation(e: DragEvent, source: GroupIdentifier) {
+	// 	const isCopy = (e.ctrlKey && !isMacintosh) || (e.altKey && isMacintosh);
 
-		return !isCopy || source === this.group.id;
-	}
+	// 	return !isCopy || source === this.group.id;
+	// }
+	/* End AGPL */
 
 	dispose(): void {
 		super.dispose();

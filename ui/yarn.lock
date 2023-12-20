@@ -4306,16 +4306,6 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=
 
-github-releases-ms@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/github-releases-ms/-/github-releases-ms-0.5.0.tgz#a5b36c3f2cfc5336064165d26708df78affc300a"
-  integrity sha512-cndYTVDF9LiL+LbMiyUfYLbWjpiMqNiTiJTQprlXJ/p8DoGBK8zZ1yGvIEzfV2SvZXgYt2m/ZFnywMHhb+/goQ==
-  dependencies:
-    minimatch "^3.0.4"
-    optimist "^0.6.1"
-    prettyjson "^1.2.1"
-    request "^2.88.0"
-
 glob-base@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/glob-base/-/glob-base-0.3.0.tgz#dbb164f6221b1c0b1ccf82aea328b497df0ea3c4"

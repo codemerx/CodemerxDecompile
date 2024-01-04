@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import type * as Proto from '../protocol';
-import { TypeScriptVersion } from '../utils/versionProvider';
+import type * as Proto from './protocol/protocol';
+import { TypeScriptVersion } from './versionProvider';
 
 
 export class TypeScriptServerError extends Error {
@@ -18,7 +18,7 @@ export class TypeScriptServerError extends Error {
 	}
 
 	private constructor(
-		serverId: string,
+		public readonly serverId: string,
 		public readonly version: TypeScriptVersion,
 		private readonly response: Proto.Response,
 		public readonly serverMessage: string | undefined,
@@ -38,12 +38,16 @@ export class TypeScriptServerError extends Error {
 		/* __GDPR__FRAGMENT__
 			"TypeScriptRequestErrorProperties" : {
 				"command" : { "classification": "SystemMetaData", "purpose": "FeatureInsight" },
-				"sanitizedstack" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" }
+				"serverid" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" },
+				"sanitizedstack" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" },
+				"badclient" : { "classification": "SystemMetaData", "purpose": "PerformanceAndHealth" }
 			}
 		*/
 		return {
 			command: this.serverCommand,
+			serverid: this.serverId,
 			sanitizedstack: this.sanitizedStack || '',
+			badclient: /\bBADCLIENT\b/.test(this.stack || ''),
 		} as const;
 	}
 

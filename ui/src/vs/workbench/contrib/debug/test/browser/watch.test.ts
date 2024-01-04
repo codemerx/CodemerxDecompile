@@ -4,30 +4,39 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as assert from 'assert';
-import { Expression, DebugModel } from 'vs/workbench/contrib/debug/common/debugModel';
-import { createMockDebugModel } from 'vs/workbench/contrib/debug/test/common/mockDebug';
+import { DisposableStore } from 'vs/base/common/lifecycle';
+import { ensureNoDisposablesAreLeakedInTestSuite } from 'vs/base/test/common/utils';
+import { DebugModel, Expression } from 'vs/workbench/contrib/debug/common/debugModel';
+import { createMockDebugModel } from 'vs/workbench/contrib/debug/test/browser/mockDebugModel';
 
 // Expressions
 
 function assertWatchExpressions(watchExpressions: Expression[], expectedName: string) {
-	assert.equal(watchExpressions.length, 2);
+	assert.strictEqual(watchExpressions.length, 2);
 	watchExpressions.forEach(we => {
-		assert.equal(we.available, false);
-		assert.equal(we.reference, 0);
-		assert.equal(we.name, expectedName);
+		assert.strictEqual(we.available, false);
+		assert.strictEqual(we.reference, 0);
+		assert.strictEqual(we.name, expectedName);
 	});
 }
 
 suite('Debug - Watch', () => {
-
 	let model: DebugModel;
+	let disposables: DisposableStore;
 
 	setup(() => {
-		model = createMockDebugModel();
+		disposables = new DisposableStore();
+		model = createMockDebugModel(disposables);
 	});
 
+	teardown(() => {
+		disposables.dispose();
+	});
+
+	ensureNoDisposablesAreLeakedInTestSuite();
+
 	test('watch expressions', () => {
-		assert.equal(model.getWatchExpressions().length, 0);
+		assert.strictEqual(model.getWatchExpressions().length, 0);
 		model.addWatchExpression('console');
 		model.addWatchExpression('console');
 		let watchExpressions = model.getWatchExpressions();
@@ -42,11 +51,11 @@ suite('Debug - Watch', () => {
 		model.addWatchExpression('mockExpression');
 		model.moveWatchExpression(model.getWatchExpressions()[2].getId(), 1);
 		watchExpressions = model.getWatchExpressions();
-		assert.equal(watchExpressions[0].name, 'new_name');
-		assert.equal(watchExpressions[1].name, 'mockExpression');
-		assert.equal(watchExpressions[2].name, 'new_name');
+		assert.strictEqual(watchExpressions[0].name, 'new_name');
+		assert.strictEqual(watchExpressions[1].name, 'mockExpression');
+		assert.strictEqual(watchExpressions[2].name, 'new_name');
 
 		model.removeWatchExpressions();
-		assert.equal(model.getWatchExpressions().length, 0);
+		assert.strictEqual(model.getWatchExpressions().length, 0);
 	});
 });

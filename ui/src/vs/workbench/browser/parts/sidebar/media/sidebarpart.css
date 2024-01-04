@@ -3,14 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-/* Removed to allow progress bar positioning to escape */
-/* .monaco-workbench .sidebar > .content {
-	overflow: hidden;
-} */
-
 .monaco-workbench.nosidebar > .part.sidebar {
 	display: none !important;
 	visibility: hidden !important;
+}
+
+.monaco-workbench .part.sidebar .title-actions .actions-container {
+	justify-content: flex-end;
+}
+
+.monaco-workbench .part.sidebar .title-actions .action-item {
+	margin-right: 4px;
 }
 
 .monaco-workbench .part.sidebar > .title > .title-label h2 {
@@ -55,4 +58,16 @@
 	background-repeat: no-repeat;
 	width: 16px;
 	height: 16px;
+}
+
+.monaco-workbench .sidebar.pane-composite-part > .title > .composite-bar-container {
+	flex: 1;
+}
+
+.monaco-workbench .sidebar.part.pane-composite-part > .composite.title.has-composite-bar > .title-actions {
+	flex: inherit;
+}
+
+.monaco-workbench .sidebar.pane-composite-part > .title.has-composite-bar > .title-actions .monaco-action-bar .action-item {
+	max-width: 150px;
 }

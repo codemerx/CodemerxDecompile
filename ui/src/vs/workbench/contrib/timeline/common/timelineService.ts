@@ -6,11 +6,14 @@
 import { CancellationTokenSource } from 'vs/base/common/cancellation';
 import { Event, Emitter } from 'vs/base/common/event';
 import { IDisposable } from 'vs/base/common/lifecycle';
-// import { basename } from 'vs/base/common/path';
 import { URI } from 'vs/base/common/uri';
 import { ILogService } from 'vs/platform/log/common/log';
-import { ITimelineService, TimelineChangeEvent, TimelineOptions, TimelineProvidersChangeEvent, TimelineProvider, InternalTimelineOptions, TimelinePaneId } from './timeline';
+import { ITimelineService, TimelineChangeEvent, TimelineOptions, TimelineProvidersChangeEvent, TimelineProvider, TimelinePaneId } from './timeline';
 import { IViewsService } from 'vs/workbench/common/views';
+import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
+import { IContextKey, IContextKeyService, RawContextKey } from 'vs/platform/contextkey/common/contextkey';
+
+export const TimelineHasProviderContext = new RawContextKey<boolean>('timelineHasProvider', false);
 
 export class TimelineService implements ITimelineService {
 	declare readonly _serviceBrand: undefined;
@@ -23,146 +26,26 @@ export class TimelineService implements ITimelineService {
 	private readonly _onDidChangeUri = new Emitter<URI>();
 	readonly onDidChangeUri: Event<URI> = this._onDidChangeUri.event;
 
+	private readonly hasProviderContext: IContextKey<boolean>;
 	private readonly providers = new Map<string, TimelineProvider>();
 	private readonly providerSubscriptions = new Map<string, IDisposable>();
 
 	constructor(
 		@ILogService private readonly logService: ILogService,
 		@IViewsService protected viewsService: IViewsService,
+		@IConfigurationService protected configurationService: IConfigurationService,
+		@IContextKeyService protected contextKeyService: IContextKeyService,
 	) {
-		// let source = 'fast-source';
-		// this.registerTimelineProvider({
-		// 	scheme: '*',
-		// 	id: source,
-		// 	label: 'Fast Source',
-		// 	provideTimeline(uri: URI, options: TimelineOptions, token: CancellationToken, internalOptions?: { cacheResults?: boolean | undefined; }) {
-		// 		if (options.cursor === undefined) {
-		// 			return Promise.resolve<Timeline>({
-		// 				source: source,
-		// 				items: [
-		// 					{
-		// 						handle: `${source}|1`,
-		// 						id: '1',
-		// 						label: 'Fast Timeline1',
-		// 						description: '',
-		// 						timestamp: Date.now(),
-		// 						source: source
-		// 					},
-		// 					{
-		// 						handle: `${source}|2`,
-		// 						id: '2',
-		// 						label: 'Fast Timeline2',
-		// 						description: '',
-		// 						timestamp: Date.now() - 3000000000,
-		// 						source: source
-		// 					}
-		// 				],
-		// 				paging: {
-		// 					cursor: 'next'
-		// 				}
-		// 			});
-		// 		}
-		// 		return Promise.resolve<Timeline>({
-		// 			source: source,
-		// 			items: [
-		// 				{
-		// 					handle: `${source}|3`,
-		// 					id: '3',
-		// 					label: 'Fast Timeline3',
-		// 					description: '',
-		// 					timestamp: Date.now() - 4000000000,
-		// 					source: source
-		// 				},
-		// 				{
-		// 					handle: `${source}|4`,
-		// 					id: '4',
-		// 					label: 'Fast Timeline4',
-		// 					description: '',
-		// 					timestamp: Date.now() - 300000000000,
-		// 					source: source
-		// 				}
-		// 			],
-		// 			paging: {
-		// 				cursor: undefined
-		// 			}
-		// 		});
-		// 	},
-		// 	dispose() { }
-		// });
-
-		// let source = 'slow-source';
-		// this.registerTimelineProvider({
-		// 	scheme: '*',
-		// 	id: source,
-		// 	label: 'Slow Source',
-		// 	provideTimeline(uri: URI, options: TimelineOptions, token: CancellationToken, internalOptions?: { cacheResults?: boolean | undefined; }) {
-		// 		return new Promise<Timeline>(resolve => setTimeout(() => {
-		// 			resolve({
-		// 				source: source,
-		// 				items: [
-		// 					{
-		// 						handle: `${source}|1`,
-		// 						id: '1',
-		// 						label: 'Slow Timeline1',
-		// 						description: basename(uri.fsPath),
-		// 						timestamp: Date.now(),
-		// 						source: source
-		// 					},
-		// 					{
-		// 						handle: `${source}|2`,
-		// 						id: '2',
-		// 						label: 'Slow Timeline2',
-		// 						description: basename(uri.fsPath),
-		// 						timestamp: new Date(0).getTime(),
-		// 						source: source
-		// 					}
-		// 				]
-		// 			});
-		// 		}, 5000));
-		// 	},
-		// 	dispose() { }
-		// });
-
-		// source = 'very-slow-source';
-		// this.registerTimelineProvider({
-		// 	scheme: '*',
-		// 	id: source,
-		// 	label: 'Very Slow Source',
-		// 	provideTimeline(uri: URI, options: TimelineOptions, token: CancellationToken, internalOptions?: { cacheResults?: boolean | undefined; }) {
-		// 		return new Promise<Timeline>(resolve => setTimeout(() => {
-		// 			resolve({
-		// 				source: source,
-		// 				items: [
-		// 					{
-		// 						handle: `${source}|1`,
-		// 						id: '1',
-		// 						label: 'VERY Slow Timeline1',
-		// 						description: basename(uri.fsPath),
-		// 						timestamp: Date.now(),
-		// 						source: source
-		// 					},
-		// 					{
-		// 						handle: `${source}|2`,
-		// 						id: '2',
-		// 						label: 'VERY Slow Timeline2',
-		// 						description: basename(uri.fsPath),
-		// 						timestamp: new Date(0).getTime(),
-		// 						source: source
-		// 					}
-		// 				]
-		// 			});
-		// 		}, 10000));
-		// 	},
-		// 	dispose() { }
-		// });
+		this.hasProviderContext = TimelineHasProviderContext.bindTo(this.contextKeyService);
+		this.updateHasProviderContext();
 	}
 
 	getSources() {
 		return [...this.providers.values()].map(p => ({ id: p.id, label: p.label }));
 	}
 
-	getTimeline(id: string, uri: URI, options: TimelineOptions, tokenSource: CancellationTokenSource, internalOptions?: InternalTimelineOptions) {
-		this.logService.trace(`TimelineService#getTimeline(${id}): uri=${uri.toString(true)}`);
+	getTimeline(id: string, uri: URI, options: TimelineOptions, tokenSource: CancellationTokenSource) {
+		this.logService.trace(`TimelineService#getTimeline(${id}): uri=${uri.toString()}`);
 
 		const provider = this.providers.get(id);
 		if (provider === undefined) {
@@ -178,7 +61,7 @@ export class TimelineService implements ITimelineService {
 		}
 
 		return {
-			result: provider.provideTimeline(uri, options, tokenSource.token, internalOptions)
+			result: provider.provideTimeline(uri, options, tokenSource.token)
 				.then(result => {
 					if (result === undefined) {
 						return undefined;
@@ -213,6 +96,9 @@ export class TimelineService implements ITimelineService {
 		}
 
 		this.providers.set(id, provider);
+
+		this.updateHasProviderContext();
+
 		if (provider.onDidChange) {
 			this.providerSubscriptions.set(id, provider.onDidChange(e => this._onDidChangeTimeline.fire(e)));
 		}
@@ -235,11 +121,18 @@ export class TimelineService implements ITimelineService {
 
 		this.providers.delete(id);
 		this.providerSubscriptions.delete(id);
+
+		this.updateHasProviderContext();
+
 		this._onDidChangeProviders.fire({ removed: [id] });
 	}
 
 	setUri(uri: URI) {
 		this.viewsService.openView(TimelinePaneId, true);
 		this._onDidChangeUri.fire(uri);
+	}
+
+	private updateHasProviderContext() {
+		this.hasProviderContext.set(this.providers.size !== 0);
 	}
 }

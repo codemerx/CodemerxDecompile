@@ -3,61 +3,66 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IAction, IActionRunner, ActionRunner, WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification } from 'vs/base/common/actions';
-import { Separator } from 'vs/base/browser/ui/actionbar/actionbar';
+import { IAction, IActionRunner, ActionRunner, WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification, Separator, SubmenuAction } from 'vs/base/common/actions';
 import * as dom from 'vs/base/browser/dom';
-import { IContextMenuService, IContextViewService } from 'vs/platform/contextview/browser/contextView';
+import { IContextMenuMenuDelegate, IContextMenuService, IContextViewService } from 'vs/platform/contextview/browser/contextView';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
-import { webFrame } from 'vs/base/parts/sandbox/electron-sandbox/globals';
+import { getZoomFactor } from 'vs/base/browser/browser';
 import { unmnemonicLabel } from 'vs/base/common/labels';
-import { Event, Emitter } from 'vs/base/common/event';
 import { INotificationService } from 'vs/platform/notification/common/notification';
-import { IContextMenuDelegate, ContextSubMenu, IContextMenuEvent } from 'vs/base/browser/contextmenu';
-import { once } from 'vs/base/common/functional';
-import { Disposable } from 'vs/base/common/lifecycle';
+import { IContextMenuDelegate, IContextMenuEvent } from 'vs/base/browser/contextmenu';
+import { createSingleCallFunction } from 'vs/base/common/functional';
 import { IContextMenuItem } from 'vs/base/parts/contextmenu/common/contextmenu';
 import { popup } from 'vs/base/parts/contextmenu/electron-sandbox/contextmenu';
-import { getTitleBarStyle } from 'vs/platform/windows/common/windows';
-import { isMacintosh } from 'vs/base/common/platform';
+import { getTitleBarStyle } from 'vs/platform/window/common/window';
+import { isMacintosh, isWindows } from 'vs/base/common/platform';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IEnvironmentService } from 'vs/platform/environment/common/environment';
-import { ContextMenuService as HTMLContextMenuService } from 'vs/platform/contextview/browser/contextMenuService';
-import { IThemeService } from 'vs/platform/theme/common/themeService';
-import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
-import { stripCodicons } from 'vs/base/common/codicons';
+import { ContextMenuMenuDelegate, ContextMenuService as HTMLContextMenuService } from 'vs/platform/contextview/browser/contextMenuService';
+import { InstantiationType, registerSingleton } from 'vs/platform/instantiation/common/extensions';
+import { stripIcons } from 'vs/base/common/iconLabels';
+import { coalesce } from 'vs/base/common/arrays';
+import { Event, Emitter } from 'vs/base/common/event';
+import { AnchorAlignment, AnchorAxisAlignment, isAnchor } from 'vs/base/browser/ui/contextview/contextview';
+import { IMenuService } from 'vs/platform/actions/common/actions';
+import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
+import { Disposable } from 'vs/base/common/lifecycle';
 
-export class ContextMenuService extends Disposable implements IContextMenuService {
+export class ContextMenuService implements IContextMenuService {
 
 	declare readonly _serviceBrand: undefined;
 
-	get onDidContextMenu(): Event<void> { return this.impl.onDidContextMenu; }
+	private impl: HTMLContextMenuService | NativeContextMenuService;
 
-	private impl: IContextMenuService;
+	get onDidShowContextMenu(): Event<void> { return this.impl.onDidShowContextMenu; }
+	get onDidHideContextMenu(): Event<void> { return this.impl.onDidHideContextMenu; }
 
 	constructor(
 		@INotificationService notificationService: INotificationService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IKeybindingService keybindingService: IKeybindingService,
 		@IConfigurationService configurationService: IConfigurationService,
-		@IEnvironmentService environmentService: IEnvironmentService,
 		@IContextViewService contextViewService: IContextViewService,
-		@IThemeService themeService: IThemeService
+		@IMenuService menuService: IMenuService,
+		@IContextKeyService contextKeyService: IContextKeyService,
 	) {
-		super();
 
 		// Custom context menu: Linux/Windows if custom title is enabled
-		if (!isMacintosh && getTitleBarStyle(configurationService, environmentService) === 'custom') {
-			this.impl = new HTMLContextMenuService(telemetryService, notificationService, contextViewService, keybindingService, themeService);
+		if (!isMacintosh && getTitleBarStyle(configurationService) === 'custom') {
+			this.impl = new HTMLContextMenuService(telemetryService, notificationService, contextViewService, keybindingService, menuService, contextKeyService);
 		}
 
 		// Native context menu: otherwise
 		else {
-			this.impl = new NativeContextMenuService(notificationService, telemetryService, keybindingService);
+			this.impl = new NativeContextMenuService(notificationService, telemetryService, keybindingService, menuService, contextKeyService);
 		}
 	}
 
-	showContextMenu(delegate: IContextMenuDelegate): void {
+	dispose(): void {
+		this.impl.dispose();
+	}
+
+	showContextMenu(delegate: IContextMenuDelegate | IContextMenuMenuDelegate): void {
 		this.impl.showContextMenu(delegate);
 	}
 }
@@ -66,38 +71,84 @@ class NativeContextMenuService extends Disposable implements IContextMenuService
 
 	declare readonly _serviceBrand: undefined;
 
-	private _onDidContextMenu = this._register(new Emitter<void>());
-	readonly onDidContextMenu: Event<void> = this._onDidContextMenu.event;
+	private readonly _onDidShowContextMenu = this._store.add(new Emitter<void>());
+	readonly onDidShowContextMenu = this._onDidShowContextMenu.event;
+
+	private readonly _onDidHideContextMenu = this._store.add(new Emitter<void>());
+	readonly onDidHideContextMenu = this._onDidHideContextMenu.event;
 
 	constructor(
 		@INotificationService private readonly notificationService: INotificationService,
 		@ITelemetryService private readonly telemetryService: ITelemetryService,
-		@IKeybindingService private readonly keybindingService: IKeybindingService
+		@IKeybindingService private readonly keybindingService: IKeybindingService,
+		@IMenuService private readonly menuService: IMenuService,
+		@IContextKeyService private readonly contextKeyService: IContextKeyService
 	) {
 		super();
 	}
 
-	showContextMenu(delegate: IContextMenuDelegate): void {
+	showContextMenu(delegate: IContextMenuDelegate | IContextMenuMenuDelegate): void {
+
+		delegate = ContextMenuMenuDelegate.transform(delegate, this.menuService, this.contextKeyService);
+
 		const actions = delegate.getActions();
 		if (actions.length) {
-			const onHide = once(() => {
-				if (delegate.onHide) {
-					delegate.onHide(false);
-				}
+			const onHide = createSingleCallFunction(() => {
+				delegate.onHide?.(false);
 
-				this._onDidContextMenu.fire();
+				dom.ModifierKeyEmitter.getInstance().resetKeyStatus();
+				this._onDidHideContextMenu.fire();
 			});
 
 			const menu = this.createMenu(delegate, actions, onHide);
 			const anchor = delegate.getAnchor();
-			let x: number, y: number;
 
-			let zoom = webFrame.getZoomFactor();
-			if (dom.isHTMLElement(anchor)) {
-				let elementPosition = dom.getDomNodePagePosition(anchor);
+			let x: number | undefined;
+			let y: number | undefined;
 
-				x = elementPosition.left;
-				y = elementPosition.top + elementPosition.height;
+			let zoom = getZoomFactor();
+			if (anchor instanceof HTMLElement) {
+				const elementPosition = dom.getDomNodePagePosition(anchor);
+
+				// When drawing context menus, we adjust the pixel position for native menus using zoom level
+				// In areas where zoom is applied to the element or its ancestors, we need to adjust accordingly
+				// e.g. The title bar has counter zoom behavior meaning it applies the inverse of zoom level.
+				// Window Zoom Level: 1.5, Title Bar Zoom: 1/1.5, Coordinate Multiplier: 1.5 * 1.0 / 1.5 = 1.0
+				zoom *= dom.getDomNodeZoomLevel(anchor);
+
+				// Position according to the axis alignment and the anchor alignment:
+				// `HORIZONTAL` aligns at the top left or right of the anchor and
+				//  `VERTICAL` aligns at the bottom left of the anchor.
+				if (delegate.anchorAxisAlignment === AnchorAxisAlignment.HORIZONTAL) {
+					if (delegate.anchorAlignment === AnchorAlignment.LEFT) {
+						x = elementPosition.left;
+						y = elementPosition.top;
+					} else {
+						x = elementPosition.left + elementPosition.width;
+						y = elementPosition.top;
+					}
+
+					if (!isMacintosh) {
+						const window = dom.getWindow(anchor);
+						const availableHeightForMenu = window.screen.height - y;
+						if (availableHeightForMenu < actions.length * (isWindows ? 45 : 32) /* guess of 1 menu item height */) {
+							// this is a guess to detect whether the context menu would
+							// open to the bottom from this point or to the top. If the
+							// menu opens to the top, make sure to align it to the bottom
+							// of the anchor and not to the top.
+							// this seems to be only necessary for Windows and Linux.
+							y += elementPosition.height;
+						}
+					}
+				} else {
+					if (delegate.anchorAlignment === AnchorAlignment.LEFT) {
+						x = elementPosition.left;
+						y = elementPosition.top + elementPosition.height;
+					} else {
+						x = elementPosition.left + elementPosition.width;
+						y = elementPosition.top + elementPosition.height;
+					}
+				}
 
 				// Shift macOS menus by a few pixels below elements
 				// to account for extra padding on top of native menu
@@ -105,41 +156,49 @@ class NativeContextMenuService extends Disposable implements IContextMenuService
 				if (isMacintosh) {
 					y += 4 / zoom;
 				}
+			} else if (isAnchor(anchor)) {
+				x = anchor.x;
+				y = anchor.y;
 			} else {
-				const pos: { x: number; y: number; } = anchor;
-				x = pos.x + 1; /* prevent first item from being selected automatically under mouse */
-				y = pos.y;
+				// We leave x/y undefined in this case which will result in
+				// Electron taking care of opening the menu at the cursor position.
 			}
 
-			x *= zoom;
-			y *= zoom;
+			if (typeof x === 'number') {
+				x = Math.floor(x * zoom);
+			}
 
-			popup(menu, {
-				x: Math.floor(x),
-				y: Math.floor(y),
-				positioningItem: delegate.autoSelectFirstItem ? 0 : undefined,
-			}, () => onHide());
+			if (typeof y === 'number') {
+				y = Math.floor(y * zoom);
+			}
+
+			popup(menu, { x, y, positioningItem: delegate.autoSelectFirstItem ? 0 : undefined, }, () => onHide());
+
+			this._onDidShowContextMenu.fire();
 		}
 	}
 
-	private createMenu(delegate: IContextMenuDelegate, entries: ReadonlyArray<IAction | ContextSubMenu>, onHide: () => void): IContextMenuItem[] {
+	private createMenu(delegate: IContextMenuDelegate, entries: readonly IAction[], onHide: () => void, submenuIds = new Set<string>()): IContextMenuItem[] {
 		const actionRunner = delegate.actionRunner || new ActionRunner();
-
-		return entries.map(entry => this.createMenuItem(delegate, entry, actionRunner, onHide));
+		return coalesce(entries.map(entry => this.createMenuItem(delegate, entry, actionRunner, onHide, submenuIds)));
 	}
 
-	private createMenuItem(delegate: IContextMenuDelegate, entry: IAction | ContextSubMenu, actionRunner: IActionRunner, onHide: () => void): IContextMenuItem {
-
+	private createMenuItem(delegate: IContextMenuDelegate, entry: IAction, actionRunner: IActionRunner, onHide: () => void, submenuIds: Set<string>): IContextMenuItem | undefined {
 		// Separator
 		if (entry instanceof Separator) {
 			return { type: 'separator' };
 		}
 
 		// Submenu
-		if (entry instanceof ContextSubMenu) {
+		if (entry instanceof SubmenuAction) {
+			if (submenuIds.has(entry.id)) {
+				console.warn(`Found submenu cycle: ${entry.id}`);
+				return undefined;
+			}
+
 			return {
-				label: unmnemonicLabel(stripCodicons(entry.label)).trim(),
-				submenu: this.createMenu(delegate, entry.entries, onHide)
+				label: unmnemonicLabel(stripIcons(entry.label)).trim(),
+				submenu: this.createMenu(delegate, entry.actions, onHide, new Set([...submenuIds, entry.id]))
 			};
 		}
 
@@ -155,7 +214,7 @@ class NativeContextMenuService extends Disposable implements IContextMenuService
 			}
 
 			const item: IContextMenuItem = {
-				label: unmnemonicLabel(stripCodicons(entry.label)).trim(),
+				label: unmnemonicLabel(stripIcons(entry.label)).trim(),
 				checked: !!entry.checked,
 				type,
 				enabled: !!entry.enabled,
@@ -163,7 +222,7 @@ class NativeContextMenuService extends Disposable implements IContextMenuService
 
 					// To preserve pre-electron-2.x behaviour, we first trigger
 					// the onHide callback and then the action.
-					// Fixes https://github.com/Microsoft/vscode/issues/45601
+					// Fixes https://github.com/microsoft/vscode/issues/45601
 					onHide();
 
 					// Run action which will close the menu
@@ -189,19 +248,19 @@ class NativeContextMenuService extends Disposable implements IContextMenuService
 	}
 
 	private async runAction(actionRunner: IActionRunner, actionToRun: IAction, delegate: IContextMenuDelegate, event: IContextMenuEvent): Promise<void> {
-		this.telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', { id: actionToRun.id, from: 'contextMenu' });
+		if (!delegate.skipTelemetry) {
+			this.telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', { id: actionToRun.id, from: 'contextMenu' });
+		}
 
 		const context = delegate.getActionsContext ? delegate.getActionsContext(event) : undefined;
 
 		const runnable = actionRunner.run(actionToRun, context);
-		if (runnable) {
-			try {
-				await runnable;
-			} catch (error) {
-				this.notificationService.error(error);
-			}
+		try {
+			await runnable;
+		} catch (error) {
+			this.notificationService.error(error);
 		}
 	}
 }
 
-registerSingleton(IContextMenuService, ContextMenuService, true);
+registerSingleton(IContextMenuService, ContextMenuService, InstantiationType.Delayed);

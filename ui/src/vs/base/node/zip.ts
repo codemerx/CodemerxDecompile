@@ -3,15 +3,18 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as nls from 'vs/nls';
-import * as path from 'vs/base/common/path';
 import { createWriteStream, WriteStream } from 'fs';
 import { Readable } from 'stream';
-import { Sequencer, createCancelablePromise } from 'vs/base/common/async';
-import { mkdirp, rimraf } from 'vs/base/node/pfs';
-import { open as _openZip, Entry, ZipFile } from 'yauzl';
-import * as yazl from 'yazl';
+import { createCancelablePromise, Sequencer } from 'vs/base/common/async';
 import { CancellationToken } from 'vs/base/common/cancellation';
+import * as path from 'vs/base/common/path';
+import { assertIsDefined } from 'vs/base/common/types';
+import { Promises } from 'vs/base/node/pfs';
+import * as nls from 'vs/nls';
+import type { Entry, ZipFile } from 'yauzl';
+
+export const CorruptZipMessage: string = 'end of central directory record signature not found';
+const CORRUPT_ZIP_PATTERN = new RegExp(CorruptZipMessage);
 
 export interface IExtractOptions {
 	overwrite?: boolean;
@@ -32,7 +35,6 @@ export type ExtractErrorType = 'CorruptZip' | 'Incomplete';
 export class ExtractError extends Error {
 
 	readonly type?: ExtractErrorType;
-	readonly cause: Error;
 
 	constructor(type: ExtractErrorType | undefined, cause: Error) {
 		let message = cause.message;
@@ -62,7 +64,7 @@ function toExtractError(err: Error): ExtractError {
 
 	let type: ExtractErrorType | undefined = undefined;
 
-	if (/end of central directory record signature not found/.test(err.message)) {
+	if (CORRUPT_ZIP_PATTERN.test(err.message)) {
 		type = 'CorruptZip';
 	}
 
@@ -72,7 +74,7 @@ function toExtractError(err: Error): ExtractError {
 function extractEntry(stream: Readable, fileName: string, mode: number, targetPath: string, options: IOptions, token: CancellationToken): Promise<void> {
 	const dirName = path.dirname(fileName);
 	const targetDirName = path.join(targetPath, dirName);
-	if (targetDirName.indexOf(targetPath) !== 0) {
+	if (!targetDirName.startsWith(targetPath)) {
 		return Promise.reject(new Error(nls.localize('invalid file', "Error extracting {0}. Invalid file.", fileName)));
 	}
 	const targetFileName = path.join(targetPath, fileName);
@@ -80,12 +82,10 @@ function extractEntry(stream: Readable, fileName: string, mode: number, targetPa
 	let istream: WriteStream;
 
 	token.onCancellationRequested(() => {
-		if (istream) {
-			istream.destroy();
-		}
+		istream?.destroy();
 	});
 
-	return Promise.resolve(mkdirp(targetDirName)).then(() => new Promise<void>((c, e) => {
+	return Promise.resolve(Promises.mkdir(targetDirName, { recursive: true })).then(() => new Promise<void>((c, e) => {
 		if (token.isCancellationRequested) {
 			return;
 		}
@@ -106,12 +106,12 @@ function extractZip(zipfile: ZipFile, targetPath: string, options: IOptions, tok
 	let last = createCancelablePromise<void>(() => Promise.resolve());
 	let extractedEntriesCount = 0;
 
-	token.onCancellationRequested(() => {
+	const listener = token.onCancellationRequested(() => {
 		last.cancel();
 		zipfile.close();
 	});
 
-	return new Promise((c, e) => {
+	return new Promise<void>((c, e) => {
 		const throttler = new Sequencer();
 
 		const readNextEntry = (token: CancellationToken) => {
@@ -148,7 +148,7 @@ function extractZip(zipfile: ZipFile, targetPath: string, options: IOptions, tok
 			// directory file names end with '/'
 			if (/\/$/.test(fileName)) {
 				const targetFileName = path.join(targetPath, fileName);
-				last = createCancelablePromise(token => mkdirp(targetFileName).then(() => readNextEntry(token)).then(undefined, e));
+				last = createCancelablePromise(token => Promises.mkdir(targetFileName, { recursive: true }).then(() => readNextEntry(token)).then(undefined, e));
 				return;
 			}
 
@@ -157,28 +157,30 @@ function extractZip(zipfile: ZipFile, targetPath: string, options: IOptions, tok
 
 			last = createCancelablePromise(token => throttler.queue(() => stream.then(stream => extractEntry(stream, fileName, mode, targetPath, options, token).then(() => readNextEntry(token)))).then(null, e));
 		});
-	});
+	}).finally(() => listener.dispose());
 }
 
-function openZip(zipFile: string, lazy: boolean = false): Promise<ZipFile> {
-	return new Promise((resolve, reject) => {
-		_openZip(zipFile, lazy ? { lazyEntries: true } : undefined!, (error?: Error, zipfile?: ZipFile) => {
+async function openZip(zipFile: string, lazy: boolean = false): Promise<ZipFile> {
+	const { open } = await import('yauzl');
+
+	return new Promise<ZipFile>((resolve, reject) => {
+		open(zipFile, lazy ? { lazyEntries: true } : undefined!, (error?: Error, zipfile?: ZipFile) => {
 			if (error) {
 				reject(toExtractError(error));
 			} else {
-				resolve(zipfile);
+				resolve(assertIsDefined(zipfile));
 			}
 		});
 	});
 }
 
 function openZipStream(zipFile: ZipFile, entry: Entry): Promise<Readable> {
-	return new Promise((resolve, reject) => {
+	return new Promise<Readable>((resolve, reject) => {
 		zipFile.openReadStream(entry, (error?: Error, stream?: Readable) => {
 			if (error) {
 				reject(toExtractError(error));
 			} else {
-				resolve(stream);
+				resolve(assertIsDefined(stream));
 			}
 		});
 	});
@@ -190,9 +192,11 @@ export interface IFile {
 	localPath?: string;
 }
 
-export function zip(zipPath: string, files: IFile[]): Promise<string> {
+export async function zip(zipPath: string, files: IFile[]): Promise<string> {
+	const { ZipFile } = await import('yazl');
+
 	return new Promise<string>((c, e) => {
-		const zip = new yazl.ZipFile();
+		const zip = new ZipFile();
 		files.forEach(f => {
 			if (f.contents) {
 				zip.addBuffer(typeof f.contents === 'string' ? Buffer.from(f.contents, 'utf8') : f.contents, f.path);
@@ -217,7 +221,7 @@ export function extract(zipPath: string, targetPath: string, options: IExtractOp
 	let promise = openZip(zipPath, true);
 
 	if (options.overwrite) {
-		promise = promise.then(zipfile => rimraf(targetPath).then(() => zipfile));
+		promise = promise.then(zipfile => Promises.rm(targetPath).then(() => zipfile));
 	}
 
 	return promise.then(zipfile => extractZip(zipfile, targetPath, { sourcePathRegex }, token));

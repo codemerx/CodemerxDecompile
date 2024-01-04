@@ -15,14 +15,6 @@
 	position: absolute;
 }
 
-.monaco-workbench .outline-pane .outline-progress .monaco-progress-container {
-	height: 2px;
-}
-
-.monaco-workbench .outline-pane .outline-progress .monaco-progress-container .progress-bit {
-	height: 2px;
-}
-
 .monaco-workbench .outline-pane .outline-tree {
 	height: 100%;
 }
@@ -31,6 +23,9 @@
 	display: none;
 	padding: 10px 22px 0 22px;
 	opacity: 0.5;
+	position: absolute;
+	pointer-events: none;
+	z-index: 1;
 }
 
 .monaco-workbench .outline-pane.message .outline-message {
@@ -38,9 +33,5 @@
 }
 
 .monaco-workbench .outline-pane.message .outline-progress {
-	display: none;
-}
-
-.monaco-workbench .outline-pane.message .outline-tree {
 	display: none;
 }

@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as browser from 'vs/base/browser/browser';
+import { mainWindow } from 'vs/base/browser/window';
 import * as platform from 'vs/base/common/platform';
 
 export const enum KeyboardSupport {
@@ -25,22 +26,10 @@ export const BrowserFeatures = {
 		readText: (
 			platform.isNative
 			|| !!(navigator && navigator.clipboard && navigator.clipboard.readText)
-		),
-		richText: (() => {
-			if (browser.isEdge) {
-				let index = navigator.userAgent.indexOf('Edge/');
-				let version = parseInt(navigator.userAgent.substring(index + 5, navigator.userAgent.indexOf('.', index)), 10);
-
-				if (!version || (version >= 12 && version <= 16)) {
-					return false;
-				}
-			}
-
-			return true;
-		})()
+		)
 	},
 	keyboard: (() => {
-		if (platform.isNative || browser.isStandalone) {
+		if (platform.isNative || browser.isStandalone()) {
 			return KeyboardSupport.Always;
 		}
 
@@ -53,6 +42,6 @@ export const BrowserFeatures = {
 
 	// 'ontouchstart' in window always evaluates to true with typescript's modern typings. This causes `window` to be
 	// `never` later in `window.navigator`. That's why we need the explicit `window as Window` cast
-	touch: 'ontouchstart' in window || navigator.maxTouchPoints > 0 || (window as Window).navigator.msMaxTouchPoints > 0,
-	pointerEvents: window.PointerEvent && ('ontouchstart' in window || (window as Window).navigator.maxTouchPoints > 0 || navigator.maxTouchPoints > 0 || (window as Window).navigator.msMaxTouchPoints > 0)
+	touch: 'ontouchstart' in mainWindow || navigator.maxTouchPoints > 0,
+	pointerEvents: mainWindow.PointerEvent && ('ontouchstart' in mainWindow || navigator.maxTouchPoints > 0 || navigator.maxTouchPoints > 0)
 };

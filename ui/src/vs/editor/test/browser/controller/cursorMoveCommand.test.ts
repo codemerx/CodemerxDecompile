@@ -4,15 +4,18 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as assert from 'assert';
-import { CoreNavigationCommands } from 'vs/editor/browser/controller/coreCommands';
-import { CursorMove } from 'vs/editor/common/controller/cursorMoveCommands';
+import { ensureNoDisposablesAreLeakedInTestSuite } from 'vs/base/test/common/utils';
+import { CoreNavigationCommands } from 'vs/editor/browser/coreCommands';
 import { Position } from 'vs/editor/common/core/position';
 import { Range } from 'vs/editor/common/core/range';
 import { Selection } from 'vs/editor/common/core/selection';
-import { withTestCodeEditor, ITestCodeEditor } from 'vs/editor/test/browser/testCodeEditor';
+import { CursorMove } from 'vs/editor/common/cursor/cursorMoveCommands';
 import { ViewModel } from 'vs/editor/common/viewModel/viewModelImpl';
+import { ITestCodeEditor, withTestCodeEditor } from 'vs/editor/test/browser/testCodeEditor';
 
 suite('Cursor move command test', () => {
+
+	ensureNoDisposablesAreLeakedInTestSuite();
 
 	const TEXT = [
 		'    \tMy First Line\t ',
@@ -416,6 +419,93 @@ suite('Cursor move command test', () => {
 	});
 });
 
+suite('Cursor move by blankline test', () => {
+
+	ensureNoDisposablesAreLeakedInTestSuite();
+
+	const TEXT = [
+		'    \tMy First Line\t ',
+		'\tMy Second Line',
+		'    Third Line🐶',
+		'',
+		'1',
+		'2',
+		'3',
+		'',
+		'         ',
+		'a',
+		'b',
+	].join('\n');
+
+	function executeTest(callback: (editor: ITestCodeEditor, viewModel: ViewModel) => void): void {
+		withTestCodeEditor(TEXT, {}, (editor, viewModel) => {
+			callback(editor, viewModel);
+		});
+	}
+
+	test('move down should move to start of next blank line', () => {
+		executeTest((editor, viewModel) => {
+			moveDownByBlankLine(viewModel, false);
+			cursorEqual(viewModel, 4, 1);
+		});
+	});
+
+	test('move up should move to start of previous blank line', () => {
+		executeTest((editor, viewModel) => {
+			moveTo(viewModel, 7, 1);
+			moveUpByBlankLine(viewModel, false);
+			cursorEqual(viewModel, 4, 1);
+		});
+	});
+
+	test('move down should skip over whitespace if already on blank line', () => {
+		executeTest((editor, viewModel) => {
+			moveTo(viewModel, 8, 1);
+			moveDownByBlankLine(viewModel, false);
+			cursorEqual(viewModel, 11, 1);
+		});
+	});
+
+	test('move up should skip over whitespace if already on blank line', () => {
+		executeTest((editor, viewModel) => {
+			moveTo(viewModel, 9, 1);
+			moveUpByBlankLine(viewModel, false);
+			cursorEqual(viewModel, 4, 1);
+		});
+	});
+
+	test('move up should go to first column of first line if not empty', () => {
+		executeTest((editor, viewModel) => {
+			moveTo(viewModel, 2, 1);
+			moveUpByBlankLine(viewModel, false);
+			cursorEqual(viewModel, 1, 1);
+		});
+	});
+
+	test('move down should go to first column of last line if not empty', () => {
+		executeTest((editor, viewModel) => {
+			moveTo(viewModel, 10, 1);
+			moveDownByBlankLine(viewModel, false);
+			cursorEqual(viewModel, 11, 1);
+		});
+	});
+
+	test('select down should select to start of next blank line', () => {
+		executeTest((editor, viewModel) => {
+			moveDownByBlankLine(viewModel, true);
+			selectionEqual(viewModel.getSelection(), 4, 1, 1, 1);
+		});
+	});
+
+	test('select up should select to start of previous blank line', () => {
+		executeTest((editor, viewModel) => {
+			moveTo(viewModel, 7, 1);
+			moveUpByBlankLine(viewModel, true);
+			selectionEqual(viewModel.getSelection(), 4, 1, 7, 1);
+		});
+	});
+});
+
 // Move command
 
 function move(viewModel: ViewModel, args: any) {
@@ -454,12 +544,20 @@ function moveUp(viewModel: ViewModel, noOfLines: number = 1, select?: boolean) {
 	move(viewModel, { to: CursorMove.RawDirection.Up, by: CursorMove.RawUnit.WrappedLine, value: noOfLines, select: select });
 }
 
+function moveUpByBlankLine(viewModel: ViewModel, select?: boolean) {
+	move(viewModel, { to: CursorMove.RawDirection.PrevBlankLine, by: CursorMove.RawUnit.WrappedLine, select: select });
+}
+
 function moveUpByModelLine(viewModel: ViewModel, noOfLines: number = 1, select?: boolean) {
 	move(viewModel, { to: CursorMove.RawDirection.Up, value: noOfLines, select: select });
 }
 
 function moveDown(viewModel: ViewModel, noOfLines: number = 1, select?: boolean) {
 	move(viewModel, { to: CursorMove.RawDirection.Down, by: CursorMove.RawUnit.WrappedLine, value: noOfLines, select: select });
+}
+
+function moveDownByBlankLine(viewModel: ViewModel, select?: boolean) {
+	move(viewModel, { to: CursorMove.RawDirection.NextBlankLine, by: CursorMove.RawUnit.WrappedLine, select: select });
 }
 
 function moveDownByModelLine(viewModel: ViewModel, noOfLines: number = 1, select?: boolean) {
@@ -484,11 +582,11 @@ function cursorEqual(viewModel: ViewModel, posLineNumber: number, posColumn: num
 }
 
 function positionEqual(position: Position, lineNumber: number, column: number) {
-	assert.deepEqual(position, new Position(lineNumber, column), 'position equal');
+	assert.deepStrictEqual(position, new Position(lineNumber, column), 'position equal');
 }
 
 function selectionEqual(selection: Selection, posLineNumber: number, posColumn: number, selLineNumber: number, selColumn: number) {
-	assert.deepEqual({
+	assert.deepStrictEqual({
 		selectionStartLineNumber: selection.selectionStartLineNumber,
 		selectionStartColumn: selection.selectionStartColumn,
 		positionLineNumber: selection.positionLineNumber,

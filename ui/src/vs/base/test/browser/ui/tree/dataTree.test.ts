@@ -4,9 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as assert from 'assert';
-import { ITreeNode, ITreeRenderer, IDataSource } from 'vs/base/browser/ui/tree/tree';
-import { IListVirtualDelegate, IIdentityProvider } from 'vs/base/browser/ui/list/list';
+import { IIdentityProvider, IListVirtualDelegate } from 'vs/base/browser/ui/list/list';
 import { DataTree } from 'vs/base/browser/ui/tree/dataTree';
+import { IDataSource, ITreeNode, ITreeRenderer } from 'vs/base/browser/ui/tree/tree';
+import { ensureNoDisposablesAreLeakedInTestSuite } from 'vs/base/test/common/utils';
 
 interface E {
 	value: number;
@@ -29,6 +30,10 @@ suite('DataTree', function () {
 		value: -1,
 		children: []
 	};
+
+	teardown(() => tree.dispose());
+
+	ensureNoDisposablesAreLeakedInTestSuite();
 
 	setup(() => {
 		const container = document.createElement('div');
@@ -58,39 +63,33 @@ suite('DataTree', function () {
 		};
 
 		const identityProvider = new class implements IIdentityProvider<E> {
-			getId(element: E): { toString(): string; } {
+			getId(element: E): { toString(): string } {
 				return `${element.value}`;
 			}
 		};
 
-		tree = new DataTree<E, E>('test', container, delegate, [renderer], dataSource, {
-			identityProvider
-		});
+		tree = new DataTree<E, E>('test', container, delegate, [renderer], dataSource, { identityProvider });
 		tree.layout(200);
-	});
-
-	teardown(() => {
-		tree.dispose();
 	});
 
 	test('view state is lost implicitly', () => {
 		tree.setInput(root);
 
 		let navigator = tree.navigate();
-		assert.equal(navigator.next()!.value, 0);
-		assert.equal(navigator.next()!.value, 10);
-		assert.equal(navigator.next()!.value, 11);
-		assert.equal(navigator.next()!.value, 12);
-		assert.equal(navigator.next()!.value, 1);
-		assert.equal(navigator.next()!.value, 2);
-		assert.equal(navigator.next()!, null);
+		assert.strictEqual(navigator.next()!.value, 0);
+		assert.strictEqual(navigator.next()!.value, 10);
+		assert.strictEqual(navigator.next()!.value, 11);
+		assert.strictEqual(navigator.next()!.value, 12);
+		assert.strictEqual(navigator.next()!.value, 1);
+		assert.strictEqual(navigator.next()!.value, 2);
+		assert.strictEqual(navigator.next()!, null);
 
 		tree.collapse(root.children![0]);
 		navigator = tree.navigate();
-		assert.equal(navigator.next()!.value, 0);
-		assert.equal(navigator.next()!.value, 1);
-		assert.equal(navigator.next()!.value, 2);
-		assert.equal(navigator.next()!, null);
+		assert.strictEqual(navigator.next()!.value, 0);
+		assert.strictEqual(navigator.next()!.value, 1);
+		assert.strictEqual(navigator.next()!.value, 2);
+		assert.strictEqual(navigator.next()!, null);
 
 		tree.setSelection([root.children![1]]);
 		tree.setFocus([root.children![2]]);
@@ -98,36 +97,36 @@ suite('DataTree', function () {
 		tree.setInput(empty);
 		tree.setInput(root);
 		navigator = tree.navigate();
-		assert.equal(navigator.next()!.value, 0);
-		assert.equal(navigator.next()!.value, 10);
-		assert.equal(navigator.next()!.value, 11);
-		assert.equal(navigator.next()!.value, 12);
-		assert.equal(navigator.next()!.value, 1);
-		assert.equal(navigator.next()!.value, 2);
-		assert.equal(navigator.next()!, null);
+		assert.strictEqual(navigator.next()!.value, 0);
+		assert.strictEqual(navigator.next()!.value, 10);
+		assert.strictEqual(navigator.next()!.value, 11);
+		assert.strictEqual(navigator.next()!.value, 12);
+		assert.strictEqual(navigator.next()!.value, 1);
+		assert.strictEqual(navigator.next()!.value, 2);
+		assert.strictEqual(navigator.next()!, null);
 
-		assert.deepEqual(tree.getSelection(), []);
-		assert.deepEqual(tree.getFocus(), []);
+		assert.deepStrictEqual(tree.getSelection(), []);
+		assert.deepStrictEqual(tree.getFocus(), []);
 	});
 
 	test('view state can be preserved', () => {
 		tree.setInput(root);
 
 		let navigator = tree.navigate();
-		assert.equal(navigator.next()!.value, 0);
-		assert.equal(navigator.next()!.value, 10);
-		assert.equal(navigator.next()!.value, 11);
-		assert.equal(navigator.next()!.value, 12);
-		assert.equal(navigator.next()!.value, 1);
-		assert.equal(navigator.next()!.value, 2);
-		assert.equal(navigator.next()!, null);
+		assert.strictEqual(navigator.next()!.value, 0);
+		assert.strictEqual(navigator.next()!.value, 10);
+		assert.strictEqual(navigator.next()!.value, 11);
+		assert.strictEqual(navigator.next()!.value, 12);
+		assert.strictEqual(navigator.next()!.value, 1);
+		assert.strictEqual(navigator.next()!.value, 2);
+		assert.strictEqual(navigator.next()!, null);
 
 		tree.collapse(root.children![0]);
 		navigator = tree.navigate();
-		assert.equal(navigator.next()!.value, 0);
-		assert.equal(navigator.next()!.value, 1);
-		assert.equal(navigator.next()!.value, 2);
-		assert.equal(navigator.next()!, null);
+		assert.strictEqual(navigator.next()!.value, 0);
+		assert.strictEqual(navigator.next()!.value, 1);
+		assert.strictEqual(navigator.next()!.value, 2);
+		assert.strictEqual(navigator.next()!, null);
 
 		tree.setSelection([root.children![1]]);
 		tree.setFocus([root.children![2]]);
@@ -137,12 +136,12 @@ suite('DataTree', function () {
 		tree.setInput(empty);
 		tree.setInput(root, viewState);
 		navigator = tree.navigate();
-		assert.equal(navigator.next()!.value, 0);
-		assert.equal(navigator.next()!.value, 1);
-		assert.equal(navigator.next()!.value, 2);
-		assert.equal(navigator.next()!, null);
+		assert.strictEqual(navigator.next()!.value, 0);
+		assert.strictEqual(navigator.next()!.value, 1);
+		assert.strictEqual(navigator.next()!.value, 2);
+		assert.strictEqual(navigator.next()!, null);
 
-		assert.deepEqual(tree.getSelection(), [root.children![1]]);
-		assert.deepEqual(tree.getFocus(), [root.children![2]]);
+		assert.deepStrictEqual(tree.getSelection(), [root.children![1]]);
+		assert.deepStrictEqual(tree.getFocus(), [root.children![2]]);
 	});
 });

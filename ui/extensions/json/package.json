@@ -29,12 +29,14 @@
           ".ts.map",
           ".har",
           ".jslintrc",
-          ".jsonld"
+          ".jsonld",
+          ".geojson",
+          ".ipynb",
+          ".vuerc"
         ],
         "filenames": [
           "composer.lock",
-          ".watchmanconfig",
-          ".ember-cli"
+          ".watchmanconfig"
         ],
         "mimetypes": [
           "application/json",
@@ -48,14 +50,45 @@
           "JSON with Comments"
         ],
         "extensions": [
-          ".hintrc",
-          ".babelrc",
           ".jsonc",
           ".eslintrc",
           ".eslintrc.json",
           ".jsfmtrc",
           ".jshintrc",
-          ".swcrc"
+          ".swcrc",
+          ".hintrc",
+          ".babelrc"
+        ],
+        "filenames": [
+          "babel.config.json",
+          ".babelrc.json",
+          ".ember-cli",
+          "typedoc.json"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "jsonl",
+        "aliases": [
+          "JSON Lines"
+        ],
+        "extensions": [
+          ".jsonl"
+        ],
+        "filenames": [],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "snippets",
+        "aliases": [
+            "Code Snippets"
+        ],
+        "extensions": [
+          ".code-snippets"
+        ],
+        "filenamePatterns": [
+          "**/User/snippets/*.json",
+          "**/User/profiles/*/snippets/*.json"
         ],
         "configuration": "./language-configuration.json"
       }
@@ -70,7 +103,21 @@
         "language": "jsonc",
         "scopeName": "source.json.comments",
         "path": "./syntaxes/JSONC.tmLanguage.json"
+      },
+      {
+        "language": "jsonl",
+        "scopeName": "source.json.lines",
+        "path": "./syntaxes/JSONL.tmLanguage.json"
+      },
+      {
+        "language": "snippets",
+        "scopeName": "source.json.comments.snippets",
+        "path": "./syntaxes/snippets.tmLanguage.json"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/vscode.git"
   }
 }

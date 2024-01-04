@@ -3,14 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IDisposable, Disposable } from 'vs/base/common/lifecycle';
+import { IDisposable } from 'vs/base/common/lifecycle';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-import { IViewDescriptorService } from 'vs/workbench/common/views';
+import { ThemeIcon } from 'vs/base/common/themables';
 import { Event } from 'vs/base/common/event';
+import { ViewContainer } from 'vs/workbench/common/views';
 
 export interface IActivity {
 	readonly badge: IBadge;
-	readonly clazz?: string;
 	readonly priority?: number;
 }
 
@@ -21,9 +21,24 @@ export interface IActivityService {
 	readonly _serviceBrand: undefined;
 
 	/**
+	 * Emitted when activity changes for a view container or when the activity of the global actions change.
+	 */
+	readonly onDidChangeActivity: Event<string | ViewContainer>;
+
+	/**
 	 * Show activity for the given view container
 	 */
 	showViewContainerActivity(viewContainerId: string, badge: IActivity): IDisposable;
+
+	/**
+	 * Returns the activity for the given view container
+	 */
+	getViewContainerActivities(viewContainerId: string): IActivity[];
+
+	/**
+	 * Show activity for the given view
+	 */
+	showViewActivity(viewId: string, badge: IActivity): IDisposable;
 
 	/**
 	 * Show accounts activity
@@ -34,39 +49,11 @@ export interface IActivityService {
 	 * Show global activity
 	 */
 	showGlobalActivity(activity: IActivity): IDisposable;
-}
 
-export class ViewContaierActivityByView extends Disposable {
-
-	private activity: IActivity | undefined = undefined;
-	private activityDisposable: IDisposable = Disposable.None;
-
-	constructor(
-		private readonly viewId: string,
-		@IViewDescriptorService private readonly viewDescriptorService: IViewDescriptorService,
-		@IActivityService private readonly activityService: IActivityService,
-	) {
-		super();
-		this._register(Event.filter(this.viewDescriptorService.onDidChangeContainer, e => e.views.some(view => view.id === viewId))(() => this.update()));
-		this._register(Event.filter(this.viewDescriptorService.onDidChangeLocation, e => e.views.some(view => view.id === viewId))(() => this.update()));
-	}
-
-	setActivity(activity: IActivity): void {
-		this.activity = activity;
-		this.update();
-	}
-
-	private update(): void {
-		this.activityDisposable.dispose();
-		const container = this.viewDescriptorService.getViewContainerByViewId(this.viewId);
-		if (container && this.activity) {
-			this.activityDisposable = this.activityService.showViewContainerActivity(container.id, this.activity);
-		}
-	}
-
-	dispose() {
-		this.activityDisposable.dispose();
-	}
+	/**
+	 * Return the activity for the given action
+	 */
+	getActivity(id: string): IActivity[];
 }
 
 export interface IBadge {
@@ -75,7 +62,7 @@ export interface IBadge {
 
 class BaseBadge implements IBadge {
 
-	constructor(public readonly descriptorFn: (arg: any) => string) {
+	constructor(readonly descriptorFn: (arg: any) => string) {
 		this.descriptorFn = descriptorFn;
 	}
 
@@ -86,27 +73,19 @@ class BaseBadge implements IBadge {
 
 export class NumberBadge extends BaseBadge {
 
-	constructor(public readonly number: number, descriptorFn: (num: number) => string) {
+	constructor(readonly number: number, descriptorFn: (num: number) => string) {
 		super(descriptorFn);
 
 		this.number = number;
 	}
 
-	getDescription(): string {
+	override getDescription(): string {
 		return this.descriptorFn(this.number);
 	}
 }
 
-export class TextBadge extends BaseBadge {
-
-	constructor(public readonly text: string, descriptorFn: () => string) {
-		super(descriptorFn);
-	}
-}
-
 export class IconBadge extends BaseBadge {
-
-	constructor(descriptorFn: () => string) {
+	constructor(readonly icon: ThemeIcon, descriptorFn: () => string) {
 		super(descriptorFn);
 	}
 }

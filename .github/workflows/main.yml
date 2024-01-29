@@ -40,8 +40,8 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          '2.1.x'
-          '3.1.x'
+          2.1.x
+          3.1.x
 
     - name: Build Solution
       run: dotnet build engine/CodemerxDecompileEngine.sln -c Release

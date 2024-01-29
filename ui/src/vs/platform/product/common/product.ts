@@ -3,16 +3,54 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IProductConfiguration } from 'vs/platform/product/common/productService';
-import { isWeb } from 'vs/base/common/platform';
-import * as path from 'vs/base/common/path';
-import { getPathFromAmdModule } from 'vs/base/common/amd';
 import { env } from 'vs/base/common/process';
+import { IProductConfiguration } from 'vs/base/common/product';
+import { ISandboxConfiguration } from 'vs/base/parts/sandbox/common/sandboxTypes';
 
+/**
+ * @deprecated You MUST use `IProductService` if possible.
+ */
 let product: IProductConfiguration;
 
-// Web
-if (isWeb) {
+// Native sandbox environment
+const vscodeGlobal = (globalThis as any).vscode;
+if (typeof vscodeGlobal !== 'undefined' && typeof vscodeGlobal.context !== 'undefined') {
+	const configuration: ISandboxConfiguration | undefined = vscodeGlobal.context.configuration();
+	if (configuration) {
+		product = configuration.product;
+	} else {
+		throw new Error('Sandbox: unable to resolve product configuration from preload script.');
+	}
+}
+// _VSCODE environment
+else if (globalThis._VSCODE_PRODUCT_JSON && globalThis._VSCODE_PACKAGE_JSON) {
+	// Obtain values from product.json and package.json-data
+	product = globalThis._VSCODE_PRODUCT_JSON as unknown as IProductConfiguration;
+
+	// Running out of sources
+	if (env['VSCODE_DEV']) {
+		Object.assign(product, {
+			nameShort: `${product.nameShort} Dev`,
+			nameLong: `${product.nameLong} Dev`,
+			dataFolderName: `${product.dataFolderName}-dev`,
+			serverDataFolderName: product.serverDataFolderName ? `${product.serverDataFolderName}-dev` : undefined
+		});
+	}
+
+	// Version is added during built time, but we still
+	// want to have it running out of sources so we
+	// read it from package.json only when we need it.
+	if (!product.version) {
+		const pkg = globalThis._VSCODE_PACKAGE_JSON as { version: string };
+
+		Object.assign(product, {
+			version: pkg.version
+		});
+	}
+}
+
+// Web environment or unknown
+else {
 
 	// Built time configuration (do NOT modify)
 	product = { /*BUILD->INSERT_PRODUCT_CONFIGURATION*/ } as IProductConfiguration;
@@ -20,44 +58,23 @@ if (isWeb) {
 	// Running out of sources
 	if (Object.keys(product).length === 0) {
 		Object.assign(product, {
-			version: '1.47.0-dev',
+			version: '1.82.0-dev',
 			/* AGPL */
-			nameLong: 'CodemerxDecompile Web',
 			nameShort: 'CodemerxDecompile Web',
-			urlProtocol: 'codemerxdecompile'
+			nameLong: 'CodemerxDecompile Web',
+			applicationName: 'codemerxdecompile',
+			dataFolderName: '.codemerxdecompile',
+			urlProtocol: 'codemerxdecompile',
+			reportIssueUrl: 'https://github.com/codemerx/CodemerxDecompile/issues/new',
+			licenseName: 'AGPL',
+			licenseUrl: 'https://github.com/codemerx/CodemerxDecompile/blob/master/COPYING',
+			serverLicenseUrl: 'https://github.com/codemerx/CodemerxDecompile/blob/master/COPYING'
 			/* End AGPL */
 		});
 	}
 }
 
-// Node: AMD loader
-else if (typeof require !== 'undefined' && typeof require.__$__nodeRequire === 'function') {
-
-	// Obtain values from product.json and package.json
-	const rootPath = path.dirname(getPathFromAmdModule(require, ''));
-
-	product = require.__$__nodeRequire(path.join(rootPath, 'product.json'));
-	const pkg = require.__$__nodeRequire(path.join(rootPath, 'package.json')) as { version: string; };
-
-	// Running out of sources
-	if (env['VSCODE_DEV']) {
-		Object.assign(product, {
-			/* AGPL */
-			nameShort: `${product.nameShort}`,
-			nameLong: `${product.nameLong}`,
-			dataFolderName: `${product.dataFolderName}`
-			/* End AGPL */
-		});
-	}
-
-	Object.assign(product, {
-		version: pkg.version
-	});
-}
-
-// Unknown
-else {
-	throw new Error('Unable to resolve product configuration');
-}
-
+/**
+ * @deprecated You MUST use `IProductService` if possible.
+ */
 export default product;

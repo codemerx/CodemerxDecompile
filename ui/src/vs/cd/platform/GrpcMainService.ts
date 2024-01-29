@@ -57,11 +57,11 @@ export class GrpcMainService implements IGrpcMainService {
 	}
 
 	public async initialize(): Promise<void> {
-		const logService: ILogService = this.loggerService.getLogger(this.environmentService.codemerxDecompileLogResource);
+		const logService = this.loggerService.getLogger(this.environmentService.codemerxDecompileLogResource);
 
 		for (let count = 0; count < MAX_RETRIES; count += 1) {
 			const randomPort = this.getRandomPort();
-			logService.info(`Starting CodemerxDecompile.Service on port ${randomPort}.`);
+			logService?.info(`Starting CodemerxDecompile.Service on port ${randomPort}.`);
 
 			const args = [
 				`--port=${randomPort}`,
@@ -74,36 +74,36 @@ export class GrpcMainService implements IGrpcMainService {
 			});
 
 			const milliseconds = count * WAIT_TIME_MILLISECONDS;
-			logService.info(`Waiting CodemerxDecompile.Service response for ${milliseconds} Milliseconds.`);
+			logService?.info(`Waiting CodemerxDecompile.Service response for ${milliseconds} Milliseconds.`);
 			await this.sleep(milliseconds);
 
 			try {
 				const status = await this.getServerStatus(randomPort);
 
 				if (status === RUNNING_STATUS) {
-					logService.info(`CodemerxDecompile.Service is listening on port ${randomPort}.`);
+					logService?.info(`CodemerxDecompile.Service is listening on port ${randomPort}.`);
 
 					this.port = randomPort;
 
 					this.lifecycleMainService.onWillShutdown(async e => {
-						logService.info(`Shutting down CodemerxDecompile.Service.`);
-						e.join(this.shutdownServer());
+						logService?.info(`Shutting down CodemerxDecompile.Service.`);
+						e.join('grpcMainService', this.shutdownServer());
 					});
 
 					return;
 				} else {
-					logService.error(`Failed starting CodemerxDecompile.Service on port "${randomPort}". Status returned: ${status}.`);
+					logService?.error(`Failed starting CodemerxDecompile.Service on port "${randomPort}". Status returned: ${status}.`);
 				}
 			} catch (error) {
-				logService.error(`Failed starting CodemerxDecompile.Service on port "${randomPort}". Error: ${error}.`);
+				logService?.error(`Failed starting CodemerxDecompile.Service on port "${randomPort}". Error: ${error}.`);
 			}
 
 			serverProcess.kill();
 
 			if (count < MAX_RETRIES - 1) {
-				logService.info('Retrying.');
+				logService?.info('Retrying.');
 			} else {
-				logService.info('Quitting.');
+				logService?.info('Quitting.');
 
 				await this.lifecycleMainService.quit();
 
@@ -119,7 +119,7 @@ export class GrpcMainService implements IGrpcMainService {
 		const status = await new Promise<string>((resolve, reject) => {
 			client.getServerStatus(new Empty(), (error, response) => {
 				if (!error) {
-					resolve(response?.getStatus());
+					resolve(response!.getStatus());
 				}
 				else {
 					reject(error);

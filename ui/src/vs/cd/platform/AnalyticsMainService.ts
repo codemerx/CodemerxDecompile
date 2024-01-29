@@ -21,7 +21,7 @@ import { IEnvironmentService } from 'vs/platform/environment/common/environment'
 
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IProductService } from 'vs/platform/product/common/productService';
-import { IStorageMainService } from 'vs/platform/storage/node/storageMainService';
+import { IStorageMainService } from 'vs/platform/storage/electron-main/storageMainService';
 
 export const IAnalyticsMainService = createDecorator<IAnalyticsMainService>('IAnalyticsMainService');
 
@@ -45,7 +45,7 @@ export class AnalyticsMainService implements IAnalyticsMainService {
 				@IProductService private readonly productService: IProductService) {
 		if (environmentService.isBuilt) {
 			(async () => {
-				await this.storageService.initialize();
+				// await this.storageService.initialize();
 				await this.initializeAnalyticsClient(this.storageService);
 
 				this.visitor?.pageview('/').send();
@@ -87,13 +87,14 @@ export class AnalyticsMainService implements IAnalyticsMainService {
 	}
 
 	private ensureClientUniqueIdIsPresent(storageService: IStorageMainService) : string {
-		let userId = storageService.get(CLIENT_ID_KEY_NAME);
+		// let userId = storageService.get(CLIENT_ID_KEY_NAME);
 
-		if (!userId) {
-			userId = generateUuid();
-			storageService.store(CLIENT_ID_KEY_NAME, userId);
-		}
+		// if (!userId) {
+		// 	userId = generateUuid();
+		// 	storageService.store(CLIENT_ID_KEY_NAME, userId);
+		// }
 
-		return userId;
+		// return userId;
+		return '';
 	}
 };

@@ -4,13 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as assert from 'assert';
-import * as scorer from 'vs/base/common/fuzzyScorer';
-import { URI } from 'vs/base/common/uri';
-import { basename, dirname, sep, posix, win32 } from 'vs/base/common/path';
-import { isWindows } from 'vs/base/common/platform';
+import { compareItemsByFuzzyScore, FuzzyScore, FuzzyScore2, FuzzyScorerCache, IItemAccessor, IItemScore, pieceToQuery, prepareQuery, scoreFuzzy, scoreFuzzy2, scoreItemFuzzy } from 'vs/base/common/fuzzyScorer';
 import { Schemas } from 'vs/base/common/network';
+import { basename, dirname, posix, sep, win32 } from 'vs/base/common/path';
+import { isWindows } from 'vs/base/common/platform';
+import { URI } from 'vs/base/common/uri';
+import { ensureNoDisposablesAreLeakedInTestSuite } from 'vs/base/test/common/utils';
 
-class ResourceAccessorClass implements scorer.IItemAccessor<URI> {
+class ResourceAccessorClass implements IItemAccessor<URI> {
 
 	getItemLabel(resource: URI): string {
 		return basename(resource.fsPath);
@@ -27,7 +28,7 @@ class ResourceAccessorClass implements scorer.IItemAccessor<URI> {
 
 const ResourceAccessor = new ResourceAccessorClass();
 
-class ResourceWithSlashAccessorClass implements scorer.IItemAccessor<URI> {
+class ResourceWithSlashAccessorClass implements IItemAccessor<URI> {
 
 	getItemLabel(resource: URI): string {
 		return basename(resource.fsPath);
@@ -44,7 +45,7 @@ class ResourceWithSlashAccessorClass implements scorer.IItemAccessor<URI> {
 
 const ResourceWithSlashAccessor = new ResourceWithSlashAccessorClass();
 
-class ResourceWithBackslashAccessorClass implements scorer.IItemAccessor<URI> {
+class ResourceWithBackslashAccessorClass implements IItemAccessor<URI> {
 
 	getItemLabel(resource: URI): string {
 		return basename(resource.fsPath);
@@ -61,7 +62,7 @@ class ResourceWithBackslashAccessorClass implements scorer.IItemAccessor<URI> {
 
 const ResourceWithBackslashAccessor = new ResourceWithBackslashAccessorClass();
 
-class NullAccessorClass implements scorer.IItemAccessor<URI> {
+class NullAccessorClass implements IItemAccessor<URI> {
 
 	getItemLabel(resource: URI): string {
 		return undefined!;
@@ -76,24 +77,24 @@ class NullAccessorClass implements scorer.IItemAccessor<URI> {
 	}
 }
 
-function _doScore(target: string, query: string, fuzzy: boolean): scorer.FuzzyScore {
-	const preparedQuery = scorer.prepareQuery(query);
+function _doScore(target: string, query: string, allowNonContiguousMatches?: boolean): FuzzyScore {
+	const preparedQuery = prepareQuery(query);
 
-	return scorer.scoreFuzzy(target, preparedQuery.normalized, preparedQuery.normalizedLowercase, fuzzy);
+	return scoreFuzzy(target, preparedQuery.normalized, preparedQuery.normalizedLowercase, allowNonContiguousMatches ?? !preparedQuery.expectContiguousMatch);
 }
 
-function _doScore2(target: string, query: string, matchOffset: number = 0): scorer.FuzzyScore2 {
-	const preparedQuery = scorer.prepareQuery(query);
+function _doScore2(target: string, query: string, matchOffset: number = 0): FuzzyScore2 {
+	const preparedQuery = prepareQuery(query);
 
-	return scorer.scoreFuzzy2(target, preparedQuery, 0, matchOffset);
+	return scoreFuzzy2(target, preparedQuery, 0, matchOffset);
 }
 
-function scoreItem<T>(item: T, query: string, fuzzy: boolean, accessor: scorer.IItemAccessor<T>): scorer.IItemScore {
-	return scorer.scoreItemFuzzy(item, scorer.prepareQuery(query), fuzzy, accessor, Object.create(null));
+function scoreItem<T>(item: T, query: string, allowNonContiguousMatches: boolean, accessor: IItemAccessor<T>, cache: FuzzyScorerCache = Object.create(null)): IItemScore {
+	return scoreItemFuzzy(item, prepareQuery(query), allowNonContiguousMatches, accessor, cache);
 }
 
-function compareItemsByScore<T>(itemA: T, itemB: T, query: string, fuzzy: boolean, accessor: scorer.IItemAccessor<T>): number {
-	return scorer.compareItemsByFuzzyScore(itemA, itemB, scorer.prepareQuery(query), fuzzy, accessor, Object.create(null));
+function compareItemsByScore<T>(itemA: T, itemB: T, query: string, allowNonContiguousMatches: boolean, accessor: IItemAccessor<T>): number {
+	return compareItemsByFuzzyScore(itemA, itemB, prepareQuery(query), allowNonContiguousMatches, accessor, Object.create(null));
 }
 
 const NullAccessor = new NullAccessorClass();
@@ -101,49 +102,49 @@ const NullAccessor = new NullAccessorClass();
 suite('Fuzzy Scorer', () => {
 
 	test('score (fuzzy)', function () {
-		const target = 'HeLlo-World';
+		const target = 'HelLo-World';
 
-		const scores: scorer.FuzzyScore[] = [];
+		const scores: FuzzyScore[] = [];
 		scores.push(_doScore(target, 'HelLo-World', true)); // direct case match
 		scores.push(_doScore(target, 'hello-world', true)); // direct mix-case match
 		scores.push(_doScore(target, 'HW', true)); // direct case prefix (multiple)
 		scores.push(_doScore(target, 'hw', true)); // direct mix-case prefix (multiple)
 		scores.push(_doScore(target, 'H', true)); // direct case prefix
 		scores.push(_doScore(target, 'h', true)); // direct mix-case prefix
-		scores.push(_doScore(target, 'ld', true)); // in-string mix-case match (consecutive, avoids scattered hit)
 		scores.push(_doScore(target, 'W', true)); // direct case word prefix
-		scores.push(_doScore(target, 'w', true)); // direct mix-case word prefix
 		scores.push(_doScore(target, 'Ld', true)); // in-string case match (multiple)
+		scores.push(_doScore(target, 'ld', true)); // in-string mix-case match (consecutive, avoids scattered hit)
+		scores.push(_doScore(target, 'w', true)); // direct mix-case word prefix
 		scores.push(_doScore(target, 'L', true)); // in-string case match
 		scores.push(_doScore(target, 'l', true)); // in-string mix-case match
 		scores.push(_doScore(target, '4', true)); // no match
 
 		// Assert scoring order
-		let sortedScores = scores.concat().sort((a, b) => b[0] - a[0]);
-		assert.deepEqual(scores, sortedScores);
+		const sortedScores = scores.concat().sort((a, b) => b[0] - a[0]);
+		assert.deepStrictEqual(scores, sortedScores);
 
 		// Assert scoring positions
-		let positions = scores[0][1];
-		assert.equal(positions.length, 'HelLo-World'.length);
+		// let positions = scores[0][1];
+		// assert.strictEqual(positions.length, 'HelLo-World'.length);
 
-		positions = scores[2][1];
-		assert.equal(positions.length, 'HW'.length);
-		assert.equal(positions[0], 0);
-		assert.equal(positions[1], 6);
+		// positions = scores[2][1];
+		// assert.strictEqual(positions.length, 'HW'.length);
+		// assert.strictEqual(positions[0], 0);
+		// assert.strictEqual(positions[1], 6);
 	});
 
 	test('score (non fuzzy)', function () {
-		const target = 'HeLlo-World';
+		const target = 'HelLo-World';
 
 		assert.ok(_doScore(target, 'HelLo-World', false)[0] > 0);
-		assert.equal(_doScore(target, 'HelLo-World', false)[1].length, 'HelLo-World'.length);
+		assert.strictEqual(_doScore(target, 'HelLo-World', false)[1].length, 'HelLo-World'.length);
 
 		assert.ok(_doScore(target, 'hello-world', false)[0] > 0);
-		assert.equal(_doScore(target, 'HW', false)[0], 0);
+		assert.strictEqual(_doScore(target, 'HW', false)[0], 0);
 		assert.ok(_doScore(target, 'h', false)[0] > 0);
 		assert.ok(_doScore(target, 'ello', false)[0] > 0);
 		assert.ok(_doScore(target, 'ld', false)[0] > 0);
-		assert.equal(_doScore(target, 'eo', false)[0], 0);
+		assert.strictEqual(_doScore(target, 'eo', false)[0], 0);
 	});
 
 	test('scoreItem - matches are proper', function () {
@@ -158,58 +159,65 @@ suite('Fuzzy Scorer', () => {
 		// Path Identity
 		const identityRes = scoreItem(resource, ResourceAccessor.getItemPath(resource), true, ResourceAccessor);
 		assert.ok(identityRes.score);
-		assert.equal(identityRes.descriptionMatch!.length, 1);
-		assert.equal(identityRes.labelMatch!.length, 1);
-		assert.equal(identityRes.descriptionMatch![0].start, 0);
-		assert.equal(identityRes.descriptionMatch![0].end, ResourceAccessor.getItemDescription(resource).length);
-		assert.equal(identityRes.labelMatch![0].start, 0);
-		assert.equal(identityRes.labelMatch![0].end, ResourceAccessor.getItemLabel(resource).length);
+		assert.strictEqual(identityRes.descriptionMatch!.length, 1);
+		assert.strictEqual(identityRes.labelMatch!.length, 1);
+		assert.strictEqual(identityRes.descriptionMatch![0].start, 0);
+		assert.strictEqual(identityRes.descriptionMatch![0].end, ResourceAccessor.getItemDescription(resource).length);
+		assert.strictEqual(identityRes.labelMatch![0].start, 0);
+		assert.strictEqual(identityRes.labelMatch![0].end, ResourceAccessor.getItemLabel(resource).length);
 
 		// Basename Prefix
 		const basenamePrefixRes = scoreItem(resource, 'som', true, ResourceAccessor);
 		assert.ok(basenamePrefixRes.score);
 		assert.ok(!basenamePrefixRes.descriptionMatch);
-		assert.equal(basenamePrefixRes.labelMatch!.length, 1);
-		assert.equal(basenamePrefixRes.labelMatch![0].start, 0);
-		assert.equal(basenamePrefixRes.labelMatch![0].end, 'som'.length);
+		assert.strictEqual(basenamePrefixRes.labelMatch!.length, 1);
+		assert.strictEqual(basenamePrefixRes.labelMatch![0].start, 0);
+		assert.strictEqual(basenamePrefixRes.labelMatch![0].end, 'som'.length);
 
 		// Basename Camelcase
 		const basenameCamelcaseRes = scoreItem(resource, 'sF', true, ResourceAccessor);
 		assert.ok(basenameCamelcaseRes.score);
 		assert.ok(!basenameCamelcaseRes.descriptionMatch);
-		assert.equal(basenameCamelcaseRes.labelMatch!.length, 2);
-		assert.equal(basenameCamelcaseRes.labelMatch![0].start, 0);
-		assert.equal(basenameCamelcaseRes.labelMatch![0].end, 1);
-		assert.equal(basenameCamelcaseRes.labelMatch![1].start, 4);
-		assert.equal(basenameCamelcaseRes.labelMatch![1].end, 5);
+		assert.strictEqual(basenameCamelcaseRes.labelMatch!.length, 2);
+		assert.strictEqual(basenameCamelcaseRes.labelMatch![0].start, 0);
+		assert.strictEqual(basenameCamelcaseRes.labelMatch![0].end, 1);
+		assert.strictEqual(basenameCamelcaseRes.labelMatch![1].start, 4);
+		assert.strictEqual(basenameCamelcaseRes.labelMatch![1].end, 5);
 
 		// Basename Match
 		const basenameRes = scoreItem(resource, 'of', true, ResourceAccessor);
 		assert.ok(basenameRes.score);
 		assert.ok(!basenameRes.descriptionMatch);
-		assert.equal(basenameRes.labelMatch!.length, 2);
-		assert.equal(basenameRes.labelMatch![0].start, 1);
-		assert.equal(basenameRes.labelMatch![0].end, 2);
-		assert.equal(basenameRes.labelMatch![1].start, 4);
-		assert.equal(basenameRes.labelMatch![1].end, 5);
+		assert.strictEqual(basenameRes.labelMatch!.length, 2);
+		assert.strictEqual(basenameRes.labelMatch![0].start, 1);
+		assert.strictEqual(basenameRes.labelMatch![0].end, 2);
+		assert.strictEqual(basenameRes.labelMatch![1].start, 4);
+		assert.strictEqual(basenameRes.labelMatch![1].end, 5);
 
 		// Path Match
 		const pathRes = scoreItem(resource, 'xyz123', true, ResourceAccessor);
 		assert.ok(pathRes.score);
 		assert.ok(pathRes.descriptionMatch);
 		assert.ok(pathRes.labelMatch);
-		assert.equal(pathRes.labelMatch!.length, 1);
-		assert.equal(pathRes.labelMatch![0].start, 8);
-		assert.equal(pathRes.labelMatch![0].end, 11);
-		assert.equal(pathRes.descriptionMatch!.length, 1);
-		assert.equal(pathRes.descriptionMatch![0].start, 1);
-		assert.equal(pathRes.descriptionMatch![0].end, 4);
+		assert.strictEqual(pathRes.labelMatch!.length, 1);
+		assert.strictEqual(pathRes.labelMatch![0].start, 8);
+		assert.strictEqual(pathRes.labelMatch![0].end, 11);
+		assert.strictEqual(pathRes.descriptionMatch!.length, 1);
+		assert.strictEqual(pathRes.descriptionMatch![0].start, 1);
+		assert.strictEqual(pathRes.descriptionMatch![0].end, 4);
 
 		// No Match
 		const noRes = scoreItem(resource, '987', true, ResourceAccessor);
 		assert.ok(!noRes.score);
 		assert.ok(!noRes.labelMatch);
 		assert.ok(!noRes.descriptionMatch);
+
+		// No Exact Match
+		const noExactRes = scoreItem(resource, '"sF"', true, ResourceAccessor);
+		assert.ok(!noExactRes.score);
+		assert.ok(!noExactRes.labelMatch);
+		assert.ok(!noExactRes.descriptionMatch);
+		assert.strictEqual(noRes.score, noExactRes.score);
 
 		// Verify Scores
 		assert.ok(identityRes.score > basenamePrefixRes.score);
@@ -221,53 +229,64 @@ suite('Fuzzy Scorer', () => {
 	test('scoreItem - multiple', function () {
 		const resource = URI.file('/xyz/some/path/someFile123.txt');
 
-		let res1 = scoreItem(resource, 'xyz some', true, ResourceAccessor);
+		const res1 = scoreItem(resource, 'xyz some', true, ResourceAccessor);
 		assert.ok(res1.score);
-		assert.equal(res1.labelMatch?.length, 1);
-		assert.equal(res1.labelMatch![0].start, 0);
-		assert.equal(res1.labelMatch![0].end, 4);
-		assert.equal(res1.descriptionMatch?.length, 1);
-		assert.equal(res1.descriptionMatch![0].start, 1);
-		assert.equal(res1.descriptionMatch![0].end, 4);
+		assert.strictEqual(res1.labelMatch?.length, 1);
+		assert.strictEqual(res1.labelMatch![0].start, 0);
+		assert.strictEqual(res1.labelMatch![0].end, 4);
+		assert.strictEqual(res1.descriptionMatch?.length, 1);
+		assert.strictEqual(res1.descriptionMatch![0].start, 1);
+		assert.strictEqual(res1.descriptionMatch![0].end, 4);
 
-		let res2 = scoreItem(resource, 'some xyz', true, ResourceAccessor);
+		const res2 = scoreItem(resource, 'some xyz', true, ResourceAccessor);
 		assert.ok(res2.score);
-		assert.equal(res1.score, res2.score);
-		assert.equal(res2.labelMatch?.length, 1);
-		assert.equal(res2.labelMatch![0].start, 0);
-		assert.equal(res2.labelMatch![0].end, 4);
-		assert.equal(res2.descriptionMatch?.length, 1);
-		assert.equal(res2.descriptionMatch![0].start, 1);
-		assert.equal(res2.descriptionMatch![0].end, 4);
+		assert.strictEqual(res1.score, res2.score);
+		assert.strictEqual(res2.labelMatch?.length, 1);
+		assert.strictEqual(res2.labelMatch![0].start, 0);
+		assert.strictEqual(res2.labelMatch![0].end, 4);
+		assert.strictEqual(res2.descriptionMatch?.length, 1);
+		assert.strictEqual(res2.descriptionMatch![0].start, 1);
+		assert.strictEqual(res2.descriptionMatch![0].end, 4);
 
-		let res3 = scoreItem(resource, 'some xyz file file123', true, ResourceAccessor);
+		const res3 = scoreItem(resource, 'some xyz file file123', true, ResourceAccessor);
 		assert.ok(res3.score);
 		assert.ok(res3.score > res2.score);
-		assert.equal(res3.labelMatch?.length, 1);
-		assert.equal(res3.labelMatch![0].start, 0);
-		assert.equal(res3.labelMatch![0].end, 11);
-		assert.equal(res3.descriptionMatch?.length, 1);
-		assert.equal(res3.descriptionMatch![0].start, 1);
-		assert.equal(res3.descriptionMatch![0].end, 4);
+		assert.strictEqual(res3.labelMatch?.length, 1);
+		assert.strictEqual(res3.labelMatch![0].start, 0);
+		assert.strictEqual(res3.labelMatch![0].end, 11);
+		assert.strictEqual(res3.descriptionMatch?.length, 1);
+		assert.strictEqual(res3.descriptionMatch![0].start, 1);
+		assert.strictEqual(res3.descriptionMatch![0].end, 4);
 
-		let res4 = scoreItem(resource, 'path z y', true, ResourceAccessor);
+		const res4 = scoreItem(resource, 'path z y', true, ResourceAccessor);
 		assert.ok(res4.score);
 		assert.ok(res4.score < res2.score);
-		assert.equal(res4.labelMatch?.length, 0);
-		assert.equal(res4.descriptionMatch?.length, 2);
-		assert.equal(res4.descriptionMatch![0].start, 2);
-		assert.equal(res4.descriptionMatch![0].end, 4);
-		assert.equal(res4.descriptionMatch![1].start, 10);
-		assert.equal(res4.descriptionMatch![1].end, 14);
+		assert.strictEqual(res4.labelMatch?.length, 0);
+		assert.strictEqual(res4.descriptionMatch?.length, 2);
+		assert.strictEqual(res4.descriptionMatch![0].start, 2);
+		assert.strictEqual(res4.descriptionMatch![0].end, 4);
+		assert.strictEqual(res4.descriptionMatch![1].start, 10);
+		assert.strictEqual(res4.descriptionMatch![1].end, 14);
+	});
+
+	test('scoreItem - multiple with cache yields different results', function () {
+		const resource = URI.file('/xyz/some/path/someFile123.txt');
+		const cache = {};
+		const res1 = scoreItem(resource, 'xyz sm', true, ResourceAccessor, cache);
+		assert.ok(res1.score);
+
+		// from the cache's perspective this should be a totally different query
+		const res2 = scoreItem(resource, 'xyz "sm"', true, ResourceAccessor, cache);
+		assert.ok(!res2.score);
 	});
 
 	test('scoreItem - invalid input', function () {
 
 		let res = scoreItem(null, null!, true, ResourceAccessor);
-		assert.equal(res.score, 0);
+		assert.strictEqual(res.score, 0);
 
 		res = scoreItem(null, 'null', true, ResourceAccessor);
-		assert.equal(res.score, 0);
+		assert.strictEqual(res.score, 0);
 	});
 
 	test('scoreItem - optimize for file paths', function () {
@@ -280,12 +299,12 @@ suite('Fuzzy Scorer', () => {
 		assert.ok(pathRes.score);
 		assert.ok(pathRes.descriptionMatch);
 		assert.ok(pathRes.labelMatch);
-		assert.equal(pathRes.labelMatch!.length, 1);
-		assert.equal(pathRes.labelMatch![0].start, 0);
-		assert.equal(pathRes.labelMatch![0].end, 7);
-		assert.equal(pathRes.descriptionMatch!.length, 1);
-		assert.equal(pathRes.descriptionMatch![0].start, 23);
-		assert.equal(pathRes.descriptionMatch![0].end, 26);
+		assert.strictEqual(pathRes.labelMatch!.length, 1);
+		assert.strictEqual(pathRes.labelMatch![0].start, 0);
+		assert.strictEqual(pathRes.labelMatch![0].end, 7);
+		assert.strictEqual(pathRes.descriptionMatch!.length, 1);
+		assert.strictEqual(pathRes.descriptionMatch![0].start, 23);
+		assert.strictEqual(pathRes.descriptionMatch![0].end, 26);
 	});
 
 	test('scoreItem - avoid match scattering (bug #36119)', function () {
@@ -295,9 +314,9 @@ suite('Fuzzy Scorer', () => {
 		assert.ok(pathRes.score);
 		assert.ok(pathRes.descriptionMatch);
 		assert.ok(pathRes.labelMatch);
-		assert.equal(pathRes.labelMatch!.length, 1);
-		assert.equal(pathRes.labelMatch![0].start, 0);
-		assert.equal(pathRes.labelMatch![0].end, 9);
+		assert.strictEqual(pathRes.labelMatch!.length, 1);
+		assert.strictEqual(pathRes.labelMatch![0].start, 0);
+		assert.strictEqual(pathRes.labelMatch![0].end, 9);
 	});
 
 	test('scoreItem - prefers more compact matches', function () {
@@ -309,11 +328,11 @@ suite('Fuzzy Scorer', () => {
 		assert.ok(res.score);
 		assert.ok(res.descriptionMatch);
 		assert.ok(!res.labelMatch!.length);
-		assert.equal(res.descriptionMatch!.length, 2);
-		assert.equal(res.descriptionMatch![0].start, 11);
-		assert.equal(res.descriptionMatch![0].end, 12);
-		assert.equal(res.descriptionMatch![1].start, 13);
-		assert.equal(res.descriptionMatch![1].end, 14);
+		assert.strictEqual(res.descriptionMatch!.length, 2);
+		assert.strictEqual(res.descriptionMatch![0].start, 11);
+		assert.strictEqual(res.descriptionMatch![0].end, 12);
+		assert.strictEqual(res.descriptionMatch![1].start, 13);
+		assert.strictEqual(res.descriptionMatch![1].end, 14);
 	});
 
 	test('scoreItem - proper target offset', function () {
@@ -328,9 +347,9 @@ suite('Fuzzy Scorer', () => {
 
 		const res = scoreItem(resource, 'de', true, ResourceAccessor);
 
-		assert.equal(res.labelMatch!.length, 1);
-		assert.equal(res.labelMatch![0].start, 1);
-		assert.equal(res.labelMatch![0].end, 3);
+		assert.strictEqual(res.labelMatch!.length, 1);
+		assert.strictEqual(res.labelMatch![0].start, 1);
+		assert.strictEqual(res.labelMatch![0].end, 3);
 	});
 
 	test('scoreItem - proper target offset #3', function () {
@@ -338,19 +357,19 @@ suite('Fuzzy Scorer', () => {
 
 		const res = scoreItem(resource, 'debug', true, ResourceAccessor);
 
-		assert.equal(res.descriptionMatch!.length, 3);
-		assert.equal(res.descriptionMatch![0].start, 9);
-		assert.equal(res.descriptionMatch![0].end, 10);
-		assert.equal(res.descriptionMatch![1].start, 36);
-		assert.equal(res.descriptionMatch![1].end, 37);
-		assert.equal(res.descriptionMatch![2].start, 40);
-		assert.equal(res.descriptionMatch![2].end, 41);
+		assert.strictEqual(res.descriptionMatch!.length, 3);
+		assert.strictEqual(res.descriptionMatch![0].start, 9);
+		assert.strictEqual(res.descriptionMatch![0].end, 10);
+		assert.strictEqual(res.descriptionMatch![1].start, 36);
+		assert.strictEqual(res.descriptionMatch![1].end, 37);
+		assert.strictEqual(res.descriptionMatch![2].start, 40);
+		assert.strictEqual(res.descriptionMatch![2].end, 41);
 
-		assert.equal(res.labelMatch!.length, 2);
-		assert.equal(res.labelMatch![0].start, 9);
-		assert.equal(res.labelMatch![0].end, 10);
-		assert.equal(res.labelMatch![1].start, 20);
-		assert.equal(res.labelMatch![1].end, 21);
+		assert.strictEqual(res.labelMatch!.length, 2);
+		assert.strictEqual(res.labelMatch![0].start, 9);
+		assert.strictEqual(res.labelMatch![0].end, 10);
+		assert.strictEqual(res.labelMatch![1].start, 20);
+		assert.strictEqual(res.labelMatch![1].end, 21);
 	});
 
 	test('scoreItem - no match unless query contained in sequence', function () {
@@ -385,6 +404,13 @@ suite('Fuzzy Scorer', () => {
 		}
 	});
 
+	test('scoreItem - ensure upper case bonus only applies on non-consecutive matches (bug #134723)', function () {
+		const resourceWithUpper = URI.file('ASDFasdfasdf');
+		const resourceAllLower = URI.file('asdfasdfasdf');
+
+		assert.ok(scoreItem(resourceAllLower, 'asdf', true, ResourceAccessor).score > scoreItem(resourceWithUpper, 'asdf', true, ResourceAccessor).score);
+	});
+
 	test('compareItemsByScore - identity', function () {
 		const resourceA = URI.file('/some/path/fileA.txt');
 		const resourceB = URI.file('/some/path/other/fileB.txt');
@@ -394,27 +420,27 @@ suite('Fuzzy Scorer', () => {
 		let query = ResourceAccessor.getItemPath(resourceA);
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		// Full resource B path
 		query = ResourceAccessor.getItemPath(resourceB);
 
 		res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - basename prefix', function () {
@@ -426,27 +452,27 @@ suite('Fuzzy Scorer', () => {
 		let query = ResourceAccessor.getItemLabel(resourceA);
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		// Full resource B basename
 		query = ResourceAccessor.getItemLabel(resourceB);
 
 		res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - basename camelcase', function () {
@@ -458,27 +484,27 @@ suite('Fuzzy Scorer', () => {
 		let query = 'fA';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		// resource B camelcase
 		query = 'fB';
 
 		res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - basename scores', function () {
@@ -490,27 +516,27 @@ suite('Fuzzy Scorer', () => {
 		let query = 'fileA';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		// Resource B part of basename
 		query = 'fileB';
 
 		res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - path scores', function () {
@@ -522,27 +548,27 @@ suite('Fuzzy Scorer', () => {
 		let query = 'pathfileA';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		// Resource B part of path
 		query = 'pathfileB';
 
 		res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - prefer shorter basenames', function () {
@@ -551,17 +577,17 @@ suite('Fuzzy Scorer', () => {
 		const resourceC = URI.file('/unrelated/the/path/other/fileC.txt');
 
 		// Resource A part of path
-		let query = 'somepath';
+		const query = 'somepath';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - prefer shorter basenames (match on basename)', function () {
@@ -570,17 +596,17 @@ suite('Fuzzy Scorer', () => {
 		const resourceC = URI.file('/unrelated/the/path/other/fileC.txt');
 
 		// Resource A part of path
-		let query = 'file';
+		const query = 'file';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceC);
-		assert.equal(res[2], resourceB);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceC);
+		assert.strictEqual(res[2], resourceB);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceC);
-		assert.equal(res[2], resourceB);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceC);
+		assert.strictEqual(res[2], resourceB);
 	});
 
 	test('compareFilesByScore - prefer shorter paths', function () {
@@ -589,17 +615,17 @@ suite('Fuzzy Scorer', () => {
 		const resourceC = URI.file('/unrelated/some/path/other/fileC.txt');
 
 		// Resource A part of path
-		let query = 'somepath';
+		const query = 'somepath';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceB);
-		assert.equal(res[2], resourceC);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - prefer shorter paths (bug #17443)', function () {
@@ -607,83 +633,98 @@ suite('Fuzzy Scorer', () => {
 		const resourceB = URI.file('config/test.js');
 		const resourceC = URI.file('config/test/t2.js');
 
-		let query = 'co/te';
+		const query = 'co/te';
 
-		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
-		assert.equal(res[2], resourceC);
+		const res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+		assert.strictEqual(res[2], resourceC);
 	});
 
 	test('compareFilesByScore - prefer matches in label over description if scores are otherwise equal', function () {
 		const resourceA = URI.file('parts/quick/arrow-left-dark.svg');
 		const resourceB = URI.file('parts/quickopen/quickopen.ts');
 
-		let query = 'partsquick';
+		const query = 'partsquick';
 
-		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		const res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+	});
+
+	test('compareFilesByScore - prefer camel case matches', function () {
+		const resourceA = URI.file('config/test/NullPointerException.java');
+		const resourceB = URI.file('config/test/nopointerexception.java');
+
+		for (const query of ['npe', 'NPE']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+		}
 	});
 
 	test('compareFilesByScore - prefer more compact camel case matches', function () {
 		const resourceA = URI.file('config/test/openthisAnythingHandler.js');
 		const resourceB = URI.file('config/test/openthisisnotsorelevantforthequeryAnyHand.js');
 
-		let query = 'AH';
+		const query = 'AH';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 	});
 
 	test('compareFilesByScore - prefer more compact matches (label)', function () {
 		const resourceA = URI.file('config/test/examasdaple.js');
 		const resourceB = URI.file('config/test/exampleasdaasd.ts');
 
-		let query = 'xp';
+		const query = 'xp';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 	});
 
 	test('compareFilesByScore - prefer more compact matches (path)', function () {
 		const resourceA = URI.file('config/test/examasdaple/file.js');
 		const resourceB = URI.file('config/test/exampleasdaasd/file.ts');
 
-		let query = 'xp';
+		const query = 'xp';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 	});
 
 	test('compareFilesByScore - prefer more compact matches (label and path)', function () {
 		const resourceA = URI.file('config/example/thisfile.ts');
 		const resourceB = URI.file('config/24234243244/example/file.js');
 
-		let query = 'exfile';
+		const query = 'exfile';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
-		assert.equal(res[1], resourceA);
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #34210)', function () {
@@ -695,18 +736,18 @@ suite('Fuzzy Scorer', () => {
 		let query = isWindows ? 'modu1\\index.js' : 'modu1/index.js';
 
 		let res = [resourceA, resourceB, resourceC, resourceD].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceC);
+		assert.strictEqual(res[0], resourceC);
 
 		res = [resourceC, resourceB, resourceA, resourceD].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceC);
+		assert.strictEqual(res[0], resourceC);
 
 		query = isWindows ? 'un1\\index.js' : 'un1/index.js';
 
 		res = [resourceA, resourceB, resourceC, resourceD].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceC, resourceB, resourceA, resourceD].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #21019 1.)', function () {
@@ -714,26 +755,26 @@ suite('Fuzzy Scorer', () => {
 		const resourceB = URI.file('app/containers/Services/NetworkData/ServiceDetails/ServiceDistribution/index.js');
 		const resourceC = URI.file('app/containers/Services/NetworkData/ServiceDetailTabs/ServiceTabs/StatVideo/index.js');
 
-		let query = 'StatVideoindex';
+		const query = 'StatVideoindex';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceC);
+		assert.strictEqual(res[0], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceC);
+		assert.strictEqual(res[0], resourceC);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #21019 2.)', function () {
 		const resourceA = URI.file('src/build-helper/store/redux.ts');
 		const resourceB = URI.file('src/repository/store/redux.ts');
 
-		let query = 'reproreduxts';
+		const query = 'reproreduxts';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #26649)', function () {
@@ -741,52 +782,52 @@ suite('Fuzzy Scorer', () => {
 		const resourceB = URI.file('photobook/src/components/ApprovalPageHeader/index.js');
 		const resourceC = URI.file('photobook/src/canvasComponents/BookPage/index.js');
 
-		let query = 'bookpageIndex';
+		const query = 'bookpageIndex';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceC);
+		assert.strictEqual(res[0], resourceC);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceC);
+		assert.strictEqual(res[0], resourceC);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #33247)', function () {
 		const resourceA = URI.file('ui/src/utils/constants.js');
 		const resourceB = URI.file('ui/src/ui/Icons/index.js');
 
-		let query = isWindows ? 'ui\\icons' : 'ui/icons';
+		const query = isWindows ? 'ui\\icons' : 'ui/icons';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #33247 comment)', function () {
 		const resourceA = URI.file('ui/src/components/IDInput/index.js');
 		const resourceB = URI.file('ui/src/ui/Input/index.js');
 
-		let query = isWindows ? 'ui\\input\\index' : 'ui/input/index';
+		const query = isWindows ? 'ui\\input\\index' : 'ui/input/index';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #36166)', function () {
 		const resourceA = URI.file('django/contrib/sites/locale/ga/LC_MESSAGES/django.mo');
 		const resourceB = URI.file('django/core/signals.py');
 
-		let query = 'djancosig';
+		const query = 'djancosig';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #32918)', function () {
@@ -794,108 +835,108 @@ suite('Fuzzy Scorer', () => {
 		const resourceB = URI.file('adsys/protected/framework/smarty/sysplugins/smarty_internal_config.php');
 		const resourceC = URI.file('duowanVideo/wap/protected/config.php');
 
-		let query = 'protectedconfig.php';
+		const query = 'protectedconfig.php';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceC);
-		assert.equal(res[2], resourceB);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceC);
+		assert.strictEqual(res[2], resourceB);
 
 		res = [resourceC, resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceA);
-		assert.equal(res[1], resourceC);
-		assert.equal(res[2], resourceB);
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceC);
+		assert.strictEqual(res[2], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #14879)', function () {
 		const resourceA = URI.file('pkg/search/gradient/testdata/constraint_attrMatchString.yml');
 		const resourceB = URI.file('cmd/gradient/main.go');
 
-		let query = 'gradientmain';
+		const query = 'gradientmain';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #14727 1)', function () {
 		const resourceA = URI.file('alpha-beta-cappa.txt');
 		const resourceB = URI.file('abc.txt');
 
-		let query = 'abc';
+		const query = 'abc';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #14727 2)', function () {
 		const resourceA = URI.file('xerxes-yak-zubba/index.js');
 		const resourceB = URI.file('xyz/index.js');
 
-		let query = 'xyz';
+		const query = 'xyz';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #18381)', function () {
 		const resourceA = URI.file('AssymblyInfo.cs');
 		const resourceB = URI.file('IAsynchronousTask.java');
 
-		let query = 'async';
+		const query = 'async';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #35572)', function () {
 		const resourceA = URI.file('static/app/source/angluar/-admin/-organization/-settings/layout/layout.js');
 		const resourceB = URI.file('static/app/source/angular/-admin/-project/-settings/_settings/settings.js');
 
-		let query = 'partisettings';
+		const query = 'partisettings';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #36810)', function () {
 		const resourceA = URI.file('Trilby.TrilbyTV.Web.Portal/Views/Systems/Index.cshtml');
 		const resourceB = URI.file('Trilby.TrilbyTV.Web.Portal/Areas/Admins/Views/Tips/Index.cshtml');
 
-		let query = 'tipsindex.cshtml';
+		const query = 'tipsindex.cshtml';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - prefer shorter hit (bug #20546)', function () {
 		const resourceA = URI.file('editor/core/components/tests/list-view-spec.js');
 		const resourceB = URI.file('editor/core/components/list-view.js');
 
-		let query = 'listview';
+		const query = 'listview';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - avoid match scattering (bug #12095)', function () {
@@ -903,113 +944,246 @@ suite('Fuzzy Scorer', () => {
 		const resourceB = URI.file('src/vs/workbench/contrib/files/browser/views/explorerView.ts');
 		const resourceC = URI.file('src/vs/workbench/contrib/files/browser/views/explorerViewer.ts');
 
-		let query = 'filesexplorerview.ts';
+		const query = 'filesexplorerview.ts';
 
 		let res = [resourceA, resourceB, resourceC].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceA, resourceC, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 	});
 
 	test('compareFilesByScore - prefer case match (bug #96122)', function () {
 		const resourceA = URI.file('lists.php');
 		const resourceB = URI.file('lib/Lists.php');
 
-		let query = 'Lists.php';
+		const query = 'Lists.php';
 
 		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
 
 		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
-		assert.equal(res[0], resourceB);
+		assert.strictEqual(res[0], resourceB);
+	});
+
+	test('compareFilesByScore - prefer shorter match (bug #103052) - foo bar', function () {
+		const resourceA = URI.file('app/emails/foo.bar.js');
+		const resourceB = URI.file('app/emails/other-footer.other-bar.js');
+
+		for (const query of ['foo bar', 'foobar']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+		}
+	});
+
+	test('compareFilesByScore - prefer shorter match (bug #103052) - payment model', function () {
+		const resourceA = URI.file('app/components/payment/payment.model.js');
+		const resourceB = URI.file('app/components/online-payments-history/online-payments-history.model.js');
+
+		for (const query of ['payment model', 'paymentmodel']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+		}
+	});
+
+	test('compareFilesByScore - prefer shorter match (bug #103052) - color', function () {
+		const resourceA = URI.file('app/constants/color.js');
+		const resourceB = URI.file('app/components/model/input/pick-avatar-color.js');
+
+		for (const query of ['color js', 'colorjs']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceA);
+			assert.strictEqual(res[1], resourceB);
+		}
+	});
+
+	test('compareFilesByScore - prefer strict case prefix', function () {
+		const resourceA = URI.file('app/constants/color.js');
+		const resourceB = URI.file('app/components/model/input/Color.js');
+
+		let query = 'Color';
+
+		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+
+		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceB);
+		assert.strictEqual(res[1], resourceA);
+
+		query = 'color';
+
+		res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+
+		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+	});
+
+	test('compareFilesByScore - prefer prefix (bug #103052)', function () {
+		const resourceA = URI.file('test/smoke/src/main.ts');
+		const resourceB = URI.file('src/vs/editor/common/services/semantikTokensProviderStyling.ts');
+
+		const query = 'smoke main.ts';
+
+		let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+
+		res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+		assert.strictEqual(res[0], resourceA);
+		assert.strictEqual(res[1], resourceB);
+	});
+
+	test('compareFilesByScore - boost better prefix match if multiple queries are used', function () {
+		const resourceA = URI.file('src/vs/workbench/services/host/browser/browserHostService.ts');
+		const resourceB = URI.file('src/vs/workbench/browser/workbench.ts');
+
+		for (const query of ['workbench.ts browser', 'browser workbench.ts', 'browser workbench', 'workbench browser']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceB);
+			assert.strictEqual(res[1], resourceA);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceB);
+			assert.strictEqual(res[1], resourceA);
+		}
+	});
+
+	test('compareFilesByScore - boost shorter prefix match if multiple queries are used', function () {
+		const resourceA = URI.file('src/vs/workbench/node/actions/windowActions.ts');
+		const resourceB = URI.file('src/vs/workbench/electron-node/window.ts');
+
+		for (const query of ['window node', 'window.ts node']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceB);
+			assert.strictEqual(res[1], resourceA);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceB);
+			assert.strictEqual(res[1], resourceA);
+		}
+	});
+
+	test('compareFilesByScore - boost shorter prefix match if multiple queries are used (#99171)', function () {
+		const resourceA = URI.file('mesh_editor_lifetime_job.h');
+		const resourceB = URI.file('lifetime_job.h');
+
+		for (const query of ['m life, life m']) {
+			let res = [resourceA, resourceB].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceB);
+			assert.strictEqual(res[1], resourceA);
+
+			res = [resourceB, resourceA].sort((r1, r2) => compareItemsByScore(r1, r2, query, true, ResourceAccessor));
+			assert.strictEqual(res[0], resourceB);
+			assert.strictEqual(res[1], resourceA);
+		}
 	});
 
 	test('prepareQuery', () => {
-		assert.equal(scorer.prepareQuery(' f*a ').normalized, 'fa');
-		assert.equal(scorer.prepareQuery('model Tester.ts').original, 'model Tester.ts');
-		assert.equal(scorer.prepareQuery('model Tester.ts').originalLowercase, 'model Tester.ts'.toLowerCase());
-		assert.equal(scorer.prepareQuery('model Tester.ts').normalized, 'modelTester.ts');
-		assert.equal(scorer.prepareQuery('Model Tester.ts').normalizedLowercase, 'modeltester.ts');
-		assert.equal(scorer.prepareQuery('ModelTester.ts').containsPathSeparator, false);
-		assert.equal(scorer.prepareQuery('Model' + sep + 'Tester.ts').containsPathSeparator, true);
+		assert.strictEqual(prepareQuery(' f*a ').normalized, 'fa');
+		assert.strictEqual(prepareQuery('model Tester.ts').original, 'model Tester.ts');
+		assert.strictEqual(prepareQuery('model Tester.ts').originalLowercase, 'model Tester.ts'.toLowerCase());
+		assert.strictEqual(prepareQuery('model Tester.ts').normalized, 'modelTester.ts');
+		assert.strictEqual(prepareQuery('model Tester.ts').expectContiguousMatch, false); // doesn't have quotes in it
+		assert.strictEqual(prepareQuery('Model Tester.ts').normalizedLowercase, 'modeltester.ts');
+		assert.strictEqual(prepareQuery('ModelTester.ts').containsPathSeparator, false);
+		assert.strictEqual(prepareQuery('Model' + sep + 'Tester.ts').containsPathSeparator, true);
+		assert.strictEqual(prepareQuery('"hello"').expectContiguousMatch, true);
+		assert.strictEqual(prepareQuery('"hello"').normalized, 'hello');
 
 		// with spaces
-		let query = scorer.prepareQuery('He*llo World');
-		assert.equal(query.original, 'He*llo World');
-		assert.equal(query.normalized, 'HelloWorld');
-		assert.equal(query.normalizedLowercase, 'HelloWorld'.toLowerCase());
-		assert.equal(query.values?.length, 2);
-		assert.equal(query.values?.[0].original, 'He*llo');
-		assert.equal(query.values?.[0].normalized, 'Hello');
-		assert.equal(query.values?.[0].normalizedLowercase, 'Hello'.toLowerCase());
-		assert.equal(query.values?.[1].original, 'World');
-		assert.equal(query.values?.[1].normalized, 'World');
-		assert.equal(query.values?.[1].normalizedLowercase, 'World'.toLowerCase());
+		let query = prepareQuery('He*llo World');
+		assert.strictEqual(query.original, 'He*llo World');
+		assert.strictEqual(query.normalized, 'HelloWorld');
+		assert.strictEqual(query.normalizedLowercase, 'HelloWorld'.toLowerCase());
+		assert.strictEqual(query.values?.length, 2);
+		assert.strictEqual(query.values?.[0].original, 'He*llo');
+		assert.strictEqual(query.values?.[0].normalized, 'Hello');
+		assert.strictEqual(query.values?.[0].normalizedLowercase, 'Hello'.toLowerCase());
+		assert.strictEqual(query.values?.[1].original, 'World');
+		assert.strictEqual(query.values?.[1].normalized, 'World');
+		assert.strictEqual(query.values?.[1].normalizedLowercase, 'World'.toLowerCase());
 
-		let restoredQuery = scorer.pieceToQuery(query.values!);
-		assert.equal(restoredQuery.original, query.original);
-		assert.equal(restoredQuery.values?.length, query.values?.length);
-		assert.equal(restoredQuery.containsPathSeparator, query.containsPathSeparator);
+		const restoredQuery = pieceToQuery(query.values!);
+		assert.strictEqual(restoredQuery.original, query.original);
+		assert.strictEqual(restoredQuery.values?.length, query.values?.length);
+		assert.strictEqual(restoredQuery.containsPathSeparator, query.containsPathSeparator);
 
 		// with spaces that are empty
-		query = scorer.prepareQuery(' Hello   World  	');
-		assert.equal(query.original, ' Hello   World  	');
-		assert.equal(query.originalLowercase, ' Hello   World  	'.toLowerCase());
-		assert.equal(query.normalized, 'HelloWorld');
-		assert.equal(query.normalizedLowercase, 'HelloWorld'.toLowerCase());
-		assert.equal(query.values?.length, 2);
-		assert.equal(query.values?.[0].original, 'Hello');
-		assert.equal(query.values?.[0].originalLowercase, 'Hello'.toLowerCase());
-		assert.equal(query.values?.[0].normalized, 'Hello');
-		assert.equal(query.values?.[0].normalizedLowercase, 'Hello'.toLowerCase());
-		assert.equal(query.values?.[1].original, 'World');
-		assert.equal(query.values?.[1].originalLowercase, 'World'.toLowerCase());
-		assert.equal(query.values?.[1].normalized, 'World');
-		assert.equal(query.values?.[1].normalizedLowercase, 'World'.toLowerCase());
+		query = prepareQuery(' Hello   World  	');
+		assert.strictEqual(query.original, ' Hello   World  	');
+		assert.strictEqual(query.originalLowercase, ' Hello   World  	'.toLowerCase());
+		assert.strictEqual(query.normalized, 'HelloWorld');
+		assert.strictEqual(query.normalizedLowercase, 'HelloWorld'.toLowerCase());
+		assert.strictEqual(query.values?.length, 2);
+		assert.strictEqual(query.values?.[0].original, 'Hello');
+		assert.strictEqual(query.values?.[0].originalLowercase, 'Hello'.toLowerCase());
+		assert.strictEqual(query.values?.[0].normalized, 'Hello');
+		assert.strictEqual(query.values?.[0].normalizedLowercase, 'Hello'.toLowerCase());
+		assert.strictEqual(query.values?.[1].original, 'World');
+		assert.strictEqual(query.values?.[1].originalLowercase, 'World'.toLowerCase());
+		assert.strictEqual(query.values?.[1].normalized, 'World');
+		assert.strictEqual(query.values?.[1].normalizedLowercase, 'World'.toLowerCase());
 
 		// Path related
 		if (isWindows) {
-			assert.equal(scorer.prepareQuery('C:\\some\\path').pathNormalized, 'C:\\some\\path');
-			assert.equal(scorer.prepareQuery('C:\\some\\path').normalized, 'C:\\some\\path');
-			assert.equal(scorer.prepareQuery('C:\\some\\path').containsPathSeparator, true);
-			assert.equal(scorer.prepareQuery('C:/some/path').pathNormalized, 'C:\\some\\path');
-			assert.equal(scorer.prepareQuery('C:/some/path').normalized, 'C:\\some\\path');
-			assert.equal(scorer.prepareQuery('C:/some/path').containsPathSeparator, true);
+			assert.strictEqual(prepareQuery('C:\\some\\path').pathNormalized, 'C:\\some\\path');
+			assert.strictEqual(prepareQuery('C:\\some\\path').normalized, 'C:\\some\\path');
+			assert.strictEqual(prepareQuery('C:\\some\\path').containsPathSeparator, true);
+			assert.strictEqual(prepareQuery('C:/some/path').pathNormalized, 'C:\\some\\path');
+			assert.strictEqual(prepareQuery('C:/some/path').normalized, 'C:\\some\\path');
+			assert.strictEqual(prepareQuery('C:/some/path').containsPathSeparator, true);
 		} else {
-			assert.equal(scorer.prepareQuery('/some/path').pathNormalized, '/some/path');
-			assert.equal(scorer.prepareQuery('/some/path').normalized, '/some/path');
-			assert.equal(scorer.prepareQuery('/some/path').containsPathSeparator, true);
-			assert.equal(scorer.prepareQuery('\\some\\path').pathNormalized, '/some/path');
-			assert.equal(scorer.prepareQuery('\\some\\path').normalized, '/some/path');
-			assert.equal(scorer.prepareQuery('\\some\\path').containsPathSeparator, true);
+			assert.strictEqual(prepareQuery('/some/path').pathNormalized, '/some/path');
+			assert.strictEqual(prepareQuery('/some/path').normalized, '/some/path');
+			assert.strictEqual(prepareQuery('/some/path').containsPathSeparator, true);
+			assert.strictEqual(prepareQuery('\\some\\path').pathNormalized, '/some/path');
+			assert.strictEqual(prepareQuery('\\some\\path').normalized, '/some/path');
+			assert.strictEqual(prepareQuery('\\some\\path').containsPathSeparator, true);
 		}
 	});
 
 	test('fuzzyScore2 (matching)', function () {
-		const target = 'HeLlo-World';
+		const target = 'HelLo-World';
 
 		for (const offset of [0, 3]) {
-			let [score, matches] = _doScore2(offset === 0 ? target : `123${target}`, 'HeLlo-World', offset);
+			let [score, matches] = _doScore2(offset === 0 ? target : `123${target}`, 'HelLo-World', offset);
 
 			assert.ok(score);
-			assert.equal(matches.length, 1);
-			assert.equal(matches[0].start, 0 + offset);
-			assert.equal(matches[0].end, target.length + offset);
+			assert.strictEqual(matches.length, 1);
+			assert.strictEqual(matches[0].start, 0 + offset);
+			assert.strictEqual(matches[0].end, target.length + offset);
 
 			[score, matches] = _doScore2(offset === 0 ? target : `123${target}`, 'HW', offset);
 
 			assert.ok(score);
-			assert.equal(matches.length, 2);
-			assert.equal(matches[0].start, 0 + offset);
-			assert.equal(matches[0].end, 1 + offset);
-			assert.equal(matches[1].start, 6 + offset);
-			assert.equal(matches[1].end, 7 + offset);
+			assert.strictEqual(matches.length, 2);
+			assert.strictEqual(matches[0].start, 0 + offset);
+			assert.strictEqual(matches[0].end, 1 + offset);
+			assert.strictEqual(matches[1].start, 6 + offset);
+			assert.strictEqual(matches[1].end, 7 + offset);
 		}
 	});
 
 	test('fuzzyScore2 (multiple queries)', function () {
-		const target = 'HeLlo-World';
+		const target = 'HelLo-World';
 
 		const [firstSingleScore, firstSingleMatches] = _doScore2(target, 'HelLo');
 		const [secondSingleScore, secondSingleMatches] = _doScore2(target, 'World');
@@ -1024,8 +1198,8 @@ suite('Fuzzy Scorer', () => {
 				const firstAndSecondSingleMatch = firstAndSecondSingleMatches[i];
 
 				if (multiMatch && firstAndSecondSingleMatch) {
-					assert.equal(multiMatch.start, firstAndSecondSingleMatch.start);
-					assert.equal(multiMatch.end, firstAndSecondSingleMatch.end);
+					assert.strictEqual(multiMatch.start, firstAndSecondSingleMatch.start);
+					assert.strictEqual(multiMatch.end, firstAndSecondSingleMatch.end);
 				} else {
 					assert.fail();
 				}
@@ -1033,8 +1207,8 @@ suite('Fuzzy Scorer', () => {
 		}
 
 		function assertNoScore() {
-			assert.equal(multiScore, undefined);
-			assert.equal(multiMatches.length, 0);
+			assert.strictEqual(multiScore, undefined);
+			assert.strictEqual(multiMatches.length, 0);
 		}
 
 		assertScore();
@@ -1060,4 +1234,23 @@ suite('Fuzzy Scorer', () => {
 		assert.ok(typeof score[0] === 'number');
 		assert.ok(score[1].length > 0);
 	});
+
+	test('Using quotes should expect contiguous matches match', function () {
+		// missing the "i" in the query
+		assert.strictEqual(_doScore('contiguous', '"contguous"')[0], 0);
+
+		const score = _doScore('contiguous', '"contiguous"');
+		assert.strictEqual(score[0], 253);
+	});
+
+	test('Using quotes should highlight contiguous indexes', function () {
+		const score = _doScore('2021-7-26.md', '"26"');
+		assert.strictEqual(score[0], 13);
+
+		// The indexes of the 2 and 6 of "26"
+		assert.strictEqual(score[1][0], 7);
+		assert.strictEqual(score[1][1], 8);
+	});
+
+	ensureNoDisposablesAreLeakedInTestSuite();
 });

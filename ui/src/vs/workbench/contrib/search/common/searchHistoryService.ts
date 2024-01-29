@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Emitter, Event } from 'vs/base/common/event';
-import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
+import { IStorageService, StorageScope, StorageTarget } from 'vs/platform/storage/common/storage';
 import { isEmptyObject } from 'vs/base/common/types';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 
@@ -20,6 +20,9 @@ export const ISearchHistoryService = createDecorator<ISearchHistoryService>('sea
 
 export interface ISearchHistoryValues {
 	search?: string[];
+	/* AGPL */
+	// replace?: string[];
+	/* End AGPL */
 	include?: string[];
 	exclude?: string[];
 }
@@ -27,7 +30,7 @@ export interface ISearchHistoryValues {
 export class SearchHistoryService implements ISearchHistoryService {
 	declare readonly _serviceBrand: undefined;
 
-	private static readonly SEARCH_HISTORY_KEY = 'workbench.search.history';
+	public static readonly SEARCH_HISTORY_KEY = 'workbench.search.history';
 
 	private readonly _onDidClearHistory = new Emitter<void>();
 	readonly onDidClearHistory: Event<void> = this._onDidClearHistory.event;
@@ -60,7 +63,7 @@ export class SearchHistoryService implements ISearchHistoryService {
 		if (isEmptyObject(history)) {
 			this.storageService.remove(SearchHistoryService.SEARCH_HISTORY_KEY, StorageScope.WORKSPACE);
 		} else {
-			this.storageService.store(SearchHistoryService.SEARCH_HISTORY_KEY, JSON.stringify(history), StorageScope.WORKSPACE);
+			this.storageService.store(SearchHistoryService.SEARCH_HISTORY_KEY, JSON.stringify(history), StorageScope.WORKSPACE, StorageTarget.USER);
 		}
 	}
 }

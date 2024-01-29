@@ -68,7 +68,7 @@ export class DecompilationHelper implements IDecompilationHelper {
 	}
 
 	async decompileTypeAndUpdateFileContents(typeUri: URI) : Promise<void> {
-		await this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+		await this.progressService.withProgress({ location: ProgressLocation.Dialog, sticky: true }, async progress => {
 			progress.report({ message: 'Loading type...'});
 
 			const sourceCode = await this.decompilationService.decompileType(typeUri.fsPath);

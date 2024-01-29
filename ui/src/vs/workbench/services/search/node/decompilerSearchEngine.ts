@@ -70,7 +70,8 @@ export class DecompilerSearchEngine {
 
 			stream.on('end', () => resolve({
 				limitHit: false,
-				type: 'success'
+				type: 'success',
+				messages: []
 			}));
 
 			stream.on('error', err => reject(err));

@@ -3,24 +3,24 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { TokenizationRegistry } from 'vs/editor/common/modes';
-import { generateTokensCSSForColorMap } from 'vs/editor/common/modes/supports/tokenization';
-import { IModeService } from 'vs/editor/common/services/modeService';
+import { TokenizationRegistry } from 'vs/editor/common/languages';
+import { generateTokensCSSForColorMap } from 'vs/editor/common/languages/supports/tokenization';
+import { ILanguageService } from 'vs/editor/common/languages/language';
 import * as nls from 'vs/nls';
-import { IWebviewWorkbenchService } from 'vs/workbench/contrib/webview/browser/webviewWorkbenchService';
+import { IWebviewWorkbenchService } from 'vs/workbench/contrib/webviewPanel/browser/webviewWorkbenchService';
 import { IEditorService, ACTIVE_GROUP } from 'vs/workbench/services/editor/common/editorService';
-import { WebviewInput } from 'vs/workbench/contrib/webview/browser/webviewEditorInput';
+import { WebviewInput } from 'vs/workbench/contrib/webviewPanel/browser/webviewEditorInput';
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import { generateUuid } from 'vs/base/common/uuid';
-import { renderMarkdownDocument } from 'vs/workbench/contrib/markdown/common/markdownDocumentRenderer';
+import { renderMarkdownDocument } from 'vs/workbench/contrib/markdown/browser/markdownDocumentRenderer';
 
 export class MarkdownPreviewEditor {
 
 	private _currentWebview: WebviewInput | undefined = undefined;
 
 	public constructor(
-		@IModeService private readonly _modeService: IModeService,
+		@ILanguageService private readonly _languageService: ILanguageService,
 		@IEditorService private readonly _editorService: IEditorService,
 		@IEditorGroupsService private readonly _editorGroupService: IEditorGroupsService,
 		@IWebviewWorkbenchService private readonly _webviewWorkbenchService: IWebviewWorkbenchService,
@@ -37,24 +37,28 @@ export class MarkdownPreviewEditor {
 		const activeEditorPane = this._editorService.activeEditorPane;
 		if (this._currentWebview) {
 			this._currentWebview.setName(title);
-			this._currentWebview.webview.html = html;
+			this._currentWebview.webview.setHtml(html);
 			this._webviewWorkbenchService.revealWebview(this._currentWebview, activeEditorPane ? activeEditorPane.group : this._editorGroupService.activeGroup, false);
 		} else {
-			this._currentWebview = this._webviewWorkbenchService.createWebview(
-				'markdown_preview_webview',
+			this._currentWebview = this._webviewWorkbenchService.openWebview(
+				{
+					title,
+					options: {
+						tryRestoreScrollPosition: true,
+						enableFindWidget: true
+					},
+					contentOptions: {
+						localResourceRoots: []
+					},
+					extension: undefined
+				},
 				'markdownPreview',
 				title,
-				{ group: ACTIVE_GROUP, preserveFocus: false },
-				{
-					tryRestoreScrollPosition: true,
-					enableFindWidget: true,
-					localResourceRoots: []
-				},
-				undefined);
+				{ group: ACTIVE_GROUP, preserveFocus: false });
 
-			this._currentWebview.onDispose(() => { this._currentWebview = undefined; });
+			this._currentWebview.onWillDispose(() => { this._currentWebview = undefined; });
 
-			this._currentWebview.webview.html = html;
+			this._currentWebview.webview.setHtml(html);
 		}
 
 		return true;
@@ -62,7 +66,7 @@ export class MarkdownPreviewEditor {
 
 	private async renderBody(text: string) {
 		const nonce = generateUuid();
-		const content = await renderMarkdownDocument(text, this._extensionService, this._modeService);
+		const content = await renderMarkdownDocument(text, this._extensionService, this._languageService);
 		const colorMap = TokenizationRegistry.getColorMap();
 		const css = colorMap ? generateTokensCSSForColorMap(colorMap) : '';
 		return `<!DOCTYPE html>

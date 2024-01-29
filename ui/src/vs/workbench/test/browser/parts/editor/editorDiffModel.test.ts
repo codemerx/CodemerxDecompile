@@ -6,55 +6,63 @@
 import * as assert from 'assert';
 import { TextDiffEditorModel } from 'vs/workbench/common/editor/textDiffEditorModel';
 import { DiffEditorInput } from 'vs/workbench/common/editor/diffEditorInput';
-import { ResourceEditorInput } from 'vs/workbench/common/editor/resourceEditorInput';
+import { TextResourceEditorInput } from 'vs/workbench/common/editor/textResourceEditorInput';
 import { URI } from 'vs/base/common/uri';
 import { workbenchInstantiationService, TestServiceAccessor } from 'vs/workbench/test/browser/workbenchTestServices';
 import { ITextModel } from 'vs/editor/common/model';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
+import { DisposableStore } from 'vs/base/common/lifecycle';
+import { ensureNoDisposablesAreLeakedInTestSuite } from 'vs/base/test/common/utils';
 
-suite('Workbench editor model', () => {
+suite('TextDiffEditorModel', () => {
 
+	const disposables = new DisposableStore();
 	let instantiationService: IInstantiationService;
 	let accessor: TestServiceAccessor;
 
 	setup(() => {
-		instantiationService = workbenchInstantiationService();
+		instantiationService = workbenchInstantiationService(undefined, disposables);
 		accessor = instantiationService.createInstance(TestServiceAccessor);
 	});
 
-	test('TextDiffEditorModel', async () => {
-		const dispose = accessor.textModelResolverService.registerTextModelContentProvider('test', {
-			provideTextContent: function (resource: URI): Promise<ITextModel> {
+	teardown(() => {
+		disposables.clear();
+	});
+
+	test('basics', async () => {
+		disposables.add(accessor.textModelResolverService.registerTextModelContentProvider('test', {
+			provideTextContent: async function (resource: URI): Promise<ITextModel | null> {
 				if (resource.scheme === 'test') {
-					let modelContent = 'Hello Test';
-					let languageSelection = accessor.modeService.create('json');
-					return Promise.resolve(accessor.modelService.createModel(modelContent, languageSelection, resource));
+					const modelContent = 'Hello Test';
+					const languageSelection = accessor.languageService.createById('json');
+
+					return disposables.add(accessor.modelService.createModel(modelContent, languageSelection, resource));
 				}
 
-				return Promise.resolve(null!);
+				return null;
 			}
-		});
+		}));
 
-		let input = instantiationService.createInstance(ResourceEditorInput, URI.from({ scheme: 'test', authority: null!, path: 'thePath' }), 'name', 'description', undefined);
-		let otherInput = instantiationService.createInstance(ResourceEditorInput, URI.from({ scheme: 'test', authority: null!, path: 'thePath' }), 'name2', 'description', undefined);
-		let diffInput = new DiffEditorInput('name', 'description', input, otherInput);
+		const input = disposables.add(instantiationService.createInstance(TextResourceEditorInput, URI.from({ scheme: 'test', authority: null!, path: 'thePath' }), 'name', 'description', undefined, undefined));
+		const otherInput = disposables.add(instantiationService.createInstance(TextResourceEditorInput, URI.from({ scheme: 'test', authority: null!, path: 'thePath' }), 'name2', 'description', undefined, undefined));
+		const diffInput = disposables.add(instantiationService.createInstance(DiffEditorInput, 'name', 'description', input, otherInput, undefined));
 
-		let model = await diffInput.resolve() as TextDiffEditorModel;
+		let model = disposables.add(await diffInput.resolve() as TextDiffEditorModel);
 
 		assert(model);
 		assert(model instanceof TextDiffEditorModel);
 
-		let diffEditorModel = model.textDiffEditorModel!;
+		const diffEditorModel = model.textDiffEditorModel!;
 		assert(diffEditorModel.original);
 		assert(diffEditorModel.modified);
 
-		model = await diffInput.resolve() as TextDiffEditorModel;
+		model = disposables.add(await diffInput.resolve() as TextDiffEditorModel);
 		assert(model.isResolved());
 
 		assert(diffEditorModel !== model.textDiffEditorModel);
 		diffInput.dispose();
 		assert(!model.textDiffEditorModel);
-
-		dispose.dispose();
 	});
+
+	ensureNoDisposablesAreLeakedInTestSuite();
 });

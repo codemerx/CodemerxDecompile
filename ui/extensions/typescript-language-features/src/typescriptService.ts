@@ -4,12 +4,19 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import BufferSyncSupport from './features/bufferSyncSupport';
-import * as Proto from './protocol';
-import API from './utils/api';
-import { TypeScriptServiceConfiguration } from './utils/configuration';
-import { PluginManager } from './utils/plugins';
-import { TypeScriptVersion } from './utils/versionProvider';
+import * as Proto from './tsServer/protocol/protocol';
+import BufferSyncSupport from './tsServer/bufferSyncSupport';
+import { ExecutionTarget } from './tsServer/server';
+import { TypeScriptVersion } from './tsServer/versionProvider';
+import { API } from './tsServer/api';
+import { TypeScriptServiceConfiguration } from './configuration/configuration';
+import { PluginManager } from './tsServer/plugins';
+import { TelemetryReporter } from './logging/telemetry';
+
+export enum ServerType {
+	Syntax = 'syntax',
+	Semantic = 'semantic',
+}
 
 export namespace ServerResponse {
 
@@ -23,7 +30,9 @@ export namespace ServerResponse {
 
 	export const NoContent = { type: 'noContent' } as const;
 
-	export type Response<T extends Proto.Response> = T | Cancelled | typeof NoContent;
+	export const NoServer = { type: 'noServer' } as const;
+
+	export type Response<T extends Proto.Response> = T | Cancelled | typeof NoContent | typeof NoServer;
 }
 
 interface StandardTsServerRequests {
@@ -61,6 +70,13 @@ interface StandardTsServerRequests {
 	'prepareCallHierarchy': [Proto.FileLocationRequestArgs, Proto.PrepareCallHierarchyResponse];
 	'provideCallHierarchyIncomingCalls': [Proto.FileLocationRequestArgs, Proto.ProvideCallHierarchyIncomingCallsResponse];
 	'provideCallHierarchyOutgoingCalls': [Proto.FileLocationRequestArgs, Proto.ProvideCallHierarchyOutgoingCallsResponse];
+	'fileReferences': [Proto.FileRequestArgs, Proto.FileReferencesResponse];
+	'provideInlayHints': [Proto.InlayHintsRequestArgs, Proto.InlayHintsResponse];
+	'encodedSemanticClassifications-full': [Proto.EncodedSemanticClassificationsRequestArgs, Proto.EncodedSemanticClassificationsResponse];
+	'findSourceDefinition': [Proto.FileLocationRequestArgs, Proto.DefinitionResponse];
+	'getMoveToRefactoringFileSuggestions': [Proto.GetMoveToRefactoringFileSuggestionsRequestArgs, Proto.GetMoveToRefactoringFileSuggestions];
+	'linkedEditingRange': [Proto.FileLocationRequestArgs, Proto.LinkedEditingRangeResponse];
+	'mapCode': [Proto.MapCodeRequestArgs, Proto.MapCodeResponse];
 }
 
 interface NoResponseTsServerRequests {
@@ -82,23 +98,45 @@ export type TypeScriptRequests = StandardTsServerRequests & NoResponseTsServerRe
 export type ExecConfig = {
 	readonly lowPriority?: boolean;
 	readonly nonRecoverable?: boolean;
-	readonly cancelOnResourceChange?: vscode.Uri
+	readonly cancelOnResourceChange?: vscode.Uri;
+	readonly executionTarget?: ExecutionTarget;
 };
 
-export interface ITypeScriptServiceClient {
+export enum ClientCapability {
 	/**
-	 * Convert a resource (VS Code) to a normalized path (TypeScript).
-	 *
-	 * Does not try handling case insensitivity.
+	 * Basic syntax server. All clients should support this.
 	 */
-	normalizedPath(resource: vscode.Uri): string | undefined;
+	Syntax,
 
 	/**
-	 * Map a resource to a normalized path
-	 *
-	 * This will attempt to handle case insensitivity.
+	 * Advanced syntax server that can provide single file IntelliSense.
 	 */
-	toPath(resource: vscode.Uri): string | undefined;
+	EnhancedSyntax,
+
+	/**
+	 * Complete, multi-file semantic server
+	 */
+	Semantic,
+}
+
+export class ClientCapabilities {
+	private readonly capabilities: ReadonlySet<ClientCapability>;
+
+	constructor(...capabilities: ClientCapability[]) {
+		this.capabilities = new Set(capabilities);
+	}
+
+	public has(capability: ClientCapability): boolean {
+		return this.capabilities.has(capability);
+	}
+}
+
+export interface ITypeScriptServiceClient {
+
+	/**
+	 * Convert a (VS Code) resource to a path that TypeScript server understands.
+	 */
+	toTsFilePath(resource: vscode.Uri): string | undefined;
 
 	/**
 	 * Convert a path to a resource.
@@ -108,26 +146,38 @@ export interface ITypeScriptServiceClient {
 	/**
 	 * Tries to ensure that a vscode document is open on the TS server.
 	 *
-	 * Returns the normalized path.
+	 * @return The normalized path or `undefined` if the document is not open on the server.
 	 */
-	toOpenedFilePath(document: vscode.TextDocument): string | undefined;
+	toOpenTsFilePath(document: vscode.TextDocument, options?: {
+		suppressAlertOnFailure?: boolean;
+	}): string | undefined;
 
-	getWorkspaceRootForResource(resource: vscode.Uri): string | undefined;
+	/**
+	 * Checks if `resource` has a given capability.
+	 */
+	hasCapabilityForResource(resource: vscode.Uri, capability: ClientCapability): boolean;
 
-	readonly onTsServerStarted: vscode.Event<{ version: TypeScriptVersion, usedApiVersion: API }>;
+	getWorkspaceRootForResource(resource: vscode.Uri): vscode.Uri | undefined;
+
+	readonly onTsServerStarted: vscode.Event<{ version: TypeScriptVersion; usedApiVersion: API }>;
 	readonly onProjectLanguageServiceStateChanged: vscode.Event<Proto.ProjectLanguageServiceStateEventBody>;
 	readonly onDidBeginInstallTypings: vscode.Event<Proto.BeginInstallTypesEventBody>;
 	readonly onDidEndInstallTypings: vscode.Event<Proto.EndInstallTypesEventBody>;
 	readonly onTypesInstallerInitializationFailed: vscode.Event<Proto.TypesInstallerInitializationFailedEventBody>;
+
+	readonly capabilities: ClientCapabilities;
+	readonly onDidChangeCapabilities: vscode.Event<void>;
 
 	onReady(f: () => void): Promise<void>;
 
 	showVersionPicker(): void;
 
 	readonly apiVersion: API;
+
 	readonly pluginManager: PluginManager;
 	readonly configuration: TypeScriptServiceConfiguration;
 	readonly bufferSyncSupport: BufferSyncSupport;
+	readonly telemetryReporter: TelemetryReporter;
 
 	execute<K extends keyof StandardTsServerRequests>(
 		command: K,

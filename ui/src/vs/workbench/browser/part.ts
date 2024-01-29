@@ -6,21 +6,22 @@
 import 'vs/css!./media/part';
 import { Component } from 'vs/workbench/common/component';
 import { IThemeService, IColorTheme } from 'vs/platform/theme/common/themeService';
-import { Dimension, size, IDimension } from 'vs/base/browser/dom';
+import { Dimension, size, IDimension, getActiveDocument } from 'vs/base/browser/dom';
 import { IStorageService } from 'vs/platform/storage/common/storage';
 import { ISerializableView, IViewSize } from 'vs/base/browser/ui/grid/grid';
 import { Event, Emitter } from 'vs/base/common/event';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { assertIsDefined } from 'vs/base/common/types';
+import { Disposable, IDisposable, toDisposable } from 'vs/base/common/lifecycle';
 
 export interface IPartOptions {
-	hasTitle?: boolean;
-	borderWidth?: () => number;
+	readonly hasTitle?: boolean;
+	readonly borderWidth?: () => number;
 }
 
 export interface ILayoutContentResult {
-	titleSize: IDimension;
-	contentSize: IDimension;
+	readonly titleSize: IDimension;
+	readonly contentSize: IDimension;
 }
 
 /**
@@ -52,7 +53,7 @@ export abstract class Part extends Component implements ISerializableView {
 		layoutService.registerPart(this);
 	}
 
-	protected onThemeChange(theme: IColorTheme): void {
+	protected override onThemeChange(theme: IColorTheme): void {
 
 		// only call if our create() method has been called
 		if (this.parent) {
@@ -60,7 +61,7 @@ export abstract class Part extends Component implements ISerializableView {
 		}
 	}
 
-	updateStyles(): void {
+	override updateStyles(): void {
 		super.updateStyles();
 	}
 
@@ -126,7 +127,7 @@ export abstract class Part extends Component implements ISerializableView {
 
 	//#region ISerializableView
 
-	private _onDidChange = this._register(new Emitter<IViewSize | undefined>());
+	protected _onDidChange = this._register(new Emitter<IViewSize | undefined>());
 	get onDidChange(): Event<IViewSize | undefined> { return this._onDidChange.event; }
 
 	element!: HTMLElement;
@@ -136,7 +137,7 @@ export abstract class Part extends Component implements ISerializableView {
 	abstract minimumHeight: number;
 	abstract maximumHeight: number;
 
-	layout(width: number, height: number): void {
+	layout(width: number, height: number, _top: number, _left: number): void {
 		this._dimension = new Dimension(width, height);
 	}
 
@@ -159,10 +160,10 @@ class PartLayout {
 
 		// Title Size: Width (Fill), Height (Variable)
 		let titleSize: Dimension;
-		if (this.options && this.options.hasTitle) {
+		if (this.options.hasTitle) {
 			titleSize = new Dimension(width, Math.min(height, PartLayout.TITLE_HEIGHT));
 		} else {
-			titleSize = new Dimension(0, 0);
+			titleSize = Dimension.None;
 		}
 
 		let contentWidth = width;
@@ -179,5 +180,47 @@ class PartLayout {
 		}
 
 		return { titleSize, contentSize };
+	}
+}
+
+export interface IMultiWindowPart {
+	readonly element: HTMLElement;
+}
+
+export abstract class MultiWindowParts<T extends IMultiWindowPart> extends Disposable {
+
+	protected readonly _parts = new Set<T>();
+	get parts() { return Array.from(this._parts); }
+
+	abstract readonly mainPart: T;
+
+	registerPart(part: T): IDisposable {
+		this._parts.add(part);
+
+		return this._register(toDisposable(() => this.unregisterPart(part)));
+	}
+
+	protected unregisterPart(part: T): void {
+		this._parts.delete(part);
+	}
+
+	getPart(container: HTMLElement): T {
+		return this.getPartByDocument(container.ownerDocument);
+	}
+
+	protected getPartByDocument(document: Document): T {
+		if (this._parts.size > 1) {
+			for (const part of this._parts) {
+				if (part.element?.ownerDocument === document) {
+					return part;
+				}
+			}
+		}
+
+		return this.mainPart;
+	}
+
+	get activePart(): T {
+		return this.getPartByDocument(getActiveDocument());
 	}
 }

@@ -8,7 +8,7 @@ import * as assert from 'assert';
 import { getFoldingRanges } from '../modes/htmlFolding';
 import { TextDocument, getLanguageModes } from '../modes/languageModes';
 import { ClientCapabilities } from 'vscode-css-languageservice';
-import { getNodeFSRequestService } from '../node/nodeFs';
+import { getNodeFileFS } from '../node/nodeFs';
 
 interface ExpectedIndentRange {
 	startLine: number;
@@ -22,7 +22,7 @@ async function assertRanges(lines: string[], expected: ExpectedIndentRange[], me
 		settings: {},
 		folders: [{ name: 'foo', uri: 'test://foo' }]
 	};
-	const languageModes = getLanguageModes({ css: true, javascript: true }, workspace, ClientCapabilities.LATEST, getNodeFSRequestService());
+	const languageModes = getLanguageModes({ css: true, javascript: true }, workspace, ClientCapabilities.LATEST, getNodeFileFS());
 	const actual = await getFoldingRanges(languageModes, document, nRanges, null);
 
 	let actualRanges = [];
@@ -30,14 +30,14 @@ async function assertRanges(lines: string[], expected: ExpectedIndentRange[], me
 		actualRanges[i] = r(actual[i].startLine, actual[i].endLine, actual[i].kind);
 	}
 	actualRanges = actualRanges.sort((r1, r2) => r1.startLine - r2.startLine);
-	assert.deepEqual(actualRanges, expected, message);
+	assert.deepStrictEqual(actualRanges, expected, message);
 }
 
 function r(startLine: number, endLine: number, kind?: string): ExpectedIndentRange {
 	return { startLine, endLine, kind };
 }
 
-suite('HTML Folding', async () => {
+suite('HTML Folding', () => {
 
 	test('Embedded JavaScript', async () => {
 		const input = [
@@ -71,7 +71,7 @@ suite('HTML Folding', async () => {
 			/*13*/'</head>',
 			/*14*/'</html>',
 		];
-		await assertRanges(input, [r(0, 13), r(1, 12), r(2, 6), r(3, 6), r(8, 11), r(9, 11)]);
+		await assertRanges(input, [r(0, 13), r(1, 12), r(2, 6), r(3, 6), r(8, 11), r(9, 11), r(9, 11)]);
 	});
 
 	test('Embedded JavaScript - incomplete', async () => {

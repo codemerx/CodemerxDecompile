@@ -14,303 +14,303 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-import { Action } from 'vs/base/common/actions';
-import * as nls from 'vs/nls';
-import { Registry } from 'vs/platform/registry/common/platform';
-import { IWorkbenchActionRegistry, Extensions } from 'vs/workbench/common/actions';
-import { SyncActionDescriptor, MenuRegistry, MenuId, ISubmenuItem, IMenuItem } from 'vs/platform/actions/common/actions';
-import { KeyChord, KeyMod, KeyCode } from 'vs/base/common/keyCodes';
-import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
-import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
-import { INotificationService, Severity, IPromptChoice } from 'vs/platform/notification/common/notification';
-import { URI } from 'vs/base/common/uri';
-import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
-import { IWorkbenchContributionsRegistry, IWorkbenchContribution, Extensions as WorkbenchExtensions } from 'vs/workbench/common/contributions';
-import { Disposable } from 'vs/base/common/lifecycle';
-import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
-import { IExplorerService } from 'vs/workbench/contrib/files/common/files';
-import { RawContextKey } from 'vs/platform/contextkey/common/contextkey';
-import { IAnalyticsService } from 'vs/cd/workbench/AnalyticsService';
+// import { Action } from 'vs/base/common/actions';
+// import * as nls from 'vs/nls';
+// import { Registry } from 'vs/platform/registry/common/platform';
+// import { IWorkbenchActionRegistry, Extensions } from 'vs/workbench/common/actions';
+// import { SyncActionDescriptor, MenuRegistry, MenuId, ISubmenuItem, IMenuItem } from 'vs/platform/actions/common/actions';
+// import { KeyChord, KeyMod, KeyCode } from 'vs/base/common/keyCodes';
+// import { IFileDialogService } from 'vs/platform/dialogs/common/dialogs';
+// import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
+// import { INotificationService, Severity, IPromptChoice } from 'vs/platform/notification/common/notification';
+// import { URI } from 'vs/base/common/uri';
+// import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
+// import { IWorkbenchContributionsRegistry, IWorkbenchContribution, Extensions as WorkbenchExtensions } from 'vs/workbench/common/contributions';
+// import { Disposable } from 'vs/base/common/lifecycle';
+// import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
+// import { IExplorerService } from 'vs/workbench/contrib/files/common/files';
+// import { RawContextKey } from 'vs/platform/contextkey/common/contextkey';
+// import { IAnalyticsService } from 'vs/cd/workbench/AnalyticsService';
 
-export const PROJECT_CREATION_ENABLED_STATE = new RawContextKey<boolean>('areProjectCreationCommandsEnabled', false);
+// export const PROJECT_CREATION_ENABLED_STATE = new RawContextKey<boolean>('areProjectCreationCommandsEnabled', false);
 
-const DANGEROUS_RESOURCES_MESSAGE = 'This assembly contains resources that may contain malicious code. Decompilation of such resources will result in execution of that malicious code. Do you want to decompile those resources during the project generation?';
+// const DANGEROUS_RESOURCES_MESSAGE = 'This assembly contains resources that may contain malicious code. Decompilation of such resources will result in execution of that malicious code. Do you want to decompile those resources during the project generation?';
 
-abstract class BaseCreateProjectAction extends Action {
+// abstract class BaseCreateProjectAction extends Action {
 
-	constructor(
-		id: string,
-		label: string,
-		private readonly fileDialogService: IFileDialogService,
-		private readonly notificationService: INotificationService,
-		private readonly decompilationService: IDecompilationService,
-		private readonly progressService: IProgressService,
-		private readonly explorerService: IExplorerService,
-		private readonly analyticsService: IAnalyticsService
-	) {
-		super(id, label);
-	}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		private readonly fileDialogService: IFileDialogService,
+// 		private readonly notificationService: INotificationService,
+// 		private readonly decompilationService: IDecompilationService,
+// 		private readonly progressService: IProgressService,
+// 		private readonly explorerService: IExplorerService,
+// 		private readonly analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label);
+// 	}
 
-	protected abstract get projectVsStudioVersion(): string | undefined;
+// 	protected abstract get projectVsStudioVersion(): string | undefined;
 
-	async run(): Promise<void> {
-		await this.analyticsService.trackEvent('CreateProject', this.projectVsStudioVersion ?? 'Latest');
+// 	async run(): Promise<void> {
+// 		await this.analyticsService.trackEvent('CreateProject', this.projectVsStudioVersion ?? 'Latest');
 
-		const selectedExplorerItems = this.explorerService.getContext(false);
-		const currentOpenCodeEditorResourceUri = selectedExplorerItems.length ? selectedExplorerItems[0].resource : null;
+// 		const selectedExplorerItems = this.explorerService.getContext(false);
+// 		const currentOpenCodeEditorResourceUri = selectedExplorerItems.length ? selectedExplorerItems[0].resource : null;
 
-		if (currentOpenCodeEditorResourceUri?.fsPath) {
-			const { assemblyFilePath } = await this.decompilationService.getContextAssembly(currentOpenCodeEditorResourceUri.fsPath);
-			const { containsDangerousResources, projectFileMetadata } = await this.decompilationService.getProjectCreationMetadata(assemblyFilePath, this.projectVsStudioVersion);
+// 		if (currentOpenCodeEditorResourceUri?.fsPath) {
+// 			const { assemblyFilePath } = await this.decompilationService.getContextAssembly(currentOpenCodeEditorResourceUri.fsPath);
+// 			const { containsDangerousResources, projectFileMetadata } = await this.decompilationService.getProjectCreationMetadata(assemblyFilePath, this.projectVsStudioVersion);
 
-			if (!projectFileMetadata || !projectFileMetadata.isVSSupportedProjectType) {
-				this.notificationService.error(projectFileMetadata?.projectTypeNotSupportedErrorMessage ?? 'Failed to generate project');
-				return;
-			}
+// 			if (!projectFileMetadata || !projectFileMetadata.isVSSupportedProjectType) {
+// 				this.notificationService.error(projectFileMetadata?.projectTypeNotSupportedErrorMessage ?? 'Failed to generate project');
+// 				return;
+// 			}
 
-			let decompileDangerousResources = false;
+// 			let decompileDangerousResources = false;
 
-			if (containsDangerousResources) {
-				decompileDangerousResources = await this.promptUserForDangerousResourcesDecompilation();
-			}
+// 			if (containsDangerousResources) {
+// 				decompileDangerousResources = await this.promptUserForDangerousResourcesDecompilation();
+// 			}
 
-			const defaultPath = this.fileDialogService.defaultFolderPath();
-			if (defaultPath) {
-				const { projectFileName, projectFileExtension, isDecompilerSupportedProjectType } = projectFileMetadata;
+// 			const defaultPath = this.fileDialogService.defaultFolderPath();
+// 			if (defaultPath) {
+// 				const { projectFileName, projectFileExtension, isDecompilerSupportedProjectType } = projectFileMetadata;
 
-				const path = URI.joinPath(defaultPath, `${projectFileName}.${projectFileExtension}`);
-				const projectFileExtensionName = isDecompilerSupportedProjectType ? 'Project file' : 'Error project file';
-				const outputPath = await this.fileDialogService.showSaveDialog({ defaultUri: path, filters: [{ name: projectFileExtensionName, extensions: [projectFileExtension] }] });
+// 				const path = URI.joinPath(defaultPath, `${projectFileName}.${projectFileExtension}`);
+// 				const projectFileExtensionName = isDecompilerSupportedProjectType ? 'Project file' : 'Error project file';
+// 				const outputPath = await this.fileDialogService.showSaveDialog({ defaultUri: path, filters: [{ name: projectFileExtensionName, extensions: [projectFileExtension] }] });
 
-				if (outputPath?.fsPath) {
-					this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
-						progress.report({ message: 'Creating project...' });
+// 				if (outputPath?.fsPath) {
+// 					this.progressService.withProgress({ location: ProgressLocation.Dialog, sticky: true }, async progress => {
+// 						progress.report({ message: 'Creating project...' });
 
-						const { errorMessage } = await this.decompilationService.createProject(assemblyFilePath, outputPath.fsPath, decompileDangerousResources, this.projectVsStudioVersion);
+// 						const { errorMessage } = await this.decompilationService.createProject(assemblyFilePath, outputPath.fsPath, decompileDangerousResources, this.projectVsStudioVersion);
 
-						if (errorMessage) {
-							this.notificationService.error(errorMessage);
-						} else {
-							this.notificationService.info('Project creation completed successfully.');
-						}
-					});
-				}
-			}
-		}
-	}
+// 						if (errorMessage) {
+// 							this.notificationService.error(errorMessage);
+// 						} else {
+// 							this.notificationService.info('Project creation completed successfully.');
+// 						}
+// 					});
+// 				}
+// 			}
+// 		}
+// 	}
 
-	private async promptUserForDangerousResourcesDecompilation(): Promise<boolean> {
-		return new Promise(resolve => {
-			const choices: IPromptChoice[] = [
-				{
-					label: 'Yes',
-					run: () => resolve(true)
-				},
-				{
-					label: 'No',
-					run: () => resolve(false)
-				}
-			];
+// 	private async promptUserForDangerousResourcesDecompilation(): Promise<boolean> {
+// 		return new Promise(resolve => {
+// 			const choices: IPromptChoice[] = [
+// 				{
+// 					label: 'Yes',
+// 					run: () => resolve(true)
+// 				},
+// 				{
+// 					label: 'No',
+// 					run: () => resolve(false)
+// 				}
+// 			];
 
-			this.notificationService.prompt(Severity.Warning, DANGEROUS_RESOURCES_MESSAGE, choices, {
-				onCancel: () => resolve(false)
-			});
-		});
-	}
-}
+// 			this.notificationService.prompt(Severity.Warning, DANGEROUS_RESOURCES_MESSAGE, choices, {
+// 				onCancel: () => resolve(false)
+// 			});
+// 		});
+// 	}
+// }
 
-class CreateProjectAction extends BaseCreateProjectAction {
-	static readonly ID = 'workbench.action.decompilerCreateProject';
-	static readonly LABEL = nls.localize('decompilerCreateProject', "Create Project...");
+// class CreateProjectAction extends BaseCreateProjectAction {
+// 	static readonly ID = 'workbench.action.decompilerCreateProject';
+// 	static readonly LABEL = nls.localize('decompilerCreateProject', "Create Project...");
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
 
-	protected get projectVsStudioVersion(): string | undefined {
-		return undefined;
-	}
-}
+// 	protected get projectVsStudioVersion(): string | undefined {
+// 		return undefined;
+// 	}
+// }
 
-abstract class CreateLegacyProjectAction extends BaseCreateProjectAction {
-	static readonly BASE_ID = 'workbench.action.decompilerCreateLegacyProject';
-	static readonly LABEL = nls.localize('decompilerCreateLegacyProject', "Create Legacy Project");
+// abstract class CreateLegacyProjectAction extends BaseCreateProjectAction {
+// 	static readonly BASE_ID = 'workbench.action.decompilerCreateLegacyProject';
+// 	static readonly LABEL = nls.localize('decompilerCreateLegacyProject', "Create Legacy Project");
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
 
-	protected get projectVsStudioVersion(): string | undefined {
-		const idParts = this._id.split('.');
-		return idParts[idParts.length - 1];
-	}
-}
+// 	protected get projectVsStudioVersion(): string | undefined {
+// 		const idParts = this._id.split('.');
+// 		return idParts[idParts.length - 1];
+// 	}
+// }
 
-class Create2010ProjectAction extends CreateLegacyProjectAction {
-	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2010';
+// class Create2010ProjectAction extends CreateLegacyProjectAction {
+// 	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2010';
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
-}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
+// }
 
-class Create2012ProjectAction extends CreateLegacyProjectAction {
-	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2012';
+// class Create2012ProjectAction extends CreateLegacyProjectAction {
+// 	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2012';
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
-}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
+// }
 
-class Create2013ProjectAction extends CreateLegacyProjectAction {
-	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2013';
+// class Create2013ProjectAction extends CreateLegacyProjectAction {
+// 	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2013';
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
-}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
+// }
 
-class Create2015ProjectAction extends CreateLegacyProjectAction {
-	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2015';
+// class Create2015ProjectAction extends CreateLegacyProjectAction {
+// 	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2015';
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
-}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
+// }
 
-class Create2017ProjectAction extends CreateLegacyProjectAction {
-	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2017';
+// class Create2017ProjectAction extends CreateLegacyProjectAction {
+// 	static readonly ID = 'workbench.action.decompilerCreateLegacyProject.2017';
 
-	constructor(
-		id: string,
-		label: string,
-		@IFileDialogService fileDialogService: IFileDialogService,
-		@INotificationService notificationService: INotificationService,
-		@IDecompilationService decompilationService: IDecompilationService,
-		@IProgressService progressService: IProgressService,
-		@IExplorerService explorerService: IExplorerService,
-		@IAnalyticsService analyticsService: IAnalyticsService
-	) {
-		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
-	}
-}
+// 	constructor(
+// 		id: string,
+// 		label: string,
+// 		@IFileDialogService fileDialogService: IFileDialogService,
+// 		@INotificationService notificationService: INotificationService,
+// 		@IDecompilationService decompilationService: IDecompilationService,
+// 		@IProgressService progressService: IProgressService,
+// 		@IExplorerService explorerService: IExplorerService,
+// 		@IAnalyticsService analyticsService: IAnalyticsService
+// 	) {
+// 		super(id, label, fileDialogService, notificationService, decompilationService, progressService, explorerService, analyticsService);
+// 	}
+// }
 
-class ToolsActionsProvider extends Disposable implements IWorkbenchContribution {
+// class ToolsActionsProvider extends Disposable implements IWorkbenchContribution {
 
-	constructor(@IDecompilationService private readonly decompilationService: IDecompilationService) {
-		super();
+// 	constructor(@IDecompilationService private readonly decompilationService: IDecompilationService) {
+// 		super();
 
-		this.registerActions();
-		this.appendMenuItems();
-	}
+// 		this.registerActions();
+// 		this.appendMenuItems();
+// 	}
 
-	private registerActions() : void {
-		const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
+// 	private registerActions() : void {
+// 		const registry = Registry.as<IWorkbenchActionRegistry>(Extensions.WorkbenchActions);
 
-		registry.registerWorkbenchAction(SyncActionDescriptor.from(CreateProjectAction, { primary: KeyChord(KeyMod.CtrlCmd, KeyMod.Shift & KeyCode.KEY_G) }), 'Tools: Create Project...', nls.localize('tools', "Tools"));
-		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2010ProjectAction), 'Legacy Project Visual Studio 2010', nls.localize('tools', "Tools"));
-		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2012ProjectAction), 'Legacy Project Visual Studio 2012', nls.localize('tools', "Tools"));
-		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2013ProjectAction), 'Legacy Project Visual Studio 2013', nls.localize('tools', "Tools"));
-		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2015ProjectAction), 'Legacy Project Visual Studio 2015', nls.localize('tools', "Tools"));
-		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2017ProjectAction), 'Legacy Project Visual Studio 2017', nls.localize('tools', "Tools"));
-	}
+// 		registry.registerWorkbenchAction(SyncActionDescriptor.from(CreateProjectAction, { primary: KeyChord(KeyMod.CtrlCmd, KeyMod.Shift & KeyCode.KEY_G) }), 'Tools: Create Project...', nls.localize('tools', "Tools"));
+// 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2010ProjectAction), 'Legacy Project Visual Studio 2010', nls.localize('tools', "Tools"));
+// 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2012ProjectAction), 'Legacy Project Visual Studio 2012', nls.localize('tools', "Tools"));
+// 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2013ProjectAction), 'Legacy Project Visual Studio 2013', nls.localize('tools', "Tools"));
+// 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2015ProjectAction), 'Legacy Project Visual Studio 2015', nls.localize('tools', "Tools"));
+// 		registry.registerWorkbenchAction(SyncActionDescriptor.from(Create2017ProjectAction), 'Legacy Project Visual Studio 2017', nls.localize('tools', "Tools"));
+// 	}
 
-	private async appendMenuItems() : Promise<void> {
-		const legacyVsStudioVersions: string[] = await this.decompilationService.getLegacyVisualStudioVersions();
+// 	private async appendMenuItems() : Promise<void> {
+// 		const legacyVsStudioVersions: string[] = await this.decompilationService.getLegacyVisualStudioVersions();
 
-		const menuItems: { id: MenuId, item: IMenuItem | ISubmenuItem }[] = [];
+// 		const menuItems: { id: MenuId, item: IMenuItem | ISubmenuItem }[] = [];
 
-		for (let i = 0; i < legacyVsStudioVersions.length; i += 1) {
-			menuItems.push({
-				id: MenuId.MenubarCreateLegacyProjectMenu,
-				item: {
-					command: {
-						id: `${CreateLegacyProjectAction.BASE_ID}.${legacyVsStudioVersions[i]}`,
-						precondition: PROJECT_CREATION_ENABLED_STATE,
-						title: nls.localize({ key: 'miDecompilerCreateLegacyProject', comment: ['&& denotes a mnemonic'] }, '&&Visual Studio {0}', legacyVsStudioVersions[i])
-					},
-					order: i + 1
-				}
-			});
-		}
+// 		for (let i = 0; i < legacyVsStudioVersions.length; i += 1) {
+// 			menuItems.push({
+// 				id: MenuId.MenubarCreateLegacyProjectMenu,
+// 				item: {
+// 					command: {
+// 						id: `${CreateLegacyProjectAction.BASE_ID}.${legacyVsStudioVersions[i]}`,
+// 						precondition: PROJECT_CREATION_ENABLED_STATE,
+// 						title: nls.localize({ key: 'miDecompilerCreateLegacyProject', comment: ['&& denotes a mnemonic'] }, '&&Visual Studio {0}', legacyVsStudioVersions[i])
+// 					},
+// 					order: i + 1
+// 				}
+// 			});
+// 		}
 
-		menuItems.push({
-			id: MenuId.MenubarToolsMenu,
-			item: {
-				title: nls.localize({ key: 'miDecompilerCreateLegacyProject', comment: ['&& denotes a mnemonic'] }, "&&Create Legacy Project"),
-				submenu: MenuId.MenubarCreateLegacyProjectMenu,
-				order: 2
-			}
-		});
+// 		menuItems.push({
+// 			id: MenuId.MenubarToolsMenu,
+// 			item: {
+// 				title: nls.localize({ key: 'miDecompilerCreateLegacyProject', comment: ['&& denotes a mnemonic'] }, "&&Create Legacy Project"),
+// 				submenu: MenuId.MenubarCreateLegacyProjectMenu,
+// 				order: 2
+// 			}
+// 		});
 
-		menuItems.push({
-			id: MenuId.MenubarToolsMenu,
-			item: {
-				command: {
-					id: CreateProjectAction.ID,
-					precondition: PROJECT_CREATION_ENABLED_STATE,
-					title: nls.localize({ key: 'miDecompilerCreateProject', comment: ['&& denotes a mnemonic'] }, "&&Crete Project...")
-				},
-				order: 1
-			}
-		});
+// 		menuItems.push({
+// 			id: MenuId.MenubarToolsMenu,
+// 			item: {
+// 				command: {
+// 					id: CreateProjectAction.ID,
+// 					precondition: PROJECT_CREATION_ENABLED_STATE,
+// 					title: nls.localize({ key: 'miDecompilerCreateProject', comment: ['&& denotes a mnemonic'] }, "&&Crete Project...")
+// 				},
+// 				order: 1
+// 			}
+// 		});
 
-		MenuRegistry.appendMenuItems(menuItems);
-	}
-}
+// 		MenuRegistry.appendMenuItems(menuItems);
+// 	}
+// }
 
-Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).registerWorkbenchContribution(ToolsActionsProvider, LifecyclePhase.Starting);
+// Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).registerWorkbenchContribution(ToolsActionsProvider, LifecyclePhase.Starting);

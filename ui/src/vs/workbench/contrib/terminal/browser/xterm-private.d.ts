@@ -3,8 +3,18 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export interface XTermCore {
-	_onScroll: IEventEmitter<number>;
+/* eslint-disable @typescript-eslint/naming-convention */
+
+import { IBufferCell } from '@xterm/xterm';
+
+export type XtermAttributes = Omit<IBufferCell, 'getWidth' | 'getChars' | 'getCode'> & { clone?(): XtermAttributes };
+
+export interface IXtermCore {
+	viewport?: {
+		readonly scrollBarWidth: number;
+		_innerRefresh(): void;
+	};
+	_onData: IEventEmitter<string>;
 	_onKey: IEventEmitter<{ key: string }>;
 
 	_charSizeService: {
@@ -12,19 +22,29 @@ export interface XTermCore {
 		height: number;
 	};
 
-	_coreService: {
+	coreService: {
 		triggerDataEvent(data: string, wasUserInput?: boolean): void;
+	};
+
+	_inputHandler: {
+		_curAttrData: XtermAttributes;
 	};
 
 	_renderService: {
 		dimensions: {
-			actualCellWidth: number;
-			actualCellHeight: number;
+			css: {
+				cell: {
+					width: number;
+					height: number;
+				}
+			}
 		},
 		_renderer: {
-			_renderLayers: any[];
+			value?: {
+				_renderLayers?: any[];
+			}
 		};
-		_onIntersectionChange: any;
+		_handleIntersectionChange: any;
 	};
 }
 

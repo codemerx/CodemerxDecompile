@@ -9,25 +9,27 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import { IThemeService } from 'vs/platform/theme/common/themeService';
 import { IKeybindingService } from 'vs/platform/keybinding/common/keybinding';
 import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
-import { IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
+import { isTemporaryWorkspace, IWorkspaceContextService, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { ViewPane } from 'vs/workbench/browser/parts/views/viewPaneContainer';
-/* AGPL */
-// import { ResourcesDropHandler, DragAndDropObserver } from 'vs/workbench/browser/dnd';
-// import { listDropBackground } from 'vs/platform/theme/common/colorRegistry';
-/* End AGPL */
+import { ViewPane } from 'vs/workbench/browser/parts/views/viewPane';
+import { ResourcesDropHandler } from 'vs/workbench/browser/dnd';
+import { listDropBackground } from 'vs/platform/theme/common/colorRegistry';
 import { ILabelService } from 'vs/platform/label/common/label';
 import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
 import { IViewDescriptorService } from 'vs/workbench/common/views';
 import { IOpenerService } from 'vs/platform/opener/common/opener';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
+import { isWeb } from 'vs/base/common/platform';
+import { DragAndDropObserver, getWindow } from 'vs/base/browser/dom';
+import { ILocalizedString } from 'vs/platform/action/common/action';
 
 export class EmptyView extends ViewPane {
 
 	static readonly ID: string = 'workbench.explorer.emptyView';
 	/* AGPL */
-	static readonly NAME = nls.localize('noWorkspace', "No Assembly Opened");
+	static readonly NAME: ILocalizedString = nls.localize2('noWorkspace', "No Assembly Opened");
 	/* End AGPL */
+	private _disposed: boolean = false;
 
 	constructor(
 		options: IViewletViewOptions,
@@ -49,19 +51,19 @@ export class EmptyView extends ViewPane {
 		this._register(this.labelService.onDidChangeFormatters(() => this.refreshTitle()));
 	}
 
-	shouldShowWelcome(): boolean {
+	override shouldShowWelcome(): boolean {
 		return true;
 	}
 
-	protected renderBody(container: HTMLElement): void {
+	protected override renderBody(container: HTMLElement): void {
 		super.renderBody(container);
 
 		/* AGPL */
 		// this._register(new DragAndDropObserver(container, {
 		// 	onDrop: e => {
 		// 		container.style.backgroundColor = '';
-		// 		const dropHandler = this.instantiationService.createInstance(ResourcesDropHandler, { allowWorkspaceOpen: true });
-		// 		dropHandler.handleDrop(e, () => undefined, () => undefined);
+		// 		const dropHandler = this.instantiationService.createInstance(ResourcesDropHandler, { allowWorkspaceOpen: !isWeb || isTemporaryWorkspace(this.contextService.getWorkspace()) });
+		// 		dropHandler.handleDrop(e, getWindow(container));
 		// 	},
 		// 	onDragEnter: () => {
 		// 		const color = this.themeService.getColorTheme().getColor(listDropBackground);
@@ -85,10 +87,19 @@ export class EmptyView extends ViewPane {
 	}
 
 	private refreshTitle(): void {
+		if (this._disposed) {
+			return;
+		}
+
 		if (this.contextService.getWorkbenchState() === WorkbenchState.WORKSPACE) {
-			this.updateTitle(EmptyView.NAME);
+			this.updateTitle(EmptyView.NAME.value);
 		} else {
 			this.updateTitle(this.title);
 		}
+	}
+
+	override dispose(): void {
+		this._disposed = true;
+		super.dispose();
 	}
 }

@@ -24,11 +24,10 @@ function code() {
 		CODE=".build/electron/$NAME"
 	fi
 
-	# Node modules
-	test -d node_modules || yarn
-
-	# Get electron
-	yarn electron
+	# Get electron, compile, built-in extensions
+	if [[ -z "${VSCODE_SKIP_PRELAUNCH}" ]]; then
+		node build/lib/preLaunch.js
+	fi
 
 	# Manage built-in extensions
 	if [[ "$1" == "--builtin" ]]; then
@@ -36,27 +35,20 @@ function code() {
 		return
 	fi
 
-	# Sync built-in extensions
-	node build/lib/builtInExtensions.js
-
-	# Build
-	test -d out || yarn compile
-
 	# Configuration
 	export NODE_ENV=development
 	export VSCODE_DEV=1
 	export VSCODE_CLI=1
 	export ELECTRON_ENABLE_STACK_DUMPING=1
 	export ELECTRON_ENABLE_LOGGING=1
-	export VSCODE_LOGS=
 
 	# Launch Code
-	exec "$CODE" . --no-sandbox "$@"
+	exec "$CODE" . "$@"
 }
 
 function code-wsl()
 {
-	HOST_IP=$(powershell.exe –noprofile -Command "& {(Get-NetIPAddress | Where-Object {\$_.InterfaceAlias -like '*WSL*' -and \$_.AddressFamily -eq 'IPv4'}).IPAddress | Write-Host -NoNewline}")
+	HOST_IP=$(echo "" | powershell.exe -noprofile -Command "& {(Get-NetIPAddress | Where-Object {\$_.InterfaceAlias -like '*WSL*' -and \$_.AddressFamily -eq 'IPv4'}).IPAddress | Write-Host -NoNewline}")
 	export DISPLAY="$HOST_IP:0"
 
 	# in a wsl shell
@@ -66,10 +58,10 @@ function code-wsl()
 	if [ -f "$ELECTRON"  ]; then
 		local CWD=$(pwd)
 		cd $ROOT
-		export WSLENV=ELECTRON_RUN_AS_NODE/w:$WSLENV
+		export WSLENV=ELECTRON_RUN_AS_NODE/w:VSCODE_DEV/w:$WSLENV
 		local WSL_EXT_ID="ms-vscode-remote.remote-wsl"
 		# AGPL
-		local WSL_EXT_WLOC=$(ELECTRON_RUN_AS_NODE=1 "$ROOT/.build/electron/CodemerxDecompile.exe" "out/cli.js" --locate-extension $WSL_EXT_ID)
+		local WSL_EXT_WLOC=$(echo "" | VSCODE_DEV=1 ELECTRON_RUN_AS_NODE=1 "$ROOT/.build/electron/CodemerxDecompile.exe" "out/cli.js" --ms-enable-electron-run-as-node --locate-extension $WSL_EXT_ID)
 		# End AGPL
 		cd $CWD
 		if [ -n "$WSL_EXT_WLOC" ]; then
@@ -83,7 +75,18 @@ function code-wsl()
 	fi
 }
 
-if ! [ -z ${IN_WSL+x} ]; then
+if [ "$IN_WSL" == "true" ] && [ -z "$DISPLAY" ]; then
 	code-wsl "$@"
+elif [ -f /mnt/wslg/versions.txt ]; then
+	code --disable-gpu "$@"
+elif [ -f /.dockerenv ]; then
+	# Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1263267
+	# Chromium does not release shared memory when streaming scripts
+	# which might exhaust the available resources in the container environment
+	# leading to failed script loading.
+	code --disable-dev-shm-usage "$@"
+else
+	code "$@"
 fi
-code "$@"
+
+exit $?

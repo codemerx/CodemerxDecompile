@@ -1,8 +1,8 @@
 {
 	"$schema": "vscode://schemas/color-theme",
-	"name": "Light+ (default light)",
+	"name": "Light+",
 	"include": "./light_vs.json",
-	"tokenColors": [
+	"tokenColors": [ // adds rules to the light vs rules
 		{
 			"name": "Function declarations",
 			"scope": [
@@ -19,7 +19,6 @@
 		{
 			"name": "Types declaration and references",
 			"scope": [
-				"meta.return-type",
 				"support.class",
 				"support.type",
 				"entity.name.type",
@@ -78,6 +77,7 @@
 				"source.cpp keyword.operator.new",
 				"source.cpp keyword.operator.delete",
 				"keyword.other.using",
+				"keyword.other.directive.using",
 				"keyword.other.operator",
 				"entity.name.operator"
 			],
@@ -91,7 +91,9 @@
 				"variable",
 				"meta.definition.variable.name",
 				"support.variable",
-				"entity.name.variable"
+				"entity.name.variable",
+				"constant.other.placeholder", // placeholders in strings
+
 			],
 			"settings": {
 				"foreground": "#001080"
@@ -173,7 +175,10 @@
 			}
 		},
 		{
-			"scope": "constant.character",
+			"scope": [
+				"constant.character",
+				"constant.other.option"
+			],
 			"settings": {
 				"foreground": "#0000ff"
 			}
@@ -191,6 +196,7 @@
 			}
 		}
 	],
+	"semanticHighlighting": true,
 	"semanticTokenColors": {
 		"newOperator": "#AF00DB",
 		"stringLiteral": "#a31515",

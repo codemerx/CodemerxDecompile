@@ -18,7 +18,7 @@ import { Registry } from 'vs/platform/registry/common/platform';
 import { IDecompilationService } from 'vs/cd/workbench/DecompilationService';
 import { IWorkbenchContributionsRegistry, IWorkbenchContribution, Extensions as WorkbenchExtensions } from 'vs/workbench/common/contributions';
 import { Disposable } from 'vs/base/common/lifecycle';
-import { LifecyclePhase } from 'vs/platform/lifecycle/common/lifecycle';
+import { LifecyclePhase } from 'vs/workbench/services/lifecycle/common/lifecycle';
 import { IProgressService, ProgressLocation } from 'vs/platform/progress/common/progress';
 import { IFileService } from 'vs/platform/files/common/files';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
@@ -36,7 +36,7 @@ class DecompilationStateInitializer extends Disposable implements IWorkbenchCont
 	}
 
 	private initialize() : void {
-		this.progressService.withProgress({ location: ProgressLocation.Dialog, nonClosable: true }, async progress => {
+		this.progressService.withProgress({ location: ProgressLocation.Dialog, sticky: true }, async progress => {
 			progress.report({ message: 'Restoring workspace...'});
 
 			await this.decompilationService.restoreDecompilationContext();

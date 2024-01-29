@@ -15,8 +15,8 @@
 //    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-import { IMainProcessService } from 'vs/platform/ipc/electron-sandbox/mainProcessService';
-import { createChannelSender } from 'vs/base/parts/ipc/common/ipc';
+import { IMainProcessService } from 'vs/platform/ipc/common/mainProcessService';
+import { ProxyChannel } from 'vs/base/parts/ipc/common/ipc';
 
 export const IGrpcService = createDecorator<IGrpcService>('IGrpcService');
 
@@ -30,6 +30,6 @@ export class GrpcService {
 	readonly _serviceBrand: undefined;
 
 	constructor(@IMainProcessService mainProcessService: IMainProcessService) {
-		return createChannelSender<IGrpcService>(mainProcessService.getChannel('grpc'));
+		return ProxyChannel.toService<IGrpcService>(mainProcessService.getChannel('grpc'));
 	}
 }

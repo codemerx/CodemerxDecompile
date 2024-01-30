@@ -15,6 +15,12 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <TreeView ItemsSource="{Binding Nodes}">
+        <TreeView.ItemTemplate>
+            <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+                <TextBlock Text="{Binding Title}"/>
+            </TreeDataTemplate>
+        </TreeView.ItemTemplate>
+    </TreeView>
 
 </Window>

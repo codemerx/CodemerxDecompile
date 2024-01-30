@@ -3,6 +3,7 @@
         xmlns:vm="using:CodemerxDecompile.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CodemerxDecompile.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -31,9 +32,12 @@
             </TreeView.ItemTemplate>
         </TreeView>
         
-        <TextBlock Grid.Column="1"
-                   Text="{Binding SourceCode}">
-        </TextBlock>
+        <avaloniaEdit:TextEditor Grid.Column="1"
+                                 Name="TextEditor"
+                                 Document="{Binding Document}"
+                                 ShowLineNumbers="True"
+                                 FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                 IsReadOnly="True" />
     </Grid>
 
 </Window>

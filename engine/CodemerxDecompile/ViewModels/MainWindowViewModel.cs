@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mono.Cecil;
 using Telerik.JustDecompiler.Decompiler;
@@ -18,7 +19,7 @@ public partial class MainWindowViewModel : ObservableObject
     private Node? selectedNode;
 
     [ObservableProperty]
-    private string? sourceCode;
+    private TextDocument? document;
     
     public MainWindowViewModel()
     {
@@ -61,11 +62,11 @@ public partial class MainWindowViewModel : ObservableObject
             var writerSettings = new WriterSettings();
             var writer = language.GetWriter(new PlainTextFormatter(stringWriter), new SimpleExceptionFormatter(), writerSettings);
             writer.Write(value.TypeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
-            SourceCode = stringBuilder.ToString();
+            Document = new TextDocument(stringBuilder.ToString());
         }
         else
         {
-            SourceCode = string.Empty;
+            Document = null;
         }
     }
 

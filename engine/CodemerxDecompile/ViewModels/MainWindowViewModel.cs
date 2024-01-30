@@ -61,7 +61,7 @@ public partial class MainWindowViewModel : ObservableObject
             var stringWriter = new StringWriter(stringBuilder);
             var writerSettings = new WriterSettings();
             var writer = language.GetWriter(new PlainTextFormatter(stringWriter), new SimpleExceptionFormatter(), writerSettings);
-            writer.Write(value.TypeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
+            (writer as NamespaceImperativeLanguageWriter).WriteTypeAndNamespaces(value.TypeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
             Document = new TextDocument(stringBuilder.ToString());
         }
         else

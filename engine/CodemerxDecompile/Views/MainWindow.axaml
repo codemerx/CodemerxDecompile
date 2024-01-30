@@ -15,12 +15,25 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TreeView ItemsSource="{Binding Nodes}">
-        <TreeView.ItemTemplate>
-            <TreeDataTemplate ItemsSource="{Binding SubNodes}">
-                <TextBlock Text="{Binding Title}"/>
-            </TreeDataTemplate>
-        </TreeView.ItemTemplate>
-    </TreeView>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <TreeView ItemsSource="{Binding Nodes}"
+                  SelectionMode="Single"
+                  SelectedItem="{Binding SelectedNode}">
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+                    <TextBlock Text="{Binding Title}"/>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        
+        <TextBlock Grid.Column="1"
+                   Text="{Binding SourceCode}">
+        </TextBlock>
+    </Grid>
 
 </Window>

@@ -15,6 +15,18 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
+    
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="Load assembly">
+                <NativeMenu>
+                    <NativeMenuItem Header="From file"
+                                    Command="{Binding OpenFileCommand}" />
+                                    <!-- TODO: Add shortcut/gesture -->
+                </NativeMenu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
 
     <Grid>
         <Grid.ColumnDefinitions>

@@ -2,8 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mono.Cecil;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.Caching;
@@ -20,17 +24,27 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private TextDocument? document;
-    
-    public MainWindowViewModel()
+
+    public ObservableCollection<Node> Nodes { get; } = new();
+
+    [RelayCommand]
+    private async Task OpenFile()
     {
-        var assembly = Utilities.GetAssembly(
-            "/Users/alexander/work/codemerx/CodemerxDecompile/engine/JustDecompiler.NetStandard/bin/Debug/netstandard2.0/JustDecompiler.NetStandard.dll");
-        var types = assembly.MainModule.GetTypes();
-        var groupedByNamespace = types.GroupBy(t => t.Namespace);
-        
-        Nodes = new ObservableCollection<Node>
+        var storageProvider = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow.StorageProvider;
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
-            new()
+            Title = "Load assemblies",
+            AllowMultiple = true
+            // TODO: Add file type filter
+        });
+
+        foreach (var file in files)
+        {
+            var assembly = Utilities.GetAssembly(file.Path.AbsolutePath);
+            var types = assembly.MainModule.GetTypes();
+            var groupedByNamespace = types.GroupBy(t => t.Namespace);
+        
+            Nodes.Add(new()
             {
                 Title = assembly.Name.Name,
                 SubNodes = new ObservableCollection<Node>(
@@ -46,11 +60,9 @@ public partial class MainWindowViewModel : ObservableObject
                         )
                     })
                 )
-            }
-        };
+            });
+        }
     }
-    
-    public ObservableCollection<Node> Nodes { get; }
 
     partial void OnSelectedNodeChanged(Node? value)
     {

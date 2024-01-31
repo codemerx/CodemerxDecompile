@@ -51,7 +51,6 @@
         
         <avaloniaEdit:TextEditor Grid.Column="2"
                                  Name="TextEditor"
-                                 Document="{Binding Document}"
                                  ShowLineNumbers="True"
                                  FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
                                  IsReadOnly="True" />

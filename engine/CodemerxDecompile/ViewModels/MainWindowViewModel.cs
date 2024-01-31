@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
-using AvaloniaEdit.Document;
+using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mono.Cecil;
@@ -19,18 +19,18 @@ namespace CodemerxDecompile.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    private TypeDefinition? currentTypeDefinition;
+    private WritingInfo? currentWritingInfo;
+    
     [ObservableProperty]
     private Node? selectedNode;
-
-    [ObservableProperty]
-    private TextDocument? document;
 
     public ObservableCollection<Node> Nodes { get; } = new();
 
     [RelayCommand]
     private async Task OpenFile()
     {
-        var storageProvider = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).MainWindow.StorageProvider;
+        var storageProvider = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!.StorageProvider;
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             Title = "Load assemblies",
@@ -55,7 +55,14 @@ public partial class MainWindowViewModel : ObservableObject
                             g.Select(t => new Node
                             {
                                 Title = t.Name,
-                                TypeDefinition = t
+                                MemberDefinition = t,
+                                SubNodes = new ObservableCollection<Node>(
+                                    Utilities.GetTypeMembers(t, LanguageFactory.GetLanguage(CSharpVersion.V7)).Select(m => new Node()
+                                    {
+                                        Title = m.Name,
+                                        MemberDefinition = m
+                                    })
+                                )
                             })
                         )
                     })
@@ -72,26 +79,45 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedNodeChanged(Node? value)
     {
-        if (value is { TypeDefinition: not null })
+        var textEditor = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!.TextEditor;
+        
+        if (value is null or { MemberDefinition: null })
+        {
+            textEditor.Document.Text = string.Empty;
+            currentTypeDefinition = null;
+            currentWritingInfo = null;
+            return;
+        }
+
+        var typeDefinition = value switch
+        {
+            { MemberDefinition: TypeDefinition typeDef } => typeDef,
+            _ => value.MemberDefinition.DeclaringType
+        };
+
+        if (typeDefinition != currentTypeDefinition)
         {
             var language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             var stringBuilder = new StringBuilder();
             var stringWriter = new StringWriter(stringBuilder);
             var writerSettings = new WriterSettings();
             var writer = language.GetWriter(new PlainTextFormatter(stringWriter), new SimpleExceptionFormatter(), writerSettings);
-            (writer as NamespaceImperativeLanguageWriter).WriteTypeAndNamespaces(value.TypeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
-            Document = new TextDocument(stringBuilder.ToString());
+            var writingInfos = (writer as NamespaceImperativeLanguageWriter)!.WriteTypeAndNamespaces(typeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
+
+            textEditor.Document.Text = stringBuilder.ToString();
+            currentTypeDefinition = typeDefinition;
+            currentWritingInfo = writingInfos[0];
         }
-        else
-        {
-            Document = null;
-        }
+
+        var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[value.MemberDefinition];
+        textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
+        textEditor.ScrollToLine(textEditor.Document!.GetLocation(codePosition.StartOffset).Line);
     }
 
     public class Node
     {
         public required string Title { get; init; }
         public ObservableCollection<Node>? SubNodes { get; init; }
-        public TypeDefinition? TypeDefinition { get; init; }
+        public IMemberDefinition? MemberDefinition { get; init; }
     }
 }

@@ -36,6 +36,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Decompiler.Tests, PublicKey=002400000480000094000000060200000024000052534131000400000100010001be52ebf131facc15d6b5893afa9799462506e031d439d70017b9c1a87147029ee619e119d71f63222c25f0910b4a2f77d6635b110a2229375e3e1e23f337eca02258c497263d9d1191af05fff461d222da5fbf2552031dca79a5341f7e00582af029c9b0d14ba113e35180fcbab106ac896c9e902dff8a76b14535218cabb0")]
 #else
 [assembly: InternalsVisibleTo("ConsoleRunner")]
+[assembly: InternalsVisibleTo("ConsoleRunnerDotNet6")]
 [assembly: InternalsVisibleTo("Decompiler.Tests")]
 /* End AGPL */
 #endif

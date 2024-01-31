@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConsoleRunnerDotNet6": {
+      "commandName": "Project",
+      "commandLineArgs": "/target:.\test\\Sample3.dll /out:.\test\\out\\"
+    }
+  }
+}

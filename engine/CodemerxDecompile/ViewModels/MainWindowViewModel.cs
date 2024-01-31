@@ -64,6 +64,12 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private void ClearAssemblyList()
+    {
+        Nodes.Clear();
+    }
+
     partial void OnSelectedNodeChanged(Node? value)
     {
         if (value is { TypeDefinition: not null })

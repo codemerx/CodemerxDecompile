@@ -25,6 +25,12 @@
                                     <!-- TODO: Add shortcut/gesture -->
                 </NativeMenu>
             </NativeMenuItem>
+            <NativeMenuItem Header="Assembly list">
+                <NativeMenu>
+                    <NativeMenuItem Header="Clear"
+                                    Command="{Binding ClearAssemblyListCommand}" />
+                </NativeMenu>
+            </NativeMenuItem>
         </NativeMenu>
     </NativeMenu.Menu>
 

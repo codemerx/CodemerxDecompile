@@ -13,6 +13,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = App.Current.Services.GetService<MainWindowViewModel>();
 
+        // TODO: Switch editor theme according with app theme
         var registryOptions = new RegistryOptions(ThemeName.DarkPlus);
         var installation = TextEditor.InstallTextMate(registryOptions);
         installation.SetGrammar(registryOptions.GetScopeByLanguageId(registryOptions.GetLanguageByExtension(".cs").Id));

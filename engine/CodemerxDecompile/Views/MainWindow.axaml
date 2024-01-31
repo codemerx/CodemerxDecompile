@@ -34,12 +34,7 @@
         </NativeMenu>
     </NativeMenu.Menu>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        
+    <Grid ColumnDefinitions="*, 4, 2*">
         <TreeView ItemsSource="{Binding Nodes}"
                   SelectionMode="Single"
                   SelectedItem="{Binding SelectedNode}">
@@ -50,7 +45,11 @@
             </TreeView.ItemTemplate>
         </TreeView>
         
-        <avaloniaEdit:TextEditor Grid.Column="1"
+        <GridSplitter Grid.Column="1"
+                      Background="Transparent"
+                      ResizeDirection="Columns" />
+        
+        <avaloniaEdit:TextEditor Grid.Column="2"
                                  Name="TextEditor"
                                  Document="{Binding Document}"
                                  ShowLineNumbers="True"

@@ -33,7 +33,7 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        services.AddTransient<MainWindowViewModel>();
+        services.AddSingleton<MainWindowViewModel>();
 
         return services.BuildServiceProvider();
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,7 @@ namespace CodemerxDecompile.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    private readonly Dictionary<IMemberDefinition, Node> MemberDefinitionToNodeMap = new();
     private TypeDefinition? currentTypeDefinition;
     private WritingInfo? currentWritingInfo;
     
@@ -26,6 +28,11 @@ public partial class MainWindowViewModel : ObservableObject
     private Node? selectedNode;
 
     public ObservableCollection<Node> Nodes { get; } = new();
+
+    internal void SelectNodeByMemberDefinition(IMemberDefinition memberDefinition)
+    {
+        SelectedNode = MemberDefinitionToNodeMap[memberDefinition];
+    }
 
     [RelayCommand]
     private async Task OpenFile()
@@ -43,30 +50,46 @@ public partial class MainWindowViewModel : ObservableObject
             var assembly = Utilities.GetAssembly(file.Path.AbsolutePath);
             var types = assembly.MainModule.GetTypes();
             var groupedByNamespace = types.GroupBy(t => t.Namespace);
-        
-            Nodes.Add(new()
+
+            var namespaceNodes = new ObservableCollection<Node>();
+            foreach (var namespaceGroup in groupedByNamespace)
+            {
+                var typeNodes = new ObservableCollection<Node>();
+                foreach (var type in namespaceGroup)
+                {
+                    var memberNodes = new ObservableCollection<Node>();
+                    foreach (var member in Utilities.GetTypeMembers(type, LanguageFactory.GetLanguage(CSharpVersion.V7)))
+                    {
+                        var memberNode = new Node
+                        {
+                            Title = member.Name,
+                            MemberDefinition = member
+                        };
+                        memberNodes.Add(memberNode);
+                        MemberDefinitionToNodeMap.Add(member, memberNode);
+                    }
+                    
+                    var typeNode = new Node
+                    {
+                        Title = type.Name,
+                        MemberDefinition = type,
+                        SubNodes = memberNodes
+                    };
+                    typeNodes.Add(typeNode);
+                    MemberDefinitionToNodeMap.Add(type, typeNode);
+                }
+                
+                namespaceNodes.Add(new Node
+                {
+                    Title = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
+                    SubNodes = typeNodes
+                });
+            }
+
+            Nodes.Add(new Node
             {
                 Title = assembly.Name.Name,
-                SubNodes = new ObservableCollection<Node>(
-                    groupedByNamespace.Select(g => new Node
-                    {
-                        Title = g.Key == string.Empty ? "<Default namespace>" : g.Key,
-                        SubNodes = new ObservableCollection<Node>(
-                            g.Select(t => new Node
-                            {
-                                Title = t.Name,
-                                MemberDefinition = t,
-                                SubNodes = new ObservableCollection<Node>(
-                                    Utilities.GetTypeMembers(t, LanguageFactory.GetLanguage(CSharpVersion.V7)).Select(m => new Node()
-                                    {
-                                        Title = m.Name,
-                                        MemberDefinition = m
-                                    })
-                                )
-                            })
-                        )
-                    })
-                )
+                SubNodes = namespaceNodes
             });
         }
     }
@@ -79,7 +102,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedNodeChanged(Node? value)
     {
-        var textEditor = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!.TextEditor;
+        var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+        var textEditor = mainWindow.TextEditor;
         
         if (value is null or { MemberDefinition: null })
         {
@@ -107,6 +131,18 @@ public partial class MainWindowViewModel : ObservableObject
             textEditor.Document.Text = stringBuilder.ToString();
             currentTypeDefinition = typeDefinition;
             currentWritingInfo = writingInfos[0];
+
+            MainWindow.references.Clear();
+            foreach (var kvp in currentWritingInfo.MemberDeclarationToCodePostionMap)
+            {
+                MainWindow.references.Add(new ReferenceTextSegment
+                {
+                    StartOffset = kvp.Value.StartOffset,
+                    EndOffset = kvp.Value.EndOffset,
+                    Length = kvp.Value.EndOffset - kvp.Value.StartOffset + 1, // TODO: Figure out why we need +1 here
+                    MemberDefinition = kvp.Key
+                });
+            }
         }
 
         var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[value.MemberDefinition];

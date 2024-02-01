@@ -1,47 +1,43 @@
 using Piranha;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Piranha.Cache
 {
 	public class SimpleCache : ICache
 	{
-		private readonly IDictionary<string, object> _cache;
+		private readonly IDictionary<string, object> _cache = new ConcurrentDictionary<string, object>();
 
 		private readonly bool _clone;
 
 		public SimpleCache(bool clone = true)
 		{
-			this._cache = new ConcurrentDictionary<string, object>();
-			base();
 			this._clone = clone;
-			return;
 		}
 
 		public T Get<T>(string key)
 		{
-			if (!this._cache.TryGetValue(key, out V_0))
+			object obj;
+			if (!this._cache.TryGetValue(key, out obj))
 			{
-				V_1 = default(T);
-				return V_1;
+				return default(T);
 			}
 			if (!this._clone)
 			{
-				return (T)V_0;
+				return (T)obj;
 			}
-			return Utils.DeepClone<T>((T)V_0);
+			return Utils.DeepClone<T>((T)obj);
 		}
 
 		public void Remove(string key)
 		{
-			dummyVar0 = this._cache.Remove(key);
-			return;
+			this._cache.Remove(key);
 		}
 
 		public void Set<T>(string key, T value)
 		{
-			this._cache.set_Item(key, value);
-			return;
+			this._cache[key] = value;
 		}
 	}
 }

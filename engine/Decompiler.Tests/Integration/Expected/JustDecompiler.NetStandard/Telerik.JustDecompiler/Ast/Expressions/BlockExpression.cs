@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -15,9 +16,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new BlockExpression.u003cget_Childrenu003ed__3(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				BlockExpression blockExpression = null;
+				foreach (ICodeNode expression in blockExpression.Expressions)
+				{
+					yield return expression;
+				}
 			}
 		}
 
@@ -25,7 +28,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 18;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.BlockExpression;
 			}
 		}
 
@@ -55,36 +58,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public BlockExpression(IEnumerable<Instruction> instructions)
+		public BlockExpression(IEnumerable<Instruction> instructions) : this(new ExpressionCollection(), instructions)
 		{
-			this(new ExpressionCollection(), instructions);
-			return;
 		}
 
-		public BlockExpression(ExpressionCollection expressions, IEnumerable<Instruction> instructions)
+		public BlockExpression(ExpressionCollection expressions, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expressions(expressions);
-			return;
+			this.Expressions = expressions;
 		}
 
 		public override Expression Clone()
 		{
-			return new BlockExpression(this.get_Expressions().Clone(), this.instructions);
+			return new BlockExpression(this.Expressions.Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new BlockExpression(this.get_Expressions().CloneExpressionsOnly(), null);
+			return new BlockExpression(this.Expressions.CloneExpressionsOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as BlockExpression == null)
+			if (!(other is BlockExpression))
 			{
 				return false;
 			}
-			return this.get_Expressions().Equals((other as BlockExpression).get_Expressions());
+			return this.Expressions.Equals((other as BlockExpression).Expressions);
 		}
 	}
 }

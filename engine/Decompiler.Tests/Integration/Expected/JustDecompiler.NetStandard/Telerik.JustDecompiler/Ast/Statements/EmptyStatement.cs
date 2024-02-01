@@ -13,7 +13,6 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return new EmptyStatement.u003cget_Childrenu003ed__1(-2);
 			}
 		}
 
@@ -21,14 +20,12 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 58;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.EmptyStatement;
 			}
 		}
 
 		public EmptyStatement()
 		{
-			base();
-			return;
 		}
 
 		public override Statement Clone()
@@ -38,9 +35,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new EmptyStatement();
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			EmptyStatement emptyStatement = new EmptyStatement();
+			base.CopyParentAndLabel(emptyStatement);
+			return emptyStatement;
 		}
 	}
 }

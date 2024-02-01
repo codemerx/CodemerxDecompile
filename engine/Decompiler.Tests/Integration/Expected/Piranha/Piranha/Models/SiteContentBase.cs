@@ -7,8 +7,6 @@ namespace Piranha.Models
 	{
 		protected SiteContentBase()
 		{
-			base();
-			return;
 		}
 	}
 }

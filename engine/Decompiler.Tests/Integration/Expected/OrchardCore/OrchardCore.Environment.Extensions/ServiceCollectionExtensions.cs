@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -14,11 +15,11 @@ namespace OrchardCore.Environment.Extensions
 
 		public static IServiceCollection AddExtensionManagerHost(this IServiceCollection services)
 		{
-			dummyVar0 = ServiceCollectionServiceExtensions.AddSingleton<IExtensionManager, ExtensionManager>(services);
-			dummyVar1 = ServiceCollectionServiceExtensions.AddSingleton<ITypeFeatureProvider, TypeFeatureProvider>(services);
-			dummyVar2 = ServiceCollectionServiceExtensions.AddSingleton<IFeaturesProvider, FeaturesProvider>(services);
-			dummyVar3 = ServiceCollectionServiceExtensions.AddSingleton<IExtensionDependencyStrategy, ExtensionDependencyStrategy>(services);
-			dummyVar4 = ServiceCollectionServiceExtensions.AddSingleton<IExtensionPriorityStrategy, ExtensionPriorityStrategy>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IExtensionManager, ExtensionManager>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<ITypeFeatureProvider, TypeFeatureProvider>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IFeaturesProvider, FeaturesProvider>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IExtensionDependencyStrategy, ExtensionDependencyStrategy>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IExtensionPriorityStrategy, ExtensionPriorityStrategy>(services);
 			return services;
 		}
 	}

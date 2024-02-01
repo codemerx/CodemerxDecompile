@@ -14,8 +14,6 @@ namespace Piranha.Runtime
 
 		public AppModule()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -12,104 +12,101 @@ namespace Mix.Cms.Messenger.Migrations
 	{
 		public MixChatServiceContextModelSnapshot()
 		{
-			base();
-			return;
 		}
 
 		protected override void BuildModel(ModelBuilder modelBuilder)
 		{
-			dummyVar0 = modelBuilder.HasAnnotation("ProductVersion", "2.1.4-rtm-31024");
-			stackVariable4 = modelBuilder;
-			stackVariable6 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_0;
-			if (stackVariable6 == null)
-			{
-				dummyVar1 = stackVariable6;
-				stackVariable6 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_0);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_0 = stackVariable6;
-			}
-			dummyVar2 = stackVariable4.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom", stackVariable6);
-			stackVariable8 = modelBuilder;
-			stackVariable10 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_1;
-			if (stackVariable10 == null)
-			{
-				dummyVar3 = stackVariable10;
-				stackVariable10 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_1);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_1 = stackVariable10;
-			}
-			dummyVar4 = stackVariable8.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerMessage", stackVariable10);
-			stackVariable12 = modelBuilder;
-			stackVariable14 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_2;
-			if (stackVariable14 == null)
-			{
-				dummyVar5 = stackVariable14;
-				stackVariable14 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_2);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_2 = stackVariable14;
-			}
-			dummyVar6 = stackVariable12.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser", stackVariable14);
-			stackVariable16 = modelBuilder;
-			stackVariable18 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_3;
-			if (stackVariable18 == null)
-			{
-				dummyVar7 = stackVariable18;
-				stackVariable18 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_3);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_3 = stackVariable18;
-			}
-			dummyVar8 = stackVariable16.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser", stackVariable18);
-			stackVariable20 = modelBuilder;
-			stackVariable22 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_4;
-			if (stackVariable22 == null)
-			{
-				dummyVar9 = stackVariable22;
-				stackVariable22 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_4);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_4 = stackVariable22;
-			}
-			dummyVar10 = stackVariable20.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerTeam", stackVariable22);
-			stackVariable24 = modelBuilder;
-			stackVariable26 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_5;
-			if (stackVariable26 == null)
-			{
-				dummyVar11 = stackVariable26;
-				stackVariable26 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_5);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_5 = stackVariable26;
-			}
-			dummyVar12 = stackVariable24.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerUser", stackVariable26);
-			stackVariable28 = modelBuilder;
-			stackVariable30 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_6;
-			if (stackVariable30 == null)
-			{
-				dummyVar13 = stackVariable30;
-				stackVariable30 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_6);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_6 = stackVariable30;
-			}
-			dummyVar14 = stackVariable28.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerUserDevice", stackVariable30);
-			stackVariable32 = modelBuilder;
-			stackVariable34 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_7;
-			if (stackVariable34 == null)
-			{
-				dummyVar15 = stackVariable34;
-				stackVariable34 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_7);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_7 = stackVariable34;
-			}
-			dummyVar16 = stackVariable32.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerMessage", stackVariable34);
-			stackVariable36 = modelBuilder;
-			stackVariable38 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_8;
-			if (stackVariable38 == null)
-			{
-				dummyVar17 = stackVariable38;
-				stackVariable38 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_8);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_8 = stackVariable38;
-			}
-			dummyVar18 = stackVariable36.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser", stackVariable38);
-			stackVariable40 = modelBuilder;
-			stackVariable42 = MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_9;
-			if (stackVariable42 == null)
-			{
-				dummyVar19 = stackVariable42;
-				stackVariable42 = new Action<EntityTypeBuilder>(MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9.u003cBuildModelu003eb__0_9);
-				MixChatServiceContextModelSnapshot.u003cu003ec.u003cu003e9__0_9 = stackVariable42;
-			}
-			dummyVar20 = stackVariable40.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser", stackVariable42);
-			return;
+			modelBuilder.HasAnnotation("ProductVersion", "2.1.4-rtm-31024");
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom", (EntityTypeBuilder b) => {
+				b.Property<Guid>("Id");
+				b.Property<string>("Avatar").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDate"), "datetime");
+				b.Property<string>("Description");
+				b.Property<string>("HostId").HasMaxLength(128);
+				b.Property<bool>("IsOpen");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				b.Property<string>("Name").IsRequired(true).HasMaxLength(50);
+				b.Property<int?>("TeamId");
+				b.Property<string>("Title").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_hub_room");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerMessage", (EntityTypeBuilder b) => {
+				b.Property<Guid>("Id");
+				b.Property<string>("Content");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDate"), "datetime");
+				b.Property<Guid?>("RoomId");
+				b.Property<int?>("TeamId");
+				b.Property<string>("UserId").HasMaxLength(50);
+				b.HasKey(new string[] { "Id" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "RoomId" }), "IX_messenger_message_RoomId");
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "TeamId" }), "IX_messenger_message_TeamId");
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "UserId" }), "IX_messenger_message_UserId");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_message");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser", (EntityTypeBuilder b) => {
+				b.Property<Guid>("RoomId");
+				b.Property<string>("UserId").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("JoinedDate"), "datetime");
+				b.HasKey(new string[] { "RoomId", "UserId" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "UserId" }), "IX_messenger_nav_room_user_UserId");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_nav_room_user");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser", (EntityTypeBuilder b) => {
+				b.Property<int>("TeamId");
+				b.Property<string>("UserId").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("JoinedDate"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				b.Property<int>("Status");
+				b.HasKey(new string[] { "TeamId", "UserId" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "UserId" }), "IX_messenger_nav_team_user_UserId");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_nav_team_user");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerTeam", (EntityTypeBuilder b) => {
+				b.Property<int>("Id");
+				b.Property<string>("Avatar").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDate"), "datetime");
+				b.Property<string>("HostId").HasMaxLength(128);
+				b.Property<bool?>("IsOpen").ValueGeneratedOnAdd();
+				b.Property<string>("Name").IsRequired(true).HasMaxLength(250);
+				b.Property<int>("Type");
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_team");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerUser", (EntityTypeBuilder b) => {
+				b.Property<string>("Id").HasMaxLength(50);
+				b.Property<string>("Avatar").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDate"), "datetime");
+				b.Property<string>("FacebookId").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				b.Property<string>("Name").IsRequired(true).HasMaxLength(250);
+				b.Property<int>("Status").ValueGeneratedOnAdd();
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_user");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerUserDevice", (EntityTypeBuilder b) => {
+				b.Property<string>("UserId").HasMaxLength(50);
+				b.Property<string>("DeviceId").HasMaxLength(50);
+				b.Property<string>("ConnectionId").IsRequired(true).HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("EndDate"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("StartDate"), "datetime");
+				b.Property<int>("Status");
+				b.HasKey(new string[] { "UserId", "DeviceId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_messenger_user_device");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerMessage", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom", "Room").WithMany("MixMessengerMessage").HasForeignKey(new string[] { "RoomId" }), "FK_messenger_message_messenger_hub_room");
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerTeam", "Team").WithMany("MixMessengerMessage").HasForeignKey(new string[] { "TeamId" }), "FK_messenger_message_messenger_team");
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerUser", "User").WithMany("MixMessengerMessage").HasForeignKey(new string[] { "UserId" }), "FK_messenger_message_messenger_user");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerHubRoom", "Room").WithMany("MixMessengerNavRoomUser").HasForeignKey(new string[] { "RoomId" }), "FK_messenger_nav_room_user_messenger_hub_room");
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerUser", "User").WithMany("MixMessengerNavRoomUser").HasForeignKey(new string[] { "UserId" }), "FK_messenger_nav_room_user_messenger_user");
+			});
+			modelBuilder.Entity("Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerTeam", "Team").WithMany("MixMessengerNavTeamUser").HasForeignKey(new string[] { "TeamId" }), "FK_messenger_nav_team_user_messenger_team");
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Messenger.Models.Data.MixMessengerUser", "User").WithMany("MixMessengerNavTeamUser").HasForeignKey(new string[] { "UserId" }), "FK_messenger_nav_team_user_messenger_user");
+			});
 		}
 	}
 }

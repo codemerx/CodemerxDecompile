@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace OrchardCore.Localization
@@ -11,17 +12,12 @@ namespace OrchardCore.Localization
 
 		static DefaultLocalizationService()
 		{
-			DefaultLocalizationService.DefaultCulture = Task.FromResult<string>(CultureInfo.get_InstalledUICulture().get_Name());
-			stackVariable4 = new string[1];
-			stackVariable4[0] = CultureInfo.get_InstalledUICulture().get_Name();
-			DefaultLocalizationService.SupportedCultures = Task.FromResult<string[]>(stackVariable4);
-			return;
+			DefaultLocalizationService.DefaultCulture = Task.FromResult<string>(CultureInfo.InstalledUICulture.Name);
+			DefaultLocalizationService.SupportedCultures = Task.FromResult<string[]>(new string[] { CultureInfo.InstalledUICulture.Name });
 		}
 
 		public DefaultLocalizationService()
 		{
-			base();
-			return;
 		}
 
 		public Task<string> GetDefaultCultureAsync()

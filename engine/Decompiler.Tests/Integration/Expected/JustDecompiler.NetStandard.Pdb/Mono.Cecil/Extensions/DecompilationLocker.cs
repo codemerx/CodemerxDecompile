@@ -9,7 +9,6 @@ namespace Mono.Cecil.Extensions
 		static DecompilationLocker()
 		{
 			DecompilationLocker.Lock = new Object();
-			return;
 		}
 	}
 }

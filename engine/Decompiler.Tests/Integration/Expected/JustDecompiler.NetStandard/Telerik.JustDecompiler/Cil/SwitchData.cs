@@ -26,17 +26,13 @@ namespace Telerik.JustDecompiler.Cil
 
 		public SwitchData(InstructionBlock switchBlock, InstructionBlock defaultCase, IList<InstructionBlock> orderedCases)
 		{
-			base();
-			this.set_SwitchBlock(switchBlock);
-			this.set_DefaultCase(defaultCase);
-			this.set_OrderedCasesArray(new InstructionBlock[orderedCases.get_Count()]);
-			V_0 = 0;
-			while (V_0 < orderedCases.get_Count())
+			this.SwitchBlock = switchBlock;
+			this.DefaultCase = defaultCase;
+			this.OrderedCasesArray = new InstructionBlock[orderedCases.Count];
+			for (int i = 0; i < orderedCases.Count; i++)
 			{
-				this.get_OrderedCasesArray()[V_0] = orderedCases.get_Item(V_0);
-				V_0 = V_0 + 1;
+				this.OrderedCasesArray[i] = orderedCases[i];
 			}
-			return;
 		}
 	}
 }

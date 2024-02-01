@@ -1,6 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
+using System.Linq;
 using Telerik.JustDecompiler.Ast;
 
 namespace Telerik.JustDecompiler.Ast.Statements
@@ -13,18 +14,19 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
+				MethodDefinition containingMethod;
 				if (this.cachedInstructionsContainer == null)
 				{
-					V_0 = this.get_UnderlyingSameMethodInstructions().FirstOrDefault<Instruction>();
-					if (V_0 != null)
+					Instruction instruction = base.UnderlyingSameMethodInstructions.FirstOrDefault<Instruction>();
+					if (instruction != null)
 					{
-						stackVariable10 = V_0.get_ContainingMethod();
+						containingMethod = instruction.get_ContainingMethod();
 					}
 					else
 					{
-						stackVariable10 = null;
+						containingMethod = null;
 					}
-					this.cachedInstructionsContainer = stackVariable10;
+					this.cachedInstructionsContainer = containingMethod;
 				}
 				return this.cachedInstructionsContainer;
 			}
@@ -32,8 +34,6 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		protected BasePdbStatement()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -1,8 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Expressions;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.DefineUseAnalysis;
 
@@ -12,29 +14,20 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 	{
 		private HashSet<VariableReference> resolvedVariables;
 
-		public GreedyTypeInferer(DecompilationContext context, Dictionary<int, Expression> offsetToExpression)
+		public GreedyTypeInferer(DecompilationContext context, Dictionary<int, Expression> offsetToExpression) : base(context, offsetToExpression)
 		{
-			base(context, offsetToExpression);
 			this.resolvedVariables = new HashSet<VariableReference>();
-			return;
 		}
 
 		private T First<T>(IEnumerable<T> collection)
 		{
-			V_0 = collection.GetEnumerator();
-			try
+			T current;
+			using (IEnumerator<T> enumerator = collection.GetEnumerator())
 			{
-				dummyVar0 = V_0.MoveNext();
-				V_1 = V_0.get_Current();
+				enumerator.MoveNext();
+				current = enumerator.Current;
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return V_1;
+			return current;
 		}
 
 		private bool FixVariableType(VariableReference variable, TypeReference type)
@@ -44,105 +37,87 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			{
 				return false;
 			}
-			dummyVar0 = this.resolvedVariables.Add(variable);
+			this.resolvedVariables.Add(variable);
 			return true;
 		}
 
 		private IList<VariableReference> GetVariablesToInfer()
 		{
-			V_0 = new List<VariableReference>();
-			V_1 = this.context.get_MethodContext().get_StackData().get_VariableToDefineUseInfo().get_Keys().GetEnumerator();
-			try
+			List<VariableReference> variableReferences = new List<VariableReference>();
+			foreach (VariableDefinition key in this.context.MethodContext.StackData.VariableToDefineUseInfo.Keys)
 			{
-				while (V_1.MoveNext())
+				if (key.get_VariableType() != null)
 				{
-					V_2 = V_1.get_Current();
-					if (V_2.get_VariableType() != null)
-					{
-						dummyVar0 = this.resolvedVariables.Add(V_2);
-					}
-					else
-					{
-						V_0.Add(V_2);
-					}
+					this.resolvedVariables.Add(key);
+				}
+				else
+				{
+					variableReferences.Add(key);
 				}
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return variableReferences;
 		}
 
 		public new HashSet<VariableReference> InferTypes()
 		{
+			TypeReference typeReference;
 			this.resolvedVariables = new HashSet<VariableReference>();
-			V_0 = false;
+			bool flag = false;
 			do
 			{
-				V_0 = false;
-				V_1 = this.GetVariablesToInfer().GetEnumerator();
-				try
+				flag = false;
+				foreach (VariableReference variablesToInfer in this.GetVariablesToInfer())
 				{
-					while (V_1.MoveNext())
+					if (!this.IsOnlyAssignedOnce(variablesToInfer, out typeReference))
 					{
-						V_2 = V_1.get_Current();
-						if (!this.IsOnlyAssignedOnce(V_2, out V_3))
+						if (!this.IsOnlyUsedOnce(variablesToInfer, out typeReference))
 						{
-							if (!this.IsOnlyUsedOnce(V_2, out V_3))
-							{
-								continue;
-							}
-							V_0 = this.FixVariableType(V_2, V_3) | V_0;
+							continue;
 						}
-						else
-						{
-							V_0 = this.FixVariableType(V_2, V_3) | V_0;
-						}
+						flag = this.FixVariableType(variablesToInfer, typeReference) | flag;
 					}
-				}
-				finally
-				{
-					if (V_1 != null)
+					else
 					{
-						V_1.Dispose();
+						flag = this.FixVariableType(variablesToInfer, typeReference) | flag;
 					}
 				}
 			}
-			while (V_0);
+			while (flag);
 			return this.resolvedVariables;
 		}
 
 		private bool IsOnlyAssignedOnce(VariableReference variable, out TypeReference type)
 		{
+			StackVariableDefineUseInfo stackVariableDefineUseInfo;
 			type = null;
-			if (!this.context.get_MethodContext().get_StackData().get_VariableToDefineUseInfo().TryGetValue(variable.Resolve(), out V_0))
+			if (!this.context.MethodContext.StackData.VariableToDefineUseInfo.TryGetValue(variable.Resolve(), out stackVariableDefineUseInfo))
 			{
 				throw new Exception("Define/use info not found.");
 			}
-			if (V_0.get_DefinedAt().get_Count() != 1)
+			if (stackVariableDefineUseInfo.DefinedAt.Count != 1)
 			{
 				return false;
 			}
-			type = this.offsetToExpression.get_Item(this.First<int>(V_0.get_DefinedAt())).get_ExpressionType();
+			type = this.offsetToExpression[this.First<int>(stackVariableDefineUseInfo.DefinedAt)].ExpressionType;
 			return true;
 		}
 
 		private bool IsOnlyUsedOnce(VariableReference variable, out TypeReference type)
 		{
+			StackVariableDefineUseInfo stackVariableDefineUseInfo;
 			type = null;
-			if (!this.context.get_MethodContext().get_StackData().get_VariableToDefineUseInfo().TryGetValue(variable.Resolve(), out V_0))
+			if (!this.context.MethodContext.StackData.VariableToDefineUseInfo.TryGetValue(variable.Resolve(), out stackVariableDefineUseInfo))
 			{
 				throw new Exception("Define/use info not found.");
 			}
-			if (V_0.get_UsedAt().get_Count() != 1)
+			if (stackVariableDefineUseInfo.UsedAt.Count != 1)
 			{
 				return false;
 			}
-			V_1 = this.First<int>(V_0.get_UsedAt());
-			V_2 = new UsedAsTypeHelper(this.context.get_MethodContext());
-			V_3 = this.context.get_MethodContext().get_ControlFlowGraph().get_OffsetToInstruction().get_Item(V_1);
-			type = V_2.GetUseExpressionTypeNode(V_3, this.offsetToExpression.get_Item(V_1), variable);
+			int num = this.First<int>(stackVariableDefineUseInfo.UsedAt);
+			UsedAsTypeHelper usedAsTypeHelper = new UsedAsTypeHelper(this.context.MethodContext);
+			Instruction item = this.context.MethodContext.ControlFlowGraph.OffsetToInstruction[num];
+			type = usedAsTypeHelper.GetUseExpressionTypeNode(item, this.offsetToExpression[num], variable);
 			return true;
 		}
 	}

@@ -13,11 +13,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			private set;
 		}
 
-		public CompilerOptimizedSwitchByStringStatement(Expression condition, IEnumerable<int> loadSwitchValueInstructionOffsets)
+		public CompilerOptimizedSwitchByStringStatement(Expression condition, IEnumerable<int> loadSwitchValueInstructionOffsets) : base(condition, null)
 		{
-			base(condition, null);
-			this.set_LoadSwitchValueInstructionOffsets(loadSwitchValueInstructionOffsets);
-			return;
+			this.LoadSwitchValueInstructionOffsets = loadSwitchValueInstructionOffsets;
 		}
 	}
 }

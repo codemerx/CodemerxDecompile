@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Mono.Cecil.Extensions
@@ -11,6 +12,7 @@ namespace Mono.Cecil.Extensions
 	{
 		public static IEnumerable<Instruction> GetMethodInstructions(this MethodDefinition method)
 		{
+			IEnumerable<Instruction> instructions;
 			if (method == null)
 			{
 				throw new ArgumentNullException("MethodDefinition");
@@ -21,14 +23,13 @@ namespace Mono.Cecil.Extensions
 			}
 			try
 			{
-				V_0 = method.get_Body().get_Instructions();
+				instructions = method.get_Body().get_Instructions();
 			}
 			catch
 			{
-				dummyVar0 = exception_0;
-				V_0 = Enumerable.Empty<Instruction>();
+				instructions = Enumerable.Empty<Instruction>();
 			}
-			return V_0;
+			return instructions;
 		}
 
 		public static MethodDefinition GetMoreVisibleMethod(this MethodDefinition method, MethodDefinition other)
@@ -66,83 +67,81 @@ namespace Mono.Cecil.Extensions
 
 		public static bool HasAsyncAttributes(this MethodDefinition self)
 		{
-			V_0 = false;
-			V_1 = false;
-			V_2 = self.get_CustomAttributes().GetEnumerator();
+			bool flag;
+			bool flag1 = false;
+			bool flag2 = false;
+			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (V_2.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_3 = V_2.get_Current();
-					if (!V_0 & V_1)
+					CustomAttribute current = enumerator.get_Current();
+					if (!(flag1 & flag2))
 					{
-						if (!V_0 && MethodDefinitionExtensions.IsAsyncStateMachineAttribute(V_3))
+						if (!flag1 && MethodDefinitionExtensions.IsAsyncStateMachineAttribute(current))
 						{
-							V_0 = true;
+							flag1 = true;
 						}
-						if (V_1 || !MethodDefinitionExtensions.IsDebuggerStepThroughAttribute(V_3))
+						if (flag2 || !MethodDefinitionExtensions.IsDebuggerStepThroughAttribute(current))
 						{
 							continue;
 						}
-						V_1 = true;
+						flag2 = true;
 					}
 					else
 					{
-						V_4 = true;
-						goto Label1;
+						flag = true;
+						return flag;
 					}
 				}
-				goto Label0;
+				return flag1 & flag2;
 			}
 			finally
 			{
-				V_2.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_4;
-		Label0:
-			return V_0 & V_1;
+			return flag;
 		}
 
 		public static bool HasAsyncStateMachineVariable(this MethodDefinition self)
 		{
-			V_0 = self.get_Body().get_Variables().GetEnumerator();
+			bool flag;
+			TypeDefinition typeDefinition;
+			Collection<VariableDefinition>.Enumerator enumerator = self.get_Body().get_Variables().GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (V_1.get_VariableType() == null)
+					VariableDefinition current = enumerator.get_Current();
+					if (current.get_VariableType() == null)
 					{
-						stackVariable10 = null;
+						typeDefinition = null;
 					}
 					else
 					{
-						stackVariable10 = V_1.get_VariableType().Resolve();
+						typeDefinition = current.get_VariableType().Resolve();
 					}
-					V_2 = stackVariable10;
-					if (V_2 == null || !V_2.IsAsyncStateMachine())
+					TypeDefinition typeDefinition1 = typeDefinition;
+					if (typeDefinition1 == null || !typeDefinition1.IsAsyncStateMachine())
 					{
 						continue;
 					}
-					V_3 = true;
-					goto Label1;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				return false;
 			}
 			finally
 			{
-				V_0.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_3;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		public static bool IsAsync(this MethodDefinition self)
 		{
-			if (self.IsAsync(out V_0))
+			TypeDefinition typeDefinition;
+			if (self.IsAsync(out typeDefinition))
 			{
 				return true;
 			}
@@ -155,66 +154,64 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsAsync(this MethodDefinition self, out TypeDefinition asyncStateMachineType)
 		{
+			bool flag;
 			asyncStateMachineType = null;
-			V_0 = self.get_CustomAttributes().GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					if (!MethodDefinitionExtensions.IsAsyncAttribute(V_0.get_Current(), self, self.get_DeclaringType(), out asyncStateMachineType))
+					if (!MethodDefinitionExtensions.IsAsyncAttribute(enumerator.get_Current(), self, self.get_DeclaringType(), out asyncStateMachineType))
 					{
 						continue;
 					}
-					V_1 = true;
-					goto Label1;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				return false;
 			}
 			finally
 			{
-				V_0.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_1;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		private static bool IsAsyncAttribute(CustomAttribute customAttribute, MethodDefinition method, TypeDefinition declaringType, out TypeDefinition stateMachineType)
 		{
 			stateMachineType = null;
-			if (String.op_Inequality(customAttribute.get_AttributeType().get_FullName(), "System.Runtime.CompilerServices.AsyncStateMachineAttribute"))
+			if (customAttribute.get_AttributeType().get_FullName() != "System.Runtime.CompilerServices.AsyncStateMachineAttribute")
 			{
 				return false;
 			}
 			customAttribute.Resolve();
-			if (customAttribute.get_ConstructorArguments().get_Count() != 1 || String.op_Inequality(customAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName(), "System.Type"))
+			if (customAttribute.get_ConstructorArguments().get_Count() != 1 || customAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName() != "System.Type")
 			{
 				return false;
 			}
-			V_2 = customAttribute.get_ConstructorArguments().get_Item(0);
-			V_0 = V_2.get_Value() as TypeReference;
-			if (V_0 == null)
+			CustomAttributeArgument item = customAttribute.get_ConstructorArguments().get_Item(0);
+			TypeReference value = item.get_Value() as TypeReference;
+			if (value == null)
 			{
 				return false;
 			}
-			V_1 = V_0.Resolve();
-			if (V_1 == null || (object)V_1.get_DeclaringType() != (object)declaringType || !V_1.IsAsyncStateMachine())
+			TypeDefinition typeDefinition = value.Resolve();
+			if (typeDefinition == null || (object)typeDefinition.get_DeclaringType() != (object)declaringType || !typeDefinition.IsAsyncStateMachine())
 			{
 				return false;
 			}
-			stateMachineType = V_1;
+			stateMachineType = typeDefinition;
 			return true;
 		}
 
 		private static bool IsAsyncStateMachineAttribute(CustomAttribute customAttribute)
 		{
-			return String.op_Equality(customAttribute.get_AttributeType().get_FullName(), "System.Runtime.CompilerServices.AsyncStateMachineAttribute");
+			return customAttribute.get_AttributeType().get_FullName() == "System.Runtime.CompilerServices.AsyncStateMachineAttribute";
 		}
 
 		private static bool IsDebuggerStepThroughAttribute(CustomAttribute customAttribute)
 		{
-			return String.op_Equality(customAttribute.get_AttributeType().get_FullName(), "System.Diagnostics.DebuggerStepThroughAttribute");
+			return customAttribute.get_AttributeType().get_FullName() == "System.Diagnostics.DebuggerStepThroughAttribute";
 		}
 
 		public static bool IsExtern(this MethodDefinition method)
@@ -240,7 +237,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			return String.op_Inequality(self.get_FixedReturnType().get_FullName(), "System.Void");
+			return self.get_FixedReturnType().get_FullName() != "System.Void";
 		}
 
 		public static bool IsQueryableMethod(this MethodDefinition self)
@@ -249,7 +246,7 @@ namespace Mono.Cecil.Extensions
 			{
 				return false;
 			}
-			return String.op_Equality(self.get_DeclaringType().get_FullName(), "System.Linq.Queryable");
+			return self.get_DeclaringType().get_FullName() == "System.Linq.Queryable";
 		}
 
 		public static bool IsQueryMethod(this MethodDefinition self)

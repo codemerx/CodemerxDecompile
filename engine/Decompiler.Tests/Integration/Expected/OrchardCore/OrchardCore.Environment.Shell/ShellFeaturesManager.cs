@@ -3,6 +3,7 @@ using OrchardCore.Environment.Extensions.Features;
 using OrchardCore.Environment.Shell.Descriptor.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -18,43 +19,54 @@ namespace OrchardCore.Environment.Shell
 
 		public ShellFeaturesManager(IExtensionManager extensionManager, ShellDescriptor shellDescriptor, IShellDescriptorFeaturesManager shellDescriptorFeaturesManager)
 		{
-			base();
 			this._extensionManager = extensionManager;
 			this._shellDescriptor = shellDescriptor;
 			this._shellDescriptorFeaturesManager = shellDescriptorFeaturesManager;
-			return;
 		}
 
 		public Task<IEnumerable<IFeatureInfo>> GetAlwaysEnabledFeaturesAsync()
 		{
-			return Task.FromResult<IEnumerable<IFeatureInfo>>(this._extensionManager.GetFeatures().Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(this.u003cGetAlwaysEnabledFeaturesAsyncu003eb__5_0)));
+			return Task.FromResult<IEnumerable<IFeatureInfo>>(this._extensionManager.GetFeatures().Where<IFeatureInfo>((IFeatureInfo f) => {
+				if (f.get_IsAlwaysEnabled())
+				{
+					return true;
+				}
+				return this._shellDescriptor.get_Features().Any<ShellFeature>((ShellFeature sf) => {
+					if (sf.get_Id() != f.get_Id())
+					{
+						return false;
+					}
+					return sf.get_AlwaysEnabled();
+				});
+			}));
 		}
 
 		public Task<IEnumerable<IFeatureInfo>> GetDisabledFeaturesAsync()
 		{
-			return Task.FromResult<IEnumerable<IFeatureInfo>>(this._extensionManager.GetFeatures().Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(this.u003cGetDisabledFeaturesAsyncu003eb__6_0)));
+			return Task.FromResult<IEnumerable<IFeatureInfo>>(
+				from f in this._extensionManager.GetFeatures()
+				where this._shellDescriptor.get_Features().All<ShellFeature>((ShellFeature sf) => sf.get_Id() != f.get_Id())
+				select f);
 		}
 
 		public Task<IEnumerable<IExtensionInfo>> GetEnabledExtensionsAsync()
 		{
-			V_0 = new ShellFeaturesManager.u003cu003ec__DisplayClass8_0();
-			V_0.u003cu003e4__this = this;
-			stackVariable3 = V_0;
-			stackVariable10 = this._extensionManager.GetFeatures().Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetEnabledExtensionsAsyncu003eb__0));
-			stackVariable11 = ShellFeaturesManager.u003cu003ec.u003cu003e9__8_1;
-			if (stackVariable11 == null)
-			{
-				dummyVar0 = stackVariable11;
-				stackVariable11 = new Func<IFeatureInfo, string>(ShellFeaturesManager.u003cu003ec.u003cu003e9.u003cGetEnabledExtensionsAsyncu003eb__8_1);
-				ShellFeaturesManager.u003cu003ec.u003cu003e9__8_1 = stackVariable11;
-			}
-			stackVariable3.enabledIds = stackVariable10.Select<IFeatureInfo, string>(stackVariable11).Distinct<string>().ToArray<string>();
-			return Task.FromResult<IEnumerable<IExtensionInfo>>(this._extensionManager.GetExtensions().Where<IExtensionInfo>(new Func<IExtensionInfo, bool>(V_0.u003cGetEnabledExtensionsAsyncu003eb__2)));
+			string[] array = (
+				from f in this._extensionManager.GetFeatures()
+				where this._shellDescriptor.get_Features().Any<ShellFeature>((ShellFeature sf) => sf.get_Id() == f.get_Id())
+				select f.get_Extension().get_Id()).Distinct<string>().ToArray<string>();
+			return Task.FromResult<IEnumerable<IExtensionInfo>>(
+				from e in this._extensionManager.GetExtensions()
+				where array.Contains<string>(e.get_Id())
+				select e);
 		}
 
 		public Task<IEnumerable<IFeatureInfo>> GetEnabledFeaturesAsync()
 		{
-			return Task.FromResult<IEnumerable<IFeatureInfo>>(this._extensionManager.GetFeatures().Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(this.u003cGetEnabledFeaturesAsyncu003eb__4_0)));
+			return Task.FromResult<IEnumerable<IFeatureInfo>>(
+				from f in this._extensionManager.GetFeatures()
+				where this._shellDescriptor.get_Features().Any<ShellFeature>((ShellFeature sf) => sf.get_Id() == f.get_Id())
+				select f);
 		}
 
 		public Task<ValueTuple<IEnumerable<IFeatureInfo>, IEnumerable<IFeatureInfo>>> UpdateFeaturesAsync(IEnumerable<IFeatureInfo> featuresToDisable, IEnumerable<IFeatureInfo> featuresToEnable, bool force)

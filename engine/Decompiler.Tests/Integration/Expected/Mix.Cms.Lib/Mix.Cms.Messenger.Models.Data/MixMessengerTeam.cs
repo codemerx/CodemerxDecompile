@@ -62,10 +62,8 @@ namespace Mix.Cms.Messenger.Models.Data
 
 		public MixMessengerTeam()
 		{
-			base();
-			this.set_MixMessengerMessage(new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>());
-			this.set_MixMessengerNavTeamUser(new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser>());
-			return;
+			this.MixMessengerMessage = new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>();
+			this.MixMessengerNavTeamUser = new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerNavTeamUser>();
 		}
 	}
 }

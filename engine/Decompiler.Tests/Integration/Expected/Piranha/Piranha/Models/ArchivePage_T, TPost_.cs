@@ -19,9 +19,7 @@ namespace Piranha.Models
 
 		public ArchivePage()
 		{
-			base();
-			this.set_Archive(new PostArchive<TPost>());
-			return;
+			this.Archive = new PostArchive<TPost>();
 		}
 	}
 }

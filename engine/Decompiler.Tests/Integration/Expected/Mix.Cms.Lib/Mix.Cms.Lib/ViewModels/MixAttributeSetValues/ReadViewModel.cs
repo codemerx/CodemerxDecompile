@@ -174,16 +174,12 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 
 		public ReadViewModel()
 		{
-			base();
-			this.set_IsCache(false);
-			return;
+			base.set_IsCache(false);
 		}
 
-		public ReadViewModel(MixAttributeSetValue model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixAttributeSetValue model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			this.set_IsCache(false);
-			return;
+			base.set_IsCache(false);
 		}
 	}
 }

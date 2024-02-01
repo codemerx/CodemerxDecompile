@@ -17,9 +17,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new MemberReferenceExpresion.u003cget_Childrenu003ed__3(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				MemberReferenceExpresion memberReferenceExpresion = null;
+				if (memberReferenceExpresion.target != null)
+				{
+					yield return memberReferenceExpresion.target;
+				}
 			}
 		}
 
@@ -38,16 +40,13 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			internal set
 			{
 				this.target = value;
-				return;
 			}
 		}
 
-		public MemberReferenceExpresion(Expression target, MemberReference memberReference, IEnumerable<Instruction> instructions)
+		public MemberReferenceExpresion(Expression target, MemberReference memberReference, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Target(target);
-			this.set_Member(memberReference);
-			return;
+			this.Target = target;
+			this.Member = memberReference;
 		}
 	}
 }

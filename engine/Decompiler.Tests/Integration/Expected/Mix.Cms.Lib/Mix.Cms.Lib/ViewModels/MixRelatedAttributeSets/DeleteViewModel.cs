@@ -53,25 +53,19 @@ namespace Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets
 
 		public DeleteViewModel()
 		{
-			base();
-			return;
 		}
 
-		public DeleteViewModel(MixRelatedAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public DeleteViewModel(MixRelatedAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override MixRelatedAttributeSet ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = this.get_CreatedDateTime();
-			V_0 = new DateTime();
-			if (DateTime.op_Equality(stackVariable1, V_0))
+			if (this.CreatedDateTime == new DateTime())
 			{
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
+				this.CreatedDateTime = DateTime.UtcNow;
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 	}
 }

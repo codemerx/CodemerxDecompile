@@ -8,8 +8,6 @@ namespace Piranha.Extend.Blocks
 	{
 		public SeparatorBlock()
 		{
-			base();
-			return;
 		}
 
 		public override string GetTitle()

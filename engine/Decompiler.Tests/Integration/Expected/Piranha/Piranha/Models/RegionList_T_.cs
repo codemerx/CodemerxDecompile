@@ -27,18 +27,15 @@ namespace Piranha.Models
 
 		public RegionList()
 		{
-			base();
-			return;
 		}
 
 		public void Add(object item)
 		{
-			if (!Type.op_Equality(item.GetType(), Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Piranha.Models.RegionList`1::Add(System.Object)
-			// Exception in: System.Void Add(System.Object)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			if (item.GetType() != typeof(T))
+			{
+				throw new ArgumentException("Item type does not match the list");
+			}
+			base.Add((T)item);
+		}
 	}
 }

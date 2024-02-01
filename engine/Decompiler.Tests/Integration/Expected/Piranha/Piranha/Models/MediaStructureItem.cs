@@ -32,9 +32,7 @@ namespace Piranha.Models
 
 		public MediaStructureItem()
 		{
-			base();
-			this.set_Items(new MediaStructure());
-			return;
+			base.Items = new MediaStructure();
 		}
 	}
 }

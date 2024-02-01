@@ -1,4 +1,6 @@
 using System;
+using System.Collections.ObjectModel;
+using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 
@@ -8,25 +10,23 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public RemoveLastReturn()
 		{
-			base();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
-			if (block.get_Statements().get_Count() <= 0)
+			if (block.Statements.Count <= 0)
 			{
 				return block;
 			}
-			V_0 = block.get_Statements().get_Count() - 1;
-			V_1 = block.get_Statements().get_Item(V_0) as ExpressionStatement;
-			if (V_1 == null)
+			int count = block.Statements.Count - 1;
+			ExpressionStatement item = block.Statements[count] as ExpressionStatement;
+			if (item == null)
 			{
 				return block;
 			}
-			if (V_1.get_Expression() as ReturnExpression != null && (V_1.get_Expression() as ReturnExpression).get_Value() == null && String.IsNullOrEmpty(V_1.get_Label()))
+			if (item.Expression is ReturnExpression && (item.Expression as ReturnExpression).Value == null && String.IsNullOrEmpty(item.Label))
 			{
-				block.get_Statements().RemoveAt(V_0);
+				block.Statements.RemoveAt(count);
 			}
 			return block;
 		}

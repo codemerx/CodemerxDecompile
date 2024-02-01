@@ -14,8 +14,6 @@ namespace Piranha.Models
 
 		public StreamMediaContent()
 		{
-			base();
-			return;
 		}
 	}
 }

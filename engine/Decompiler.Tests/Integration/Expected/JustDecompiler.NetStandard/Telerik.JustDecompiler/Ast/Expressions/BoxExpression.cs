@@ -29,9 +29,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new BoxExpression.u003cget_Childrenu003ed__15(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				BoxExpression boxExpression = null;
+				yield return boxExpression.BoxedExpression;
 			}
 		}
 
@@ -39,7 +38,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 62;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.BoxExpression;
 			}
 		}
 
@@ -61,42 +60,42 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public BoxExpression(Expression boxedExpression, TypeSystem theTypeSystem, TypeReference boxedAsType, IEnumerable<Instruction> instructions)
+		public BoxExpression(Expression boxedExpression, TypeSystem theTypeSystem, TypeReference boxedAsType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
 			this.theTypeSystem = theTypeSystem;
-			this.set_BoxedExpression(boxedExpression);
-			this.set_BoxedAs(boxedAsType);
-			this.set_IsAutoBox(false);
-			return;
+			this.BoxedExpression = boxedExpression;
+			this.BoxedAs = boxedAsType;
+			this.IsAutoBox = false;
 		}
 
 		public override Expression Clone()
 		{
-			stackVariable9 = new BoxExpression(this.get_BoxedExpression().Clone(), this.theTypeSystem, this.get_BoxedAs(), this.instructions);
-			stackVariable9.set_IsAutoBox(this.get_IsAutoBox());
-			return stackVariable9;
+			return new BoxExpression(this.BoxedExpression.Clone(), this.theTypeSystem, this.BoxedAs, this.instructions)
+			{
+				IsAutoBox = this.IsAutoBox
+			};
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			stackVariable8 = new BoxExpression(this.get_BoxedExpression().CloneExpressionOnly(), this.theTypeSystem, this.get_BoxedAs(), null);
-			stackVariable8.set_IsAutoBox(this.get_IsAutoBox());
-			return stackVariable8;
+			return new BoxExpression(this.BoxedExpression.CloneExpressionOnly(), this.theTypeSystem, this.BoxedAs, null)
+			{
+				IsAutoBox = this.IsAutoBox
+			};
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as BoxExpression;
-			if (V_0 == null)
+			BoxExpression boxExpression = other as BoxExpression;
+			if (boxExpression == null)
 			{
 				return false;
 			}
-			if (!this.get_BoxedExpression().Equals(V_0.get_BoxedExpression()))
+			if (!this.BoxedExpression.Equals(boxExpression.BoxedExpression))
 			{
 				return false;
 			}
-			return String.op_Equality(this.get_BoxedAs().get_FullName(), V_0.get_BoxedAs().get_FullName());
+			return this.BoxedAs.get_FullName() == boxExpression.BoxedAs.get_FullName();
 		}
 	}
 }

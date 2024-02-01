@@ -1,12 +1,15 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Decompiler.AssignmentAnalysis;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -20,23 +23,20 @@ namespace Telerik.JustDecompiler.Steps
 
 		private YieldData yieldData;
 
-		private readonly Dictionary<FieldDefinition, Expression> parameterMappings;
+		private readonly Dictionary<FieldDefinition, Expression> parameterMappings = new Dictionary<FieldDefinition, Expression>();
 
 		private StatementCollection newStatements;
 
 		public RebuildYieldStatementsStep()
 		{
-			this.parameterMappings = new Dictionary<FieldDefinition, Expression>();
-			base();
-			return;
 		}
 
 		private bool CheckFieldReference(Expression expression)
 		{
-			if (expression.get_CodeNodeType() == 30)
+			if (expression.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 			{
-				V_0 = (expression as FieldReferenceExpression).get_Field().Resolve();
-				if (V_0 == this.yieldData.get_FieldsInfo().get_CurrentItemField() || V_0 == this.yieldData.get_FieldsInfo().get_StateHolderField())
+				FieldDefinition fieldDefinition = (expression as FieldReferenceExpression).Field.Resolve();
+				if (fieldDefinition == this.yieldData.FieldsInfo.CurrentItemField || fieldDefinition == this.yieldData.FieldsInfo.StateHolderField)
 				{
 					return true;
 				}
@@ -46,22 +46,19 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckVariableReference(Expression expression)
 		{
-			V_0 = null;
-			if (expression.get_CodeNodeType() != 26)
+			VariableReference variable = null;
+			if (expression.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 			{
-				if (expression.get_CodeNodeType() == 27)
-				{
-					V_0 = (expression as VariableDeclarationExpression).get_Variable();
-				}
+				variable = (expression as VariableReferenceExpression).Variable;
 			}
-			else
+			else if (expression.CodeNodeType == CodeNodeType.VariableDeclarationExpression)
 			{
-				V_0 = (expression as VariableReferenceExpression).get_Variable();
+				variable = (expression as VariableDeclarationExpression).Variable;
 			}
-			if (V_0 != null)
+			if (variable != null)
 			{
-				V_1 = this.yieldData.get_FieldsInfo();
-				if ((object)V_0 == (object)V_1.get_ReturnFlagVariable())
+				YieldFieldsInformation fieldsInfo = this.yieldData.FieldsInfo;
+				if ((object)variable == (object)fieldsInfo.ReturnFlagVariable)
 				{
 					return true;
 				}
@@ -71,49 +68,52 @@ namespace Telerik.JustDecompiler.Steps
 
 		private StatementCollection GetEnumeratorStatements()
 		{
-			V_0 = null;
-			V_1 = this.yieldDeclaringType.get_Methods().GetEnumerator();
-			try
+			BlockStatement blockStatement;
+			MethodDefinition methodDefinition = null;
+			foreach (MethodDefinition method in this.yieldDeclaringType.get_Methods())
 			{
-				while (V_1.MoveNext())
+				if (!method.get_Name().EndsWith(".GetEnumerator"))
 				{
-					V_2 = V_1.get_Current();
-					if (!V_2.get_Name().EndsWith(".GetEnumerator"))
-					{
-						continue;
-					}
-					V_0 = V_2;
-					goto Label0;
+					continue;
 				}
+				methodDefinition = method;
+				if (methodDefinition == null)
+				{
+					return null;
+				}
+				if (methodDefinition.get_Body() != null)
+				{
+					blockStatement = methodDefinition.get_Body().Decompile(this.decompilationContext.Language, (TypeSpecificContext)null);
+				}
+				else
+				{
+					blockStatement = null;
+				}
+				return blockStatement.Statements;
 			}
-			finally
-			{
-				V_1.Dispose();
-			}
-		Label0:
-			if (V_0 == null)
+			if (methodDefinition == null)
 			{
 				return null;
 			}
-			if (V_0.get_Body() != null)
+			if (methodDefinition.get_Body() != null)
 			{
-				stackVariable23 = V_0.get_Body().Decompile(this.decompilationContext.get_Language(), null);
+				blockStatement = methodDefinition.get_Body().Decompile(this.decompilationContext.Language, (TypeSpecificContext)null);
 			}
 			else
 			{
-				stackVariable23 = null;
+				blockStatement = null;
 			}
-			return stackVariable23.get_Statements();
+			return blockStatement.Statements;
 		}
 
 		private string GetFriendlyName(string fieldName)
 		{
-			if (fieldName.get_Chars(0) == '<')
+			if (fieldName[0] == '<')
 			{
-				V_0 = fieldName.IndexOf('>');
-				if (V_0 > 1)
+				int num = fieldName.IndexOf('>');
+				if (num > 1)
 				{
-					return fieldName.Substring(1, V_0 - 1);
+					return fieldName.Substring(1, num - 1);
 				}
 			}
 			return fieldName;
@@ -121,103 +121,102 @@ namespace Telerik.JustDecompiler.Steps
 
 		private TypeDefinition GetGeneratedType()
 		{
-			if (this.statements.get_Item(0).get_CodeNodeType() != 5)
+			ObjectCreationExpression value;
+			if (this.statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
 			{
 				return null;
 			}
-			V_0 = this.statements.get_Item(0) as ExpressionStatement;
-			if (V_0.get_Expression().get_CodeNodeType() != 24)
+			ExpressionStatement item = this.statements[0] as ExpressionStatement;
+			if (item.Expression.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
-				if (V_0.get_Expression().get_CodeNodeType() != 57)
+				if (item.Expression.CodeNodeType != CodeNodeType.ReturnExpression)
 				{
 					return null;
 				}
-				V_5 = V_0.get_Expression() as ReturnExpression;
-				if (V_5.get_Value() == null || V_5.get_Value().get_CodeNodeType() != 40)
+				ReturnExpression expression = item.Expression as ReturnExpression;
+				if (expression.Value == null || expression.Value.CodeNodeType != CodeNodeType.ObjectCreationExpression)
 				{
 					return null;
 				}
-				V_1 = V_5.get_Value() as ObjectCreationExpression;
+				value = expression.Value as ObjectCreationExpression;
 			}
 			else
 			{
-				if (!(V_0.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
+				if (!(item.Expression as BinaryExpression).IsAssignmentExpression)
 				{
 					return null;
 				}
-				V_4 = V_0.get_Expression() as BinaryExpression;
-				if (V_4.get_Right().get_CodeNodeType() != 40)
+				BinaryExpression binaryExpression = item.Expression as BinaryExpression;
+				if (binaryExpression.Right.CodeNodeType != CodeNodeType.ObjectCreationExpression)
 				{
 					return null;
 				}
-				V_1 = V_4.get_Right() as ObjectCreationExpression;
+				value = binaryExpression.Right as ObjectCreationExpression;
 			}
-			V_2 = V_1.get_Constructor();
-			if (V_2 == null || V_2.get_DeclaringType() == null)
+			MethodReference constructor = value.Constructor;
+			if (constructor == null || constructor.get_DeclaringType() == null)
 			{
 				return null;
 			}
-			V_3 = V_2.get_DeclaringType().Resolve();
-			if (V_3 != null && V_3.get_IsNestedPrivate() && V_3.HasCompilerGeneratedAttribute())
+			TypeDefinition typeDefinition = constructor.get_DeclaringType().Resolve();
+			if (typeDefinition != null && typeDefinition.get_IsNestedPrivate() && typeDefinition.HasCompilerGeneratedAttribute())
 			{
-				return V_3;
+				return typeDefinition;
 			}
 			return null;
 		}
 
 		private IEnumerable<Statement> GetStatements()
 		{
-			V_0 = null;
-			V_2 = this.yieldDeclaringType.get_Methods().GetEnumerator();
-			try
+			BlockStatement blockStatement;
+			MethodDefinition methodDefinition = null;
+			foreach (MethodDefinition method in this.yieldDeclaringType.get_Methods())
 			{
-				while (V_2.MoveNext())
+				if (method.get_Name() != "MoveNext")
 				{
-					V_3 = V_2.get_Current();
-					if (!String.op_Equality(V_3.get_Name(), "MoveNext"))
-					{
-						continue;
-					}
-					V_0 = V_3;
-					goto Label0;
+					continue;
 				}
+				methodDefinition = method;
+				if (methodDefinition == null || methodDefinition.get_Body() == null)
+				{
+					return null;
+				}
+				blockStatement = methodDefinition.get_Body().DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
+				if (blockStatement == null)
+				{
+					return null;
+				}
+				return this.GetStatements(blockStatement);
 			}
-			finally
-			{
-				V_2.Dispose();
-			}
-		Label0:
-			if (V_0 == null || V_0.get_Body() == null)
+			if (methodDefinition == null || methodDefinition.get_Body() == null)
 			{
 				return null;
 			}
-			V_1 = V_0.get_Body().DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
-			if (V_1 == null)
+			blockStatement = methodDefinition.get_Body().DecompileYieldStateMachine(this.decompilationContext, out this.yieldData);
+			if (blockStatement == null)
 			{
 				return null;
 			}
-			return this.GetStatements(V_1);
+			return this.GetStatements(blockStatement);
 		}
 
 		private IEnumerable<Statement> GetStatements(BlockStatement moveNextBody)
 		{
-			V_0 = new List<Statement>();
-			V_1 = 0;
-			while (V_1 < moveNextBody.get_Statements().get_Count())
+			List<Statement> statements = new List<Statement>();
+			for (int i = 0; i < moveNextBody.Statements.Count; i++)
 			{
-				V_2 = moveNextBody.get_Statements().get_Item(V_1);
-				V_3 = V_2 as TryStatement;
-				if (this.yieldData.get_StateMachineVersion() != 1 || V_3 == null || V_3.get_Fault() == null && this.yieldData.get_StateMachineVersion() != 2 || V_3 == null || V_3.get_CatchClauses().get_Count() != 1)
+				Statement item = moveNextBody.Statements[i];
+				TryStatement tryStatement = item as TryStatement;
+				if ((this.yieldData.StateMachineVersion != YieldStateMachineVersion.V1 || tryStatement == null || tryStatement.Fault == null) && (this.yieldData.StateMachineVersion != YieldStateMachineVersion.V2 || tryStatement == null || tryStatement.CatchClauses.Count != 1))
 				{
-					V_0.Add(V_2);
+					statements.Add(item);
 				}
 				else
 				{
-					V_0.AddRange(V_3.get_Try().get_Statements());
+					statements.AddRange(tryStatement.Try.Statements);
 				}
-				V_1 = V_1 + 1;
 			}
-			return V_0;
+			return statements;
 		}
 
 		private bool Match(StatementCollection statements)
@@ -228,214 +227,187 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			V_0 = this.GetStatements();
-			if (V_0 == null || this.yieldData == null)
+			IEnumerable<Statement> statements1 = this.GetStatements();
+			if (statements1 == null || this.yieldData == null)
 			{
 				return false;
 			}
-			if (statements.get_Count() > 2)
+			if (statements.Count > 2)
 			{
 				this.SetParameterMappings();
-				V_1 = this.GetEnumeratorStatements();
-				if (V_1 != null)
+				StatementCollection enumeratorStatements = this.GetEnumeratorStatements();
+				if (enumeratorStatements != null)
 				{
-					this.PostProcessMappings(V_1);
+					this.PostProcessMappings(enumeratorStatements);
 				}
 			}
 			this.newStatements = new StatementCollection();
-			V_2 = V_0.GetEnumerator();
-			try
+			foreach (Statement statement in statements1)
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = V_2.get_Current();
-					this.newStatements.Add(V_3);
-				}
-			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
+				this.newStatements.Add(statement);
 			}
 			return true;
 		}
 
 		private void PostProcessMappings(StatementCollection getEnumeratorStatements)
 		{
-			V_0 = getEnumeratorStatements.GetEnumerator();
-			try
+			Expression expression;
+			foreach (Statement getEnumeratorStatement in getEnumeratorStatements)
 			{
-				while (V_0.MoveNext())
+				if (getEnumeratorStatement.CodeNodeType != CodeNodeType.ExpressionStatement || (getEnumeratorStatement as ExpressionStatement).Expression.CodeNodeType != CodeNodeType.BinaryExpression)
 				{
-					V_1 = V_0.get_Current();
-					if (V_1.get_CodeNodeType() != 5 || (V_1 as ExpressionStatement).get_Expression().get_CodeNodeType() != 24)
-					{
-						continue;
-					}
-					V_2 = (V_1 as ExpressionStatement).get_Expression() as BinaryExpression;
-					if (!V_2.get_IsAssignmentExpression() || V_2.get_Left().get_CodeNodeType() != 30 || V_2.get_Right().get_CodeNodeType() != 30)
-					{
-						continue;
-					}
-					V_3 = (V_2.get_Left() as FieldReferenceExpression).get_Field().Resolve();
-					V_4 = (V_2.get_Right() as FieldReferenceExpression).get_Field().Resolve();
-					if (!this.parameterMappings.TryGetValue(V_4, out V_5))
-					{
-						continue;
-					}
-					dummyVar0 = this.parameterMappings.Remove(V_4);
-					this.parameterMappings.set_Item(V_3, V_5);
+					continue;
 				}
-			}
-			finally
-			{
-				if (V_0 != null)
+				BinaryExpression binaryExpression = (getEnumeratorStatement as ExpressionStatement).Expression as BinaryExpression;
+				if (!binaryExpression.IsAssignmentExpression || binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.FieldReferenceExpression)
 				{
-					V_0.Dispose();
+					continue;
 				}
+				FieldDefinition fieldDefinition = (binaryExpression.Left as FieldReferenceExpression).Field.Resolve();
+				FieldDefinition fieldDefinition1 = (binaryExpression.Right as FieldReferenceExpression).Field.Resolve();
+				if (!this.parameterMappings.TryGetValue(fieldDefinition1, out expression))
+				{
+					continue;
+				}
+				this.parameterMappings.Remove(fieldDefinition1);
+				this.parameterMappings[fieldDefinition] = expression;
 			}
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.decompilationContext = context;
-			if (!this.Match(body.get_Statements()))
+			if (!this.Match(body.Statements))
 			{
 				return body;
 			}
-			body.set_Statements(this.newStatements);
+			body.Statements = this.newStatements;
 			body = (BlockStatement)this.Visit(body);
-			this.RemoveLastIfYieldBreak(body.get_Statements());
+			this.RemoveLastIfYieldBreak(body.Statements);
 			return body;
 		}
 
 		private void RemoveLastIfYieldBreak(StatementCollection collection)
 		{
-			V_0 = collection.get_Count() - 1;
-			V_1 = collection.get_Item(V_0);
-			if (V_1.get_CodeNodeType() == 5 && (V_1 as ExpressionStatement).get_Expression().get_CodeNodeType() == 55 && String.IsNullOrEmpty(V_1.get_Label()) && this.yieldData.get_YieldBreaks().get_Count() != 1 || this.yieldData.get_YieldReturns().get_Count() != 0)
+			int count = collection.Count - 1;
+			Statement item = collection[count];
+			if (item.CodeNodeType == CodeNodeType.ExpressionStatement && (item as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.YieldBreakExpression && String.IsNullOrEmpty(item.Label) && (this.yieldData.YieldBreaks.Count != 1 || this.yieldData.YieldReturns.Count != 0))
 			{
-				collection.RemoveAt(V_0);
+				collection.RemoveAt(count);
 			}
-			return;
 		}
 
 		private void SetParameterMappings()
 		{
-			V_0 = 1;
-			while (V_0 < this.statements.get_Count())
+			for (int i = 1; i < this.statements.Count; i++)
 			{
-				if (this.statements.get_Item(V_0).get_CodeNodeType() == 5)
+				if (this.statements[i].CodeNodeType == CodeNodeType.ExpressionStatement)
 				{
-					V_1 = this.statements.get_Item(V_0) as ExpressionStatement;
-					if (V_1.get_Expression().get_CodeNodeType() == 24 && (V_1.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
+					ExpressionStatement item = this.statements[i] as ExpressionStatement;
+					if (item.Expression.CodeNodeType == CodeNodeType.BinaryExpression && (item.Expression as BinaryExpression).IsAssignmentExpression)
 					{
-						V_2 = V_1.get_Expression() as BinaryExpression;
-						if (V_2.get_Left().get_CodeNodeType() == 30)
+						BinaryExpression expression = item.Expression as BinaryExpression;
+						if (expression.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 						{
-							V_3 = (V_2.get_Left() as FieldReferenceExpression).get_Field();
-							if ((object)V_3.get_DeclaringType().Resolve() == (object)this.yieldDeclaringType)
+							FieldReference field = (expression.Left as FieldReferenceExpression).Field;
+							if ((object)field.get_DeclaringType().Resolve() == (object)this.yieldDeclaringType)
 							{
-								this.parameterMappings.set_Item(V_3.Resolve(), V_2.get_Right());
+								this.parameterMappings[field.Resolve()] = expression.Right;
 							}
 						}
 					}
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.get_IsAssignmentExpression() && this.CheckFieldReference(node.get_Left()) || this.CheckFieldReference(node.get_Right()) || this.CheckVariableReference(node.get_Left()) || this.CheckVariableReference(node.get_Right()) || node.get_Right().get_CodeNodeType() == 28)
+			if (node.IsAssignmentExpression && (this.CheckFieldReference(node.Left) || this.CheckFieldReference(node.Right) || this.CheckVariableReference(node.Left) || this.CheckVariableReference(node.Right) || node.Right.CodeNodeType == CodeNodeType.ThisReferenceExpression))
 			{
 				return null;
 			}
-			return this.VisitBinaryExpression(node);
+			return base.VisitBinaryExpression(node);
 		}
 
 		public override ICodeNode VisitExpressionStatement(ExpressionStatement node)
 		{
-			V_0 = (Expression)this.Visit(node.get_Expression());
-			if (V_0 != null)
+			Expression expression = (Expression)this.Visit(node.Expression);
+			if (expression != null)
 			{
-				node.set_Expression(V_0);
+				node.Expression = expression;
 				return node;
 			}
-			if (!String.IsNullOrEmpty(node.get_Label()))
+			if (!String.IsNullOrEmpty(node.Label))
 			{
-				V_1 = node.GetNextStatement();
-				if (V_1 == null || !String.IsNullOrEmpty(V_1.get_Label()))
+				Statement nextStatement = node.GetNextStatement();
+				if (nextStatement == null || !String.IsNullOrEmpty(nextStatement.Label))
 				{
-					stackVariable16 = new EmptyStatement();
-					stackVariable16.set_Label(node.get_Label());
-					return stackVariable16;
+					return new EmptyStatement()
+					{
+						Label = node.Label
+					};
 				}
-				V_1.set_Label(node.get_Label());
+				nextStatement.Label = node.Label;
 			}
 			return null;
 		}
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if ((object)node.get_Field().get_DeclaringType().Resolve() != (object)this.yieldDeclaringType)
+			if ((object)node.Field.get_DeclaringType().Resolve() != (object)this.yieldDeclaringType)
 			{
-				return this.VisitFieldReferenceExpression(node);
+				return base.VisitFieldReferenceExpression(node);
 			}
-			V_0 = node.get_Field().Resolve();
-			if (this.parameterMappings.ContainsKey(V_0))
+			FieldDefinition fieldDefinition = node.Field.Resolve();
+			if (this.parameterMappings.ContainsKey(fieldDefinition))
 			{
-				return this.parameterMappings.get_Item(V_0).CloneExpressionOnlyAndAttachInstructions(node.get_UnderlyingSameMethodInstructions());
+				return this.parameterMappings[fieldDefinition].CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 			}
-			V_1 = new VariableDefinition(this.GetFriendlyName(V_0.get_Name()), V_0.get_FieldType(), this.decompilationContext.get_MethodContext().get_Method());
-			this.decompilationContext.get_MethodContext().get_Variables().Add(V_1);
-			this.decompilationContext.get_MethodContext().get_VariableAssignmentData().Add(V_1, this.yieldData.get_FieldAssignmentData().get_Item(V_0));
-			dummyVar0 = this.decompilationContext.get_MethodContext().get_VariablesToRename().Add(V_1);
-			V_2 = new VariableReferenceExpression(V_1, node.get_UnderlyingSameMethodInstructions());
-			this.parameterMappings.set_Item(V_0, V_2);
-			return V_2;
+			VariableDefinition variableDefinition = new VariableDefinition(this.GetFriendlyName(fieldDefinition.get_Name()), fieldDefinition.get_FieldType(), this.decompilationContext.MethodContext.Method);
+			this.decompilationContext.MethodContext.Variables.Add(variableDefinition);
+			this.decompilationContext.MethodContext.VariableAssignmentData.Add(variableDefinition, this.yieldData.FieldAssignmentData[fieldDefinition]);
+			this.decompilationContext.MethodContext.VariablesToRename.Add(variableDefinition);
+			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(variableDefinition, node.UnderlyingSameMethodInstructions);
+			this.parameterMappings[fieldDefinition] = variableReferenceExpression;
+			return variableReferenceExpression;
 		}
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			if (node.get_MethodExpression().get_Target() != null && node.get_MethodExpression().get_Target().get_CodeNodeType() == 28)
+			if (node.MethodExpression.Target != null && node.MethodExpression.Target.CodeNodeType == CodeNodeType.ThisReferenceExpression)
 			{
 				return null;
 			}
-			return this.VisitMethodInvocationExpression(node);
+			return base.VisitMethodInvocationExpression(node);
 		}
 
 		public override ICodeNode VisitTryStatement(TryStatement node)
 		{
-			if (node.get_Finally() != null && node.get_Finally().get_Body().get_Statements().get_Count() == 1 && node.get_Finally().get_Body().get_Statements().get_Item(0).get_CodeNodeType() == 5)
+			if (node.Finally != null && node.Finally.Body.Statements.Count == 1 && node.Finally.Body.Statements[0].CodeNodeType == CodeNodeType.ExpressionStatement)
 			{
-				V_0 = node.get_Finally().get_Body().get_Statements().get_Item(0) as ExpressionStatement;
-				if (V_0.get_Expression().get_CodeNodeType() == 19)
+				ExpressionStatement item = node.Finally.Body.Statements[0] as ExpressionStatement;
+				if (item.Expression.CodeNodeType == CodeNodeType.MethodInvocationExpression)
 				{
-					V_1 = (V_0.get_Expression() as MethodInvocationExpression).get_MethodExpression();
-					if (V_1 != null && V_1.get_Method() != null && V_1.get_Method().get_DeclaringType() != null && (object)V_1.get_Method().get_DeclaringType().Resolve() == (object)this.yieldDeclaringType)
+					MethodReferenceExpression methodExpression = (item.Expression as MethodInvocationExpression).MethodExpression;
+					if (methodExpression != null && methodExpression.Method != null && methodExpression.Method.get_DeclaringType() != null && (object)methodExpression.Method.get_DeclaringType().Resolve() == (object)this.yieldDeclaringType)
 					{
-						node.set_Finally(new FinallyClause(V_1.get_Method().Resolve().get_Body().Decompile(this.decompilationContext.get_Language(), null), node.get_Finally().get_UnderlyingSameMethodInstructions()));
+						node.Finally = new FinallyClause(methodExpression.Method.Resolve().get_Body().Decompile(this.decompilationContext.Language, (TypeSpecificContext)null), node.Finally.UnderlyingSameMethodInstructions);
 					}
 				}
 			}
-			return this.VisitTryStatement(node);
+			return base.VisitTryStatement(node);
 		}
 
 		public override ICodeNode VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			dummyVar0 = this.decompilationContext.get_MethodContext().get_VariablesToRename().Add(node.get_Variable());
-			return this.VisitVariableDeclarationExpression(node);
+			this.decompilationContext.MethodContext.VariablesToRename.Add(node.Variable);
+			return base.VisitVariableDeclarationExpression(node);
 		}
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			dummyVar0 = this.decompilationContext.get_MethodContext().get_VariablesToRename().Add(node.get_Variable().Resolve());
-			return this.VisitVariableReferenceExpression(node);
+			this.decompilationContext.MethodContext.VariablesToRename.Add(node.Variable.Resolve());
+			return base.VisitVariableReferenceExpression(node);
 		}
 	}
 }

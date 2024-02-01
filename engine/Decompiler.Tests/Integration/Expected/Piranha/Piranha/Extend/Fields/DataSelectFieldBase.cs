@@ -21,8 +21,6 @@ namespace Piranha.Extend.Fields
 
 		protected DataSelectFieldBase()
 		{
-			base();
-			return;
 		}
 
 		public abstract string GetTitle();

@@ -1,12 +1,17 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Account;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Repositories;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
+using Mix.Common.Helper;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -33,14 +38,11 @@ namespace Mix.Cms.Lib.ViewModels.Account
 		{
 			get
 			{
-				if (this.get_Avatar() == null || this.get_Avatar().IndexOf("http") != -1 || this.get_Avatar().get_Chars(0) == '/')
+				if (this.Avatar == null || this.Avatar.IndexOf("http") != -1 || this.Avatar[0] == '/')
 				{
-					return this.get_Avatar();
+					return this.Avatar;
 				}
-				stackVariable15 = new string[2];
-				stackVariable15[0] = this.get_Domain();
-				stackVariable15[1] = this.get_Avatar();
-				return CommonHelper.GetFullPath(stackVariable15);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Avatar });
 			}
 		}
 
@@ -117,11 +119,7 @@ namespace Mix.Cms.Lib.ViewModels.Account
 		}
 
 		[JsonProperty("mediaFile")]
-		public FileViewModel MediaFile
-		{
-			get;
-			set;
-		}
+		public FileViewModel MediaFile { get; set; } = new FileViewModel();
 
 		[JsonProperty("middleName")]
 		public string MiddleName
@@ -181,60 +179,55 @@ namespace Mix.Cms.Lib.ViewModels.Account
 
 		public MixRegisterViewModel()
 		{
-			this.u003cMediaFileu003ek__BackingField = new FileViewModel();
-			base();
-			return;
 		}
 
-		public MixRegisterViewModel(MixCmsUser model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public MixRegisterViewModel(MixCmsUser model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cMediaFileu003ek__BackingField = new FileViewModel();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_UserRoles(this.GetRoleNavs());
-			return;
+			this.UserRoles = this.GetRoleNavs();
 		}
 
 		public List<NavUserRoleViewModel> GetRoleNavs()
 		{
-			V_0 = new MixRegisterViewModel.u003cu003ec__DisplayClass88_0();
-			V_0.u003cu003e4__this = this;
-			V_0.context = new MixCmsAccountContext();
-			try
+			List<NavUserRoleViewModel> list;
+			using (MixCmsAccountContext mixCmsAccountContext = new MixCmsAccountContext())
 			{
-				stackVariable7 = V_0.context.get_AspNetRoles();
-				V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.Account.NavUserRoleViewModel> Mix.Cms.Lib.ViewModels.Account.MixRegisterViewModel::GetRoleNavs()
-				// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.Account.NavUserRoleViewModel> GetRoleNavs()
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				list = (
+					from p in EntityFrameworkQueryableExtensions.Include<AspNetRoles, ICollection<AspNetUserRoles>>(mixCmsAccountContext.AspNetRoles, (AspNetRoles cp) => cp.AspNetUserRoles).ToList<AspNetRoles>()
+					select new NavUserRoleViewModel()
+					{
+						UserId = this.Id,
+						RoleId = p.Id,
+						Description = p.Name,
+						IsActived = mixCmsAccountContext.AspNetUserRoles.Any<AspNetUserRoles>((AspNetUserRoles m) => m.UserId == this.Id && m.RoleId == p.Id)
+					} into m
+					orderby m.Priority
+					select m).ToList<NavUserRoleViewModel>();
+			}
+			return list;
+		}
 
 		public override MixCmsUser ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_MediaFile().get_FileStream() != null)
+			if (this.MediaFile.FileStream != null)
 			{
-				stackVariable8 = this.get_MediaFile();
-				stackVariable10 = new string[2];
-				stackVariable10[0] = MixService.GetConfig<string>("UploadFolder");
-				V_0 = DateTime.get_UtcNow();
-				stackVariable10[1] = V_0.ToString("MMM-yyyy");
-				stackVariable8.set_FileFolder(CommonHelper.GetFullPath(stackVariable10));
-				if (!FileRepository.get_Instance().SaveWebFile(this.get_MediaFile()))
+				FileViewModel mediaFile = this.MediaFile;
+				string[] config = new string[] { MixService.GetConfig<string>("UploadFolder"), null };
+				config[1] = DateTime.UtcNow.ToString("MMM-yyyy");
+				mediaFile.FileFolder = CommonHelper.GetFullPath(config);
+				if (!FileRepository.Instance.SaveWebFile(this.MediaFile))
 				{
-					this.set_IsValid(false);
+					base.set_IsValid(false);
 				}
 				else
 				{
-					this.set_Avatar(this.get_MediaFile().get_FullPath());
+					this.Avatar = this.MediaFile.FullPath;
 				}
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 	}
 }

@@ -8,20 +8,19 @@ namespace Piranha.Extend.Fields
 	{
 		public ReadonlyField()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator ReadonlyField(string str)
 		{
-			stackVariable0 = new ReadonlyField();
-			stackVariable0.set_Value(str);
-			return stackVariable0;
+			return new ReadonlyField()
+			{
+				Value = str
+			};
 		}
 
 		public static implicit operator String(ReadonlyField field)
 		{
-			return field.get_Value();
+			return field.Value;
 		}
 	}
 }

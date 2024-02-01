@@ -15,9 +15,10 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ConditionExpression.u003cget_Childrenu003ed__2(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ConditionExpression conditionExpression = null;
+				yield return conditionExpression.Condition;
+				yield return conditionExpression.Then;
+				yield return conditionExpression.Else;
 			}
 		}
 
@@ -25,7 +26,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 36;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ConditionExpression;
 			}
 		}
 
@@ -45,7 +46,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Then().get_ExpressionType();
+				return this.Then.ExpressionType;
 			}
 		}
 
@@ -53,7 +54,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Then().get_HasType();
+				return this.Then.HasType;
 			}
 		}
 
@@ -63,37 +64,35 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ConditionExpression(Expression condition, Expression then, Expression else, IEnumerable<Instruction> instructions)
+		public ConditionExpression(Expression condition, Expression then, Expression @else, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Condition(condition);
-			this.set_Then(then);
-			this.set_Else(else);
-			return;
+			this.Condition = condition;
+			this.Then = then;
+			this.Else = @else;
 		}
 
 		public override Expression Clone()
 		{
-			return new ConditionExpression(this.get_Condition().Clone(), this.get_Then().Clone(), this.get_Else().Clone(), this.instructions);
+			return new ConditionExpression(this.Condition.Clone(), this.Then.Clone(), this.Else.Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ConditionExpression(this.get_Condition().CloneExpressionOnly(), this.get_Then().CloneExpressionOnly(), this.get_Else().CloneExpressionOnly(), null);
+			return new ConditionExpression(this.Condition.CloneExpressionOnly(), this.Then.CloneExpressionOnly(), this.Else.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as ConditionExpression;
-			if (V_0 == null)
+			ConditionExpression conditionExpression = other as ConditionExpression;
+			if (conditionExpression == null)
 			{
 				return false;
 			}
-			if (!this.get_Condition().Equals(V_0.get_Condition()) || !this.get_Then().Equals(V_0.get_Then()))
+			if (!this.Condition.Equals(conditionExpression.Condition) || !this.Then.Equals(conditionExpression.Then))
 			{
 				return false;
 			}
-			return this.get_Else().Equals(V_0.get_Else());
+			return this.Else.Equals(conditionExpression.Else);
 		}
 	}
 }

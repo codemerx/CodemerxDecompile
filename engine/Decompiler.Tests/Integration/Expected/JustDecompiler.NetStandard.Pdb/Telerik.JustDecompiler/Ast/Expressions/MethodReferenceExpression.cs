@@ -19,7 +19,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 20;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.MethodReferenceExpression;
 			}
 		}
 
@@ -29,7 +29,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				if (this.expressionType == null)
 				{
-					this.expressionType = this.get_Method().get_FixedReturnType();
+					this.expressionType = this.Method.get_FixedReturnType();
 				}
 				return this.expressionType;
 			}
@@ -59,51 +59,51 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				if (!this.resolved)
 				{
-					this.methodDefinition = this.get_Method().Resolve();
+					this.methodDefinition = this.Method.Resolve();
 					this.resolved = true;
 				}
 				return this.methodDefinition;
 			}
 		}
 
-		public MethodReferenceExpression(Expression target, MethodReference method, IEnumerable<Instruction> instructions)
+		public MethodReferenceExpression(Expression target, MethodReference method, IEnumerable<Instruction> instructions) : base(target, method, instructions)
 		{
-			base(target, method, instructions);
 			this.expressionType = null;
-			this.set_Target(target);
-			this.set_Method(method);
-			this.set_Member(method);
-			return;
+			this.Target = target;
+			this.Method = method;
+			base.Member = method;
 		}
 
 		public override Expression Clone()
 		{
-			if (this.get_Target() != null)
+			Expression expression;
+			if (this.Target != null)
 			{
-				stackVariable4 = this.get_Target().Clone();
+				expression = this.Target.Clone();
 			}
 			else
 			{
-				stackVariable4 = null;
+				expression = null;
 			}
-			V_0 = new MethodReferenceExpression(stackVariable4, this.get_Method(), this.instructions);
-			this.CopyFields(V_0);
-			return V_0;
+			MethodReferenceExpression methodReferenceExpression = new MethodReferenceExpression(expression, this.Method, this.instructions);
+			this.CopyFields(methodReferenceExpression);
+			return methodReferenceExpression;
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			if (this.get_Target() != null)
+			Expression expression;
+			if (this.Target != null)
 			{
-				stackVariable4 = this.get_Target().CloneExpressionOnly();
+				expression = this.Target.CloneExpressionOnly();
 			}
 			else
 			{
-				stackVariable4 = null;
+				expression = null;
 			}
-			V_0 = new MethodReferenceExpression(stackVariable4, this.get_Method(), null);
-			this.CopyFields(V_0);
-			return V_0;
+			MethodReferenceExpression methodReferenceExpression = new MethodReferenceExpression(expression, this.Method, null);
+			this.CopyFields(methodReferenceExpression);
+			return methodReferenceExpression;
 		}
 
 		private void CopyFields(MethodReferenceExpression clone)
@@ -111,7 +111,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			clone.resolved = this.resolved;
 			clone.methodDefinition = this.methodDefinition;
 			clone.expressionType = this.expressionType;
-			return;
 		}
 
 		public override bool Equals(Expression other)
@@ -120,26 +119,23 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			{
 				return false;
 			}
-			if (other as MethodReferenceExpression == null)
+			if (!(other is MethodReferenceExpression))
 			{
 				return false;
 			}
-			V_0 = other as MethodReferenceExpression;
-			if (this.get_Target() != null)
+			MethodReferenceExpression methodReferenceExpression = other as MethodReferenceExpression;
+			if (this.Target == null)
 			{
-				if (!this.get_Target().Equals(V_0.get_Target()))
+				if (methodReferenceExpression.Target != null)
 				{
 					return false;
 				}
 			}
-			else
+			else if (!this.Target.Equals(methodReferenceExpression.Target))
 			{
-				if (V_0.get_Target() != null)
-				{
-					return false;
-				}
+				return false;
 			}
-			if (String.op_Inequality(this.get_Method().get_FullName(), V_0.get_Method().get_FullName()))
+			if (this.Method.get_FullName() != methodReferenceExpression.Method.get_FullName())
 			{
 				return false;
 			}

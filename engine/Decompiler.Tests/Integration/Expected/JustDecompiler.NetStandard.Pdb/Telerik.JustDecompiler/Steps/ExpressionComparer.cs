@@ -8,8 +8,6 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public ExpressionComparer()
 		{
-			base();
-			return;
 		}
 
 		public new bool Equals(object x, object y)
@@ -22,13 +20,13 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return (object)y == (object)null;
 			}
-			V_0 = x as Expression;
-			V_1 = y as Expression;
-			if (V_0 == null || V_1 == null)
+			Expression expression = x as Expression;
+			Expression expression1 = y as Expression;
+			if (expression == null || expression1 == null)
 			{
 				return false;
 			}
-			return V_0.Equals(V_1);
+			return expression.Equals(expression1);
 		}
 
 		public int GetHashCode(object obj)

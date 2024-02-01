@@ -13,7 +13,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private DecompilationContext context;
 
-		private readonly TypeOfStep typeOfStep;
+		private readonly TypeOfStep typeOfStep = new TypeOfStep();
 
 		private readonly ReplaceDelegateInvokeStep replaceDelegateInvokeStep;
 
@@ -33,186 +33,178 @@ namespace Telerik.JustDecompiler.Steps
 
 		private RebuildAnonymousTypesInitializersStep rebuildAnonymousInitializersStep;
 
-		private FixSwitchCasesStep fixSwitchCasesStep;
+		private FixSwitchCasesStep fixSwitchCasesStep = new FixSwitchCasesStep();
 
 		static CombinedTransformerStep()
 		{
 			CombinedTransformerStep.Instance = new CombinedTransformerStep();
-			return;
 		}
 
 		public CombinedTransformerStep()
 		{
-			this.typeOfStep = new TypeOfStep();
-			this.fixSwitchCasesStep = new FixSwitchCasesStep();
-			base();
 			this.canCastStep = new CanCastStep(this);
 			this.replaceDelegateInvokeStep = new ReplaceDelegateInvokeStep(this);
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			V_0 = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
-			this.operatorStep = new OperatorStep(this, V_0);
-			this.removePIDStep = new RemovePrivateImplementationDetailsStep(V_0);
-			this.rebuildEventsStep = new RebuildEventsStep(V_0);
-			this.propertyRecognizer = new PropertyRecognizer(V_0, context.get_TypeContext(), context.get_Language());
-			this.rebuildAnonymousInitializersStep = new RebuildAnonymousTypesInitializersStep(this, V_0);
+			TypeSystem typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
+			this.operatorStep = new OperatorStep(this, typeSystem);
+			this.removePIDStep = new RemovePrivateImplementationDetailsStep(typeSystem);
+			this.rebuildEventsStep = new RebuildEventsStep(typeSystem);
+			this.propertyRecognizer = new PropertyRecognizer(typeSystem, context.TypeContext, context.Language);
+			this.rebuildAnonymousInitializersStep = new RebuildAnonymousTypesInitializersStep(this, typeSystem);
 			this.fixSwitchConditionStep = new FixSwitchConditionStep(context);
-			this.replaceThisWithBaseStep = new HandleVirtualMethodInvocations(this.context.get_MethodContext().get_Method());
+			this.replaceThisWithBaseStep = new HandleVirtualMethodInvocations(this.context.MethodContext.Method);
 			return (BlockStatement)this.VisitBlockStatement(body);
 		}
 
 		public override ICodeNode VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			V_0 = this.removePIDStep.VisitArrayCreationExpression(node);
-			if (V_0 != null)
+			ICodeNode codeNode = this.removePIDStep.VisitArrayCreationExpression(node);
+			if (codeNode != null)
 			{
-				return V_0;
+				return codeNode;
 			}
-			return this.VisitArrayCreationExpression(node);
+			return base.VisitArrayCreationExpression(node);
 		}
 
 		private ICodeNode VisitAssignExpression(BinaryExpression node)
 		{
-			V_0 = this.operatorStep.VisitAssignExpression(node);
-			if (V_0 != null)
+			BinaryExpression binaryExpression = this.operatorStep.VisitAssignExpression(node);
+			if (binaryExpression != null)
 			{
-				return V_0;
+				return binaryExpression;
 			}
-			return this.VisitBinaryExpression(node);
+			return base.VisitBinaryExpression(node);
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.get_IsAssignmentExpression())
+			if (node.IsAssignmentExpression)
 			{
 				return this.VisitAssignExpression(node);
 			}
-			V_0 = this.canCastStep.VisitBinaryExpression(node);
-			if (V_0 != null)
+			ICodeNode codeNode = this.canCastStep.VisitBinaryExpression(node);
+			if (codeNode != null)
 			{
-				return V_0;
+				return codeNode;
 			}
-			if (node.get_Operator() != 9 && node.get_Operator() != 10)
+			if (node.Operator != BinaryOperator.ValueEquality && node.Operator != BinaryOperator.ValueInequality)
 			{
-				return this.VisitBinaryExpression(node);
+				return base.VisitBinaryExpression(node);
 			}
 			return this.VisitCeqExpression(node);
 		}
 
 		private ICodeNode VisitCeqExpression(BinaryExpression node)
 		{
-			if (node.get_Right() as LiteralExpression == null || node.get_Left().get_CodeNodeType() == 22)
+			if (node.Right is LiteralExpression && node.Left.CodeNodeType != CodeNodeType.LiteralExpression)
 			{
-				if (node.get_Left() as LiteralExpression != null && node.get_Right().get_CodeNodeType() != 22 && node.get_Right().get_HasType() && String.op_Equality(node.get_Right().get_ExpressionType().get_FullName(), "System.Boolean"))
+				if (node.Left.HasType && node.Left.ExpressionType.get_FullName() == "System.Boolean")
 				{
-					V_3 = node.get_Left() as LiteralExpression;
-					V_4 = false;
-					if (V_3.get_Value().Equals(false) && node.get_Operator() == 9 || V_3.get_Value().Equals(true) && node.get_Operator() == 10)
+					LiteralExpression right = node.Right as LiteralExpression;
+					bool flag = false;
+					if (right.Value.Equals(false) && node.Operator == BinaryOperator.ValueEquality || right.Value.Equals(true) && node.Operator == BinaryOperator.ValueInequality)
 					{
-						V_4 = true;
+						flag = true;
 					}
-					if (!V_4)
+					if (!flag)
 					{
-						return this.Visit(node.get_Left());
+						return this.Visit(node.Left);
 					}
-					V_5 = new UnaryExpression(1, node.get_Right(), null);
-					return this.Visit(V_5);
+					UnaryExpression unaryExpression = new UnaryExpression(UnaryOperator.LogicalNot, node.Left, null);
+					return this.Visit(unaryExpression);
 				}
 			}
-			else
+			else if (node.Left is LiteralExpression && node.Right.CodeNodeType != CodeNodeType.LiteralExpression && node.Right.HasType && node.Right.ExpressionType.get_FullName() == "System.Boolean")
 			{
-				if (node.get_Left().get_HasType() && String.op_Equality(node.get_Left().get_ExpressionType().get_FullName(), "System.Boolean"))
+				LiteralExpression left = node.Left as LiteralExpression;
+				bool flag1 = false;
+				if (left.Value.Equals(false) && node.Operator == BinaryOperator.ValueEquality || left.Value.Equals(true) && node.Operator == BinaryOperator.ValueInequality)
 				{
-					V_0 = node.get_Right() as LiteralExpression;
-					V_1 = false;
-					if (V_0.get_Value().Equals(false) && node.get_Operator() == 9 || V_0.get_Value().Equals(true) && node.get_Operator() == 10)
-					{
-						V_1 = true;
-					}
-					if (!V_1)
-					{
-						return this.Visit(node.get_Left());
-					}
-					V_2 = new UnaryExpression(1, node.get_Left(), null);
-					return this.Visit(V_2);
+					flag1 = true;
 				}
+				if (!flag1)
+				{
+					return this.Visit(node.Left);
+				}
+				UnaryExpression unaryExpression1 = new UnaryExpression(UnaryOperator.LogicalNot, node.Right, null);
+				return this.Visit(unaryExpression1);
 			}
-			node.set_Left((Expression)this.Visit(node.get_Left()));
-			node.set_Right((Expression)this.Visit(node.get_Right()));
+			node.Left = (Expression)this.Visit(node.Left);
+			node.Right = (Expression)this.Visit(node.Right);
 			return node;
 		}
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (!this.context.get_MethodContext().get_Method().get_IsConstructor() || !String.op_Equality(node.get_Field().get_DeclaringType().get_FullName(), this.context.get_MethodContext().get_Method().get_DeclaringType().get_FullName()))
+			if (!this.context.MethodContext.Method.get_IsConstructor() || !(node.Field.get_DeclaringType().get_FullName() == this.context.MethodContext.Method.get_DeclaringType().get_FullName()))
 			{
-				return this.VisitFieldReferenceExpression(node);
+				return base.VisitFieldReferenceExpression(node);
 			}
 			return this.propertyRecognizer.VisitFieldReferenceExpression(node);
 		}
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			V_0 = this.typeOfStep.VisitMethodInvocationExpression(node);
-			if (V_0 != null)
+			ICodeNode codeNode = this.typeOfStep.VisitMethodInvocationExpression(node);
+			if (codeNode != null)
 			{
-				return V_0;
+				return codeNode;
 			}
 			this.replaceThisWithBaseStep.VisitMethodInvocationExpression(node);
-			V_0 = this.operatorStep.VisitMethodInvocationExpression(node);
-			if (V_0 != null)
+			codeNode = this.operatorStep.VisitMethodInvocationExpression(node);
+			if (codeNode != null)
 			{
-				return this.Visit(V_0);
+				return base.Visit(codeNode);
 			}
-			V_0 = this.replaceDelegateInvokeStep.VisitMethodInvocationExpression(node);
-			if (V_0 != null)
+			codeNode = this.replaceDelegateInvokeStep.VisitMethodInvocationExpression(node);
+			if (codeNode != null)
 			{
-				return this.VisitDelegateInvokeExpression(V_0 as DelegateInvokeExpression);
+				return base.VisitDelegateInvokeExpression(codeNode as DelegateInvokeExpression);
 			}
-			V_0 = this.propertyRecognizer.VisitMethodInvocationExpression(node);
-			if (V_0 != null)
+			codeNode = this.propertyRecognizer.VisitMethodInvocationExpression(node);
+			if (codeNode != null)
 			{
-				V_1 = V_0 as PropertyReferenceExpression;
-				if (V_1 != null)
+				PropertyReferenceExpression propertyReferenceExpression = codeNode as PropertyReferenceExpression;
+				if (propertyReferenceExpression != null)
 				{
-					V_0 = this.VisitPropertyReferenceExpression(V_1);
+					codeNode = this.VisitPropertyReferenceExpression(propertyReferenceExpression);
 				}
-				if (V_0 as BinaryExpression != null)
+				if (codeNode is BinaryExpression)
 				{
-					V_0 = this.VisitBinaryExpression(V_0 as BinaryExpression);
+					codeNode = this.VisitBinaryExpression(codeNode as BinaryExpression);
 				}
-				return V_0;
+				return codeNode;
 			}
-			V_0 = this.rebuildEventsStep.VisitMethodInvocationExpression(node);
-			if (V_0 == null)
+			codeNode = this.rebuildEventsStep.VisitMethodInvocationExpression(node);
+			if (codeNode == null)
 			{
-				return this.VisitMethodInvocationExpression(node);
+				return base.VisitMethodInvocationExpression(node);
 			}
-			if (V_0 as BinaryExpression == null)
+			if (!(codeNode is BinaryExpression))
 			{
-				return V_0;
+				return codeNode;
 			}
-			return this.VisitBinaryExpression(V_0 as BinaryExpression);
+			return this.VisitBinaryExpression(codeNode as BinaryExpression);
 		}
 
 		public override ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			V_0 = this.rebuildAnonymousInitializersStep.VisitObjectCreationExpression(node);
-			if (V_0 != null)
+			ICodeNode codeNode = this.rebuildAnonymousInitializersStep.VisitObjectCreationExpression(node);
+			if (codeNode != null)
 			{
-				return V_0;
+				return codeNode;
 			}
-			return this.VisitObjectCreationExpression(node);
+			return base.VisitObjectCreationExpression(node);
 		}
 
 		public override ICodeNode VisitSwitchStatement(SwitchStatement node)
 		{
 			this.fixSwitchCasesStep.FixCases(node);
-			return this.VisitSwitchStatement(this.fixSwitchConditionStep.VisitSwitchStatement(node));
+			return base.VisitSwitchStatement(this.fixSwitchConditionStep.VisitSwitchStatement(node));
 		}
 	}
 }

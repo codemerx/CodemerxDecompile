@@ -44,10 +44,8 @@ namespace Mix.Cms.Lib.Models.Account
 
 		public AspNetRoles()
 		{
-			base();
-			this.set_AspNetRoleClaims(new HashSet<Mix.Cms.Lib.Models.Account.AspNetRoleClaims>());
-			this.set_AspNetUserRoles(new HashSet<Mix.Cms.Lib.Models.Account.AspNetUserRoles>());
-			return;
+			this.AspNetRoleClaims = new HashSet<Mix.Cms.Lib.Models.Account.AspNetRoleClaims>();
+			this.AspNetUserRoles = new HashSet<Mix.Cms.Lib.Models.Account.AspNetUserRoles>();
 		}
 	}
 }

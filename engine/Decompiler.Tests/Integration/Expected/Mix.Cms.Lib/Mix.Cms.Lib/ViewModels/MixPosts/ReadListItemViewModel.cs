@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.ViewModels.MixPosts
@@ -66,19 +69,11 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		[JsonIgnore]
 		[JsonProperty("extraFields")]
-		public string ExtraFields
-		{
-			get;
-			set;
-		}
+		public string ExtraFields { get; set; } = "[]";
 
 		[JsonIgnore]
 		[JsonProperty("extraProperties")]
-		public string ExtraProperties
-		{
-			get;
-			set;
-		}
+		public string ExtraProperties { get; set; } = "[]";
 
 		[JsonProperty("icon")]
 		public string Icon
@@ -106,14 +101,11 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_Image()) || this.get_Image().IndexOf("http") != -1 || this.get_Image().get_Chars(0) == '/')
+				if (string.IsNullOrEmpty(this.Image) || this.Image.IndexOf("http") != -1 || this.Image[0] == '/')
 				{
-					return this.get_Image();
+					return this.Image;
 				}
-				stackVariable16 = new string[2];
-				stackVariable16[0] = this.get_Domain();
-				stackVariable16[1] = this.get_Image();
-				return CommonHelper.GetFullPath(stackVariable16);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Image });
 			}
 		}
 
@@ -129,13 +121,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				stackVariable1 = this.get_Tags();
-				if (stackVariable1 == null)
-				{
-					dummyVar0 = stackVariable1;
-					stackVariable1 = "[]";
-				}
-				return JArray.Parse(stackVariable1);
+				return JArray.Parse(this.Tags ?? "[]");
 			}
 		}
 
@@ -216,11 +202,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		}
 
 		[JsonProperty("tags")]
-		public string Tags
-		{
-			get;
-			set;
-		}
+		public string Tags { get; set; } = "[]";
 
 		[JsonProperty("template")]
 		public string Template
@@ -233,18 +215,10 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				stackVariable1 = new string[4];
-				stackVariable1[0] = "";
-				stackVariable1[1] = "Views/Shared/Templates";
-				stackVariable10 = MixService.GetConfig<string>("ThemeFolder", this.get_Specificulture());
-				if (stackVariable10 == null)
-				{
-					dummyVar0 = stackVariable10;
-					stackVariable10 = "Default";
-				}
-				stackVariable1[2] = stackVariable10;
-				stackVariable1[3] = this.get_Template();
-				return CommonHelper.GetFullPath(stackVariable1);
+				string[] config = new string[] { "", "Views/Shared/Templates", null, null };
+				config[2] = MixService.GetConfig<string>("ThemeFolder", this.Specificulture) ?? "Default";
+				config[3] = this.Template;
+				return CommonHelper.GetFullPath(config);
 			}
 		}
 
@@ -260,18 +234,15 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				if (this.get_Thumbnail() == null || this.get_Thumbnail().IndexOf("http") != -1 || this.get_Thumbnail().get_Chars(0) == '/')
+				if (this.Thumbnail == null || this.Thumbnail.IndexOf("http") != -1 || this.Thumbnail[0] == '/')
 				{
-					if (!string.IsNullOrEmpty(this.get_Thumbnail()))
+					if (!string.IsNullOrEmpty(this.Thumbnail))
 					{
-						return this.get_Thumbnail();
+						return this.Thumbnail;
 					}
-					return this.get_ImageUrl();
+					return this.ImageUrl;
 				}
-				stackVariable20 = new string[2];
-				stackVariable20[0] = this.get_Domain();
-				stackVariable20[1] = this.get_Thumbnail();
-				return CommonHelper.GetFullPath(stackVariable20);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Thumbnail });
 			}
 		}
 
@@ -305,57 +276,31 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		public ReadListItemViewModel()
 		{
-			this.u003cExtraFieldsu003ek__BackingField = "[]";
-			this.u003cExtraPropertiesu003ek__BackingField = "[]";
-			this.u003cTagsu003ek__BackingField = "[]";
-			base();
-			return;
 		}
 
-		public ReadListItemViewModel(MixPost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadListItemViewModel(MixPost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cExtraFieldsu003ek__BackingField = "[]";
-			this.u003cExtraPropertiesu003ek__BackingField = "[]";
-			this.u003cTagsu003ek__BackingField = "[]";
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_Properties(new List<ExtraProperty>());
-			if (!string.IsNullOrEmpty(this.get_ExtraProperties()))
+			this.Properties = new List<ExtraProperty>();
+			if (!string.IsNullOrEmpty(this.ExtraProperties))
 			{
-				V_0 = JArray.Parse(this.get_ExtraProperties()).GetEnumerator();
-				try
+				foreach (JToken jToken in JArray.Parse(this.ExtraProperties))
 				{
-					while (V_0.MoveNext())
-					{
-						V_1 = V_0.get_Current();
-						this.get_Properties().Add(V_1.ToObject<ExtraProperty>());
-					}
-				}
-				finally
-				{
-					if (V_0 != null)
-					{
-						V_0.Dispose();
-					}
+					this.Properties.Add(jToken.ToObject<ExtraProperty>());
 				}
 			}
-			return;
 		}
 
 		public string Property(string name)
 		{
-			V_0 = new ReadListItemViewModel.u003cu003ec__DisplayClass133_0();
-			V_0.name = name;
-			stackVariable8 = this.get_Properties().FirstOrDefault<ExtraProperty>(new Func<ExtraProperty, bool>(V_0.u003cPropertyu003eb__0));
-			if (stackVariable8 != null)
+			ExtraProperty extraProperty = this.Properties.FirstOrDefault<ExtraProperty>((ExtraProperty p) => p.Name.ToLower() == name.ToLower());
+			if (extraProperty != null)
 			{
-				return stackVariable8.get_Value();
+				return extraProperty.Value;
 			}
-			dummyVar0 = stackVariable8;
 			return null;
 		}
 	}

@@ -2,6 +2,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
@@ -19,110 +20,110 @@ namespace Telerik.JustDecompiler.Steps
 
 		static OperatorStep()
 		{
-			stackVariable0 = new Dictionary<string, BinaryOperator>();
-			stackVariable0.Add("op_Equality", 9);
-			stackVariable0.Add("op_Inequality", 10);
-			stackVariable0.Add("op_GreaterThan", 15);
-			stackVariable0.Add("op_GreaterThanOrEqual", 16);
-			stackVariable0.Add("op_LessThan", 13);
-			stackVariable0.Add("op_LessThanOrEqual", 14);
-			stackVariable0.Add("op_Addition", 1);
-			stackVariable0.Add("op_Subtraction", 3);
-			stackVariable0.Add("op_Division", 7);
-			stackVariable0.Add("op_Multiply", 5);
-			stackVariable0.Add("op_Modulus", 24);
-			stackVariable0.Add("op_BitwiseAnd", 22);
-			stackVariable0.Add("op_BitwiseOr", 21);
-			stackVariable0.Add("op_ExclusiveOr", 23);
-			stackVariable0.Add("op_RightShift", 19);
-			stackVariable0.Add("op_LeftShift", 17);
-			OperatorStep.binaryOperators = stackVariable0;
-			stackVariable33 = new Dictionary<string, UnaryOperator>();
-			stackVariable33.Add("op_UnaryNegation", 0);
-			stackVariable33.Add("op_LogicalNot", 1);
-			stackVariable33.Add("op_OnesComplement", 2);
-			stackVariable33.Add("op_Decrement", 3);
-			stackVariable33.Add("op_Increment", 4);
-			stackVariable33.Add("op_UnaryPlus", 10);
-			OperatorStep.unaryOperators = stackVariable33;
-			return;
+			OperatorStep.binaryOperators = new Dictionary<string, BinaryOperator>()
+			{
+				{ "op_Equality", BinaryOperator.ValueEquality },
+				{ "op_Inequality", BinaryOperator.ValueInequality },
+				{ "op_GreaterThan", BinaryOperator.GreaterThan },
+				{ "op_GreaterThanOrEqual", BinaryOperator.GreaterThanOrEqual },
+				{ "op_LessThan", BinaryOperator.LessThan },
+				{ "op_LessThanOrEqual", BinaryOperator.LessThanOrEqual },
+				{ "op_Addition", BinaryOperator.Add },
+				{ "op_Subtraction", BinaryOperator.Subtract },
+				{ "op_Division", BinaryOperator.Divide },
+				{ "op_Multiply", BinaryOperator.Multiply },
+				{ "op_Modulus", BinaryOperator.Modulo },
+				{ "op_BitwiseAnd", BinaryOperator.BitwiseAnd },
+				{ "op_BitwiseOr", BinaryOperator.BitwiseOr },
+				{ "op_ExclusiveOr", BinaryOperator.BitwiseXor },
+				{ "op_RightShift", BinaryOperator.RightShift },
+				{ "op_LeftShift", BinaryOperator.LeftShift }
+			};
+			OperatorStep.unaryOperators = new Dictionary<string, UnaryOperator>()
+			{
+				{ "op_UnaryNegation", UnaryOperator.Negate },
+				{ "op_LogicalNot", UnaryOperator.LogicalNot },
+				{ "op_OnesComplement", UnaryOperator.BitwiseNot },
+				{ "op_Decrement", UnaryOperator.PostDecrement },
+				{ "op_Increment", UnaryOperator.PostIncrement },
+				{ "op_UnaryPlus", UnaryOperator.UnaryPlus }
+			};
 		}
 
 		public OperatorStep(BaseCodeTransformer codeTransformer, TypeSystem typeSystem)
 		{
-			base();
 			this.codeTransformer = codeTransformer;
 			this.typeSystem = typeSystem;
-			return;
 		}
 
 		private bool AreTheSame(Expression first, Expression second)
 		{
-			if (first.get_CodeNodeType() != second.get_CodeNodeType())
+			if (first.CodeNodeType != second.CodeNodeType)
 			{
 				return false;
 			}
 			return first.Equals(second);
 		}
 
-		private ICodeNode BuildBinaryExpression(BinaryOperator operator, Expression left, Expression right, TypeReference expressionType, IEnumerable<Instruction> instructions)
+		private ICodeNode BuildBinaryExpression(BinaryOperator @operator, Expression left, Expression right, TypeReference expressionType, IEnumerable<Instruction> instructions)
 		{
-			V_0 = new BinaryExpression(operator, (Expression)this.codeTransformer.Visit(left), (Expression)this.codeTransformer.Visit(right), expressionType, this.typeSystem, instructions, true);
-			if (V_0.get_IsComparisonExpression() || V_0.get_IsLogicalExpression())
+			BinaryExpression binaryExpression = new BinaryExpression(@operator, (Expression)this.codeTransformer.Visit(left), (Expression)this.codeTransformer.Visit(right), expressionType, this.typeSystem, instructions, true);
+			if (binaryExpression.IsComparisonExpression || binaryExpression.IsLogicalExpression)
 			{
-				V_0.set_ExpressionType(left.get_ExpressionType().get_Module().get_TypeSystem().get_Boolean());
+				binaryExpression.ExpressionType = left.ExpressionType.get_Module().get_TypeSystem().get_Boolean();
 			}
-			return V_0;
+			return binaryExpression;
 		}
 
-		private ICodeNode BuildUnaryExpression(UnaryOperator operator, Expression expression, IEnumerable<Instruction> instructions)
+		private ICodeNode BuildUnaryExpression(UnaryOperator @operator, Expression expression, IEnumerable<Instruction> instructions)
 		{
-			return new UnaryExpression(operator, (Expression)this.codeTransformer.Visit(expression), instructions);
+			return new UnaryExpression(@operator, (Expression)this.codeTransformer.Visit(expression), instructions);
 		}
 
 		internal BinaryExpression VisitAssignExpression(BinaryExpression node)
 		{
-			V_0 = node.get_Left();
-			V_1 = V_0.get_ExpressionType().Resolve();
-			if (V_1 == null)
+			BinaryOperator binaryOperator;
+			Expression left = node.Left;
+			TypeDefinition typeDefinition = left.ExpressionType.Resolve();
+			if (typeDefinition == null)
 			{
 				return null;
 			}
-			if (V_1.get_BaseType() != null && String.op_Equality(V_1.get_BaseType().get_Name(), "MulticastDelegate"))
+			if (typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_Name() == "MulticastDelegate")
 			{
-				V_2 = node.get_Right();
-				V_3 = V_2 as MethodInvocationExpression;
-				if (V_2 as ExplicitCastExpression != null)
+				Expression right = node.Right;
+				MethodInvocationExpression expression = right as MethodInvocationExpression;
+				if (right is ExplicitCastExpression)
 				{
-					V_3 = (V_2 as ExplicitCastExpression).get_Expression() as MethodInvocationExpression;
+					expression = (right as ExplicitCastExpression).Expression as MethodInvocationExpression;
 				}
-				if (V_3 == null)
+				if (expression == null)
 				{
 					return null;
 				}
-				if (V_3.get_Arguments().get_Count() == 2)
+				if (expression.Arguments.Count == 2)
 				{
-					V_4 = V_3.get_Arguments().get_Item(0);
-					V_5 = V_3.get_Arguments().get_Item(1);
-					if (!this.AreTheSame(V_4, V_0))
+					Expression item = expression.Arguments[0];
+					Expression item1 = expression.Arguments[1];
+					if (!this.AreTheSame(item, left))
 					{
 						return null;
 					}
-					if (!String.op_Equality(V_3.get_MethodExpression().get_Method().get_Name(), "Combine"))
+					if (expression.MethodExpression.Method.get_Name() != "Combine")
 					{
-						if (!String.op_Equality(V_3.get_MethodExpression().get_Method().get_Name(), "Remove"))
+						if (expression.MethodExpression.Method.get_Name() != "Remove")
 						{
 							return null;
 						}
-						V_6 = 4;
+						binaryOperator = BinaryOperator.SubtractAssign;
 					}
 					else
 					{
-						V_6 = 2;
+						binaryOperator = BinaryOperator.AddAssign;
 					}
-					V_7 = new List<Instruction>(node.get_MappedInstructions());
-					V_7.AddRange(V_3.get_InvocationInstructions());
-					return new BinaryExpression(V_6, V_0, V_5, this.typeSystem, V_7, false);
+					List<Instruction> instructions = new List<Instruction>(node.MappedInstructions);
+					instructions.AddRange(expression.InvocationInstructions);
+					return new BinaryExpression(binaryOperator, left, item1, this.typeSystem, instructions, false);
 				}
 			}
 			return null;
@@ -130,58 +131,48 @@ namespace Telerik.JustDecompiler.Steps
 
 		public ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			V_0 = node.get_MethodExpression();
-			if (V_0 == null || V_0.get_Method().get_CallingConvention() == 2)
+			BinaryOperator binaryOperator;
+			UnaryOperator unaryOperator;
+			MethodReferenceExpression methodExpression = node.MethodExpression;
+			if (methodExpression == null || methodExpression.Method.get_CallingConvention() == 2)
 			{
 				return null;
 			}
-			V_1 = V_0.get_Method();
-			if (OperatorStep.binaryOperators.TryGetValue(V_1.get_Name(), out V_2))
+			MethodReference method = methodExpression.Method;
+			if (OperatorStep.binaryOperators.TryGetValue(method.get_Name(), out binaryOperator))
 			{
-				return this.BuildBinaryExpression(V_2, node.get_Arguments().get_Item(0), node.get_Arguments().get_Item(1), V_1.get_FixedReturnType(), node.get_InvocationInstructions());
+				return this.BuildBinaryExpression(binaryOperator, node.Arguments[0], node.Arguments[1], method.get_FixedReturnType(), node.InvocationInstructions);
 			}
-			if (OperatorStep.unaryOperators.TryGetValue(V_1.get_Name(), out V_3))
+			if (OperatorStep.unaryOperators.TryGetValue(method.get_Name(), out unaryOperator))
 			{
-				return this.BuildUnaryExpression(V_3, node.get_Arguments().get_Item(0), node.get_InvocationInstructions());
+				return this.BuildUnaryExpression(unaryOperator, node.Arguments[0], node.InvocationInstructions);
 			}
-			if (String.op_Equality(V_1.get_Name(), "op_True"))
+			if (method.get_Name() == "op_True")
 			{
-				return (Expression)this.codeTransformer.Visit(node.get_Arguments().get_Item(0));
+				return (Expression)this.codeTransformer.Visit(node.Arguments[0]);
 			}
-			if (String.op_Equality(V_1.get_Name(), "op_False"))
+			if (method.get_Name() == "op_False")
 			{
-				return new ConditionExpression((Expression)this.codeTransformer.Visit(node.get_Arguments().get_Item(0)), new LiteralExpression(false, this.typeSystem, null), new LiteralExpression(true, this.typeSystem, null), node.get_InvocationInstructions());
+				return new ConditionExpression((Expression)this.codeTransformer.Visit(node.Arguments[0]), new LiteralExpression(false, this.typeSystem, null), new LiteralExpression(true, this.typeSystem, null), node.InvocationInstructions);
 			}
-			if (String.op_Equality(V_1.get_Name(), "op_Explicit"))
+			if (method.get_Name() == "op_Explicit")
 			{
-				return new ExplicitCastExpression((Expression)this.codeTransformer.Visit(node.get_Arguments().get_Item(0)), node.get_ExpressionType(), node.get_InvocationInstructions());
+				return new ExplicitCastExpression((Expression)this.codeTransformer.Visit(node.Arguments[0]), node.ExpressionType, node.InvocationInstructions);
 			}
-			if (String.op_Equality(V_1.get_Name(), "op_Implicit"))
+			if (method.get_Name() == "op_Implicit")
 			{
-				return new ImplicitCastExpression((Expression)this.codeTransformer.Visit(node.get_Arguments().get_Item(0)), node.get_ExpressionType(), node.get_InvocationInstructions());
+				return new ImplicitCastExpression((Expression)this.codeTransformer.Visit(node.Arguments[0]), node.ExpressionType, node.InvocationInstructions);
 			}
-			if (!String.op_Equality(V_1.get_Name(), "get_Chars") || !String.op_Equality(node.get_MethodExpression().get_Target().get_ExpressionType().get_FullName(), "System.String"))
+			if (!(method.get_Name() == "get_Chars") || !(node.MethodExpression.Target.ExpressionType.get_FullName() == "System.String"))
 			{
 				return null;
 			}
-			V_4 = new ArrayIndexerExpression(node.get_MethodExpression().get_Target(), node.get_InvocationInstructions());
-			V_5 = node.get_Arguments().GetEnumerator();
-			try
+			ArrayIndexerExpression arrayIndexerExpression = new ArrayIndexerExpression(node.MethodExpression.Target, node.InvocationInstructions);
+			foreach (Expression argument in node.Arguments)
 			{
-				while (V_5.MoveNext())
-				{
-					V_6 = V_5.get_Current();
-					V_4.get_Indices().Add(V_6);
-				}
+				arrayIndexerExpression.Indices.Add(argument);
 			}
-			finally
-			{
-				if (V_5 != null)
-				{
-					V_5.Dispose();
-				}
-			}
-			return V_4;
+			return arrayIndexerExpression;
 		}
 	}
 }

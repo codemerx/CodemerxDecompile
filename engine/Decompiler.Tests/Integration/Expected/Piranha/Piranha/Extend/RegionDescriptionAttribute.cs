@@ -14,15 +14,11 @@ namespace Piranha.Extend
 
 		public RegionDescriptionAttribute()
 		{
-			base();
-			return;
 		}
 
 		public RegionDescriptionAttribute(string text)
 		{
-			base();
-			this.set_Text(text);
-			return;
+			this.Text = text;
 		}
 	}
 }

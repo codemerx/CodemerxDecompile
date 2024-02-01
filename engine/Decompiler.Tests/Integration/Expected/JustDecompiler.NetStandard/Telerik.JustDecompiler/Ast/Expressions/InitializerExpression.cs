@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 
@@ -15,9 +16,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new InitializerExpression.u003cget_Childrenu003ed__24(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				InitializerExpression initializerExpression = null;
+				yield return initializerExpression.Expression;
 			}
 		}
 
@@ -25,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 88;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.InitializerExpression;
 			}
 		}
 
@@ -39,12 +39,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Expression().get_Expressions();
+				return this.Expression.Expressions;
 			}
 			set
 			{
-				this.get_Expression().set_Expressions(value);
-				return;
+				this.Expression.Expressions = value;
 			}
 		}
 
@@ -80,48 +79,44 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public InitializerExpression(ExpressionCollection expressions, Telerik.JustDecompiler.Ast.Expressions.InitializerType initializerType)
+		public InitializerExpression(ExpressionCollection expressions, Telerik.JustDecompiler.Ast.Expressions.InitializerType initializerType) : this(new BlockExpression(expressions, null), initializerType, Enumerable.Empty<Instruction>())
 		{
-			this(new BlockExpression(expressions, null), initializerType, Enumerable.Empty<Instruction>());
-			return;
 		}
 
-		public InitializerExpression(BlockExpression expression, Telerik.JustDecompiler.Ast.Expressions.InitializerType initializerType)
+		public InitializerExpression(BlockExpression expression, Telerik.JustDecompiler.Ast.Expressions.InitializerType initializerType) : this(expression, initializerType, Enumerable.Empty<Instruction>())
 		{
-			this(expression, initializerType, Enumerable.Empty<Instruction>());
-			return;
 		}
 
-		public InitializerExpression(BlockExpression expression, Telerik.JustDecompiler.Ast.Expressions.InitializerType initializerType, IEnumerable<Instruction> instructions)
+		public InitializerExpression(BlockExpression expression, Telerik.JustDecompiler.Ast.Expressions.InitializerType initializerType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			this.set_InitializerType(initializerType);
-			return;
+			this.Expression = expression;
+			this.InitializerType = initializerType;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			stackVariable8 = new InitializerExpression(this.get_Expression().Clone() as BlockExpression, this.get_InitializerType(), this.instructions);
-			stackVariable8.set_IsMultiLine(this.get_IsMultiLine());
-			return stackVariable8;
+			return new InitializerExpression(this.Expression.Clone() as BlockExpression, this.InitializerType, this.instructions)
+			{
+				IsMultiLine = this.IsMultiLine
+			};
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			stackVariable7 = new InitializerExpression(this.get_Expression().Clone() as BlockExpression, this.get_InitializerType(), null);
-			stackVariable7.set_IsMultiLine(this.get_IsMultiLine());
-			return stackVariable7;
+			return new InitializerExpression(this.Expression.Clone() as BlockExpression, this.InitializerType, null)
+			{
+				IsMultiLine = this.IsMultiLine
+			};
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			V_0 = other as InitializerExpression;
-			if (V_0 == null || !this.get_Expression().Equals(V_0.get_Expression()))
+			InitializerExpression initializerExpression = other as InitializerExpression;
+			if (initializerExpression == null || !this.Expression.Equals(initializerExpression.Expression))
 			{
 				return false;
 			}
-			return this.get_InitializerType() == V_0.get_InitializerType();
+			return this.InitializerType == initializerExpression.InitializerType;
 		}
 	}
 }

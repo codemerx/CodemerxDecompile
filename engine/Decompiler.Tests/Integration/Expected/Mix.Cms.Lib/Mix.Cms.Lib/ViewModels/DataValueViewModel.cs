@@ -8,11 +8,7 @@ namespace Mix.Cms.Lib.ViewModels
 	public class DataValueViewModel
 	{
 		[JsonProperty("dataType")]
-		public MixEnums.MixDataType DataType
-		{
-			get;
-			set;
-		}
+		public MixEnums.MixDataType DataType { get; set; } = MixEnums.MixDataType.Text;
 
 		[JsonProperty("name")]
 		public string Name
@@ -30,9 +26,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public DataValueViewModel()
 		{
-			this.u003cDataTypeu003ek__BackingField = 7;
-			base();
-			return;
 		}
 	}
 }

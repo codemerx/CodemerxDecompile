@@ -2,11 +2,16 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixAttributeFields;
+using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 {
@@ -175,164 +180,183 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 
 		public ImportViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ImportViewModel(MixAttributeSetValue model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ImportViewModel(MixAttributeSetValue model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_AttributeFieldId() <= 0)
+			string name;
+			if (this.AttributeFieldId <= 0)
 			{
-				stackVariable4 = new Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel();
-				stackVariable4.set_DataType(this.get_DataType());
-				stackVariable4.set_Id(this.get_AttributeFieldId());
-				stackVariable4.set_Title(this.get_AttributeFieldName());
-				stackVariable4.set_Name(this.get_AttributeFieldName());
-				stackVariable4.set_Priority(this.get_Priority());
-				this.set_Field(stackVariable4);
+				this.Field = new Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel()
+				{
+					DataType = this.DataType,
+					Id = this.AttributeFieldId,
+					Title = this.AttributeFieldName,
+					Name = this.AttributeFieldName,
+					Priority = this.Priority
+				};
 			}
 			else
 			{
-				stackVariable16 = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository;
-				V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Field = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository.GetSingleModel((MixAttributeField f) => f.Id == this.AttributeFieldId, null, null).get_Data();
+				if (this.Field != null && this.DataType == MixEnums.MixDataType.Reference)
+				{
+					MixAttributeSet mixAttributeSet = _context.MixAttributeSet.FirstOrDefault<MixAttributeSet>((MixAttributeSet m) => (int?)m.Id == this.Field.ReferenceId);
+					if (mixAttributeSet != null)
+					{
+						name = mixAttributeSet.Name;
+					}
+					else
+					{
+						name = null;
+					}
+					this.AttributeSetName = name;
+					return;
+				}
+			}
+		}
 
 		private void ParseDefaultValue(string defaultValue)
 		{
-			this.set_StringValue(defaultValue);
-			V_3 = this.get_DataType();
-			switch (V_3 - 1)
+			double num;
+			bool flag;
+			int num1;
+			this.StringValue = defaultValue;
+			MixEnums.MixDataType dataType = this.DataType;
+			switch (dataType)
 			{
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-				case 4:
+				case MixEnums.MixDataType.DateTime:
+				case MixEnums.MixDataType.Date:
+				case MixEnums.MixDataType.Time:
+				case MixEnums.MixDataType.Duration:
+				case MixEnums.MixDataType.PhoneNumber:
 				{
-				Label0:
 					return;
 				}
-				case 5:
+				case MixEnums.MixDataType.Double:
 				{
-					dummyVar0 = double.TryParse(defaultValue, out V_0);
-					this.set_DoubleValue(this.get_DoubleValue());
+					double.TryParse(defaultValue, out num);
+					this.DoubleValue = this.DoubleValue;
 					return;
 				}
 				default:
 				{
-					if (V_3 == 18)
+					if (dataType == MixEnums.MixDataType.Boolean)
 					{
-						dummyVar1 = bool.TryParse(defaultValue, out V_1);
-						this.set_BooleanValue(new bool?(V_1));
+						bool.TryParse(defaultValue, out flag);
+						this.BooleanValue = new bool?(flag);
 						return;
 					}
-					if (V_3 != 22)
+					if (dataType != MixEnums.MixDataType.Integer)
 					{
 						return;
 					}
-					dummyVar2 = int.TryParse(defaultValue, out V_2);
-					this.set_IntegerValue(new int?(V_2));
-					goto Label0;
+					int.TryParse(defaultValue, out num1);
+					this.IntegerValue = new int?(num1);
+					return;
 				}
 			}
 		}
 
 		public override MixAttributeSetValue ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (string.IsNullOrEmpty(this.get_Id()))
+			int priority;
+			MixEnums.MixDataType dataType;
+			string name;
+			int id;
+			string defaultValue;
+			if (string.IsNullOrEmpty(this.Id))
 			{
-				this.set_Id(Guid.NewGuid().ToString());
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
+				this.Id = Guid.NewGuid().ToString();
+				this.CreatedDateTime = DateTime.UtcNow;
 			}
-			stackVariable5 = this.get_Field();
-			if (stackVariable5 != null)
+			Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field = this.Field;
+			if (field != null)
 			{
-				stackVariable6 = stackVariable5.get_Priority();
-			}
-			else
-			{
-				dummyVar0 = stackVariable5;
-				stackVariable6 = this.get_Priority();
-			}
-			this.set_Priority(stackVariable6);
-			stackVariable9 = this.get_Field();
-			if (stackVariable9 != null)
-			{
-				stackVariable10 = stackVariable9.get_DataType();
+				priority = field.Priority;
 			}
 			else
 			{
-				dummyVar1 = stackVariable9;
-				stackVariable10 = this.get_DataType();
+				priority = this.Priority;
 			}
-			this.set_DataType(stackVariable10);
-			stackVariable13 = this.get_Field();
-			if (stackVariable13 != null)
+			this.Priority = priority;
+			Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel updateViewModel = this.Field;
+			if (updateViewModel != null)
 			{
-				stackVariable14 = stackVariable13.get_Name();
-			}
-			else
-			{
-				dummyVar2 = stackVariable13;
-				stackVariable14 = null;
-			}
-			this.set_AttributeFieldName(stackVariable14);
-			stackVariable17 = this.get_Field();
-			if (stackVariable17 != null)
-			{
-				stackVariable18 = stackVariable17.get_Id();
+				dataType = updateViewModel.DataType;
 			}
 			else
 			{
-				dummyVar3 = stackVariable17;
-				stackVariable18 = 0;
+				dataType = this.DataType;
 			}
-			this.set_AttributeFieldId(stackVariable18);
-			if (string.IsNullOrEmpty(this.get_StringValue()))
+			this.DataType = dataType;
+			Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field1 = this.Field;
+			if (field1 != null)
 			{
-				stackVariable27 = this.get_Field();
-				if (stackVariable27 != null)
+				name = field1.Name;
+			}
+			else
+			{
+				name = null;
+			}
+			this.AttributeFieldName = name;
+			Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel updateViewModel1 = this.Field;
+			if (updateViewModel1 != null)
+			{
+				id = updateViewModel1.Id;
+			}
+			else
+			{
+				id = 0;
+			}
+			this.AttributeFieldId = id;
+			if (string.IsNullOrEmpty(this.StringValue))
+			{
+				Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field2 = this.Field;
+				if (field2 != null)
 				{
-					stackVariable28 = stackVariable27.get_DefaultValue();
+					defaultValue = field2.DefaultValue;
 				}
 				else
 				{
-					dummyVar4 = stackVariable27;
-					stackVariable28 = null;
+					defaultValue = null;
 				}
-				if (!string.IsNullOrEmpty(stackVariable28))
+				if (!string.IsNullOrEmpty(defaultValue))
 				{
-					this.ParseDefaultValue(this.get_Field().get_DefaultValue());
+					this.ParseDefaultValue(this.Field.DefaultValue);
 				}
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			this.Validate(_context, _transaction);
-			if (this.get_IsValid() && this.get_Field() != null)
+			base.Validate(_context, _transaction);
+			if (base.get_IsValid() && this.Field != null)
 			{
-				if (this.get_Field().get_IsUnique())
+				if (this.Field.IsUnique)
 				{
-					stackVariable48 = _context.get_MixAttributeSetValue();
-					V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-					// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel::Validate(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Exception in: System.Void Validate(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
+					if (_context.MixAttributeSetValue.Any<MixAttributeSetValue>((MixAttributeSetValue d) => d.Specificulture == this.Specificulture && d.StringValue == this.StringValue && d.Id != this.Id && d.DataId != this.DataId))
+					{
+						base.set_IsValid(false);
+						base.get_Errors().Add(string.Concat(this.Field.Title, " = ", this.StringValue, " is existed"));
+					}
+				}
+				if (this.Field.IsRequire && string.IsNullOrEmpty(this.StringValue))
+				{
+					base.set_IsValid(false);
+					base.get_Errors().Add(string.Concat(this.Field.Title, " is required"));
+				}
+				if (!string.IsNullOrEmpty(this.Field.Regex) && !(new System.Text.RegularExpressions.Regex(this.Field.Regex, RegexOptions.IgnoreCase)).Match(this.StringValue).Success)
+				{
+					base.set_IsValid(false);
+					base.get_Errors().Add(string.Concat(this.Field.Title, " is invalid"));
+				}
+			}
+		}
 	}
 }

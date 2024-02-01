@@ -16,7 +16,6 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return new BreakStatement.u003cget_Childrenu003ed__3(-2);
 			}
 		}
 
@@ -24,49 +23,44 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 9;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.BreakStatement;
 			}
 		}
 
 		public BreakStatement(IEnumerable<Instruction> jumps)
 		{
-			base();
 			this.breakJumps = new List<Instruction>();
 			if (jumps != null)
 			{
 				this.breakJumps.AddRange(jumps);
-				stackVariable8 = this.breakJumps;
-				stackVariable9 = BreakStatement.u003cu003ec.u003cu003e9__1_0;
-				if (stackVariable9 == null)
-				{
-					dummyVar0 = stackVariable9;
-					stackVariable9 = new Comparison<Instruction>(BreakStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__1_0);
-					BreakStatement.u003cu003ec.u003cu003e9__1_0 = stackVariable9;
-				}
-				stackVariable8.Sort(stackVariable9);
+				this.breakJumps.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
-			return;
 		}
 
 		public override Statement Clone()
 		{
-			V_0 = new BreakStatement(this.breakJumps);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			BreakStatement breakStatement = new BreakStatement(this.breakJumps);
+			base.CopyParentAndLabel(breakStatement);
+			return breakStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new BreakStatement(null);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			BreakStatement breakStatement = new BreakStatement(null);
+			base.CopyParentAndLabel(breakStatement);
+			return breakStatement;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			stackVariable1 = new BreakStatement.u003cGetOwnInstructionsu003ed__4(-2);
-			stackVariable1.u003cu003e4__this = this;
-			return stackVariable1;
+			BreakStatement breakStatement = null;
+			if (breakStatement.breakJumps != null)
+			{
+				foreach (Instruction breakJump in breakStatement.breakJumps)
+				{
+					yield return breakJump;
+				}
+			}
 		}
 	}
 }

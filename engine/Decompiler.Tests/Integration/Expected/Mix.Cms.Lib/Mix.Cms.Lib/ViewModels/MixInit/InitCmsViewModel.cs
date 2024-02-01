@@ -13,65 +13,24 @@ namespace Mix.Cms.Lib.ViewModels.MixInit
 		{
 			get
 			{
-				switch (this.get_DatabaseProvider())
+				switch (this.DatabaseProvider)
 				{
-					case 0:
+					case MixEnums.DatabaseProvider.MSSQL:
 					{
-						if (!string.IsNullOrEmpty(this.get_DatabasePort()))
+						string str = (!string.IsNullOrEmpty(this.DatabasePort) ? string.Concat(this.DatabaseServer, ",", this.DatabasePort) : this.DatabaseServer);
+						if (this.IsUseLocal)
 						{
-							stackVariable11 = string.Concat(this.get_DatabaseServer(), ",", this.get_DatabasePort());
+							return this.LocalDbConnectionString;
 						}
-						else
-						{
-							stackVariable11 = this.get_DatabaseServer();
-						}
-						V_1 = stackVariable11;
-						if (this.get_IsUseLocal())
-						{
-							return this.get_LocalDbConnectionString();
-						}
-						stackVariable17 = new string[9];
-						stackVariable17[0] = "Server=";
-						stackVariable17[1] = V_1;
-						stackVariable17[2] = ";Database=";
-						stackVariable17[3] = this.get_DatabaseName();
-						stackVariable17[4] = ";UID=";
-						stackVariable17[5] = this.get_DatabaseUser();
-						stackVariable17[6] = ";Pwd=";
-						stackVariable17[7] = this.get_DatabasePassword();
-						stackVariable17[8] = ";MultipleActiveResultSets=true;";
-						return string.Concat(stackVariable17);
+						return string.Concat(new string[] { "Server=", str, ";Database=", this.DatabaseName, ";UID=", this.DatabaseUser, ";Pwd=", this.DatabasePassword, ";MultipleActiveResultSets=true;" });
 					}
-					case 1:
+					case MixEnums.DatabaseProvider.MySQL:
 					{
-						stackVariable42 = new string[11];
-						stackVariable42[0] = "Server=";
-						stackVariable42[1] = this.get_DatabaseServer();
-						stackVariable42[2] = ";port=";
-						stackVariable42[3] = this.get_DatabasePort();
-						stackVariable42[4] = ";Database=";
-						stackVariable42[5] = this.get_DatabaseName();
-						stackVariable42[6] = ";User=";
-						stackVariable42[7] = this.get_DatabaseUser();
-						stackVariable42[8] = ";Password=";
-						stackVariable42[9] = this.get_DatabasePassword();
-						stackVariable42[10] = ";";
-						return string.Concat(stackVariable42);
+						return string.Concat(new string[] { "Server=", this.DatabaseServer, ";port=", this.DatabasePort, ";Database=", this.DatabaseName, ";User=", this.DatabaseUser, ";Password=", this.DatabasePassword, ";" });
 					}
-					case 2:
+					case MixEnums.DatabaseProvider.PostgreSQL:
 					{
-						stackVariable72 = new string[10];
-						stackVariable72[0] = "Host=";
-						stackVariable72[1] = this.get_DatabaseServer();
-						stackVariable72[2] = ";Port=";
-						stackVariable72[3] = this.get_DatabasePort();
-						stackVariable72[4] = ";Database=";
-						stackVariable72[5] = this.get_DatabaseName();
-						stackVariable72[6] = ";Username=";
-						stackVariable72[7] = this.get_DatabaseUser();
-						stackVariable72[8] = ";Password=";
-						stackVariable72[9] = this.get_DatabasePassword();
-						return string.Concat(stackVariable72);
+						return string.Concat(new string[] { "Host=", this.DatabaseServer, ";Port=", this.DatabasePort, ";Database=", this.DatabaseName, ";Username=", this.DatabaseUser, ";Password=", this.DatabasePassword });
 					}
 				}
 				return string.Empty;
@@ -132,7 +91,7 @@ namespace Mix.Cms.Lib.ViewModels.MixInit
 		{
 			get
 			{
-				return this.get_DatabaseProvider() == 1;
+				return this.DatabaseProvider == MixEnums.DatabaseProvider.MySQL;
 			}
 		}
 
@@ -151,33 +110,16 @@ namespace Mix.Cms.Lib.ViewModels.MixInit
 		}
 
 		[JsonProperty("localDbConnectionString")]
-		public string LocalDbConnectionString
-		{
-			get;
-			set;
-		}
+		public string LocalDbConnectionString { get; set; } = "Server=(localdb)\\MSSQLLocalDB;Initial Catalog=mix-cms.db;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True";
 
 		[JsonProperty("siteName")]
-		public string SiteName
-		{
-			get;
-			set;
-		}
+		public string SiteName { get; set; } = "MixCore";
 
 		[JsonProperty("sqliteDbConnectionString")]
-		public string SqliteDbConnectionString
-		{
-			get;
-			set;
-		}
+		public string SqliteDbConnectionString { get; set; } = "Data Source=mix-cms.db";
 
 		public InitCmsViewModel()
 		{
-			this.u003cLocalDbConnectionStringu003ek__BackingField = "Server=(localdb)\\MSSQLLocalDB;Initial Catalog=mix-cms.db;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True";
-			this.u003cSqliteDbConnectionStringu003ek__BackingField = "Data Source=mix-cms.db";
-			this.u003cSiteNameu003ek__BackingField = "MixCore";
-			base();
-			return;
 		}
 	}
 }

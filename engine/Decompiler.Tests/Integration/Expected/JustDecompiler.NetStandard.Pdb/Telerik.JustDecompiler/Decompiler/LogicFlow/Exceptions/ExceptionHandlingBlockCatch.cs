@@ -19,15 +19,13 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions
 		{
 			get
 			{
-				return 0;
+				return FilteringExceptionHandlerType.Catch;
 			}
 		}
 
-		public ExceptionHandlingBlockCatch(HashSet<ILogicalConstruct> Children, ILogicalConstruct Entry, TypeReference catchType)
+		public ExceptionHandlingBlockCatch(HashSet<ILogicalConstruct> Children, ILogicalConstruct Entry, TypeReference catchType) : base(Entry, Children)
 		{
-			base(Entry, Children);
-			this.set_CatchType(catchType);
-			return;
+			this.CatchType = catchType;
 		}
 	}
 }

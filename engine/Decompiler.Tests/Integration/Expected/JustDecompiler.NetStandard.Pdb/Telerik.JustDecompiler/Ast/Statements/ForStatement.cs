@@ -23,9 +23,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.set_Parent(this);
+					this.body.Parent = this;
 				}
-				return;
 			}
 		}
 
@@ -33,9 +32,20 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new ForStatement.u003cget_Childrenu003ed__3(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ForStatement forStatement = null;
+				yield return forStatement.Condition;
+				if (forStatement.Initializer != null)
+				{
+					yield return forStatement.Initializer;
+				}
+				if (forStatement.Increment != null)
+				{
+					yield return forStatement.Increment;
+				}
+				if (forStatement.Body != null)
+				{
+					yield return forStatement.Body;
+				}
 			}
 		}
 
@@ -43,7 +53,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 11;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ForStatement;
 			}
 		}
 
@@ -59,47 +69,51 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			set;
 		}
 
-		public ForStatement(Expression initializer, Expression condition, Expression increment, BlockStatement body)
+		public ForStatement(Expression initializer, Expression condition, Expression increment, BlockStatement body) : base(condition)
 		{
-			base(condition);
-			this.set_Initializer(initializer);
-			this.set_Increment(increment);
-			this.set_Body(body);
-			return;
+			this.Initializer = initializer;
+			this.Increment = increment;
+			this.Body = body;
 		}
 
 		public override Statement Clone()
 		{
+			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				stackVariable5 = this.body.Clone() as BlockStatement;
+				blockStatement = this.body.Clone() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable5;
-			V_1 = new ForStatement(this.get_Initializer().Clone(), this.get_Condition().Clone(), this.get_Increment().Clone(), V_0);
-			V_1.set_ConditionBlock(this.get_ConditionBlock());
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			BlockStatement blockStatement1 = blockStatement;
+			ForStatement forStatement = new ForStatement(this.Initializer.Clone(), base.Condition.Clone(), this.Increment.Clone(), blockStatement1)
+			{
+				ConditionBlock = base.ConditionBlock
+			};
+			base.CopyParentAndLabel(forStatement);
+			return forStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
+			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				stackVariable5 = this.body.CloneStatementOnly() as BlockStatement;
+				blockStatement = this.body.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable5;
-			V_1 = new ForStatement(this.get_Initializer().CloneExpressionOnly(), this.get_Condition().CloneExpressionOnly(), this.get_Increment().CloneExpressionOnly(), V_0);
-			V_1.set_ConditionBlock(null);
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			BlockStatement blockStatement1 = blockStatement;
+			ForStatement forStatement = new ForStatement(this.Initializer.CloneExpressionOnly(), base.Condition.CloneExpressionOnly(), this.Increment.CloneExpressionOnly(), blockStatement1)
+			{
+				ConditionBlock = null
+			};
+			base.CopyParentAndLabel(forStatement);
+			return forStatement;
 		}
 	}
 }

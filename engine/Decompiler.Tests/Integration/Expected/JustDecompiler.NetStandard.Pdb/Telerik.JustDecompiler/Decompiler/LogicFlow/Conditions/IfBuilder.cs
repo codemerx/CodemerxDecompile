@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DFST;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DTree;
 
@@ -16,22 +17,16 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 	{
 		private readonly TypeSystem typeSystem;
 
-		private readonly Dictionary<int, int> blockToInstructionsCount;
+		private readonly Dictionary<int, int> blockToInstructionsCount = new Dictionary<int, int>();
 
-		public IfBuilder(LogicalFlowBuilderContext logicalContext, TypeSystem typeSystem)
+		public IfBuilder(LogicalFlowBuilderContext logicalContext, TypeSystem typeSystem) : base(logicalContext)
 		{
-			this.blockToInstructionsCount = new Dictionary<int, int>();
-			base(logicalContext);
 			this.typeSystem = typeSystem;
-			return;
 		}
 
 		private bool AllEndsAreThrow(ILogicalConstruct entry)
 		{
-			stackVariable4 = entry.get_FirstBlock().get_TheBlock();
-			stackVariable6 = new Code[1];
-			stackVariable6[0] = 119;
-			if (!this.SubtreeEndsInInstructionCode(stackVariable4, stackVariable6))
+			if (!this.SubtreeEndsInInstructionCode(entry.FirstBlock.TheBlock, new Code[] { 119 }))
 			{
 				return false;
 			}
@@ -40,53 +35,31 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		public void BuildConstructs(ILogicalConstruct construct)
 		{
-			if (construct as CFGBlockLogicalConstruct != null || construct as ConditionLogicalConstruct != null)
+			if (construct is CFGBlockLogicalConstruct || construct is ConditionLogicalConstruct)
 			{
 				return;
 			}
-			V_0 = construct.get_Children().GetEnumerator();
-			try
+			foreach (ILogicalConstruct child in construct.Children)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = (ILogicalConstruct)V_0.get_Current();
-					this.BuildConstructs(V_1);
-				}
-			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
+				this.BuildConstructs(child);
 			}
 			this.BuildIfConstructs(construct);
-			return;
 		}
 
 		private void BuildIfConstructs(ILogicalConstruct construct)
 		{
-			V_0 = this.GetDominatorTreeFromContext(construct);
-			V_1 = DFSTBuilder.BuildTree(construct);
-			V_2 = this.GetPostOrderedIfConditionCandidates(V_1).GetEnumerator();
-			try
+			DominatorTree dominatorTreeFromContext = base.GetDominatorTreeFromContext(construct);
+			DFSTree dFSTree = DFSTBuilder.BuildTree(construct);
+			foreach (ConditionLogicalConstruct postOrderedIfConditionCandidate in this.GetPostOrderedIfConditionCandidates(dFSTree))
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = V_2.get_Current();
-					dummyVar0 = this.TryBuildIfConstruct(V_3, V_0, V_1);
-				}
+				this.TryBuildIfConstruct(postOrderedIfConditionCandidate, dominatorTreeFromContext, dFSTree);
 			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
-			}
-			return;
 		}
 
 		private ILogicalConstruct CheckSuccessor(ILogicalConstruct condition, ILogicalConstruct conditionSuccessor, HashSet<ISingleEntrySubGraph> otherSuccessorFrontier, DFSTree dfsTree)
 		{
-			if (otherSuccessorFrontier.Contains(conditionSuccessor) && !dfsTree.get_ConstructToNodeMap().TryGetValue(conditionSuccessor, out V_0) || dfsTree.get_ConstructToNodeMap().get_Item(condition).CompareTo(V_0) < 0)
+			DFSTNode dFSTNode;
+			if (otherSuccessorFrontier.Contains(conditionSuccessor) && (!dfsTree.ConstructToNodeMap.TryGetValue(conditionSuccessor, out dFSTNode) || dfsTree.ConstructToNodeMap[condition].CompareTo(dFSTNode) < 0))
 			{
 				return conditionSuccessor;
 			}
@@ -95,197 +68,156 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private bool CheckSuccessors(HashSet<ILogicalConstruct> theBody, ILogicalConstruct successor)
 		{
-			V_0 = false;
-			V_1 = theBody.GetEnumerator();
+			bool flag;
+			bool flag1 = false;
+			HashSet<ILogicalConstruct>.Enumerator enumerator = theBody.GetEnumerator();
 			try
 			{
-				while (V_1.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_2 = V_1.get_Current().get_SameParentSuccessors().GetEnumerator();
+					HashSet<ISingleEntrySubGraph>.Enumerator enumerator1 = enumerator.Current.SameParentSuccessors.GetEnumerator();
 					try
 					{
-						while (V_2.MoveNext())
+						while (enumerator1.MoveNext())
 						{
-							V_3 = (ILogicalConstruct)V_2.get_Current();
-							if (theBody.Contains(V_3))
+							ILogicalConstruct current = (ILogicalConstruct)enumerator1.Current;
+							if (theBody.Contains(current))
 							{
 								continue;
 							}
-							V_0 = true;
-							if (V_3 != successor)
+							flag1 = true;
+							if (current != successor)
 							{
 								continue;
 							}
-							V_4 = true;
-							goto Label1;
+							flag = true;
+							return flag;
 						}
 					}
 					finally
 					{
-						((IDisposable)V_2).Dispose();
+						((IDisposable)enumerator1).Dispose();
 					}
 				}
-				goto Label0;
+				return !flag1;
 			}
 			finally
 			{
-				((IDisposable)V_1).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_4;
-		Label0:
-			return !V_0;
+			return flag;
 		}
 
 		private int CountInstructions(IEnumerable<ILogicalConstruct> trueSuccessor)
 		{
-			V_0 = 0;
-			V_1 = trueSuccessor.GetEnumerator();
-			try
+			int num = 0;
+			foreach (ILogicalConstruct logicalConstruct in trueSuccessor)
 			{
-				while (V_1.MoveNext())
+				foreach (CFGBlockLogicalConstruct cFGBlock in logicalConstruct.CFGBlocks)
 				{
-					V_2 = V_1.get_Current().get_CFGBlocks().GetEnumerator();
-					try
+					int item = 0;
+					if (!this.blockToInstructionsCount.ContainsKey(cFGBlock.TheBlock.First.get_Offset()))
 					{
-						while (V_2.MoveNext())
+						foreach (Instruction theBlock in cFGBlock.TheBlock)
 						{
-							V_3 = V_2.get_Current();
-							V_4 = 0;
-							if (!this.blockToInstructionsCount.ContainsKey(V_3.get_TheBlock().get_First().get_Offset()))
-							{
-								V_5 = V_3.get_TheBlock().GetEnumerator();
-								try
-								{
-									while (V_5.MoveNext())
-									{
-										dummyVar0 = V_5.get_Current();
-										V_4 = V_4 + 1;
-									}
-								}
-								finally
-								{
-									if (V_5 != null)
-									{
-										V_5.Dispose();
-									}
-								}
-								this.blockToInstructionsCount.Add(V_3.get_TheBlock().get_First().get_Offset(), V_4);
-							}
-							else
-							{
-								V_4 = this.blockToInstructionsCount.get_Item(V_3.get_TheBlock().get_First().get_Offset());
-							}
-							V_0 = V_0 + V_4;
+							item++;
 						}
+						this.blockToInstructionsCount.Add(cFGBlock.TheBlock.First.get_Offset(), item);
 					}
-					finally
+					else
 					{
-						((IDisposable)V_2).Dispose();
+						item = this.blockToInstructionsCount[cFGBlock.TheBlock.First.get_Offset()];
 					}
+					num += item;
 				}
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			return V_0;
+			return num;
 		}
 
 		private HashSet<ILogicalConstruct> GetBlockBody(DominatorTree dominatorTree, ILogicalConstruct conditionSuccessor, ConditionLogicalConstruct theCondition)
 		{
-			if (conditionSuccessor == dominatorTree.get_RootConstruct())
+			HashSet<ILogicalConstruct> logicalConstructs;
+			if (conditionSuccessor == dominatorTree.RootConstruct)
 			{
 				return null;
 			}
-			V_0 = null;
-			if (conditionSuccessor.get_AllPredecessors().get_Count() == 1)
+			HashSet<ILogicalConstruct> logicalConstructs1 = null;
+			if (conditionSuccessor.AllPredecessors.Count == 1)
 			{
-				V_0 = new HashSet<ILogicalConstruct>();
-				V_1 = dominatorTree.GetDominatedNodes(conditionSuccessor).GetEnumerator();
+				logicalConstructs1 = new HashSet<ILogicalConstruct>();
+				HashSet<ISingleEntrySubGraph>.Enumerator enumerator = dominatorTree.GetDominatedNodes(conditionSuccessor).GetEnumerator();
 				try
 				{
-					while (V_1.MoveNext())
+					while (enumerator.MoveNext())
 					{
-						V_2 = (ILogicalConstruct)V_1.get_Current();
-						if (V_2 != theCondition)
+						ILogicalConstruct current = (ILogicalConstruct)enumerator.Current;
+						if (current != theCondition)
 						{
-							dummyVar0 = V_0.Add(V_2);
+							logicalConstructs1.Add(current);
 						}
 						else
 						{
-							V_3 = null;
-							goto Label1;
+							logicalConstructs = null;
+							return logicalConstructs;
 						}
 					}
-					goto Label0;
+					return logicalConstructs1;
 				}
 				finally
 				{
-					((IDisposable)V_1).Dispose();
+					((IDisposable)enumerator).Dispose();
 				}
-			Label1:
-				return V_3;
+				return logicalConstructs;
 			}
-		Label0:
-			return V_0;
+			return logicalConstructs1;
 		}
 
 		private IEnumerable<ConditionLogicalConstruct> GetPostOrderedIfConditionCandidates(DFSTree dfsTree)
 		{
-			stackVariable1 = new IfBuilder.u003cGetPostOrderedIfConditionCandidatesu003ed__5(-2);
-			stackVariable1.u003cu003e3__dfsTree = dfsTree;
-			return stackVariable1;
+			for (int i = dfsTree.ReversePostOrder.Count - 1; i >= 0; i--)
+			{
+				ConditionLogicalConstruct construct = dfsTree.ReversePostOrder[i].Construct as ConditionLogicalConstruct;
+				if (construct != null && construct.SameParentSuccessors.Count == 2)
+				{
+					yield return construct;
+				}
+			}
 		}
 
 		private bool HasLessOrEqualInstructions(IEnumerable<ILogicalConstruct> trueSuccessor, IEnumerable<ILogicalConstruct> falseSuccessor)
 		{
-			V_0 = this.CountInstructions(trueSuccessor);
-			return this.CountInstructions(falseSuccessor) <= V_0;
+			int num = this.CountInstructions(trueSuccessor);
+			return this.CountInstructions(falseSuccessor) <= num;
 		}
 
 		private bool HasSuccessors(ICollection<ILogicalConstruct> block)
 		{
-			V_0 = block.GetEnumerator();
-			try
+			bool flag;
+			using (IEnumerator<ILogicalConstruct> enumerator = block.GetEnumerator())
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current().get_AllSuccessors().GetEnumerator();
+					HashSet<ISingleEntrySubGraph>.Enumerator enumerator1 = enumerator.Current.AllSuccessors.GetEnumerator();
 					try
 					{
-						while (V_1.MoveNext())
+						while (enumerator1.MoveNext())
 						{
-							V_2 = (ILogicalConstruct)V_1.get_Current();
-							if (block.Contains(V_2))
+							if (block.Contains((ILogicalConstruct)enumerator1.Current))
 							{
 								continue;
 							}
-							V_3 = true;
-							goto Label1;
+							flag = true;
+							return flag;
 						}
 					}
 					finally
 					{
-						((IDisposable)V_1).Dispose();
+						((IDisposable)enumerator1).Dispose();
 					}
 				}
-				goto Label0;
+				return false;
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-		Label1:
-			return V_3;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		private bool ShouldInvertIfAndRemoveElse(ICollection<ILogicalConstruct> trueSuccessor, ILogicalConstruct trueBlockEntry, ICollection<ILogicalConstruct> falseSuccessor, ILogicalConstruct falseBlockEntry)
@@ -317,137 +249,114 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private bool SubtreeEndsInInstructionCode(InstructionBlock entryBlock, IEnumerable<Code> operationCodes)
 		{
-			V_0 = true;
-			V_1 = new Queue<InstructionBlock>();
-			V_2 = new HashSet<int>();
-			V_1.Enqueue(entryBlock);
-			while (V_1.get_Count() > 0 & V_0)
+			bool flag = true;
+			Queue<InstructionBlock> instructionBlocks = new Queue<InstructionBlock>();
+			HashSet<int> nums = new HashSet<int>();
+			instructionBlocks.Enqueue(entryBlock);
+			while (instructionBlocks.Count > 0 & flag)
 			{
-				V_3 = V_1.Dequeue();
-				if (V_2.Contains(V_3.get_First().get_Offset()))
+				InstructionBlock instructionBlocks1 = instructionBlocks.Dequeue();
+				if (nums.Contains(instructionBlocks1.First.get_Offset()))
 				{
 					continue;
 				}
-				dummyVar0 = V_2.Add(V_3.get_First().get_Offset());
-				if (V_3.get_Successors().Length != 0)
+				nums.Add(instructionBlocks1.First.get_Offset());
+				if (instructionBlocks1.Successors.Length != 0)
 				{
-					V_8 = V_3.get_Successors();
-					V_9 = 0;
-					while (V_9 < (int)V_8.Length)
+					InstructionBlock[] successors = instructionBlocks1.Successors;
+					for (int i = 0; i < (int)successors.Length; i++)
 					{
-						V_1.Enqueue(V_8[V_9]);
-						V_9 = V_9 + 1;
+						instructionBlocks.Enqueue(successors[i]);
 					}
 				}
 				else
 				{
-					V_4 = false;
-					V_5 = operationCodes.GetEnumerator();
-					try
+					bool code = false;
+					foreach (Code operationCode in operationCodes)
 					{
-						while (V_5.MoveNext())
-						{
-							V_6 = V_5.get_Current();
-							V_7 = V_3.get_Last().get_OpCode();
-							V_4 = V_4 | V_7.get_Code() == V_6;
-						}
+						OpCode opCode = instructionBlocks1.Last.get_OpCode();
+						code = code | opCode.get_Code() == operationCode;
 					}
-					finally
-					{
-						if (V_5 != null)
-						{
-							V_5.Dispose();
-						}
-					}
-					V_0 = V_0 & V_4;
+					flag &= code;
 				}
 			}
-			return V_0;
+			return flag;
 		}
 
 		private bool TryBuildIfConstruct(ConditionLogicalConstruct condition, DominatorTree dominatorTree, DFSTree dfsTree)
 		{
-			V_0 = condition.get_FalseSuccessor();
-			V_1 = condition.get_TrueSuccessor();
-			V_2 = dominatorTree.GetDominanceFrontier(V_0);
-			V_3 = dominatorTree.GetDominanceFrontier(V_1);
-			stackVariable15 = this.CheckSuccessor(condition, V_1, V_2, dfsTree);
-			if (stackVariable15 == null)
-			{
-				dummyVar0 = stackVariable15;
-				stackVariable15 = this.CheckSuccessor(condition, V_0, V_3, dfsTree);
-			}
-			V_4 = new HashSet<ISingleEntrySubGraph>(V_3);
-			V_4.IntersectWith(V_2);
-			if (stackVariable15 == null && V_2.get_Count() > 0 && V_3.get_Count() > 0 && V_4.get_Count() == 0)
+			BlockLogicalConstruct blockLogicalConstruct;
+			ILogicalConstruct falseSuccessor = condition.FalseSuccessor;
+			ILogicalConstruct trueSuccessor = condition.TrueSuccessor;
+			HashSet<ISingleEntrySubGraph> dominanceFrontier = dominatorTree.GetDominanceFrontier(falseSuccessor);
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = dominatorTree.GetDominanceFrontier(trueSuccessor);
+			ILogicalConstruct logicalConstruct = this.CheckSuccessor(condition, trueSuccessor, dominanceFrontier, dfsTree) ?? this.CheckSuccessor(condition, falseSuccessor, singleEntrySubGraphs, dfsTree);
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs1 = new HashSet<ISingleEntrySubGraph>(singleEntrySubGraphs);
+			singleEntrySubGraphs1.IntersectWith(dominanceFrontier);
+			if (logicalConstruct == null && dominanceFrontier.Count > 0 && singleEntrySubGraphs.Count > 0 && singleEntrySubGraphs1.Count == 0)
 			{
 				return false;
 			}
-			V_5 = this.GetBlockBody(dominatorTree, V_1, condition);
-			V_6 = this.GetBlockBody(dominatorTree, V_0, condition);
-			if (V_5 == null && V_6 == null)
+			HashSet<ILogicalConstruct> blockBody = this.GetBlockBody(dominatorTree, trueSuccessor, condition);
+			HashSet<ILogicalConstruct> logicalConstructs = this.GetBlockBody(dominatorTree, falseSuccessor, condition);
+			if (blockBody == null && logicalConstructs == null)
 			{
 				return false;
 			}
-			if (V_5 == null)
+			if (blockBody == null)
 			{
 				condition.Negate(this.typeSystem);
-				stackVariable86 = V_1;
-				V_1 = V_0;
-				V_0 = stackVariable86;
-				V_5 = V_6;
-				V_6 = null;
+				ILogicalConstruct logicalConstruct1 = trueSuccessor;
+				trueSuccessor = falseSuccessor;
+				falseSuccessor = logicalConstruct1;
+				blockBody = logicalConstructs;
+				logicalConstructs = null;
 			}
-			if (V_6 == null && !this.CheckSuccessors(V_5, V_0))
+			if (logicalConstructs == null && !this.CheckSuccessors(blockBody, falseSuccessor))
 			{
 				return false;
 			}
-			if (this.ShouldInvertIfAndRemoveElse(V_5, V_1, V_6, V_0))
+			if (this.ShouldInvertIfAndRemoveElse(blockBody, trueSuccessor, logicalConstructs, falseSuccessor))
 			{
 				condition.Negate(this.typeSystem);
-				stackVariable73 = V_1;
-				V_1 = V_0;
-				V_0 = stackVariable73;
-				stackVariable75 = V_5;
-				V_5 = V_6;
-				V_6 = stackVariable75;
-				V_6 = null;
+				ILogicalConstruct logicalConstruct2 = trueSuccessor;
+				trueSuccessor = falseSuccessor;
+				falseSuccessor = logicalConstruct2;
+				HashSet<ILogicalConstruct> logicalConstructs1 = blockBody;
+				blockBody = logicalConstructs;
+				logicalConstructs = logicalConstructs1;
+				logicalConstructs = null;
 			}
-			if (V_6 != null && !this.HasSuccessors(V_5))
+			if (logicalConstructs != null && !this.HasSuccessors(blockBody))
 			{
-				stackVariable61 = V_1.get_FirstBlock().get_TheBlock();
-				stackVariable63 = new Code[2];
-				stackVariable63[0] = 41;
-				stackVariable63[1] = 119;
-				if (this.SubtreeEndsInInstructionCode(stackVariable61, stackVariable63))
+				if (this.SubtreeEndsInInstructionCode(trueSuccessor.FirstBlock.TheBlock, new Code[] { 41, 119 }))
 				{
-					V_6 = null;
+					logicalConstructs = null;
 				}
 			}
-			V_7 = new BlockLogicalConstruct(V_1, V_5);
-			if (V_6 != null)
+			BlockLogicalConstruct blockLogicalConstruct1 = new BlockLogicalConstruct(trueSuccessor, blockBody);
+			if (logicalConstructs != null)
 			{
-				stackVariable46 = new BlockLogicalConstruct(V_0, V_6);
+				blockLogicalConstruct = new BlockLogicalConstruct(falseSuccessor, logicalConstructs);
 			}
 			else
 			{
-				stackVariable46 = null;
+				blockLogicalConstruct = null;
 			}
-			this.UpdateDominatorTree(dominatorTree, IfLogicalConstruct.GroupInIfConstruct(condition, V_7, stackVariable46));
+			this.UpdateDominatorTree(dominatorTree, IfLogicalConstruct.GroupInIfConstruct(condition, blockLogicalConstruct1, blockLogicalConstruct));
 			return true;
 		}
 
 		private void UpdateDominatorTree(DominatorTree dominatorTree, IfLogicalConstruct theIfConstruct)
 		{
-			V_0 = new HashSet<ISingleEntrySubGraph>();
-			dummyVar0 = V_0.Add(theIfConstruct.get_Condition());
-			V_0.UnionWith(theIfConstruct.get_Then().get_Children());
-			if (theIfConstruct.get_Else() != null)
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+			singleEntrySubGraphs.Add(theIfConstruct.Condition);
+			singleEntrySubGraphs.UnionWith(theIfConstruct.Then.Children);
+			if (theIfConstruct.Else != null)
 			{
-				V_0.UnionWith(theIfConstruct.get_Else().get_Children());
+				singleEntrySubGraphs.UnionWith(theIfConstruct.Else.Children);
 			}
-			dominatorTree.MergeNodes(V_0, theIfConstruct.get_Condition(), theIfConstruct);
-			return;
+			dominatorTree.MergeNodes(singleEntrySubGraphs, theIfConstruct.Condition, theIfConstruct);
 		}
 	}
 }

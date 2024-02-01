@@ -1,11 +1,14 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
@@ -16,8 +19,6 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildAnonymousDelegatesStep()
 		{
-			base();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -30,14 +31,11 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_Statements().get_Count() - 1)
+			for (int i = 0; i < node.Statements.Count - 1; i++)
 			{
-				this.theRebuilder.Match(node, V_0);
-				V_0 = V_0 + 1;
+				this.theRebuilder.Match(node, i);
 			}
-			this.VisitBlockStatement(node);
-			return;
+			base.VisitBlockStatement(node);
 		}
 
 		private class AnonymousDelegateRebuilder : BaseCodeTransformer
@@ -72,84 +70,82 @@ namespace Telerik.JustDecompiler.Steps
 
 			public AnonymousDelegateRebuilder(DecompilationContext context, BlockStatement methodBodyBlock)
 			{
-				base();
 				this.context = context;
 				this.methodBodyBlock = methodBodyBlock;
-				if (context.get_MethodContext().get_FieldToExpression() == null)
+				if (context.MethodContext.FieldToExpression == null)
 				{
-					context.get_MethodContext().set_FieldToExpression(new Dictionary<FieldDefinition, Expression>());
+					context.MethodContext.FieldToExpression = new Dictionary<FieldDefinition, Expression>();
 				}
-				this.fieldDefToAssignedValueMap = context.get_MethodContext().get_FieldToExpression();
+				this.fieldDefToAssignedValueMap = context.MethodContext.FieldToExpression;
 				this.fieldVisitor = new RebuildAnonymousDelegatesStep.FieldReferenceVisitor(methodBodyBlock);
 				this.variableCopyFinder = new RebuildAnonymousDelegatesStep.VariableCopyFinder(methodBodyBlock);
 				this.assignmentsToRemove = new HashSet<Statement>();
-				this.closuresArchive = context.get_MethodContext().get_ClosureVariableToFieldValue();
-				return;
+				this.closuresArchive = context.MethodContext.ClosureVariableToFieldValue;
 			}
 
 			private bool CheckAssignExpression(ExpressionStatement theStatement)
 			{
-				if (theStatement == null || theStatement.get_Expression().get_CodeNodeType() != 24)
+				if (theStatement == null || theStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression)
 				{
 					return false;
 				}
-				V_0 = theStatement.get_Expression() as BinaryExpression;
-				if (!V_0.get_IsAssignmentExpression())
+				BinaryExpression expression = theStatement.Expression as BinaryExpression;
+				if (!expression.IsAssignmentExpression)
 				{
 					return false;
 				}
-				V_1 = this.state;
-				if (V_1 == RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.DelegateCreate)
+				RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State state = this.state;
+				if (state == RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.DelegateCreate)
 				{
-					return this.CheckDelegateCreation(V_0);
+					return this.CheckDelegateCreation(expression);
 				}
-				if (V_1 != 1)
+				if (state != RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.FieldAssign)
 				{
 					return false;
 				}
-				return this.CheckFieldAssignment(V_0, theStatement);
+				return this.CheckFieldAssignment(expression, theStatement);
 			}
 
 			private bool CheckDelegateCreation(BinaryExpression theAssignExpression)
 			{
-				if (theAssignExpression.get_Left().get_CodeNodeType() != 26 || theAssignExpression.get_Right().get_CodeNodeType() != 40)
+				if (theAssignExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || theAssignExpression.Right.CodeNodeType != CodeNodeType.ObjectCreationExpression)
 				{
 					return false;
 				}
-				V_0 = theAssignExpression.get_Right() as ObjectCreationExpression;
-				if (V_0.get_Arguments().get_Count() != 0)
+				ObjectCreationExpression right = theAssignExpression.Right as ObjectCreationExpression;
+				if (right.Arguments.Count != 0)
 				{
 					return false;
 				}
-				V_1 = V_0.get_ExpressionType().Resolve();
-				if (V_1 == null || !this.CheckTypeForCompilerGeneratedAttribute(V_1))
+				TypeDefinition typeDefinition = right.ExpressionType.Resolve();
+				if (typeDefinition == null || !this.CheckTypeForCompilerGeneratedAttribute(typeDefinition))
 				{
 					return false;
 				}
-				this.delegateTypeDef = V_1;
-				this.delegateVariableReference = (theAssignExpression.get_Left() as VariableReferenceExpression).get_Variable();
+				this.delegateTypeDef = typeDefinition;
+				this.delegateVariableReference = (theAssignExpression.Left as VariableReferenceExpression).Variable;
 				return true;
 			}
 
 			private bool CheckFieldAssignment(BinaryExpression theAssignExpression, ExpressionStatement theStatement)
 			{
-				if (theAssignExpression.get_Left().get_CodeNodeType() != 30)
+				if (theAssignExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression)
 				{
 					return false;
 				}
-				V_0 = theAssignExpression.get_Left() as FieldReferenceExpression;
-				if (V_0.get_Target() == null || V_0.get_Target().get_CodeNodeType() != 26 || (object)(V_0.get_Target() as VariableReferenceExpression).get_Variable() != (object)this.delegateVariableReference)
+				FieldReferenceExpression left = theAssignExpression.Left as FieldReferenceExpression;
+				if (left.Target == null || left.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(left.Target as VariableReferenceExpression).Variable != (object)this.delegateVariableReference)
 				{
 					return false;
 				}
-				V_1 = V_0.get_Field().Resolve();
-				if (theAssignExpression.get_Right().get_CodeNodeType() == 28 || theAssignExpression.get_Right().get_CodeNodeType() == 25 || this.IsClosureVariableReference(theAssignExpression.get_Right() as VariableReferenceExpression) && !this.fieldVisitor.CheckForAnotherAssignment(V_1, V_0, this.delegateCopies))
+				FieldDefinition right = left.Field.Resolve();
+				if ((theAssignExpression.Right.CodeNodeType == CodeNodeType.ThisReferenceExpression || theAssignExpression.Right.CodeNodeType == CodeNodeType.ArgumentReferenceExpression || this.IsClosureVariableReference(theAssignExpression.Right as VariableReferenceExpression)) && !this.fieldVisitor.CheckForAnotherAssignment(right, left, this.delegateCopies))
 				{
-					this.fieldDefToAssignedValueMap.set_Item(V_1, theAssignExpression.get_Right());
+					this.fieldDefToAssignedValueMap[right] = theAssignExpression.Right;
 				}
 				else
 				{
-					dummyVar0 = this.statementsToKeep.Add(theStatement);
+					this.statementsToKeep.Add(theStatement);
 				}
 				return true;
 			}
@@ -169,25 +165,15 @@ namespace Telerik.JustDecompiler.Steps
 
 			public void CleanUpVariableCopyAssignments()
 			{
-				V_0 = (new List<Statement>(this.assignmentsToRemove)).GetEnumerator();
-				try
+				foreach (Statement statement in new List<Statement>(this.assignmentsToRemove))
 				{
-					while (V_0.MoveNext())
+					BlockStatement parent = statement.Parent as BlockStatement;
+					if (parent == null)
 					{
-						V_1 = V_0.get_Current();
-						V_2 = V_1.get_Parent() as BlockStatement;
-						if (V_2 == null)
-						{
-							continue;
-						}
-						dummyVar0 = V_2.get_Statements().Remove(V_1);
+						continue;
 					}
+					parent.Statements.Remove(statement);
 				}
-				finally
-				{
-					((IDisposable)V_0).Dispose();
-				}
-				return;
 			}
 
 			private bool IsClosureVariableReference(VariableReferenceExpression varRefExpression)
@@ -196,224 +182,183 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return false;
 				}
-				return this.closuresArchive.ContainsKey(varRefExpression.get_Variable());
+				return this.closuresArchive.ContainsKey(varRefExpression.Variable);
 			}
 
 			private void MapTheRestOfTheFieldsToVariables()
 			{
-				V_0 = this.delegateTypeDef.get_Fields().GetEnumerator();
-				try
+				foreach (FieldDefinition field in this.delegateTypeDef.get_Fields())
 				{
-					while (V_0.MoveNext())
+					if (this.fieldDefToAssignedValueMap.ContainsKey(field))
 					{
-						V_1 = V_0.get_Current();
-						if (this.fieldDefToAssignedValueMap.ContainsKey(V_1))
-						{
-							continue;
-						}
-						stackVariable15 = this.context.get_MethodContext();
-						V_3 = stackVariable15.get_LambdaVariablesCount();
-						stackVariable15.set_LambdaVariablesCount(V_3 + 1);
-						V_2 = new VariableDefinition(String.Concat("lambdaVar", V_3.ToString()), V_1.get_FieldType(), this.context.get_MethodContext().get_Method());
-						this.context.get_MethodContext().get_Variables().Add(V_2);
-						dummyVar0 = this.context.get_MethodContext().get_VariablesToRename().Add(V_2);
-						this.fieldDefToAssignedValueMap.set_Item(V_1, new VariableReferenceExpression(V_2, null));
+						continue;
 					}
+					MethodSpecificContext methodContext = this.context.MethodContext;
+					int lambdaVariablesCount = methodContext.LambdaVariablesCount;
+					methodContext.LambdaVariablesCount = lambdaVariablesCount + 1;
+					VariableDefinition variableDefinition = new VariableDefinition(String.Concat("lambdaVar", lambdaVariablesCount.ToString()), field.get_FieldType(), this.context.MethodContext.Method);
+					this.context.MethodContext.Variables.Add(variableDefinition);
+					this.context.MethodContext.VariablesToRename.Add(variableDefinition);
+					this.fieldDefToAssignedValueMap[field] = new VariableReferenceExpression(variableDefinition, null);
 				}
-				finally
-				{
-					V_0.Dispose();
-				}
-				return;
 			}
 
 			public void Match(BlockStatement theBlock, int index)
 			{
+				int num;
 				this.delegatesFound = new List<BlockStatement>();
 				this.statementsToKeep = new HashSet<Statement>();
 				this.delegateCopies = new HashSet<VariableReference>();
 				this.fieldDefToAssignedValueMap = new Dictionary<FieldDefinition, Expression>();
-				this.state = 0;
-				if (!this.CheckAssignExpression(theBlock.get_Statements().get_Item(index) as ExpressionStatement))
+				this.state = RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.DelegateCreate;
+				if (!this.CheckAssignExpression(theBlock.Statements[index] as ExpressionStatement))
 				{
 					return;
 				}
-				dummyVar0 = this.delegateCopies.Add(this.delegateVariableReference);
+				this.delegateCopies.Add(this.delegateVariableReference);
 				this.variableCopyFinder.FindCopiesOfDelegate(this.delegateCopies, this.assignmentsToRemove);
 				this.startIndex = index;
-				this.state = 1;
+				this.state = RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.FieldAssign;
 				do
 				{
-					stackVariable34 = index + 1;
-					index = stackVariable34;
+					num = index + 1;
+					index = num;
 				}
-				while (stackVariable34 < theBlock.get_Statements().get_Count() && this.CheckAssignExpression(theBlock.get_Statements().get_Item(index) as ExpressionStatement));
-				if (index == theBlock.get_Statements().get_Count())
+				while (num < theBlock.Statements.Count && this.CheckAssignExpression(theBlock.Statements[index] as ExpressionStatement));
+				if (index == theBlock.Statements.Count)
 				{
 					return;
 				}
 				this.MapTheRestOfTheFieldsToVariables();
-				this.RemoveFieldAssignments(theBlock.get_Statements(), index);
+				this.RemoveFieldAssignments(theBlock.Statements, index);
 				this.CleanUpVariableCopyAssignments();
-				this.state = 3;
-				dummyVar1 = this.VisitBlockStatement(this.methodBodyBlock);
-				this.state = 2;
-				V_0 = this.startIndex;
-				while (V_0 < theBlock.get_Statements().get_Count())
+				this.state = RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.ReplaceFields;
+				this.VisitBlockStatement(this.methodBodyBlock);
+				this.state = RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.ReplaceDelegate;
+				for (int i = this.startIndex; i < theBlock.Statements.Count; i++)
 				{
-					theBlock.get_Statements().set_Item(V_0, (Statement)this.Visit(theBlock.get_Statements().get_Item(V_0)));
-					this.state = 3;
-					V_1 = this.delegatesFound.GetEnumerator();
-					try
+					theBlock.Statements[i] = (Statement)this.Visit(theBlock.Statements[i]);
+					this.state = RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.ReplaceFields;
+					foreach (BlockStatement blockStatement in this.delegatesFound)
 					{
-						while (V_1.MoveNext())
-						{
-							V_2 = V_1.get_Current();
-							dummyVar2 = this.VisitBlockStatement(V_2);
-						}
+						this.VisitBlockStatement(blockStatement);
 					}
-					finally
-					{
-						((IDisposable)V_1).Dispose();
-					}
-					this.state = 2;
+					this.state = RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.ReplaceDelegate;
 					this.delegatesFound = new List<BlockStatement>();
-					V_0 = V_0 + 1;
 				}
 				this.SaveClosureToArchive();
-				return;
 			}
 
 			private void RemoveFieldAssignments(StatementCollection theCollection, int currentIndex)
 			{
-				V_0 = this.startIndex;
-				while (V_0 < currentIndex)
+				for (int i = this.startIndex; i < currentIndex; i++)
 				{
-					if (this.statementsToKeep.Contains(theCollection.get_Item(V_0)))
+					if (this.statementsToKeep.Contains(theCollection[i]))
 					{
-						V_1 = this.startIndex;
-						this.startIndex = V_1 + 1;
-						theCollection.set_Item(V_1, theCollection.get_Item(V_0));
+						int item = this.startIndex;
+						this.startIndex = item + 1;
+						theCollection[item] = theCollection[i];
 					}
-					V_0 = V_0 + 1;
 				}
 				this.RemoveRange(theCollection, this.startIndex, currentIndex);
-				return;
 			}
 
 			private void RemoveRange(StatementCollection theCollection, int from, int to)
 			{
-				while (to < theCollection.get_Count())
+				while (to < theCollection.Count)
 				{
-					theCollection.set_Item(from, theCollection.get_Item(to));
-					from = from + 1;
-					to = to + 1;
+					theCollection[from] = theCollection[to];
+					from++;
+					to++;
 				}
-				V_0 = theCollection.get_Count();
-				while (from < V_0)
+				int count = theCollection.Count;
+				while (from < count)
 				{
-					stackVariable21 = V_0 - 1;
-					V_0 = stackVariable21;
-					theCollection.RemoveAt(stackVariable21);
+					int num = count - 1;
+					count = num;
+					theCollection.RemoveAt(num);
 				}
-				return;
 			}
 
 			private void SaveClosureToArchive()
 			{
-				V_0 = this.delegateCopies.GetEnumerator();
-				try
+				foreach (VariableReference delegateCopy in this.delegateCopies)
 				{
-					while (V_0.MoveNext())
-					{
-						V_1 = V_0.get_Current();
-						this.closuresArchive.Add(V_1, this.fieldDefToAssignedValueMap);
-					}
+					this.closuresArchive.Add(delegateCopy, this.fieldDefToAssignedValueMap);
 				}
-				finally
-				{
-					((IDisposable)V_0).Dispose();
-				}
-				return;
 			}
 
 			public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 			{
-				if (this.state != 3)
+				Expression expression;
+				Dictionary<FieldDefinition, Expression> fieldDefinitions;
+				if (this.state != RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.ReplaceFields)
 				{
-					return this.VisitFieldReferenceExpression(node);
+					return base.VisitFieldReferenceExpression(node);
 				}
-				V_1 = node.get_Field().Resolve();
-				if (V_1 == null)
+				FieldDefinition fieldDefinition = node.Field.Resolve();
+				if (fieldDefinition == null)
 				{
-					return this.VisitFieldReferenceExpression(node);
+					return base.VisitFieldReferenceExpression(node);
 				}
-				if (this.fieldDefToAssignedValueMap.TryGetValue(V_1, out V_0))
+				if (this.fieldDefToAssignedValueMap.TryGetValue(fieldDefinition, out expression))
 				{
-					return V_0.CloneExpressionOnlyAndAttachInstructions(node.get_UnderlyingSameMethodInstructions());
+					return expression.CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 				}
-				dummyVar0 = this.VisitFieldReferenceExpression(node);
-				if (node.get_Target() == null || node.get_Target().get_CodeNodeType() != 26)
-				{
-					return node;
-				}
-				V_2 = (node.get_Target() as VariableReferenceExpression).get_Variable();
-				if (!this.closuresArchive.TryGetValue(V_2, out V_3) || !V_3.TryGetValue(V_1, out V_0))
+				base.VisitFieldReferenceExpression(node);
+				if (node.Target == null || node.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 				{
 					return node;
 				}
-				return V_0.CloneExpressionOnlyAndAttachInstructions(node.get_UnderlyingSameMethodInstructions());
+				VariableReference variable = (node.Target as VariableReferenceExpression).Variable;
+				if (!this.closuresArchive.TryGetValue(variable, out fieldDefinitions) || !fieldDefinitions.TryGetValue(fieldDefinition, out expression))
+				{
+					return node;
+				}
+				return expression.CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 			}
 
 			public override ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
 			{
-				if (this.state != 2 || node.get_Arguments() == null || node.get_Arguments().get_Count() != 2 || node.get_Arguments().get_Item(0).get_CodeNodeType() != 26 || node.get_Arguments().get_Item(1).get_CodeNodeType() != 20 || !this.delegateCopies.Contains((node.get_Arguments().get_Item(0) as VariableReferenceExpression).get_Variable()))
+				if (this.state != RebuildAnonymousDelegatesStep.AnonymousDelegateRebuilder.State.ReplaceDelegate || node.Arguments == null || node.Arguments.Count != 2 || node.Arguments[0].CodeNodeType != CodeNodeType.VariableReferenceExpression || node.Arguments[1].CodeNodeType != CodeNodeType.MethodReferenceExpression || !this.delegateCopies.Contains((node.Arguments[0] as VariableReferenceExpression).Variable))
 				{
-					return this.VisitObjectCreationExpression(node);
+					return base.VisitObjectCreationExpression(node);
 				}
-				V_0 = node.get_Constructor().get_DeclaringType().Resolve();
-				if (V_0 == null || V_0.get_BaseType() == null || String.op_Inequality(V_0.get_BaseType().get_FullName(), "System.MulticastDelegate"))
+				TypeDefinition typeDefinition = node.Constructor.get_DeclaringType().Resolve();
+				if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 				{
-					return this.VisitObjectCreationExpression(node);
+					return base.VisitObjectCreationExpression(node);
 				}
-				V_1 = (node.get_Arguments().get_Item(1) as MethodReferenceExpression).get_Method();
-				V_2 = (node.get_Arguments().get_Item(1) as MethodReferenceExpression).get_MethodDefinition();
-				stackVariable62 = new MethodSpecificContext(V_2.get_Body());
-				V_3 = new DecompilationContext(stackVariable62, this.context.get_TypeContext(), this.context.get_ModuleContext(), this.context.get_AssemblyContext(), this.context.get_Language());
-				stackVariable62.set_FieldToExpression(this.fieldDefToAssignedValueMap);
-				V_4 = V_2.get_Body().DecompileLambda(this.context.get_Language(), V_3);
-				if (V_4.get_Statements().get_Count() == 1 && V_4.get_Statements().get_Item(0).get_CodeNodeType() == 5 && (V_4.get_Statements().get_Item(0) as ExpressionStatement).get_Expression().get_CodeNodeType() == 57)
+				MethodReference method = (node.Arguments[1] as MethodReferenceExpression).Method;
+				MethodDefinition methodDefinition = (node.Arguments[1] as MethodReferenceExpression).MethodDefinition;
+				MethodSpecificContext methodSpecificContext = new MethodSpecificContext(methodDefinition.get_Body());
+				DecompilationContext decompilationContext = new DecompilationContext(methodSpecificContext, this.context.TypeContext, this.context.ModuleContext, this.context.AssemblyContext, this.context.Language);
+				methodSpecificContext.FieldToExpression = this.fieldDefToAssignedValueMap;
+				BlockStatement blockStatement = methodDefinition.get_Body().DecompileLambda(this.context.Language, decompilationContext);
+				if (blockStatement.Statements.Count == 1 && blockStatement.Statements[0].CodeNodeType == CodeNodeType.ExpressionStatement && (blockStatement.Statements[0] as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ReturnExpression)
 				{
-					V_8 = (V_4.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as ReturnExpression;
-					V_9 = new ShortFormReturnExpression(V_8.get_Value(), V_8.get_MappedInstructions());
-					V_4 = new BlockStatement();
-					V_4.get_Statements().Add(new ExpressionStatement(V_9));
+					ReturnExpression expression = (blockStatement.Statements[0] as ExpressionStatement).Expression as ReturnExpression;
+					ShortFormReturnExpression shortFormReturnExpression = new ShortFormReturnExpression(expression.Value, expression.MappedInstructions);
+					blockStatement = new BlockStatement();
+					blockStatement.Statements.Add(new ExpressionStatement(shortFormReturnExpression));
 				}
-				this.context.get_MethodContext().get_VariableDefinitionToNameMap().AddRange<VariableDefinition, string>(V_3.get_MethodContext().get_VariableDefinitionToNameMap());
-				this.context.get_MethodContext().get_VariableNamesCollection().UnionWith(V_3.get_MethodContext().get_VariableNamesCollection());
-				this.context.get_MethodContext().AddInnerMethodParametersToContext(V_3.get_MethodContext());
-				this.context.get_MethodContext().get_GotoStatements().AddRange(V_3.get_MethodContext().get_GotoStatements());
-				this.context.get_MethodContext().get_GotoLabels().AddRange<string, Statement>(V_3.get_MethodContext().get_GotoLabels());
-				V_5 = new ExpressionCollection();
-				V_6 = LambdaExpressionsHelper.HasAnonymousParameter(V_2.get_Parameters());
-				V_10 = V_2.get_Parameters().GetEnumerator();
-				try
+				this.context.MethodContext.VariableDefinitionToNameMap.AddRange<VariableDefinition, string>(decompilationContext.MethodContext.VariableDefinitionToNameMap);
+				this.context.MethodContext.VariableNamesCollection.UnionWith(decompilationContext.MethodContext.VariableNamesCollection);
+				this.context.MethodContext.AddInnerMethodParametersToContext(decompilationContext.MethodContext);
+				this.context.MethodContext.GotoStatements.AddRange(decompilationContext.MethodContext.GotoStatements);
+				this.context.MethodContext.GotoLabels.AddRange<string, Statement>(decompilationContext.MethodContext.GotoLabels);
+				ExpressionCollection expressionCollection = new ExpressionCollection();
+				bool flag = LambdaExpressionsHelper.HasAnonymousParameter(methodDefinition.get_Parameters());
+				foreach (ParameterDefinition parameter in methodDefinition.get_Parameters())
 				{
-					while (V_10.MoveNext())
-					{
-						V_11 = V_10.get_Current();
-						V_5.Add(new LambdaParameterExpression(V_11, !V_6, null));
-					}
+					expressionCollection.Add(new LambdaParameterExpression(parameter, !flag, null));
 				}
-				finally
+				this.delegatesFound.Add(blockStatement);
+				LambdaExpression lambdaExpression = new LambdaExpression(expressionCollection, blockStatement, methodDefinition.IsAsync(), methodDefinition.IsFunction(), method.get_Parameters(), false, node.Arguments[1].MappedInstructions)
 				{
-					V_10.Dispose();
-				}
-				this.delegatesFound.Add(V_4);
-				stackVariable157 = new LambdaExpression(V_5, V_4, V_2.IsAsync(), V_2.IsFunction(), V_1.get_Parameters(), false, node.get_Arguments().get_Item(1).get_MappedInstructions());
-				stackVariable157.set_ExpressionType(V_0);
-				V_7 = stackVariable157;
-				return new DelegateCreationExpression(node.get_Constructor().get_DeclaringType(), V_7, node.get_Arguments().get_Item(0), node.get_MappedInstructions());
+					ExpressionType = typeDefinition
+				};
+				return new DelegateCreationExpression(node.Constructor.get_DeclaringType(), lambdaExpression, node.Arguments[0], node.MappedInstructions);
 			}
 
 			private enum State
@@ -439,18 +384,15 @@ namespace Telerik.JustDecompiler.Steps
 
 			public FieldReferenceVisitor(BlockStatement theBlockStatement)
 			{
-				base();
 				this.theBlockStatement = theBlockStatement;
-				return;
 			}
 
 			private void CheckFieldReference(FieldReferenceExpression node)
 			{
-				if (node != this.assignedReference && node.get_Target() != null && node.get_Target().get_CodeNodeType() == 26 && this.delegateVariableCopies.Contains((node.get_Target() as VariableReferenceExpression).get_Variable()) && (object)node.get_Field().Resolve() == (object)this.fieldDef)
+				if (node != this.assignedReference && node.Target != null && node.Target.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.delegateVariableCopies.Contains((node.Target as VariableReferenceExpression).Variable) && (object)node.Field.Resolve() == (object)this.fieldDef)
 				{
 					this.foundUsage = true;
 				}
-				return;
 			}
 
 			public bool CheckForAnotherAssignment(FieldDefinition fieldDef, FieldReferenceExpression assignedReference, HashSet<VariableReference> delegateVariableCopies)
@@ -459,7 +401,7 @@ namespace Telerik.JustDecompiler.Steps
 				this.assignedReference = assignedReference;
 				this.delegateVariableCopies = delegateVariableCopies;
 				this.foundUsage = false;
-				this.Visit(this.theBlockStatement);
+				base.Visit(this.theBlockStatement);
 				return this.foundUsage;
 			}
 
@@ -467,9 +409,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (!this.foundUsage)
 				{
-					this.Visit(node);
+					base.Visit(node);
 				}
-				return;
 			}
 
 			public override void VisitBinaryExpression(BinaryExpression node)
@@ -478,16 +419,15 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return;
 				}
-				if (node.get_IsAssignmentExpression() && node.get_Left().get_CodeNodeType() == 30)
+				if (node.IsAssignmentExpression && node.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 				{
-					this.CheckFieldReference(node.get_Left() as FieldReferenceExpression);
+					this.CheckFieldReference(node.Left as FieldReferenceExpression);
 					if (this.foundUsage)
 					{
 						return;
 					}
 				}
-				this.VisitBinaryExpression(node);
-				return;
+				base.VisitBinaryExpression(node);
 			}
 		}
 
@@ -501,18 +441,16 @@ namespace Telerik.JustDecompiler.Steps
 
 			public VariableCopyFinder(BlockStatement theBlock)
 			{
-				base();
 				this.theBlock = theBlock;
-				return;
 			}
 
 			private bool CheckBinaryExpression(BinaryExpression node)
 			{
-				if (node.get_Left().get_CodeNodeType() != 26 || node.get_Right().get_CodeNodeType() != 26 || !this.delegateVariablesSet.Contains((node.get_Right() as VariableReferenceExpression).get_Variable()))
+				if (node.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || node.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || !this.delegateVariablesSet.Contains((node.Right as VariableReferenceExpression).Variable))
 				{
 					return false;
 				}
-				dummyVar0 = this.delegateVariablesSet.Add((node.get_Left() as VariableReferenceExpression).get_Variable());
+				this.delegateVariablesSet.Add((node.Left as VariableReferenceExpression).Variable);
 				return true;
 			}
 
@@ -521,18 +459,16 @@ namespace Telerik.JustDecompiler.Steps
 				this.delegateVariablesSet = delegateVariablesSet;
 				this.statementsToRemove = statementsToRemove;
 				this.Visit(this.theBlock);
-				return;
 			}
 
 			public override void VisitExpressionStatement(ExpressionStatement node)
 			{
-				if (!node.IsAssignmentStatement() || !this.CheckBinaryExpression(node.get_Expression() as BinaryExpression))
+				if (!node.IsAssignmentStatement() || !this.CheckBinaryExpression(node.Expression as BinaryExpression))
 				{
-					this.VisitExpressionStatement(node);
+					base.VisitExpressionStatement(node);
 					return;
 				}
-				dummyVar0 = this.statementsToRemove.Add(node);
-				return;
+				this.statementsToRemove.Add(node);
 			}
 		}
 	}

@@ -17,9 +17,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ArrayLengthExpression.u003cget_Childrenu003ed__12(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ArrayLengthExpression arrayLengthExpression = null;
+				yield return arrayLengthExpression.Target;
 			}
 		}
 
@@ -27,7 +26,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 66;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ArrayLengthExpression;
 			}
 		}
 
@@ -39,8 +38,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 			set
 			{
-				this.set_ExpressionType(value);
-				return;
+				base.ExpressionType = value;
 			}
 		}
 
@@ -50,31 +48,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ArrayLengthExpression(Expression target, TypeSystem theTypeSystem, IEnumerable<Instruction> instructions)
+		public ArrayLengthExpression(Expression target, TypeSystem theTypeSystem, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Target(target);
+			this.Target = target;
 			this.theTypeSystem = theTypeSystem;
-			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new ArrayLengthExpression(this.get_Target().Clone(), this.theTypeSystem, this.instructions);
+			return new ArrayLengthExpression(this.Target.Clone(), this.theTypeSystem, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ArrayLengthExpression(this.get_Target().CloneExpressionOnly(), this.theTypeSystem, null);
+			return new ArrayLengthExpression(this.Target.CloneExpressionOnly(), this.theTypeSystem, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other == null || other as ArrayLengthExpression == null)
+			if (other == null || !(other is ArrayLengthExpression))
 			{
 				return false;
 			}
-			return this.get_Target().Equals((other as ArrayLengthExpression).get_Target());
+			return this.Target.Equals((other as ArrayLengthExpression).Target);
 		}
 	}
 }

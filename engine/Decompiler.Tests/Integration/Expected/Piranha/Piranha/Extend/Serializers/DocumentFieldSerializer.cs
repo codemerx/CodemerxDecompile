@@ -8,34 +8,32 @@ namespace Piranha.Extend.Serializers
 	{
 		public DocumentFieldSerializer()
 		{
-			base();
-			return;
 		}
 
 		public object Deserialize(string str)
 		{
-			stackVariable0 = new DocumentField();
+			Guid? nullable;
+			DocumentField documentField = new DocumentField();
 			if (!String.IsNullOrEmpty(str))
 			{
-				stackVariable5 = new Guid?(new Guid(str));
+				nullable = new Guid?(new Guid(str));
 			}
 			else
 			{
-				V_0 = null;
-				stackVariable5 = V_0;
+				nullable = null;
 			}
-			stackVariable0.set_Id(stackVariable5);
-			return stackVariable0;
+			documentField.Id = nullable;
+			return documentField;
 		}
 
 		public string Serialize(object obj)
 		{
-			V_0 = obj as DocumentField;
-			if (V_0 == null)
+			DocumentField documentField = obj as DocumentField;
+			if (documentField == null)
 			{
 				throw new ArgumentException("The given object doesn't match the serialization type");
 			}
-			return V_0.get_Id().ToString();
+			return documentField.Id.ToString();
 		}
 	}
 }

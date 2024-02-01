@@ -1,4 +1,5 @@
 using Piranha;
+using Piranha.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -12,23 +13,21 @@ namespace Piranha.Models
 		{
 			get
 			{
-				if (this.get_ParentId().get_HasValue())
+				if (base.ParentId.HasValue)
 				{
 					return false;
 				}
-				return this.get_SortOrder() == 0;
+				return base.SortOrder == 0;
 			}
 		}
 
 		public GenericPage()
 		{
-			base();
-			return;
 		}
 
 		public static Task<T> CreateAsync(IApi api, string typeId = null)
 		{
-			return api.get_Pages().CreateAsync<T>(typeId);
+			return api.Pages.CreateAsync<T>(typeId);
 		}
 	}
 }

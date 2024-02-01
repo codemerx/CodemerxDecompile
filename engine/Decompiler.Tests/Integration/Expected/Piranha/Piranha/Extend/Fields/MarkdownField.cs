@@ -1,3 +1,4 @@
+using Piranha;
 using Piranha.Extend;
 using System;
 
@@ -8,13 +9,11 @@ namespace Piranha.Extend.Fields
 	{
 		public MarkdownField()
 		{
-			base();
-			return;
 		}
 
 		public string GetIndexedContent()
 		{
-			if (String.IsNullOrEmpty(this.get_Value()))
+			if (String.IsNullOrEmpty(base.Value))
 			{
 				return "";
 			}
@@ -23,9 +22,10 @@ namespace Piranha.Extend.Fields
 
 		public static implicit operator MarkdownField(string str)
 		{
-			stackVariable0 = new MarkdownField();
-			stackVariable0.set_Value(str);
-			return stackVariable0;
+			return new MarkdownField()
+			{
+				Value = str
+			};
 		}
 
 		public static implicit operator String(MarkdownField field)
@@ -35,7 +35,7 @@ namespace Piranha.Extend.Fields
 
 		public string ToHtml()
 		{
-			return App.get_Markdown().Transform(this.get_Value());
+			return App.Markdown.Transform(base.Value);
 		}
 	}
 }

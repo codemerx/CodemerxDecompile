@@ -15,9 +15,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new AnonymousObjectCreationExpression.u003cget_Childrenu003ed__2(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				AnonymousObjectCreationExpression anonymousObjectCreationExpression = null;
+				if (anonymousObjectCreationExpression.Initializer != null)
+				{
+					yield return anonymousObjectCreationExpression.Initializer;
+				}
 			}
 		}
 
@@ -25,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 72;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.AnonymousObjectCreationExpression;
 			}
 		}
 
@@ -39,11 +41,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (this.get_Type() != null)
+				if (this.Type != null)
 				{
-					return this.get_Type();
+					return this.Type;
 				}
-				return this.get_Constructor().get_DeclaringType();
+				return this.Constructor.get_DeclaringType();
 			}
 			set
 			{
@@ -71,91 +73,81 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public AnonymousObjectCreationExpression(MethodReference constructor, TypeReference type, InitializerExpression initializer, IEnumerable<Instruction> instructions)
+		public AnonymousObjectCreationExpression(MethodReference constructor, TypeReference type, InitializerExpression initializer, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Constructor(constructor);
-			this.set_Type(type);
-			this.set_Initializer(initializer);
-			return;
+			this.Constructor = constructor;
+			this.Type = type;
+			this.Initializer = initializer;
 		}
 
 		public override Expression Clone()
 		{
-			if (this.get_Initializer() != null)
+			InitializerExpression initializerExpression;
+			if (this.Initializer != null)
 			{
-				stackVariable5 = this.get_Initializer().Clone() as InitializerExpression;
+				initializerExpression = this.Initializer.Clone() as InitializerExpression;
 			}
 			else
 			{
-				stackVariable5 = null;
+				initializerExpression = null;
 			}
-			V_0 = stackVariable5;
-			return new AnonymousObjectCreationExpression(this.get_Constructor(), this.get_Type(), V_0, this.instructions);
+			InitializerExpression initializerExpression1 = initializerExpression;
+			return new AnonymousObjectCreationExpression(this.Constructor, this.Type, initializerExpression1, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			if (this.get_Initializer() != null)
+			InitializerExpression initializerExpression;
+			if (this.Initializer != null)
 			{
-				stackVariable5 = this.get_Initializer().CloneExpressionOnly() as InitializerExpression;
+				initializerExpression = this.Initializer.CloneExpressionOnly() as InitializerExpression;
 			}
 			else
 			{
-				stackVariable5 = null;
+				initializerExpression = null;
 			}
-			V_0 = stackVariable5;
-			return new AnonymousObjectCreationExpression(this.get_Constructor(), this.get_Type(), V_0, null);
+			return new AnonymousObjectCreationExpression(this.Constructor, this.Type, initializerExpression, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as AnonymousObjectCreationExpression == null)
+			if (!(other is AnonymousObjectCreationExpression))
 			{
 				return false;
 			}
-			V_0 = other as AnonymousObjectCreationExpression;
-			if (this.get_Constructor() != null)
+			AnonymousObjectCreationExpression anonymousObjectCreationExpression = other as AnonymousObjectCreationExpression;
+			if (this.Constructor == null)
 			{
-				if (V_0.get_Constructor() == null || String.op_Inequality(this.get_Constructor().get_FullName(), V_0.get_Constructor().get_FullName()))
+				if (anonymousObjectCreationExpression.Constructor != null)
 				{
 					return false;
 				}
 			}
-			else
+			else if (anonymousObjectCreationExpression.Constructor == null || this.Constructor.get_FullName() != anonymousObjectCreationExpression.Constructor.get_FullName())
 			{
-				if (V_0.get_Constructor() != null)
+				return false;
+			}
+			if (this.Type == null)
+			{
+				if (anonymousObjectCreationExpression.Type != null)
 				{
 					return false;
 				}
 			}
-			if (this.get_Type() != null)
+			else if (anonymousObjectCreationExpression.Type == null || this.Type.get_FullName() != anonymousObjectCreationExpression.Type.get_FullName())
 			{
-				if (V_0.get_Type() == null || String.op_Inequality(this.get_Type().get_FullName(), V_0.get_Type().get_FullName()))
+				return false;
+			}
+			if (this.Initializer == null)
+			{
+				if (anonymousObjectCreationExpression.Initializer != null)
 				{
 					return false;
 				}
 			}
-			else
+			else if (anonymousObjectCreationExpression.Initializer == null || !this.Initializer.Equals(anonymousObjectCreationExpression.Initializer))
 			{
-				if (V_0.get_Type() != null)
-				{
-					return false;
-				}
-			}
-			if (this.get_Initializer() != null)
-			{
-				if (V_0.get_Initializer() == null || !this.get_Initializer().Equals(V_0.get_Initializer()))
-				{
-					return false;
-				}
-			}
-			else
-			{
-				if (V_0.get_Initializer() != null)
-				{
-					return false;
-				}
+				return false;
 			}
 			return true;
 		}

@@ -2,6 +2,8 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
+using System.Collections.ObjectModel;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Languages;
@@ -18,56 +20,56 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public AutoImplementedEventMatcher(EventDefinition eventDef, ILanguage language)
 		{
-			base();
 			this.eventDef = eventDef;
 			this.language = language;
-			return;
 		}
 
 		private bool CheckLoopBody(BlockStatement loopBody, VariableReference v0Variable, VariableReference v1Variable, string operationName)
 		{
-			if (loopBody.get_Statements().get_Count() != 3)
+			Expression expression;
+			Expression expression1;
+			if (loopBody.Statements.Count != 3)
 			{
 				return false;
 			}
-			if (!loopBody.get_Statements().get_Item(0).IsAssignmentStatement())
+			if (!loopBody.Statements[0].IsAssignmentStatement())
 			{
 				return false;
 			}
-			V_0 = (loopBody.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_0.get_Left().get_CodeNodeType() != 26 || V_0.get_Right().get_CodeNodeType() != 26 || (object)(V_0.get_Right() as VariableReferenceExpression).get_Variable() != (object)v0Variable)
+			BinaryExpression binaryExpression = (loopBody.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
+			if (binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(binaryExpression.Right as VariableReferenceExpression).Variable != (object)v0Variable)
 			{
 				return false;
 			}
-			if ((object)(V_0.get_Left() as VariableReferenceExpression).get_Variable() != (object)v1Variable)
+			if ((object)(binaryExpression.Left as VariableReferenceExpression).Variable != (object)v1Variable)
 			{
 				return false;
 			}
-			if (!this.IsDelegateOperationStatement(loopBody.get_Statements().get_Item(1), operationName, out V_1, out V_2) || V_1.get_CodeNodeType() != 26 || V_2.get_CodeNodeType() != 26 || (object)(V_2 as VariableReferenceExpression).get_Variable() != (object)v1Variable)
+			if (!this.IsDelegateOperationStatement(loopBody.Statements[1], operationName, out expression, out expression1) || expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression1.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression1 as VariableReferenceExpression).Variable != (object)v1Variable)
 			{
 				return false;
 			}
-			V_3 = (V_1 as VariableReferenceExpression).get_Variable();
-			if (!loopBody.get_Statements().get_Item(2).IsAssignmentStatement())
+			VariableReference variable = (expression as VariableReferenceExpression).Variable;
+			if (!loopBody.Statements[2].IsAssignmentStatement())
 			{
 				return false;
 			}
-			V_4 = (loopBody.get_Statements().get_Item(2) as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_4.get_Left().get_CodeNodeType() != 26 || (object)(V_4.get_Left() as VariableReferenceExpression).get_Variable() != (object)v0Variable || V_4.get_Right().get_CodeNodeType() != 19)
+			BinaryExpression binaryExpression1 = (loopBody.Statements[2] as ExpressionStatement).Expression as BinaryExpression;
+			if (binaryExpression1.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(binaryExpression1.Left as VariableReferenceExpression).Variable != (object)v0Variable || binaryExpression1.Right.CodeNodeType != CodeNodeType.MethodInvocationExpression)
 			{
 				return false;
 			}
-			V_5 = V_4.get_Right() as MethodInvocationExpression;
-			if (String.op_Inequality(V_5.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Threading.Interlocked") || V_5.get_MethodExpression().get_Method().get_HasThis() || String.op_Inequality(V_5.get_MethodExpression().get_Method().get_Name(), "CompareExchange") || V_5.get_Arguments().get_Count() != 3 || V_5.get_Arguments().get_Item(0).get_CodeNodeType() != 23)
+			MethodInvocationExpression right = binaryExpression1.Right as MethodInvocationExpression;
+			if (right.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Threading.Interlocked" || right.MethodExpression.Method.get_HasThis() || right.MethodExpression.Method.get_Name() != "CompareExchange" || right.Arguments.Count != 3 || right.Arguments[0].CodeNodeType != CodeNodeType.UnaryExpression)
 			{
 				return false;
 			}
-			V_6 = V_5.get_Arguments().get_Item(0) as UnaryExpression;
-			if (V_6.get_Operator() != 7 || V_6.get_Operand().get_CodeNodeType() != 30 || (object)(V_6.get_Operand() as FieldReferenceExpression).get_Field().Resolve() != (object)this.eventField)
+			UnaryExpression item = right.Arguments[0] as UnaryExpression;
+			if (item.Operator != UnaryOperator.AddressReference || item.Operand.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item.Operand as FieldReferenceExpression).Field.Resolve() != (object)this.eventField)
 			{
 				return false;
 			}
-			if (V_5.get_Arguments().get_Item(1).get_CodeNodeType() == 26 && (object)(V_5.get_Arguments().get_Item(1) as VariableReferenceExpression).get_Variable() == (object)V_3 && V_5.get_Arguments().get_Item(2).get_CodeNodeType() == 26 && (object)(V_5.get_Arguments().get_Item(2) as VariableReferenceExpression).get_Variable() == (object)v1Variable)
+			if (right.Arguments[1].CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(right.Arguments[1] as VariableReferenceExpression).Variable == (object)variable && right.Arguments[2].CodeNodeType == CodeNodeType.VariableReferenceExpression && (object)(right.Arguments[2] as VariableReferenceExpression).Variable == (object)v1Variable)
 			{
 				return true;
 			}
@@ -81,9 +83,9 @@ namespace Telerik.JustDecompiler.Decompiler
 				methodBody = null;
 				return false;
 			}
-			V_0 = BaseLanguage.get_IntermediateRepresenationPipeline();
-			dummyVar0 = V_0.Run(methodDef.get_Body(), this.language);
-			methodBody = V_0.get_Body();
+			DecompilationPipeline intermediateRepresenationPipeline = BaseLanguage.IntermediateRepresenationPipeline;
+			intermediateRepresenationPipeline.Run(methodDef.get_Body(), this.language);
+			methodBody = intermediateRepresenationPipeline.Body;
 			return true;
 		}
 
@@ -93,47 +95,41 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return null;
 			}
-			V_0 = AutoImplementedEventMatcher.GetFieldWithName(eventDef.get_DeclaringType(), eventDef.get_EventType().get_FullName(), String.Concat(eventDef.get_Name(), "Event"));
-			if (V_0 == null)
-			{
-				V_0 = AutoImplementedEventMatcher.GetFieldWithName(eventDef.get_DeclaringType(), eventDef.get_EventType().get_FullName(), eventDef.get_Name());
-			}
-			if (V_0 == null)
+			FieldDefinition fieldWithName = AutoImplementedEventMatcher.GetFieldWithName(eventDef.get_DeclaringType(), eventDef.get_EventType().get_FullName(), String.Concat(eventDef.get_Name(), "Event")) ?? AutoImplementedEventMatcher.GetFieldWithName(eventDef.get_DeclaringType(), eventDef.get_EventType().get_FullName(), eventDef.get_Name());
+			if (fieldWithName == null)
 			{
 				return null;
 			}
-			if (!this.IsThreadUnsafeEvent(V_0) && !this.IsThreadSafeEvent(V_0))
+			if (!this.IsThreadUnsafeEvent(fieldWithName) && !this.IsThreadSafeEvent(fieldWithName))
 			{
 				return null;
 			}
-			return V_0;
+			return fieldWithName;
 		}
 
 		private static FieldDefinition GetFieldWithName(TypeDefinition typeDef, string eventTypeFullName, string name)
 		{
-			V_0 = typeDef.get_Fields().GetEnumerator();
+			FieldDefinition fieldDefinition;
+			Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = typeDef.get_Fields().GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (!String.op_Equality(V_1.get_Name(), name) || !String.op_Equality(V_1.get_FieldType().get_FullName(), eventTypeFullName))
+					FieldDefinition current = enumerator.get_Current();
+					if (!(current.get_Name() == name) || !(current.get_FieldType().get_FullName() == eventTypeFullName))
 					{
 						continue;
 					}
-					V_2 = V_1;
-					goto Label1;
+					fieldDefinition = current;
+					return fieldDefinition;
 				}
-				goto Label0;
+				return null;
 			}
 			finally
 			{
-				V_0.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return null;
+			return fieldDefinition;
 		}
 
 		public bool IsAutoImplemented(out FieldDefinition eventField)
@@ -144,7 +140,8 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public bool IsAutoImplemented()
 		{
-			return this.IsAutoImplemented(out V_0);
+			FieldDefinition fieldDefinition;
+			return this.IsAutoImplemented(out fieldDefinition);
 		}
 
 		private bool IsDelegateOperationStatement(Statement statement, string operationName, out Expression newValueHolder, out Expression oldValueHolder)
@@ -155,70 +152,71 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return false;
 			}
-			V_0 = (statement as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_0.get_Right().get_CodeNodeType() != 31 || (V_0.get_Right() as ExplicitCastExpression).get_Expression().get_CodeNodeType() != 19)
+			BinaryExpression expression = (statement as ExpressionStatement).Expression as BinaryExpression;
+			if (expression.Right.CodeNodeType != CodeNodeType.ExplicitCastExpression || (expression.Right as ExplicitCastExpression).Expression.CodeNodeType != CodeNodeType.MethodInvocationExpression)
 			{
 				return false;
 			}
-			V_1 = (V_0.get_Right() as ExplicitCastExpression).get_Expression() as MethodInvocationExpression;
-			if (V_1.get_Arguments().get_Count() != 2 || V_1.get_MethodExpression().get_Method().get_HasThis() || String.op_Inequality(V_1.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Delegate") || String.op_Inequality(V_1.get_MethodExpression().get_Method().get_Name(), operationName))
+			MethodInvocationExpression methodInvocationExpression = (expression.Right as ExplicitCastExpression).Expression as MethodInvocationExpression;
+			if (methodInvocationExpression.Arguments.Count != 2 || methodInvocationExpression.MethodExpression.Method.get_HasThis() || methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Delegate" || methodInvocationExpression.MethodExpression.Method.get_Name() != operationName)
 			{
 				return false;
 			}
-			if (V_1.get_Arguments().get_Item(1).get_CodeNodeType() != 25)
+			if (methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.ArgumentReferenceExpression)
 			{
 				return false;
 			}
-			newValueHolder = V_0.get_Left();
-			oldValueHolder = V_1.get_Arguments().get_Item(0);
+			newValueHolder = expression.Left;
+			oldValueHolder = methodInvocationExpression.Arguments[0];
 			return true;
 		}
 
 		private bool IsThreadSafeAutoImplOperation(MethodDefinition methodDef, string operationName)
 		{
-			if (!this.CheckMethodAndDecompile(methodDef, out V_0) || V_0.get_Statements().get_Count() != 3)
+			BlockStatement blockStatement;
+			if (!this.CheckMethodAndDecompile(methodDef, out blockStatement) || blockStatement.Statements.Count != 3)
 			{
 				return false;
 			}
-			V_1 = null;
-			V_2 = null;
-			if (!V_0.get_Statements().get_Item(0).IsAssignmentStatement())
+			VariableReference variable = null;
+			VariableReference variableReference = null;
+			if (!blockStatement.Statements[0].IsAssignmentStatement())
 			{
 				return false;
 			}
-			V_3 = (V_0.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_3.get_Left().get_CodeNodeType() != 26 || V_3.get_Right().get_CodeNodeType() != 30 || (object)(V_3.get_Right() as FieldReferenceExpression).get_Field().Resolve() != (object)this.eventField)
+			BinaryExpression expression = (blockStatement.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
+			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(expression.Right as FieldReferenceExpression).Field.Resolve() != (object)this.eventField)
 			{
 				return false;
 			}
-			V_1 = (V_3.get_Left() as VariableReferenceExpression).get_Variable();
-			if (V_0.get_Statements().get_Item(1).get_CodeNodeType() != 8 || V_0.get_Statements().get_Item(2).get_CodeNodeType() != 5 || (V_0.get_Statements().get_Item(2) as ExpressionStatement).get_Expression().get_CodeNodeType() != 57)
+			variable = (expression.Left as VariableReferenceExpression).Variable;
+			if (blockStatement.Statements[1].CodeNodeType != CodeNodeType.DoWhileStatement || blockStatement.Statements[2].CodeNodeType != CodeNodeType.ExpressionStatement || (blockStatement.Statements[2] as ExpressionStatement).Expression.CodeNodeType != CodeNodeType.ReturnExpression)
 			{
 				return false;
 			}
-			V_4 = V_0.get_Statements().get_Item(1) as DoWhileStatement;
-			V_5 = V_4.get_Condition();
-			if (V_5.get_CodeNodeType() == 23 && (V_5 as UnaryExpression).get_Operator() == 11)
+			DoWhileStatement item = blockStatement.Statements[1] as DoWhileStatement;
+			Expression condition = item.Condition;
+			if (condition.CodeNodeType == CodeNodeType.UnaryExpression && (condition as UnaryExpression).Operator == UnaryOperator.None)
 			{
-				V_5 = (V_5 as UnaryExpression).get_Operand();
+				condition = (condition as UnaryExpression).Operand;
 			}
-			if (V_5.get_CodeNodeType() != 24)
-			{
-				return false;
-			}
-			stackVariable78 = V_5 as BinaryExpression;
-			V_6 = stackVariable78.get_Left() as ExplicitCastExpression;
-			V_7 = stackVariable78.get_Right() as ExplicitCastExpression;
-			if (stackVariable78.get_Operator() != 10 || V_6 == null || String.op_Inequality(V_6.get_TargetType().get_Name(), "Object") || V_6.get_Expression().get_CodeNodeType() != 26 || V_7 == null || V_7.get_Expression().get_CodeNodeType() != 26 || String.op_Inequality(V_7.get_TargetType().get_Name(), "Object"))
+			if (condition.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
 				return false;
 			}
-			if ((object)(V_6.get_Expression() as VariableReferenceExpression).get_Variable() != (object)V_1)
+			BinaryExpression binaryExpression = condition as BinaryExpression;
+			ExplicitCastExpression left = binaryExpression.Left as ExplicitCastExpression;
+			ExplicitCastExpression right = binaryExpression.Right as ExplicitCastExpression;
+			if (binaryExpression.Operator != BinaryOperator.ValueInequality || left == null || left.TargetType.get_Name() != "Object" || left.Expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || right == null || right.Expression.CodeNodeType != CodeNodeType.VariableReferenceExpression || right.TargetType.get_Name() != "Object")
 			{
 				return false;
 			}
-			V_2 = (V_7.get_Expression() as VariableReferenceExpression).get_Variable();
-			return this.CheckLoopBody(V_4.get_Body(), V_1, V_2, operationName);
+			if ((object)(left.Expression as VariableReferenceExpression).Variable != (object)variable)
+			{
+				return false;
+			}
+			variableReference = (right.Expression as VariableReferenceExpression).Variable;
+			return this.CheckLoopBody(item.Body, variable, variableReference, operationName);
 		}
 
 		private bool IsThreadSafeEvent(FieldDefinition eventField)
@@ -243,19 +241,22 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private bool IsThreadUnsafeOperation(MethodDefinition methodDef, string operationName)
 		{
-			if (!this.CheckMethodAndDecompile(methodDef, out V_0))
+			BlockStatement blockStatement;
+			Expression expression;
+			Expression expression1;
+			if (!this.CheckMethodAndDecompile(methodDef, out blockStatement))
 			{
 				return false;
 			}
-			if (V_0.get_Statements().get_Count() != 2 || V_0.get_Statements().get_Item(1).get_CodeNodeType() != 5 || (V_0.get_Statements().get_Item(1) as ExpressionStatement).get_Expression().get_CodeNodeType() != 57)
+			if (blockStatement.Statements.Count != 2 || blockStatement.Statements[1].CodeNodeType != CodeNodeType.ExpressionStatement || (blockStatement.Statements[1] as ExpressionStatement).Expression.CodeNodeType != CodeNodeType.ReturnExpression)
 			{
 				return false;
 			}
-			if (!this.IsDelegateOperationStatement(V_0.get_Statements().get_Item(0), operationName, out V_1, out V_2))
+			if (!this.IsDelegateOperationStatement(blockStatement.Statements[0], operationName, out expression, out expression1))
 			{
 				return false;
 			}
-			if (V_1.get_CodeNodeType() == 30 && (object)(V_1 as FieldReferenceExpression).get_Field().Resolve() == (object)this.eventField && V_2.get_CodeNodeType() == 30 && (object)(V_2 as FieldReferenceExpression).get_Field().Resolve() == (object)this.eventField)
+			if (expression.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(expression as FieldReferenceExpression).Field.Resolve() == (object)this.eventField && expression1.CodeNodeType == CodeNodeType.FieldReferenceExpression && (object)(expression1 as FieldReferenceExpression).Field.Resolve() == (object)this.eventField)
 			{
 				return true;
 			}

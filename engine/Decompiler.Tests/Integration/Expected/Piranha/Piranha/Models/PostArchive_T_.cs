@@ -58,9 +58,6 @@ namespace Piranha.Models
 
 		public PostArchive()
 		{
-			this.u003cPostsu003ek__BackingField = new List<T>();
-			base();
-			return;
 		}
 	}
 }

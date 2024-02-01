@@ -5,10 +5,8 @@ namespace Piranha.Cache
 {
 	public class MemoryCacheWithClone : MemoryCache
 	{
-		public MemoryCacheWithClone(IMemoryCache cache)
+		public MemoryCacheWithClone(IMemoryCache cache) : base(cache, true)
 		{
-			base(cache, true);
-			return;
 		}
 	}
 }

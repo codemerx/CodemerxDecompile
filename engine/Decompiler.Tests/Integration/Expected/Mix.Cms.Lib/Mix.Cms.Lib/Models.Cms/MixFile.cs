@@ -97,8 +97,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixFile()
 		{
-			base();
-			return;
 		}
 	}
 }

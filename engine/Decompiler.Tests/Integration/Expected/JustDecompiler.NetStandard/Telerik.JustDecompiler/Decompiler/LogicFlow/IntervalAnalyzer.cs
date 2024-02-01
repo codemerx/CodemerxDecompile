@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Cil;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DFST;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow
@@ -21,47 +22,32 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		public IntervalAnalyzer(ISingleEntrySubGraph graph, Dictionary<ILogicalConstruct, HashSet<ILogicalConstruct>> removedEdges)
 		{
-			base();
-			this.availableNodes = graph.get_Children();
-			this.entryPoint = graph.get_Entry() as ILogicalConstruct;
+			this.availableNodes = graph.Children;
+			this.entryPoint = graph.Entry as ILogicalConstruct;
 			this.headers = new Queue<ILogicalConstruct>();
 			this.intervals = new List<IntervalConstruct>();
 			this.nodeToInterval = new Dictionary<ISingleEntrySubGraph, IntervalConstruct>();
 			this.removedEdges = removedEdges;
-			return;
 		}
 
 		private void AddNewHeaders(ILogicalConstruct currentHeader, IntervalConstruct currentInterval)
 		{
-			V_0 = new Stack<ILogicalConstruct>();
-			V_1 = new HashSet<ILogicalConstruct>();
-			V_0.Push(currentHeader);
-			while (V_0.get_Count() > 0)
+			Stack<ILogicalConstruct> logicalConstructs = new Stack<ILogicalConstruct>();
+			HashSet<ILogicalConstruct> logicalConstructs1 = new HashSet<ILogicalConstruct>();
+			logicalConstructs.Push(currentHeader);
+			while (logicalConstructs.Count > 0)
 			{
-				V_2 = V_0.Pop();
-				if (V_1.Contains(V_2))
+				ILogicalConstruct logicalConstruct = logicalConstructs.Pop();
+				if (logicalConstructs1.Contains(logicalConstruct))
 				{
 					continue;
 				}
-				dummyVar0 = V_1.Add(V_2);
-				V_3 = this.GetNodeSuccessors(V_2).GetEnumerator();
-				try
+				logicalConstructs1.Add(logicalConstruct);
+				foreach (ILogicalConstruct nodeSuccessor in this.GetNodeSuccessors(logicalConstruct))
 				{
-					while (V_3.MoveNext())
-					{
-						V_4 = V_3.get_Current();
-						this.CheckAndAddPossibleHeader(V_4, currentInterval, V_0);
-					}
-				}
-				finally
-				{
-					if (V_3 != null)
-					{
-						V_3.Dispose();
-					}
+					this.CheckAndAddPossibleHeader(nodeSuccessor, currentInterval, logicalConstructs);
 				}
 			}
-			return;
 		}
 
 		private void CheckAndAddPossibleHeader(ILogicalConstruct node, IntervalConstruct currentInterval, Stack<ILogicalConstruct> st)
@@ -74,211 +60,121 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 				}
 				return;
 			}
-			if (this.nodeToInterval.get_Item(node) == currentInterval)
+			if (this.nodeToInterval[node] == currentInterval)
 			{
 				st.Push(node);
 			}
-			return;
 		}
 
 		private void CreateGraph(IEnumerable<IntervalConstruct> intervals)
 		{
-			V_0 = intervals.GetEnumerator();
-			try
+			foreach (IntervalConstruct interval in intervals)
 			{
-				while (V_0.MoveNext())
+				foreach (ILogicalConstruct child in interval.Children)
 				{
-					V_1 = V_0.get_Current();
-					V_2 = V_1.get_Children().GetEnumerator();
-					try
+					foreach (ILogicalConstruct nodeSuccessor in this.GetNodeSuccessors(child))
 					{
-						while (V_2.MoveNext())
+						if (!this.nodeToInterval.ContainsKey(nodeSuccessor) || this.nodeToInterval[nodeSuccessor] == interval)
 						{
-							V_3 = (ILogicalConstruct)V_2.get_Current();
-							V_4 = this.GetNodeSuccessors(V_3).GetEnumerator();
-							try
-							{
-								while (V_4.MoveNext())
-								{
-									V_5 = V_4.get_Current();
-									if (!this.nodeToInterval.ContainsKey(V_5) || this.nodeToInterval.get_Item(V_5) == V_1)
-									{
-										continue;
-									}
-									V_6 = this.nodeToInterval.get_Item(V_5);
-									if (V_1.get_SameParentSuccessors().Contains(V_6))
-									{
-										continue;
-									}
-									dummyVar0 = V_1.get_SameParentSuccessors().Add(V_6);
-									dummyVar1 = V_6.get_SameParentPredecessors().Add(V_1);
-								}
-							}
-							finally
-							{
-								if (V_4 != null)
-								{
-									V_4.Dispose();
-								}
-							}
+							continue;
 						}
-					}
-					finally
-					{
-						((IDisposable)V_2).Dispose();
+						IntervalConstruct item = this.nodeToInterval[nodeSuccessor];
+						if (interval.SameParentSuccessors.Contains(item))
+						{
+							continue;
+						}
+						interval.SameParentSuccessors.Add(item);
+						item.SameParentPredecessors.Add(interval);
 					}
 				}
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 
 		private void FillInterval(ILogicalConstruct intervalHeader, IntervalConstruct interval)
 		{
 			this.nodeToInterval.Add(intervalHeader, interval);
-			V_0 = new Queue<ILogicalConstruct>();
-			V_1 = this.GetNodeSuccessors(intervalHeader).GetEnumerator();
-			try
+			Queue<ILogicalConstruct> logicalConstructs = new Queue<ILogicalConstruct>();
+			foreach (ILogicalConstruct nodeSuccessor in this.GetNodeSuccessors(intervalHeader))
 			{
-				while (V_1.MoveNext())
+				if (!this.availableNodes.Contains(nodeSuccessor))
 				{
-					V_2 = V_1.get_Current();
-					if (!this.availableNodes.Contains(V_2))
+					continue;
+				}
+				logicalConstructs.Enqueue(nodeSuccessor);
+			}
+			while (logicalConstructs.Count > 0)
+			{
+				ILogicalConstruct logicalConstruct = logicalConstructs.Dequeue();
+				if (this.nodeToInterval.ContainsKey(logicalConstruct))
+				{
+					continue;
+				}
+				bool flag = true;
+				foreach (ILogicalConstruct nodePredecessor in this.GetNodePredecessors(logicalConstruct))
+				{
+					if (this.nodeToInterval.ContainsKey(nodePredecessor) && this.nodeToInterval[nodePredecessor] == interval)
 					{
 						continue;
 					}
-					V_0.Enqueue(V_2);
-				}
-			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			while (V_0.get_Count() > 0)
-			{
-				V_3 = V_0.Dequeue();
-				if (this.nodeToInterval.ContainsKey(V_3))
-				{
-					continue;
-				}
-				V_4 = true;
-				V_1 = this.GetNodePredecessors(V_3).GetEnumerator();
-				try
-				{
-					while (V_1.MoveNext())
-					{
-						V_5 = V_1.get_Current();
-						if (this.nodeToInterval.ContainsKey(V_5) && this.nodeToInterval.get_Item(V_5) == interval)
-						{
-							continue;
-						}
-						V_4 = false;
-						goto Label0;
-					}
-				}
-				finally
-				{
-					if (V_1 != null)
-					{
-						V_1.Dispose();
-					}
+					flag = false;
+					goto Label0;
 				}
 			Label0:
-				if (!V_4)
+				if (!flag)
 				{
 					continue;
 				}
-				dummyVar0 = interval.get_Children().Add(V_3);
-				this.nodeToInterval.Add(V_3, interval);
-				V_1 = this.GetNodeSuccessors(V_3).GetEnumerator();
-				try
+				interval.Children.Add(logicalConstruct);
+				this.nodeToInterval.Add(logicalConstruct, interval);
+				foreach (ILogicalConstruct nodeSuccessor1 in this.GetNodeSuccessors(logicalConstruct))
 				{
-					while (V_1.MoveNext())
+					if (!this.availableNodes.Contains(nodeSuccessor1))
 					{
-						V_6 = V_1.get_Current();
-						if (!this.availableNodes.Contains(V_6))
-						{
-							continue;
-						}
-						V_0.Enqueue(V_6);
+						continue;
 					}
-				}
-				finally
-				{
-					if (V_1 != null)
-					{
-						V_1.Dispose();
-					}
+					logicalConstructs.Enqueue(nodeSuccessor1);
 				}
 			}
-			return;
 		}
 
 		private IEnumerable<ILogicalConstruct> GetNodePredecessors(ILogicalConstruct node)
 		{
-			V_0 = new HashSet<ILogicalConstruct>();
-			V_1 = node.get_SameParentPredecessors().GetEnumerator();
-			try
+			ICollection<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
+			foreach (ILogicalConstruct sameParentPredecessor in node.SameParentPredecessors)
 			{
-				while (V_1.MoveNext())
+				if (this.removedEdges.ContainsKey(sameParentPredecessor) && this.removedEdges[sameParentPredecessor].Contains(node))
 				{
-					V_2 = (ILogicalConstruct)V_1.get_Current();
-					if (this.removedEdges.ContainsKey(V_2) && this.removedEdges.get_Item(V_2).Contains(node))
-					{
-						continue;
-					}
-					V_0.Add(V_2);
+					continue;
 				}
+				logicalConstructs.Add(sameParentPredecessor);
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return logicalConstructs;
 		}
 
 		private IEnumerable<ILogicalConstruct> GetNodeSuccessors(ILogicalConstruct node)
 		{
-			V_0 = new List<ILogicalConstruct>();
-			V_1 = node.get_SameParentSuccessors().GetEnumerator();
-			try
+			ICollection<ILogicalConstruct> logicalConstructs = new List<ILogicalConstruct>();
+			foreach (ILogicalConstruct sameParentSuccessor in node.SameParentSuccessors)
 			{
-				while (V_1.MoveNext())
+				if (this.removedEdges.ContainsKey(node) && this.removedEdges[node].Contains(sameParentSuccessor))
 				{
-					V_2 = (ILogicalConstruct)V_1.get_Current();
-					if (this.removedEdges.ContainsKey(node) && this.removedEdges.get_Item(node).Contains(V_2))
-					{
-						continue;
-					}
-					V_0.Add(V_2);
+					continue;
 				}
+				logicalConstructs.Add(sameParentSuccessor);
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return logicalConstructs;
 		}
 
 		public List<IntervalConstruct> ReduceCfg()
 		{
 			this.headers.Enqueue(this.entryPoint);
-			while (this.headers.get_Count() > 0)
+			while (this.headers.Count > 0)
 			{
-				V_0 = this.headers.Dequeue();
-				V_1 = new IntervalConstruct(V_0);
-				this.intervals.Add(V_1);
-				this.FillInterval(V_0, V_1);
-				this.AddNewHeaders(V_0, V_1);
+				ILogicalConstruct logicalConstruct = this.headers.Dequeue();
+				IntervalConstruct intervalConstruct = new IntervalConstruct(logicalConstruct);
+				this.intervals.Add(intervalConstruct);
+				this.FillInterval(logicalConstruct, intervalConstruct);
+				this.AddNewHeaders(logicalConstruct, intervalConstruct);
 			}
 			this.CreateGraph(this.intervals);
 			return this.SortIntervalList(this.intervals);
@@ -286,36 +182,18 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		private List<IntervalConstruct> SortIntervalList(List<IntervalConstruct> intervals)
 		{
-			V_0 = new IntervalConstruct(intervals.get_Item(0));
-			V_2 = intervals.GetEnumerator();
-			try
+			IntervalConstruct intervalConstruct = new IntervalConstruct(intervals[0]);
+			foreach (ISingleEntrySubGraph interval in intervals)
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = V_2.get_Current();
-					dummyVar0 = V_0.get_Children().Add(V_3);
-				}
+				intervalConstruct.Children.Add(interval);
 			}
-			finally
+			DFSTree dFSTree = DFSTBuilder.BuildTree(intervalConstruct);
+			List<IntervalConstruct> intervalConstructs = new List<IntervalConstruct>();
+			foreach (DFSTNode reversePostOrder in dFSTree.ReversePostOrder)
 			{
-				((IDisposable)V_2).Dispose();
+				intervalConstructs.Add(reversePostOrder.Construct as IntervalConstruct);
 			}
-			stackVariable15 = DFSTBuilder.BuildTree(V_0);
-			V_1 = new List<IntervalConstruct>();
-			V_4 = stackVariable15.get_ReversePostOrder().GetEnumerator();
-			try
-			{
-				while (V_4.MoveNext())
-				{
-					V_5 = V_4.get_Current();
-					V_1.Add(V_5.get_Construct() as IntervalConstruct);
-				}
-			}
-			finally
-			{
-				((IDisposable)V_4).Dispose();
-			}
-			return V_1;
+			return intervalConstructs;
 		}
 	}
 }

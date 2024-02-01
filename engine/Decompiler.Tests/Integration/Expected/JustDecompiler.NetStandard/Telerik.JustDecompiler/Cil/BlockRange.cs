@@ -10,34 +10,32 @@ namespace Telerik.JustDecompiler.Cil
 
 		public BlockRange(InstructionBlock start, InstructionBlock end)
 		{
-			base();
 			this.Start = start;
 			this.End = end;
-			return;
 		}
 
 		public bool Equals(BlockRange other)
 		{
-			if (!InstructionBlock.op_Equality(this.Start, other.Start))
+			if (this.Start != other.Start)
 			{
 				return false;
 			}
-			return InstructionBlock.op_Equality(this.End, other.End);
+			return this.End == other.End;
 		}
 
 		public override bool Equals(object obj)
 		{
-			V_0 = obj as BlockRange;
-			if (V_0 == null)
+			BlockRange blockRange = obj as BlockRange;
+			if (blockRange == null)
 			{
 				return false;
 			}
-			return this.Equals(V_0);
+			return this.Equals(blockRange);
 		}
 
 		public override int GetHashCode()
 		{
-			return this.Start.get_Index() * this.End.get_Index();
+			return this.Start.Index * this.End.Index;
 		}
 	}
 }

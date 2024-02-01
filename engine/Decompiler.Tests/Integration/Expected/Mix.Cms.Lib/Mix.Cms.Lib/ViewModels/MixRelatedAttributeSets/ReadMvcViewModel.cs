@@ -3,6 +3,7 @@ using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixAttributeSets;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -96,27 +97,21 @@ namespace Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets
 			set;
 		}
 
-		public ReadMvcViewModel(MixRelatedAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixRelatedAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public ReadMvcViewModel()
 		{
-			base();
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets.ReadMvcViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel> singleModel = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel>.Repository.GetSingleModel((MixAttributeSet p) => p.Id == this.Id, _context, _transaction);
+			if (singleModel.get_IsSucceed())
+			{
+				this.AttributeSet = singleModel.get_Data();
+			}
+		}
 	}
 }

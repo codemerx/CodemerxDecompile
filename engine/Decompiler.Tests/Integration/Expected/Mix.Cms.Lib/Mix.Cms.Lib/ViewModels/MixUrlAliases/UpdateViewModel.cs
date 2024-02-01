@@ -4,11 +4,13 @@ using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixCultures;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -110,83 +112,67 @@ namespace Mix.Cms.Lib.ViewModels.MixUrlAliases
 
 		public UpdateViewModel()
 		{
-			base();
-			return;
 		}
 
-		public UpdateViewModel(MixUrlAlias model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixUrlAlias model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_Cultures(this.LoadCultures(this.get_Specificulture(), _context, _transaction));
-			return;
+			this.Cultures = this.LoadCultures(this.Specificulture, _context, _transaction);
 		}
 
 		private List<SupportedCulture> LoadCultures(string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
-			V_1 = new List<SupportedCulture>();
-			if (V_0.get_IsSucceed())
+			RepositoryResponse<List<SystemCultureViewModel>> modelList = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
+			List<SupportedCulture> supportedCultures = new List<SupportedCulture>();
+			if (modelList.get_IsSucceed())
 			{
-				V_2 = V_0.get_Data().GetEnumerator();
-				try
+				foreach (SystemCultureViewModel datum in modelList.get_Data())
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = new Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel.u003cu003ec__DisplayClass57_0();
-						V_3.u003cu003e4__this = this;
-						V_3.culture = V_2.get_Current();
-						stackVariable19 = V_1;
-						V_4 = new SupportedCulture();
-						V_4.set_Icon(V_3.culture.get_Icon());
-						V_4.set_Specificulture(V_3.culture.get_Specificulture());
-						V_4.set_Alias(V_3.culture.get_Alias());
-						V_4.set_FullName(V_3.culture.get_FullName());
-						V_4.set_Description(V_3.culture.get_FullName());
-						V_4.set_Id(V_3.culture.get_Id());
-						V_4.set_Lcid(V_3.culture.get_Lcid());
-						stackVariable49 = V_4;
-						if (string.op_Equality(V_3.culture.get_Specificulture(), initCulture))
-						{
-							stackVariable55 = true;
-						}
-						else
-						{
-							stackVariable58 = _context.get_MixUrlAlias();
-							V_5 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-							// Current member / type: System.Collections.Generic.List`1<Mix.Domain.Core.Models.SupportedCulture> Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel::LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Exception in: System.Collections.Generic.List<Mix.Domain.Core.Models.SupportedCulture> LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Specified method is not supported.
-							// 
-							// mailto: JustDecompilePublicFeedback@telerik.com
-
+					List<SupportedCulture> supportedCultures1 = supportedCultures;
+					SupportedCulture supportedCulture = new SupportedCulture();
+					supportedCulture.set_Icon(datum.Icon);
+					supportedCulture.set_Specificulture(datum.Specificulture);
+					supportedCulture.set_Alias(datum.Alias);
+					supportedCulture.set_FullName(datum.FullName);
+					supportedCulture.set_Description(datum.FullName);
+					supportedCulture.set_Id(datum.Id);
+					supportedCulture.set_Lcid(datum.Lcid);
+					supportedCulture.set_IsSupported((datum.Specificulture == initCulture ? true : _context.MixUrlAlias.Any<MixUrlAlias>((MixUrlAlias p) => p.Id == this.Id && p.Specificulture == datum.Specificulture)));
+					supportedCultures1.Add(supportedCulture);
+				}
+			}
+			return supportedCultures;
+		}
 
 		public override MixUrlAlias ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				stackVariable7 = ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository;
-				V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixUrlAlias Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixUrlAlias ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository.Max((MixUrlAlias c) => c.Id, null, null).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
+				this.Cultures = this.Cultures ?? this.LoadCultures(this.Specificulture, _context, _transaction);
+				this.Cultures.ForEach((SupportedCulture c) => c.set_IsSupported(true));
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			this.Validate(_context, _transaction);
-			if (this.get_IsValid() && ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository.CheckIsExists(new Func<MixUrlAlias, bool>(this.u003cValidateu003eb__56_0), null, null))
+			base.Validate(_context, _transaction);
+			if (base.get_IsValid() && ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository.CheckIsExists((MixUrlAlias o) => {
+				if (!(o.Alias == this.Alias) || !(o.Specificulture == this.Specificulture))
+				{
+					return false;
+				}
+				return o.Id != this.Id;
+			}, null, null))
 			{
-				this.get_Errors().Add("Alias Existed");
-				this.set_IsValid(false);
+				base.get_Errors().Add("Alias Existed");
+				base.set_IsValid(false);
 			}
-			return;
 		}
 	}
 }

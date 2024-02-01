@@ -69,47 +69,34 @@ namespace Telerik.JustDecompiler.Decompiler
 		private YieldExceptionHandlerInfo(HashSet<int> tryStates)
 		{
 			this.tryStates = tryStates;
-			this.handlerType = 0;
+			this.handlerType = YieldExceptionHandlerType.Method;
 			this.finallyMethodDef = null;
 			this.nextState = -1;
 			this.enumeratorField = null;
 			this.disposableField = null;
-			return;
 		}
 
-		public YieldExceptionHandlerInfo(HashSet<int> tryStates, MethodDefinition finallyMethodDef)
+		public YieldExceptionHandlerInfo(HashSet<int> tryStates, MethodDefinition finallyMethodDef) : this(tryStates)
 		{
-			this(tryStates);
-			this.handlerType = 0;
+			this.handlerType = YieldExceptionHandlerType.Method;
 			this.finallyMethodDef = finallyMethodDef;
-			return;
 		}
 
-		public YieldExceptionHandlerInfo(HashSet<int> tryStates, int nextState, FieldReference enumeratorField, FieldReference disposableField)
+		public YieldExceptionHandlerInfo(HashSet<int> tryStates, int nextState, FieldReference enumeratorField, FieldReference disposableField) : this(tryStates)
 		{
-			this(tryStates);
-			if (enumeratorField == null)
-			{
-				stackVariable4 = 1;
-			}
-			else
-			{
-				stackVariable4 = 2;
-			}
-			this.handlerType = stackVariable4;
+			this.handlerType = (enumeratorField == null ? YieldExceptionHandlerType.SimpleConditionalDispose : YieldExceptionHandlerType.ConditionalDispose);
 			this.nextState = nextState;
 			this.enumeratorField = enumeratorField;
 			this.disposableField = disposableField;
-			return;
 		}
 
 		public int CompareTo(YieldExceptionHandlerInfo other)
 		{
-			if (this.get_TryStates().SetEquals(other.get_TryStates()))
+			if (this.TryStates.SetEquals(other.TryStates))
 			{
 				return 0;
 			}
-			if (this.get_TryStates().IsProperSupersetOf(other.get_TryStates()))
+			if (this.TryStates.IsProperSupersetOf(other.TryStates))
 			{
 				return 1;
 			}

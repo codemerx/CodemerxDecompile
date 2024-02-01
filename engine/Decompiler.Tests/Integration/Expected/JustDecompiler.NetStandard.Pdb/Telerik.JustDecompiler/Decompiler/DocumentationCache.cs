@@ -19,44 +19,39 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public DocumentationCache(Dictionary<string, string> map, string filePath)
 		{
-			base();
 			this.documentationMap = map;
-			this.set_DocumentationFilePath(filePath);
-			return;
+			this.DocumentationFilePath = filePath;
 		}
 
 		private string AppendGenericArguments(GenericInstanceType generic, int startingIndex)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append('{');
-			V_1 = startingIndex;
-			while (V_1 < generic.get_GenericArguments().get_Count())
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append('{');
+			for (int i = startingIndex; i < generic.get_GenericArguments().get_Count(); i++)
 			{
-				if (V_1 > startingIndex)
+				if (i > startingIndex)
 				{
-					dummyVar1 = V_0.Append(',');
+					stringBuilder.Append(',');
 				}
-				V_2 = generic.get_PostionToArgument().get_Item(V_1);
-				dummyVar2 = V_0.Append(this.GetParameterTypeRepresentation(V_2));
-				V_1 = V_1 + 1;
+				TypeReference item = generic.get_PostionToArgument()[i];
+				stringBuilder.Append(this.GetParameterTypeRepresentation(item));
 			}
-			dummyVar3 = V_0.Append('}');
-			return V_0.ToString();
+			stringBuilder.Append('}');
+			return stringBuilder.ToString();
 		}
 
 		public void ClearCache()
 		{
 			this.documentationMap.Clear();
-			return;
 		}
 
 		private string GetArgumentsString(IMemberDefinition member)
 		{
-			if (member as MethodDefinition != null)
+			if (member is MethodDefinition)
 			{
 				return this.GetArgumentsString((member as MethodDefinition).get_Parameters());
 			}
-			if (member as PropertyDefinition == null)
+			if (!(member is PropertyDefinition))
 			{
 				return String.Empty;
 			}
@@ -69,91 +64,82 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return String.Empty;
 			}
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append('(');
-			V_1 = true;
-			V_2 = parameters.GetEnumerator();
-			try
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append('(');
+			bool flag = true;
+			foreach (ParameterDefinition parameter in parameters)
 			{
-				while (V_2.MoveNext())
+				if (!flag)
 				{
-					V_3 = V_2.get_Current();
-					if (!V_1)
-					{
-						dummyVar1 = V_0.Append(',');
-					}
-					V_4 = this.GetParameterTypeRepresentation(V_3.get_ParameterType());
-					dummyVar2 = V_0.Append(V_4);
-					V_1 = false;
+					stringBuilder.Append(',');
 				}
+				string parameterTypeRepresentation = this.GetParameterTypeRepresentation(parameter.get_ParameterType());
+				stringBuilder.Append(parameterTypeRepresentation);
+				flag = false;
 			}
-			finally
-			{
-				V_2.Dispose();
-			}
-			dummyVar3 = V_0.Append(')');
-			return V_0.ToString();
+			stringBuilder.Append(')');
+			return stringBuilder.ToString();
 		}
 
 		public string GetDocumentationForMember(IMemberDefinition member)
 		{
-			V_0 = this.GetDocumentationMemberName(member);
-			if (!this.documentationMap.ContainsKey(V_0))
+			string documentationMemberName = this.GetDocumentationMemberName(member);
+			if (!this.documentationMap.ContainsKey(documentationMemberName))
 			{
 				return String.Empty;
 			}
-			return this.documentationMap.get_Item(V_0);
+			return this.documentationMap[documentationMemberName];
 		}
 
 		private string GetDocumentationMemberName(IMemberDefinition member)
 		{
-			stackVariable0 = new StringBuilder();
-			dummyVar0 = stackVariable0.Append(this.GetMemberPrefix(member));
-			dummyVar1 = stackVariable0.Append(this.GetMemberFullName(member));
-			return stackVariable0.ToString();
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(this.GetMemberPrefix(member));
+			stringBuilder.Append(this.GetMemberFullName(member));
+			return stringBuilder.ToString();
 		}
 
 		private string GetMemberFullName(IMemberDefinition member)
 		{
-			V_0 = new StringBuilder();
-			if (member as TypeDefinition != null)
+			StringBuilder stringBuilder = new StringBuilder();
+			if (member is TypeDefinition)
 			{
 				return this.GetTypeFullName(member as TypeDefinition);
 			}
-			dummyVar0 = V_0.Append(this.GetTypeFullName(member.get_DeclaringType()));
-			dummyVar1 = V_0.Append('.');
-			V_1 = member.get_Name().Replace('.', '#');
-			dummyVar2 = V_0.Append(V_1);
-			if (member as MethodDefinition != null)
+			stringBuilder.Append(this.GetTypeFullName(member.get_DeclaringType()));
+			stringBuilder.Append('.');
+			string str = member.get_Name().Replace('.', '#');
+			stringBuilder.Append(str);
+			if (member is MethodDefinition)
 			{
-				dummyVar3 = V_0.Append(this.GetMethodGenericParametersMarker(member as MethodDefinition));
+				stringBuilder.Append(this.GetMethodGenericParametersMarker(member as MethodDefinition));
 			}
-			if (member as MethodDefinition != null || member as PropertyDefinition != null)
+			if (member is MethodDefinition || member is PropertyDefinition)
 			{
-				dummyVar4 = V_0.Append(this.GetArgumentsString(member));
+				stringBuilder.Append(this.GetArgumentsString(member));
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		private string GetMemberPrefix(IMemberDefinition member)
 		{
-			if (member as EventDefinition != null)
+			if (member is EventDefinition)
 			{
 				return "E:";
 			}
-			if (member as FieldDefinition != null)
+			if (member is FieldDefinition)
 			{
 				return "F:";
 			}
-			if (member as MethodDefinition != null)
+			if (member is MethodDefinition)
 			{
 				return "M:";
 			}
-			if (member as PropertyDefinition != null)
+			if (member is PropertyDefinition)
 			{
 				return "P:";
 			}
-			if (member as TypeDefinition != null)
+			if (member is TypeDefinition)
 			{
 				return "T:";
 			}
@@ -171,163 +157,153 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		private string GetParameterTypeRepresentation(TypeReference parameterType)
 		{
-			if (parameterType as GenericParameter != null)
+			if (parameterType is GenericParameter)
 			{
 				return this.HandleGenericParameterType(parameterType as GenericParameter);
 			}
-			if (parameterType as ByReferenceType != null)
+			if (parameterType is ByReferenceType)
 			{
 				return this.HandleByReferenceType(parameterType as ByReferenceType);
 			}
-			if (parameterType as ArrayType != null)
+			if (parameterType is ArrayType)
 			{
 				return this.HandleArrayType(parameterType as ArrayType);
 			}
-			V_0 = new StringBuilder();
+			StringBuilder stringBuilder = new StringBuilder();
 			if (parameterType.get_DeclaringType() == null)
 			{
-				dummyVar1 = V_0.Append(parameterType.get_Namespace());
+				stringBuilder.Append(parameterType.get_Namespace());
 			}
 			else
 			{
-				if (parameterType.get_DeclaringType().get_HasGenericParameters() && parameterType as GenericInstanceType != null)
+				if (parameterType.get_DeclaringType().get_HasGenericParameters() && parameterType is GenericInstanceType)
 				{
 					return this.HandleNestedGenericTypes(parameterType);
 				}
-				dummyVar0 = V_0.Append(this.GetParameterTypeRepresentation(parameterType.get_DeclaringType()));
+				stringBuilder.Append(this.GetParameterTypeRepresentation(parameterType.get_DeclaringType()));
 			}
-			dummyVar2 = V_0.Append('.');
-			V_1 = GenericHelper.GetNonGenericName(parameterType.get_Name());
-			dummyVar3 = V_0.Append(V_1);
-			if (parameterType as GenericInstanceType != null)
+			stringBuilder.Append('.');
+			string nonGenericName = GenericHelper.GetNonGenericName(parameterType.get_Name());
+			stringBuilder.Append(nonGenericName);
+			if (parameterType is GenericInstanceType)
 			{
-				dummyVar4 = V_0.Append(this.AppendGenericArguments(parameterType as GenericInstanceType, 0));
+				stringBuilder.Append(this.AppendGenericArguments(parameterType as GenericInstanceType, 0));
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		private string GetTypeFullName(TypeDefinition theType)
 		{
-			V_0 = new StringBuilder();
+			StringBuilder stringBuilder = new StringBuilder();
 			if (theType.get_DeclaringType() == null)
 			{
-				dummyVar1 = V_0.Append(theType.get_Namespace());
+				stringBuilder.Append(theType.get_Namespace());
 			}
 			else
 			{
-				dummyVar0 = V_0.Append(this.GetTypeFullName(theType.get_DeclaringType()));
+				stringBuilder.Append(this.GetTypeFullName(theType.get_DeclaringType()));
 			}
-			V_1 = GenericHelper.GetNonGenericName(theType.get_Name()).Replace('.', '#');
-			dummyVar2 = V_0.AppendFormat(".{0}", V_1);
+			string str = GenericHelper.GetNonGenericName(theType.get_Name()).Replace('.', '#');
+			stringBuilder.AppendFormat(".{0}", str);
 			if (theType.get_HasGenericParameters())
 			{
-				V_2 = theType.get_GenericParameters().get_Count();
+				int count = theType.get_GenericParameters().get_Count();
 				if (theType.get_DeclaringType() != null && theType.get_DeclaringType().get_HasGenericParameters())
 				{
-					V_2 = V_2 - theType.get_DeclaringType().get_GenericParameters().get_Count();
+					count -= theType.get_DeclaringType().get_GenericParameters().get_Count();
 				}
-				if (V_2 > 0)
+				if (count > 0)
 				{
-					dummyVar3 = V_0.AppendFormat("`{0}", V_2);
+					stringBuilder.AppendFormat("`{0}", count);
 				}
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		private string HandleArrayType(ArrayType parameterType)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append(this.GetParameterTypeRepresentation(parameterType.get_ElementType()));
-			dummyVar1 = V_0.Append('[');
-			V_1 = true;
-			V_2 = parameterType.get_Dimensions().GetEnumerator();
-			try
+			int? lowerBound;
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(this.GetParameterTypeRepresentation(parameterType.get_ElementType()));
+			stringBuilder.Append('[');
+			bool flag = true;
+			foreach (ArrayDimension dimension in parameterType.get_Dimensions())
 			{
-				while (V_2.MoveNext())
+				if (!flag)
 				{
-					V_3 = V_2.get_Current();
-					if (!V_1)
-					{
-						dummyVar2 = V_0.Append(',');
-					}
-					if (V_3.get_LowerBound().get_HasValue())
-					{
-						V_4 = V_3.get_LowerBound();
-						dummyVar3 = V_0.Append(V_4.get_Value());
-					}
-					if (V_3.get_IsSized())
-					{
-						dummyVar4 = V_0.Append(':');
-					}
-					if (V_3.get_UpperBound().get_HasValue())
-					{
-						V_4 = V_3.get_UpperBound();
-						dummyVar5 = V_0.Append(V_4.get_Value());
-					}
-					V_1 = false;
+					stringBuilder.Append(',');
 				}
+				if (dimension.get_LowerBound().HasValue)
+				{
+					lowerBound = dimension.get_LowerBound();
+					stringBuilder.Append(lowerBound.Value);
+				}
+				if (dimension.get_IsSized())
+				{
+					stringBuilder.Append(':');
+				}
+				if (dimension.get_UpperBound().HasValue)
+				{
+					lowerBound = dimension.get_UpperBound();
+					stringBuilder.Append(lowerBound.Value);
+				}
+				flag = false;
 			}
-			finally
-			{
-				V_2.Dispose();
-			}
-			dummyVar6 = V_0.Append(']');
-			return V_0.ToString();
+			stringBuilder.Append(']');
+			return stringBuilder.ToString();
 		}
 
 		private string HandleByReferenceType(ByReferenceType parameterType)
 		{
-			V_0 = parameterType.get_ElementType();
-			return String.Format("{0}@", this.GetParameterTypeRepresentation(V_0));
+			TypeReference elementType = parameterType.get_ElementType();
+			return String.Format("{0}@", this.GetParameterTypeRepresentation(elementType));
 		}
 
 		private string HandleGenericParameterType(GenericParameter parameterType)
 		{
-			V_0 = new StringBuilder();
-			if (parameterType.get_Owner() as TypeReference == null)
+			StringBuilder stringBuilder = new StringBuilder();
+			if (!(parameterType.get_Owner() is TypeReference))
 			{
-				dummyVar1 = V_0.Append("``");
+				stringBuilder.Append("``");
 			}
 			else
 			{
-				dummyVar0 = V_0.Append('\u0060');
+				stringBuilder.Append('\u0060');
 			}
-			dummyVar2 = V_0.Append(parameterType.get_Position());
-			return V_0.ToString();
+			stringBuilder.Append(parameterType.get_Position());
+			return stringBuilder.ToString();
 		}
 
 		private string HandleNestedGenericTypes(TypeReference parameterType)
 		{
-			V_0 = new StringBuilder();
-			stackVariable2 = parameterType.get_DeclaringType();
-			V_1 = parameterType as GenericInstanceType;
-			V_2 = new GenericInstanceType(stackVariable2);
-			V_3 = new Collection<TypeReference>(V_1.get_GenericArguments());
-			V_4 = new Collection<TypeReference>(V_2.get_GenericArguments());
-			V_5 = stackVariable2.get_GenericParameters().get_Count();
-			V_6 = 0;
-			while (V_6 < V_5)
+			StringBuilder stringBuilder = new StringBuilder();
+			TypeReference declaringType = parameterType.get_DeclaringType();
+			GenericInstanceType genericInstanceType = parameterType as GenericInstanceType;
+			GenericInstanceType genericInstanceType1 = new GenericInstanceType(declaringType);
+			Collection<TypeReference> collection = new Collection<TypeReference>(genericInstanceType.get_GenericArguments());
+			Collection<TypeReference> collection1 = new Collection<TypeReference>(genericInstanceType1.get_GenericArguments());
+			int count = declaringType.get_GenericParameters().get_Count();
+			for (int i = 0; i < count; i++)
 			{
-				V_2.AddGenericArgument(V_1.get_GenericArguments().get_Item(V_6));
-				V_2.get_GenericArguments().Add(V_1.get_GenericArguments().get_Item(V_6));
-				V_6 = V_6 + 1;
+				genericInstanceType1.AddGenericArgument(genericInstanceType.get_GenericArguments().get_Item(i));
+				genericInstanceType1.get_GenericArguments().Add(genericInstanceType.get_GenericArguments().get_Item(i));
 			}
-			dummyVar0 = V_0.Append(this.GetParameterTypeRepresentation(V_2));
-			dummyVar1 = V_0.Append('.');
-			if (V_1.get_GenericArguments().get_Count() - V_5 <= 0)
+			stringBuilder.Append(this.GetParameterTypeRepresentation(genericInstanceType1));
+			stringBuilder.Append('.');
+			if (genericInstanceType.get_GenericArguments().get_Count() - count <= 0)
 			{
-				V_7 = GenericHelper.GetNonGenericName(parameterType.get_Name());
-				dummyVar3 = V_0.Append(V_7);
+				string nonGenericName = GenericHelper.GetNonGenericName(parameterType.get_Name());
+				stringBuilder.Append(nonGenericName);
 			}
 			else
 			{
-				dummyVar2 = V_0.Append(this.AppendGenericArguments(V_1, V_5));
+				stringBuilder.Append(this.AppendGenericArguments(genericInstanceType, count));
 			}
-			V_1.get_GenericArguments().Clear();
-			V_1.get_GenericArguments().AddRange(V_3);
-			V_2.get_GenericArguments().Clear();
-			V_2.get_GenericArguments().AddRange(V_4);
-			return V_0.ToString();
+			genericInstanceType.get_GenericArguments().Clear();
+			genericInstanceType.get_GenericArguments().AddRange(collection);
+			genericInstanceType1.get_GenericArguments().Clear();
+			genericInstanceType1.get_GenericArguments().AddRange(collection1);
+			return stringBuilder.ToString();
 		}
 	}
 }

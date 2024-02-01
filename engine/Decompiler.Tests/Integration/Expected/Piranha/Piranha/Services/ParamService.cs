@@ -1,6 +1,8 @@
 using Piranha;
+using Piranha.Cache;
 using Piranha.Models;
 using Piranha.Repositories;
+using Piranha.Runtime;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,33 +20,30 @@ namespace Piranha.Services
 
 		public ParamService(IParamRepository repo, ICache cache = null)
 		{
-			base();
 			this._repo = repo;
-			if (App.get_CacheLevel() > 0)
+			if (App.CacheLevel > CacheLevel.None)
 			{
 				this._cache = cache;
 			}
-			return;
 		}
 
 		public async Task DeleteAsync(Guid id)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ParamService.u003cDeleteAsyncu003ed__7>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ConfiguredTaskAwaitable<Param> configuredTaskAwaitable = this.GetByIdAsync(id).ConfigureAwait(false);
+			Param param = await configuredTaskAwaitable;
+			if (param != null)
+			{
+				await this.DeleteAsync(param).ConfigureAwait(false);
+			}
 		}
 
 		public async Task DeleteAsync(Param model)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.model = model;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ParamService.u003cDeleteAsyncu003ed__8>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			App.Hooks.OnBeforeDelete<Param>(model);
+			ConfiguredTaskAwaitable configuredTaskAwaitable = this._repo.Delete(model.Id).ConfigureAwait(false);
+			await configuredTaskAwaitable;
+			App.Hooks.OnAfterDelete<Param>(model);
+			this.RemoveFromCache(model);
 		}
 
 		public Task<IEnumerable<Param>> GetAllAsync()
@@ -54,59 +53,94 @@ namespace Piranha.Services
 
 		public async Task<Param> GetByIdAsync(Guid id)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<Param>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ParamService.u003cGetByIdAsyncu003ed__4>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Param param;
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				param = cache.Get<Param>(id.ToString());
+			}
+			else
+			{
+				param = null;
+			}
+			Param param1 = param;
+			if (param1 == null)
+			{
+				ConfiguredTaskAwaitable<Param> configuredTaskAwaitable = this._repo.GetById(id).ConfigureAwait(false);
+				param1 = await configuredTaskAwaitable;
+				this.OnLoad(param1);
+			}
+			return param1;
 		}
 
 		public async Task<Param> GetByKeyAsync(string key)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.key = key;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<Param>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ParamService.u003cGetByKeyAsyncu003ed__5>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ConfiguredTaskAwaitable<Param> configuredTaskAwaitable;
+			Guid? nullable;
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				nullable = cache.Get<Guid?>(String.Concat("ParamKey_", key));
+			}
+			else
+			{
+				nullable = null;
+			}
+			Guid? nullable1 = nullable;
+			Param param = null;
+			if (!nullable1.HasValue)
+			{
+				configuredTaskAwaitable = this._repo.GetByKey(key).ConfigureAwait(false);
+				param = await configuredTaskAwaitable;
+				this.OnLoad(param);
+			}
+			else
+			{
+				configuredTaskAwaitable = this.GetByIdAsync(nullable1.Value).ConfigureAwait(false);
+				param = await configuredTaskAwaitable;
+			}
+			return param;
 		}
 
 		private void OnLoad(Param model)
 		{
 			if (model != null)
 			{
-				App.get_Hooks().OnLoad<Param>(model);
+				App.Hooks.OnLoad<Param>(model);
 				if (this._cache != null)
 				{
-					stackVariable6 = this._cache;
-					V_0 = model.get_Id();
-					stackVariable6.Set<Param>(V_0.ToString(), model);
-					this._cache.Set<Guid>(String.Concat("ParamKey_", model.get_Key()), model.get_Id());
+					this._cache.Set<Param>(model.Id.ToString(), model);
+					this._cache.Set<Guid>(String.Concat("ParamKey_", model.Key), model.Id);
 				}
 			}
-			return;
 		}
 
 		private void RemoveFromCache(Param model)
 		{
 			if (this._cache != null)
 			{
-				stackVariable3 = this._cache;
-				stackVariable3.Remove(model.get_Id().ToString());
-				this._cache.Remove(String.Concat("ParamKey_", model.get_Key()));
+				this._cache.Remove(model.Id.ToString());
+				this._cache.Remove(String.Concat("ParamKey_", model.Key));
 			}
-			return;
 		}
 
 		public async Task SaveAsync(Param model)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.model = model;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ParamService.u003cSaveAsyncu003ed__6>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			if (model.Id == Guid.Empty)
+			{
+				model.Id = Guid.NewGuid();
+			}
+			Validator.ValidateObject(model, new ValidationContext(model), true);
+			ConfiguredTaskAwaitable<Param> configuredTaskAwaitable = this._repo.GetByKey(model.Key).ConfigureAwait(false);
+			Param param = await configuredTaskAwaitable;
+			if (param != null && param.Id != model.Id)
+			{
+				throw new ValidationException("The Key field must be unique");
+			}
+			App.Hooks.OnBeforeSave<Param>(model);
+			await this._repo.Save(model).ConfigureAwait(false);
+			App.Hooks.OnAfterSave<Param>(model);
+			this.RemoveFromCache(model);
 		}
 	}
 }

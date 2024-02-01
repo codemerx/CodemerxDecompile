@@ -3,6 +3,7 @@ using Mono.Cecil.AssemblyResolver;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Telerik.JustDecompiler.Common
@@ -11,57 +12,40 @@ namespace Telerik.JustDecompiler.Common
 	{
 		public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> self, IDictionary<TKey, TValue> source)
 		{
-			V_0 = source.GetEnumerator();
-			try
+			foreach (KeyValuePair<TKey, TValue> keyValuePair in source)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					self.Add(V_1);
-				}
+				self.Add(keyValuePair);
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 
 		public static bool IsValidIdentifier(this string self)
 		{
-			if (self == null || String.op_Equality(self, String.Empty))
+			bool flag;
+			if (self == null || self == String.Empty)
 			{
 				return false;
 			}
 			try
 			{
-				V_0 = self.Normalize();
-				goto Label0;
-			}
-			catch (ArgumentException exception_0)
-			{
-				dummyVar0 = exception_0;
-				V_1 = false;
-			}
-			return V_1;
-		Label0:
-			if (!V_0.get_Chars(0).IsValidIdentifierFirstCharacter())
-			{
-				return false;
-			}
-			V_2 = 1;
-			while (V_2 < V_0.get_Length())
-			{
-				if (!V_0.get_Chars(V_2).IsValidIdentifierCharacter())
+				string str = self.Normalize();
+				if (!str[0].IsValidIdentifierFirstCharacter())
 				{
 					return false;
 				}
-				V_2 = V_2 + 1;
+				for (int i = 1; i < str.Length; i++)
+				{
+					if (!str[i].IsValidIdentifierCharacter())
+					{
+						return false;
+					}
+				}
+				return true;
 			}
-			return true;
+			catch (ArgumentException argumentException)
+			{
+				flag = false;
+			}
+			return flag;
 		}
 
 		public static bool IsValidIdentifierCharacter(this char currentChar)
@@ -70,8 +54,8 @@ namespace Telerik.JustDecompiler.Common
 			{
 				return true;
 			}
-			V_0 = Char.GetUnicodeCategory(currentChar);
-			if (V_0 != 5 && V_0 != 6 && V_0 != 8 && V_0 != 18 && V_0 != 15)
+			UnicodeCategory unicodeCategory = Char.GetUnicodeCategory(currentChar);
+			if (unicodeCategory != UnicodeCategory.NonSpacingMark && unicodeCategory != UnicodeCategory.SpacingCombiningMark && unicodeCategory != UnicodeCategory.DecimalDigitNumber && unicodeCategory != UnicodeCategory.ConnectorPunctuation && unicodeCategory != UnicodeCategory.Format)
 			{
 				return false;
 			}
@@ -84,8 +68,8 @@ namespace Telerik.JustDecompiler.Common
 			{
 				return true;
 			}
-			V_0 = Char.GetUnicodeCategory(firstCharacter);
-			if (V_0 != 1 && V_0 != UnicodeCategory.UppercaseLetter && V_0 != 2 && V_0 != 3 && V_0 != 4 && V_0 != 9)
+			UnicodeCategory unicodeCategory = Char.GetUnicodeCategory(firstCharacter);
+			if (unicodeCategory != UnicodeCategory.LowercaseLetter && unicodeCategory != UnicodeCategory.UppercaseLetter && unicodeCategory != UnicodeCategory.TitlecaseLetter && unicodeCategory != UnicodeCategory.ModifierLetter && unicodeCategory != UnicodeCategory.OtherLetter && unicodeCategory != UnicodeCategory.LetterNumber)
 			{
 				return false;
 			}
@@ -94,194 +78,192 @@ namespace Telerik.JustDecompiler.Common
 
 		public static bool? ResolveToOverloadedEqualityOperator(TypeReference type, out TypeReference lastResolvedType)
 		{
+			bool? nullable;
 			if (type.get_IsValueType() || type.get_IsFunctionPointer() || type.get_IsPrimitive() || type.get_IsGenericParameter())
 			{
 				throw new NotSupportedException();
 			}
 			lastResolvedType = type;
-			V_0 = type.Resolve();
-			if (V_0 == null)
+			TypeDefinition typeDefinition = type.Resolve();
+			if (typeDefinition == null)
 			{
-				V_1 = null;
-				return V_1;
+				nullable = null;
+				return nullable;
 			}
-			if (V_0.get_IsInterface())
+			if (typeDefinition.get_IsInterface())
 			{
 				return new bool?(false);
 			}
-			while (String.op_Inequality(V_0.get_Name(), "Object"))
+			while (typeDefinition.get_Name() != "Object")
 			{
-				stackVariable21 = V_0.get_Methods();
-				stackVariable22 = Telerik.JustDecompiler.Common.Extensions.u003cu003ec.u003cu003e9__4_0;
-				if (stackVariable22 == null)
-				{
-					dummyVar0 = stackVariable22;
-					stackVariable22 = new Func<MethodDefinition, bool>(Telerik.JustDecompiler.Common.Extensions.u003cu003ec.u003cu003e9.u003cResolveToOverloadedEqualityOperatoru003eb__4_0);
-					Telerik.JustDecompiler.Common.Extensions.u003cu003ec.u003cu003e9__4_0 = stackVariable22;
-				}
-				if (stackVariable21.Any<MethodDefinition>(stackVariable22))
+				if (typeDefinition.get_Methods().Any<MethodDefinition>((MethodDefinition m) => {
+					if (m.get_Name() == "op_Equality")
+					{
+						return true;
+					}
+					return m.get_Name() == "op_Inequality";
+				}))
 				{
 					return new bool?(true);
 				}
-				lastResolvedType = V_0.get_BaseType();
-				V_2 = V_0.get_BaseType().Resolve();
-				if (V_2 == null)
+				lastResolvedType = typeDefinition.get_BaseType();
+				TypeDefinition typeDefinition1 = typeDefinition.get_BaseType().Resolve();
+				if (typeDefinition1 == null)
 				{
-					V_1 = null;
-					return V_1;
+					nullable = null;
+					return nullable;
 				}
-				V_0 = V_2;
+				typeDefinition = typeDefinition1;
 			}
 			return new bool?(false);
 		}
 
 		public static string ToString(this FrameworkVersion self, bool includeVersionSign)
 		{
-			V_0 = String.Empty;
-			switch (self - 1)
+			string empty = String.Empty;
+			switch (self)
 			{
-				case 0:
-				{
-					V_0 = "1.0";
-					break;
-				}
 				case 1:
-				case 24:
 				{
-				Label0:
-					return String.Empty;
+					empty = "1.0";
+					break;
 				}
 				case 2:
+				case 25:
 				{
-					V_0 = "2.0";
-					break;
+					return String.Empty;
 				}
 				case 3:
 				{
-					V_0 = "3.0";
+					empty = "2.0";
 					break;
 				}
 				case 4:
 				{
-					V_0 = "3.5";
+					empty = "3.0";
 					break;
 				}
 				case 5:
 				{
-					V_0 = "4.0";
+					empty = "3.5";
 					break;
 				}
 				case 6:
 				{
-					V_0 = "4.5";
+					empty = "4.0";
 					break;
 				}
 				case 7:
 				{
-					V_0 = "4.5.1";
+					empty = "4.5";
 					break;
 				}
 				case 8:
 				{
-					V_0 = "4.5.2";
+					empty = "4.5.1";
 					break;
 				}
 				case 9:
 				{
-					V_0 = "4.6";
+					empty = "4.5.2";
 					break;
 				}
 				case 10:
 				{
-					V_0 = "4.6.1";
+					empty = "4.6";
 					break;
 				}
 				case 11:
 				{
-					V_0 = "4.6.2";
+					empty = "4.6.1";
 					break;
 				}
 				case 12:
 				{
-					V_0 = "4.7";
+					empty = "4.6.2";
 					break;
 				}
 				case 13:
 				{
-					V_0 = "4.7.1";
+					empty = "4.7";
 					break;
 				}
 				case 14:
+				{
+					empty = "4.7.1";
+					break;
+				}
 				case 15:
 				case 16:
+				case 17:
 				{
 					return self.ToString();
 				}
-				case 17:
-				{
-					V_0 = ".NETPortable v4.0";
-					break;
-				}
 				case 18:
 				{
-					V_0 = ".NETPortable v4.6";
+					empty = ".NETPortable v4.0";
 					break;
 				}
 				case 19:
 				{
-					V_0 = ".NETPortable v4.5";
+					empty = ".NETPortable v4.6";
 					break;
 				}
 				case 20:
 				{
-					V_0 = ".NETPortable v5.0";
+					empty = ".NETPortable v4.5";
 					break;
 				}
 				case 21:
 				{
-					V_0 = "WinRT - 4.5";
+					empty = ".NETPortable v5.0";
 					break;
 				}
 				case 22:
 				{
-					V_0 = "WinRT - 4.5.1";
+					empty = "WinRT - 4.5";
 					break;
 				}
 				case 23:
 				{
-					V_0 = "UWP";
+					empty = "WinRT - 4.5.1";
 					break;
 				}
-				case 25:
+				case 24:
 				{
-					V_0 = "netcoreapp2.1";
+					empty = "UWP";
 					break;
 				}
 				case 26:
 				{
-					V_0 = "netcoreapp2.0";
+					empty = "netcoreapp2.1";
 					break;
 				}
 				case 27:
 				{
-					V_0 = "netcoreapp1.1";
+					empty = "netcoreapp2.0";
 					break;
 				}
 				case 28:
 				{
-					V_0 = "netcoreapp1.0";
+					empty = "netcoreapp1.1";
+					break;
+				}
+				case 29:
+				{
+					empty = "netcoreapp1.0";
 					break;
 				}
 				default:
 				{
-					goto Label0;
+					return String.Empty;
 				}
 			}
 			if (!includeVersionSign)
 			{
-				return V_0;
+				return empty;
 			}
-			return String.Concat("v", V_0);
+			return String.Concat("v", empty);
 		}
 	}
 }

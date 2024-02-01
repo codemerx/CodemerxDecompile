@@ -903,8 +903,6 @@ namespace Telerik.JustDecompiler.Languages.CSharp
 
 		public CSharpKeyWordWriter()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -7,20 +7,15 @@ namespace Telerik.JustDecompiler.Common
 	{
 		public PairList()
 		{
-			base();
-			return;
 		}
 
-		public PairList(IEnumerable<KeyValuePair<K, V>> collection)
+		public PairList(IEnumerable<KeyValuePair<K, V>> collection) : base(collection)
 		{
-			base(collection);
-			return;
 		}
 
 		public void Add(K key, V value)
 		{
-			this.Add(new KeyValuePair<K, V>(key, value));
-			return;
+			base.Add(new KeyValuePair<K, V>(key, value));
 		}
 	}
 }

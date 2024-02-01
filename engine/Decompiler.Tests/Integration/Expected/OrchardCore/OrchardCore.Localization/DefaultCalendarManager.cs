@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -14,18 +16,17 @@ namespace OrchardCore.Localization
 
 		public DefaultCalendarManager(IEnumerable<ICalendarSelector> calendarSelectors)
 		{
-			base();
 			this._calendarSelectors = calendarSelectors;
-			return;
 		}
 
 		public async Task<CalendarName> GetCurrentCalendar()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<CalendarName>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3 variable = new DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3();
+			variable.u003cu003e4__this = this;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<CalendarName>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

@@ -1,12 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations.Builders;
 using Mix.Cms.Lib.Models.Account;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.Migrations.MixCmsAccount
@@ -17,313 +20,502 @@ namespace Mix.Cms.Lib.Migrations.MixCmsAccount
 	{
 		public Init()
 		{
-			base();
-			return;
 		}
 
 		protected override void BuildTargetModel(ModelBuilder modelBuilder)
 		{
-			dummyVar0 = modelBuilder.HasAnnotation("ProductVersion", "3.1.2").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", (SqlServerValueGenerationStrategy)2);
-			stackVariable12 = modelBuilder;
-			stackVariable14 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_0;
-			if (stackVariable14 == null)
-			{
-				dummyVar1 = stackVariable14;
-				stackVariable14 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_0);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_0 = stackVariable14;
-			}
-			dummyVar2 = stackVariable12.Entity("Mix.Cms.Lib.Models.Account.AspNetRoleClaims", stackVariable14);
-			stackVariable16 = modelBuilder;
-			stackVariable18 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_1;
-			if (stackVariable18 == null)
-			{
-				dummyVar3 = stackVariable18;
-				stackVariable18 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_1);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_1 = stackVariable18;
-			}
-			dummyVar4 = stackVariable16.Entity("Mix.Cms.Lib.Models.Account.AspNetRoles", stackVariable18);
-			stackVariable20 = modelBuilder;
-			stackVariable22 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_2;
-			if (stackVariable22 == null)
-			{
-				dummyVar5 = stackVariable22;
-				stackVariable22 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_2);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_2 = stackVariable22;
-			}
-			dummyVar6 = stackVariable20.Entity("Mix.Cms.Lib.Models.Account.AspNetUserClaims", stackVariable22);
-			stackVariable24 = modelBuilder;
-			stackVariable26 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_3;
-			if (stackVariable26 == null)
-			{
-				dummyVar7 = stackVariable26;
-				stackVariable26 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_3);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_3 = stackVariable26;
-			}
-			dummyVar8 = stackVariable24.Entity("Mix.Cms.Lib.Models.Account.AspNetUserLogins", stackVariable26);
-			stackVariable28 = modelBuilder;
-			stackVariable30 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_4;
-			if (stackVariable30 == null)
-			{
-				dummyVar9 = stackVariable30;
-				stackVariable30 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_4);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_4 = stackVariable30;
-			}
-			dummyVar10 = stackVariable28.Entity("Mix.Cms.Lib.Models.Account.AspNetUserRoles", stackVariable30);
-			stackVariable32 = modelBuilder;
-			stackVariable34 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_5;
-			if (stackVariable34 == null)
-			{
-				dummyVar11 = stackVariable34;
-				stackVariable34 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_5);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_5 = stackVariable34;
-			}
-			dummyVar12 = stackVariable32.Entity("Mix.Cms.Lib.Models.Account.AspNetUserTokens", stackVariable34);
-			stackVariable36 = modelBuilder;
-			stackVariable38 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_6;
-			if (stackVariable38 == null)
-			{
-				dummyVar13 = stackVariable38;
-				stackVariable38 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_6);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_6 = stackVariable38;
-			}
-			dummyVar14 = stackVariable36.Entity("Mix.Cms.Lib.Models.Account.AspNetUsers", stackVariable38);
-			stackVariable40 = modelBuilder;
-			stackVariable42 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_7;
-			if (stackVariable42 == null)
-			{
-				dummyVar15 = stackVariable42;
-				stackVariable42 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_7);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_7 = stackVariable42;
-			}
-			dummyVar16 = stackVariable40.Entity("Mix.Cms.Lib.Models.Account.Clients", stackVariable42);
-			stackVariable44 = modelBuilder;
-			stackVariable46 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_8;
-			if (stackVariable46 == null)
-			{
-				dummyVar17 = stackVariable46;
-				stackVariable46 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_8);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_8 = stackVariable46;
-			}
-			dummyVar18 = stackVariable44.Entity("Mix.Cms.Lib.Models.Account.RefreshTokens", stackVariable46);
-			stackVariable48 = modelBuilder;
-			stackVariable50 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_9;
-			if (stackVariable50 == null)
-			{
-				dummyVar19 = stackVariable50;
-				stackVariable50 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_9);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_9 = stackVariable50;
-			}
-			dummyVar20 = stackVariable48.Entity("Mix.Cms.Lib.Models.Account.AspNetRoleClaims", stackVariable50);
-			stackVariable52 = modelBuilder;
-			stackVariable54 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_10;
-			if (stackVariable54 == null)
-			{
-				dummyVar21 = stackVariable54;
-				stackVariable54 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_10);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_10 = stackVariable54;
-			}
-			dummyVar22 = stackVariable52.Entity("Mix.Cms.Lib.Models.Account.AspNetUserClaims", stackVariable54);
-			stackVariable56 = modelBuilder;
-			stackVariable58 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_11;
-			if (stackVariable58 == null)
-			{
-				dummyVar23 = stackVariable58;
-				stackVariable58 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_11);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_11 = stackVariable58;
-			}
-			dummyVar24 = stackVariable56.Entity("Mix.Cms.Lib.Models.Account.AspNetUserLogins", stackVariable58);
-			stackVariable60 = modelBuilder;
-			stackVariable62 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_12;
-			if (stackVariable62 == null)
-			{
-				dummyVar25 = stackVariable62;
-				stackVariable62 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_12);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_12 = stackVariable62;
-			}
-			dummyVar26 = stackVariable60.Entity("Mix.Cms.Lib.Models.Account.AspNetUserRoles", stackVariable62);
-			stackVariable64 = modelBuilder;
-			stackVariable66 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_13;
-			if (stackVariable66 == null)
-			{
-				dummyVar27 = stackVariable66;
-				stackVariable66 = new Action<EntityTypeBuilder>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_13);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__2_13 = stackVariable66;
-			}
-			dummyVar28 = stackVariable64.Entity("Mix.Cms.Lib.Models.Account.AspNetUserTokens", stackVariable66);
-			return;
+			modelBuilder.HasAnnotation("ProductVersion", "3.1.2").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", (SqlServerValueGenerationStrategy)2);
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetRoleClaims", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ClaimType"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ClaimValue"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("RoleId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "RoleId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetRoleClaims");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetRoles", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ConcurrencyStamp"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("NormalizedName"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalIndexBuilderExtensions.HasFilter(RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "NormalizedName" }).IsUnique(true), "RoleNameIndex"), "([NormalizedName] IS NOT NULL)");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetRoles");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserClaims", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ApplicationUserId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ClaimType"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ClaimValue"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("UserId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "ApplicationUserId" });
+				b.HasIndex(new string[] { "UserId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetUserClaims");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserLogins", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("LoginProvider"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ProviderKey"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ApplicationUserId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ProviderDisplayName"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("UserId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalKeyBuilderExtensions.HasName(b.HasKey(new string[] { "LoginProvider", "ProviderKey" }), "PK_AspNetUserLogins_1");
+				b.HasIndex(new string[] { "ApplicationUserId" });
+				b.HasIndex(new string[] { "UserId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetUserLogins");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserRoles", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("UserId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("RoleId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ApplicationUserId"), "nvarchar(50)").HasMaxLength(50);
+				b.HasKey(new string[] { "UserId", "RoleId" });
+				b.HasIndex(new string[] { "ApplicationUserId" });
+				b.HasIndex(new string[] { "RoleId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetUserRoles");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserTokens", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("UserId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("LoginProvider"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Value"), "nvarchar(400)").HasMaxLength(0x190);
+				b.HasKey(new string[] { "UserId", "LoginProvider", "Name" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetUserTokens");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUsers", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AccessFailedCount"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Avatar"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ConcurrencyStamp"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("CountryId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Culture"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnName<DateTime?>(b.Property<DateTime?>("Dob"), "DOB");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Email"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("EmailConfirmed"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FirstName"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Gender"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("IsActived"), "bit");
+				b.Property<DateTime>("JoinDate");
+				b.Property<DateTime>("LastModified");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("LastName"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("LockoutEnabled"), "bit");
+				b.Property<DateTimeOffset?>("LockoutEnd");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("NickName"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("NormalizedEmail"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("NormalizedUserName"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("PasswordHash"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("PhoneNumber"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("PhoneNumberConfirmed"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("RegisterType"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SecurityStamp"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("TwoFactorEnabled"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("UserName"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "NormalizedEmail" }), "EmailIndex");
+				RelationalIndexBuilderExtensions.HasFilter(RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "NormalizedUserName" }).IsUnique(true), "UserNameIndex"), "([NormalizedUserName] IS NOT NULL)");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "AspNetUsers");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.Clients", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("Active"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AllowedOrigin"), "nvarchar(100)").HasMaxLength(100);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ApplicationType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name").IsRequired(true), "nvarchar(100)").HasMaxLength(100);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("RefreshTokenLifeTime"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Secret").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "Clients");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.RefreshTokens", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ClientId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Email").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				b.Property<DateTime>("ExpiresUtc");
+				b.Property<DateTime>("IssuedUtc");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Username"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "RefreshTokens");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetRoleClaims", (EntityTypeBuilder b) => b.HasOne("Mix.Cms.Lib.Models.Account.AspNetRoles", "Role").WithMany("AspNetRoleClaims").HasForeignKey(new string[] { "RoleId" }).OnDelete(3).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserClaims", (EntityTypeBuilder b) => {
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "ApplicationUser").WithMany("AspNetUserClaimsApplicationUser").HasForeignKey(new string[] { "ApplicationUserId" });
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "User").WithMany("AspNetUserClaimsUser").HasForeignKey(new string[] { "UserId" }).OnDelete(3).IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserLogins", (EntityTypeBuilder b) => {
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "ApplicationUser").WithMany("AspNetUserLoginsApplicationUser").HasForeignKey(new string[] { "ApplicationUserId" });
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "User").WithMany("AspNetUserLoginsUser").HasForeignKey(new string[] { "UserId" }).OnDelete(3).IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserRoles", (EntityTypeBuilder b) => {
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "ApplicationUser").WithMany("AspNetUserRolesApplicationUser").HasForeignKey(new string[] { "ApplicationUserId" });
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetRoles", "Role").WithMany("AspNetUserRoles").HasForeignKey(new string[] { "RoleId" }).OnDelete(3).IsRequired(true);
+				b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "User").WithMany("AspNetUserRolesUser").HasForeignKey(new string[] { "UserId" }).OnDelete(3).IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Account.AspNetUserTokens", (EntityTypeBuilder b) => b.HasOne("Mix.Cms.Lib.Models.Account.AspNetUsers", "User").WithMany("AspNetUserTokens").HasForeignKey(new string[] { "UserId" }).OnDelete(3).IsRequired(true));
 		}
 
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
-			dummyVar0 = migrationBuilder.DropTable("AspNetRoleClaims", null);
-			dummyVar1 = migrationBuilder.DropTable("AspNetUserClaims", null);
-			dummyVar2 = migrationBuilder.DropTable("AspNetUserLogins", null);
-			dummyVar3 = migrationBuilder.DropTable("AspNetUserRoles", null);
-			dummyVar4 = migrationBuilder.DropTable("AspNetUserTokens", null);
-			dummyVar5 = migrationBuilder.DropTable("Clients", null);
-			dummyVar6 = migrationBuilder.DropTable("RefreshTokens", null);
-			dummyVar7 = migrationBuilder.DropTable("AspNetRoles", null);
-			dummyVar8 = migrationBuilder.DropTable("AspNetUsers", null);
-			return;
+			migrationBuilder.DropTable("AspNetRoleClaims", null);
+			migrationBuilder.DropTable("AspNetUserClaims", null);
+			migrationBuilder.DropTable("AspNetUserLogins", null);
+			migrationBuilder.DropTable("AspNetUserRoles", null);
+			migrationBuilder.DropTable("AspNetUserTokens", null);
+			migrationBuilder.DropTable("Clients", null);
+			migrationBuilder.DropTable("RefreshTokens", null);
+			migrationBuilder.DropTable("AspNetRoles", null);
+			migrationBuilder.DropTable("AspNetUsers", null);
 		}
 
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
-			stackVariable0 = migrationBuilder;
-			stackVariable2 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType39<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_0);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_0 = stackVariable2;
-			}
-			stackVariable4 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_1;
-			if (stackVariable4 == null)
-			{
-				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType39<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_1);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_1 = stackVariable4;
-			}
-			dummyVar2 = stackVariable0.CreateTable("AspNetRoles", stackVariable2, null, stackVariable4, null);
-			stackVariable7 = migrationBuilder;
-			stackVariable9 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_2;
-			if (stackVariable9 == null)
-			{
-				dummyVar3 = stackVariable9;
-				stackVariable9 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType40<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_2);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_2 = stackVariable9;
-			}
-			stackVariable11 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_3;
-			if (stackVariable11 == null)
-			{
-				dummyVar4 = stackVariable11;
-				stackVariable11 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType40<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_3);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_3 = stackVariable11;
-			}
-			dummyVar5 = stackVariable7.CreateTable("AspNetUsers", stackVariable9, null, stackVariable11, null);
-			stackVariable14 = migrationBuilder;
-			stackVariable16 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_4;
-			if (stackVariable16 == null)
-			{
-				dummyVar6 = stackVariable16;
-				stackVariable16 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType41<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_4);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_4 = stackVariable16;
-			}
-			stackVariable18 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_5;
-			if (stackVariable18 == null)
-			{
-				dummyVar7 = stackVariable18;
-				stackVariable18 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType41<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_5);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_5 = stackVariable18;
-			}
-			dummyVar8 = stackVariable14.CreateTable("Clients", stackVariable16, null, stackVariable18, null);
-			stackVariable21 = migrationBuilder;
-			stackVariable23 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_6;
-			if (stackVariable23 == null)
-			{
-				dummyVar9 = stackVariable23;
-				stackVariable23 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType42<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_6);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_6 = stackVariable23;
-			}
-			stackVariable25 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_7;
-			if (stackVariable25 == null)
-			{
-				dummyVar10 = stackVariable25;
-				stackVariable25 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType42<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_7);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_7 = stackVariable25;
-			}
-			dummyVar11 = stackVariable21.CreateTable("RefreshTokens", stackVariable23, null, stackVariable25, null);
-			stackVariable28 = migrationBuilder;
-			stackVariable30 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_8;
-			if (stackVariable30 == null)
-			{
-				dummyVar12 = stackVariable30;
-				stackVariable30 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType43<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_8);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_8 = stackVariable30;
-			}
-			stackVariable32 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_9;
-			if (stackVariable32 == null)
-			{
-				dummyVar13 = stackVariable32;
-				stackVariable32 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType43<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_9);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_9 = stackVariable32;
-			}
-			dummyVar14 = stackVariable28.CreateTable("AspNetRoleClaims", stackVariable30, null, stackVariable32, null);
-			stackVariable35 = migrationBuilder;
-			stackVariable37 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_10;
-			if (stackVariable37 == null)
-			{
-				dummyVar15 = stackVariable37;
-				stackVariable37 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType44<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_10);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_10 = stackVariable37;
-			}
-			stackVariable39 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_11;
-			if (stackVariable39 == null)
-			{
-				dummyVar16 = stackVariable39;
-				stackVariable39 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType44<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_11);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_11 = stackVariable39;
-			}
-			dummyVar17 = stackVariable35.CreateTable("AspNetUserClaims", stackVariable37, null, stackVariable39, null);
-			stackVariable42 = migrationBuilder;
-			stackVariable44 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_12;
-			if (stackVariable44 == null)
-			{
-				dummyVar18 = stackVariable44;
-				stackVariable44 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_12);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_12 = stackVariable44;
-			}
-			stackVariable46 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_13;
-			if (stackVariable46 == null)
-			{
-				dummyVar19 = stackVariable46;
-				stackVariable46 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_13);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_13 = stackVariable46;
-			}
-			dummyVar20 = stackVariable42.CreateTable("AspNetUserLogins", stackVariable44, null, stackVariable46, null);
-			stackVariable49 = migrationBuilder;
-			stackVariable51 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_14;
-			if (stackVariable51 == null)
-			{
-				dummyVar21 = stackVariable51;
-				stackVariable51 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_14);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_14 = stackVariable51;
-			}
-			stackVariable53 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_15;
-			if (stackVariable53 == null)
-			{
-				dummyVar22 = stackVariable53;
-				stackVariable53 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_15);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_15 = stackVariable53;
-			}
-			dummyVar23 = stackVariable49.CreateTable("AspNetUserRoles", stackVariable51, null, stackVariable53, null);
-			stackVariable56 = migrationBuilder;
-			stackVariable58 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_16;
-			if (stackVariable58 == null)
-			{
-				dummyVar24 = stackVariable58;
-				stackVariable58 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_16);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_16 = stackVariable58;
-			}
-			stackVariable60 = Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_17;
-			if (stackVariable60 == null)
-			{
-				dummyVar25 = stackVariable60;
-				stackVariable60 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_17);
-				Mix.Cms.Lib.Migrations.MixCmsAccount.Init.u003cu003ec.u003cu003e9__0_17 = stackVariable60;
-			}
-			dummyVar26 = stackVariable56.CreateTable("AspNetUserTokens", stackVariable58, null, stackVariable60, null);
-			dummyVar27 = migrationBuilder.CreateIndex("IX_AspNetRoleClaims_RoleId", "AspNetRoleClaims", "RoleId", null, false, null);
-			dummyVar28 = migrationBuilder.CreateIndex("RoleNameIndex", "AspNetRoles", "NormalizedName", null, true, "([NormalizedName] IS NOT NULL)");
-			dummyVar29 = migrationBuilder.CreateIndex("IX_AspNetUserClaims_ApplicationUserId", "AspNetUserClaims", "ApplicationUserId", null, false, null);
-			dummyVar30 = migrationBuilder.CreateIndex("IX_AspNetUserClaims_UserId", "AspNetUserClaims", "UserId", null, false, null);
-			dummyVar31 = migrationBuilder.CreateIndex("IX_AspNetUserLogins_ApplicationUserId", "AspNetUserLogins", "ApplicationUserId", null, false, null);
-			dummyVar32 = migrationBuilder.CreateIndex("IX_AspNetUserLogins_UserId", "AspNetUserLogins", "UserId", null, false, null);
-			dummyVar33 = migrationBuilder.CreateIndex("IX_AspNetUserRoles_ApplicationUserId", "AspNetUserRoles", "ApplicationUserId", null, false, null);
-			dummyVar34 = migrationBuilder.CreateIndex("IX_AspNetUserRoles_RoleId", "AspNetUserRoles", "RoleId", null, false, null);
-			dummyVar35 = migrationBuilder.CreateIndex("EmailIndex", "AspNetUsers", "NormalizedEmail", null, false, null);
-			dummyVar36 = migrationBuilder.CreateIndex("UserNameIndex", "AspNetUsers", "NormalizedUserName", null, true, "([NormalizedUserName] IS NOT NULL)");
-			return;
+			migrationBuilder.CreateTable("AspNetRoles", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable3, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				return new { Id = operationBuilder, ConcurrencyStamp = operationBuilder1, Name = operationBuilder2, NormalizedName = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_AspNetRoles", (x) => x.Id), null);
+			migrationBuilder.CreateTable("AspNetUsers", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				int? nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<int>(null, nullable2, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<int>(null, nullable6, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<DateTime>(null, nullable8, nullable3, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<bool>(null, nullable10, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, nullable11, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, nullable12, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<bool>(null, nullable13, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<DateTime>(null, nullable14, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<DateTime>(null, nullable15, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<string>(null, nullable16, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<bool>(null, nullable17, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable18 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<DateTimeOffset>(null, nullable18, nullable3, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable19 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<string>(null, nullable19, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable20 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder18 = table.Column<string>(null, nullable20, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable21 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder19 = table.Column<string>(null, nullable21, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable22 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder20 = table.Column<string>(null, nullable22, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable23 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder21 = table.Column<string>(null, nullable23, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable24 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder22 = table.Column<string>(null, nullable24, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable25 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder23 = table.Column<bool>(null, nullable25, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable26 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder24 = table.Column<string>(null, nullable26, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable27 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder25 = table.Column<string>(null, nullable27, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable28 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder26 = table.Column<bool>(null, nullable28, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable29 = nullable;
+				nullable = null;
+				return new { Id = operationBuilder, AccessFailedCount = operationBuilder1, Avatar = operationBuilder2, ConcurrencyStamp = operationBuilder3, CountryId = operationBuilder4, Culture = operationBuilder5, DOB = operationBuilder6, Email = operationBuilder7, EmailConfirmed = operationBuilder8, FirstName = operationBuilder9, Gender = operationBuilder10, IsActived = operationBuilder11, JoinDate = operationBuilder12, LastModified = operationBuilder13, LastName = operationBuilder14, LockoutEnabled = operationBuilder15, LockoutEnd = operationBuilder16, ModifiedBy = operationBuilder17, NickName = operationBuilder18, NormalizedEmail = operationBuilder19, NormalizedUserName = operationBuilder20, PasswordHash = operationBuilder21, PhoneNumber = operationBuilder22, PhoneNumberConfirmed = operationBuilder23, RegisterType = operationBuilder24, SecurityStamp = operationBuilder25, TwoFactorEnabled = operationBuilder26, UserName = table.Column<string>(null, nullable29, new int?(250), false, null, true, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_AspNetUsers", (x) => x.Id), null);
+			migrationBuilder.CreateTable("Clients", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				int? nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<bool>(null, nullable2, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(100), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(100), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable3 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<int>(null, nullable7, nullable3, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				return new { Id = operationBuilder, Active = operationBuilder1, AllowedOrigin = operationBuilder2, ApplicationType = operationBuilder3, Name = operationBuilder4, RefreshTokenLifeTime = operationBuilder5, Secret = table.Column<string>(null, nullable8, new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_Clients", (x) => x.Id), null);
+			migrationBuilder.CreateTable("RefreshTokens", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable3, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				int? nullable6 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<DateTime>(null, nullable5, nullable6, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable6 = null;
+				nullable = null;
+				return new { Id = operationBuilder, ClientId = operationBuilder1, Email = operationBuilder2, Username = operationBuilder3, ExpiresUtc = operationBuilder4, IssuedUtc = table.Column<DateTime>(null, nullable7, nullable6, false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_RefreshTokens", (x) => x.Id), null);
+			migrationBuilder.CreateTable("AspNetRoleClaims", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				return new { Id = operationBuilder, ClaimType = operationBuilder1, ClaimValue = operationBuilder2, RoleId = table.Column<string>(null, nullable5, new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_AspNetRoleClaims", (x) => x.Id);
+				table.ForeignKey("FK_AspNetRoleClaims_AspNetRoles_RoleId", (x) => x.RoleId, "AspNetRoles", "Id", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("AspNetUserClaims", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				return new { Id = operationBuilder, ApplicationUserId = operationBuilder1, ClaimType = operationBuilder2, ClaimValue = operationBuilder3, UserId = table.Column<string>(null, nullable6, new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_AspNetUserClaims", (x) => x.Id);
+				table.ForeignKey("FK_AspNetUserClaims_AspNetUsers_ApplicationUserId", (x) => x.ApplicationUserId, "AspNetUsers", "Id", null, 0, 1);
+				table.ForeignKey("FK_AspNetUserClaims_AspNetUsers_UserId", (x) => x.UserId, "AspNetUsers", "Id", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("AspNetUserLogins", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable3, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable4, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				return new { LoginProvider = operationBuilder, ProviderKey = operationBuilder1, ApplicationUserId = operationBuilder2, ProviderDisplayName = operationBuilder3, UserId = table.Column<string>(null, nullable5, new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType46<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cLoginProvideru003ej__TPar), typeof(u003cProviderKeyu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType46<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_LoginProvider").MethodHandle, typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ProviderKey").MethodHandle, typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType46<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_LoginProvider").MethodHandle, typeof(u003cu003ef__AnonymousType46<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType46<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ProviderKey").MethodHandle, typeof(u003cu003ef__AnonymousType46<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_AspNetUserLogins_1", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_AspNetUserLogins_AspNetUsers_ApplicationUserId", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ApplicationUserId").MethodHandle, typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "AspNetUsers", "Id", null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_AspNetUserLogins_AspNetUsers_UserId", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType45<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "AspNetUsers", "Id", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("AspNetUserRoles", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				return new { UserId = operationBuilder, RoleId = operationBuilder1, ApplicationUserId = table.Column<string>(null, nullable3, new int?(50), false, null, true, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType48<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cUserIdu003ej__TPar), typeof(u003cRoleIdu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType48<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_RoleId").MethodHandle, typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType48<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType48<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType48<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_RoleId").MethodHandle, typeof(u003cu003ef__AnonymousType48<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_AspNetUserRoles", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_AspNetUserRoles_AspNetUsers_ApplicationUserId", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ApplicationUserId").MethodHandle, typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "AspNetUsers", "Id", null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_AspNetUserRoles_AspNetRoles_RoleId", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_RoleId").MethodHandle, typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "AspNetRoles", "Id", null, 0, 2);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_AspNetUserRoles_AspNetUsers_UserId", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType47<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "AspNetUsers", "Id", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("AspNetUserTokens", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable3, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				return new { UserId = operationBuilder, LoginProvider = operationBuilder1, Name = operationBuilder2, Value = table.Column<string>(null, nullable4, new int?(0x190), false, null, true, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cUserIdu003ej__TPar), typeof(u003cLoginProvideru003ej__TPar), typeof(u003cNameu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_LoginProvider").MethodHandle, typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Name").MethodHandle, typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_LoginProvider").MethodHandle, typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Name").MethodHandle, typeof(u003cu003ef__AnonymousType50<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_AspNetUserTokens", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_AspNetUserTokens_AspNetUsers_UserId", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_UserId").MethodHandle, typeof(u003cu003ef__AnonymousType49<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "AspNetUsers", "Id", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateIndex("IX_AspNetRoleClaims_RoleId", "AspNetRoleClaims", "RoleId", null, false, null);
+			migrationBuilder.CreateIndex("RoleNameIndex", "AspNetRoles", "NormalizedName", null, true, "([NormalizedName] IS NOT NULL)");
+			migrationBuilder.CreateIndex("IX_AspNetUserClaims_ApplicationUserId", "AspNetUserClaims", "ApplicationUserId", null, false, null);
+			migrationBuilder.CreateIndex("IX_AspNetUserClaims_UserId", "AspNetUserClaims", "UserId", null, false, null);
+			migrationBuilder.CreateIndex("IX_AspNetUserLogins_ApplicationUserId", "AspNetUserLogins", "ApplicationUserId", null, false, null);
+			migrationBuilder.CreateIndex("IX_AspNetUserLogins_UserId", "AspNetUserLogins", "UserId", null, false, null);
+			migrationBuilder.CreateIndex("IX_AspNetUserRoles_ApplicationUserId", "AspNetUserRoles", "ApplicationUserId", null, false, null);
+			migrationBuilder.CreateIndex("IX_AspNetUserRoles_RoleId", "AspNetUserRoles", "RoleId", null, false, null);
+			migrationBuilder.CreateIndex("EmailIndex", "AspNetUsers", "NormalizedEmail", null, false, null);
+			migrationBuilder.CreateIndex("UserNameIndex", "AspNetUsers", "NormalizedUserName", null, true, "([NormalizedUserName] IS NOT NULL)");
 		}
 	}
 }

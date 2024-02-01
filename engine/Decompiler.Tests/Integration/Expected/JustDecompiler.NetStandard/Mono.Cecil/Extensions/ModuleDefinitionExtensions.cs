@@ -15,71 +15,52 @@ namespace Mono.Cecil.Extensions
 	{
 		public static NamespaceHierarchyTree BuildNamespaceHierarchyTree(this AssemblyDefinition self)
 		{
-			V_0 = new HashSet<string>();
-			V_1 = self.get_Modules().GetEnumerator();
-			try
+			HashSet<string> strs = new HashSet<string>();
+			foreach (ModuleDefinition module in self.get_Modules())
 			{
-				while (V_1.MoveNext())
+				foreach (TypeDefinition type in module.get_Types())
 				{
-					V_2 = V_1.get_Current().get_Types().GetEnumerator();
-					try
+					if (type.get_Namespace() == String.Empty && type.get_Name() == "<Module>")
 					{
-						while (V_2.MoveNext())
-						{
-							V_3 = V_2.get_Current();
-							if (String.op_Equality(V_3.get_Namespace(), String.Empty) && String.op_Equality(V_3.get_Name(), "<Module>"))
-							{
-								continue;
-							}
-							dummyVar0 = V_0.Add(V_3.get_Namespace());
-						}
+						continue;
 					}
-					finally
-					{
-						V_2.Dispose();
-					}
+					strs.Add(type.get_Namespace());
 				}
 			}
-			finally
-			{
-				V_1.Dispose();
-			}
-			return NamespaceHierarchyTreeBuilder.BuildTree(V_0);
+			return NamespaceHierarchyTreeBuilder.BuildTree(strs);
 		}
 
 		public static AssemblyNameReference GetReferencedCoreLibraryRef(this ModuleDefinition self, string coreLibraryName)
 		{
+			AssemblyNameReference assemblyNameReference;
 			if (self == null)
 			{
 				throw new ArgumentNullException("Module definition is null.");
 			}
-			if (String.op_Equality(self.get_Assembly().get_Name().get_Name(), coreLibraryName))
+			if (self.get_Assembly().get_Name().get_Name() == coreLibraryName)
 			{
 				return self.get_Assembly().get_Name();
 			}
-			V_0 = self.get_AssemblyReferences().GetEnumerator();
+			Collection<AssemblyNameReference>.Enumerator enumerator = self.get_AssemblyReferences().GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (!String.op_Equality(V_1.get_Name(), coreLibraryName))
+					AssemblyNameReference current = enumerator.get_Current();
+					if (current.get_Name() != coreLibraryName)
 					{
 						continue;
 					}
-					V_2 = V_1;
-					goto Label1;
+					assemblyNameReference = current;
+					return assemblyNameReference;
 				}
-				goto Label0;
+				return null;
 			}
 			finally
 			{
-				V_0.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return null;
+			return assemblyNameReference;
 		}
 
 		public static ModuleDefinition ReferencedMscorlib(this ModuleDefinition self)
@@ -88,27 +69,19 @@ namespace Mono.Cecil.Extensions
 			{
 				throw new ArgumentNullException("Module definition is null.");
 			}
-			if (String.op_Equality(self.get_Assembly().get_Name().get_Name(), "mscorlib"))
+			if (self.get_Assembly().get_Name().get_Name() == "mscorlib")
 			{
 				return self;
 			}
-			V_0 = self.ReferencedMscorlibRef();
-			stackVariable10 = self.get_AssemblyResolver();
-			if (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(self))
-			{
-				stackVariable13 = 1;
-			}
-			else
-			{
-				stackVariable13 = 0;
-			}
-			V_1 = stackVariable13;
-			V_2 = stackVariable10.Resolve(V_0, "", ModuleDefinitionExtensions.GetModuleArchitecture(self), V_1, true);
-			if (V_2 == null)
+			AssemblyNameReference assemblyNameReference = self.ReferencedMscorlibRef();
+			IAssemblyResolver assemblyResolver = self.get_AssemblyResolver();
+			SpecialTypeAssembly specialTypeAssembly = (Mono.Cecil.AssemblyResolver.Extensions.IsReferenceAssembly(self) ? 1 : 0);
+			AssemblyDefinition assemblyDefinition = assemblyResolver.Resolve(assemblyNameReference, "", ModuleDefinitionExtensions.GetModuleArchitecture(self), specialTypeAssembly, true);
+			if (assemblyDefinition == null)
 			{
 				return null;
 			}
-			return V_2.get_MainModule();
+			return assemblyDefinition.get_MainModule();
 		}
 
 		public static AssemblyNameReference ReferencedMscorlibRef(this ModuleDefinition self)

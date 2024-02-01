@@ -51,8 +51,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public TemplateViewModel()
 		{
-			base();
-			return;
 		}
 	}
 }

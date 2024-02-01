@@ -104,10 +104,8 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixPortalPage()
 		{
-			base();
-			this.set_MixPortalPageNavigationParent(new HashSet<MixPortalPageNavigation>());
-			this.set_MixPortalPageRole(new HashSet<Mix.Cms.Lib.Models.Cms.MixPortalPageRole>());
-			return;
+			this.MixPortalPageNavigationParent = new HashSet<MixPortalPageNavigation>();
+			this.MixPortalPageRole = new HashSet<Mix.Cms.Lib.Models.Cms.MixPortalPageRole>();
 		}
 	}
 }

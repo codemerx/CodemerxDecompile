@@ -1,19 +1,21 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Piranha;
+using Piranha.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 public static class PiranhaExtensions
 {
 	public static IServiceCollection AddPiranha(this IServiceCollection services, ServiceLifetime scope = 1)
 	{
-		services.Add(new ServiceDescriptor(Type.GetTypeFromHandle(// 
-		// Current member / type: Microsoft.Extensions.DependencyInjection.IServiceCollection PiranhaExtensions::AddPiranha(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.DependencyInjection.ServiceLifetime)
-		// Exception in: Microsoft.Extensions.DependencyInjection.IServiceCollection AddPiranha(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.DependencyInjection.ServiceLifetime)
-		// Specified method is not supported.
-		// 
-		// mailto: JustDecompilePublicFeedback@telerik.com
-
+		services.Add(new ServiceDescriptor(typeof(IContentFactory), typeof(ContentFactory), 0));
+		services.Add(new ServiceDescriptor(typeof(IApi), typeof(Api), scope));
+		services.Add(new ServiceDescriptor(typeof(Config), typeof(Config), scope));
+		return services;
+	}
 
 	public static IServiceCollection AddPiranhaDistributedCache(this IServiceCollection services)
 	{
@@ -40,19 +42,11 @@ public static class PiranhaExtensions
 
 	public static PiranhaServiceBuilder UseMemoryCache(this PiranhaServiceBuilder serviceBuilder, bool clone = false)
 	{
-		stackVariable1 = serviceBuilder.Services;
-		stackVariable2 = PiranhaExtensions.u003cu003ec.u003cu003e9__2_0;
-		if (stackVariable2 == null)
-		{
-			dummyVar0 = stackVariable2;
-			stackVariable2 = new Func<ServiceDescriptor, bool>(PiranhaExtensions.u003cu003ec.u003cu003e9.u003cUseMemoryCacheu003eb__2_0);
-			PiranhaExtensions.u003cu003ec.u003cu003e9__2_0 = stackVariable2;
-		}
-		if (!stackVariable1.Any<ServiceDescriptor>(stackVariable2))
+		if (!serviceBuilder.Services.Any<ServiceDescriptor>((ServiceDescriptor s) => s.get_ServiceType() == typeof(IMemoryCache)))
 		{
 			throw new NotSupportedException("You need to register a IMemoryCache service in order to use Memory Cache in Piranha");
 		}
-		dummyVar1 = serviceBuilder.Services.AddPiranhaMemoryCache(false);
+		serviceBuilder.Services.AddPiranhaMemoryCache(false);
 		return serviceBuilder;
 	}
 }

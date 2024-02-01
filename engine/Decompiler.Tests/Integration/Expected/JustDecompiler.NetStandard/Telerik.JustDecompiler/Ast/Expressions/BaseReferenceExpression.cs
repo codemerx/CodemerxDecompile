@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new BaseReferenceExpression.u003cget_Childrenu003ed__2(-2);
 			}
 		}
 
@@ -23,7 +22,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 29;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.BaseReferenceExpression;
 			}
 		}
 
@@ -31,7 +30,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_TargetType().Resolve();
+				return this.TargetType.Resolve();
 			}
 			set
 			{
@@ -53,30 +52,28 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			private set;
 		}
 
-		public BaseReferenceExpression(TypeReference targetType, IEnumerable<Instruction> instructions)
+		public BaseReferenceExpression(TypeReference targetType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_TargetType(targetType);
-			return;
+			this.TargetType = targetType;
 		}
 
 		public override Expression Clone()
 		{
-			return new BaseReferenceExpression(this.get_TargetType(), this.instructions);
+			return new BaseReferenceExpression(this.TargetType, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new BaseReferenceExpression(this.get_TargetType(), null);
+			return new BaseReferenceExpression(this.TargetType, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as BaseReferenceExpression == null)
+			if (!(other is BaseReferenceExpression))
 			{
 				return false;
 			}
-			return String.op_Equality(this.get_TargetType().get_FullName(), (other as BaseReferenceExpression).get_TargetType().get_FullName());
+			return this.TargetType.get_FullName() == (other as BaseReferenceExpression).TargetType.get_FullName();
 		}
 	}
 }

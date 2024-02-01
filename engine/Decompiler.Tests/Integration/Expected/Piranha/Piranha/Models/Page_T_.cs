@@ -8,8 +8,6 @@ namespace Piranha.Models
 	{
 		public Page()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -1,9 +1,11 @@
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Steps.CodePatterns;
 
 namespace Telerik.JustDecompiler.Steps
@@ -22,22 +24,13 @@ namespace Telerik.JustDecompiler.Steps
 
 		public CodePatternsStep(bool isAggressive)
 		{
-			base();
 			this.isAggressive = isAggressive;
 			this.isInFilter = false;
-			return;
 		}
 
 		protected virtual IEnumerable<ICodePattern> GetCodePatterns()
 		{
-			stackVariable1 = new ICodePattern[6];
-			stackVariable1[0] = new NullCoalescingPattern(this.patternsContext, this.context.get_MethodContext());
-			stackVariable1[1] = this.GetTernaryPattern(this.patternsContext);
-			stackVariable1[2] = new ArrayInitialisationPattern(this.patternsContext, this.typeSystem);
-			stackVariable1[3] = new ObjectInitialisationPattern(this.patternsContext, this.typeSystem);
-			stackVariable1[4] = new CollectionInitializationPattern(this.patternsContext, this.typeSystem);
-			stackVariable1[5] = this.GetVariableInliningPattern(this.patternsContext);
-			return stackVariable1;
+			return new ICodePattern[] { new NullCoalescingPattern(this.patternsContext, this.context.MethodContext), this.GetTernaryPattern(this.patternsContext), new ArrayInitialisationPattern(this.patternsContext, this.typeSystem), new ObjectInitialisationPattern(this.patternsContext, this.typeSystem), new CollectionInitializationPattern(this.patternsContext, this.typeSystem), this.GetVariableInliningPattern(this.patternsContext) };
 		}
 
 		private TernaryConditionPattern GetTernaryPattern(CodePatternsContext patternsContext)
@@ -53,15 +46,15 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (!this.isAggressive)
 			{
-				return new VariableInliningPattern(patternsContext, this.context.get_MethodContext(), this.context.get_Language().get_VariablesToNotInlineFinder());
+				return new VariableInliningPattern(patternsContext, this.context.MethodContext, this.context.Language.VariablesToNotInlineFinder);
 			}
-			return new VariableInliningPatternAggressive(patternsContext, this.context.get_MethodContext(), this.context.get_Language().get_VariablesToNotInlineFinder());
+			return new VariableInliningPatternAggressive(patternsContext, this.context.MethodContext, this.context.Language.VariablesToNotInlineFinder);
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.patternsContext = new CodePatternsContext(body);
 			body = (BlockStatement)this.Visit(body);
 			return body;
@@ -73,93 +66,81 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			V_0 = statements.get_Count();
-			V_1 = startIndex;
-			while (V_1 + length < V_0)
+			int count = statements.Count;
+			for (int i = startIndex; i + length < count; i++)
 			{
-				statements.set_Item(V_1, statements.get_Item(V_1 + length));
-				V_1 = V_1 + 1;
+				statements[i] = statements[i + length];
 			}
 			while (length > 0)
 			{
-				stackVariable23 = V_0 - 1;
-				V_0 = stackVariable23;
-				statements.RemoveAt(stackVariable23);
-				length = length - 1;
+				int num = count - 1;
+				count = num;
+				statements.RemoveAt(num);
+				length--;
 			}
-			return;
 		}
 
 		private void RemoveRangeAndInsert(BlockStatement block, int startIndex, int length, Statement newStatement)
 		{
-			V_0 = block.get_Statements().get_Item(startIndex).get_Label();
-			this.RemoveRange(block.get_Statements(), startIndex, length);
-			newStatement.set_Label(V_0);
-			if (!String.IsNullOrEmpty(V_0))
+			string label = block.Statements[startIndex].Label;
+			this.RemoveRange(block.Statements, startIndex, length);
+			newStatement.Label = label;
+			if (!String.IsNullOrEmpty(label))
 			{
-				this.context.get_MethodContext().get_GotoLabels().set_Item(V_0, newStatement);
+				this.context.MethodContext.GotoLabels[label] = newStatement;
 			}
 			block.AddStatementAt(startIndex, newStatement);
-			return;
 		}
 
 		public override ICodeNode VisitBlockStatement(BlockStatement node)
 		{
-			node = (BlockStatement)this.VisitBlockStatement(node);
+			Statement statement;
+			int num;
+			int num1;
+			node = (BlockStatement)base.VisitBlockStatement(node);
 			if (node == null)
 			{
 				return node;
 			}
-			V_0 = this.GetCodePatterns();
-			V_1 = false;
+			IEnumerable<ICodePattern> codePatterns = this.GetCodePatterns();
+			bool flag = false;
 			do
 			{
-				V_1 = false;
-				V_5 = V_0.GetEnumerator();
-				try
+				flag = false;
+				foreach (ICodePattern codePattern in codePatterns)
 				{
-					while (V_5.MoveNext())
+					if (!codePattern.TryMatch(node.Statements, out num1, out statement, out num))
 					{
-						if (!V_5.get_Current().TryMatch(node.get_Statements(), out V_4, out V_2, out V_3))
-						{
-							continue;
-						}
-						V_1 = true;
-						if (V_2 == null)
-						{
-							this.RemoveRange(node.get_Statements(), V_4, V_3);
-							goto Label0;
-						}
-						else
-						{
-							this.RemoveRangeAndInsert(node, V_4, V_3, V_2);
-							goto Label0;
-						}
+						continue;
 					}
-				}
-				finally
-				{
-					if (V_5 != null)
+					flag = true;
+					if (statement == null)
 					{
-						V_5.Dispose();
+						this.RemoveRange(node.Statements, num1, num);
+						goto Label0;
+					}
+					else
+					{
+						this.RemoveRangeAndInsert(node, num1, num, statement);
+						goto Label0;
 					}
 				}
 			Label0:
 			}
-			while (V_1);
+			while (flag);
 			return node;
 		}
 
 		public override ICodeNode VisitCatchClause(CatchClause node)
 		{
-			if (node.get_Filter() == null || !this.context.get_Language().get_SupportsExceptionFilters())
+			if (node.Filter == null || !this.context.Language.SupportsExceptionFilters)
 			{
-				return this.VisitCatchClause(node);
+				return base.VisitCatchClause(node);
 			}
 			this.isInFilter = true;
-			node.set_Filter((Statement)this.Visit(node.get_Filter()));
+			node.Filter = (Statement)this.Visit(node.Filter);
 			this.isInFilter = false;
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 	}

@@ -19,50 +19,44 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		public ConditionBuilder(LogicalFlowBuilderContext logicalBuilderContext, TypeSystem typeSystem)
 		{
-			base();
 			this.typeSystem = typeSystem;
 			this.logicalBuilderContext = logicalBuilderContext;
-			this.booleanTypeReference = logicalBuilderContext.get_CFG().get_MethodBody().get_Method().get_Module().get_TypeSystem().get_Boolean();
-			return;
+			this.booleanTypeReference = logicalBuilderContext.CFG.MethodBody.get_Method().get_Module().get_TypeSystem().get_Boolean();
 		}
 
 		private bool ArePredecessorsLegal(ILogicalConstruct node, HashSet<ILogicalConstruct> allowedPredecessors)
 		{
-			V_0 = node.get_SameParentPredecessors().GetEnumerator();
+			bool flag;
+			HashSet<ISingleEntrySubGraph>.Enumerator enumerator = node.SameParentPredecessors.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = (ILogicalConstruct)V_0.get_Current();
-					if (allowedPredecessors.Contains(V_1))
+					if (allowedPredecessors.Contains((ILogicalConstruct)enumerator.Current))
 					{
 						continue;
 					}
-					V_2 = false;
-					goto Label1;
+					flag = false;
+					return flag;
 				}
-				goto Label0;
+				return true;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return true;
+			return flag;
 		}
 
 		public void BuildConstructs(ILogicalConstruct theConstruct)
 		{
 			this.CreateSimpleConditions();
 			this.CreateComplexConditions(theConstruct);
-			return;
 		}
 
 		private bool CanBePartOfComplexCondition(ILogicalConstruct node, HashSet<ILogicalConstruct> nodesInCondition, CFGBlockLogicalConstruct commonSuccessor)
 		{
-			if (node == null || node as ConditionLogicalConstruct == null || !this.ArePredecessorsLegal(node, nodesInCondition) || !node.get_CFGSuccessors().Contains(commonSuccessor))
+			if (node == null || !(node is ConditionLogicalConstruct) || !this.ArePredecessorsLegal(node, nodesInCondition) || !node.CFGSuccessors.Contains(commonSuccessor))
 			{
 				return false;
 			}
@@ -71,153 +65,119 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions
 
 		private ConditionLogicalConstruct CreateComplexCondition(ConditionLogicalConstruct conditionNode)
 		{
-			V_0 = conditionNode.get_ConditionExpression();
-			V_1 = new HashSet<ILogicalConstruct>();
-			V_2 = conditionNode;
-			dummyVar0 = V_1.Add(V_2);
-			V_3 = V_2.get_TrueSuccessor();
-			V_4 = V_2.get_FalseSuccessor();
+			ConditionLogicalConstruct conditionLogicalConstruct;
+			BinaryOperator binaryOperator;
+			Expression conditionExpression = conditionNode.ConditionExpression;
+			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
+			ConditionLogicalConstruct conditionLogicalConstruct1 = conditionNode;
+			logicalConstructs.Add(conditionLogicalConstruct1);
+			ILogicalConstruct trueSuccessor = conditionLogicalConstruct1.TrueSuccessor;
+			ILogicalConstruct falseSuccessor = conditionLogicalConstruct1.FalseSuccessor;
 			while (true)
 			{
-				if (!this.CanBePartOfComplexCondition(V_3, V_1, V_2.get_FalseCFGSuccessor()))
+				if (!this.CanBePartOfComplexCondition(trueSuccessor, logicalConstructs, conditionLogicalConstruct1.FalseCFGSuccessor))
 				{
-					if (!this.CanBePartOfComplexCondition(V_4, V_1, V_2.get_TrueCFGSuccessor()))
+					if (!this.CanBePartOfComplexCondition(falseSuccessor, logicalConstructs, conditionLogicalConstruct1.TrueCFGSuccessor))
 					{
 						break;
 					}
-					V_6 = V_4 as ConditionLogicalConstruct;
-					if (V_6.get_TrueSuccessor() != V_3)
+					conditionLogicalConstruct = falseSuccessor as ConditionLogicalConstruct;
+					if (conditionLogicalConstruct.TrueSuccessor != trueSuccessor)
 					{
-						V_6.Negate(this.typeSystem);
+						conditionLogicalConstruct.Negate(this.typeSystem);
 					}
-					V_8 = 11;
+					binaryOperator = BinaryOperator.LogicalOr;
 				}
 				else
 				{
-					V_6 = V_3 as ConditionLogicalConstruct;
-					if (V_6.get_FalseSuccessor() != V_4)
+					conditionLogicalConstruct = trueSuccessor as ConditionLogicalConstruct;
+					if (conditionLogicalConstruct.FalseSuccessor != falseSuccessor)
 					{
-						V_6.Negate(this.typeSystem);
+						conditionLogicalConstruct.Negate(this.typeSystem);
 					}
-					V_8 = 12;
+					binaryOperator = BinaryOperator.LogicalAnd;
 				}
-				V_0 = new BinaryExpression(V_8, V_0, V_6.get_ConditionExpression(), this.typeSystem, null, false);
-				V_0.set_ExpressionType(this.booleanTypeReference);
-				V_2 = V_6;
-				V_3 = V_2.get_TrueSuccessor();
-				V_4 = V_2.get_FalseSuccessor();
-				dummyVar1 = V_1.Add(V_2);
+				conditionExpression = new BinaryExpression(binaryOperator, conditionExpression, conditionLogicalConstruct.ConditionExpression, this.typeSystem, null, false)
+				{
+					ExpressionType = this.booleanTypeReference
+				};
+				conditionLogicalConstruct1 = conditionLogicalConstruct;
+				trueSuccessor = conditionLogicalConstruct1.TrueSuccessor;
+				falseSuccessor = conditionLogicalConstruct1.FalseSuccessor;
+				logicalConstructs.Add(conditionLogicalConstruct1);
 			}
-			if (V_1.get_Count() == 1)
+			if (logicalConstructs.Count == 1)
 			{
 				return conditionNode;
 			}
-			V_5 = new HashSet<ConditionLogicalConstruct>();
-			V_9 = V_1.GetEnumerator();
-			try
+			HashSet<ConditionLogicalConstruct> conditionLogicalConstructs = new HashSet<ConditionLogicalConstruct>();
+			foreach (ConditionLogicalConstruct logicalConstruct in logicalConstructs)
 			{
-				while (V_9.MoveNext())
-				{
-					V_10 = (ConditionLogicalConstruct)V_9.get_Current();
-					dummyVar2 = V_5.Add(V_10);
-				}
+				conditionLogicalConstructs.Add(logicalConstruct);
 			}
-			finally
-			{
-				((IDisposable)V_9).Dispose();
-			}
-			return new ConditionLogicalConstruct(conditionNode, V_2, V_5, V_0);
+			return new ConditionLogicalConstruct(conditionNode, conditionLogicalConstruct1, conditionLogicalConstructs, conditionExpression);
 		}
 
 		private void CreateComplexConditions(ILogicalConstruct theConstruct)
 		{
-			if (theConstruct as ConditionLogicalConstruct != null || theConstruct as CFGBlockLogicalConstruct != null)
+			if (theConstruct is ConditionLogicalConstruct || theConstruct is CFGBlockLogicalConstruct)
 			{
 				return;
 			}
-			V_1 = theConstruct.get_Children().GetEnumerator();
-			try
+			foreach (ILogicalConstruct child in theConstruct.Children)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = (ILogicalConstruct)V_1.get_Current();
-					this.CreateComplexConditions(V_2);
-				}
-			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
+				this.CreateComplexConditions(child);
 			}
 			while (this.TryTraverseAndMerge(theConstruct))
 			{
 			}
-			return;
 		}
 
 		private void CreateSimpleConditions()
 		{
-			V_0 = this.logicalBuilderContext.get_CFGBlockToLogicalConstructMap().get_Values().GetEnumerator();
-			try
+			foreach (CFGBlockLogicalConstruct[] value in this.logicalBuilderContext.CFGBlockToLogicalConstructMap.Values)
 			{
-				while (V_0.MoveNext())
+				CFGBlockLogicalConstruct cFGBlockLogicalConstruct = value[(int)value.Length - 1];
+				InstructionBlock theBlock = cFGBlockLogicalConstruct.TheBlock;
+				if ((int)theBlock.Successors.Length != 2 || !(theBlock.Successors[0] != theBlock.Successors[1]) || theBlock.Last.get_OpCode().get_Code() == 68)
 				{
-					stackVariable8 = V_0.get_Current();
-					V_1 = stackVariable8[(int)stackVariable8.Length - 1];
-					V_2 = V_1.get_TheBlock();
-					if ((int)V_2.get_Successors().Length != 2 || !InstructionBlock.op_Inequality(V_2.get_Successors()[0], V_2.get_Successors()[1]) || V_2.get_Last().get_OpCode().get_Code() == 68)
-					{
-						continue;
-					}
-					dummyVar0 = ConditionLogicalConstruct.GroupInSimpleConditionConstruct(V_1);
+					continue;
 				}
+				ConditionLogicalConstruct.GroupInSimpleConditionConstruct(cFGBlockLogicalConstruct);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private bool TryTraverseAndMerge(ILogicalConstruct theConstruct)
 		{
-			V_0 = new HashSet<ILogicalConstruct>();
-			V_1 = new Queue<ILogicalConstruct>();
-			V_1.Enqueue(theConstruct.get_Entry() as ILogicalConstruct);
-			V_2 = false;
-			while (V_1.get_Count() > 0)
+			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
+			Queue<ILogicalConstruct> logicalConstructs1 = new Queue<ILogicalConstruct>();
+			logicalConstructs1.Enqueue(theConstruct.Entry as ILogicalConstruct);
+			bool flag = false;
+			while (logicalConstructs1.Count > 0)
 			{
-				V_3 = V_1.Dequeue();
-				V_4 = V_3 as ConditionLogicalConstruct;
-				if (V_4 != null)
+				ILogicalConstruct logicalConstruct = logicalConstructs1.Dequeue();
+				ConditionLogicalConstruct conditionLogicalConstruct = logicalConstruct as ConditionLogicalConstruct;
+				if (conditionLogicalConstruct != null)
 				{
-					V_5 = this.CreateComplexCondition(V_4);
-					V_2 = V_2 | V_5 != V_3;
-					V_3 = V_5;
+					ConditionLogicalConstruct conditionLogicalConstruct1 = this.CreateComplexCondition(conditionLogicalConstruct);
+					flag = flag | conditionLogicalConstruct1 != logicalConstruct;
+					logicalConstruct = conditionLogicalConstruct1;
 				}
-				dummyVar0 = V_0.Add(V_3);
-				V_6 = V_3.get_SameParentSuccessors().GetEnumerator();
-				try
+				logicalConstructs.Add(logicalConstruct);
+				foreach (ILogicalConstruct sameParentSuccessor in logicalConstruct.SameParentSuccessors)
 				{
-					while (V_6.MoveNext())
+					if (logicalConstructs.Contains(sameParentSuccessor))
 					{
-						V_7 = (ILogicalConstruct)V_6.get_Current();
-						if (V_0.Contains(V_7))
-						{
-							continue;
-						}
-						V_1.Enqueue(V_7);
+						continue;
 					}
+					logicalConstructs1.Enqueue(sameParentSuccessor);
 				}
-				finally
+				while (logicalConstructs1.Count > 0 && logicalConstructs.Contains(logicalConstructs1.Peek()))
 				{
-					((IDisposable)V_6).Dispose();
-				}
-				while (V_1.get_Count() > 0 && V_0.Contains(V_1.Peek()))
-				{
-					dummyVar1 = V_1.Dequeue();
+					logicalConstructs1.Dequeue();
 				}
 			}
-			return V_2;
+			return flag;
 		}
 	}
 }

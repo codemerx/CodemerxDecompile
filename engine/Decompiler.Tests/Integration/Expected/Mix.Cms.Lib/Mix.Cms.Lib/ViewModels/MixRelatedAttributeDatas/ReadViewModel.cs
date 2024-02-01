@@ -118,19 +118,14 @@ namespace Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(MixRelatedAttributeData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixRelatedAttributeData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return;
 		}
 	}
 }

@@ -20,10 +20,8 @@ namespace Telerik.JustDecompiler.Decompiler.DefineUseAnalysis
 
 		public StackVariableDefineUseInfo()
 		{
-			base();
-			this.set_DefinedAt(new HashSet<int>());
-			this.set_UsedAt(new List<int>());
-			return;
+			this.DefinedAt = new HashSet<int>();
+			this.UsedAt = new List<int>();
 		}
 	}
 }

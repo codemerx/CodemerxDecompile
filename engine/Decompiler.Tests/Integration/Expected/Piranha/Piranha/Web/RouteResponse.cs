@@ -50,8 +50,6 @@ namespace Piranha.Web
 
 		public RouteResponse()
 		{
-			base();
-			return;
 		}
 	}
 }

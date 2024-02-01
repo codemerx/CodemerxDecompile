@@ -43,8 +43,6 @@ namespace Mix.Cms.Messenger.Models.Data
 
 		public MixMessengerUserDevice()
 		{
-			base();
-			return;
 		}
 	}
 }

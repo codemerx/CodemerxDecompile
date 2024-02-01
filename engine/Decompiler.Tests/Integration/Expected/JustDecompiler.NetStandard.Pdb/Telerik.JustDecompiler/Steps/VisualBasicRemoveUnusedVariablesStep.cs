@@ -1,5 +1,8 @@
 using System;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
+using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -7,30 +10,28 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public VisualBasicRemoveUnusedVariablesStep()
 		{
-			base();
-			return;
 		}
 
 		protected override bool CanExistInStatement(Expression expression)
 		{
-			if (!this.CanExistInStatement(expression))
+			if (!base.CanExistInStatement(expression))
 			{
 				return false;
 			}
-			if (expression.get_CodeNodeType() != 19)
+			if (expression.CodeNodeType != CodeNodeType.MethodInvocationExpression)
 			{
 				return true;
 			}
-			V_0 = (expression as MethodInvocationExpression).GetTarget();
-			if (V_0 == null)
+			Expression target = (expression as MethodInvocationExpression).GetTarget();
+			if (target == null)
 			{
 				return true;
 			}
-			if (V_0.IsArgumentReferenceToRefParameter())
+			if (target.IsArgumentReferenceToRefParameter())
 			{
 				return true;
 			}
-			return this.context.get_Language().IsValidLineStarter(V_0.get_CodeNodeType());
+			return this.context.Language.IsValidLineStarter(target.CodeNodeType);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using Piranha;
 using Piranha.Models;
+using Piranha.Services;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -11,19 +12,29 @@ namespace Piranha.Web
 	{
 		public AliasRouter()
 		{
-			base();
-			return;
 		}
 
 		public static async Task<IRouteResponse> InvokeAsync(IApi api, string url, Guid siteId)
 		{
-			V_0.api = api;
-			V_0.url = url;
-			V_0.siteId = siteId;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<IRouteResponse>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<AliasRouter.u003cInvokeAsyncu003ed__0>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			IRouteResponse routeResponse;
+			if (!String.IsNullOrWhiteSpace(url) && url.Length > 1)
+			{
+				ConfiguredTaskAwaitable<Alias> configuredTaskAwaitable = api.Aliases.GetByAliasUrlAsync(url, new Guid?(siteId)).ConfigureAwait(false);
+				Alias alia = await configuredTaskAwaitable;
+				if (alia != null)
+				{
+					RouteResponse routeResponse1 = new RouteResponse()
+					{
+						IsPublished = true,
+						RedirectUrl = alia.RedirectUrl,
+						RedirectType = alia.Type
+					};
+					routeResponse = routeResponse1;
+					return routeResponse;
+				}
+			}
+			routeResponse = null;
+			return routeResponse;
 		}
 	}
 }

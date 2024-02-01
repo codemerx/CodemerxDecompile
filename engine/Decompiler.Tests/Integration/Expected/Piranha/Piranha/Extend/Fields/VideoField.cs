@@ -9,31 +9,31 @@ namespace Piranha.Extend.Fields
 	{
 		public VideoField()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator VideoField(Guid guid)
 		{
-			stackVariable0 = new VideoField();
-			stackVariable0.set_Id(new Guid?(guid));
-			return stackVariable0;
+			return new VideoField()
+			{
+				Id = new Guid?(guid)
+			};
 		}
 
 		public static implicit operator VideoField(Piranha.Models.Media media)
 		{
-			stackVariable0 = new VideoField();
-			stackVariable0.set_Id(new Guid?(media.get_Id()));
-			return stackVariable0;
+			return new VideoField()
+			{
+				Id = new Guid?(media.Id)
+			};
 		}
 
 		public static implicit operator String(VideoField video)
 		{
-			if (video.get_Media() == null)
+			if (video.Media == null)
 			{
 				return "";
 			}
-			return video.get_Media().get_PublicUrl();
+			return video.Media.PublicUrl;
 		}
 	}
 }

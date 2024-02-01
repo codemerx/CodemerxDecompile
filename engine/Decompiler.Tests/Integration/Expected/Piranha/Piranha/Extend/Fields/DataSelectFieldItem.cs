@@ -19,8 +19,6 @@ namespace Piranha.Extend.Fields
 
 		public DataSelectFieldItem()
 		{
-			base();
-			return;
 		}
 	}
 }

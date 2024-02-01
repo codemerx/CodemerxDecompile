@@ -42,8 +42,6 @@ namespace Piranha.Models
 
 		public MediaFolder()
 		{
-			base();
-			return;
 		}
 	}
 }

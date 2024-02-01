@@ -13,22 +13,57 @@ namespace Mono.Cecil.Extensions
 	{
 		public static IEnumerable<Instruction> GetInstructions(IMemberDefinition memberDefinition)
 		{
-			stackVariable1 = new MemberDefinitionExtensions.u003cGetInstructionsu003ed__3(-2);
-			stackVariable1.u003cu003e3__memberDefinition = memberDefinition;
-			return stackVariable1;
+			if (memberDefinition is MethodDefinition)
+			{
+				Collection<Instruction> safeBodyInstructions = MemberDefinitionExtensions.GetSafeBodyInstructions((MethodDefinition)memberDefinition);
+				if (safeBodyInstructions != null)
+				{
+					foreach (Instruction safeBodyInstruction in safeBodyInstructions)
+					{
+						yield return safeBodyInstruction;
+					}
+				}
+			}
+			if (memberDefinition is PropertyDefinition)
+			{
+				PropertyDefinition propertyDefinition = (PropertyDefinition)memberDefinition;
+				if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasBody())
+				{
+					Collection<Instruction> collection = MemberDefinitionExtensions.GetSafeBodyInstructions(propertyDefinition.get_GetMethod());
+					if (collection != null)
+					{
+						foreach (Instruction instruction in collection)
+						{
+							yield return instruction;
+						}
+					}
+				}
+				if (propertyDefinition.get_SetMethod() != null && propertyDefinition.get_SetMethod().get_HasBody())
+				{
+					Collection<Instruction> safeBodyInstructions1 = MemberDefinitionExtensions.GetSafeBodyInstructions(propertyDefinition.get_SetMethod());
+					if (safeBodyInstructions1 != null)
+					{
+						foreach (Instruction safeBodyInstruction1 in safeBodyInstructions1)
+						{
+							yield return safeBodyInstruction1;
+						}
+					}
+				}
+				propertyDefinition = null;
+			}
 		}
 
 		public static TypeReference GetReturnType(this IMemberDefinition memberDefinition)
 		{
-			if (memberDefinition as MethodDefinition != null)
+			if (memberDefinition is MethodDefinition)
 			{
 				return ((MethodDefinition)memberDefinition).get_FixedReturnType();
 			}
-			if (memberDefinition as PropertyDefinition != null)
+			if (memberDefinition is PropertyDefinition)
 			{
 				return ((PropertyDefinition)memberDefinition).get_PropertyType();
 			}
-			if (memberDefinition as FieldDefinition == null)
+			if (!(memberDefinition is FieldDefinition))
 			{
 				return null;
 			}
@@ -37,72 +72,69 @@ namespace Mono.Cecil.Extensions
 
 		private static Collection<Instruction> GetSafeBodyInstructions(MethodDefinition memberDefinition)
 		{
-			V_0 = null;
+			Collection<Instruction> instructions = null;
 			try
 			{
-				V_0 = memberDefinition.get_Body().get_Instructions();
+				instructions = memberDefinition.get_Body().get_Instructions();
 			}
 			catch
 			{
-				dummyVar0 = exception_0;
 			}
-			return V_0;
+			return instructions;
 		}
 
 		public static bool HasBody(this IMemberDefinition memberDefinition)
 		{
-			if (memberDefinition as MethodDefinition != null)
+			if (memberDefinition is MethodDefinition)
 			{
 				return ((MethodDefinition)memberDefinition).get_HasBody();
 			}
-			if (memberDefinition as PropertyDefinition == null)
+			if (!(memberDefinition is PropertyDefinition))
 			{
 				return false;
 			}
-			V_0 = (PropertyDefinition)memberDefinition;
-			if (V_0.get_GetMethod() != null && V_0.get_GetMethod().get_HasBody())
+			PropertyDefinition propertyDefinition = (PropertyDefinition)memberDefinition;
+			if (propertyDefinition.get_GetMethod() != null && propertyDefinition.get_GetMethod().get_HasBody())
 			{
 				return true;
 			}
-			if (V_0.get_SetMethod() == null)
+			if (propertyDefinition.get_SetMethod() == null)
 			{
 				return false;
 			}
-			return V_0.get_SetMethod().get_HasBody();
+			return propertyDefinition.get_SetMethod().get_HasBody();
 		}
 
 		public static bool TryGetDynamicAttribute(this ICustomAttributeProvider self, out CustomAttribute dynamicAttribute)
 		{
+			bool flag;
 			if (!self.get_HasCustomAttributes())
 			{
 				dynamicAttribute = null;
 				return false;
 			}
-			V_0 = self.get_CustomAttributes().GetEnumerator();
+			Collection<CustomAttribute>.Enumerator enumerator = self.get_CustomAttributes().GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (!String.op_Equality(V_1.get_AttributeType().get_FullName(), "System.Runtime.CompilerServices.DynamicAttribute"))
+					CustomAttribute current = enumerator.get_Current();
+					if (current.get_AttributeType().get_FullName() != "System.Runtime.CompilerServices.DynamicAttribute")
 					{
 						continue;
 					}
-					dynamicAttribute = V_1;
-					V_2 = true;
-					goto Label1;
+					dynamicAttribute = current;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				dynamicAttribute = null;
+				return false;
 			}
 			finally
 			{
-				V_0.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			dynamicAttribute = null;
-			return false;
+			return flag;
 		}
 	}
 }

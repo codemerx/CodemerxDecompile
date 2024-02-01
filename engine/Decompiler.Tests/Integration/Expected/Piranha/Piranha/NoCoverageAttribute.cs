@@ -7,8 +7,6 @@ namespace Piranha
 	{
 		public NoCoverageAttribute()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -20,17 +20,15 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public Assignment()
 		{
-			base();
-			return;
 		}
 
 		protected override bool OnMatch(MatchContext context, BinaryExpression node)
 		{
-			if (!this.get_Target().TryMatch(context, node.get_Left()))
+			if (!this.Target.TryMatch(context, node.Left))
 			{
 				return false;
 			}
-			return this.get_Expression().TryMatch(context, node.get_Right());
+			return this.Expression.TryMatch(context, node.Right);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
@@ -15,41 +16,33 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		private MethodSpecificContext methodContext;
 
-		private readonly HashSet<VariableDefinition> not_assigned;
+		private readonly HashSet<VariableDefinition> not_assigned = new HashSet<VariableDefinition>();
 
-		private readonly Dictionary<VariableDefinition, DeclareVariablesOnFirstAssignment.StatementDeclaration> variableDeclarations;
+		private readonly Dictionary<VariableDefinition, DeclareVariablesOnFirstAssignment.StatementDeclaration> variableDeclarations = new Dictionary<VariableDefinition, DeclareVariablesOnFirstAssignment.StatementDeclaration>();
 
-		private readonly Stack<Statement> statements;
+		private readonly Stack<Statement> statements = new Stack<Statement>();
 
-		private readonly Stack<CodeNodeType> codeNodeTypes;
+		private readonly Stack<CodeNodeType> codeNodeTypes = new Stack<CodeNodeType>();
 
 		private DeclareVariablesOnFirstAssignment.State state;
 
 		public DeclareVariablesOnFirstAssignment()
 		{
-			this.not_assigned = new HashSet<VariableDefinition>();
-			this.variableDeclarations = new Dictionary<VariableDefinition, DeclareVariablesOnFirstAssignment.StatementDeclaration>();
-			this.statements = new Stack<Statement>();
-			this.codeNodeTypes = new Stack<CodeNodeType>();
-			base();
-			return;
 		}
 
 		private bool GetResultOnFirstOccurrence(VariableDefinition variable)
 		{
+			DeclareVariablesOnFirstAssignment.StatementDeclaration statementDeclaration;
 			if (this.state == DeclareVariablesOnFirstAssignment.State.LocateDeclarations)
 			{
-				if (!this.variableDeclarations.TryGetValue(variable, out V_0) || V_0.get_UsedInOtherStatements())
+				if (this.variableDeclarations.TryGetValue(variable, out statementDeclaration) && !statementDeclaration.UsedInOtherStatements)
 				{
-					if (!this.methodContext.get_Variables().Contains(variable) && this.codeNodeTypes.Peek() == 24)
-					{
-						dummyVar0 = this.not_assigned.Add(variable);
-						return true;
-					}
+					statementDeclaration.UsedInOtherStatements = !this.IsChildOfCurrentStatement(statementDeclaration.Statement);
 				}
-				else
+				else if (!this.methodContext.Variables.Contains(variable) && this.codeNodeTypes.Peek() == CodeNodeType.BinaryExpression)
 				{
-					V_0.set_UsedInOtherStatements(!this.IsChildOfCurrentStatement(V_0.get_Statement()));
+					this.not_assigned.Add(variable);
+					return true;
 				}
 			}
 			return false;
@@ -57,121 +50,110 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsChildOfCurrentStatement(Statement statement)
 		{
-			V_0 = this.statements.GetEnumerator();
+			bool flag;
+			Stack<Statement>.Enumerator enumerator = this.statements.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					if (V_0.get_Current() != statement)
+					if (enumerator.Current != statement)
 					{
 						continue;
 					}
-					V_1 = true;
-					goto Label1;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				return false;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_1;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		private void PopulateNotAssigned()
 		{
 			this.not_assigned.Clear();
-			V_0 = this.methodContext.get_Variables().GetEnumerator();
-			try
+			foreach (VariableDefinition variable in this.methodContext.Variables)
 			{
-				while (V_0.MoveNext())
+				if (this.methodContext.VariablesToNotDeclare.Contains(variable))
 				{
-					V_1 = V_0.get_Current();
-					if (this.methodContext.get_VariablesToNotDeclare().Contains(V_1))
-					{
-						continue;
-					}
-					dummyVar0 = this.not_assigned.Add(V_1);
+					continue;
 				}
+				this.not_assigned.Add(variable);
 			}
-			finally
-			{
-				V_0.Dispose();
-			}
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
-			this.methodContext = context.get_MethodContext();
+			this.methodContext = context.MethodContext;
 			this.PopulateNotAssigned();
-			this.codeNodeTypes.Push(0);
-			dummyVar0 = this.VisitBlockStatement(block);
-			dummyVar1 = this.codeNodeTypes.Pop();
+			this.codeNodeTypes.Push(CodeNodeType.BlockStatement);
+			this.VisitBlockStatement(block);
+			this.codeNodeTypes.Pop();
 			return this.ReplaceDeclarations(block);
 		}
 
 		private bool RemoveVariable(VariableDefinition variable)
 		{
-			stackVariable2 = this.ShouldRemoveVariable(variable);
-			if (stackVariable2)
+			bool flag = this.ShouldRemoveVariable(variable);
+			if (flag)
 			{
 				this.methodContext.RemoveVariable(variable);
 			}
-			dummyVar0 = this.not_assigned.Remove(variable);
-			return stackVariable2;
+			this.not_assigned.Remove(variable);
+			return flag;
 		}
 
 		private BlockStatement ReplaceDeclarations(BlockStatement block)
 		{
-			this.state = 1;
+			this.state = DeclareVariablesOnFirstAssignment.State.ReplaceDeclarations;
 			this.PopulateNotAssigned();
 			block = (BlockStatement)this.VisitBlockStatement(block);
-			this.state = 0;
+			this.state = DeclareVariablesOnFirstAssignment.State.LocateDeclarations;
 			return block;
 		}
 
 		private bool ShouldRemoveVariable(VariableDefinition variable)
 		{
-			if (this.state != 1)
+			DeclareVariablesOnFirstAssignment.StatementDeclaration statementDeclaration;
+			if (this.state != DeclareVariablesOnFirstAssignment.State.ReplaceDeclarations)
 			{
 				return false;
 			}
-			if (this.variableDeclarations.TryGetValue(variable, out V_0))
+			if (this.variableDeclarations.TryGetValue(variable, out statementDeclaration))
 			{
-				return !V_0.get_UsedInOtherStatements();
+				return !statementDeclaration.UsedInOtherStatements;
 			}
-			return !this.methodContext.get_VariableAssignmentData().ContainsKey(variable);
+			return !this.methodContext.VariableAssignmentData.ContainsKey(variable);
 		}
 
 		private void TryAddNewVariableDeclaration(VariableDefinition variable)
 		{
+			DeclareVariablesOnFirstAssignment.StatementDeclaration statementDeclaration;
+			AssignmentType assignmentType;
 			if (this.state != DeclareVariablesOnFirstAssignment.State.LocateDeclarations)
 			{
 				return;
 			}
-			V_0 = this.statements.Peek();
-			if (!this.variableDeclarations.TryGetValue(variable, out V_1))
+			Statement statement = this.statements.Peek();
+			if (this.variableDeclarations.TryGetValue(variable, out statementDeclaration))
 			{
-				if (!this.methodContext.get_VariableAssignmentData().TryGetValue(variable, out V_2) || V_2 == 2)
+				if (!statementDeclaration.UsedInOtherStatements)
 				{
-					V_3 = new DeclareVariablesOnFirstAssignment.StatementDeclaration(V_0);
-					V_3.set_UsedInOtherStatements(this.codeNodeTypes.Peek() != 24);
-					this.variableDeclarations.Add(variable, V_3);
-				}
-			}
-			else
-			{
-				if (!V_1.get_UsedInOtherStatements())
-				{
-					V_1.set_UsedInOtherStatements(!this.IsChildOfCurrentStatement(V_0));
+					statementDeclaration.UsedInOtherStatements = !this.IsChildOfCurrentStatement(statement);
 					return;
 				}
 			}
-			return;
+			else if (!this.methodContext.VariableAssignmentData.TryGetValue(variable, out assignmentType) || assignmentType == AssignmentType.SingleAssignment)
+			{
+				DeclareVariablesOnFirstAssignment.StatementDeclaration statementDeclaration1 = new DeclareVariablesOnFirstAssignment.StatementDeclaration(statement)
+				{
+					UsedInOtherStatements = this.codeNodeTypes.Peek() != CodeNodeType.BinaryExpression
+				};
+				this.variableDeclarations.Add(variable, statementDeclaration1);
+			}
 		}
 
 		private bool TryDiscardVariable(VariableDefinition variable)
@@ -180,7 +162,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return this.GetResultOnFirstOccurrence(variable);
 			}
-			if (!this.methodContext.get_Variables().Contains(variable))
+			if (!this.methodContext.Variables.Contains(variable))
 			{
 				return false;
 			}
@@ -190,59 +172,53 @@ namespace Telerik.JustDecompiler.Steps
 
 		private ICodeNode VisitAssignExpression(BinaryExpression node)
 		{
-			if (node.get_Left().get_CodeNodeType() == 26)
+			bool flag;
+			flag = (node.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression ? true : node.Left.CodeNodeType == CodeNodeType.VariableDeclarationExpression);
+			if (flag)
 			{
-				stackVariable4 = true;
+				this.codeNodeTypes.Push(CodeNodeType.BinaryExpression);
 			}
-			else
+			node.Left = (Expression)this.Visit(node.Left);
+			if (flag)
 			{
-				stackVariable4 = node.get_Left().get_CodeNodeType() == 27;
+				this.codeNodeTypes.Pop();
 			}
-			if (stackVariable4)
-			{
-				this.codeNodeTypes.Push(24);
-			}
-			node.set_Left((Expression)this.Visit(node.get_Left()));
-			if (stackVariable4)
-			{
-				dummyVar0 = this.codeNodeTypes.Pop();
-			}
-			node.set_Right((Expression)this.Visit(node.get_Right()));
+			node.Right = (Expression)this.Visit(node.Right);
 			return node;
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.get_IsAssignmentExpression())
+			if (node.IsAssignmentExpression)
 			{
 				return this.VisitAssignExpression(node);
 			}
-			return this.VisitBinaryExpression(node);
+			return base.VisitBinaryExpression(node);
 		}
 
 		public override ICodeNode VisitBlockStatement(BlockStatement node)
 		{
 			this.statements.Push(node);
-			stackVariable5 = this.VisitBlockStatement(node);
-			dummyVar0 = this.statements.Pop();
-			return stackVariable5;
+			ICodeNode codeNode = base.VisitBlockStatement(node);
+			this.statements.Pop();
+			return codeNode;
 		}
 
 		public override ICodeNode VisitForEachStatement(ForEachStatement node)
 		{
-			this.codeNodeTypes.Push(24);
-			node.set_Variable((VariableDeclarationExpression)this.Visit(node.get_Variable()));
-			dummyVar0 = this.codeNodeTypes.Pop();
-			node.set_Collection((Expression)this.Visit(node.get_Collection()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			this.codeNodeTypes.Push(CodeNodeType.BinaryExpression);
+			node.Variable = (VariableDeclarationExpression)this.Visit(node.Variable);
+			this.codeNodeTypes.Pop();
+			node.Collection = (Expression)this.Visit(node.Collection);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public override ICodeNode VisitForStatement(ForStatement node)
 		{
 			this.statements.Push(node);
-			dummyVar0 = this.VisitForStatement(node);
-			dummyVar1 = this.statements.Pop();
+			base.VisitForStatement(node);
+			this.statements.Pop();
 			return node;
 		}
 
@@ -250,29 +226,29 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			if (this.state == DeclareVariablesOnFirstAssignment.State.LocateDeclarations)
 			{
-				dummyVar0 = this.Visit((node.CloneExpressionOnly() as LambdaExpression).get_Body());
+				this.Visit((node.CloneExpressionOnly() as LambdaExpression).Body);
 			}
 			return node;
 		}
 
 		public override ICodeNode VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			dummyVar0 = this.TryDiscardVariable(node.get_Variable());
+			this.TryDiscardVariable(node.Variable);
 			return node;
 		}
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			V_0 = (VariableDefinition)node.get_Variable();
-			if (!this.TryDiscardVariable(V_0))
+			VariableDefinition variable = (VariableDefinition)node.Variable;
+			if (!this.TryDiscardVariable(variable))
 			{
 				return node;
 			}
-			if (V_0.get_VariableType().get_IsByReference())
+			if (variable.get_VariableType().get_IsByReference())
 			{
-				return new RefVariableDeclarationExpression(V_0, node.get_UnderlyingSameMethodInstructions());
+				return new RefVariableDeclarationExpression(variable, node.UnderlyingSameMethodInstructions);
 			}
-			return new VariableDeclarationExpression(V_0, node.get_UnderlyingSameMethodInstructions());
+			return new VariableDeclarationExpression(variable, node.UnderlyingSameMethodInstructions);
 		}
 
 		private enum State
@@ -297,9 +273,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			public StatementDeclaration(Statement statement)
 			{
-				base();
-				this.set_Statement(statement);
-				return;
+				this.Statement = statement;
 			}
 		}
 	}

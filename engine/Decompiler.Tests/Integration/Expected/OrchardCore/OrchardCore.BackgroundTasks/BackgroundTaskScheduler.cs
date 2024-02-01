@@ -1,3 +1,4 @@
+using NCrontab;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -7,10 +8,7 @@ namespace OrchardCore.BackgroundTasks
 	{
 		public string Name
 		{
-			get
-			{
-				return this.u003cNameu003ek__BackingField;
-			}
+			get;
 		}
 
 		public DateTime ReferenceTime
@@ -39,10 +37,7 @@ namespace OrchardCore.BackgroundTasks
 
 		public string Tenant
 		{
-			get
-			{
-				return this.u003cTenantu003ek__BackingField;
-			}
+			get;
 		}
 
 		public bool Updated
@@ -53,41 +48,38 @@ namespace OrchardCore.BackgroundTasks
 
 		public BackgroundTaskScheduler(string tenant, string name, DateTime referenceTime)
 		{
-			base();
-			this.u003cNameu003ek__BackingField = name;
-			this.u003cTenantu003ek__BackingField = tenant;
-			this.set_ReferenceTime(referenceTime);
-			stackVariable8 = new BackgroundTaskSettings();
-			stackVariable8.set_Name(name);
-			this.set_Settings(stackVariable8);
-			stackVariable11 = new BackgroundTaskState();
-			stackVariable11.set_Name(name);
-			this.set_State(stackVariable11);
-			return;
+			this.Name = name;
+			this.Tenant = tenant;
+			this.ReferenceTime = referenceTime;
+			BackgroundTaskSettings backgroundTaskSetting = new BackgroundTaskSettings();
+			backgroundTaskSetting.set_Name(name);
+			this.Settings = backgroundTaskSetting;
+			BackgroundTaskState backgroundTaskState = new BackgroundTaskState();
+			backgroundTaskState.set_Name(name);
+			this.State = backgroundTaskState;
 		}
 
 		public bool CanRun()
 		{
-			V_0 = CrontabSchedule.Parse(this.get_Settings().get_Schedule()).GetNextOccurrence(this.get_ReferenceTime());
-			if (DateTime.op_GreaterThanOrEqual(DateTime.get_UtcNow(), V_0))
+			DateTime nextOccurrence = CrontabSchedule.Parse(this.Settings.get_Schedule()).GetNextOccurrence(this.ReferenceTime);
+			if (DateTime.UtcNow >= nextOccurrence)
 			{
-				if (this.get_Settings().get_Enable() && !this.get_Released() && this.get_Updated())
+				if (this.Settings.get_Enable() && !this.Released && this.Updated)
 				{
 					return true;
 				}
-				this.set_ReferenceTime(DateTime.get_UtcNow());
+				this.ReferenceTime = DateTime.UtcNow;
 			}
 			return false;
 		}
 
 		public void Run()
 		{
-			stackVariable1 = this.get_State();
-			stackVariable3 = DateTime.get_UtcNow();
-			V_0 = stackVariable3;
-			this.set_ReferenceTime(stackVariable3);
-			stackVariable1.set_LastStartTime(V_0);
-			return;
+			BackgroundTaskState state = this.State;
+			DateTime utcNow = DateTime.UtcNow;
+			DateTime dateTime = utcNow;
+			this.ReferenceTime = utcNow;
+			state.set_LastStartTime(dateTime);
 		}
 	}
 }

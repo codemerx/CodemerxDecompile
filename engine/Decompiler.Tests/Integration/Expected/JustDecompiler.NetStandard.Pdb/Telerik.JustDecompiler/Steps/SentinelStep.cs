@@ -9,37 +9,32 @@ namespace Telerik.JustDecompiler.Steps
 {
 	internal class SentinelStep : BaseCodeVisitor, IDecompilationStep
 	{
-		private readonly HashSet<ICodeNode> visitedNodes;
+		private readonly HashSet<ICodeNode> visitedNodes = new HashSet<ICodeNode>();
 
 		private readonly string previousStep;
 
 		public SentinelStep(string previousStep)
 		{
-			this.visitedNodes = new HashSet<ICodeNode>();
-			base();
 			this.previousStep = previousStep;
-			return;
 		}
 
 		private List<Instruction> GetNonUniqueInstructions(IList<Instruction> instructions)
 		{
-			V_0 = new List<Instruction>();
-			V_1 = 1;
-			while (V_1 < instructions.get_Count())
+			List<Instruction> instructions1 = new List<Instruction>();
+			for (int i = 1; i < instructions.Count; i++)
 			{
-				if ((object)instructions.get_Item(V_1) == (object)instructions.get_Item(V_1 - 1))
+				if ((object)instructions[i] == (object)instructions[i - 1])
 				{
-					V_0.Add(instructions.get_Item(V_1));
+					instructions1.Add(instructions[i]);
 				}
-				V_1 = V_1 + 1;
 			}
-			return V_0;
+			return instructions1;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.Visit(body);
-			if (this.GetNonUniqueInstructions(new List<Instruction>(body.get_UnderlyingSameMethodInstructions())).get_Count() > 0)
+			if (this.GetNonUniqueInstructions(new List<Instruction>(body.UnderlyingSameMethodInstructions)).Count > 0)
 			{
 				throw new Exception(String.Concat("Instruction duplication detected after: ", this.previousStep));
 			}
@@ -48,35 +43,23 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void Visit(ICodeNode node)
 		{
-			V_0 = node as IPdbCodeNode;
-			if (V_0 != null)
+			IPdbCodeNode pdbCodeNode = node as IPdbCodeNode;
+			if (pdbCodeNode != null)
 			{
-				V_1 = V_0.get_UnderlyingSameMethodInstructions().GetEnumerator();
-				try
+				foreach (Instruction underlyingSameMethodInstruction in pdbCodeNode.UnderlyingSameMethodInstructions)
 				{
-					while (V_1.MoveNext())
+					if ((object)underlyingSameMethodInstruction.get_ContainingMethod() == (object)pdbCodeNode.UnderlyingInstructionsMember)
 					{
-						if ((object)V_1.get_Current().get_ContainingMethod() == (object)V_0.get_UnderlyingInstructionsMember())
-						{
-							continue;
-						}
-						throw new Exception(String.Concat("IPdbCodeNode contains instructions from different methods. After: ", this.previousStep));
+						continue;
 					}
-				}
-				finally
-				{
-					if (V_1 != null)
-					{
-						V_1.Dispose();
-					}
+					throw new Exception(String.Concat("IPdbCodeNode contains instructions from different methods. After: ", this.previousStep));
 				}
 			}
 			if (node != null && !this.visitedNodes.Add(node))
 			{
 				throw new Exception(String.Concat("Node duplication detected after: ", this.previousStep));
 			}
-			this.Visit(node);
-			return;
+			base.Visit(node);
 		}
 	}
 }

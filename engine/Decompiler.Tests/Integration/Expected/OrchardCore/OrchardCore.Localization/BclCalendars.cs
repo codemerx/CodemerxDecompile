@@ -26,7 +26,6 @@ namespace OrchardCore.Localization
 			BclCalendars.Julian = new JulianCalendar();
 			BclCalendars.Persian = new PersianCalendar();
 			BclCalendars.UmAlQura = new UmAlQuraCalendar();
-			return;
 		}
 
 		public static CalendarSystem ConvertToCalendarSystem(Calendar calendar)
@@ -35,14 +34,37 @@ namespace OrchardCore.Localization
 			{
 				throw new ArgumentNullException("calendar");
 			}
-			V_0 = calendar.GetType();
-			if (Type.op_Equality(V_0, Type.GetTypeFromHandle(// 
-			// Current member / type: NodaTime.CalendarSystem OrchardCore.Localization.BclCalendars::ConvertToCalendarSystem(System.Globalization.Calendar)
-			// Exception in: NodaTime.CalendarSystem ConvertToCalendarSystem(System.Globalization.Calendar)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			Type type = calendar.GetType();
+			if (type == typeof(GregorianCalendar))
+			{
+				return CalendarSystem.get_Iso();
+			}
+			if (type == typeof(HebrewCalendar))
+			{
+				return CalendarSystem.get_HebrewCivil();
+			}
+			if (type == typeof(HijriCalendar))
+			{
+				return CalendarSystem.get_IslamicBcl();
+			}
+			if (type == typeof(JulianCalendar))
+			{
+				return CalendarSystem.get_Julian();
+			}
+			if (type == typeof(PersianCalendar))
+			{
+				if (!calendar.IsLeapYear(1))
+				{
+					return CalendarSystem.get_PersianAstronomical();
+				}
+				return CalendarSystem.get_PersianSimple();
+			}
+			if (type == typeof(UmAlQuraCalendar))
+			{
+				return CalendarSystem.get_UmAlQura();
+			}
+			return null;
+		}
 
 		public static CalendarSystem GetCalendarByName(CalendarName calendarName)
 		{
@@ -66,7 +88,7 @@ namespace OrchardCore.Localization
 				}
 				case 4:
 				{
-					if (!CultureInfo.get_CurrentUICulture().get_Calendar().IsLeapYear(1))
+					if (!CultureInfo.CurrentUICulture.Calendar.IsLeapYear(1))
 					{
 						return CalendarSystem.get_PersianAstronomical();
 					}
@@ -86,13 +108,32 @@ namespace OrchardCore.Localization
 			{
 				throw new ArgumentNullException("calendar");
 			}
-			V_0 = calendar.GetType();
-			if (Type.op_Equality(V_0, Type.GetTypeFromHandle(// 
-			// Current member / type: OrchardCore.Localization.CalendarName OrchardCore.Localization.BclCalendars::GetCalendarName(System.Globalization.Calendar)
-			// Exception in: OrchardCore.Localization.CalendarName GetCalendarName(System.Globalization.Calendar)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			Type type = calendar.GetType();
+			if (type == typeof(GregorianCalendar))
+			{
+				return 2;
+			}
+			if (type == typeof(HebrewCalendar))
+			{
+				return 0;
+			}
+			if (type == typeof(HijriCalendar))
+			{
+				return 1;
+			}
+			if (type == typeof(JulianCalendar))
+			{
+				return 3;
+			}
+			if (type == typeof(PersianCalendar))
+			{
+				return 4;
+			}
+			if (type == typeof(UmAlQuraCalendar))
+			{
+				return 5;
+			}
+			return 6;
+		}
 	}
 }

@@ -1,8 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 
@@ -14,7 +16,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 42;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.PropertyReferenceExpression;
 			}
 		}
 
@@ -22,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_MethodExpression().get_Method().get_DeclaringType();
+				return base.MethodExpression.Method.get_DeclaringType();
 			}
 		}
 
@@ -30,12 +32,12 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (!this.get_IsSetter())
+				if (!this.IsSetter)
 				{
-					return this.get_MethodExpression().get_ExpressionType();
+					return base.MethodExpression.ExpressionType;
 				}
-				V_0 = this.get_MethodExpression().get_Method().get_Parameters().get_Count() - 1;
-				return this.get_MethodExpression().get_Method().get_Parameters().get_Item(V_0).ResolveParameterType(this.get_MethodExpression().get_Method());
+				int count = base.MethodExpression.Method.get_Parameters().get_Count() - 1;
+				return base.MethodExpression.Method.get_Parameters().get_Item(count).ResolveParameterType(base.MethodExpression.Method);
 			}
 			set
 			{
@@ -47,7 +49,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Arguments().get_Count() > 0;
+				return base.Arguments.Count > 0;
 			}
 		}
 
@@ -55,11 +57,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				if (this.get_MethodExpression().get_MethodDefinition() == null)
+				if (base.MethodExpression.MethodDefinition == null)
 				{
 					return false;
 				}
-				return this.get_MethodExpression().get_MethodDefinition().get_IsSetter();
+				return base.MethodExpression.MethodDefinition.get_IsSetter();
 			}
 		}
 
@@ -73,98 +75,85 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_MethodExpression().get_Target();
+				return base.MethodExpression.Target;
 			}
 			set
 			{
-				this.get_MethodExpression().set_Target(value);
-				return;
+				base.MethodExpression.Target = value;
 			}
 		}
 
-		public PropertyReferenceExpression(MethodInvocationExpression invocation, IEnumerable<Instruction> instructions)
+		public PropertyReferenceExpression(MethodInvocationExpression invocation, IEnumerable<Instruction> instructions) : base(invocation.MethodExpression, instructions)
 		{
-			base(invocation.get_MethodExpression(), instructions);
-			this.instructions.AddRange(invocation.get_MappedInstructions());
-			this.set_Arguments(invocation.get_Arguments().Clone());
-			this.set_MethodExpression((MethodReferenceExpression)invocation.get_MethodExpression().Clone());
-			this.set_VirtualCall(invocation.get_VirtualCall());
-			this.set_Property(this.ResolveProperty());
-			if (this.get_IsSetter())
+			this.instructions.AddRange(invocation.MappedInstructions);
+			base.Arguments = invocation.Arguments.Clone();
+			base.MethodExpression = (MethodReferenceExpression)invocation.MethodExpression.Clone();
+			base.VirtualCall = invocation.VirtualCall;
+			this.Property = this.ResolveProperty();
+			if (this.IsSetter)
 			{
-				this.get_Arguments().RemoveAt(invocation.get_Arguments().get_Count() - 1);
+				base.Arguments.RemoveAt(invocation.Arguments.Count - 1);
 			}
-			return;
 		}
 
-		private PropertyReferenceExpression(MethodReferenceExpression methodExpression, PropertyDefinition property, bool virtualCall, IEnumerable<Instruction> instructions)
+		private PropertyReferenceExpression(MethodReferenceExpression methodExpression, PropertyDefinition property, bool virtualCall, IEnumerable<Instruction> instructions) : base(methodExpression, instructions)
 		{
-			base(methodExpression, instructions);
-			this.set_MethodExpression(methodExpression);
-			this.set_Property(property);
-			this.set_VirtualCall(virtualCall);
-			return;
+			base.MethodExpression = methodExpression;
+			this.Property = property;
+			base.VirtualCall = virtualCall;
 		}
 
 		public override Expression Clone()
 		{
-			stackVariable10 = new PropertyReferenceExpression((MethodReferenceExpression)this.get_MethodExpression().Clone(), this.get_Property(), this.get_VirtualCall(), this.instructions);
-			stackVariable10.set_Arguments(this.get_Arguments().Clone());
-			return stackVariable10;
+			return new PropertyReferenceExpression((MethodReferenceExpression)base.MethodExpression.Clone(), this.Property, base.VirtualCall, this.instructions)
+			{
+				Arguments = base.Arguments.Clone()
+			};
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			stackVariable9 = new PropertyReferenceExpression((MethodReferenceExpression)this.get_MethodExpression().CloneExpressionOnly(), this.get_Property(), this.get_VirtualCall(), null);
-			stackVariable9.set_Arguments(this.get_Arguments().CloneExpressionsOnly());
-			return stackVariable9;
+			return new PropertyReferenceExpression((MethodReferenceExpression)base.MethodExpression.CloneExpressionOnly(), this.Property, base.VirtualCall, null)
+			{
+				Arguments = base.Arguments.CloneExpressionsOnly()
+			};
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other == null || other as PropertyReferenceExpression == null)
+			if (other == null || !(other is PropertyReferenceExpression))
 			{
 				return false;
 			}
-			return this.Equals(other as MethodInvocationExpression);
+			return base.Equals(other as MethodInvocationExpression);
 		}
 
 		private PropertyDefinition ResolveProperty()
 		{
-			V_0 = this.get_MethodExpression().get_Method().get_DeclaringType().Resolve();
-			V_1 = this.get_MethodExpression().get_Method().Resolve();
-			V_2 = null;
-			if (V_0 != null)
+			TypeDefinition typeDefinition = base.MethodExpression.Method.get_DeclaringType().Resolve();
+			MethodDefinition methodDefinition = base.MethodExpression.Method.Resolve();
+			PropertyDefinition propertyDefinition = null;
+			if (typeDefinition != null)
 			{
-				V_3 = V_0.get_Properties().GetEnumerator();
-				try
+				foreach (PropertyDefinition property in typeDefinition.get_Properties())
 				{
-					while (V_3.MoveNext())
+					if ((object)property.get_GetMethod() != (object)methodDefinition)
 					{
-						V_4 = V_3.get_Current();
-						if ((object)V_4.get_GetMethod() != (object)V_1)
+						if ((object)property.get_SetMethod() != (object)methodDefinition)
 						{
-							if ((object)V_4.get_SetMethod() != (object)V_1)
-							{
-								continue;
-							}
-							V_2 = V_4;
-							goto Label0;
+							continue;
 						}
-						else
-						{
-							V_2 = V_4;
-							goto Label0;
-						}
+						propertyDefinition = property;
+						return propertyDefinition;
+					}
+					else
+					{
+						propertyDefinition = property;
+						return propertyDefinition;
 					}
 				}
-				finally
-				{
-					V_3.Dispose();
-				}
 			}
-		Label0:
-			return V_2;
+			return propertyDefinition;
 		}
 	}
 }

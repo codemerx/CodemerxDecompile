@@ -40,12 +40,10 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		public LogicalFlowBuilderContext(ControlFlowGraph cfg)
 		{
-			base();
-			this.set_CFGBlockToLogicalConstructMap(new Dictionary<InstructionBlock, CFGBlockLogicalConstruct[]>());
-			this.set_CFG(cfg);
-			this.set_InstructionToCFGBlockMapping(cfg.get_InstructionToBlockMapping());
-			this.set_LogicalConstructToDominatorTreeMap(new Dictionary<ILogicalConstruct, DominatorTree>());
-			return;
+			this.CFGBlockToLogicalConstructMap = new Dictionary<InstructionBlock, CFGBlockLogicalConstruct[]>();
+			this.CFG = cfg;
+			this.InstructionToCFGBlockMapping = cfg.InstructionToBlockMapping;
+			this.LogicalConstructToDominatorTreeMap = new Dictionary<ILogicalConstruct, DominatorTree>();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using Mono.Cecil;
 using System;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
 namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
@@ -10,27 +11,24 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		public FieldUsageFinder(FieldDefinition theField)
 		{
-			base();
 			this.theField = theField;
-			return;
 		}
 
 		public override bool CheckExpression(Expression node)
 		{
-			if (node.get_CodeNodeType() != 30)
+			if (node.CodeNodeType != CodeNodeType.FieldReferenceExpression)
 			{
 				return false;
 			}
-			return (object)(node as FieldReferenceExpression).get_Field().Resolve() == (object)this.theField;
+			return (object)(node as FieldReferenceExpression).Field.Resolve() == (object)this.theField;
 		}
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if ((object)node.get_Field().Resolve() == (object)this.theField)
+			if ((object)node.Field.Resolve() == (object)this.theField)
 			{
-				this.searchResult = 2;
+				this.searchResult = UsageFinderSearchResult.Used;
 			}
-			return;
 		}
 	}
 }

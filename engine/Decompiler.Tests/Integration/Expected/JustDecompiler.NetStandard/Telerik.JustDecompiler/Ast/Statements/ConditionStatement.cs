@@ -21,9 +21,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public ConditionStatement(Expression condition)
 		{
-			base();
-			this.set_Condition(condition);
-			return;
+			this.Condition = condition;
 		}
 	}
 }

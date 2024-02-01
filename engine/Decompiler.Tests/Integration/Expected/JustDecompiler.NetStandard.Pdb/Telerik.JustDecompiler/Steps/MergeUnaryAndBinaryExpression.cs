@@ -13,75 +13,68 @@ namespace Telerik.JustDecompiler.Steps
 
 		public MergeUnaryAndBinaryExpression()
 		{
-			base();
-			return;
 		}
 
 		private bool IsConditionExpression(Expression expression)
 		{
-			if (expression as BinaryExpression != null || expression as UnaryExpression != null)
+			if (expression is BinaryExpression || expression is UnaryExpression)
 			{
 				return true;
 			}
-			return expression as ConditionExpression != null;
+			return expression is ConditionExpression;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.Visit(block);
 			return block;
 		}
 
 		private void TryMergeExpressions(ConditionStatement node)
 		{
-			if (node.get_Condition() as UnaryExpression == null)
+			if (!(node.Condition is UnaryExpression))
 			{
 				return;
 			}
-			V_0 = (UnaryExpression)node.get_Condition();
-			if (V_0.get_Operator() != 1)
+			UnaryExpression condition = (UnaryExpression)node.Condition;
+			if (condition.Operator != UnaryOperator.LogicalNot)
 			{
 				return;
 			}
-			if (V_0.get_Operand() as MethodInvocationExpression != null || V_0.get_Operand() as PropertyReferenceExpression != null)
+			if (condition.Operand is MethodInvocationExpression || condition.Operand is PropertyReferenceExpression)
 			{
 				return;
 			}
-			if (!this.IsConditionExpression(V_0.get_Operand()))
+			if (!this.IsConditionExpression(condition.Operand))
 			{
 				return;
 			}
-			node.set_Condition(Negator.Negate(V_0.get_Operand(), this.typeSystem));
-			return;
+			node.Condition = Negator.Negate(condition.Operand, this.typeSystem);
 		}
 
 		public override void VisitDoWhileStatement(DoWhileStatement node)
 		{
 			this.TryMergeExpressions(node);
-			this.VisitDoWhileStatement(node);
-			return;
+			base.VisitDoWhileStatement(node);
 		}
 
 		public override void VisitForStatement(ForStatement node)
 		{
 			this.TryMergeExpressions(node);
-			this.VisitForStatement(node);
-			return;
+			base.VisitForStatement(node);
 		}
 
 		public override void VisitIfStatement(IfStatement node)
 		{
 			this.TryMergeExpressions(node);
-			this.VisitIfStatement(node);
-			return;
+			base.VisitIfStatement(node);
 		}
 
 		public override void VisitWhileStatement(WhileStatement node)
 		{
 			this.TryMergeExpressions(node);
-			this.VisitWhileStatement(node);
-			return;
+			base.VisitWhileStatement(node);
 		}
 	}
 }

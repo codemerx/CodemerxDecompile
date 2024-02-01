@@ -4,10 +4,12 @@ using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages;
 using Mix.Cms.Lib.ViewModels.MixPortalPageRoles;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -16,11 +18,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPages
 	public class ReadRolePermissionViewModel : ViewModelBase<MixCmsContext, MixPortalPage, ReadRolePermissionViewModel>
 	{
 		[JsonProperty("childPages")]
-		public List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel> ChildPages
-		{
-			get;
-			set;
-		}
+		public List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel> ChildPages { get; set; } = new List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>();
 
 		[JsonProperty("createdBy")]
 		public string CreatedBy
@@ -136,27 +134,22 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPages
 
 		public ReadRolePermissionViewModel()
 		{
-			this.u003cChildPagesu003ek__BackingField = new List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>();
-			base();
-			return;
 		}
 
-		public ReadRolePermissionViewModel(MixPortalPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadRolePermissionViewModel(MixPortalPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cChildPagesu003ek__BackingField = new List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixPortalPageNavigation, Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPortalPages.ReadRolePermissionViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>> modelListBy = ViewModelBase<MixCmsContext, MixPortalPageNavigation, Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>.Repository.GetModelListBy((MixPortalPageNavigation n) => n.ParentId == this.Id, _context, _transaction);
+			if (modelListBy.get_IsSucceed())
+			{
+				this.ChildPages = (
+					from c in modelListBy.get_Data()
+					orderby c.Priority
+					select c).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>();
+			}
+		}
 	}
 }

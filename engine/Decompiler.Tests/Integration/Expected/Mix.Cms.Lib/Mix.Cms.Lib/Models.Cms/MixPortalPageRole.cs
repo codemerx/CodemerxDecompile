@@ -61,8 +61,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixPortalPageRole()
 		{
-			base();
-			return;
 		}
 	}
 }

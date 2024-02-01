@@ -15,11 +15,11 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 		{
 			get
 			{
-				if (this.get_LoopType() == 1)
+				if (this.LoopType == Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.PreTestedLoop)
 				{
-					return this.get_LoopCondition();
+					return this.LoopCondition;
 				}
-				return this.get_LoopBodyBlock();
+				return this.LoopBodyBlock;
 			}
 		}
 
@@ -39,11 +39,11 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 		{
 			get
 			{
-				if (this.get_LoopType() == Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.InfiniteLoop)
+				if (this.LoopType == Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.InfiniteLoop)
 				{
-					return this.get_LoopBodyBlock().get_FirstBlock();
+					return this.LoopBodyBlock.FirstBlock;
 				}
-				return this.get_LoopCondition().get_FirstBlock();
+				return this.LoopCondition.FirstBlock;
 			}
 		}
 
@@ -55,112 +55,101 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Loops
 
 		public LoopLogicalConstruct(ILogicalConstruct entry, HashSet<ILogicalConstruct> loopBody, Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType loopType, ConditionLogicalConstruct loopCondition, TypeSystem typeSystem)
 		{
-			base();
 			if (loopCondition != null)
 			{
-				loopCondition.set_LogicalContainer(this);
+				loopCondition.LogicalContainer = this;
 			}
-			this.set_LoopType(loopType);
-			this.set_LoopCondition(loopCondition);
-			if (this.get_LoopType() != Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.InfiniteLoop)
+			this.LoopType = loopType;
+			this.LoopCondition = loopCondition;
+			if (this.LoopType != Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.InfiniteLoop)
 			{
-				dummyVar0 = loopBody.Remove(this.get_LoopCondition());
+				loopBody.Remove(this.LoopCondition);
 			}
 			this.DetermineLoopBodyBlock(entry, loopBody);
-			this.RedirectChildrenToNewParent(this.GetLoopChildrenCollection());
+			base.RedirectChildrenToNewParent(this.GetLoopChildrenCollection());
 			this.FixLoopCondition(typeSystem);
-			return;
 		}
 
 		private void DetermineLoopBodyBlock(ILogicalConstruct entry, HashSet<ILogicalConstruct> loopBodyNodes)
 		{
-			this.set_LoopBodyBlock(null);
-			if (loopBodyNodes.get_Count() > 0)
+			this.LoopBodyBlock = null;
+			if (loopBodyNodes.Count > 0)
 			{
-				if (this.get_LoopType() != 1)
+				if (this.LoopType != Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.PreTestedLoop)
 				{
 					if (!loopBodyNodes.Contains(entry))
 					{
 						throw new Exception("Invalid entry of loop body.");
 					}
-					this.set_LoopBodyBlock(new BlockLogicalConstruct(entry, loopBodyNodes));
+					this.LoopBodyBlock = new BlockLogicalConstruct(entry, loopBodyNodes);
 					return;
 				}
-				V_0 = this.get_LoopCondition().get_TrueSuccessor();
-				if (V_0 == null || !loopBodyNodes.Contains(V_0))
+				ILogicalConstruct trueSuccessor = this.LoopCondition.TrueSuccessor;
+				if (trueSuccessor == null || !loopBodyNodes.Contains(trueSuccessor))
 				{
-					V_0 = this.get_LoopCondition().get_FalseSuccessor();
+					trueSuccessor = this.LoopCondition.FalseSuccessor;
 				}
-				if (V_0 == null || !loopBodyNodes.Contains(V_0))
+				if (trueSuccessor == null || !loopBodyNodes.Contains(trueSuccessor))
 				{
 					throw new Exception("Invalid entry of loop body.");
 				}
-				this.set_LoopBodyBlock(new BlockLogicalConstruct(V_0, loopBodyNodes));
+				this.LoopBodyBlock = new BlockLogicalConstruct(trueSuccessor, loopBodyNodes);
 			}
-			return;
 		}
 
 		private void FixLoopCondition(TypeSystem typeSystem)
 		{
-			if (this.get_LoopType() == Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.InfiniteLoop)
+			if (this.LoopType == Telerik.JustDecompiler.Decompiler.LogicFlow.Loops.LoopType.InfiniteLoop)
 			{
 				return;
 			}
-			if (this.get_LoopCondition().get_TrueSuccessor() == null)
+			if (this.LoopCondition.TrueSuccessor == null)
 			{
-				this.get_LoopCondition().Negate(typeSystem);
+				this.LoopCondition.Negate(typeSystem);
 			}
-			if (this.get_LoopCondition().get_TrueSuccessor() == null)
+			if (this.LoopCondition.TrueSuccessor == null)
 			{
 				throw new ArgumentException("The loop condition must have a true successor inside of the loop");
 			}
-			return;
 		}
 
 		private ICollection<ILogicalConstruct> GetLoopChildrenCollection()
 		{
-			V_0 = new List<ILogicalConstruct>();
-			if (this.get_LoopBodyBlock() != null)
+			List<ILogicalConstruct> logicalConstructs = new List<ILogicalConstruct>();
+			if (this.LoopBodyBlock != null)
 			{
-				V_0.Add(this.get_LoopBodyBlock());
+				logicalConstructs.Add(this.LoopBodyBlock);
 			}
-			if (this.get_LoopCondition() != null)
+			if (this.LoopCondition != null)
 			{
-				V_0.Add(this.get_LoopCondition());
+				logicalConstructs.Add(this.LoopCondition);
 			}
-			return V_0;
+			return logicalConstructs;
 		}
 
 		protected override string ToString(string constructName, HashSet<CFGBlockLogicalConstruct> printedBlocks, LogicalFlowBuilderContext context)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append(this.get_LoopType());
-			dummyVar1 = V_0.AppendLine("LogicalConstruct");
-			dummyVar2 = V_0.AppendLine("{");
-			V_2 = this.GetSortedArrayFromCollection<ISingleEntrySubGraph>(this.get_Children());
-			V_3 = 0;
-			while (V_3 < (int)V_2.Length)
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(this.LoopType);
+			stringBuilder.AppendLine("LogicalConstruct");
+			stringBuilder.AppendLine("{");
+			ILogicalConstruct[] sortedArrayFromCollection = base.GetSortedArrayFromCollection<ISingleEntrySubGraph>(this.Children);
+			for (int i = 0; i < (int)sortedArrayFromCollection.Length; i++)
 			{
-				V_4 = (LogicalConstructBase)V_2[V_3];
-				stackVariable27 = V_4.ToString(context);
-				stackVariable29 = new String[1];
-				stackVariable29[0] = Environment.get_NewLine();
-				V_5 = stackVariable27.Split(stackVariable29, 1);
-				V_6 = 0;
-				while (V_6 < (int)V_5.Length)
+				LogicalConstructBase logicalConstructBase = (LogicalConstructBase)sortedArrayFromCollection[i];
+				string[] strArray = logicalConstructBase.ToString(context).Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+				for (int j = 0; j < (int)strArray.Length; j++)
 				{
-					V_7 = V_5[V_6];
-					dummyVar3 = V_0.Append('\t');
-					dummyVar4 = V_0.AppendLine(V_7);
-					V_6 = V_6 + 1;
+					string str = strArray[j];
+					stringBuilder.Append('\t');
+					stringBuilder.AppendLine(str);
 				}
-				printedBlocks.UnionWith(V_4.get_CFGBlocks());
-				V_3 = V_3 + 1;
+				printedBlocks.UnionWith(logicalConstructBase.CFGBlocks);
 			}
-			V_1 = String.Format("\tFollowNode: {0}", this.NodeILOffset(context, this.get_CFGFollowNode()));
-			dummyVar5 = V_0.AppendLine(V_1);
-			dummyVar6 = V_0.AppendLine("}");
-			return V_0.ToString();
+			string str1 = String.Format("\tFollowNode: {0}", base.NodeILOffset(context, base.CFGFollowNode));
+			stringBuilder.AppendLine(str1);
+			stringBuilder.AppendLine("}");
+			return stringBuilder.ToString();
 		}
 	}
 }

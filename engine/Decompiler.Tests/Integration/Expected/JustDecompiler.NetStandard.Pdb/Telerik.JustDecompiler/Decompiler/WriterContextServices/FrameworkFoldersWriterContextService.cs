@@ -1,6 +1,7 @@
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Languages;
@@ -9,10 +10,8 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 {
 	public class FrameworkFoldersWriterContextService : BaseWriterContextService
 	{
-		public FrameworkFoldersWriterContextService(IDecompilationCacheService cacheService)
+		public FrameworkFoldersWriterContextService(IDecompilationCacheService cacheService) : base(cacheService, false)
 		{
-			base(cacheService, false);
-			return;
 		}
 
 		public override AssemblySpecificContext GetAssemblyContext(AssemblyDefinition assembly, ILanguage language)
@@ -22,41 +21,33 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		private DecompiledType GetDecompiledType(IMemberDefinition member, ILanguage language)
 		{
-			if (member as TypeDefinition != null)
+			DecompiledType decompiledType = new DecompiledType((member is TypeDefinition ? member as TypeDefinition : member.get_DeclaringType()));
+			if (!(member is MethodDefinition))
 			{
-				stackVariable3 = member as TypeDefinition;
-			}
-			else
-			{
-				stackVariable3 = member.get_DeclaringType();
-			}
-			V_0 = new DecompiledType(stackVariable3);
-			if (member as MethodDefinition == null)
-			{
-				if (member as PropertyDefinition == null)
+				if (!(member is PropertyDefinition))
 				{
 					throw new NotSupportedException("FrameworkFolderWriterContext service supports only methods and properties.");
 				}
-				V_3 = member as PropertyDefinition;
-				if (V_3.get_GetMethod() != null)
+				PropertyDefinition propertyDefinition = member as PropertyDefinition;
+				if (propertyDefinition.get_GetMethod() != null)
 				{
-					V_4 = Utilities.TryGetDecompiledMember(V_3.get_GetMethod(), V_0.get_TypeContext(), language);
-					V_0.get_DecompiledMembers().Add(V_3.get_GetMethod().get_FullName(), V_4);
+					DecompiledMember decompiledMember = Utilities.TryGetDecompiledMember(propertyDefinition.get_GetMethod(), decompiledType.TypeContext, language);
+					decompiledType.DecompiledMembers.Add(propertyDefinition.get_GetMethod().get_FullName(), decompiledMember);
 				}
-				if (V_3.get_SetMethod() != null)
+				if (propertyDefinition.get_SetMethod() != null)
 				{
-					V_5 = Utilities.TryGetDecompiledMember(V_3.get_SetMethod(), V_0.get_TypeContext(), language);
-					V_0.get_DecompiledMembers().Add(V_3.get_SetMethod().get_FullName(), V_5);
+					DecompiledMember decompiledMember1 = Utilities.TryGetDecompiledMember(propertyDefinition.get_SetMethod(), decompiledType.TypeContext, language);
+					decompiledType.DecompiledMembers.Add(propertyDefinition.get_SetMethod().get_FullName(), decompiledMember1);
 				}
 			}
 			else
 			{
-				V_1 = member as MethodDefinition;
-				V_2 = Utilities.TryGetDecompiledMember(V_1, V_0.get_TypeContext(), language);
-				V_0.get_DecompiledMembers().Add(V_1.get_FullName(), V_2);
+				MethodDefinition methodDefinition = member as MethodDefinition;
+				DecompiledMember decompiledMember2 = Utilities.TryGetDecompiledMember(methodDefinition, decompiledType.TypeContext, language);
+				decompiledType.DecompiledMembers.Add(methodDefinition.get_FullName(), decompiledMember2);
 			}
-			this.AddGeneratedFilterMethodsToDecompiledType(V_0, V_0.get_TypeContext(), language);
-			return V_0;
+			base.AddGeneratedFilterMethodsToDecompiledType(decompiledType, decompiledType.TypeContext, language);
+			return decompiledType;
 		}
 
 		public override ModuleSpecificContext GetModuleContext(ModuleDefinition module, ILanguage language)
@@ -66,27 +57,18 @@ namespace Telerik.JustDecompiler.Decompiler.WriterContextServices
 
 		public override WriterContext GetWriterContext(IMemberDefinition member, ILanguage language)
 		{
-			V_0 = new AssemblySpecificContext();
-			V_1 = new ModuleSpecificContext();
-			V_2 = new TypeSpecificContext(Utilities.GetDeclaringTypeOrSelf(member));
-			stackVariable8 = this.GetDecompiledType(member, language);
-			V_3 = new Dictionary<string, MethodSpecificContext>();
-			V_4 = new Dictionary<string, Statement>();
-			V_5 = stackVariable8.get_DecompiledMembers().GetEnumerator();
-			try
+			AssemblySpecificContext assemblySpecificContext = new AssemblySpecificContext();
+			ModuleSpecificContext moduleSpecificContext = new ModuleSpecificContext();
+			TypeSpecificContext typeSpecificContext = new TypeSpecificContext(Utilities.GetDeclaringTypeOrSelf(member));
+			DecompiledType decompiledType = this.GetDecompiledType(member, language);
+			Dictionary<string, MethodSpecificContext> strs = new Dictionary<string, MethodSpecificContext>();
+			Dictionary<string, Statement> strs1 = new Dictionary<string, Statement>();
+			foreach (KeyValuePair<string, DecompiledMember> decompiledMember in decompiledType.DecompiledMembers)
 			{
-				while (V_5.MoveNext())
-				{
-					V_6 = V_5.get_Current();
-					V_3.Add(V_6.get_Key(), V_6.get_Value().get_Context());
-					V_4.Add(V_6.get_Key(), V_6.get_Value().get_Statement());
-				}
+				strs.Add(decompiledMember.Key, decompiledMember.Value.Context);
+				strs1.Add(decompiledMember.Key, decompiledMember.Value.Statement);
 			}
-			finally
-			{
-				((IDisposable)V_5).Dispose();
-			}
-			return new WriterContext(V_0, V_1, V_2, V_3, V_4);
+			return new WriterContext(assemblySpecificContext, moduleSpecificContext, typeSpecificContext, strs, strs1);
 		}
 	}
 }

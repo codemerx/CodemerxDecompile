@@ -10,76 +10,39 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 1;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.UnsafeBlock;
 			}
 		}
 
 		public UnsafeBlockStatement(StatementCollection statements)
 		{
-			base();
-			this.set_Statements(statements);
-			V_0 = this.get_Statements().GetEnumerator();
-			try
+			base.Statements = statements;
+			foreach (Statement statement in base.Statements)
 			{
-				while (V_0.MoveNext())
-				{
-					V_0.get_Current().set_Parent(this);
-				}
+				statement.Parent = this;
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 
 		public override Statement Clone()
 		{
-			V_0 = new UnsafeBlockStatement(new StatementCollection());
-			V_1 = this.get_Statements().GetEnumerator();
-			try
+			UnsafeBlockStatement unsafeBlockStatement = new UnsafeBlockStatement(new StatementCollection());
+			foreach (Statement statement in base.Statements)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.AddStatement(V_2.Clone());
-				}
+				unsafeBlockStatement.AddStatement(statement.Clone());
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			base.CopyParentAndLabel(unsafeBlockStatement);
+			return unsafeBlockStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new UnsafeBlockStatement(new StatementCollection());
-			V_1 = this.get_Statements().GetEnumerator();
-			try
+			UnsafeBlockStatement unsafeBlockStatement = new UnsafeBlockStatement(new StatementCollection());
+			foreach (Statement statement in base.Statements)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.AddStatement(V_2.CloneStatementOnly());
-				}
+				unsafeBlockStatement.AddStatement(statement.CloneStatementOnly());
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			base.CopyParentAndLabel(unsafeBlockStatement);
+			return unsafeBlockStatement;
 		}
 	}
 }

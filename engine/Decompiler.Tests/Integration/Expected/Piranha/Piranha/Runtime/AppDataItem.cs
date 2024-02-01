@@ -19,8 +19,6 @@ namespace Piranha.Runtime
 
 		public AppDataItem()
 		{
-			base();
-			return;
 		}
 	}
 }

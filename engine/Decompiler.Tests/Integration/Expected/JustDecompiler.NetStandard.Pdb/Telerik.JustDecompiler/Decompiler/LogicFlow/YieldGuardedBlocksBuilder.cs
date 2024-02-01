@@ -1,9 +1,13 @@
 using Mono.Cecil;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.DFST;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.Exceptions;
 
 namespace Telerik.JustDecompiler.Decompiler.LogicFlow
@@ -18,9 +22,9 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		private FieldReference stateFieldRef;
 
-		private readonly List<CFGBlockLogicalConstruct> orderedCFGNodes;
+		private readonly List<CFGBlockLogicalConstruct> orderedCFGNodes = new List<CFGBlockLogicalConstruct>();
 
-		private readonly Dictionary<TryFinallyLogicalConstruct, YieldExceptionHandlerInfo> createdConstructsToIntervalMap;
+		private readonly Dictionary<TryFinallyLogicalConstruct, YieldExceptionHandlerInfo> createdConstructsToIntervalMap = new Dictionary<TryFinallyLogicalConstruct, YieldExceptionHandlerInfo>();
 
 		private HashSet<ILogicalConstruct> newTryBody;
 
@@ -38,171 +42,141 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		public YieldGuardedBlocksBuilder(LogicalFlowBuilderContext logicalContext, DecompilationContext decompilationContext)
 		{
-			this.orderedCFGNodes = new List<CFGBlockLogicalConstruct>();
-			this.createdConstructsToIntervalMap = new Dictionary<TryFinallyLogicalConstruct, YieldExceptionHandlerInfo>();
-			base();
 			this.logicalContext = logicalContext;
-			this.methodContext = decompilationContext.get_MethodContext();
-			return;
+			this.methodContext = decompilationContext.MethodContext;
 		}
 
 		public void BuildGuardedBlocks(BlockLogicalConstruct theBlock)
 		{
-			if (this.methodContext.get_YieldData() == null)
+			if (this.methodContext.YieldData == null)
 			{
 				return;
 			}
 			this.theBlock = this.DetermineTheBlock(theBlock);
-			V_0 = this.methodContext.get_YieldData().get_FieldsInfo();
-			this.stateFieldRef = V_0.get_StateHolderField();
-			stackVariable17 = this.methodContext.get_YieldData().get_ExceptionHandlers();
-			Array.Sort<YieldExceptionHandlerInfo>(stackVariable17);
+			this.stateFieldRef = this.methodContext.YieldData.FieldsInfo.StateHolderField;
+			YieldExceptionHandlerInfo[] exceptionHandlers = this.methodContext.YieldData.ExceptionHandlers;
+			Array.Sort<YieldExceptionHandlerInfo>(exceptionHandlers);
 			this.GetOrderedCFGNodes();
-			V_1 = stackVariable17;
-			V_2 = 0;
-			while (V_2 < (int)V_1.Length)
+			YieldExceptionHandlerInfo[] yieldExceptionHandlerInfoArray = exceptionHandlers;
+			for (int i = 0; i < (int)yieldExceptionHandlerInfoArray.Length; i++)
 			{
-				this.GenerateTryFinallyHandler(V_1[V_2]);
-				V_2 = V_2 + 1;
+				this.GenerateTryFinallyHandler(yieldExceptionHandlerInfoArray[i]);
 			}
-			return;
 		}
 
 		private void BuildTryBody(YieldExceptionHandlerInfo handlerInfo)
 		{
 			this.newTryBody = new HashSet<ILogicalConstruct>();
-			dummyVar0 = this.newTryBody.Add(this.entryOfTry);
+			this.newTryBody.Add(this.entryOfTry);
 			this.newFinallyBody = null;
-			V_0 = new HashSet<ILogicalConstruct>();
-			V_1 = new Queue<ILogicalConstruct>();
-			V_2 = this.entryOfTry.get_SameParentSuccessors().GetEnumerator();
-			try
+			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>();
+			Queue<ILogicalConstruct> logicalConstructs1 = new Queue<ILogicalConstruct>();
+			foreach (ILogicalConstruct sameParentSuccessor in this.entryOfTry.SameParentSuccessors)
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = (ILogicalConstruct)V_2.get_Current();
-					V_1.Enqueue(V_3);
-				}
+				logicalConstructs1.Enqueue(sameParentSuccessor);
 			}
-			finally
+			while (logicalConstructs1.Count > 0)
 			{
-				((IDisposable)V_2).Dispose();
-			}
-			while (V_1.get_Count() > 0)
-			{
-				V_4 = V_1.Dequeue();
-				if (!V_0.Add(V_4) || this.finallyBlocks.Contains(V_4))
+				ILogicalConstruct logicalConstruct = logicalConstructs1.Dequeue();
+				if (!logicalConstructs.Add(logicalConstruct) || this.finallyBlocks.Contains(logicalConstruct))
 				{
 					continue;
 				}
-				this.ProcessCurrentNode(handlerInfo, V_1, V_4);
+				this.ProcessCurrentNode(handlerInfo, logicalConstructs1, logicalConstruct);
 			}
-			return;
 		}
 
 		private void CleanUpOrderedNodes(TryFinallyLogicalConstruct theNewTryConstruct)
 		{
-			V_0 = theNewTryConstruct.get_CFGBlocks().GetEnumerator();
-			try
+			foreach (CFGBlockLogicalConstruct cFGBlock in theNewTryConstruct.CFGBlocks)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					dummyVar0 = this.orderedCFGNodes.Remove(V_1);
-				}
+				this.orderedCFGNodes.Remove(cFGBlock);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void DetachFromLogicalTree(CFGBlockLogicalConstruct node)
 		{
-			if (node.get_CFGPredecessors().get_Count() > 0 || node.get_CFGSuccessors().get_Count() > 0)
+			if (node.CFGPredecessors.Count > 0 || node.CFGSuccessors.Count > 0)
 			{
 				throw new Exception("This node cannot be detached from the logical tree.");
 			}
-			dummyVar0 = node.get_Parent().get_Children().Remove(node);
-			V_0 = this.logicalContext.get_CFGBlockToLogicalConstructMap().get_Item(node.get_TheBlock());
-			if ((int)V_0.Length == 1)
+			node.Parent.Children.Remove(node);
+			CFGBlockLogicalConstruct[] item = this.logicalContext.CFGBlockToLogicalConstructMap[node.TheBlock];
+			if ((int)item.Length == 1)
 			{
-				if (V_0[0] != node)
+				if (item[0] != node)
 				{
 					throw new Exception("Logical tree is inconsistent.");
 				}
-				dummyVar1 = this.logicalContext.get_CFGBlockToLogicalConstructMap().Remove(node.get_TheBlock());
+				this.logicalContext.CFGBlockToLogicalConstructMap.Remove(node.TheBlock);
 			}
-			V_1 = new CFGBlockLogicalConstruct[(int)V_0.Length - 1];
-			V_2 = 0;
-			V_3 = 0;
-			while (V_2 < (int)V_0.Length)
+			CFGBlockLogicalConstruct[] cFGBlockLogicalConstructArray = new CFGBlockLogicalConstruct[(int)item.Length - 1];
+			int num = 0;
+			int num1 = 0;
+			while (num < (int)item.Length)
 			{
-				if (V_0[V_2] != node)
+				if (item[num] != node)
 				{
-					if (V_3 == (int)V_0.Length)
+					if (num1 == (int)item.Length)
 					{
 						throw new Exception("Logical tree is inconsistent.");
 					}
-					V_1[V_3] = V_0[V_2];
+					cFGBlockLogicalConstructArray[num1] = item[num];
 				}
 				else
 				{
-					V_3 = V_3 - 1;
+					num1--;
 				}
-				V_2 = V_2 + 1;
-				V_3 = V_3 + 1;
+				num++;
+				num1++;
 			}
-			this.logicalContext.get_CFGBlockToLogicalConstructMap().set_Item(node.get_TheBlock(), V_1);
-			return;
+			this.logicalContext.CFGBlockToLogicalConstructMap[node.TheBlock] = cFGBlockLogicalConstructArray;
 		}
 
 		private BlockLogicalConstruct DetermineTheBlock(BlockLogicalConstruct theBlock)
 		{
-			if (theBlock.get_Entry() as TryFaultLogicalConstruct == null || theBlock.get_Children().get_Count() > 2)
+			if (!(theBlock.Entry is TryFaultLogicalConstruct) || theBlock.Children.Count > 2)
 			{
 				return theBlock;
 			}
-			return (theBlock.get_Entry() as TryFaultLogicalConstruct).get_Try();
+			return (theBlock.Entry as TryFaultLogicalConstruct).Try;
 		}
 
 		private BlockLogicalConstruct GenerateFinallyBlock()
 		{
-			V_0 = this.ProcessFinallyNode(this.finallyEntryBlock, this.disposeCallBlock);
-			dummyVar0 = V_0.RemoveFromPredecessors(this.conditionBlock);
-			dummyVar1 = this.conditionBlock.RemoveFromSuccessors(V_0);
-			stackVariable15 = this.logicalContext;
-			V_2 = stackVariable15.get_MaxBlockIndex() + 1;
-			stackVariable15.set_MaxBlockIndex(V_2);
-			V_1 = new EmptyBlockLogicalConstruct(V_2);
-			V_1.AddToPredecessors(this.disposeCallBlock);
-			V_1.AddToPredecessors(this.conditionBlock);
-			this.disposeCallBlock.AddToSuccessors(V_1);
-			this.conditionBlock.AddToSuccessors(V_1);
-			V_1.set_Parent(this.finallyEntryBlock.get_Parent());
-			dummyVar2 = V_1.get_Parent().get_Children().Add(V_1);
-			V_3 = 0;
-			while (V_3 < (int)this.conditionBlock.get_TheBlock().get_Successors().Length)
+			CFGBlockLogicalConstruct cFGBlockLogicalConstruct = this.ProcessFinallyNode(this.finallyEntryBlock, this.disposeCallBlock);
+			cFGBlockLogicalConstruct.RemoveFromPredecessors(this.conditionBlock);
+			this.conditionBlock.RemoveFromSuccessors(cFGBlockLogicalConstruct);
+			LogicalFlowBuilderContext logicalFlowBuilderContext = this.logicalContext;
+			int maxBlockIndex = logicalFlowBuilderContext.MaxBlockIndex + 1;
+			logicalFlowBuilderContext.MaxBlockIndex = maxBlockIndex;
+			EmptyBlockLogicalConstruct emptyBlockLogicalConstruct = new EmptyBlockLogicalConstruct(maxBlockIndex);
+			emptyBlockLogicalConstruct.AddToPredecessors(this.disposeCallBlock);
+			emptyBlockLogicalConstruct.AddToPredecessors(this.conditionBlock);
+			this.disposeCallBlock.AddToSuccessors(emptyBlockLogicalConstruct);
+			this.conditionBlock.AddToSuccessors(emptyBlockLogicalConstruct);
+			emptyBlockLogicalConstruct.Parent = this.finallyEntryBlock.Parent;
+			emptyBlockLogicalConstruct.Parent.Children.Add(emptyBlockLogicalConstruct);
+			for (int i = 0; i < (int)this.conditionBlock.TheBlock.Successors.Length; i++)
 			{
-				if (InstructionBlock.op_Equality(this.conditionBlock.get_TheBlock().get_Successors()[V_3], V_0.get_TheBlock()))
+				if (this.conditionBlock.TheBlock.Successors[i] == cFGBlockLogicalConstruct.TheBlock)
 				{
-					this.conditionBlock.get_TheBlock().get_Successors()[V_3] = null;
+					this.conditionBlock.TheBlock.Successors[i] = null;
 				}
-				V_3 = V_3 + 1;
 			}
-			dummyVar3 = this.finallyBlocks.Add(V_1);
+			this.finallyBlocks.Add(emptyBlockLogicalConstruct);
 			return new BlockLogicalConstruct(this.finallyEntryBlock, this.finallyBlocks);
 		}
 
 		private void GenerateTryFinallyHandler(YieldExceptionHandlerInfo handlerInfo)
 		{
+			BlockLogicalConstruct blockLogicalConstruct;
 			this.finallyBlocks = new HashSet<ILogicalConstruct>();
-			this.entryOfTry = this.GetStateBeginBlockConstruct(handlerInfo.get_TryStates());
+			this.entryOfTry = this.GetStateBeginBlockConstruct(handlerInfo.TryStates);
 			this.BuildTryBody(handlerInfo);
-			if (handlerInfo.get_HandlerType() != YieldExceptionHandlerType.Method)
+			if (handlerInfo.HandlerType != YieldExceptionHandlerType.Method)
 			{
-				V_0 = this.GenerateFinallyBlock();
+				blockLogicalConstruct = this.GenerateFinallyBlock();
 			}
 			else
 			{
@@ -212,445 +186,350 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 				}
 				this.RemoveExcessNodesFromTheTryBlock();
 				this.ProcessFinallyNodes();
-				stackVariable31 = this.newFinallyBody;
-				stackVariable33 = new ILogicalConstruct[1];
-				stackVariable33[0] = this.newFinallyBody;
-				V_0 = new BlockLogicalConstruct(stackVariable31, stackVariable33);
+				blockLogicalConstruct = new BlockLogicalConstruct(this.newFinallyBody, new ILogicalConstruct[] { this.newFinallyBody });
 			}
-			V_1 = new TryFinallyLogicalConstruct(new BlockLogicalConstruct(this.entryOfTry, this.newTryBody), V_0);
-			this.createdConstructsToIntervalMap.set_Item(V_1, handlerInfo);
-			this.CleanUpOrderedNodes(V_1);
-			return;
+			TryFinallyLogicalConstruct tryFinallyLogicalConstruct = new TryFinallyLogicalConstruct(new BlockLogicalConstruct(this.entryOfTry, this.newTryBody), blockLogicalConstruct);
+			this.createdConstructsToIntervalMap[tryFinallyLogicalConstruct] = handlerInfo;
+			this.CleanUpOrderedNodes(tryFinallyLogicalConstruct);
 		}
 
 		private void GetOrderedCFGNodes()
 		{
-			V_0 = DFSTBuilder.BuildTree(this.theBlock).get_ReversePostOrder().GetEnumerator();
-			try
+			foreach (DFSTNode reversePostOrder in DFSTBuilder.BuildTree(this.theBlock).ReversePostOrder)
 			{
-				while (V_0.MoveNext())
+				CFGBlockLogicalConstruct construct = reversePostOrder.Construct as CFGBlockLogicalConstruct;
+				if (construct == null)
 				{
-					V_1 = V_0.get_Current().get_Construct() as CFGBlockLogicalConstruct;
-					if (V_1 == null)
-					{
-						continue;
-					}
-					this.orderedCFGNodes.Add(V_1);
+					continue;
 				}
+				this.orderedCFGNodes.Add(construct);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private CFGBlockLogicalConstruct GetStateBeginBlockConstruct(HashSet<int> tryStates)
 		{
-			V_0 = 0;
-			while (V_0 < this.orderedCFGNodes.get_Count())
+			int num;
+			for (int i = 0; i < this.orderedCFGNodes.Count; i++)
 			{
-				V_1 = this.orderedCFGNodes.get_Item(V_0);
-				V_2 = V_1.get_LogicalConstructExpressions();
-				V_3 = 0;
-				while (V_3 < V_2.get_Count())
+				CFGBlockLogicalConstruct item = this.orderedCFGNodes[i];
+				List<Expression> logicalConstructExpressions = item.LogicalConstructExpressions;
+				for (int j = 0; j < logicalConstructExpressions.Count; j++)
 				{
-					if (this.TryGetStateAssignValue(V_2.get_Item(V_3), out V_4) && tryStates.Contains(V_4))
+					if (this.TryGetStateAssignValue(logicalConstructExpressions[j], out num) && tryStates.Contains(num))
 					{
-						if (V_3 == 0)
+						if (j == 0)
 						{
-							return V_1;
+							return item;
 						}
-						V_5 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, V_1, V_3);
-						this.orderedCFGNodes.set_Item(V_0, V_5.get_Key());
-						this.orderedCFGNodes.Insert(V_0 + 1, V_5.get_Value());
-						return V_5.get_Value();
+						KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct> keyValuePair = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, item, j);
+						this.orderedCFGNodes[i] = keyValuePair.Key;
+						this.orderedCFGNodes.Insert(i + 1, keyValuePair.Value);
+						return keyValuePair.Value;
 					}
-					V_3 = V_3 + 1;
 				}
-				V_0 = V_0 + 1;
 			}
 			throw new Exception("Invalid state value");
 		}
 
 		private void ProcessCurrentNode(YieldExceptionHandlerInfo handlerInfo, Queue<ILogicalConstruct> bfsQueue, ILogicalConstruct currentNode)
 		{
-			if (currentNode as CFGBlockLogicalConstruct == null)
+			int num;
+			CFGBlockLogicalConstruct key;
+			YieldExceptionHandlerInfo yieldExceptionHandlerInfo;
+			if (currentNode is CFGBlockLogicalConstruct)
 			{
-				if (currentNode as TryFinallyLogicalConstruct != null && this.createdConstructsToIntervalMap.TryGetValue(currentNode as TryFinallyLogicalConstruct, out V_10) && V_10.get_TryStates().IsProperSupersetOf(handlerInfo.get_TryStates()))
+				CFGBlockLogicalConstruct value = currentNode as CFGBlockLogicalConstruct;
+				for (int i = 0; i < value.LogicalConstructExpressions.Count; i++)
 				{
-					throw new Exception("This try/finally construct cannot be nested in the current construct");
-				}
-			}
-			else
-			{
-				V_0 = currentNode as CFGBlockLogicalConstruct;
-				V_1 = 0;
-				while (V_1 < V_0.get_LogicalConstructExpressions().get_Count())
-				{
-					V_2 = V_0.get_LogicalConstructExpressions().get_Item(V_1);
-					if (!this.TryGetStateAssignValue(V_2, out V_3))
+					Expression item = value.LogicalConstructExpressions[i];
+					if (this.TryGetStateAssignValue(item, out num))
 					{
-						if (handlerInfo.get_HandlerType() == YieldExceptionHandlerType.Method && V_2.get_CodeNodeType() == 19 && (object)(V_2 as MethodInvocationExpression).get_MethodExpression().get_MethodDefinition() == (object)handlerInfo.get_FinallyMethodDefinition())
+						if (!handlerInfo.TryStates.Contains(num))
 						{
-							if (V_0.get_LogicalConstructExpressions().get_Count() == 1)
-							{
-								if (this.newFinallyBody == null)
-								{
-									this.newFinallyBody = V_0;
-								}
-								dummyVar0 = this.finallyBlocks.Add(this.newFinallyBody);
-								dummyVar1 = this.orderedCFGNodes.Remove(V_0);
-								return;
-							}
-							if (V_1 != 0)
-							{
-								if (V_1 >= V_0.get_LogicalConstructExpressions().get_Count() - 1)
-								{
-									V_8 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, V_0, V_1);
-									dummyVar3 = this.newTryBody.Add(V_8.get_Key());
-									V_4 = V_8.get_Value();
-									dummyVar4 = this.orderedCFGNodes.Remove(V_0);
-								}
-								else
-								{
-									V_6 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, V_0, V_1);
-									dummyVar2 = this.newTryBody.Add(V_6.get_Key());
-									V_7 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, V_6.get_Value(), 1);
-									V_4 = V_7.get_Key();
-									this.orderedCFGNodes.set_Item(this.orderedCFGNodes.IndexOf(V_0), V_7.get_Value());
-								}
-							}
-							else
-							{
-								V_5 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, V_0, V_1 + 1);
-								V_4 = V_5.get_Key();
-								this.orderedCFGNodes.set_Item(this.orderedCFGNodes.IndexOf(V_0), V_5.get_Value());
-							}
-							if (this.newFinallyBody == null)
-							{
-								this.newFinallyBody = V_4;
-							}
-							dummyVar5 = this.finallyBlocks.Add(V_4);
-							return;
-						}
-					}
-					else
-					{
-						if (!handlerInfo.get_TryStates().Contains(V_3))
-						{
-							if (handlerInfo.get_HandlerType() == YieldExceptionHandlerType.Method || !this.TryProcessConditionalDisposeHandler(handlerInfo, V_0))
+							if (handlerInfo.HandlerType == YieldExceptionHandlerType.Method || !this.TryProcessConditionalDisposeHandler(handlerInfo, value))
 							{
 								throw new Exception("Invalid state value");
 							}
 							return;
 						}
 					}
-					V_1 = V_1 + 1;
+					else if (handlerInfo.HandlerType == YieldExceptionHandlerType.Method && item.CodeNodeType == CodeNodeType.MethodInvocationExpression && (object)(item as MethodInvocationExpression).MethodExpression.MethodDefinition == (object)handlerInfo.FinallyMethodDefinition)
+					{
+						if (value.LogicalConstructExpressions.Count == 1)
+						{
+							if (this.newFinallyBody == null)
+							{
+								this.newFinallyBody = value;
+							}
+							this.finallyBlocks.Add(this.newFinallyBody);
+							this.orderedCFGNodes.Remove(value);
+							return;
+						}
+						if (i == 0)
+						{
+							KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct> keyValuePair = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, value, i + 1);
+							key = keyValuePair.Key;
+							this.orderedCFGNodes[this.orderedCFGNodes.IndexOf(value)] = keyValuePair.Value;
+						}
+						else if (i >= value.LogicalConstructExpressions.Count - 1)
+						{
+							KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct> keyValuePair1 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, value, i);
+							this.newTryBody.Add(keyValuePair1.Key);
+							key = keyValuePair1.Value;
+							this.orderedCFGNodes.Remove(value);
+						}
+						else
+						{
+							KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct> keyValuePair2 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, value, i);
+							this.newTryBody.Add(keyValuePair2.Key);
+							KeyValuePair<CFGBlockLogicalConstruct, CFGBlockLogicalConstruct> keyValuePair3 = LogicalFlowUtilities.SplitCFGBlockAt(this.logicalContext, keyValuePair2.Value, 1);
+							key = keyValuePair3.Key;
+							this.orderedCFGNodes[this.orderedCFGNodes.IndexOf(value)] = keyValuePair3.Value;
+						}
+						if (this.newFinallyBody == null)
+						{
+							this.newFinallyBody = key;
+						}
+						this.finallyBlocks.Add(key);
+						return;
+					}
 				}
 			}
-			dummyVar6 = this.newTryBody.Add(currentNode);
-			V_11 = currentNode.get_SameParentSuccessors().GetEnumerator();
-			try
+			else if (currentNode is TryFinallyLogicalConstruct && this.createdConstructsToIntervalMap.TryGetValue(currentNode as TryFinallyLogicalConstruct, out yieldExceptionHandlerInfo) && yieldExceptionHandlerInfo.TryStates.IsProperSupersetOf(handlerInfo.TryStates))
 			{
-				while (V_11.MoveNext())
-				{
-					V_12 = (ILogicalConstruct)V_11.get_Current();
-					bfsQueue.Enqueue(V_12);
-				}
+				throw new Exception("This try/finally construct cannot be nested in the current construct");
 			}
-			finally
+			this.newTryBody.Add(currentNode);
+			foreach (ILogicalConstruct sameParentSuccessor in currentNode.SameParentSuccessors)
 			{
-				((IDisposable)V_11).Dispose();
+				bfsQueue.Enqueue(sameParentSuccessor);
 			}
-			return;
 		}
 
 		private void ProcessFinallyNode(CFGBlockLogicalConstruct finallyCFGBlock)
 		{
-			dummyVar0 = this.ProcessFinallyNode(finallyCFGBlock, finallyCFGBlock);
-			return;
+			this.ProcessFinallyNode(finallyCFGBlock, finallyCFGBlock);
 		}
 
 		private CFGBlockLogicalConstruct ProcessFinallyNode(CFGBlockLogicalConstruct finallyBlockEntry, CFGBlockLogicalConstruct finallyBlockEnd)
 		{
-			V_1 = finallyBlockEntry.get_SameParentPredecessors().GetEnumerator();
-			try
+			CFGBlockLogicalConstruct current;
+			foreach (ILogicalConstruct sameParentPredecessor in finallyBlockEntry.SameParentPredecessors)
 			{
-				while (V_1.MoveNext())
+				if (this.newTryBody.Contains(sameParentPredecessor))
 				{
-					V_2 = (ILogicalConstruct)V_1.get_Current();
-					if (this.newTryBody.Contains(V_2))
-					{
-						continue;
-					}
-					throw new Exception("Invalid entry to the finally block");
+					continue;
 				}
+				throw new Exception("Invalid entry to the finally block");
 			}
-			finally
+			using (IEnumerator<CFGBlockLogicalConstruct> enumerator = finallyBlockEnd.CFGSuccessors.GetEnumerator())
 			{
-				((IDisposable)V_1).Dispose();
-			}
-			V_3 = finallyBlockEnd.get_CFGSuccessors().GetEnumerator();
-			try
-			{
-				dummyVar0 = V_3.MoveNext();
-				V_0 = V_3.get_Current();
-				if (V_3.MoveNext())
+				enumerator.MoveNext();
+				current = enumerator.Current;
+				if (enumerator.MoveNext())
 				{
 					throw new Exception("Invalid count of successors");
 				}
 			}
-			finally
+			foreach (CFGBlockLogicalConstruct cFGBlockLogicalConstruct in new HashSet<CFGBlockLogicalConstruct>(finallyBlockEntry.CFGPredecessors))
 			{
-				if (V_3 != null)
+				if (cFGBlockLogicalConstruct.TheBlock != finallyBlockEntry.TheBlock && (int)cFGBlockLogicalConstruct.TheBlock.Successors.Length > 1)
 				{
-					V_3.Dispose();
+					this.ProcessMultiWayCFGPredecessor(finallyBlockEntry, cFGBlockLogicalConstruct.TheBlock, current.TheBlock);
 				}
-			}
-			V_4 = (new HashSet<CFGBlockLogicalConstruct>(finallyBlockEntry.get_CFGPredecessors())).GetEnumerator();
-			try
-			{
-				while (V_4.MoveNext())
+				for (LogicalConstructBase i = cFGBlockLogicalConstruct; i != finallyBlockEntry.Parent; i = i.Parent as LogicalConstructBase)
 				{
-					V_5 = V_4.get_Current();
-					if (InstructionBlock.op_Inequality(V_5.get_TheBlock(), finallyBlockEntry.get_TheBlock()) && (int)V_5.get_TheBlock().get_Successors().Length > 1)
-					{
-						this.ProcessMultiWayCFGPredecessor(finallyBlockEntry, V_5.get_TheBlock(), V_0.get_TheBlock());
-					}
-					V_6 = V_5;
-					while (V_6 != finallyBlockEntry.get_Parent())
-					{
-						dummyVar1 = V_6.RemoveFromSuccessors(finallyBlockEntry);
-						V_6.AddToSuccessors(V_0);
-						V_6 = V_6.get_Parent() as LogicalConstructBase;
-					}
-					V_0.AddToPredecessors(V_5);
-					dummyVar2 = finallyBlockEntry.RemoveFromPredecessors(V_5);
+					i.RemoveFromSuccessors(finallyBlockEntry);
+					i.AddToSuccessors(current);
 				}
+				current.AddToPredecessors(cFGBlockLogicalConstruct);
+				finallyBlockEntry.RemoveFromPredecessors(cFGBlockLogicalConstruct);
 			}
-			finally
-			{
-				((IDisposable)V_4).Dispose();
-			}
-			dummyVar3 = V_0.RemoveFromPredecessors(finallyBlockEnd);
-			dummyVar4 = finallyBlockEnd.RemoveFromSuccessors(V_0);
-			return V_0;
+			current.RemoveFromPredecessors(finallyBlockEnd);
+			finallyBlockEnd.RemoveFromSuccessors(current);
+			return current;
 		}
 
 		private void ProcessFinallyNodes()
 		{
-			V_0 = this.finallyBlocks.GetEnumerator();
-			try
+			foreach (CFGBlockLogicalConstruct finallyBlock in this.finallyBlocks)
 			{
-				while (V_0.MoveNext())
+				this.ProcessFinallyNode(finallyBlock);
+				if (finallyBlock == this.newFinallyBody)
 				{
-					V_1 = (CFGBlockLogicalConstruct)V_0.get_Current();
-					this.ProcessFinallyNode(V_1);
-					if (V_1 == this.newFinallyBody)
-					{
-						continue;
-					}
-					this.DetachFromLogicalTree(V_1);
+					continue;
 				}
+				this.DetachFromLogicalTree(finallyBlock);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void ProcessMultiWayCFGPredecessor(CFGBlockLogicalConstruct finallyBody, InstructionBlock theBlock, InstructionBlock theNewSuccessor)
 		{
-			V_0 = finallyBody.get_TheBlock();
-			V_2 = 0;
-			while (V_2 < (int)theBlock.get_Successors().Length)
+			SwitchData switchDatum;
+			InstructionBlock instructionBlocks = finallyBody.TheBlock;
+			for (int i = 0; i < (int)theBlock.Successors.Length; i++)
 			{
-				if (InstructionBlock.op_Equality(theBlock.get_Successors()[V_2], V_0))
+				if (theBlock.Successors[i] == instructionBlocks)
 				{
-					theBlock.get_Successors()[V_2] = theNewSuccessor;
+					theBlock.Successors[i] = theNewSuccessor;
 				}
-				V_2 = V_2 + 1;
 			}
-			if (this.methodContext.get_ControlFlowGraph().get_SwitchBlocksInformation().TryGetValue(theBlock, out V_1))
+			if (this.methodContext.ControlFlowGraph.SwitchBlocksInformation.TryGetValue(theBlock, out switchDatum))
 			{
-				V_3 = V_1.get_OrderedCasesArray();
-				V_4 = 0;
-				while (V_4 < (int)V_3.Length)
+				InstructionBlock[] orderedCasesArray = switchDatum.OrderedCasesArray;
+				for (int j = 0; j < (int)orderedCasesArray.Length; j++)
 				{
-					if (InstructionBlock.op_Equality(V_3[V_4], V_0))
+					if (orderedCasesArray[j] == instructionBlocks)
 					{
-						V_3[V_4] = theNewSuccessor;
+						orderedCasesArray[j] = theNewSuccessor;
 					}
-					V_4 = V_4 + 1;
 				}
-				if (InstructionBlock.op_Equality(V_1.get_DefaultCase(), V_0))
+				if (switchDatum.DefaultCase == instructionBlocks)
 				{
-					V_1.set_DefaultCase(theNewSuccessor);
+					switchDatum.DefaultCase = theNewSuccessor;
 				}
 			}
-			return;
 		}
 
 		private void RemoveExcessNodesFromTheTryBlock()
 		{
-			V_0 = new HashSet<ILogicalConstruct>(this.finallyBlocks);
-			V_1 = new Queue<ILogicalConstruct>(this.finallyBlocks);
-			while (V_1.get_Count() > 0)
+			HashSet<ILogicalConstruct> logicalConstructs = new HashSet<ILogicalConstruct>(this.finallyBlocks);
+			Queue<ILogicalConstruct> logicalConstructs1 = new Queue<ILogicalConstruct>(this.finallyBlocks);
+			while (logicalConstructs1.Count > 0)
 			{
-				V_2 = V_1.Dequeue().get_SameParentSuccessors().GetEnumerator();
-				try
+				foreach (ILogicalConstruct sameParentSuccessor in logicalConstructs1.Dequeue().SameParentSuccessors)
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = (ILogicalConstruct)V_2.get_Current();
-						if (V_0.Contains(V_3) || V_3 == this.entryOfTry)
-						{
-							continue;
-						}
-						dummyVar0 = V_0.Add(V_3);
-						V_1.Enqueue(V_3);
-					}
-				}
-				finally
-				{
-					((IDisposable)V_2).Dispose();
-				}
-			}
-			V_4 = V_0.GetEnumerator();
-			try
-			{
-				while (V_4.MoveNext())
-				{
-					V_5 = V_4.get_Current();
-					if (V_5 == this.entryOfTry)
+					if (logicalConstructs.Contains(sameParentSuccessor) || sameParentSuccessor == this.entryOfTry)
 					{
 						continue;
 					}
-					dummyVar1 = this.newTryBody.Remove(V_5);
+					logicalConstructs.Add(sameParentSuccessor);
+					logicalConstructs1.Enqueue(sameParentSuccessor);
 				}
 			}
-			finally
+			foreach (ILogicalConstruct logicalConstruct in logicalConstructs)
 			{
-				((IDisposable)V_4).Dispose();
+				if (logicalConstruct == this.entryOfTry)
+				{
+					continue;
+				}
+				this.newTryBody.Remove(logicalConstruct);
 			}
-			return;
 		}
 
 		private bool TryGetStateAssignValue(Expression expression, out int value)
 		{
-			if (expression.get_CodeNodeType() != 24 || !(expression as BinaryExpression).get_IsAssignmentExpression())
+			if (expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expression as BinaryExpression).IsAssignmentExpression)
 			{
 				value = -1;
 				return false;
 			}
-			V_0 = expression as BinaryExpression;
-			if (V_0.get_Left().get_CodeNodeType() != 30 || (V_0.get_Left() as FieldReferenceExpression).get_Field().Resolve() != this.stateFieldRef)
+			BinaryExpression binaryExpression = expression as BinaryExpression;
+			if (binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (binaryExpression.Left as FieldReferenceExpression).Field.Resolve() != this.stateFieldRef)
 			{
 				value = -1;
 				return false;
 			}
-			if (V_0.get_Right().get_CodeNodeType() != 22)
+			if (binaryExpression.Right.CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				throw new Exception("Incorrect value for state field");
 			}
-			value = Convert.ToInt32((V_0.get_Right() as LiteralExpression).get_Value());
+			value = Convert.ToInt32((binaryExpression.Right as LiteralExpression).Value);
 			return true;
 		}
 
 		private bool TryProcessConditionalDisposeHandler(YieldExceptionHandlerInfo yieldExceptionHandler, CFGBlockLogicalConstruct startBlock)
 		{
-			if (this.finallyBlocks.get_Count() > 0)
+			CFGBlockLogicalConstruct current;
+			MethodInvocationExpression item;
+			bool flag;
+			bool flag1;
+			bool flag2;
+			if (this.finallyBlocks.Count > 0)
 			{
 				return false;
 			}
-			if (startBlock as PartialCFGBlockLogicalConstruct == null || startBlock.get_CFGSuccessors().get_Count() != 1)
+			if (!(startBlock is PartialCFGBlockLogicalConstruct) || startBlock.CFGSuccessors.Count != 1)
 			{
 				return false;
 			}
-			if (startBlock.get_LogicalConstructExpressions().get_Count() == 0)
+			if (startBlock.LogicalConstructExpressions.Count == 0)
 			{
 				return false;
 			}
-			V_0 = startBlock.get_LogicalConstructExpressions().get_Item(0) as BinaryExpression;
-			if (V_0 == null || !V_0.get_IsAssignmentExpression() || V_0.get_Left().get_CodeNodeType() != 30 || (V_0.get_Left() as FieldReferenceExpression).get_Field().Resolve() != this.stateFieldRef || V_0.get_Right().get_CodeNodeType() != 22 || (Int32)(V_0.get_Right() as LiteralExpression).get_Value() != yieldExceptionHandler.get_NextState())
+			BinaryExpression binaryExpression = startBlock.LogicalConstructExpressions[0] as BinaryExpression;
+			if (binaryExpression == null || !binaryExpression.IsAssignmentExpression || binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (binaryExpression.Left as FieldReferenceExpression).Field.Resolve() != this.stateFieldRef || binaryExpression.Right.CodeNodeType != CodeNodeType.LiteralExpression || (Int32)(binaryExpression.Right as LiteralExpression).Value != yieldExceptionHandler.NextState)
 			{
 				return false;
 			}
-			if (startBlock.get_LogicalConstructExpressions().get_Count() != 2 || yieldExceptionHandler.get_HandlerType() != 2)
+			if (startBlock.LogicalConstructExpressions.Count == 2 && yieldExceptionHandler.HandlerType == YieldExceptionHandlerType.ConditionalDispose)
 			{
-				if (startBlock.get_LogicalConstructExpressions().get_Count() != 1 || yieldExceptionHandler.get_HandlerType() != 1)
+				BinaryExpression item1 = startBlock.LogicalConstructExpressions[1] as BinaryExpression;
+				if (item1 == null || !item1.IsAssignmentExpression || item1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item1.Left as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || item1.Right.CodeNodeType != CodeNodeType.SafeCastExpression || (item1.Right as SafeCastExpression).Expression.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)((item1.Right as SafeCastExpression).Expression as FieldReferenceExpression).Field != (object)yieldExceptionHandler.EnumeratorField)
 				{
 					return false;
 				}
 			}
-			else
+			else if (startBlock.LogicalConstructExpressions.Count != 1 || yieldExceptionHandler.HandlerType != YieldExceptionHandlerType.SimpleConditionalDispose)
 			{
-				V_6 = startBlock.get_LogicalConstructExpressions().get_Item(1) as BinaryExpression;
-				if (V_6 == null || !V_6.get_IsAssignmentExpression() || V_6.get_Left().get_CodeNodeType() != 30 || (object)(V_6.get_Left() as FieldReferenceExpression).get_Field() != (object)yieldExceptionHandler.get_DisposableField() || V_6.get_Right().get_CodeNodeType() != 33 || (V_6.get_Right() as SafeCastExpression).get_Expression().get_CodeNodeType() != 30 || (object)((V_6.get_Right() as SafeCastExpression).get_Expression() as FieldReferenceExpression).get_Field() != (object)yieldExceptionHandler.get_EnumeratorField())
+				return false;
+			}
+			IEnumerator<CFGBlockLogicalConstruct> enumerator = startBlock.CFGSuccessors.GetEnumerator();
+			using (enumerator)
+			{
+				enumerator.MoveNext();
+				current = enumerator.Current;
+			}
+			if (current.LogicalConstructExpressions.Count != 1)
+			{
+				return false;
+			}
+			BinaryExpression binaryExpression1 = current.LogicalConstructExpressions[0] as BinaryExpression;
+			if (binaryExpression1 == null || binaryExpression1.Operator != BinaryOperator.ValueEquality || binaryExpression1.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(binaryExpression1.Left as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || binaryExpression1.Right.CodeNodeType != CodeNodeType.LiteralExpression || (binaryExpression1.Right as LiteralExpression).Value != null)
+			{
+				return false;
+			}
+			CFGBlockLogicalConstruct cFGBlockLogicalConstruct = null;
+			foreach (CFGBlockLogicalConstruct cFGSuccessor in current.CFGSuccessors)
+			{
+				CFGBlockLogicalConstruct cFGBlockLogicalConstruct1 = cFGSuccessor as CFGBlockLogicalConstruct;
+				if (cFGBlockLogicalConstruct1 == null || cFGBlockLogicalConstruct1.CFGPredecessors.Count != 1)
+				{
+					continue;
+				}
+				cFGBlockLogicalConstruct = cFGBlockLogicalConstruct1;
+				if (cFGBlockLogicalConstruct == null || cFGBlockLogicalConstruct.LogicalConstructExpressions.Count != 1)
 				{
 					return false;
 				}
-			}
-			V_2 = startBlock.get_CFGSuccessors().GetEnumerator();
-			V_7 = V_2;
-			try
-			{
-				dummyVar0 = V_2.MoveNext();
-				V_1 = V_2.get_Current();
-			}
-			finally
-			{
-				if (V_7 != null)
+				item = cFGBlockLogicalConstruct.LogicalConstructExpressions[0] as MethodInvocationExpression;
+				if (item == null || !item.VirtualCall || item.MethodExpression.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item.MethodExpression.Target as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || item.MethodExpression.Method.get_Name() != "Dispose")
 				{
-					V_7.Dispose();
+					return false;
 				}
+				this.finallyEntryBlock = startBlock;
+				flag = this.finallyBlocks.Add(startBlock);
+				this.conditionBlock = current;
+				flag1 = this.finallyBlocks.Add(current);
+				this.disposeCallBlock = cFGBlockLogicalConstruct;
+				flag2 = this.finallyBlocks.Add(cFGBlockLogicalConstruct);
+				return true;
 			}
-			if (V_1.get_LogicalConstructExpressions().get_Count() != 1)
+			if (cFGBlockLogicalConstruct == null || cFGBlockLogicalConstruct.LogicalConstructExpressions.Count != 1)
 			{
 				return false;
 			}
-			V_3 = V_1.get_LogicalConstructExpressions().get_Item(0) as BinaryExpression;
-			if (V_3 == null || V_3.get_Operator() != 9 || V_3.get_Left().get_CodeNodeType() != 30 || (object)(V_3.get_Left() as FieldReferenceExpression).get_Field() != (object)yieldExceptionHandler.get_DisposableField() || V_3.get_Right().get_CodeNodeType() != 22 || (V_3.get_Right() as LiteralExpression).get_Value() != null)
-			{
-				return false;
-			}
-			V_4 = null;
-			V_8 = V_1.get_CFGSuccessors().GetEnumerator();
-			try
-			{
-				while (V_8.MoveNext())
-				{
-					V_9 = V_8.get_Current() as CFGBlockLogicalConstruct;
-					if (V_9 == null || V_9.get_CFGPredecessors().get_Count() != 1)
-					{
-						continue;
-					}
-					V_4 = V_9;
-					goto Label0;
-				}
-			}
-			finally
-			{
-				((IDisposable)V_8).Dispose();
-			}
-		Label0:
-			if (V_4 == null || V_4.get_LogicalConstructExpressions().get_Count() != 1)
-			{
-				return false;
-			}
-			V_5 = V_4.get_LogicalConstructExpressions().get_Item(0) as MethodInvocationExpression;
-			if (V_5 == null || !V_5.get_VirtualCall() || V_5.get_MethodExpression().get_Target().get_CodeNodeType() != 30 || (object)(V_5.get_MethodExpression().get_Target() as FieldReferenceExpression).get_Field() != (object)yieldExceptionHandler.get_DisposableField() || String.op_Inequality(V_5.get_MethodExpression().get_Method().get_Name(), "Dispose"))
+			item = cFGBlockLogicalConstruct.LogicalConstructExpressions[0] as MethodInvocationExpression;
+			if (item == null || !item.VirtualCall || item.MethodExpression.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(item.MethodExpression.Target as FieldReferenceExpression).Field != (object)yieldExceptionHandler.DisposableField || item.MethodExpression.Method.get_Name() != "Dispose")
 			{
 				return false;
 			}
 			this.finallyEntryBlock = startBlock;
-			dummyVar1 = this.finallyBlocks.Add(startBlock);
-			this.conditionBlock = V_1;
-			dummyVar2 = this.finallyBlocks.Add(V_1);
-			this.disposeCallBlock = V_4;
-			dummyVar3 = this.finallyBlocks.Add(V_4);
+			flag = this.finallyBlocks.Add(startBlock);
+			this.conditionBlock = current;
+			flag1 = this.finallyBlocks.Add(current);
+			this.disposeCallBlock = cFGBlockLogicalConstruct;
+			flag2 = this.finallyBlocks.Add(cFGBlockLogicalConstruct);
 			return true;
 		}
 	}

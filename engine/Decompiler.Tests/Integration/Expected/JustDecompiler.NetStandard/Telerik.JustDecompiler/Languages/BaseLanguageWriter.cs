@@ -1,16 +1,25 @@
 using Mono.Cecil;
+using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
+using Mono.Cecil.Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.External.Interfaces;
+using Telerik.JustDecompiler.XmlDocumentationReaders;
 
 namespace Telerik.JustDecompiler.Languages
 {
@@ -20,7 +29,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected IFormatter formatter;
 
-		protected Stack<IMemberDefinition> membersStack;
+		protected Stack<IMemberDefinition> membersStack = new Stack<IMemberDefinition>();
 
 		protected bool isWritingComment;
 
@@ -38,7 +47,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.writerContext.get_AssemblyContext();
+				return this.writerContext.AssemblyContext;
 			}
 		}
 
@@ -46,7 +55,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				if (this.membersStack.get_Count() <= 0 || this.membersStack.Peek() as MethodDefinition == null)
+				if (this.membersStack.Count <= 0 || !(this.membersStack.Peek() is MethodDefinition))
 				{
 					return null;
 				}
@@ -70,7 +79,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				if (this.membersStack.get_Count() <= 0)
+				if (this.membersStack.Count <= 0)
 				{
 					return null;
 				}
@@ -82,7 +91,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.writerContext.get_MethodContexts().get_Count() == 0;
+				return this.writerContext.MethodContexts.Count == 0;
 			}
 		}
 
@@ -90,7 +99,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.writerContext.get_ModuleContext();
+				return this.writerContext.ModuleContext;
 			}
 		}
 
@@ -104,87 +113,82 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return this.writerContext.get_TypeContext();
+				return this.writerContext.TypeContext;
 			}
 		}
 
 		public BaseLanguageWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
 		{
-			this.membersStack = new Stack<IMemberDefinition>();
-			base();
-			this.set_Language(language);
+			this.Language = language;
 			this.formatter = formatter;
 			this.exceptionFormatter = exceptionFormatter;
-			this.set_Settings(settings);
-			return;
+			this.Settings = settings;
 		}
 
 		protected void AddMemberAttributesOffsetSpan(uint memberToken, int startIndex, int endIndex)
 		{
 			if (startIndex < endIndex)
 			{
-				this.currentWritingInfo.get_MemberTokenToAttributesMap().Add(memberToken, new OffsetSpan(startIndex, endIndex - 1));
+				this.currentWritingInfo.MemberTokenToAttributesMap.Add(memberToken, new OffsetSpan(startIndex, endIndex - 1));
 			}
-			return;
 		}
 
 		protected void AddMemberDocumentationOffsetSpan(uint memberToken, int startIndex, int endIndex)
 		{
 			if (startIndex < endIndex)
 			{
-				this.currentWritingInfo.get_MemberTokenToDocumentationMap().Add(memberToken, new OffsetSpan(startIndex, endIndex - 1));
+				this.currentWritingInfo.MemberTokenToDocumentationMap.Add(memberToken, new OffsetSpan(startIndex, endIndex - 1));
 			}
-			return;
 		}
 
 		internal static string ConvertChar(char ch)
 		{
+			int num;
 			switch (ch)
 			{
-				case 0:
+				case '\0':
 				{
 					return "\\0";
 				}
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 5:
-				case 6:
+				case '\u0001':
+				case '\u0002':
+				case '\u0003':
+				case '\u0004':
+				case '\u0005':
+				case '\u0006':
 				{
-				Label0:
-					if (!Char.IsControl(ch) && !Char.IsSurrogate(ch) && !Char.IsWhiteSpace(ch) || ch == ' ')
+					if (!Char.IsControl(ch) && !Char.IsSurrogate(ch) && (!Char.IsWhiteSpace(ch) || ch == ' '))
 					{
 						return ch.ToString();
 					}
-					V_0 = ch;
-					return String.Concat("\\u", V_0.ToString("x4"));
+					num = ch;
+					return String.Concat("\\u", num.ToString("x4"));
 				}
-				case 7:
+				case '\a':
 				{
 					return "\\a";
 				}
-				case 8:
+				case '\b':
 				{
 					return "\\b";
 				}
-				case 9:
+				case '\t':
 				{
 					return "\\t";
 				}
-				case 10:
+				case '\n':
 				{
 					return "\\n";
 				}
-				case 11:
+				case '\v':
 				{
 					return "\\v";
 				}
-				case 12:
+				case '\f':
 				{
 					return "\\f";
 				}
-				case 13:
+				case '\r':
 				{
 					return "\\r";
 				}
@@ -192,7 +196,12 @@ namespace Telerik.JustDecompiler.Languages
 				{
 					if (ch != '\\')
 					{
-						goto Label0;
+						if (!Char.IsControl(ch) && !Char.IsSurrogate(ch) && (!Char.IsWhiteSpace(ch) || ch == ' '))
+						{
+							return ch.ToString();
+						}
+						num = ch;
+						return String.Concat("\\u", num.ToString("x4"));
 					}
 					return "\\\\";
 				}
@@ -201,77 +210,69 @@ namespace Telerik.JustDecompiler.Languages
 
 		internal static string ConvertString(string str)
 		{
-			V_0 = new StringBuilder();
-			V_1 = str;
-			V_2 = 0;
-			while (V_2 < V_1.get_Length())
+			StringBuilder stringBuilder = new StringBuilder();
+			string str1 = str;
+			for (int i = 0; i < str1.Length; i++)
 			{
-				V_3 = V_1.get_Chars(V_2);
-				if (V_3 != '\"')
+				char chr = str1[i];
+				if (chr != '\"')
 				{
-					dummyVar1 = V_0.Append(BaseLanguageWriter.ConvertChar(V_3));
+					stringBuilder.Append(BaseLanguageWriter.ConvertChar(chr));
 				}
 				else
 				{
-					dummyVar0 = V_0.Append("\\\"");
+					stringBuilder.Append("\\\"");
 				}
-				V_2 = V_2 + 1;
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		protected virtual void EndWritingComment()
 		{
 			this.isWritingComment = false;
 			this.formatter.EndWritingComment();
-			return;
 		}
 
 		protected string GetCurrentModuleTypeName(TypeReference type)
 		{
-			V_0 = type.Resolve();
-			stackVariable4 = this.get_ModuleContext().get_RenamedMembersMap();
-			V_1 = V_0.get_MetadataToken();
-			return stackVariable4.get_Item(V_1.ToUInt32());
+			TypeDefinition typeDefinition = type.Resolve();
+			return this.ModuleContext.RenamedMembersMap[typeDefinition.get_MetadataToken().ToUInt32()];
 		}
 
-		protected virtual string GetEventName(EventReference event)
+		protected virtual string GetEventName(EventReference @event)
 		{
-			V_0 = event.Resolve();
-			if (V_0 == null || !String.op_Equality(V_0.get_Module().get_FilePath(), this.get_ModuleContext().get_Module().get_FilePath()))
+			EventDefinition eventDefinition = @event.Resolve();
+			if (eventDefinition == null || !(eventDefinition.get_Module().get_FilePath() == this.ModuleContext.Module.get_FilePath()))
 			{
-				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(event.get_Name()), this.get_Language());
+				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(@event.get_Name()), this.Language);
 			}
-			stackVariable19 = this.get_ModuleContext().get_RenamedMembersMap();
-			V_1 = V_0.get_MetadataToken();
-			return stackVariable19.get_Item(V_1.ToUInt32());
+			return this.ModuleContext.RenamedMembersMap[eventDefinition.get_MetadataToken().ToUInt32()];
 		}
 
 		protected virtual string GetFieldName(FieldReference field)
 		{
-			V_0 = field.Resolve();
-			if (V_0 == null || !String.op_Equality(V_0.get_Module().get_FilePath(), this.get_ModuleContext().get_Module().get_FilePath()))
+			FieldDefinition fieldDefinition = field.Resolve();
+			if (fieldDefinition == null || !(fieldDefinition.get_Module().get_FilePath() == this.ModuleContext.Module.get_FilePath()))
 			{
-				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(field.get_Name()), this.get_Language());
+				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(field.get_Name()), this.Language);
 			}
-			if (this.get_TypeContext() != null && this.get_TypeContext().get_BackingFieldToNameMap().ContainsKey(V_0))
+			if (this.TypeContext != null && this.TypeContext.BackingFieldToNameMap.ContainsKey(fieldDefinition))
 			{
-				return this.get_TypeContext().get_BackingFieldToNameMap().get_Item(V_0);
+				return this.TypeContext.BackingFieldToNameMap[fieldDefinition];
 			}
-			stackVariable21 = this.get_ModuleContext().get_RenamedMembersMap();
-			V_1 = V_0.get_MetadataToken();
-			return stackVariable21.get_Item(V_1.ToUInt32());
+			return this.ModuleContext.RenamedMembersMap[fieldDefinition.get_MetadataToken().ToUInt32()];
 		}
 
 		private string GetGenericParameterName(GenericParameter genericParameter)
 		{
-			if (genericParameter.get_Owner() as TypeReference != null)
+			int position;
+			if (genericParameter.get_Owner() is TypeReference)
 			{
-				V_0 = genericParameter.get_Position();
-				return String.Concat("!", V_0.ToString());
+				position = genericParameter.get_Position();
+				return String.Concat("!", position.ToString());
 			}
-			V_0 = genericParameter.get_Position();
-			return String.Concat("!!", V_0.ToString());
+			position = genericParameter.get_Position();
+			return String.Concat("!!", position.ToString());
 		}
 
 		protected string GetMemberEscapedOnlyName(object memberDefinition)
@@ -280,79 +281,79 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return String.Empty;
 			}
-			if (memberDefinition as TypeReference != null)
+			if (memberDefinition is TypeReference)
 			{
-				V_0 = ((TypeReference)memberDefinition).GetElementType();
-				if (V_0.get_IsGenericParameter())
+				TypeReference elementType = ((TypeReference)memberDefinition).GetElementType();
+				if (elementType.get_IsGenericParameter())
 				{
-					return this.GetGenericParameterName((GenericParameter)V_0);
+					return this.GetGenericParameterName((GenericParameter)elementType);
 				}
-				if (V_0.get_HasGenericParameters())
+				if (elementType.get_HasGenericParameters())
 				{
-					V_1 = new StringBuilder(this.get_Language().ReplaceInvalidCharactersInIdentifier(V_0.get_Name()));
-					this.NormalizeGenericParams(V_0.get_GenericParameters(), V_1);
-					return V_1.ToString();
+					StringBuilder stringBuilder = new StringBuilder(this.Language.ReplaceInvalidCharactersInIdentifier(elementType.get_Name()));
+					this.NormalizeGenericParams(elementType.get_GenericParameters(), stringBuilder);
+					return stringBuilder.ToString();
 				}
-				if (V_0.get_IsArray())
+				if (elementType.get_IsArray())
 				{
-					V_2 = V_0 as ArrayType;
-					return String.Concat(this.GetMemberEscapedOnlyName(V_2.get_ElementType()), "[]");
+					ArrayType arrayType = elementType as ArrayType;
+					return String.Concat(this.GetMemberEscapedOnlyName(arrayType.get_ElementType()), "[]");
 				}
-				if (memberDefinition as TypeDefinition != null)
+				if (memberDefinition is TypeDefinition)
 				{
-					return ((TypeDefinition)memberDefinition).GetFriendlyMemberName(this.get_Language());
+					return ((TypeDefinition)memberDefinition).GetFriendlyMemberName(this.Language);
 				}
-				return V_0.GetFriendlyTypeName(this.get_Language(), "<", ">");
+				return elementType.GetFriendlyTypeName(this.Language, "<", ">");
 			}
-			if (memberDefinition as MethodReference == null)
+			if (!(memberDefinition is MethodReference))
 			{
-				if (memberDefinition as IMemberDefinition != null)
+				if (memberDefinition is IMemberDefinition)
 				{
-					return (memberDefinition as IMemberDefinition).GetFriendlyMemberName(this.get_Language());
+					return (memberDefinition as IMemberDefinition).GetFriendlyMemberName(this.Language);
 				}
-				if (memberDefinition as ParameterReference != null)
+				if (memberDefinition is ParameterReference)
 				{
-					return this.get_Language().ReplaceInvalidCharactersInIdentifier(((ParameterReference)memberDefinition).get_Name());
+					return this.Language.ReplaceInvalidCharactersInIdentifier(((ParameterReference)memberDefinition).get_Name());
 				}
-				if (memberDefinition as MemberReference == null)
+				if (!(memberDefinition is MemberReference))
 				{
 					return memberDefinition.ToString();
 				}
-				return this.get_Language().ReplaceInvalidCharactersInIdentifier(((MemberReference)memberDefinition).get_Name());
+				return this.Language.ReplaceInvalidCharactersInIdentifier(((MemberReference)memberDefinition).get_Name());
 			}
-			V_3 = ((MethodReference)memberDefinition).GetElementMethod();
-			if (V_3.get_HasGenericParameters())
+			MethodReference elementMethod = ((MethodReference)memberDefinition).GetElementMethod();
+			if (elementMethod.get_HasGenericParameters())
 			{
-				V_4 = new StringBuilder(this.get_Language().ReplaceInvalidCharactersInIdentifier(V_3.get_Name()));
-				this.NormalizeGenericParams(V_3.get_GenericParameters(), V_4);
-				return V_4.ToString();
+				StringBuilder stringBuilder1 = new StringBuilder(this.Language.ReplaceInvalidCharactersInIdentifier(elementMethod.get_Name()));
+				this.NormalizeGenericParams(elementMethod.get_GenericParameters(), stringBuilder1);
+				return stringBuilder1.ToString();
 			}
-			if (memberDefinition as MethodDefinition != null)
+			if (memberDefinition is MethodDefinition)
 			{
-				return (memberDefinition as MethodDefinition).GetFriendlyMemberName(this.get_Language());
+				return (memberDefinition as MethodDefinition).GetFriendlyMemberName(this.Language);
 			}
-			return this.get_Language().ReplaceInvalidCharactersInIdentifier(((MethodReference)memberDefinition).get_Name());
+			return this.Language.ReplaceInvalidCharactersInIdentifier(((MethodReference)memberDefinition).get_Name());
 		}
 
 		protected string GetMemberName(MemberReference member)
 		{
-			if (member as MethodReference != null)
+			if (member is MethodReference)
 			{
 				return this.GetMethodName(member as MethodReference);
 			}
-			if (member as FieldReference != null)
+			if (member is FieldReference)
 			{
 				return this.GetFieldName(member as FieldReference);
 			}
-			if (member as PropertyReference != null)
+			if (member is PropertyReference)
 			{
 				return this.GetPropertyName(member as PropertyReference);
 			}
-			if (member as EventReference != null)
+			if (member is EventReference)
 			{
 				return this.GetEventName(member as EventReference);
 			}
-			if (member as TypeReference == null)
+			if (!(member is TypeReference))
 			{
 				throw new NotSupportedException("Unexpected member type.");
 			}
@@ -361,81 +362,70 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected MethodSpecificContext GetMethodContext(IMemberDefinition member)
 		{
-			V_0 = Utilities.GetMemberUniqueName(member);
-			if (!this.writerContext.get_MethodContexts().TryGetValue(V_0, out V_1))
+			MethodSpecificContext methodSpecificContext;
+			string memberUniqueName = Utilities.GetMemberUniqueName(member);
+			if (!this.writerContext.MethodContexts.TryGetValue(memberUniqueName, out methodSpecificContext))
 			{
 				return null;
 			}
-			return V_1;
+			return methodSpecificContext;
 		}
 
 		protected virtual string GetMethodName(MethodReference method)
 		{
-			V_0 = method.Resolve();
-			if (V_0 == null || !String.op_Equality(V_0.get_Module().get_FilePath(), this.get_ModuleContext().get_Module().get_FilePath()))
+			MethodDefinition methodDefinition = method.Resolve();
+			if (methodDefinition == null || !(methodDefinition.get_Module().get_FilePath() == this.ModuleContext.Module.get_FilePath()))
 			{
-				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(method.get_Name()), this.get_Language());
+				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(method.get_Name()), this.Language);
 			}
-			if (this.get_TypeContext().get_MethodDefinitionToNameMap().ContainsKey(V_0))
+			if (this.TypeContext.MethodDefinitionToNameMap.ContainsKey(methodDefinition))
 			{
-				return this.get_TypeContext().get_MethodDefinitionToNameMap().get_Item(V_0);
+				return this.TypeContext.MethodDefinitionToNameMap[methodDefinition];
 			}
-			if (this.get_TypeContext().get_GeneratedMethodDefinitionToNameMap().ContainsKey(V_0))
+			if (this.TypeContext.GeneratedMethodDefinitionToNameMap.ContainsKey(methodDefinition))
 			{
-				return this.get_TypeContext().get_GeneratedMethodDefinitionToNameMap().get_Item(V_0);
+				return this.TypeContext.GeneratedMethodDefinitionToNameMap[methodDefinition];
 			}
-			stackVariable29 = this.get_ModuleContext().get_RenamedMembersMap();
-			V_1 = V_0.get_MetadataToken();
-			return stackVariable29.get_Item(V_1.ToUInt32());
+			return this.ModuleContext.RenamedMembersMap[methodDefinition.get_MetadataToken().ToUInt32()];
 		}
 
 		protected virtual string GetPropertyName(PropertyReference property)
 		{
-			V_0 = property.Resolve();
-			if (V_0 == null || !String.op_Equality(V_0.get_Module().get_FilePath(), this.get_ModuleContext().get_Module().get_FilePath()))
+			string item;
+			PropertyDefinition propertyDefinition = property.Resolve();
+			if (propertyDefinition == null || !(propertyDefinition.get_Module().get_FilePath() == this.ModuleContext.Module.get_FilePath()))
 			{
-				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(property.get_Name()), this.get_Language());
+				return Utilities.EscapeNameIfNeeded(GenericHelper.GetNonGenericName(property.get_Name()), this.Language);
 			}
 			try
 			{
-				stackVariable19 = this.get_ModuleContext().get_RenamedMembersMap();
-				V_1 = V_0.get_MetadataToken();
-				V_2 = stackVariable19.get_Item(V_1.ToUInt32());
+				item = this.ModuleContext.RenamedMembersMap[propertyDefinition.get_MetadataToken().ToUInt32()];
 			}
-			catch (Exception exception_0)
+			catch (Exception exception1)
 			{
-				V_3 = exception_0;
-				V_4 = V_0.get_MetadataToken().ToUInt32();
-				this.Write(V_4.ToString());
+				Exception exception = exception1;
+				uint num = propertyDefinition.get_MetadataToken().ToUInt32();
+				this.Write(num.ToString());
 				this.WriteLine();
-				V_5 = this.get_ModuleContext().get_RenamedMembersMap().get_Count();
-				this.Write(V_5.ToString());
+				this.Write(this.ModuleContext.RenamedMembersMap.Count.ToString());
 				this.WriteLine();
-				V_6 = this.get_ModuleContext().get_RenamedMembersMap().GetEnumerator();
-				try
+				foreach (KeyValuePair<uint, string> renamedMembersMap in this.ModuleContext.RenamedMembersMap)
 				{
-					while (V_6.MoveNext())
-					{
-						V_7 = V_6.get_Current();
-						V_4 = V_7.get_Key();
-						this.Write(String.Concat(V_4.ToString(), " ", V_7.get_Value()));
-						this.WriteLine();
-					}
+					num = renamedMembersMap.Key;
+					this.Write(String.Concat(num.ToString(), " ", renamedMembersMap.Value));
+					this.WriteLine();
 				}
-				finally
-				{
-					((IDisposable)V_6).Dispose();
-				}
-				throw V_3;
+				throw exception;
 			}
-			return V_2;
+			return item;
 		}
 
 		protected Statement GetStatement(MethodDefinition method)
 		{
-			if (this.writerContext.get_DecompiledStatements().TryGetValue(Utilities.GetMemberUniqueName(method), out V_0))
+			Statement statement;
+			if (this.writerContext.DecompiledStatements.TryGetValue(Utilities.GetMemberUniqueName(method), out statement))
 			{
-				return V_0;
+				return statement;
 			}
 			return null;
 		}
@@ -446,41 +436,37 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return this.GetCurrentModuleTypeName(type);
 			}
-			return Utilities.EscapeTypeNameIfNeeded(GenericHelper.GetNonGenericName(type.get_Name()), this.get_Language());
+			return Utilities.EscapeTypeNameIfNeeded(GenericHelper.GetNonGenericName(type.get_Name()), this.Language);
 		}
 
 		internal virtual void Indent()
 		{
 			this.formatter.Indent();
-			return;
 		}
 
 		protected bool IsTypeInCurrentModule(TypeReference type)
 		{
-			V_0 = type.Resolve();
-			if (V_0 == null)
+			TypeDefinition typeDefinition = type.Resolve();
+			if (typeDefinition == null)
 			{
 				return false;
 			}
-			return String.op_Equality(V_0.get_Module().get_FilePath(), this.get_ModuleContext().get_Module().get_FilePath());
+			return typeDefinition.get_Module().get_FilePath() == this.ModuleContext.Module.get_FilePath();
 		}
 
 		private void NormalizeGenericParams(Collection<GenericParameter> genericCollection, StringBuilder nameBuilder)
 		{
-			dummyVar0 = nameBuilder.Append("<");
-			V_0 = 0;
-			while (V_0 < genericCollection.get_Count())
+			nameBuilder.Append("<");
+			for (int i = 0; i < genericCollection.get_Count(); i++)
 			{
-				V_1 = genericCollection.get_Item(V_0);
-				dummyVar1 = nameBuilder.Append(this.GetGenericParameterName(V_1));
-				if (V_0 < genericCollection.get_Count() - 1)
+				GenericParameter item = genericCollection.get_Item(i);
+				nameBuilder.Append(this.GetGenericParameterName(item));
+				if (i < genericCollection.get_Count() - 1)
 				{
-					dummyVar2 = nameBuilder.Append(",");
+					nameBuilder.Append(",");
 				}
-				V_0 = V_0 + 1;
 			}
-			dummyVar3 = nameBuilder.Append(">");
-			return;
+			nameBuilder.Append(">");
 		}
 
 		protected virtual string OnConvertString(string str)
@@ -491,28 +477,25 @@ namespace Telerik.JustDecompiler.Languages
 		protected void OnExceptionThrown(Exception ex)
 		{
 			this.OnExceptionThrown(this, ex);
-			return;
 		}
 
 		protected void OnExceptionThrown(object sender, Exception ex)
 		{
-			V_0 = this.ExceptionThrown;
-			if (V_0 != null)
+			EventHandler<Exception> eventHandler = this.ExceptionThrown;
+			if (eventHandler != null)
 			{
-				V_0.Invoke(sender, ex);
+				eventHandler(sender, ex);
 			}
-			return;
 		}
 
 		internal virtual void Outdent()
 		{
 			this.formatter.Outdent();
-			return;
 		}
 
 		private bool ShouldWriteAsDelegate(TypeDefinition type)
 		{
-			if (!this.get_Language().get_HasDelegateSpecificSyntax())
+			if (!this.Language.HasDelegateSpecificSyntax)
 			{
 				return false;
 			}
@@ -521,101 +504,81 @@ namespace Telerik.JustDecompiler.Languages
 
 		private int SortEnumFields(IMemberDefinition first, IMemberDefinition second)
 		{
-			V_0 = first as FieldDefinition;
-			V_1 = second as FieldDefinition;
-			if (V_0 == null || V_0.get_Constant() == null || V_0.get_Constant().get_Value() == null)
+			FieldDefinition fieldDefinition = first as FieldDefinition;
+			FieldDefinition fieldDefinition1 = second as FieldDefinition;
+			if (fieldDefinition == null || fieldDefinition.get_Constant() == null || fieldDefinition.get_Constant().get_Value() == null)
 			{
 				return 1;
 			}
-			if (V_1 == null || V_1.get_Constant() == null || V_1.get_Constant().get_Value() == null)
+			if (fieldDefinition1 == null || fieldDefinition1.get_Constant() == null || fieldDefinition1.get_Constant().get_Value() == null)
 			{
 				return -1;
 			}
-			V_2 = 0;
-			if (String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "Int32"))
+			int num = 0;
+			if (fieldDefinition.get_Constant().get_Value().GetType().Name == "Int32")
 			{
-				V_3 = (Int32)V_0.get_Constant().get_Value();
-				V_4 = (Int32)V_1.get_Constant().get_Value();
-				V_2 = V_3.CompareTo(V_4);
+				int value = (Int32)fieldDefinition.get_Constant().get_Value();
+				int value1 = (Int32)fieldDefinition1.get_Constant().get_Value();
+				num = value.CompareTo(value1);
 			}
-			if (!String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "UInt32"))
+			if (fieldDefinition.get_Constant().get_Value().GetType().Name == "UInt32")
 			{
-				if (!String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "Int16"))
-				{
-					if (!String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "UInt16"))
-					{
-						if (!String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "Byte"))
-						{
-							if (!String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "SByte"))
-							{
-								if (!String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "Int64"))
-								{
-									if (String.op_Equality(V_0.get_Constant().get_Value().GetType().get_Name(), "UInt64"))
-									{
-										V_17 = (UInt64)V_0.get_Constant().get_Value();
-										V_18 = (UInt64)V_1.get_Constant().get_Value();
-										V_2 = V_17.CompareTo(V_18);
-									}
-								}
-								else
-								{
-									V_15 = (Int64)V_0.get_Constant().get_Value();
-									V_16 = (Int64)V_1.get_Constant().get_Value();
-									V_2 = V_15.CompareTo(V_16);
-								}
-							}
-							else
-							{
-								V_13 = (SByte)V_0.get_Constant().get_Value();
-								V_14 = (SByte)V_1.get_Constant().get_Value();
-								V_2 = V_13.CompareTo(V_14);
-							}
-						}
-						else
-						{
-							V_11 = (Byte)V_0.get_Constant().get_Value();
-							V_12 = (Byte)V_1.get_Constant().get_Value();
-							V_2 = V_11.CompareTo(V_12);
-						}
-					}
-					else
-					{
-						V_9 = (UInt16)V_0.get_Constant().get_Value();
-						V_10 = (UInt16)V_1.get_Constant().get_Value();
-						V_2 = V_9.CompareTo(V_10);
-					}
-				}
-				else
-				{
-					V_7 = (Int16)V_0.get_Constant().get_Value();
-					V_8 = (Int16)V_1.get_Constant().get_Value();
-					V_2 = V_7.CompareTo(V_8);
-				}
+				uint num1 = (UInt32)fieldDefinition.get_Constant().get_Value();
+				uint value2 = (UInt32)fieldDefinition1.get_Constant().get_Value();
+				num = num1.CompareTo(value2);
 			}
-			else
+			else if (fieldDefinition.get_Constant().get_Value().GetType().Name == "Int16")
 			{
-				V_5 = (UInt32)V_0.get_Constant().get_Value();
-				V_6 = (UInt32)V_1.get_Constant().get_Value();
-				V_2 = V_5.CompareTo(V_6);
+				short num2 = (Int16)fieldDefinition.get_Constant().get_Value();
+				short value3 = (Int16)fieldDefinition1.get_Constant().get_Value();
+				num = num2.CompareTo(value3);
 			}
-			if (V_2 != 0)
+			else if (fieldDefinition.get_Constant().get_Value().GetType().Name == "UInt16")
 			{
-				return V_2;
+				ushort num3 = (UInt16)fieldDefinition.get_Constant().get_Value();
+				ushort value4 = (UInt16)fieldDefinition1.get_Constant().get_Value();
+				num = num3.CompareTo(value4);
 			}
-			return V_0.get_Name().CompareTo(V_1.get_Name());
+			else if (fieldDefinition.get_Constant().get_Value().GetType().Name == "Byte")
+			{
+				byte num4 = (Byte)fieldDefinition.get_Constant().get_Value();
+				byte value5 = (Byte)fieldDefinition1.get_Constant().get_Value();
+				num = num4.CompareTo(value5);
+			}
+			else if (fieldDefinition.get_Constant().get_Value().GetType().Name == "SByte")
+			{
+				sbyte num5 = (SByte)fieldDefinition.get_Constant().get_Value();
+				sbyte value6 = (SByte)fieldDefinition1.get_Constant().get_Value();
+				num = num5.CompareTo(value6);
+			}
+			else if (fieldDefinition.get_Constant().get_Value().GetType().Name == "Int64")
+			{
+				long num6 = (Int64)fieldDefinition.get_Constant().get_Value();
+				long value7 = (Int64)fieldDefinition1.get_Constant().get_Value();
+				num = num6.CompareTo(value7);
+			}
+			else if (fieldDefinition.get_Constant().get_Value().GetType().Name == "UInt64")
+			{
+				ulong num7 = (UInt64)fieldDefinition.get_Constant().get_Value();
+				ulong value8 = (UInt64)fieldDefinition1.get_Constant().get_Value();
+				num = num7.CompareTo(value8);
+			}
+			if (num != 0)
+			{
+				return num;
+			}
+			return fieldDefinition.get_Name().CompareTo(fieldDefinition1.get_Name());
 		}
 
 		protected virtual void StartWritingComment()
 		{
 			this.isWritingComment = true;
 			this.formatter.StartWritingComment();
-			return;
 		}
 
 		public virtual void Stop()
 		{
 			this.isStopped = true;
-			return;
 		}
 
 		protected virtual bool TryWriteEnumField(FieldDefinition fieldDefinition)
@@ -624,85 +587,50 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return false;
 			}
-			V_0 = this.formatter.get_CurrentPosition();
+			int currentPosition = this.formatter.CurrentPosition;
 			this.WriteReference(this.GetFieldName(fieldDefinition), fieldDefinition);
-			V_2 = this.formatter.get_CurrentPosition() - 1;
-			this.currentWritingInfo.get_MemberDeclarationToCodePostionMap().set_Item(fieldDefinition, new OffsetSpan(V_0, V_2));
+			int num = this.formatter.CurrentPosition - 1;
+			this.currentWritingInfo.MemberDeclarationToCodePostionMap[fieldDefinition] = new OffsetSpan(currentPosition, num);
 			if (!fieldDefinition.get_DeclaringType().get_IsDefaultEnumConstants())
 			{
 				this.WriteLiteral(" = ");
-				this.WriteLiteral(String.Format(CultureInfo.get_InvariantCulture(), "{0}", fieldDefinition.get_Constant().get_Value()));
+				this.WriteLiteral(String.Format(CultureInfo.InvariantCulture, "{0}", fieldDefinition.get_Constant().get_Value()));
 			}
 			return true;
 		}
 
 		protected void UpdateWritingInfo(WriterContext writerContext, WritingInfo writingInfo)
 		{
-			V_0 = writerContext.get_MethodContexts().get_Values().GetEnumerator();
-			try
+			foreach (MethodSpecificContext value in writerContext.MethodContexts.Values)
 			{
-				while (V_0.MoveNext())
+				if (value == null)
 				{
-					V_1 = V_0.get_Current();
-					if (V_1 == null)
-					{
-						continue;
-					}
-					writingInfo.get_ControlFlowGraphs().Add(V_1.get_Method(), V_1.get_ControlFlowGraph());
-					writingInfo.get_MethodsVariableDefinitionToNameMap().Add(V_1.get_Method(), V_1.get_VariableDefinitionToNameMap());
+					continue;
 				}
+				writingInfo.ControlFlowGraphs.Add(value.Method, value.ControlFlowGraph);
+				writingInfo.MethodsVariableDefinitionToNameMap.Add(value.Method, value.VariableDefinitionToNameMap);
 			}
-			finally
+			foreach (IMemberDefinition exceptionWhileDecompiling in writerContext.TypeContext.ExceptionWhileDecompiling)
 			{
-				((IDisposable)V_0).Dispose();
-			}
-			V_2 = writerContext.get_TypeContext().get_ExceptionWhileDecompiling().GetEnumerator();
-			try
-			{
-				while (V_2.MoveNext())
+				if (writingInfo.MembersWithExceptions.Contains(exceptionWhileDecompiling.get_MetadataToken().ToUInt32()))
 				{
-					V_3 = V_2.get_Current();
-					if (writingInfo.get_MembersWithExceptions().Contains(V_3.get_MetadataToken().ToUInt32()))
-					{
-						continue;
-					}
-					stackVariable37 = writingInfo.get_MembersWithExceptions();
-					V_4 = V_3.get_MetadataToken();
-					dummyVar0 = stackVariable37.Add(V_4.ToUInt32());
+					continue;
 				}
+				HashSet<uint> membersWithExceptions = writingInfo.MembersWithExceptions;
+				Mono.Cecil.MetadataToken metadataToken = exceptionWhileDecompiling.get_MetadataToken();
+				membersWithExceptions.Add(metadataToken.ToUInt32());
 			}
-			finally
+			writingInfo.AutoImplementedProperties.UnionWith(writerContext.TypeContext.AutoImplementedProperties);
+			writingInfo.AutoImplementedEvents.UnionWith(writerContext.TypeContext.AutoImplementedEvents);
+			foreach (GeneratedMethod generatedFilterMethod in writerContext.TypeContext.GeneratedFilterMethods)
 			{
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
+				writingInfo.GeneratedFilterMethods.Add(generatedFilterMethod.Method);
 			}
-			writingInfo.get_AutoImplementedProperties().UnionWith(writerContext.get_TypeContext().get_AutoImplementedProperties());
-			writingInfo.get_AutoImplementedEvents().UnionWith(writerContext.get_TypeContext().get_AutoImplementedEvents());
-			V_5 = writerContext.get_TypeContext().get_GeneratedFilterMethods().GetEnumerator();
-			try
-			{
-				while (V_5.MoveNext())
-				{
-					V_6 = V_5.get_Current();
-					writingInfo.get_GeneratedFilterMethods().Add(V_6.get_Method());
-				}
-			}
-			finally
-			{
-				if (V_5 != null)
-				{
-					V_5.Dispose();
-				}
-			}
-			return;
 		}
 
 		public override void VisitExceptionStatement(ExceptionStatement node)
 		{
-			this.WriteException(new Exception(String.Concat("Exception in: ", node.get_Member().GetFullMemberName(this.get_Language())), node.get_ExceptionObject()), node.get_Member());
-			return;
+			this.WriteException(new Exception(String.Concat("Exception in: ", node.Member.GetFullMemberName(this.Language)), node.ExceptionObject), node.Member);
 		}
 
 		public override void VisitMemberHandleExpression(MemberHandleExpression node)
@@ -713,312 +641,273 @@ namespace Telerik.JustDecompiler.Languages
 		internal virtual void Write(string str)
 		{
 			this.formatter.Write(str);
-			return;
 		}
 
 		public virtual List<WritingInfo> Write(IMemberDefinition member, IWriterContextService writerContextService)
 		{
 			this.writerContextService = writerContextService;
-			this.writerContext = writerContextService.GetWriterContext(member, this.get_Language());
-			if (member as TypeDefinition != null)
+			this.writerContext = writerContextService.GetWriterContext(member, this.Language);
+			if (member is TypeDefinition)
 			{
-				this.set_CurrentType(member as TypeDefinition);
+				this.CurrentType = member as TypeDefinition;
 			}
 			this.currentWritingInfo = new WritingInfo(member);
 			this.UpdateWritingInfo(this.writerContext, this.currentWritingInfo);
-			this.writingInfos = new List<WritingInfo>();
-			this.writingInfos.Add(this.currentWritingInfo);
+			this.writingInfos = new List<WritingInfo>()
+			{
+				this.currentWritingInfo
+			};
 			this.WriteInternal(member);
 			return this.writingInfos;
 		}
 
 		protected virtual void Write(Statement statement)
 		{
-			return;
 		}
 
 		protected virtual void Write(Expression expression)
 		{
-			return;
 		}
 
 		protected abstract void Write(MethodDefinition member);
 
 		protected abstract void Write(PropertyDefinition property);
 
-		protected abstract void Write(EventDefinition event);
+		protected abstract void Write(EventDefinition @event);
 
 		protected abstract void Write(FieldDefinition field);
 
 		protected virtual void WriteAttributes(IMemberDefinition member, IEnumerable<string> ignoredAttributes = null)
 		{
-			return;
 		}
 
 		protected virtual void WriteBeginBlock(bool inline = false)
 		{
-			return;
 		}
 
 		public virtual void WriteBody(IMemberDefinition member, IWriterContextService writerContextService)
 		{
 			this.writerContextService = writerContextService;
 			this.currentWritingInfo = new WritingInfo(member);
-			this.writingInfos = new List<WritingInfo>();
-			this.writingInfos.Add(this.currentWritingInfo);
-			this.writerContext = writerContextService.GetWriterContext(member, this.get_Language());
+			this.writingInfos = new List<WritingInfo>()
+			{
+				this.currentWritingInfo
+			};
+			this.writerContext = writerContextService.GetWriterContext(member, this.Language);
 			this.WriteBodyInternal(member);
-			return;
 		}
 
 		protected virtual void WriteBodyInternal(IMemberDefinition member)
 		{
-			return;
 		}
 
 		public virtual void WriteComment(string comment)
 		{
-			this.formatter.WriteComment(String.Concat(this.get_Language().get_CommentLineSymbol(), " ", comment));
-			return;
+			this.formatter.WriteComment(String.Concat(this.Language.CommentLineSymbol, " ", comment));
 		}
 
 		internal virtual void WriteDefinition(string name, object definition)
 		{
 			this.formatter.WriteDefinition(name, definition);
-			return;
 		}
 
 		protected virtual void WriteDelegate(TypeDefinition delegateDefinition)
 		{
-			return;
 		}
 
 		protected void WriteDocumentation(IMemberDefinition member)
 		{
-			V_0 = DocumentationManager.GetDocumentationForMember(member);
-			if (!String.IsNullOrEmpty(V_0))
+			string documentationForMember = DocumentationManager.GetDocumentationForMember(member);
+			if (!String.IsNullOrEmpty(documentationForMember))
 			{
-				this.WriteDocumentation(V_0);
+				this.WriteDocumentation(documentationForMember);
 				this.WriteLine();
 			}
-			return;
 		}
 
 		private void WriteDocumentation(string memberDocumentation)
 		{
 			this.formatter.WriteDocumentationStartBlock();
-			V_0 = false;
-			V_1 = false;
-			V_2 = new StringReader(memberDocumentation);
-			try
+			bool flag = false;
+			bool flag1 = false;
+			using (StringReader stringReader = new StringReader(memberDocumentation))
 			{
-				V_3 = V_2.ReadLine();
-				while (V_3 != null)
+				for (string i = stringReader.ReadLine(); i != null; i = stringReader.ReadLine())
 				{
-					if (V_0)
+					if (flag)
 					{
 						this.WriteLine();
 					}
-					V_0 = true;
-					this.formatter.WriteDocumentationTag(String.Concat(this.get_Language().get_DocumentationLineStarter(), " "));
-					V_1 = this.WriteDocumentationLine(V_3, V_1);
-					V_3 = V_2.ReadLine();
-				}
-			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					((IDisposable)V_2).Dispose();
+					flag = true;
+					this.formatter.WriteDocumentationTag(String.Concat(this.Language.DocumentationLineStarter, " "));
+					flag1 = this.WriteDocumentationLine(i, flag1);
 				}
 			}
 			this.formatter.WriteEndBlock();
-			return;
 		}
 
 		private bool WriteDocumentationLine(string currentLine, bool isDocumentTag)
 		{
-			V_0 = -1;
-			V_1 = -1;
+			int num = -1;
+			int num1 = -1;
 			if (isDocumentTag)
 			{
-				V_3 = 0;
-				while (V_3 < currentLine.get_Length())
+				int num2 = 0;
+				while (num2 < currentLine.Length)
 				{
-					if (currentLine.get_Chars(V_3) != '>')
+					if (currentLine[num2] != '>')
 					{
-						V_3 = V_3 + 1;
+						num2++;
 					}
 					else
 					{
-						V_1 = V_3;
+						num1 = num2;
 						break;
 					}
 				}
-				if (V_1 == -1)
+				if (num1 == -1)
 				{
 					this.formatter.WriteDocumentationTag(currentLine);
 					return true;
 				}
-				V_4 = currentLine.Substring(0, V_1 + 1);
-				V_5 = currentLine.Substring(V_1 + 1);
-				this.formatter.WriteDocumentationTag(V_4);
-				return this.WriteDocumentationLine(V_5, false);
+				string str = currentLine.Substring(0, num1 + 1);
+				string str1 = currentLine.Substring(num1 + 1);
+				this.formatter.WriteDocumentationTag(str);
+				return this.WriteDocumentationLine(str1, false);
 			}
-			V_6 = 0;
-			while (V_6 < currentLine.get_Length())
+			int num3 = 0;
+			while (num3 < currentLine.Length)
 			{
-				if (currentLine.get_Chars(V_6) != '<')
+				if (currentLine[num3] != '<')
 				{
-					V_6 = V_6 + 1;
+					num3++;
 				}
 				else
 				{
-					V_0 = V_6;
+					num = num3;
 					break;
 				}
 			}
-			if (V_0 == -1)
+			if (num == -1)
 			{
 				this.formatter.WriteComment(currentLine);
 				return false;
 			}
-			V_2 = currentLine.Substring(0, V_0);
-			this.formatter.WriteComment(V_2);
-			V_7 = V_0 + 1;
-			while (V_7 < currentLine.get_Length())
+			string str2 = currentLine.Substring(0, num);
+			this.formatter.WriteComment(str2);
+			int num4 = num + 1;
+			while (num4 < currentLine.Length)
 			{
-				if (currentLine.get_Chars(V_7) != '>')
+				if (currentLine[num4] != '>')
 				{
-					V_7 = V_7 + 1;
+					num4++;
 				}
 				else
 				{
-					V_1 = V_7;
+					num1 = num4;
 					break;
 				}
 			}
-			if (V_1 == -1)
+			if (num1 == -1)
 			{
-				this.formatter.WriteDocumentationTag(currentLine.Substring(V_0));
+				this.formatter.WriteDocumentationTag(currentLine.Substring(num));
 				return true;
 			}
-			V_8 = currentLine.Substring(V_0, V_1 - V_0 + 1);
-			this.formatter.WriteDocumentationTag(V_8);
-			V_9 = currentLine.Substring(V_1 + 1);
-			return this.WriteDocumentationLine(V_9, false);
+			string str3 = currentLine.Substring(num, num1 - num + 1);
+			this.formatter.WriteDocumentationTag(str3);
+			string str4 = currentLine.Substring(num1 + 1);
+			return this.WriteDocumentationLine(str4, false);
 		}
 
 		protected virtual void WriteEndBlock(string statementName)
 		{
-			return;
 		}
 
 		protected virtual void WriteEndOfStatement()
 		{
-			return;
 		}
 
 		protected virtual void WriteEnumValueSeparator()
 		{
-			return;
 		}
 
 		public virtual void WriteEscapeLiteral(string literal)
 		{
 			this.formatter.WriteLiteral(this.OnConvertString(literal));
-			return;
 		}
 
-		protected abstract void WriteEventDeclaration(EventDefinition event);
+		protected abstract void WriteEventDeclaration(EventDefinition @event);
 
 		public virtual void WriteException(Exception ex, IMemberDefinition member)
 		{
-			V_0 = this.exceptionFormatter.Format(ex, member.get_FullName(), member.get_DeclaringType().get_Module().get_FilePath());
-			if (!this.get_Settings().get_WriteExceptionsAsComments())
+			string[] strArray = this.exceptionFormatter.Format(ex, member.get_FullName(), member.get_DeclaringType().get_Module().get_FilePath());
+			if (!this.Settings.WriteExceptionsAsComments)
 			{
-				this.formatter.WriteException(V_0);
-				this.formatter.WriteExceptionMailToLink("mailto: JustDecompilePublicFeedback@telerik.com", V_0);
+				this.formatter.WriteException(strArray);
+				this.formatter.WriteExceptionMailToLink("mailto: JustDecompilePublicFeedback@telerik.com", strArray);
 				return;
 			}
-			V_1 = V_0.Select<string, string>(new Func<string, string>(this.u003cWriteExceptionu003eb__69_0)).ToArray<string>();
-			this.formatter.WriteException(V_1);
-			V_2 = String.Concat(this.get_Language().get_CommentLineSymbol(), " mailto: JustDecompilePublicFeedback@telerik.com");
-			this.formatter.WriteExceptionMailToLink(V_2, V_0);
-			return;
+			string[] array = (
+				from exceptionLine in strArray
+				select String.Concat(this.Language.CommentLineSymbol, " ", exceptionLine)).ToArray<string>();
+			this.formatter.WriteException(array);
+			string str = String.Concat(this.Language.CommentLineSymbol, " mailto: JustDecompilePublicFeedback@telerik.com");
+			this.formatter.WriteExceptionMailToLink(str, strArray);
 		}
 
 		internal virtual void WriteIdentifier(string name, object identifier)
 		{
 			this.formatter.WriteIdentifier(name, identifier);
-			return;
 		}
 
 		protected virtual void WriteInternal(IMemberDefinition member)
 		{
-			V_0 = member.get_MetadataToken().ToUInt32();
+			uint num = member.get_MetadataToken().ToUInt32();
 			if (this.isStopped)
 			{
 				return;
 			}
 			this.membersStack.Push(member);
-			if (member as TypeDefinition == null)
-			{
-				stackVariable11 = false;
-			}
-			else
-			{
-				stackVariable11 = member != this.get_CurrentType();
-			}
-			V_1 = stackVariable11;
-			if (!V_1)
+			bool flag = (!(member is TypeDefinition) ? false : member != this.CurrentType);
+			if (!flag)
 			{
 				this.formatter.PreserveIndent(member);
 			}
 			try
 			{
-				if (this.get_Settings().get_WriteDocumentation() && !V_1)
+				if (this.Settings.WriteDocumentation && !flag)
 				{
-					V_3 = this.formatter.get_CurrentPosition();
+					int currentPosition = this.formatter.CurrentPosition;
 					this.WriteDocumentation(member);
-					this.AddMemberDocumentationOffsetSpan(V_0, V_3, this.formatter.get_CurrentPosition());
+					this.AddMemberDocumentationOffsetSpan(num, currentPosition, this.formatter.CurrentPosition);
 				}
-				if (member as TypeDefinition == null)
+				if (!(member is TypeDefinition))
 				{
-					V_4 = this.formatter.get_CurrentPosition();
+					int currentPosition1 = this.formatter.CurrentPosition;
 					this.WriteAttributes(member, null);
-					this.AddMemberAttributesOffsetSpan(V_0, V_4, this.formatter.get_CurrentPosition());
-					V_5 = this.formatter.get_CurrentPosition();
-					if (member as MethodDefinition == null)
-					{
-						if (member as PropertyDefinition == null)
-						{
-							if (member as EventDefinition == null)
-							{
-								if (member as FieldDefinition != null)
-								{
-									this.formatter.WriteMemberDeclaration(member);
-									this.Write((FieldDefinition)member);
-								}
-							}
-							else
-							{
-								this.formatter.WriteMemberDeclaration(member);
-								this.Write((EventDefinition)member);
-							}
-						}
-						else
-						{
-							this.formatter.WriteMemberDeclaration(member);
-							this.Write((PropertyDefinition)member);
-						}
-					}
-					else
+					this.AddMemberAttributesOffsetSpan(num, currentPosition1, this.formatter.CurrentPosition);
+					int num1 = this.formatter.CurrentPosition;
+					if (member is MethodDefinition)
 					{
 						this.formatter.WriteMemberDeclaration(member);
 						this.Write((MethodDefinition)member);
 					}
-					this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap().Add(V_0, new OffsetSpan(V_5, this.formatter.get_CurrentPosition() - 1));
+					else if (member is PropertyDefinition)
+					{
+						this.formatter.WriteMemberDeclaration(member);
+						this.Write((PropertyDefinition)member);
+					}
+					else if (member is EventDefinition)
+					{
+						this.formatter.WriteMemberDeclaration(member);
+						this.Write((EventDefinition)member);
+					}
+					else if (member is FieldDefinition)
+					{
+						this.formatter.WriteMemberDeclaration(member);
+						this.Write((FieldDefinition)member);
+					}
+					this.currentWritingInfo.MemberTokenToDecompiledCodeMap.Add(num, new OffsetSpan(num1, this.formatter.CurrentPosition - 1));
 				}
 				else
 				{
@@ -1026,100 +915,96 @@ namespace Telerik.JustDecompiler.Languages
 					this.WriteTypeInANewWriterIfNeeded((TypeDefinition)member);
 				}
 			}
-			catch (Exception exception_0)
+			catch (Exception exception1)
 			{
-				V_6 = exception_0;
-				this.Visit(new ExceptionStatement(V_6, member));
+				Exception exception = exception1;
+				this.Visit(new ExceptionStatement(exception, member));
 				this.formatter.RestoreIndent(member);
-				dummyVar0 = this.currentWritingInfo.ExceptionsWhileWriting.Add(member);
-				dummyVar1 = this.currentWritingInfo.get_MembersWithExceptions().Add(V_0);
-				if (member as PropertyDefinition != null)
+				this.currentWritingInfo.ExceptionsWhileWriting.Add(member);
+				this.currentWritingInfo.MembersWithExceptions.Add(num);
+				if (member is PropertyDefinition)
 				{
-					V_8 = member as PropertyDefinition;
-					if (V_8.get_GetMethod() != null)
+					PropertyDefinition propertyDefinition = member as PropertyDefinition;
+					if (propertyDefinition.get_GetMethod() != null)
 					{
-						dummyVar2 = this.currentWritingInfo.ExceptionsWhileWriting.Add(V_8.get_GetMethod());
+						this.currentWritingInfo.ExceptionsWhileWriting.Add(propertyDefinition.get_GetMethod());
 					}
-					if (V_8.get_SetMethod() != null)
+					if (propertyDefinition.get_SetMethod() != null)
 					{
-						dummyVar3 = this.currentWritingInfo.ExceptionsWhileWriting.Add(V_8.get_SetMethod());
+						this.currentWritingInfo.ExceptionsWhileWriting.Add(propertyDefinition.get_SetMethod());
 					}
 				}
-				if (member as EventDefinition != null)
+				if (member is EventDefinition)
 				{
-					V_9 = member as EventDefinition;
-					if (V_9.get_AddMethod() != null)
+					EventDefinition eventDefinition = member as EventDefinition;
+					if (eventDefinition.get_AddMethod() != null)
 					{
-						dummyVar4 = this.currentWritingInfo.ExceptionsWhileWriting.Add(V_9.get_AddMethod());
+						this.currentWritingInfo.ExceptionsWhileWriting.Add(eventDefinition.get_AddMethod());
 					}
-					if (V_9.get_RemoveMethod() != null)
+					if (eventDefinition.get_RemoveMethod() != null)
 					{
-						dummyVar5 = this.currentWritingInfo.ExceptionsWhileWriting.Add(V_9.get_RemoveMethod());
+						this.currentWritingInfo.ExceptionsWhileWriting.Add(eventDefinition.get_RemoveMethod());
 					}
-					if (V_9.get_InvokeMethod() != null)
+					if (eventDefinition.get_InvokeMethod() != null)
 					{
-						dummyVar6 = this.currentWritingInfo.ExceptionsWhileWriting.Add(V_9.get_InvokeMethod());
+						this.currentWritingInfo.ExceptionsWhileWriting.Add(eventDefinition.get_InvokeMethod());
 					}
 				}
-				this.OnExceptionThrown(V_6);
+				this.OnExceptionThrown(exception);
 			}
-			if (member as TypeDefinition == null || member == this.get_CurrentType())
+			if (!(member is TypeDefinition) || member == this.CurrentType)
 			{
 				this.formatter.RemovePreservedIndent(member);
 			}
-			dummyVar7 = this.membersStack.Pop();
-			return;
+			this.membersStack.Pop();
 		}
 
 		internal virtual void WriteKeyword(string keyword)
 		{
 			this.formatter.WriteKeyword(keyword);
-			return;
 		}
 
 		internal virtual void WriteLine()
 		{
 			this.formatter.WriteLine();
-			return;
 		}
 
 		internal virtual void WriteLiteral(string literal)
 		{
 			this.formatter.WriteLiteral(literal);
-			return;
 		}
 
 		protected virtual bool WriteMemberDeclaration(IMemberDefinition member)
 		{
-			if (member as MethodDefinition != null)
+			if (member is MethodDefinition)
 			{
 				this.WriteAttributes(member, null);
 				this.WriteMethodDeclaration((MethodDefinition)member, false);
 				this.WriteEndOfStatement();
 				return true;
 			}
-			if (member as PropertyDefinition != null)
+			if (member is PropertyDefinition)
 			{
 				this.WriteAttributes(member, null);
 				this.WritePropertyDeclaration((PropertyDefinition)member);
 				this.WriteEndOfStatement();
 				return true;
 			}
-			if (member as EventDefinition != null)
+			if (member is EventDefinition)
 			{
 				this.WriteAttributes(member, null);
 				this.WriteEventDeclaration((EventDefinition)member);
 				this.WriteEndOfStatement();
 				return true;
 			}
-			if (member as FieldDefinition != null)
+			if (member is FieldDefinition)
 			{
-				V_0 = member as FieldDefinition;
-				if (V_0.get_IsSpecialName())
+				FieldDefinition fieldDefinition = member as FieldDefinition;
+				if (fieldDefinition.get_IsSpecialName())
 				{
 					return false;
 				}
-				if (this.TryWriteEnumField(V_0))
+				if (this.TryWriteEnumField(fieldDefinition))
 				{
 					return true;
 				}
@@ -1127,26 +1012,25 @@ namespace Telerik.JustDecompiler.Languages
 				this.Write((FieldDefinition)member);
 				return true;
 			}
-			if (member as TypeDefinition == null)
+			if (!(member is TypeDefinition))
 			{
 				return true;
 			}
-			V_1 = member as TypeDefinition;
-			if (!this.ShouldWriteAsDelegate(V_1))
+			TypeDefinition typeDefinition = member as TypeDefinition;
+			if (!this.ShouldWriteAsDelegate(typeDefinition))
 			{
-				this.WriteTypeDeclarationsOnlyInternal(V_1);
+				this.WriteTypeDeclarationsOnlyInternal(typeDefinition);
 				return true;
 			}
-			this.WriteAttributes(V_1, null);
-			this.WriteDelegate(V_1);
+			this.WriteAttributes(typeDefinition, null);
+			this.WriteDelegate(typeDefinition);
 			return true;
 		}
 
 		public void WriteMemberEscapedOnlyName(object memberDefinition)
 		{
-			V_0 = this.GetMemberEscapedOnlyName(memberDefinition);
-			this.formatter.Write(V_0);
-			return;
+			string memberEscapedOnlyName = this.GetMemberEscapedOnlyName(memberDefinition);
+			this.formatter.Write(memberEscapedOnlyName);
 		}
 
 		public abstract void WriteMemberNavigationName(object memberDefinition);
@@ -1157,46 +1041,38 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected virtual void WriteNamespace(object reference, bool forceWriteNamespace = false)
 		{
-			return;
 		}
 
 		public virtual void WriteNamespaceNavigationName(string memberReferenceName)
 		{
-			stackVariable2 = new Char[1];
-			stackVariable2[0] = '.';
-			V_0 = memberReferenceName.Split(stackVariable2);
-			V_1 = new StringBuilder((int)V_0.Length);
-			V_2 = 0;
-			while (V_2 < (int)V_0.Length)
+			string[] strArray = memberReferenceName.Split(new Char[] { '.' });
+			StringBuilder stringBuilder = new StringBuilder((int)strArray.Length);
+			for (int i = 0; i < (int)strArray.Length; i++)
 			{
-				V_3 = V_0[V_2];
-				if (this.get_Language().IsValidIdentifier(V_3) || !this.get_Settings().get_RenameInvalidMembers())
+				string str = strArray[i];
+				if (this.Language.IsValidIdentifier(str) || !this.Settings.RenameInvalidMembers)
 				{
-					dummyVar1 = V_1.Append(V_3);
+					stringBuilder.Append(str);
 				}
 				else
 				{
-					dummyVar0 = V_1.Append(this.get_Language().ReplaceInvalidCharactersInIdentifier(V_3));
+					stringBuilder.Append(this.Language.ReplaceInvalidCharactersInIdentifier(str));
 				}
-				if (V_2 < (int)V_0.Length - 1)
+				if (i < (int)strArray.Length - 1)
 				{
-					dummyVar2 = V_1.Append(".");
+					stringBuilder.Append(".");
 				}
-				V_2 = V_2 + 1;
 			}
-			this.formatter.Write(V_1.ToString());
-			return;
+			this.formatter.Write(stringBuilder.ToString());
 		}
 
 		protected virtual void WriteNestedTypeWriteLine()
 		{
-			return;
 		}
 
 		internal virtual void WriteNotResolvedReference(string name, MemberReference memberReference, string errorMessage)
 		{
 			this.formatter.WriteNotResolvedReference(name, memberReference, errorMessage);
-			return;
 		}
 
 		protected void WritePartialType(TypeDefinition type, ICollection<string> fieldsToSkip = null)
@@ -1205,26 +1081,20 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return;
 			}
-			stackVariable5 = new String[1];
-			stackVariable5[0] = "System.CodeDom.Compiler.GeneratedCodeAttribute";
-			this.WriteAttributes(type, stackVariable5);
-			this.WritePartialType(type, new Action<IMemberDefinition>(this.u003cWritePartialTypeu003eb__111_0), false, fieldsToSkip);
-			return;
+			this.WriteAttributes(type, new String[] { "System.CodeDom.Compiler.GeneratedCodeAttribute" });
+			this.WritePartialType(type, (IMemberDefinition x) => this.WriteInternal(x), false, fieldsToSkip);
 		}
 
 		protected virtual void WritePartialType(TypeDefinition type, Action<IMemberDefinition> writeMember, bool writeNewLine, ICollection<string> fieldsToSkip = null)
 		{
-			V_0 = String.Empty;
-			V_0 = this.WriteTypeDeclaration(type, true);
+			string empty = String.Empty;
+			empty = this.WriteTypeDeclaration(type, true);
 			this.WriteBeginBlock(false);
 			this.WriteTypeOpeningBlock(type);
-			stackVariable13 = new String[1];
-			stackVariable13[0] = "System.Diagnostics.DebuggerNonUserCodeAttribute";
-			this.WriteTypeMembers(type, writeMember, stackVariable13, fieldsToSkip);
+			this.WriteTypeMembers(type, writeMember, new String[] { "System.Diagnostics.DebuggerNonUserCodeAttribute" }, fieldsToSkip);
 			this.WriteLine();
 			this.Outdent();
-			this.WriteEndBlock(V_0);
-			return;
+			this.WriteEndBlock(empty);
 		}
 
 		protected abstract void WritePropertyDeclaration(PropertyDefinition property);
@@ -1232,19 +1102,16 @@ namespace Telerik.JustDecompiler.Languages
 		internal virtual void WriteReference(string name, object reference)
 		{
 			this.formatter.WriteReference(name, reference);
-			return;
 		}
 
 		internal virtual void WriteSpace()
 		{
 			this.formatter.WriteSpace();
-			return;
 		}
 
 		internal virtual void WriteToken(string token)
 		{
 			this.formatter.WriteToken(token);
-			return;
 		}
 
 		protected void WriteType(TypeDefinition type)
@@ -1254,42 +1121,36 @@ namespace Telerik.JustDecompiler.Languages
 				return;
 			}
 			this.membersStack.Push(type);
-			V_0 = this.formatter.get_CurrentPosition();
-			stackVariable11 = new String[1];
-			stackVariable11[0] = "System.Reflection.DefaultMemberAttribute";
-			this.WriteAttributes(type, stackVariable11);
-			stackVariable16 = this.currentWritingInfo.get_MemberTokenToAttributesMap();
-			V_2 = type.get_MetadataToken();
-			stackVariable16.Add(V_2.ToUInt32(), new OffsetSpan(V_0, this.formatter.get_CurrentPosition() - 1));
-			V_1 = this.formatter.get_CurrentPosition();
-			this.WriteTypeInternal(type, new Action<IMemberDefinition>(this.u003cWriteTypeu003eb__74_0));
-			stackVariable38 = this.currentWritingInfo.get_MemberTokenToDecompiledCodeMap();
-			V_2 = type.get_MetadataToken();
-			stackVariable38.Add(V_2.ToUInt32(), new OffsetSpan(V_1, this.formatter.get_CurrentPosition() - 1));
-			dummyVar0 = this.membersStack.Pop();
-			return;
+			int currentPosition = this.formatter.CurrentPosition;
+			this.WriteAttributes(type, new String[] { "System.Reflection.DefaultMemberAttribute" });
+			Dictionary<uint, OffsetSpan> memberTokenToAttributesMap = this.currentWritingInfo.MemberTokenToAttributesMap;
+			Mono.Cecil.MetadataToken metadataToken = type.get_MetadataToken();
+			memberTokenToAttributesMap.Add(metadataToken.ToUInt32(), new OffsetSpan(currentPosition, this.formatter.CurrentPosition - 1));
+			int num = this.formatter.CurrentPosition;
+			this.WriteTypeInternal(type, (IMemberDefinition x) => this.WriteInternal(x));
+			Dictionary<uint, OffsetSpan> memberTokenToDecompiledCodeMap = this.currentWritingInfo.MemberTokenToDecompiledCodeMap;
+			metadataToken = type.get_MetadataToken();
+			memberTokenToDecompiledCodeMap.Add(metadataToken.ToUInt32(), new OffsetSpan(num, this.formatter.CurrentPosition - 1));
+			this.membersStack.Pop();
 		}
 
 		public void WriteTypeDeclaration(TypeDefinition type, IWriterContextService writerContextService)
 		{
 			this.writerContextService = writerContextService;
-			this.writerContext = writerContextService.GetWriterContext(type, this.get_Language());
+			this.writerContext = writerContextService.GetWriterContext(type, this.Language);
 			this.currentWritingInfo = new WritingInfo(type);
-			stackVariable14 = new String[1];
-			stackVariable14[0] = "System.Reflection.DefaultMemberAttribute";
-			this.WriteAttributes(type, stackVariable14);
+			this.WriteAttributes(type, new String[] { "System.Reflection.DefaultMemberAttribute" });
 			this.membersStack.Push(type);
 			if (this.ShouldWriteAsDelegate(type))
 			{
 				this.WriteDelegate(type);
 				this.WriteLine();
-				dummyVar0 = this.membersStack.Pop();
+				this.membersStack.Pop();
 				return;
 			}
-			dummyVar1 = this.WriteTypeDeclaration(type, false);
+			this.WriteTypeDeclaration(type, false);
 			this.WriteLine();
-			dummyVar2 = this.membersStack.Pop();
-			return;
+			this.membersStack.Pop();
 		}
 
 		protected abstract string WriteTypeDeclaration(TypeDefinition type, bool isPartial = false);
@@ -1297,117 +1158,104 @@ namespace Telerik.JustDecompiler.Languages
 		public virtual void WriteTypeDeclarationsOnly(TypeDefinition member, IWriterContextService writerContextService)
 		{
 			this.writerContextService = writerContextService;
-			this.writerContext = writerContextService.GetWriterContext(member, this.get_Language());
+			this.writerContext = writerContextService.GetWriterContext(member, this.Language);
 			this.currentWritingInfo = new WritingInfo(member);
 			this.WriteTypeDeclarationsOnlyInternal(member);
-			return;
 		}
 
 		protected virtual void WriteTypeDeclarationsOnlyInternal(TypeDefinition member)
 		{
 			this.WriteTypeNamespaceStart(member);
 			this.WriteAttributes(member, null);
-			this.WriteTypeInternal(member, new Action<IMemberDefinition>(this.u003cWriteTypeDeclarationsOnlyInternalu003eb__68_0));
+			this.WriteTypeInternal(member, (IMemberDefinition x) => this.WriteMemberDeclaration(x));
 			this.WriteTypeNamespaceEnd(member);
-			return;
 		}
 
 		protected virtual void WriteTypeInANewWriterIfNeeded(TypeDefinition type)
 		{
-			if ((object)this.get_CurrentType() == (object)type)
+			if ((object)this.CurrentType == (object)type)
 			{
 				this.WriteType(type);
 				return;
 			}
-			stackVariable13 = this.get_Language().GetWriter(this.formatter, this.exceptionFormatter, this.get_Settings());
-			stackVariable13.add_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
-			V_0 = stackVariable13.Write(type, this.writerContextService);
-			stackVariable13.remove_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
-			this.writingInfos.AddRange(V_0);
-			return;
+			ILanguageWriter writer = this.Language.GetWriter(this.formatter, this.exceptionFormatter, this.Settings);
+			writer.ExceptionThrown += new EventHandler<Exception>(this.OnExceptionThrown);
+			List<WritingInfo> writingInfos = writer.Write(type, this.writerContextService);
+			writer.ExceptionThrown -= new EventHandler<Exception>(this.OnExceptionThrown);
+			this.writingInfos.AddRange(writingInfos);
 		}
 
 		protected virtual void WriteTypeInternal(TypeDefinition type, Action<IMemberDefinition> writeMember)
 		{
-			V_0 = String.Empty;
+			string empty = String.Empty;
 			this.membersStack.Push(type);
 			if (this.ShouldWriteAsDelegate(type))
 			{
 				this.WriteDelegate(type);
 				return;
 			}
-			V_0 = this.WriteTypeDeclaration(type, false);
-			V_1 = this.formatter.get_CurrentPosition();
+			empty = this.WriteTypeDeclaration(type, false);
+			int currentPosition = this.formatter.CurrentPosition;
 			this.formatter.WriteStartBlock();
 			this.WriteBeginBlock(false);
 			this.WriteTypeOpeningBlock(type);
 			this.WriteTypeMembers(type, writeMember, null, null);
 			this.WriteLine();
 			this.Outdent();
-			this.WriteEndBlock(V_0);
-			dummyVar0 = this.membersStack.Pop();
-			this.currentWritingInfo.get_MemberDefinitionToFoldingPositionMap().set_Item(type, new OffsetSpan(V_1, this.formatter.get_CurrentPosition() - 1));
+			this.WriteEndBlock(empty);
+			this.membersStack.Pop();
+			this.currentWritingInfo.MemberDefinitionToFoldingPositionMap[type] = new OffsetSpan(currentPosition, this.formatter.CurrentPosition - 1);
 			this.formatter.WriteEndBlock();
-			return;
 		}
 
 		private void WriteTypeMembers(TypeDefinition type, Action<IMemberDefinition> writeMember, IEnumerable<string> attributesToSkip = null, ICollection<string> fieldsToSkip = null)
 		{
-			V_0 = Utilities.GetTypeMembers(type, this.get_Language(), this.get_Settings().get_ShowCompilerGeneratedMembers(), attributesToSkip, fieldsToSkip, this.currentWritingInfo.get_GeneratedFilterMethods(), this.get_TypeContext().GetFieldToPropertyMap(this.get_Language()).get_Keys());
+			List<IMemberDefinition> typeMembers = Utilities.GetTypeMembers(type, this.Language, this.Settings.ShowCompilerGeneratedMembers, attributesToSkip, fieldsToSkip, this.currentWritingInfo.GeneratedFilterMethods, this.TypeContext.GetFieldToPropertyMap(this.Language).Keys);
 			if (type.get_IsEnum())
 			{
-				V_0.Sort(new Comparison<IMemberDefinition>(this.u003cWriteTypeMembersu003eb__78_0));
+				typeMembers.Sort((IMemberDefinition x, IMemberDefinition y) => this.SortEnumFields(x, y));
 			}
-			V_1 = 0;
-			while (V_1 < V_0.get_Count())
+			for (int i = 0; i < typeMembers.Count; i++)
 			{
-				V_2 = null;
+				IMemberDefinition item = null;
 				if (this.isStopped)
 				{
 					return;
 				}
-				V_2 = V_0.get_Item(V_1);
-				if (V_2 as FieldDefinition == null || !(V_2 as FieldDefinition).get_IsSpecialName())
+				item = typeMembers[i];
+				if (!(item is FieldDefinition) || !(item as FieldDefinition).get_IsSpecialName())
 				{
-					this.membersStack.Push(V_2);
-					V_3 = V_1 == V_0.get_Count() - 1;
-					writeMember.Invoke(V_2);
-					if (!type.get_IsEnum())
+					this.membersStack.Push(item);
+					bool count = i == typeMembers.Count - 1;
+					writeMember(item);
+					if (type.get_IsEnum())
 					{
-						if (!V_3)
-						{
-							this.WriteLine();
-							this.WriteLine();
-						}
-					}
-					else
-					{
-						if (!V_3 && String.op_Inequality(V_0.get_Item(V_1 + 1).get_Name(), "value__"))
+						if (!count && typeMembers[i + 1].get_Name() != "value__")
 						{
 							this.WriteEnumValueSeparator();
 							this.WriteLine();
 						}
 					}
-					dummyVar0 = this.membersStack.Pop();
+					else if (!count)
+					{
+						this.WriteLine();
+						this.WriteLine();
+					}
+					this.membersStack.Pop();
 				}
-				V_1 = V_1 + 1;
 			}
-			return;
 		}
 
 		protected virtual void WriteTypeNamespaceEnd(TypeDefinition member)
 		{
-			return;
 		}
 
 		protected virtual void WriteTypeNamespaceStart(TypeDefinition member)
 		{
-			return;
 		}
 
 		protected virtual void WriteTypeOpeningBlock(TypeDefinition type)
 		{
-			return;
 		}
 
 		public event EventHandler<Exception> ExceptionThrown;

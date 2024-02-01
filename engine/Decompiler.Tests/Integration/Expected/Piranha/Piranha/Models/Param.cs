@@ -48,8 +48,6 @@ namespace Piranha.Models
 
 		public Param()
 		{
-			base();
-			return;
 		}
 	}
 }

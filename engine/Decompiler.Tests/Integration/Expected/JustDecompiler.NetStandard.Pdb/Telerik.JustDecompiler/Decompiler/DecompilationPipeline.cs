@@ -1,4 +1,6 @@
+using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -32,47 +34,40 @@ namespace Telerik.JustDecompiler.Decompiler
 			}
 		}
 
-		public DecompilationPipeline(params IDecompilationStep[] steps)
+		public DecompilationPipeline(params IDecompilationStep[] steps) : this((IEnumerable<IDecompilationStep>)steps)
 		{
-			this(steps);
-			return;
 		}
 
-		public DecompilationPipeline(IEnumerable<IDecompilationStep> steps)
+		public DecompilationPipeline(IEnumerable<IDecompilationStep> steps) : this(steps, null)
 		{
-			this(steps, null);
-			return;
 		}
 
 		public DecompilationPipeline(IEnumerable<IDecompilationStep> steps, DecompilationContext context)
 		{
-			base();
-			this.set_Context(context);
+			this.Context = context;
 			this.steps = new List<IDecompilationStep>(steps);
-			return;
 		}
 
 		public void AddSteps(IEnumerable<IDecompilationStep> steps)
 		{
 			this.steps.AddRange(steps);
-			return;
 		}
 
 		private DecompilationContext GetNewContext(MethodBody body, ILanguage language)
 		{
-			stackVariable1 = new MethodSpecificContext(body);
-			V_0 = new TypeSpecificContext(body.get_Method().get_DeclaringType());
-			return new DecompilationContext(stackVariable1, V_0, language);
+			MethodSpecificContext methodSpecificContext = new MethodSpecificContext(body);
+			TypeSpecificContext typeSpecificContext = new TypeSpecificContext(body.get_Method().get_DeclaringType());
+			return new DecompilationContext(methodSpecificContext, typeSpecificContext, language);
 		}
 
 		public DecompilationContext Run(MethodBody body, ILanguage language)
 		{
-			if (this.get_Context() == null)
+			if (this.Context == null)
 			{
-				this.set_Context(this.GetNewContext(body, language));
+				this.Context = this.GetNewContext(body, language);
 			}
-			this.set_Body(this.RunInternal(body, new BlockStatement(), language));
-			return this.get_Context();
+			this.Body = this.RunInternal(body, new BlockStatement(), language);
+			return this.Context;
 		}
 
 		protected BlockStatement RunInternal(MethodBody body, BlockStatement block, ILanguage language)
@@ -81,36 +76,26 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				if (body.get_Instructions().get_Count() != 0 || body.get_Method().get_IsJustDecompileGenerated())
 				{
-					V_0 = this.steps.GetEnumerator();
-					try
+					foreach (IDecompilationStep step in this.steps)
 					{
-						while (V_0.MoveNext())
+						if (!this.Context.IsStopped)
 						{
-							V_1 = V_0.get_Current();
-							if (!this.get_Context().get_IsStopped())
-							{
-								block = V_1.Process(this.get_Context(), block);
-							}
-							else
-							{
-								goto Label0;
-							}
+							block = step.Process(this.Context, block);
 						}
-					}
-					finally
-					{
-						((IDisposable)V_0).Dispose();
+						else
+						{
+							return block;
+						}
 					}
 				}
 			}
 			finally
 			{
-				if (this.get_Context().get_MethodContext().get_IsMethodBodyChanged())
+				if (this.Context.MethodContext.IsMethodBodyChanged)
 				{
 					body.get_Method().RefreshBody();
 				}
 			}
-		Label0:
 			return block;
 		}
 	}

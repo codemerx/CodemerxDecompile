@@ -10,8 +10,6 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		public DefineUseCount()
 		{
-			base();
-			return;
 		}
 	}
 }

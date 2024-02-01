@@ -6,17 +6,10 @@ namespace Piranha.Extend
 {
 	public abstract class BlockGroup : Block
 	{
-		public IList<Block> Items
-		{
-			get;
-			set;
-		}
+		public IList<Block> Items { get; set; } = new List<Block>();
 
 		protected BlockGroup()
 		{
-			this.u003cItemsu003ek__BackingField = new List<Block>();
-			base();
-			return;
 		}
 	}
 }

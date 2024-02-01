@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new ArgumentReferenceExpression.u003cget_Childrenu003ed__5(-2);
 			}
 		}
 
@@ -23,7 +22,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 25;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ArgumentReferenceExpression;
 			}
 		}
 
@@ -31,7 +30,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Parameter().get_ParameterType();
+				return this.Parameter.get_ParameterType();
 			}
 			set
 			{
@@ -53,30 +52,28 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ArgumentReferenceExpression(ParameterReference parameter, IEnumerable<Instruction> instructions)
+		public ArgumentReferenceExpression(ParameterReference parameter, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Parameter(parameter);
-			return;
+			this.Parameter = parameter;
 		}
 
 		public override Expression Clone()
 		{
-			return new ArgumentReferenceExpression(this.get_Parameter(), this.instructions);
+			return new ArgumentReferenceExpression(this.Parameter, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ArgumentReferenceExpression(this.get_Parameter(), null);
+			return new ArgumentReferenceExpression(this.Parameter, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as ArgumentReferenceExpression == null)
+			if (!(other is ArgumentReferenceExpression))
 			{
 				return false;
 			}
-			return this.get_Parameter().get_Index() == (other as ArgumentReferenceExpression).get_Parameter().get_Index();
+			return this.Parameter.get_Index() == (other as ArgumentReferenceExpression).Parameter.get_Index();
 		}
 	}
 }

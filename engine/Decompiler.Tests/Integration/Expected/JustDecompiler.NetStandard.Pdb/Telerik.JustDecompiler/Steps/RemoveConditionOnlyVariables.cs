@@ -1,6 +1,9 @@
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -11,11 +14,11 @@ namespace Telerik.JustDecompiler.Steps
 {
 	internal class RemoveConditionOnlyVariables : BaseCodeVisitor, IDecompilationStep
 	{
-		private readonly List<RemoveConditionOnlyVariables.VariableStateAndExpression> variables;
+		private readonly List<RemoveConditionOnlyVariables.VariableStateAndExpression> variables = new List<RemoveConditionOnlyVariables.VariableStateAndExpression>();
 
-		private readonly Stack<RemoveConditionOnlyVariables.Step> states;
+		private readonly Stack<RemoveConditionOnlyVariables.Step> states = new Stack<RemoveConditionOnlyVariables.Step>();
 
-		private readonly Stack<Statement> statements;
+		private readonly Stack<Statement> statements = new Stack<Statement>();
 
 		private RemoveConditionOnlyVariables.ProcessStep processStep;
 
@@ -25,74 +28,66 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RemoveConditionOnlyVariables()
 		{
-			this.variables = new List<RemoveConditionOnlyVariables.VariableStateAndExpression>();
-			this.states = new Stack<RemoveConditionOnlyVariables.Step>();
-			this.statements = new Stack<Statement>();
-			base();
-			this.states.Push(0);
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Default);
 		}
 
 		private void ChangeVariableState(RemoveConditionOnlyVariables.Step state, VariableReferenceExpression node)
 		{
-			V_0 = this.GetValue(node.get_Variable());
-			if (state == 2 && V_0.get_VariableState() != 8 && V_0.get_NumberOfTimesAssigned() <= 1)
+			RemoveConditionOnlyVariables.VariableStateAndExpression value = this.GetValue(node.Variable);
+			if (state == RemoveConditionOnlyVariables.Step.Expression && value.VariableState != RemoveConditionOnlyVariables.VariableState.Other && value.NumberOfTimesAssigned <= 1)
 			{
-				V_0.set_VariableState(2);
+				value.VariableState = RemoveConditionOnlyVariables.VariableState.Condition;
 				return;
 			}
-			if (state != 1)
+			if (state != RemoveConditionOnlyVariables.Step.Assign)
 			{
-				V_0.set_VariableState(8);
+				value.VariableState = RemoveConditionOnlyVariables.VariableState.Other;
 				return;
 			}
-			if (V_0.get_VariableState() == 2)
+			if (value.VariableState == RemoveConditionOnlyVariables.VariableState.Condition)
 			{
-				V_0.set_VariableState(3);
+				value.VariableState = RemoveConditionOnlyVariables.VariableState.Assign | RemoveConditionOnlyVariables.VariableState.Condition;
 				return;
 			}
-			V_0.set_VariableState(1);
-			stackVariable15 = V_0;
-			stackVariable15.set_NumberOfTimesAssigned(stackVariable15.get_NumberOfTimesAssigned() + 1);
-			return;
+			value.VariableState = RemoveConditionOnlyVariables.VariableState.Assign;
+			RemoveConditionOnlyVariables.VariableStateAndExpression numberOfTimesAssigned = value;
+			numberOfTimesAssigned.NumberOfTimesAssigned = numberOfTimesAssigned.NumberOfTimesAssigned + 1;
 		}
 
 		private bool ContainsKey(VariableReference variableReference)
 		{
-			V_0 = new RemoveConditionOnlyVariables.u003cu003ec__DisplayClass10_0();
-			V_0.variableReference = variableReference;
-			return this.variables.Any<RemoveConditionOnlyVariables.VariableStateAndExpression>(new Func<RemoveConditionOnlyVariables.VariableStateAndExpression, bool>(V_0.u003cContainsKeyu003eb__0));
+			return this.variables.Any<RemoveConditionOnlyVariables.VariableStateAndExpression>((RemoveConditionOnlyVariables.VariableStateAndExpression v) => (object)v.VariableReference == (object)variableReference);
 		}
 
 		private Expression GetCurrentStatementExpression(RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression)
 		{
-			if (variableStateAndExpression.get_StatementExpressions().get_Count() == 0)
+			if (variableStateAndExpression.StatementExpressions.Count == 0)
 			{
 				return null;
 			}
-			V_0 = variableStateAndExpression.get_StatementExpressions().get_Item(variableStateAndExpression.get_StatementExpressions().get_Count() - 1);
-			dummyVar0 = variableStateAndExpression.get_StatementExpressions().Remove(V_0);
-			return V_0.get_Expression().CloneExpressionOnly();
+			RemoveConditionOnlyVariables.StatementExpression item = variableStateAndExpression.StatementExpressions[variableStateAndExpression.StatementExpressions.Count - 1];
+			variableStateAndExpression.StatementExpressions.Remove(item);
+			return item.Expression.CloneExpressionOnly();
 		}
 
 		private RemoveConditionOnlyVariables.VariableState GetInitialVariableState(RemoveConditionOnlyVariables.Step state)
 		{
-			switch (state - 1)
+			switch (state)
 			{
-				case 0:
+				case RemoveConditionOnlyVariables.Step.Assign:
 				{
-					return 1;
+					return RemoveConditionOnlyVariables.VariableState.Assign;
 				}
-				case 1:
+				case RemoveConditionOnlyVariables.Step.Expression:
 				{
-					return 2;
+					return RemoveConditionOnlyVariables.VariableState.Condition;
 				}
-				case 2:
+				case RemoveConditionOnlyVariables.Step.Return:
 				{
-					return 4;
+					return RemoveConditionOnlyVariables.VariableState.Return;
 				}
 			}
-			return 0;
+			return RemoveConditionOnlyVariables.VariableState.Declaration;
 		}
 
 		private Statement GetParentWhileStatement()
@@ -102,66 +97,63 @@ namespace Telerik.JustDecompiler.Steps
 
 		private Statement GetParentWhileStatementAtLevel(int level)
 		{
-			V_0 = this.statements.GetEnumerator();
+			Statement statement;
+			Stack<Statement>.Enumerator enumerator = this.statements.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (V_1 as WhileStatement == null && V_1 as DoWhileStatement == null)
+					Statement current = enumerator.Current;
+					if (!(current is WhileStatement) && !(current is DoWhileStatement))
 					{
 						continue;
 					}
 					if (level <= 0)
 					{
-						V_2 = V_1;
-						goto Label1;
+						statement = current;
+						return statement;
 					}
 					else
 					{
-						level = level - 1;
+						level--;
 					}
 				}
-				goto Label0;
+				return null;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return null;
+			return statement;
 		}
 
 		private int GetParentWhileStatementIndex(List<RemoveConditionOnlyVariables.StatementExpression> statementExpressions, Statement parentWhileStatement)
 		{
-			V_0 = 0;
-			while (V_0 < statementExpressions.get_Count())
+			for (int i = 0; i < statementExpressions.Count; i++)
 			{
-				if (statementExpressions.get_Item(V_0).get_Statement() == parentWhileStatement)
+				if (statementExpressions[i].Statement == parentWhileStatement)
 				{
-					return V_0;
+					return i;
 				}
-				V_0 = V_0 + 1;
 			}
 			return 0;
 		}
 
 		private RemoveConditionOnlyVariables.VariableStateAndExpression GetValue(VariableReference variableReference)
 		{
-			V_0 = new RemoveConditionOnlyVariables.u003cu003ec__DisplayClass12_0();
-			V_0.variableReference = variableReference;
-			return this.variables.Where<RemoveConditionOnlyVariables.VariableStateAndExpression>(new Func<RemoveConditionOnlyVariables.VariableStateAndExpression, bool>(V_0.u003cGetValueu003eb__0)).FirstOrDefault<RemoveConditionOnlyVariables.VariableStateAndExpression>();
+			return (
+				from v in this.variables
+				where (object)v.VariableReference == (object)variableReference
+				select v).FirstOrDefault<RemoveConditionOnlyVariables.VariableStateAndExpression>();
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.get_MethodContext();
-			this.processStep = 0;
+			this.methodContext = context.MethodContext;
+			this.processStep = RemoveConditionOnlyVariables.ProcessStep.Search;
 			this.Visit(body);
 			this.RemoveNonConditionVariables();
-			if (this.variables.get_Count() > 0)
+			if (this.variables.Count > 0)
 			{
 				this.ReplaceConditionOnlyVariables(body);
 			}
@@ -177,457 +169,384 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return;
 			}
-			V_0 = 0;
-			while (V_0 < node.get_Statements().get_Count())
+			for (int i = 0; i < node.Statements.Count; i++)
 			{
-				V_1 = node.get_Statements().get_Item(V_0);
-				this.TryRemoveConditionVariable(node, V_1, V_0);
-				this.TryRemoveReturnStatement(node, V_1, V_0);
-				V_0 = V_0 + 1;
+				Statement item = node.Statements[i];
+				this.TryRemoveConditionVariable(node, item, i);
+				this.TryRemoveReturnStatement(node, item, i);
 			}
-			return;
 		}
 
 		private void RemoveNonConditionVariables()
 		{
-			V_0 = new HashSet<RemoveConditionOnlyVariables.VariableStateAndExpression>();
-			V_1 = this.variables.GetEnumerator();
-			try
+			HashSet<RemoveConditionOnlyVariables.VariableStateAndExpression> variableStateAndExpressions = new HashSet<RemoveConditionOnlyVariables.VariableStateAndExpression>();
+			foreach (RemoveConditionOnlyVariables.VariableStateAndExpression variable in this.variables)
 			{
-				while (V_1.MoveNext())
+				if (variable.VariableState != RemoveConditionOnlyVariables.VariableState.Condition && variable.VariableState != RemoveConditionOnlyVariables.VariableState.Return)
 				{
-					V_2 = V_1.get_Current();
-					if (V_2.get_VariableState() != 2 && V_2.get_VariableState() != 4)
-					{
-						dummyVar0 = V_0.Add(V_2);
-					}
-					if (V_2.get_VariableState() != 2)
-					{
-						continue;
-					}
-					this.RemoveNotSetStatementExpressions(V_2, V_0);
+					variableStateAndExpressions.Add(variable);
 				}
-			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			V_3 = V_0.GetEnumerator();
-			try
-			{
-				while (V_3.MoveNext())
+				if (variable.VariableState != RemoveConditionOnlyVariables.VariableState.Condition)
 				{
-					V_4 = V_3.get_Current();
-					dummyVar1 = this.variables.Remove(V_4);
+					continue;
 				}
+				this.RemoveNotSetStatementExpressions(variable, variableStateAndExpressions);
 			}
-			finally
+			foreach (RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression in variableStateAndExpressions)
 			{
-				((IDisposable)V_3).Dispose();
+				this.variables.Remove(variableStateAndExpression);
 			}
-			return;
 		}
 
 		private void RemoveNotSetStatementExpressions(RemoveConditionOnlyVariables.VariableStateAndExpression keyValuePair, HashSet<RemoveConditionOnlyVariables.VariableStateAndExpression> variablesToRemove)
 		{
-			stackVariable2 = new Stack<RemoveConditionOnlyVariables.StatementExpression>(keyValuePair.get_StatementExpressions());
-			keyValuePair.get_StatementExpressions().Clear();
-			V_0 = stackVariable2.GetEnumerator();
-			try
+			Stack<RemoveConditionOnlyVariables.StatementExpression> statementExpressions = new Stack<RemoveConditionOnlyVariables.StatementExpression>(keyValuePair.StatementExpressions);
+			keyValuePair.StatementExpressions.Clear();
+			foreach (RemoveConditionOnlyVariables.StatementExpression statementExpression in statementExpressions)
 			{
-				while (V_0.MoveNext())
+				if (statementExpression.Statement == null)
 				{
-					V_1 = V_0.get_Current();
-					if (V_1.get_Statement() == null)
-					{
-						continue;
-					}
-					if (V_1.get_ParentWhileStatement() == null)
-					{
-						keyValuePair.get_StatementExpressions().Add(V_1);
-					}
-					else
-					{
-						V_2 = this.GetParentWhileStatementIndex(keyValuePair.get_StatementExpressions(), V_1.get_ParentWhileStatement());
-						keyValuePair.get_StatementExpressions().Insert(V_2, V_1);
-					}
+					continue;
+				}
+				if (statementExpression.ParentWhileStatement == null)
+				{
+					keyValuePair.StatementExpressions.Add(statementExpression);
+				}
+				else
+				{
+					int parentWhileStatementIndex = this.GetParentWhileStatementIndex(keyValuePair.StatementExpressions, statementExpression.ParentWhileStatement);
+					keyValuePair.StatementExpressions.Insert(parentWhileStatementIndex, statementExpression);
 				}
 			}
-			finally
+			if (keyValuePair.StatementExpressions.Count == 0)
 			{
-				((IDisposable)V_0).Dispose();
+				variablesToRemove.Add(keyValuePair);
 			}
-			if (keyValuePair.get_StatementExpressions().get_Count() == 0)
-			{
-				dummyVar0 = variablesToRemove.Add(keyValuePair);
-			}
-			return;
 		}
 
 		private void ReplaceConditionOnlyVariables(BlockStatement body)
 		{
-			this.processStep = 1;
+			this.processStep = RemoveConditionOnlyVariables.ProcessStep.Replace;
 			this.Visit(body);
-			this.processStep = 0;
+			this.processStep = RemoveConditionOnlyVariables.ProcessStep.Search;
 			this.variables.Clear();
-			return;
 		}
 
 		private void SetVariableAssignmentExpression(Expression expression)
 		{
-			V_0 = this.variables.GetEnumerator();
-			try
+			foreach (RemoveConditionOnlyVariables.VariableStateAndExpression variable in this.variables)
 			{
-				while (V_0.MoveNext())
+				if ((variable.VariableState & RemoveConditionOnlyVariables.VariableState.Assign) != RemoveConditionOnlyVariables.VariableState.Assign)
 				{
-					V_1 = V_0.get_Current();
-					if (V_1.get_VariableState() & 1 != 1)
-					{
-						continue;
-					}
-					V_1.get_StatementExpressions().Add(new RemoveConditionOnlyVariables.StatementExpression(expression, this.GetParentWhileStatement()));
-					if (V_1.get_VariableState() & 2 != 2)
-					{
-						V_1.set_VariableState(0);
-					}
-					else
-					{
-						V_1.set_VariableState(2);
-					}
+					continue;
+				}
+				variable.StatementExpressions.Add(new RemoveConditionOnlyVariables.StatementExpression(expression, this.GetParentWhileStatement()));
+				if ((variable.VariableState & RemoveConditionOnlyVariables.VariableState.Condition) != RemoveConditionOnlyVariables.VariableState.Condition)
+				{
+					variable.VariableState = RemoveConditionOnlyVariables.VariableState.Declaration;
+				}
+				else
+				{
+					variable.VariableState = RemoveConditionOnlyVariables.VariableState.Condition;
 				}
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void SetVariablesExpressionStatements(ConditionStatement node)
 		{
-			V_0 = this.variables.get_Count() - 1;
-			while (V_0 >= 0)
+			for (int i = this.variables.Count - 1; i >= 0; i--)
 			{
-				V_1 = this.variables.get_Item(V_0);
-				if (V_1.get_VariableState() != 8)
+				RemoveConditionOnlyVariables.VariableStateAndExpression item = this.variables[i];
+				if (item.VariableState != RemoveConditionOnlyVariables.VariableState.Other)
 				{
-					V_2 = V_1.get_StatementExpressions().get_Count() - 1;
-					while (V_2 >= 0)
+					for (int j = item.StatementExpressions.Count - 1; j >= 0; j--)
 					{
-						V_3 = V_1.get_StatementExpressions().get_Item(V_2);
-						if (V_3.get_Statement() == null)
+						RemoveConditionOnlyVariables.StatementExpression parentWhileStatementAtLevel = item.StatementExpressions[j];
+						if (parentWhileStatementAtLevel.Statement == null)
 						{
-							if (node == V_3.get_ParentWhileStatement())
+							if (node == parentWhileStatementAtLevel.ParentWhileStatement)
 							{
-								V_3.set_ParentWhileStatement(this.GetParentWhileStatementAtLevel(1));
+								parentWhileStatementAtLevel.ParentWhileStatement = this.GetParentWhileStatementAtLevel(1);
 							}
-							V_3.set_Statement(node);
+							parentWhileStatementAtLevel.Statement = node;
 						}
-						V_2 = V_2 - 1;
 					}
 				}
-				V_0 = V_0 - 1;
 			}
-			return;
 		}
 
 		private bool TryGetValue(VariableReference variableReference, out RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression)
 		{
-			V_0 = new RemoveConditionOnlyVariables.u003cu003ec__DisplayClass11_0();
-			V_0.variableReference = variableReference;
-			V_1 = this.variables.Where<RemoveConditionOnlyVariables.VariableStateAndExpression>(new Func<RemoveConditionOnlyVariables.VariableStateAndExpression, bool>(V_0.u003cTryGetValueu003eb__0)).FirstOrDefault<RemoveConditionOnlyVariables.VariableStateAndExpression>();
-			variableStateAndExpression = V_1;
-			return V_1 != null;
+			RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression1 = (
+				from v in this.variables
+				where (object)v.VariableReference == (object)variableReference
+				select v).FirstOrDefault<RemoveConditionOnlyVariables.VariableStateAndExpression>();
+			variableStateAndExpression = variableStateAndExpression1;
+			return variableStateAndExpression1 != null;
 		}
 
 		private bool TryGetVariableExpression(Expression variableExpression, out Expression expression)
 		{
-			if (variableExpression as VariableReferenceExpression == null || !this.TryGetValue(((VariableReferenceExpression)variableExpression).get_Variable(), out V_1) || V_1.get_VariableState() != 2)
+			RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression;
+			if (!(variableExpression is VariableReferenceExpression) || !this.TryGetValue(((VariableReferenceExpression)variableExpression).Variable, out variableStateAndExpression) || variableStateAndExpression.VariableState != RemoveConditionOnlyVariables.VariableState.Condition)
 			{
 				expression = null;
 				return false;
 			}
-			expression = this.GetCurrentStatementExpression(V_1);
+			expression = this.GetCurrentStatementExpression(variableStateAndExpression);
 			return expression != null;
 		}
 
 		private void TryProcessConditionExpression(ConditionExpression node)
 		{
-			if (this.processStep == 1 && this.TryGetVariableExpression(node.get_Condition(), out V_0))
+			Expression expression;
+			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Replace && this.TryGetVariableExpression(node.Condition, out expression))
 			{
-				node.set_Condition(V_0);
+				node.Condition = expression;
 			}
-			return;
 		}
 
 		private void TryProcessConditionStatement(ConditionStatement node)
 		{
-			if (this.processStep == 1 && this.TryGetVariableExpression(node.get_Condition(), out V_0))
+			Expression expression;
+			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Replace && this.TryGetVariableExpression(node.Condition, out expression))
 			{
-				node.set_Condition(V_0);
+				node.Condition = expression;
 			}
-			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Search && node as WhileStatement == null && node as DoWhileStatement == null)
+			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Search && !(node is WhileStatement) && !(node is DoWhileStatement))
 			{
 				this.SetVariablesExpressionStatements(node);
 			}
-			return;
 		}
 
 		private void TryProcessUnaryExpression(UnaryExpression node)
 		{
-			if (this.processStep == 1 && this.TryGetVariableExpression(node.get_Operand(), out V_0))
+			Expression expression;
+			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Replace && this.TryGetVariableExpression(node.Operand, out expression))
 			{
-				node.set_Operand(V_0);
+				node.Operand = expression;
 			}
-			return;
 		}
 
 		private void TryRemoveConditionVariable(BlockStatement node, Statement statement, int index)
 		{
-			if (statement as ExpressionStatement == null)
+			if (!(statement is ExpressionStatement))
 			{
 				return;
 			}
-			V_0 = (ExpressionStatement)statement;
-			if (V_0.get_Expression().get_CodeNodeType() != 24 || !(V_0.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
+			ExpressionStatement expressionStatement = (ExpressionStatement)statement;
+			if (expressionStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expressionStatement.Expression as BinaryExpression).IsAssignmentExpression)
 			{
 				return;
 			}
-			V_1 = (BinaryExpression)V_0.get_Expression();
-			if (V_1.get_Left() as VariableReferenceExpression == null)
+			BinaryExpression expression = (BinaryExpression)expressionStatement.Expression;
+			if (!(expression.Left is VariableReferenceExpression))
 			{
 				return;
 			}
-			if (V_1.get_Right() as MethodInvocationExpression != null && String.op_Inequality((V_1.get_Left() as VariableReferenceExpression).get_Variable().get_VariableType().get_Name(), 3.ToString()))
+			if (expression.Right is MethodInvocationExpression && (expression.Left as VariableReferenceExpression).Variable.get_VariableType().get_Name() != TypeCode.Boolean.ToString())
 			{
 				return;
 			}
-			V_2 = (VariableReferenceExpression)V_1.get_Left();
-			if (this.ContainsKey(V_2.get_Variable()))
+			VariableReferenceExpression left = (VariableReferenceExpression)expression.Left;
+			if (this.ContainsKey(left.Variable))
 			{
-				this.methodContext.RemoveVariable(V_2.get_Variable());
-				node.get_Statements().RemoveAt(index);
+				this.methodContext.RemoveVariable(left.Variable);
+				node.Statements.RemoveAt(index);
 			}
-			return;
 		}
 
 		private void TryRemoveReturnStatement(BlockStatement node, Statement statement, int index)
 		{
-			if (statement.get_CodeNodeType() == 5 && (statement as ExpressionStatement).get_Expression().get_CodeNodeType() == 57)
+			RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression;
+			if (statement.CodeNodeType == CodeNodeType.ExpressionStatement && (statement as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ReturnExpression)
 			{
-				V_0 = (ReturnExpression)(statement as ExpressionStatement).get_Expression();
-				if (V_0.get_Value() as VariableReferenceExpression == null)
+				ReturnExpression expression = (ReturnExpression)(statement as ExpressionStatement).Expression;
+				if (!(expression.Value is VariableReferenceExpression))
 				{
 					return;
 				}
-				V_1 = V_0.get_Value() as VariableReferenceExpression;
-				if (V_1 == null)
+				VariableReferenceExpression value = expression.Value as VariableReferenceExpression;
+				if (value == null)
 				{
 					return;
 				}
-				if (this.TryGetValue(V_1.get_Variable(), out V_2) && V_2.get_VariableState() == 4)
+				if (this.TryGetValue(value.Variable, out variableStateAndExpression) && variableStateAndExpression.VariableState == RemoveConditionOnlyVariables.VariableState.Return)
 				{
-					this.methodContext.RemoveVariable(V_1.get_Variable());
-					node.get_Statements().RemoveAt(index);
+					this.methodContext.RemoveVariable(value.Variable);
+					node.Statements.RemoveAt(index);
 				}
 			}
-			return;
 		}
 
 		public override void VisitArrayIndexerExpression(ArrayIndexerExpression node)
 		{
-			this.states.Push(0);
-			this.VisitArrayIndexerExpression(node);
-			dummyVar0 = this.states.Pop();
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Default);
+			base.VisitArrayIndexerExpression(node);
+			this.states.Pop();
 		}
 
 		private void VisitAssignExpression(BinaryExpression node)
 		{
 			this.currentVariable = null;
-			this.states.Push(1);
-			this.Visit(node.get_Left());
-			dummyVar0 = this.states.Pop();
+			this.states.Push(RemoveConditionOnlyVariables.Step.Assign);
+			this.Visit(node.Left);
+			this.states.Pop();
 			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Search)
 			{
-				this.SetVariableAssignmentExpression(node.get_Right());
+				this.SetVariableAssignmentExpression(node.Right);
 			}
-			if (node.get_Right().get_CodeNodeType() == 22 && this.currentVariable != null)
+			if (node.Right.CodeNodeType == CodeNodeType.LiteralExpression && this.currentVariable != null)
 			{
-				V_0 = this.GetValue(this.currentVariable);
-				if (V_0 != null && V_0.get_VariableState() != RemoveConditionOnlyVariables.VariableState.Declaration)
+				RemoveConditionOnlyVariables.VariableStateAndExpression value = this.GetValue(this.currentVariable);
+				if (value != null && value.VariableState != RemoveConditionOnlyVariables.VariableState.Declaration)
 				{
-					stackVariable29 = V_0;
-					stackVariable29.set_NumberOfTimesAssigned(stackVariable29.get_NumberOfTimesAssigned() + 1);
+					RemoveConditionOnlyVariables.VariableStateAndExpression numberOfTimesAssigned = value;
+					numberOfTimesAssigned.NumberOfTimesAssigned = numberOfTimesAssigned.NumberOfTimesAssigned + 1;
 				}
 			}
-			this.Visit(node.get_Right());
-			return;
+			this.Visit(node.Right);
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.get_IsAssignmentExpression())
+			if (node.IsAssignmentExpression)
 			{
 				this.VisitAssignExpression(node);
 				return;
 			}
-			this.states.Push(0);
-			this.VisitBinaryExpression(node);
-			dummyVar0 = this.states.Pop();
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Default);
+			base.VisitBinaryExpression(node);
+			this.states.Pop();
 		}
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
 			this.ProcessBlock(node);
-			V_0 = node.get_Statements().GetEnumerator();
-			try
+			foreach (Statement statement in node.Statements)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.statements.Push(V_1);
-					this.Visit(V_1);
-					dummyVar0 = this.statements.Pop();
-				}
+				this.statements.Push(statement);
+				this.Visit(statement);
+				this.statements.Pop();
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 
 		public override void VisitConditionExpression(ConditionExpression node)
 		{
 			this.TryProcessConditionExpression(node);
-			this.states.Push(2);
-			this.Visit(node.get_Condition());
-			dummyVar0 = this.states.Pop();
-			this.Visit(node.get_Then());
-			this.Visit(node.get_Else());
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			this.Visit(node.Condition);
+			this.states.Pop();
+			this.Visit(node.Then);
+			this.Visit(node.Else);
 		}
 
 		public override void VisitDoWhileStatement(DoWhileStatement node)
 		{
 			this.TryProcessConditionStatement(node);
-			this.states.Push(2);
-			this.Visit(node.get_Condition());
-			dummyVar0 = this.states.Pop();
-			this.Visit(node.get_Body());
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			this.Visit(node.Condition);
+			this.states.Pop();
+			this.Visit(node.Body);
 			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Search)
 			{
 				this.SetVariablesExpressionStatements(node);
 			}
-			return;
 		}
 
 		public override void VisitForStatement(ForStatement node)
 		{
 			this.TryProcessConditionStatement(node);
-			this.Visit(node.get_Initializer());
-			this.states.Push(2);
-			this.Visit(node.get_Condition());
-			dummyVar0 = this.states.Pop();
-			this.Visit(node.get_Increment());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Initializer);
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			this.Visit(node.Condition);
+			this.states.Pop();
+			this.Visit(node.Increment);
+			this.Visit(node.Body);
 		}
 
 		public override void VisitIfStatement(IfStatement node)
 		{
 			this.TryProcessConditionStatement(node);
-			this.states.Push(2);
-			this.Visit(node.get_Condition());
-			dummyVar0 = this.states.Pop();
-			this.Visit(node.get_Then());
-			this.Visit(node.get_Else());
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			this.Visit(node.Condition);
+			this.states.Pop();
+			this.Visit(node.Then);
+			this.Visit(node.Else);
 		}
 
 		public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			this.states.Push(0);
-			this.VisitMethodReferenceExpression(node);
-			dummyVar0 = this.states.Pop();
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Default);
+			base.VisitMethodReferenceExpression(node);
+			this.states.Pop();
 		}
 
 		public override void VisitReturnExpression(ReturnExpression node)
 		{
-			this.states.Push(3);
-			this.VisitReturnExpression(node);
-			dummyVar0 = this.states.Pop();
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Return);
+			base.VisitReturnExpression(node);
+			this.states.Pop();
 		}
 
 		public override void VisitSwitchStatement(SwitchStatement node)
 		{
 			this.TryProcessConditionStatement(node);
-			this.states.Push(2);
-			this.Visit(node.get_Condition());
-			dummyVar0 = this.states.Pop();
-			this.Visit(node.get_Cases());
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			this.Visit(node.Condition);
+			this.states.Pop();
+			this.Visit(node.Cases);
 		}
 
 		public override void VisitUnaryExpression(UnaryExpression node)
 		{
-			if (node.get_Operator() == 9)
+			if (node.Operator == UnaryOperator.AddressOf)
 			{
 				return;
 			}
 			this.TryProcessUnaryExpression(node);
-			this.states.Push(2);
-			this.VisitUnaryExpression(node);
-			dummyVar0 = this.states.Pop();
-			return;
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			base.VisitUnaryExpression(node);
+			this.states.Pop();
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (this.processStep == 1)
+			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Replace)
 			{
 				return;
 			}
-			V_0 = this.states.Peek();
-			if (!this.ContainsKey(node.get_Variable()))
+			RemoveConditionOnlyVariables.Step step = this.states.Peek();
+			if (!this.ContainsKey(node.Variable))
 			{
-				V_1 = this.GetInitialVariableState(V_0);
-				V_2 = new RemoveConditionOnlyVariables.VariableStateAndExpression(node.get_Variable(), V_1);
-				if (V_0 == 1)
+				RemoveConditionOnlyVariables.VariableState initialVariableState = this.GetInitialVariableState(step);
+				RemoveConditionOnlyVariables.VariableStateAndExpression variableStateAndExpression = new RemoveConditionOnlyVariables.VariableStateAndExpression(node.Variable, initialVariableState);
+				if (step == RemoveConditionOnlyVariables.Step.Assign)
 				{
-					stackVariable27 = V_2;
-					stackVariable27.set_NumberOfTimesAssigned(stackVariable27.get_NumberOfTimesAssigned() + 1);
+					RemoveConditionOnlyVariables.VariableStateAndExpression numberOfTimesAssigned = variableStateAndExpression;
+					numberOfTimesAssigned.NumberOfTimesAssigned = numberOfTimesAssigned.NumberOfTimesAssigned + 1;
 				}
-				this.variables.Add(V_2);
+				this.variables.Add(variableStateAndExpression);
 			}
 			else
 			{
-				this.ChangeVariableState(V_0, node);
+				this.ChangeVariableState(step, node);
 			}
-			this.VisitVariableReferenceExpression(node);
-			this.currentVariable = node.get_Variable();
-			return;
+			base.VisitVariableReferenceExpression(node);
+			this.currentVariable = node.Variable;
 		}
 
 		public override void VisitWhileStatement(WhileStatement node)
 		{
 			this.TryProcessConditionStatement(node);
-			this.states.Push(2);
-			this.Visit(node.get_Condition());
-			dummyVar0 = this.states.Pop();
-			this.Visit(node.get_Body());
+			this.states.Push(RemoveConditionOnlyVariables.Step.Expression);
+			this.Visit(node.Condition);
+			this.states.Pop();
+			this.Visit(node.Body);
 			if (this.processStep == RemoveConditionOnlyVariables.ProcessStep.Search)
 			{
 				this.SetVariablesExpressionStatements(node);
 			}
-			return;
 		}
 
 		private enum ProcessStep
@@ -653,7 +572,6 @@ namespace Telerik.JustDecompiler.Steps
 				set
 				{
 					this.expression = value;
-					return;
 				}
 			}
 
@@ -666,7 +584,6 @@ namespace Telerik.JustDecompiler.Steps
 				set
 				{
 					this.parentWhileStatement = value;
-					return;
 				}
 			}
 
@@ -679,16 +596,13 @@ namespace Telerik.JustDecompiler.Steps
 				set
 				{
 					this.statement = value;
-					return;
 				}
 			}
 
 			public StatementExpression(Expression expression, Statement parentWhileStatement)
 			{
-				base();
 				this.expression = expression;
 				this.parentWhileStatement = parentWhileStatement;
-				return;
 			}
 		}
 
@@ -741,7 +655,6 @@ namespace Telerik.JustDecompiler.Steps
 				set
 				{
 					this.variableReference = value;
-					return;
 				}
 			}
 
@@ -754,17 +667,14 @@ namespace Telerik.JustDecompiler.Steps
 				set
 				{
 					this.variableState = value;
-					return;
 				}
 			}
 
 			public VariableStateAndExpression(VariableReference variableReference, RemoveConditionOnlyVariables.VariableState variableState)
 			{
-				base();
 				this.variableState = variableState;
 				this.variableReference = variableReference;
 				this.statementExpressions = new List<RemoveConditionOnlyVariables.StatementExpression>();
-				return;
 			}
 		}
 	}

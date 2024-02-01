@@ -16,9 +16,7 @@ namespace Piranha
 
 		public PiranhaServiceBuilder(IServiceCollection services)
 		{
-			base();
 			this.Services = services;
-			return;
 		}
 	}
 }

@@ -38,8 +38,6 @@ namespace Piranha.Models
 
 		public MediaVersion()
 		{
-			base();
-			return;
 		}
 	}
 }

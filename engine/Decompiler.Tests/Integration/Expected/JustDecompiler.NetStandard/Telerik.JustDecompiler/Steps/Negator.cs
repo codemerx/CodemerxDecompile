@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using System;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -7,18 +8,18 @@ namespace Telerik.JustDecompiler.Steps
 {
 	public static class Negator
 	{
-		private static bool IsBitwiseOperator(BinaryOperator operator)
+		private static bool IsBitwiseOperator(BinaryOperator @operator)
 		{
-			if (operator - 21 <= 2)
+			if ((int)@operator - (int)BinaryOperator.BitwiseOr <= (int)BinaryOperator.AddAssign)
 			{
 				return true;
 			}
 			return false;
 		}
 
-		private static bool IsLogicalOperator(BinaryOperator operator)
+		private static bool IsLogicalOperator(BinaryOperator @operator)
 		{
-			if (operator - 11 <= 1)
+			if ((int)@operator - (int)BinaryOperator.LogicalOr <= (int)BinaryOperator.Add)
 			{
 				return true;
 			}
@@ -27,44 +28,42 @@ namespace Telerik.JustDecompiler.Steps
 
 		private static bool IsMathOperator(BinaryOperator binaryOperator)
 		{
-			switch (binaryOperator - 1)
+			switch (binaryOperator)
 			{
-				case 0:
-				case 2:
-				case 4:
-				case 6:
+				case BinaryOperator.Add:
+				case BinaryOperator.Subtract:
+				case BinaryOperator.Multiply:
+				case BinaryOperator.Divide:
 				{
-				Label0:
 					return true;
 				}
-				case 1:
-				case 3:
-				case 5:
+				case BinaryOperator.AddAssign:
+				case BinaryOperator.SubtractAssign:
+				case BinaryOperator.MultiplyAssign:
 				{
-				Label1:
 					return false;
 				}
 				default:
 				{
-					switch (binaryOperator - 17)
+					switch (binaryOperator)
 					{
-						case 0:
-						case 2:
-						case 4:
-						case 5:
-						case 6:
-						case 7:
+						case BinaryOperator.LeftShift:
+						case BinaryOperator.RightShift:
+						case BinaryOperator.BitwiseOr:
+						case BinaryOperator.BitwiseAnd:
+						case BinaryOperator.BitwiseXor:
+						case BinaryOperator.Modulo:
 						{
-							goto Label0;
+							return true;
 						}
-						case 1:
-						case 3:
+						case BinaryOperator.LeftShiftAssign:
+						case BinaryOperator.RightShiftAssign:
 						{
-							goto Label1;
+							return false;
 						}
 						default:
 						{
-							goto Label1;
+							return false;
 						}
 					}
 					break;
@@ -78,176 +77,160 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return null;
 			}
-			V_1 = expression.get_CodeNodeType();
-			if (V_1 == 23)
+			CodeNodeType codeNodeType = expression.CodeNodeType;
+			if (codeNodeType == CodeNodeType.UnaryExpression)
 			{
 				return Negator.NegateUnaryExpression(expression, typeSystem);
 			}
-			if (V_1 == 24)
+			if (codeNodeType == CodeNodeType.BinaryExpression)
 			{
-				V_2 = (BinaryExpression)expression;
-				if (!Negator.IsMathOperator(V_2.get_Operator()))
+				BinaryExpression binaryExpression = (BinaryExpression)expression;
+				if (!Negator.IsMathOperator(binaryExpression.Operator))
 				{
 					return Negator.NegateBinaryExpression(expression, typeSystem);
 				}
-				if (String.op_Equality(V_2.get_ExpressionType().get_FullName(), "System.Boolean"))
+				if (binaryExpression.ExpressionType.get_FullName() == "System.Boolean")
 				{
-					return new UnaryExpression(1, expression, null);
+					return new UnaryExpression(UnaryOperator.LogicalNot, expression, null);
 				}
-				return new BinaryExpression(9, expression, new LiteralExpression((object)0, typeSystem, null), typeSystem, null, false);
+				return new BinaryExpression(BinaryOperator.ValueEquality, expression, new LiteralExpression((object)0, typeSystem, null), typeSystem, null, false);
 			}
-			if (V_1 == 36)
+			if (codeNodeType == CodeNodeType.ConditionExpression)
 			{
 				return Negator.NegateConditionExpression(expression, typeSystem);
 			}
-			if (expression.get_CodeNodeType() == 22 && String.op_Equality(expression.get_ExpressionType().get_FullName(), typeSystem.get_Boolean().get_FullName()))
+			if (expression.CodeNodeType == CodeNodeType.LiteralExpression && expression.ExpressionType.get_FullName() == typeSystem.get_Boolean().get_FullName())
 			{
-				return new LiteralExpression((object)(!(Boolean)(expression as LiteralExpression).get_Value()), typeSystem, expression.get_UnderlyingSameMethodInstructions());
+				return new LiteralExpression((object)(!(Boolean)(expression as LiteralExpression).Value), typeSystem, expression.UnderlyingSameMethodInstructions);
 			}
-			V_0 = expression.get_ExpressionType().GetDefaultValueExpression(typeSystem) as LiteralExpression;
-			if (V_0 == null)
+			LiteralExpression defaultValueExpression = expression.ExpressionType.GetDefaultValueExpression(typeSystem) as LiteralExpression;
+			if (defaultValueExpression == null)
 			{
-				return new UnaryExpression(1, expression, null);
+				return new UnaryExpression(UnaryOperator.LogicalNot, expression, null);
 			}
-			if (String.op_Equality(V_0.get_ExpressionType().get_FullName(), typeSystem.get_Boolean().get_FullName()))
+			if (defaultValueExpression.ExpressionType.get_FullName() == typeSystem.get_Boolean().get_FullName())
 			{
-				return new UnaryExpression(1, expression, null);
+				return new UnaryExpression(UnaryOperator.LogicalNot, expression, null);
 			}
-			return new BinaryExpression(9, expression, V_0, typeSystem, null, false);
+			return new BinaryExpression(BinaryOperator.ValueEquality, expression, defaultValueExpression, typeSystem, null, false);
 		}
 
 		private static Expression NegateBinaryExpression(Expression expression, TypeSystem typeSystem)
 		{
-			V_0 = (BinaryExpression)expression;
-			if (Negator.IsLogicalOperator(V_0.get_Operator()))
+			BinaryOperator binaryOperator;
+			BinaryExpression binaryExpression = (BinaryExpression)expression;
+			if (Negator.IsLogicalOperator(binaryExpression.Operator))
 			{
-				if (V_0.get_Operator() == 12)
-				{
-					stackVariable48 = 11;
-				}
-				else
-				{
-					stackVariable48 = 12;
-				}
-				V_2 = stackVariable48;
-				V_0.set_Left(Negator.Negate(V_0.get_Left(), typeSystem));
-				V_0.set_Operator(V_2);
-				V_0.set_Right(Negator.Negate(V_0.get_Right(), typeSystem));
-				return V_0;
+				BinaryOperator binaryOperator1 = (binaryExpression.Operator == BinaryOperator.LogicalAnd ? BinaryOperator.LogicalOr : BinaryOperator.LogicalAnd);
+				binaryExpression.Left = Negator.Negate(binaryExpression.Left, typeSystem);
+				binaryExpression.Operator = binaryOperator1;
+				binaryExpression.Right = Negator.Negate(binaryExpression.Right, typeSystem);
+				return binaryExpression;
 			}
-			if (!Negator.IsBitwiseOperator(V_0.get_Operator()) || !String.op_Equality(V_0.get_ExpressionType().get_FullName(), typeSystem.get_Boolean().get_FullName()))
+			if (!Negator.IsBitwiseOperator(binaryExpression.Operator) || !(binaryExpression.ExpressionType.get_FullName() == typeSystem.get_Boolean().get_FullName()))
 			{
-				if (!Negator.TryGetInverseOperator(V_0.get_Operator(), out V_1))
+				if (!Negator.TryGetInverseOperator(binaryExpression.Operator, out binaryOperator))
 				{
 					throw new ArgumentException("expression");
 				}
-				V_0.set_Operator(V_1);
-				return V_0;
+				binaryExpression.Operator = binaryOperator;
+				return binaryExpression;
 			}
-			if (V_0.get_Operator() != 23)
+			if (binaryExpression.Operator != BinaryOperator.BitwiseXor)
 			{
-				V_0.set_Left(Negator.Negate(V_0.get_Left(), typeSystem));
-				stackVariable32 = V_0;
-				if (V_0.get_Operator() == 22)
-				{
-					stackVariable36 = 21;
-				}
-				else
-				{
-					stackVariable36 = 22;
-				}
-				stackVariable32.set_Operator(stackVariable36);
-				V_0.set_Right(Negator.Negate(V_0.get_Right(), typeSystem));
+				binaryExpression.Left = Negator.Negate(binaryExpression.Left, typeSystem);
+				binaryExpression.Operator = (binaryExpression.Operator == BinaryOperator.BitwiseAnd ? BinaryOperator.BitwiseOr : BinaryOperator.BitwiseAnd);
+				binaryExpression.Right = Negator.Negate(binaryExpression.Right, typeSystem);
 			}
 			else
 			{
-				V_0.set_Operator(9);
+				binaryExpression.Operator = BinaryOperator.ValueEquality;
 			}
-			return V_0;
+			return binaryExpression;
 		}
 
 		private static Expression NegateConditionExpression(Expression expression, TypeSystem typeSystem)
 		{
-			stackVariable1 = (ConditionExpression)expression;
-			stackVariable1.set_Then(Negator.Negate(stackVariable1.get_Then(), typeSystem));
-			stackVariable1.set_Else(Negator.Negate(stackVariable1.get_Else(), typeSystem));
-			return stackVariable1;
+			ConditionExpression conditionExpression = (ConditionExpression)expression;
+			conditionExpression.Then = Negator.Negate(conditionExpression.Then, typeSystem);
+			conditionExpression.Else = Negator.Negate(conditionExpression.Else, typeSystem);
+			return conditionExpression;
 		}
 
 		private static Expression NegateUnaryExpression(Expression expression, TypeSystem typeSystem)
 		{
-			V_0 = (UnaryExpression)expression;
-			V_1 = V_0.get_Operator();
-			if (V_1 == 1)
+			UnaryExpression operand = (UnaryExpression)expression;
+			UnaryOperator @operator = operand.Operator;
+			if (@operator == UnaryOperator.LogicalNot)
 			{
-				V_0.set_Operator(11);
-				return V_0;
+				operand.Operator = UnaryOperator.None;
+				return operand;
 			}
-			if (V_1 != 8 && V_1 != 11)
+			if (@operator != UnaryOperator.AddressDereference && @operator != UnaryOperator.None)
 			{
 				throw new ArgumentException("expression");
 			}
-			if (V_0.get_Operand().get_CodeNodeType() == 24)
+			if (operand.Operand.CodeNodeType == CodeNodeType.BinaryExpression)
 			{
-				V_2 = Negator.NegateBinaryExpression(V_0.get_Operand() as BinaryExpression, typeSystem);
-				V_0.set_Operand(V_2);
-				return V_0;
+				Expression expression1 = Negator.NegateBinaryExpression(operand.Operand as BinaryExpression, typeSystem);
+				operand.Operand = expression1;
+				return operand;
 			}
-			if (V_0.get_Operand().get_CodeNodeType() != 23 || (V_0.get_Operand() as UnaryExpression).get_Operator() != 1)
+			if (operand.Operand.CodeNodeType != CodeNodeType.UnaryExpression || (operand.Operand as UnaryExpression).Operator != UnaryOperator.LogicalNot)
 			{
-				V_0.set_Operator(1);
+				operand.Operator = UnaryOperator.LogicalNot;
 			}
 			else
 			{
-				V_0.set_Operand((V_0.get_Operand() as UnaryExpression).get_Operand());
+				operand.Operand = (operand.Operand as UnaryExpression).Operand;
 			}
-			return V_0;
+			return operand;
 		}
 
-		private static bool TryGetInverseOperator(BinaryOperator operator, out BinaryOperator inverse)
+		private static bool TryGetInverseOperator(BinaryOperator @operator, out BinaryOperator inverse)
 		{
-			switch (operator - 9)
+			switch (@operator)
 			{
-				case 0:
+				case BinaryOperator.ValueEquality:
 				{
-					inverse = 10;
+					inverse = BinaryOperator.ValueInequality;
 					break;
 				}
-				case 1:
+				case BinaryOperator.ValueInequality:
 				{
-					inverse = 9;
+					inverse = BinaryOperator.ValueEquality;
 					break;
 				}
-				case 2:
-				case 3:
+				case BinaryOperator.LogicalOr:
+				case BinaryOperator.LogicalAnd:
 				{
-				Label0:
-					inverse = operator;
+					inverse = @operator;
 					return false;
 				}
-				case 4:
+				case BinaryOperator.LessThan:
 				{
-					inverse = 16;
+					inverse = BinaryOperator.GreaterThanOrEqual;
 					break;
 				}
-				case 5:
+				case BinaryOperator.LessThanOrEqual:
 				{
-					inverse = 15;
+					inverse = BinaryOperator.GreaterThan;
 					break;
 				}
-				case 6:
+				case BinaryOperator.GreaterThan:
 				{
-					inverse = 14;
+					inverse = BinaryOperator.LessThanOrEqual;
 					break;
 				}
-				case 7:
+				case BinaryOperator.GreaterThanOrEqual:
 				{
-					inverse = 13;
+					inverse = BinaryOperator.LessThan;
 					break;
 				}
 				default:
 				{
-					goto Label0;
+					inverse = @operator;
+					return false;
 				}
 			}
 			return true;

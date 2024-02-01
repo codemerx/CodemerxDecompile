@@ -1,8 +1,11 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
 using System;
+using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -10,36 +13,34 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public RenameVBVariables()
 		{
-			base();
-			return;
 		}
 
 		private string GetMethodName(MethodDefinition method)
 		{
-			V_0 = method.GetFriendlyMemberName(null);
-			if (V_0.Contains("<"))
+			string friendlyMemberName = method.GetFriendlyMemberName(null);
+			if (friendlyMemberName.Contains("<"))
 			{
-				V_0 = V_0.Substring(0, V_0.IndexOf("<"));
+				friendlyMemberName = friendlyMemberName.Substring(0, friendlyMemberName.IndexOf("<"));
 			}
-			if (method.get_IsGetter() && V_0.IndexOf("get_") == 0 || method.get_IsSetter() && V_0.IndexOf("set_") == 0)
+			if (method.get_IsGetter() && friendlyMemberName.IndexOf("get_") == 0 || method.get_IsSetter() && friendlyMemberName.IndexOf("set_") == 0)
 			{
-				return V_0.Substring(4);
+				return friendlyMemberName.Substring(4);
 			}
 			if (!method.get_IsConstructor())
 			{
-				return V_0;
+				return friendlyMemberName;
 			}
-			return method.get_DeclaringType().GetFriendlyTypeName(this.context.get_Language(), "<", ">");
+			return method.get_DeclaringType().GetFriendlyTypeName(this.context.Language, "<", ">");
 		}
 
 		protected override bool IsValidNameInContext(string name, VariableDefinition variable)
 		{
-			if (!this.IsValidNameInContext(name, variable))
+			if (!base.IsValidNameInContext(name, variable))
 			{
 				return false;
 			}
-			V_0 = this.GetMethodName(this.methodContext.get_Method());
-			if (this.context.get_Language().get_IdentifierComparer().Compare(name, V_0) == 0)
+			string methodName = this.GetMethodName(this.methodContext.Method);
+			if (this.context.Language.IdentifierComparer.Compare(name, methodName) == 0)
 			{
 				return false;
 			}
@@ -49,22 +50,21 @@ namespace Telerik.JustDecompiler.Steps
 		public override BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
 			this.context = context;
-			dummyVar0 = this.suggestedNames.Add(this.GetMethodName(context.get_MethodContext().get_Method()));
-			return this.Process(context, block);
+			this.suggestedNames.Add(this.GetMethodName(context.MethodContext.Method));
+			return base.Process(context, block);
 		}
 
 		protected override void TryRenameVariable(VariableDefinition variable)
 		{
-			if (this.state != 1)
+			if (this.state != RenameVariables.State.RenameVariables)
 			{
 				return;
 			}
-			if (!this.IsValidNameInContext(this.methodContext.get_VariableDefinitionToNameMap().get_Item(variable.Resolve()), variable))
+			if (!this.IsValidNameInContext(this.methodContext.VariableDefinitionToNameMap[variable.Resolve()], variable))
 			{
-				dummyVar0 = this.methodContext.get_VariablesToRename().Add(variable);
+				this.methodContext.VariablesToRename.Add(variable);
 			}
-			this.TryRenameVariable(variable);
-			return;
+			base.TryRenameVariable(variable);
 		}
 	}
 }

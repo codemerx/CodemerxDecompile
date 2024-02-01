@@ -14,9 +14,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new SelectClause.u003cget_Childrenu003ed__11(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				SelectClause selectClause = null;
+				yield return selectClause.Expression;
 			}
 		}
 
@@ -24,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 74;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.SelectClause;
 			}
 		}
 
@@ -34,31 +33,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public SelectClause(Telerik.JustDecompiler.Ast.Expressions.Expression selectExpression, IEnumerable<Instruction> instructions)
+		public SelectClause(Telerik.JustDecompiler.Ast.Expressions.Expression selectExpression, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(selectExpression);
-			return;
+			this.Expression = selectExpression;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new SelectClause(this.get_Expression().Clone(), this.instructions);
+			return new SelectClause(this.Expression.Clone(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new SelectClause(this.get_Expression().CloneExpressionOnly(), null);
+			return new SelectClause(this.Expression.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			V_0 = other as SelectClause;
-			if (V_0 == null)
+			SelectClause selectClause = other as SelectClause;
+			if (selectClause == null)
 			{
 				return false;
 			}
-			return this.get_Expression().Equals(V_0.get_Expression());
+			return this.Expression.Equals(selectClause.Expression);
 		}
 	}
 }

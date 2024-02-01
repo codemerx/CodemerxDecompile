@@ -145,8 +145,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixAttributeField()
 		{
-			base();
-			return;
 		}
 	}
 }

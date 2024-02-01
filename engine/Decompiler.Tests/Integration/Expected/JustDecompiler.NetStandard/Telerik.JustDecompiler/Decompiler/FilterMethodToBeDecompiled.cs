@@ -33,12 +33,10 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public FilterMethodToBeDecompiled(MethodDefinition method, Telerik.JustDecompiler.Ast.Statements.CatchClause catchClause, DecompilationContext context, BlockStatement block)
 		{
-			base();
-			this.set_Method(method);
-			this.set_CatchClause(catchClause);
-			this.set_Context(context);
-			this.set_Block(block);
-			return;
+			this.Method = method;
+			this.CatchClause = catchClause;
+			this.Context = context;
+			this.Block = block;
 		}
 	}
 }

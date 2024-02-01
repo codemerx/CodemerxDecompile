@@ -9,8 +9,6 @@ namespace Piranha.Extend.Blocks
 	{
 		public ImageGalleryBlock()
 		{
-			base();
-			return;
 		}
 	}
 }

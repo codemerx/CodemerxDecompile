@@ -7,8 +7,6 @@ namespace OrchardCore.Environment.Extensions
 	{
 		public ExtensionPriorityStrategy()
 		{
-			base();
-			return;
 		}
 
 		public int GetPriority(IFeatureInfo feature)

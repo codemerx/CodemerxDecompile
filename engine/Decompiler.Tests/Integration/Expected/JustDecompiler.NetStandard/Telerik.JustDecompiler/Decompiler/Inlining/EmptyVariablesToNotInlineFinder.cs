@@ -10,8 +10,6 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 	{
 		public EmptyVariablesToNotInlineFinder()
 		{
-			base();
-			return;
 		}
 
 		public HashSet<VariableDefinition> Find(StatementCollection statements)

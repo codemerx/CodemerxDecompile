@@ -7,8 +7,6 @@ namespace Piranha.Models
 	{
 		public PostInfo()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 using System.Runtime.CompilerServices;
 
 namespace Piranha.Models
@@ -6,17 +7,10 @@ namespace Piranha.Models
 	[Serializable]
 	public class DynamicPost : Post<DynamicPost>, IDynamicContent
 	{
-		public dynamic Regions
-		{
-			get;
-			set;
-		}
+		public dynamic Regions { get; set; } = new ExpandoObject();
 
 		public DynamicPost()
 		{
-			this.u003cRegionsu003ek__BackingField = new ExpandoObject();
-			base();
-			return;
 		}
 	}
 }

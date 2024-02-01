@@ -49,8 +49,6 @@ namespace Mix.Cms.Messenger.Models.Data
 
 		public MixMessengerNavTeamUser()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Telerik.JustDecompiler.Ast;
+using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Decompiler.DefineUseAnalysis;
 using Telerik.JustDecompiler.Decompiler.Inlining;
+using Telerik.JustDecompiler.Decompiler.LogicFlow;
 using Telerik.JustDecompiler.Steps;
 
 namespace Telerik.JustDecompiler.Languages
@@ -66,7 +69,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return StringComparer.get_Ordinal();
+				return StringComparer.Ordinal;
 			}
 		}
 
@@ -74,18 +77,7 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				stackVariable1 = new IDecompilationStep[10];
-				stackVariable1[0] = new RemoveUnreachableBlocksStep();
-				stackVariable1[1] = new StackUsageAnalysis();
-				stackVariable1[2] = new ExpressionDecompilerStep();
-				stackVariable1[3] = new RemoveCompilerOptimizationsStep();
-				stackVariable1[4] = new ManagedPointersRemovalStep();
-				stackVariable1[5] = new VariableAssignmentAnalysisStep();
-				stackVariable1[6] = new LogicalFlowBuilderStep();
-				stackVariable1[7] = new FollowNodeLoopCleanUpStep();
-				stackVariable1[8] = new StatementDecompilerStep();
-				stackVariable1[9] = new MapUnconditionalBranchesStep();
-				return new DecompilationPipeline(stackVariable1);
+				return new DecompilationPipeline(new IDecompilationStep[] { new RemoveUnreachableBlocksStep(), new StackUsageAnalysis(), new ExpressionDecompilerStep(), new RemoveCompilerOptimizationsStep(), new ManagedPointersRemovalStep(), new VariableAssignmentAnalysisStep(), new LogicalFlowBuilderStep(), new FollowNodeLoopCleanUpStep(), new StatementDecompilerStep(), new MapUnconditionalBranchesStep() });
 			}
 		}
 
@@ -131,10 +123,8 @@ namespace Telerik.JustDecompiler.Languages
 
 		public BaseLanguage()
 		{
-			base();
 			this.languageSpecificGlobalKeywords = new HashSet<string>();
 			this.languageSpecificContextualKeywords = new HashSet<string>();
-			return;
 		}
 
 		public string CommentLines(string text)
@@ -144,26 +134,16 @@ namespace Telerik.JustDecompiler.Languages
 
 		private string CommentLines(string text, string lineCommentString)
 		{
-			V_0 = new StringBuilder();
-			V_1 = new StringReader(text);
-			V_2 = V_1;
-			try
+			StringBuilder stringBuilder = new StringBuilder();
+			StringReader stringReader = new StringReader(text);
+			using (stringReader)
 			{
-				V_3 = V_1.ReadLine();
-				while (V_3 != null)
+				for (string i = stringReader.ReadLine(); i != null; i = stringReader.ReadLine())
 				{
-					dummyVar0 = V_0.AppendLine(String.Format("{0} {1}", lineCommentString, V_3));
-					V_3 = V_1.ReadLine();
+					stringBuilder.AppendLine(String.Format("{0} {1}", (object)lineCommentString, i));
 				}
 			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					((IDisposable)V_2).Dispose();
-				}
-			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		public virtual BlockDecompilationPipeline CreateFilterMethodPipeline(DecompilationContext context)
@@ -178,10 +158,10 @@ namespace Telerik.JustDecompiler.Languages
 
 		public virtual DecompilationPipeline CreatePipeline()
 		{
-			stackVariable1 = new DecompilationPipeline(Array.Empty<IDecompilationStep>());
-			stackVariable1.AddSteps(BaseLanguage.get_IntermediateRepresenationPipeline().get_Steps());
-			stackVariable1.AddSteps(this.LanguageDecompilationSteps(false));
-			return stackVariable1;
+			DecompilationPipeline decompilationPipeline = new DecompilationPipeline(Array.Empty<IDecompilationStep>());
+			decompilationPipeline.AddSteps(BaseLanguage.IntermediateRepresenationPipeline.Steps);
+			decompilationPipeline.AddSteps(this.LanguageDecompilationSteps(false));
+			return decompilationPipeline;
 		}
 
 		public virtual DecompilationPipeline CreatePipeline(DecompilationContext context)
@@ -191,9 +171,9 @@ namespace Telerik.JustDecompiler.Languages
 
 		private DecompilationPipeline CreatePipelineInternal(DecompilationContext context, bool inlineAggressively)
 		{
-			stackVariable3 = new DecompilationPipeline(BaseLanguage.get_IntermediateRepresenationPipeline().get_Steps(), context);
-			stackVariable3.AddSteps(this.LanguageDecompilationSteps(inlineAggressively));
-			return stackVariable3;
+			DecompilationPipeline decompilationPipeline = new DecompilationPipeline(BaseLanguage.IntermediateRepresenationPipeline.Steps, context);
+			decompilationPipeline.AddSteps(this.LanguageDecompilationSteps(inlineAggressively));
+			return decompilationPipeline;
 		}
 
 		public virtual BlockDecompilationPipeline CreatePropertyPipeline(DecompilationContext context)
@@ -207,12 +187,12 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return false;
 			}
-			return String.Equals(this.get_Name(), other.get_Name(), 5);
+			return String.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public virtual string EscapeWord(string word)
 		{
-			return String.Concat(this.get_EscapeSymbolBeforeKeyword(), word, this.get_EscapeSymbolAfterKeyword());
+			return String.Concat(this.EscapeSymbolBeforeKeyword, word, this.EscapeSymbolAfterKeyword);
 		}
 
 		public abstract IAssemblyAttributeWriter GetAssemblyAttributeWriter(IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings);
@@ -228,16 +208,16 @@ namespace Telerik.JustDecompiler.Languages
 
 		public virtual bool IsEscapedWord(string word)
 		{
-			if (!word.StartsWith(this.get_EscapeSymbolBeforeKeyword()))
+			if (!word.StartsWith(this.EscapeSymbolBeforeKeyword))
 			{
 				return false;
 			}
-			return word.EndsWith(this.get_EscapeSymbolAfterKeyword());
+			return word.EndsWith(this.EscapeSymbolAfterKeyword);
 		}
 
 		public virtual bool IsEscapedWord(string escapedWord, string originalWord)
 		{
-			return String.op_Equality(escapedWord, this.EscapeWord(originalWord));
+			return escapedWord == this.EscapeWord(originalWord);
 		}
 
 		public virtual bool IsGlobalKeyword(string word)
@@ -254,7 +234,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		protected abstract bool IsLanguageKeyword(string word, HashSet<string> globalKeywords, HashSet<string> contextKeywords);
 
-		public abstract bool IsOperatorKeyword(string operator);
+		public abstract bool IsOperatorKeyword(string @operator);
 
 		public bool IsValidIdentifier(string identifier)
 		{
@@ -289,35 +269,33 @@ namespace Telerik.JustDecompiler.Languages
 			{
 				return null;
 			}
-			if (String.op_Equality(identifier, String.Empty))
+			if (identifier == String.Empty)
 			{
 				return String.Empty;
 			}
-			V_0 = new StringBuilder();
-			V_1 = identifier.get_Chars(0);
-			if (!this.IsValidIdentifierFirstCharacter(V_1))
+			StringBuilder stringBuilder = new StringBuilder();
+			char chr = identifier[0];
+			if (!this.IsValidIdentifierFirstCharacter(chr))
 			{
-				dummyVar1 = V_0.Append(String.Format("u{0:x4}", (Int32)V_1));
+				stringBuilder.Append(String.Format("u{0:x4}", (Int32)chr));
 			}
 			else
 			{
-				dummyVar0 = V_0.Append(V_1);
+				stringBuilder.Append(chr);
 			}
-			V_2 = 1;
-			while (V_2 < identifier.get_Length())
+			for (int i = 1; i < identifier.Length; i++)
 			{
-				V_3 = identifier.get_Chars(V_2);
-				if (!this.IsValidIdentifierCharacter(V_3))
+				char chr1 = identifier[i];
+				if (!this.IsValidIdentifierCharacter(chr1))
 				{
-					dummyVar3 = V_0.Append(String.Format("u{0:x4}", (Int32)V_3));
+					stringBuilder.Append(String.Format("u{0:x4}", (Int32)chr1));
 				}
 				else
 				{
-					dummyVar2 = V_0.Append(V_3);
+					stringBuilder.Append(chr1);
 				}
-				V_2 = V_2 + 1;
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		public virtual bool TryGetOperatorName(string operatorName, out string languageOperator)

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -10,17 +11,14 @@ namespace OrchardCore.Localization
 
 		static DefaultCalendarSelector()
 		{
-			stackVariable0 = new CalendarSelectorResult();
-			stackVariable0.set_Priority(0);
-			stackVariable0.set_CalendarName(new Func<Task<CalendarName>>(DefaultCalendarSelector.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__3_0));
-			DefaultCalendarSelector.CalendarResult = Task.FromResult<CalendarSelectorResult>(stackVariable0);
-			return;
+			CalendarSelectorResult calendarSelectorResult = new CalendarSelectorResult();
+			calendarSelectorResult.set_Priority(0);
+			calendarSelectorResult.set_CalendarName(() => Task.FromResult<CalendarName>(BclCalendars.GetCalendarName(CultureInfo.CurrentUICulture.Calendar)));
+			DefaultCalendarSelector.CalendarResult = Task.FromResult<CalendarSelectorResult>(calendarSelectorResult);
 		}
 
 		public DefaultCalendarSelector()
 		{
-			base();
-			return;
 		}
 
 		public Task<CalendarSelectorResult> GetCalendarAsync()

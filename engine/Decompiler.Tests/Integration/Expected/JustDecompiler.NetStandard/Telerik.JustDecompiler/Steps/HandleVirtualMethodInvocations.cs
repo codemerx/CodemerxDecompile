@@ -1,7 +1,9 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast.Expressions;
 
@@ -13,95 +15,128 @@ namespace Telerik.JustDecompiler.Steps
 
 		public HandleVirtualMethodInvocations(MethodDefinition method)
 		{
-			base();
 			this.method = method;
-			return;
 		}
 
 		private List<TypeDefinition> GetInheritanceChain(TypeDefinition targetType, string definingTypeFullName)
 		{
-			V_0 = new List<TypeDefinition>();
-			V_1 = new List<int>();
-			V_0.Add(targetType);
-			V_1.Add(-1);
-			V_2 = -1;
-			V_4 = 0;
-			while (V_4 < V_0.get_Count())
+			List<TypeDefinition> typeDefinitions = new List<TypeDefinition>();
+			List<int> nums = new List<int>();
+			typeDefinitions.Add(targetType);
+			nums.Add(-1);
+			int item = -1;
+			int num = 0;
+			while (num < typeDefinitions.Count)
 			{
-				V_5 = V_0.get_Item(V_4);
-				if (V_5 == null || String.op_Equality(V_5.get_FullName(), definingTypeFullName))
+				TypeDefinition typeDefinition = typeDefinitions[num];
+				if (typeDefinition == null || typeDefinition.get_FullName() == definingTypeFullName)
 				{
-					V_2 = V_4;
+					item = num;
 					break;
 				}
 				else
 				{
-					V_6 = V_5.get_BaseType();
-					if (V_6 != null)
+					TypeReference baseType = typeDefinition.get_BaseType();
+					if (baseType != null)
 					{
-						V_7 = V_6.Resolve();
-						if (V_7 != null)
+						TypeDefinition typeDefinition1 = baseType.Resolve();
+						if (typeDefinition1 != null)
 						{
-							V_0.Add(V_7);
-							V_1.Add(V_4);
+							typeDefinitions.Add(typeDefinition1);
+							nums.Add(num);
 						}
 					}
-					V_8 = V_5.get_Interfaces().GetEnumerator();
-					try
+					foreach (TypeReference @interface in typeDefinition.get_Interfaces())
 					{
-						while (V_8.MoveNext())
+						if (@interface == null)
 						{
-							V_9 = V_8.get_Current();
-							if (V_9 == null)
-							{
-								continue;
-							}
-							V_10 = V_9.Resolve();
-							if (V_10 == null)
-							{
-								continue;
-							}
-							V_0.Add(V_10);
-							V_1.Add(V_4);
+							continue;
 						}
+						TypeDefinition typeDefinition2 = @interface.Resolve();
+						if (typeDefinition2 == null)
+						{
+							continue;
+						}
+						typeDefinitions.Add(typeDefinition2);
+						nums.Add(num);
 					}
-					finally
-					{
-						V_8.Dispose();
-					}
-					V_4 = V_4 + 1;
+					num++;
 				}
 			}
-			V_3 = new List<TypeDefinition>();
-			while (V_2 != -1)
+			List<TypeDefinition> typeDefinitions1 = new List<TypeDefinition>();
+			while (item != -1)
 			{
-				V_3.Add(V_0.get_Item(V_2));
-				V_2 = V_1.get_Item(V_2);
+				typeDefinitions1.Add(typeDefinitions[item]);
+				item = nums[item];
 			}
-			return V_3;
+			return typeDefinitions1;
 		}
 
 		public void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			if (!node.get_VirtualCall())
+			Func<MethodDefinition, bool> func = null;
+			if (!node.VirtualCall)
 			{
-				V_0 = node.get_MethodExpression();
-				if (V_0 == null)
+				MethodReferenceExpression methodExpression = node.MethodExpression;
+				if (methodExpression == null)
 				{
 					return;
 				}
-				if (V_0.get_Target() as ThisReferenceExpression != null)
+				if (methodExpression.Target is ThisReferenceExpression)
 				{
-					V_7 = this.method.get_DeclaringType().Resolve();
-					if (V_7 != null && (object)V_7 != (object)V_0.get_Method().get_DeclaringType().Resolve())
+					TypeDefinition typeDefinition = this.method.get_DeclaringType().Resolve();
+					if (typeDefinition != null && (object)typeDefinition != (object)methodExpression.Method.get_DeclaringType().Resolve())
 					{
-						V_8 = this.method.get_DeclaringType().get_BaseType();
-						if (V_8 == null || String.op_Equality(V_8.get_FullName(), Type.GetTypeFromHandle(// 
-						// Current member / type: System.Void Telerik.JustDecompiler.Steps.HandleVirtualMethodInvocations::VisitMethodInvocationExpression(Telerik.JustDecompiler.Ast.Expressions.MethodInvocationExpression)
-						// Exception in: System.Void VisitMethodInvocationExpression(Telerik.JustDecompiler.Ast.Expressions.MethodInvocationExpression)
-						// Specified method is not supported.
-						// 
-						// mailto: JustDecompilePublicFeedback@telerik.com
-
+						TypeReference baseType = this.method.get_DeclaringType().get_BaseType();
+						if (baseType == null || baseType.get_FullName() == typeof(Object).FullName)
+						{
+							return;
+						}
+						methodExpression.Target = new BaseReferenceExpression(methodExpression.Method.get_DeclaringType(), (methodExpression.Target as ThisReferenceExpression).MappedInstructions);
+					}
+				}
+				return;
+			}
+			MethodReferenceExpression methodReferenceExpression = node.MethodExpression;
+			if (!methodReferenceExpression.Target.HasType)
+			{
+				return;
+			}
+			if (methodReferenceExpression.Target.ExpressionType.get_FullName() == methodReferenceExpression.Method.get_DeclaringType().get_FullName())
+			{
+				return;
+			}
+			MethodReference method = methodReferenceExpression.Method;
+			TypeDefinition typeDefinition1 = methodReferenceExpression.Target.ExpressionType.Resolve();
+			if (typeDefinition1 == null)
+			{
+				return;
+			}
+			foreach (TypeDefinition inheritanceChain in this.GetInheritanceChain(typeDefinition1, methodReferenceExpression.Method.get_DeclaringType().get_FullName()))
+			{
+				Collection<MethodDefinition> methods = inheritanceChain.get_Methods();
+				Func<MethodDefinition, bool> func1 = func;
+				if (func1 == null)
+				{
+					Func<MethodDefinition, bool> name = (MethodDefinition x) => {
+						if (x.get_Name() != methodReferenceExpression.Method.get_Name())
+						{
+							return false;
+						}
+						return x.HasSameSignatureWith(methodReferenceExpression.Method);
+					};
+					Func<MethodDefinition, bool> func2 = name;
+					func = name;
+					func1 = func2;
+				}
+				MethodDefinition methodDefinition = methods.FirstOrDefault<MethodDefinition>(func1);
+				if (methodDefinition == null)
+				{
+					continue;
+				}
+				method = methodDefinition;
+			}
+			node.MethodExpression = new MethodReferenceExpression(node.MethodExpression.Target, method, node.MethodExpression.MappedInstructions);
+		}
 	}
 }

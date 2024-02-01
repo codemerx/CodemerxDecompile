@@ -29,11 +29,11 @@ namespace Piranha.Models
 		{
 			get
 			{
-				if (!String.IsNullOrWhiteSpace(this.get_NavigationTitle()))
+				if (!String.IsNullOrWhiteSpace(this.NavigationTitle))
 				{
-					return this.get_NavigationTitle();
+					return this.NavigationTitle;
 				}
-				return this.get_Title();
+				return this.Title;
 			}
 		}
 
@@ -67,11 +67,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public IList<string> Permissions
-		{
-			get;
-			set;
-		}
+		public IList<string> Permissions { get; set; } = new List<string>();
 
 		public DateTime? Published
 		{
@@ -93,37 +89,32 @@ namespace Piranha.Models
 
 		public SitemapItem()
 		{
-			this.u003cPermissionsu003ek__BackingField = new List<string>();
-			base();
-			this.set_Items(new Sitemap());
-			return;
+			base.Items = new Sitemap();
 		}
 
 		public bool HasChild(Guid id)
 		{
-			V_0 = this.get_Items().GetEnumerator();
+			bool flag;
+			List<SitemapItem>.Enumerator enumerator = base.Items.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (!Guid.op_Equality(V_1.get_Id(), id) && !V_1.HasChild(id))
+					SitemapItem current = enumerator.Current;
+					if (!(current.Id == id) && !current.HasChild(id))
 					{
 						continue;
 					}
-					V_2 = true;
-					goto Label1;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				return false;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return false;
+			return flag;
 		}
 	}
 }

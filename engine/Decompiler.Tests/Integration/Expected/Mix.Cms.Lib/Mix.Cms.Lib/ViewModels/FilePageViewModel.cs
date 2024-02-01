@@ -23,8 +23,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public FilePageViewModel()
 		{
-			base();
-			return;
 		}
 	}
 }

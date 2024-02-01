@@ -43,11 +43,7 @@ namespace Piranha.Runtime
 			set;
 		}
 
-		public IList<System.Type> ItemTypes
-		{
-			get;
-			set;
-		}
+		public IList<System.Type> ItemTypes { get; set; } = new List<System.Type>();
 
 		public string ListTitleField
 		{
@@ -69,9 +65,6 @@ namespace Piranha.Runtime
 
 		public AppBlock()
 		{
-			this.u003cItemTypesu003ek__BackingField = new List<System.Type>();
-			base();
-			return;
 		}
 	}
 }

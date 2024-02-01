@@ -1,7 +1,9 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -22,30 +24,25 @@ namespace Telerik.JustDecompiler.Steps
 
 		private const string IEnumerableOfSystemType = "System.Collections.Generic.IEnumerable<System.Type>";
 
-		private readonly Dictionary<FieldDefinition, CallSiteInfo> fieldToCallSiteInfoMap;
+		private readonly Dictionary<FieldDefinition, CallSiteInfo> fieldToCallSiteInfoMap = new Dictionary<FieldDefinition, CallSiteInfo>();
 
-		private readonly Dictionary<VariableReference, CallSiteInfo> variableToCallSiteInfoMap;
+		private readonly Dictionary<VariableReference, CallSiteInfo> variableToCallSiteInfoMap = new Dictionary<VariableReference, CallSiteInfo>();
 
-		private readonly HashSet<Statement> statementsToRemove;
+		private readonly HashSet<Statement> statementsToRemove = new HashSet<Statement>();
 
 		private MethodSpecificContext methodContext;
 
 		public ResolveDynamicVariablesStep()
 		{
-			this.fieldToCallSiteInfoMap = new Dictionary<FieldDefinition, CallSiteInfo>();
-			this.variableToCallSiteInfoMap = new Dictionary<VariableReference, CallSiteInfo>();
-			this.statementsToRemove = new HashSet<Statement>();
-			base();
-			return;
 		}
 
 		private bool CheckArrayIndexerExpression(ArrayIndexerExpression expression, VariableReference arrayVariable, int index)
 		{
-			if (expression.get_Target().get_CodeNodeType() != 26 || (object)(expression.get_Target() as VariableReferenceExpression).get_Variable() != (object)arrayVariable || expression.get_Indices().get_Count() != 1 || expression.get_Indices().get_Item(0).get_CodeNodeType() != 22)
+			if (expression.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Target as VariableReferenceExpression).Variable != (object)arrayVariable || expression.Indices.Count != 1 || expression.Indices[0].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				return false;
 			}
-			return Convert.ToInt32((expression.get_Indices().get_Item(0) as LiteralExpression).get_Value()) == index;
+			return Convert.ToInt32((expression.Indices[0] as LiteralExpression).Value) == index;
 		}
 
 		private bool CheckFieldDefinition(FieldDefinition callSiteFieldDefinition)
@@ -54,7 +51,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			return (object)callSiteFieldDefinition.get_DeclaringType().get_DeclaringType() == (object)this.methodContext.get_Method().get_DeclaringType();
+			return (object)callSiteFieldDefinition.get_DeclaringType().get_DeclaringType() == (object)this.methodContext.Method.get_DeclaringType();
 		}
 
 		private int CheckNewArrayInitializationAndSize(Statement statement, VariableReference arrayVariable)
@@ -63,105 +60,101 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				throw new Exception("Invalid statement.");
 			}
-			V_0 = (statement as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_0.get_Left().get_CodeNodeType() != 26 || (object)(V_0.get_Left() as VariableReferenceExpression).get_Variable() != (object)arrayVariable)
+			BinaryExpression expression = (statement as ExpressionStatement).Expression as BinaryExpression;
+			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Left as VariableReferenceExpression).Variable != (object)arrayVariable)
 			{
 				throw new Exception("Invalid statement.");
 			}
-			if (V_0.get_Right().get_CodeNodeType() != 38 || (V_0.get_Right() as ArrayCreationExpression).get_Dimensions().get_Count() != 1 || (V_0.get_Right() as ArrayCreationExpression).get_Dimensions().get_Item(0).get_CodeNodeType() != 22)
+			if (expression.Right.CodeNodeType != CodeNodeType.ArrayCreationExpression || (expression.Right as ArrayCreationExpression).Dimensions.Count != 1 || (expression.Right as ArrayCreationExpression).Dimensions[0].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				throw new Exception("Invalid statement.");
 			}
-			return Convert.ToInt32(((V_0.get_Right() as ArrayCreationExpression).get_Dimensions().get_Item(0) as LiteralExpression).get_Value());
+			return Convert.ToInt32(((expression.Right as ArrayCreationExpression).Dimensions[0] as LiteralExpression).Value);
 		}
 
 		private VariableReference GetArgumentArrayVariable(MethodInvocationExpression binderMethodInvocation)
 		{
-			V_0 = binderMethodInvocation.get_Arguments().get_Count() - 1;
-			V_1 = binderMethodInvocation.get_Arguments().get_Item(V_0);
-			V_2 = null;
-			if (V_1.get_CodeNodeType() != 26)
+			int count = binderMethodInvocation.Arguments.Count - 1;
+			Expression item = binderMethodInvocation.Arguments[count];
+			VariableReferenceExpression expression = null;
+			if (item.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 			{
-				if (V_1.get_CodeNodeType() == 31)
+				expression = item as VariableReferenceExpression;
+			}
+			else if (item.CodeNodeType == CodeNodeType.ExplicitCastExpression)
+			{
+				ExplicitCastExpression explicitCastExpression = item as ExplicitCastExpression;
+				if (explicitCastExpression.ExpressionType.GetFriendlyFullName(null) == "System.Collections.Generic.IEnumerable<Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo>" && explicitCastExpression.Expression.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 				{
-					V_3 = V_1 as ExplicitCastExpression;
-					if (String.op_Equality(V_3.get_ExpressionType().GetFriendlyFullName(null), "System.Collections.Generic.IEnumerable<Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo>") && V_3.get_Expression().get_CodeNodeType() == 26)
-					{
-						V_2 = V_3.get_Expression() as VariableReferenceExpression;
-					}
+					expression = explicitCastExpression.Expression as VariableReferenceExpression;
 				}
 			}
-			else
-			{
-				V_2 = V_1 as VariableReferenceExpression;
-			}
-			if (V_2 == null)
+			if (expression == null)
 			{
 				throw new Exception("Invalid argument: argumentInfo.");
 			}
-			return V_2.get_Variable();
+			return expression.Variable;
 		}
 
 		private MethodInvocationExpression GetBinderMethodInvocation(ExpressionStatement callSiteCreationStatement, FieldDefinition callSiteField)
 		{
-			if (callSiteCreationStatement == null || callSiteCreationStatement.get_Expression().get_CodeNodeType() != 24 || (callSiteCreationStatement.get_Expression() as BinaryExpression).get_Operator() != 26 || (callSiteCreationStatement.get_Expression() as BinaryExpression).get_Left().get_CodeNodeType() != 30 || (object)((callSiteCreationStatement.get_Expression() as BinaryExpression).get_Left() as FieldReferenceExpression).get_Field().Resolve() != (object)callSiteField)
+			if (callSiteCreationStatement == null || callSiteCreationStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || (callSiteCreationStatement.Expression as BinaryExpression).Operator != BinaryOperator.Assign || (callSiteCreationStatement.Expression as BinaryExpression).Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)((callSiteCreationStatement.Expression as BinaryExpression).Left as FieldReferenceExpression).Field.Resolve() != (object)callSiteField)
 			{
 				throw new Exception("Last statement is not CallSite field assignment.");
 			}
-			V_0 = (callSiteCreationStatement.get_Expression() as BinaryExpression).get_Right() as MethodInvocationExpression;
-			if (String.op_Inequality(V_0.get_MethodExpression().get_Method().get_DeclaringType().GetElementType().GetFriendlyFullName(null), "System.Runtime.CompilerServices.CallSite<!0>") || V_0.get_MethodExpression().get_Target() != null || String.op_Inequality(V_0.get_MethodExpression().get_Method().get_Name(), "Create") || V_0.get_Arguments().get_Item(0).get_CodeNodeType() != 19)
+			MethodInvocationExpression right = (callSiteCreationStatement.Expression as BinaryExpression).Right as MethodInvocationExpression;
+			if (right.MethodExpression.Method.get_DeclaringType().GetElementType().GetFriendlyFullName(null) != "System.Runtime.CompilerServices.CallSite<!0>" || right.MethodExpression.Target != null || right.MethodExpression.Method.get_Name() != "Create" || right.Arguments[0].CodeNodeType != CodeNodeType.MethodInvocationExpression)
 			{
 				throw new Exception("Invalid CallSite field assignment.");
 			}
-			V_1 = V_0.get_Arguments().get_Item(0) as MethodInvocationExpression;
-			if (V_1.get_MethodExpression().get_Target() != null || String.op_Inequality(V_1.get_MethodExpression().get_Method().get_DeclaringType().GetFriendlyFullName(null), "Microsoft.CSharp.RuntimeBinder.Binder"))
+			MethodInvocationExpression item = right.Arguments[0] as MethodInvocationExpression;
+			if (item.MethodExpression.Target != null || item.MethodExpression.Method.get_DeclaringType().GetFriendlyFullName(null) != "Microsoft.CSharp.RuntimeBinder.Binder")
 			{
 				throw new Exception("Invalid CallSite creation argument.");
 			}
-			return V_1;
+			return item;
 		}
 
 		private void GetConvertTypeArgument(MethodInvocationExpression binderInvocation, CallSiteInfo callSiteInfo)
 		{
-			V_0 = 1;
-			if (binderInvocation.get_Arguments().get_Item(V_0).get_CodeNodeType() != 19 || !(binderInvocation.get_Arguments().get_Item(V_0) as MethodInvocationExpression).IsTypeOfExpression(out V_1))
+			TypeReference typeReference;
+			int num = 1;
+			if (binderInvocation.Arguments[num].CodeNodeType != CodeNodeType.MethodInvocationExpression || !(binderInvocation.Arguments[num] as MethodInvocationExpression).IsTypeOfExpression(out typeReference))
 			{
 				throw new Exception("Invalid argument: convert type.");
 			}
-			callSiteInfo.set_ConvertType(V_1);
-			return;
+			callSiteInfo.ConvertType = typeReference;
 		}
 
 		private void GetDynamicArgument(MethodInvocationExpression expression, int index, CallSiteInfo callSiteInfo)
 		{
-			if (String.op_Inequality(expression.get_MethodExpression().get_Method().get_Name(), "Create") || expression.get_MethodExpression().get_Target() != null || String.op_Inequality(expression.get_MethodExpression().get_Method().get_DeclaringType().GetFriendlyFullName(null), "Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo") || expression.get_Arguments().get_Count() != 2 || expression.get_Arguments().get_Item(0).get_CodeNodeType() != 22)
+			if (expression.MethodExpression.Method.get_Name() != "Create" || expression.MethodExpression.Target != null || expression.MethodExpression.Method.get_DeclaringType().GetFriendlyFullName(null) != "Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo" || expression.Arguments.Count != 2 || expression.Arguments[0].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				throw new Exception("Invalid statement.");
 			}
-			if (Convert.ToInt32((expression.get_Arguments().get_Item(0) as LiteralExpression).get_Value()) & 1 == 0)
+			if ((Convert.ToInt32((expression.Arguments[0] as LiteralExpression).Value) & 1) == 0)
 			{
-				callSiteInfo.get_DynamicArgumentIndices().Add(index);
+				callSiteInfo.DynamicArgumentIndices.Add(index);
 			}
-			return;
 		}
 
 		private void GetGenericTypeArgument(MethodInvocationExpression expression, int index, CallSiteInfo callSiteInfo)
 		{
-			if (!expression.IsTypeOfExpression(out V_0))
+			TypeReference typeReference;
+			if (!expression.IsTypeOfExpression(out typeReference))
 			{
 				throw new Exception("Invalid statement.");
 			}
-			callSiteInfo.get_GenericTypeArguments().Add(V_0);
-			return;
+			callSiteInfo.GenericTypeArguments.Add(typeReference);
 		}
 
 		private void GetMemberNameArgument(MethodInvocationExpression binderInvocation, CallSiteInfo callSiteInfo)
 		{
-			V_0 = 1;
-			if (binderInvocation.get_Arguments().get_Item(V_0).get_CodeNodeType() == 22)
+			int num = 1;
+			if (binderInvocation.Arguments[num].CodeNodeType == CodeNodeType.LiteralExpression)
 			{
-				callSiteInfo.set_MemberName((binderInvocation.get_Arguments().get_Item(V_0) as LiteralExpression).get_Value() as String);
-				if (callSiteInfo.get_MemberName() != null)
+				callSiteInfo.MemberName = (binderInvocation.Arguments[num] as LiteralExpression).Value as String;
+				if (callSiteInfo.MemberName != null)
 				{
 					return;
 				}
@@ -171,188 +164,169 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void GetOperatorArgument(MethodInvocationExpression binderInvocation, CallSiteInfo callSiteInfo)
 		{
-			V_0 = 1;
-			if (binderInvocation.get_Arguments().get_Item(V_0).get_CodeNodeType() != 22)
+			int num = 1;
+			if (binderInvocation.Arguments[num].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				throw new Exception("Invalid argument: operator.");
 			}
-			callSiteInfo.set_Operator(Convert.ToInt32((binderInvocation.get_Arguments().get_Item(V_0) as LiteralExpression).get_Value()));
-			return;
+			callSiteInfo.Operator = Convert.ToInt32((binderInvocation.Arguments[num] as LiteralExpression).Value);
 		}
 
 		private VariableReference GetTypeArrayVariable(MethodInvocationExpression binderMethodInvocation)
 		{
-			V_1 = binderMethodInvocation.get_Arguments().get_Item(2);
-			if (V_1.get_CodeNodeType() == 22 && (V_1 as LiteralExpression).get_Value() == null)
+			Expression item = binderMethodInvocation.Arguments[2];
+			if (item.CodeNodeType == CodeNodeType.LiteralExpression && (item as LiteralExpression).Value == null)
 			{
 				return null;
 			}
-			V_2 = null;
-			if (V_1.get_CodeNodeType() != 26)
+			VariableReferenceExpression expression = null;
+			if (item.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 			{
-				if (V_1.get_CodeNodeType() == 31)
+				expression = item as VariableReferenceExpression;
+			}
+			else if (item.CodeNodeType == CodeNodeType.ExplicitCastExpression)
+			{
+				ExplicitCastExpression explicitCastExpression = item as ExplicitCastExpression;
+				if (explicitCastExpression.ExpressionType.GetFriendlyFullName(null) == "System.Collections.Generic.IEnumerable<System.Type>" && explicitCastExpression.Expression.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 				{
-					V_3 = V_1 as ExplicitCastExpression;
-					if (String.op_Equality(V_3.get_ExpressionType().GetFriendlyFullName(null), "System.Collections.Generic.IEnumerable<System.Type>") && V_3.get_Expression().get_CodeNodeType() == 26)
-					{
-						V_2 = V_3.get_Expression() as VariableReferenceExpression;
-					}
+					expression = explicitCastExpression.Expression as VariableReferenceExpression;
 				}
 			}
-			else
-			{
-				V_2 = V_1 as VariableReferenceExpression;
-			}
-			if (V_2 == null)
+			if (expression == null)
 			{
 				throw new Exception("Invalid argument: typeArguments.");
 			}
-			return V_2.get_Variable();
+			return expression.Variable;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.get_MethodContext();
+			this.methodContext = context.MethodContext;
 			this.Visit(body);
-			body = CallSiteInvocationReplacer.ReplaceInvocations(body, this.fieldToCallSiteInfoMap, this.variableToCallSiteInfoMap, this.statementsToRemove, this.methodContext.get_Method().get_Module().get_TypeSystem());
+			body = CallSiteInvocationReplacer.ReplaceInvocations(body, this.fieldToCallSiteInfoMap, this.variableToCallSiteInfoMap, this.statementsToRemove, this.methodContext.Method.get_Module().get_TypeSystem());
 			this.RemoveStatements();
 			return body;
 		}
 
 		private void ProcessArgumentArray(StatementCollection statements, ref int index, VariableReference typesArray, CallSiteInfo callSiteInfo, Action<MethodInvocationExpression, int, CallSiteInfo> action)
 		{
-			if (statements.get_Item(index) as ExpressionStatement != null && (statements.get_Item(index) as ExpressionStatement).get_Expression() as BinaryExpression != null)
+			if (statements[index] is ExpressionStatement && (statements[index] as ExpressionStatement).Expression is BinaryExpression)
 			{
-				V_1 = (statements.get_Item(index) as ExpressionStatement).get_Expression() as BinaryExpression;
-				if (V_1.get_IsAssignmentExpression() && V_1.get_Left() as VariableReferenceExpression != null && V_1.get_Right() as MethodInvocationExpression != null)
+				BinaryExpression expression = (statements[index] as ExpressionStatement).Expression as BinaryExpression;
+				if (expression.IsAssignmentExpression && expression.Left is VariableReferenceExpression && expression.Right is MethodInvocationExpression)
 				{
-					index = index + 1;
+					index++;
 				}
 			}
-			V_2 = index;
-			index = V_2 + 1;
-			V_0 = this.CheckNewArrayInitializationAndSize(statements.get_Item(V_2), typesArray);
-			V_3 = 0;
-			while (V_3 < V_0)
+			int num = index;
+			index = num + 1;
+			int num1 = this.CheckNewArrayInitializationAndSize(statements[num], typesArray);
+			for (int i = 0; i < num1; i++)
 			{
-				if (!statements.get_Item(index).IsAssignmentStatement())
+				if (!statements[index].IsAssignmentStatement())
 				{
 					throw new Exception("Invalid statement.");
 				}
-				V_2 = index;
-				index = V_2 + 1;
-				V_4 = (statements.get_Item(V_2) as ExpressionStatement).get_Expression() as BinaryExpression;
-				if (V_4.get_Left().get_CodeNodeType() != 39 || !this.CheckArrayIndexerExpression(V_4.get_Left() as ArrayIndexerExpression, typesArray, V_3) || V_4.get_Right().get_CodeNodeType() != 19)
+				num = index;
+				index = num + 1;
+				BinaryExpression binaryExpression = (statements[num] as ExpressionStatement).Expression as BinaryExpression;
+				if (binaryExpression.Left.CodeNodeType != CodeNodeType.ArrayIndexerExpression || !this.CheckArrayIndexerExpression(binaryExpression.Left as ArrayIndexerExpression, typesArray, i) || binaryExpression.Right.CodeNodeType != CodeNodeType.MethodInvocationExpression)
 				{
 					throw new Exception("Invalid statement.");
 				}
-				action.Invoke(V_4.get_Right() as MethodInvocationExpression, V_3, callSiteInfo);
-				V_3 = V_3 + 1;
+				action(binaryExpression.Right as MethodInvocationExpression, i, callSiteInfo);
 			}
-			return;
 		}
 
 		private void ProcessCallSiteCaching(IfStatement theIf, FieldDefinition callSiteField)
 		{
-			V_0 = this.GetBinderMethodInvocation(theIf.get_Then().get_Statements().Last<Statement>() as ExpressionStatement, callSiteField);
-			V_1 = new CallSiteInfo(callSiteField, V_0.get_MethodExpression().get_Method().get_Name());
-			V_2 = 0;
-			if (V_1.get_BinderType() == 3 || V_1.get_BinderType() == 6 || V_1.get_BinderType() == 9 || V_1.get_BinderType() == 7)
+			MethodInvocationExpression binderMethodInvocation = this.GetBinderMethodInvocation(theIf.Then.Statements.Last<Statement>() as ExpressionStatement, callSiteField);
+			CallSiteInfo callSiteInfo = new CallSiteInfo(callSiteField, binderMethodInvocation.MethodExpression.Method.get_Name());
+			int num = 0;
+			if (callSiteInfo.BinderType == CallSiteBinderType.GetMember || callSiteInfo.BinderType == CallSiteBinderType.InvokeMember || callSiteInfo.BinderType == CallSiteBinderType.SetMember || callSiteInfo.BinderType == CallSiteBinderType.IsEvent)
 			{
-				this.GetMemberNameArgument(V_0, V_1);
+				this.GetMemberNameArgument(binderMethodInvocation, callSiteInfo);
 			}
-			if (V_1.get_BinderType() == CallSiteBinderType.BinaryOperation || V_1.get_BinderType() == 10)
+			if (callSiteInfo.BinderType == CallSiteBinderType.BinaryOperation || callSiteInfo.BinderType == CallSiteBinderType.UnaryOperation)
 			{
-				this.GetOperatorArgument(V_0, V_1);
+				this.GetOperatorArgument(binderMethodInvocation, callSiteInfo);
 			}
-			if (V_1.get_BinderType() == 1)
+			if (callSiteInfo.BinderType == CallSiteBinderType.Convert)
 			{
-				this.GetConvertTypeArgument(V_0, V_1);
+				this.GetConvertTypeArgument(binderMethodInvocation, callSiteInfo);
 			}
-			if (V_1.get_BinderType() == 6)
+			if (callSiteInfo.BinderType == CallSiteBinderType.InvokeMember)
 			{
-				V_3 = this.GetTypeArrayVariable(V_0);
-				if (V_3 != null)
+				VariableReference typeArrayVariable = this.GetTypeArrayVariable(binderMethodInvocation);
+				if (typeArrayVariable != null)
 				{
-					V_1.set_GenericTypeArguments(new List<TypeReference>());
-					this.ProcessArgumentArray(theIf.get_Then().get_Statements(), ref V_2, V_3, V_1, new Action<MethodInvocationExpression, int, CallSiteInfo>(this.GetGenericTypeArgument));
+					callSiteInfo.GenericTypeArguments = new List<TypeReference>();
+					this.ProcessArgumentArray(theIf.Then.Statements, ref num, typeArrayVariable, callSiteInfo, new Action<MethodInvocationExpression, int, CallSiteInfo>(this.GetGenericTypeArgument));
 				}
 			}
-			if (V_1.get_BinderType() == 1 || V_1.get_BinderType() == 7)
+			if (callSiteInfo.BinderType == CallSiteBinderType.Convert || callSiteInfo.BinderType == CallSiteBinderType.IsEvent)
 			{
-				V_1.get_DynamicArgumentIndices().Add(0);
+				callSiteInfo.DynamicArgumentIndices.Add(0);
 			}
 			else
 			{
-				this.ProcessArgumentArray(theIf.get_Then().get_Statements(), ref V_2, this.GetArgumentArrayVariable(V_0), V_1, new Action<MethodInvocationExpression, int, CallSiteInfo>(this.GetDynamicArgument));
+				this.ProcessArgumentArray(theIf.Then.Statements, ref num, this.GetArgumentArrayVariable(binderMethodInvocation), callSiteInfo, new Action<MethodInvocationExpression, int, CallSiteInfo>(this.GetDynamicArgument));
 			}
-			this.fieldToCallSiteInfoMap.Add(callSiteField, V_1);
-			return;
+			this.fieldToCallSiteInfoMap.Add(callSiteField, callSiteInfo);
 		}
 
 		private void RemoveStatements()
 		{
-			V_0 = this.statementsToRemove.GetEnumerator();
-			try
+			foreach (Statement statement in this.statementsToRemove)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					dummyVar0 = (V_1.get_Parent() as BlockStatement).get_Statements().Remove(V_1);
-				}
+				(statement.Parent as BlockStatement).Statements.Remove(statement);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public override void VisitExpressionStatement(ExpressionStatement node)
 		{
+			CallSiteInfo callSiteInfo;
 			if (!node.IsAssignmentStatement())
 			{
 				return;
 			}
-			V_0 = node.get_Expression() as BinaryExpression;
-			if (V_0.get_Left().get_CodeNodeType() != 26 || V_0.get_Right().get_CodeNodeType() != 30)
+			BinaryExpression expression = node.Expression as BinaryExpression;
+			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.FieldReferenceExpression)
 			{
 				return;
 			}
-			V_1 = V_0.get_Right() as FieldReferenceExpression;
-			if (V_1.get_Target() == null || V_1.get_Target().get_CodeNodeType() != 30 || String.op_Inequality(V_1.get_Field().get_Name(), "Target"))
+			FieldReferenceExpression right = expression.Right as FieldReferenceExpression;
+			if (right.Target == null || right.Target.CodeNodeType != CodeNodeType.FieldReferenceExpression || right.Field.get_Name() != "Target")
 			{
 				return;
 			}
-			V_2 = (V_1.get_Target() as FieldReferenceExpression).get_Field().Resolve();
-			if (V_2 == null || !this.fieldToCallSiteInfoMap.TryGetValue(V_2, out V_3))
+			FieldDefinition fieldDefinition = (right.Target as FieldReferenceExpression).Field.Resolve();
+			if (fieldDefinition == null || !this.fieldToCallSiteInfoMap.TryGetValue(fieldDefinition, out callSiteInfo))
 			{
 				return;
 			}
-			this.variableToCallSiteInfoMap.Add((V_0.get_Left() as VariableReferenceExpression).get_Variable(), V_3);
-			dummyVar0 = this.statementsToRemove.Add(node);
-			return;
+			this.variableToCallSiteInfoMap.Add((expression.Left as VariableReferenceExpression).Variable, callSiteInfo);
+			this.statementsToRemove.Add(node);
 		}
 
 		public override void VisitIfStatement(IfStatement node)
 		{
-			if (node.get_Else() == null && node.get_Condition().get_CodeNodeType() == 24)
+			if (node.Else == null && node.Condition.CodeNodeType == CodeNodeType.BinaryExpression)
 			{
-				V_0 = node.get_Condition() as BinaryExpression;
-				if (V_0.get_Operator() == 9 && V_0.get_Left().get_CodeNodeType() == 30 && V_0.get_Right().get_CodeNodeType() == 22 && (V_0.get_Right() as LiteralExpression).get_Value() == null)
+				BinaryExpression condition = node.Condition as BinaryExpression;
+				if (condition.Operator == BinaryOperator.ValueEquality && condition.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression && condition.Right.CodeNodeType == CodeNodeType.LiteralExpression && (condition.Right as LiteralExpression).Value == null)
 				{
-					stackVariable28 = V_0.get_Left() as FieldReferenceExpression;
-					V_1 = stackVariable28.get_Field().Resolve();
-					if (String.op_Equality(stackVariable28.get_Field().get_FieldType().GetElementType().GetFriendlyFullName(null), "System.Runtime.CompilerServices.CallSite<!0>") && this.CheckFieldDefinition(V_1))
+					FieldReferenceExpression left = condition.Left as FieldReferenceExpression;
+					FieldDefinition fieldDefinition = left.Field.Resolve();
+					if (left.Field.get_FieldType().GetElementType().GetFriendlyFullName(null) == "System.Runtime.CompilerServices.CallSite<!0>" && this.CheckFieldDefinition(fieldDefinition))
 					{
-						this.ProcessCallSiteCaching(node, V_1);
-						dummyVar0 = this.statementsToRemove.Add(node);
+						this.ProcessCallSiteCaching(node, fieldDefinition);
+						this.statementsToRemove.Add(node);
 						return;
 					}
 				}
 			}
-			this.VisitIfStatement(node);
-			return;
+			base.VisitIfStatement(node);
 		}
 	}
 }

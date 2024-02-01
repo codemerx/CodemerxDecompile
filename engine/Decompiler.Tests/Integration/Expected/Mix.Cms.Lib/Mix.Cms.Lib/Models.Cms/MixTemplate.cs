@@ -121,8 +121,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixTemplate()
 		{
-			base();
-			return;
 		}
 	}
 }

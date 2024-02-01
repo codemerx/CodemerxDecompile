@@ -62,13 +62,10 @@ namespace Mix.Cms.Lib
 		static MixConstants()
 		{
 			MixConstants.cachedKeys = new List<string>();
-			return;
 		}
 
 		public MixConstants()
 		{
-			base();
-			return;
 		}
 
 		public static class AttributeSetName

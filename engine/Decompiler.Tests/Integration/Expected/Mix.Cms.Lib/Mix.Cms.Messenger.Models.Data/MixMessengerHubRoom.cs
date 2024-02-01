@@ -80,10 +80,8 @@ namespace Mix.Cms.Messenger.Models.Data
 
 		public MixMessengerHubRoom()
 		{
-			base();
-			this.set_MixMessengerMessage(new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>());
-			this.set_MixMessengerNavRoomUser(new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser>());
-			return;
+			this.MixMessengerMessage = new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerMessage>();
+			this.MixMessengerNavRoomUser = new HashSet<Mix.Cms.Messenger.Models.Data.MixMessengerNavRoomUser>();
 		}
 	}
 }

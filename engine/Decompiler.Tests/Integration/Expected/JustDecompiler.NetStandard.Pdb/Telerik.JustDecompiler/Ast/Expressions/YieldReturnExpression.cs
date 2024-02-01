@@ -15,9 +15,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new YieldReturnExpression.u003cget_Childrenu003ed__6(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				YieldReturnExpression yieldReturnExpression = null;
+				yield return yieldReturnExpression.Expression;
 			}
 		}
 
@@ -25,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 54;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.YieldReturnExpression;
 			}
 		}
 
@@ -39,44 +38,41 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Expression().get_ExpressionType();
+				return this.Expression.ExpressionType;
 			}
 			set
 			{
-				this.get_Expression().set_ExpressionType(value);
-				return;
+				this.Expression.ExpressionType = value;
 			}
 		}
 
-		public YieldReturnExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions)
+		public YieldReturnExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			return;
+			this.Expression = expression;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new YieldReturnExpression(this.get_Expression().Clone(), this.instructions);
+			return new YieldReturnExpression(this.Expression.Clone(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new YieldReturnExpression(this.get_Expression().CloneExpressionOnly(), null);
+			return new YieldReturnExpression(this.Expression.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (other as YieldReturnExpression == null)
+			if (!(other is YieldReturnExpression))
 			{
 				return false;
 			}
-			V_0 = other as YieldReturnExpression;
-			if (this.get_Expression() == null)
+			YieldReturnExpression yieldReturnExpression = other as YieldReturnExpression;
+			if (this.Expression == null)
 			{
-				return V_0.get_Expression() == null;
+				return yieldReturnExpression.Expression == null;
 			}
-			return this.get_Expression().Equals(V_0.get_Expression());
+			return this.Expression.Equals(yieldReturnExpression.Expression);
 		}
 	}
 }

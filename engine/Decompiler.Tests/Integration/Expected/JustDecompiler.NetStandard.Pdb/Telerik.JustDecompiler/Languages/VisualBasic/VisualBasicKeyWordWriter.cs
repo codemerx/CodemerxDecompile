@@ -903,8 +903,6 @@ namespace Telerik.JustDecompiler.Languages.VisualBasic
 
 		public VisualBasicKeyWordWriter()
 		{
-			base();
-			return;
 		}
 	}
 }

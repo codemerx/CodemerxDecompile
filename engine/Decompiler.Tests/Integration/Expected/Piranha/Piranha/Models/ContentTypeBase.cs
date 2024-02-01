@@ -15,11 +15,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public IList<ContentTypeEditor> CustomEditors
-		{
-			get;
-			set;
-		}
+		public IList<ContentTypeEditor> CustomEditors { get; set; } = new List<ContentTypeEditor>();
 
 		[Required]
 		[StringLength(64)]
@@ -29,17 +25,9 @@ namespace Piranha.Models
 			set;
 		}
 
-		public IList<RegionType> Regions
-		{
-			get;
-			set;
-		}
+		public IList<RegionType> Regions { get; set; } = new List<RegionType>();
 
-		public IList<ContentTypeRoute> Routes
-		{
-			get;
-			set;
-		}
+		public IList<ContentTypeRoute> Routes { get; set; } = new List<ContentTypeRoute>();
 
 		public string Title
 		{
@@ -49,11 +37,6 @@ namespace Piranha.Models
 
 		protected ContentTypeBase()
 		{
-			this.u003cRegionsu003ek__BackingField = new List<RegionType>();
-			this.u003cRoutesu003ek__BackingField = new List<ContentTypeRoute>();
-			this.u003cCustomEditorsu003ek__BackingField = new List<ContentTypeEditor>();
-			base();
-			return;
 		}
 	}
 }

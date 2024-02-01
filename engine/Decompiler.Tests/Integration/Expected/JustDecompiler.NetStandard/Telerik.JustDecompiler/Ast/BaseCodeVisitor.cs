@@ -12,13 +12,11 @@ namespace Telerik.JustDecompiler.Ast
 
 		public BaseCodeVisitor()
 		{
-			base();
-			return;
 		}
 
 		public virtual void Visit(ICodeNode node)
 		{
-			this.visitsOnStack = this.visitsOnStack + (long)1;
+			this.visitsOnStack += (long)1;
 			if (this.visitsOnStack == (long)0x258)
 			{
 				this.visitsOnStack = (long)0;
@@ -26,1141 +24,1008 @@ namespace Telerik.JustDecompiler.Ast
 			}
 			if (node == null)
 			{
-				this.visitsOnStack = this.visitsOnStack - (long)1;
+				this.visitsOnStack -= (long)1;
 				return;
 			}
-			switch (node.get_CodeNodeType())
+			switch (node.CodeNodeType)
 			{
-				case 0:
+				case CodeNodeType.BlockStatement:
 				{
 					this.VisitBlockStatement((BlockStatement)node);
 					break;
 				}
-				case 1:
+				case CodeNodeType.UnsafeBlock:
 				{
 					this.VisitUnsafeBlockStatement((UnsafeBlockStatement)node);
 					break;
 				}
-				case 2:
+				case CodeNodeType.GotoStatement:
 				{
 					this.VisitGotoStatement((GotoStatement)node);
 					break;
 				}
-				case 3:
+				case CodeNodeType.IfStatement:
 				{
 					this.VisitIfStatement((IfStatement)node);
 					break;
 				}
-				case 4:
+				case CodeNodeType.IfElseIfStatement:
 				{
 					this.VisitIfElseIfStatement((IfElseIfStatement)node);
 					break;
 				}
-				case 5:
+				case CodeNodeType.ExpressionStatement:
 				{
 					this.VisitExpressionStatement((ExpressionStatement)node);
 					break;
 				}
-				case 6:
+				case CodeNodeType.ThrowExpression:
 				{
 					this.VisitThrowExpression((ThrowExpression)node);
 					break;
 				}
-				case 7:
+				case CodeNodeType.WhileStatement:
 				{
 					this.VisitWhileStatement((WhileStatement)node);
 					break;
 				}
-				case 8:
+				case CodeNodeType.DoWhileStatement:
 				{
 					this.VisitDoWhileStatement((DoWhileStatement)node);
 					break;
 				}
-				case 9:
+				case CodeNodeType.BreakStatement:
 				{
 					this.VisitBreakStatement((BreakStatement)node);
 					break;
 				}
-				case 10:
+				case CodeNodeType.ContinueStatement:
 				{
 					this.VisitContinueStatement((ContinueStatement)node);
 					break;
 				}
-				case 11:
+				case CodeNodeType.ForStatement:
 				{
 					this.VisitForStatement((ForStatement)node);
 					break;
 				}
-				case 12:
+				case CodeNodeType.ForEachStatement:
 				{
 					this.VisitForEachStatement((ForEachStatement)node);
 					break;
 				}
-				case 13:
+				case CodeNodeType.ConditionCase:
 				{
 					this.VisitConditionCase((ConditionCase)node);
 					break;
 				}
-				case 14:
+				case CodeNodeType.DefaultCase:
 				{
 					this.VisitDefaultCase((DefaultCase)node);
 					break;
 				}
-				case 15:
+				case CodeNodeType.SwitchStatement:
 				{
 					this.VisitSwitchStatement((SwitchStatement)node);
 					break;
 				}
-				case 16:
+				case CodeNodeType.CatchClause:
 				{
 					this.VisitCatchClause((CatchClause)node);
 					break;
 				}
-				case 17:
+				case CodeNodeType.TryStatement:
 				{
 					this.VisitTryStatement((TryStatement)node);
 					break;
 				}
-				case 18:
+				case CodeNodeType.BlockExpression:
 				{
 					this.VisitBlockExpression((BlockExpression)node);
 					break;
 				}
-				case 19:
+				case CodeNodeType.MethodInvocationExpression:
 				{
 					this.VisitMethodInvocationExpression((MethodInvocationExpression)node);
 					break;
 				}
-				case 20:
+				case CodeNodeType.MethodReferenceExpression:
 				{
 					this.VisitMethodReferenceExpression((MethodReferenceExpression)node);
 					break;
 				}
-				case 21:
+				case CodeNodeType.DelegateCreationExpression:
 				{
 					this.VisitDelegateCreationExpression((DelegateCreationExpression)node);
 					break;
 				}
-				case 22:
+				case CodeNodeType.LiteralExpression:
 				{
 					this.VisitLiteralExpression((LiteralExpression)node);
 					break;
 				}
-				case 23:
+				case CodeNodeType.UnaryExpression:
 				{
 					this.VisitUnaryExpression((UnaryExpression)node);
 					break;
 				}
-				case 24:
+				case CodeNodeType.BinaryExpression:
 				{
 					this.VisitBinaryExpression((BinaryExpression)node);
 					break;
 				}
-				case 25:
+				case CodeNodeType.ArgumentReferenceExpression:
 				{
 					this.VisitArgumentReferenceExpression((ArgumentReferenceExpression)node);
 					break;
 				}
-				case 26:
+				case CodeNodeType.VariableReferenceExpression:
 				{
 					this.VisitVariableReferenceExpression((VariableReferenceExpression)node);
 					break;
 				}
-				case 27:
+				case CodeNodeType.VariableDeclarationExpression:
 				{
 					this.VisitVariableDeclarationExpression((VariableDeclarationExpression)node);
 					break;
 				}
-				case 28:
+				case CodeNodeType.ThisReferenceExpression:
 				{
 					this.VisitThisReferenceExpression((ThisReferenceExpression)node);
 					break;
 				}
-				case 29:
+				case CodeNodeType.BaseReferenceExpression:
 				{
 					this.VisitBaseReferenceExpression((BaseReferenceExpression)node);
 					break;
 				}
-				case 30:
+				case CodeNodeType.FieldReferenceExpression:
 				{
 					this.VisitFieldReferenceExpression((FieldReferenceExpression)node);
 					break;
 				}
-				case 31:
+				case CodeNodeType.ExplicitCastExpression:
 				{
 					this.VisitExplicitCastExpression((ExplicitCastExpression)node);
 					break;
 				}
-				case 32:
+				case CodeNodeType.ImplicitCastExpression:
 				{
 					this.VisitImplicitCastExpression((ImplicitCastExpression)node);
 					break;
 				}
-				case 33:
+				case CodeNodeType.SafeCastExpression:
 				{
 					this.VisitSafeCastExpression((SafeCastExpression)node);
 					break;
 				}
-				case 34:
+				case CodeNodeType.CanCastExpression:
 				{
 					this.VisitCanCastExpression((CanCastExpression)node);
 					break;
 				}
-				case 35:
+				case CodeNodeType.TypeOfExpression:
 				{
 					this.VisitTypeOfExpression((TypeOfExpression)node);
 					break;
 				}
-				case 36:
+				case CodeNodeType.ConditionExpression:
 				{
 					this.VisitConditionExpression((ConditionExpression)node);
 					break;
 				}
-				case 37:
+				case CodeNodeType.FixedStatement:
 				{
 					this.VisitFixedStatement((FixedStatement)node);
 					break;
 				}
-				case 38:
+				case CodeNodeType.ArrayCreationExpression:
 				{
 					this.VisitArrayCreationExpression((ArrayCreationExpression)node);
 					break;
 				}
-				case 39:
+				case CodeNodeType.ArrayIndexerExpression:
 				{
 					this.VisitArrayIndexerExpression((ArrayIndexerExpression)node);
 					break;
 				}
-				case 40:
+				case CodeNodeType.ObjectCreationExpression:
 				{
 					this.VisitObjectCreationExpression((ObjectCreationExpression)node);
 					break;
 				}
-				case 41:
+				case CodeNodeType.DefaultObjectExpression:
 				{
 					this.VisitDefaultObjectExpression((DefaultObjectExpression)node);
 					break;
 				}
-				case 42:
+				case CodeNodeType.PropertyReferenceExpression:
 				{
 					this.VisitPropertyReferenceExpression((PropertyReferenceExpression)node);
 					break;
 				}
-				case 43:
+				case CodeNodeType.TypeReferenceExpression:
 				{
 					this.VisitTypeReferenceExpression((TypeReferenceExpression)node);
 					break;
 				}
-				case 44:
+				case CodeNodeType.UsingStatement:
 				{
 					this.VisitUsingStatement((UsingStatement)node);
 					break;
 				}
-				case 45:
+				case CodeNodeType.StackAllocExpression:
 				{
 					this.VisitStackAllocExpression((StackAllocExpression)node);
 					break;
 				}
-				case 46:
+				case CodeNodeType.SizeOfExpression:
 				{
 					this.VisitSizeOfExpression((SizeOfExpression)node);
 					break;
 				}
-				case 47:
+				case CodeNodeType.MakeRefExpression:
 				{
 					this.VisitMakeRefExpression((MakeRefExpression)node);
 					break;
 				}
-				case 48:
+				case CodeNodeType.EventReferenceExpression:
 				{
 					this.VisitEventReferenceExpression((EventReferenceExpression)node);
 					break;
 				}
-				case 49:
+				case CodeNodeType.EnumExpression:
 				{
 					this.VisitEnumExpression((EnumExpression)node);
 					break;
 				}
-				case 50:
+				case CodeNodeType.LambdaExpression:
 				{
 					this.VisitLambdaExpression((LambdaExpression)node);
 					break;
 				}
-				case 51:
+				case CodeNodeType.DelegateInvokeExpression:
 				{
 					this.VisitDelegateInvokeExpression((DelegateInvokeExpression)node);
 					break;
 				}
-				case 52:
+				case CodeNodeType.BaseCtorExpression:
 				{
 					this.VisitBaseCtorExpression((BaseCtorExpression)node);
 					break;
 				}
-				case 53:
+				case CodeNodeType.ThisCtorExpression:
 				{
 					this.VisitThisCtorExpression((ThisCtorExpression)node);
 					break;
 				}
-				case 54:
+				case CodeNodeType.YieldReturnExpression:
 				{
 					this.VisitYieldReturnExpression((YieldReturnExpression)node);
 					break;
 				}
-				case 55:
+				case CodeNodeType.YieldBreakExpression:
 				{
 					this.VisitYieldBreakExpression((YieldBreakExpression)node);
 					break;
 				}
-				case 56:
+				case CodeNodeType.LockStatement:
 				{
 					this.VisitLockStatement((LockStatement)node);
 					break;
 				}
-				case 57:
+				case CodeNodeType.ReturnExpression:
 				{
 					this.VisitReturnExpression((ReturnExpression)node);
 					break;
 				}
-				case 58:
+				case CodeNodeType.EmptyStatement:
 				{
 					this.VisitEmptyStatement((EmptyStatement)node);
 					break;
 				}
-				case 59:
+				case CodeNodeType.DynamicMemberReferenceExpression:
 				{
 					this.VisitDynamicMemberReferenceExpression((DynamicMemberReferenceExpression)node);
 					break;
 				}
-				case 60:
+				case CodeNodeType.DynamicConstructorInvocationExpression:
 				{
 					this.VisitDynamicConstructorInvocationExpression((DynamicConstructorInvocationExpression)node);
 					break;
 				}
-				case 61:
+				case CodeNodeType.DynamicIndexerExpression:
 				{
 					this.VisitDynamicIndexerExpression((DynamicIndexerExpression)node);
 					break;
 				}
-				case 62:
+				case CodeNodeType.BoxExpression:
 				{
 					this.VisitBoxExpression((BoxExpression)node);
 					break;
 				}
-				case 63:
+				case CodeNodeType.AnonymousPropertyInitializerExpression:
 				{
 					this.VisitAnonymousPropertyInitializerExpression((AnonymousPropertyInitializerExpression)node);
 					break;
 				}
-				case 64:
+				case CodeNodeType.LambdaParameterExpression:
 				{
 					this.VisitLambdaParameterExpression((LambdaParameterExpression)node);
 					break;
 				}
-				case 65:
+				case CodeNodeType.AwaitExpression:
 				{
 					this.VisitAwaitExpression((AwaitExpression)node);
 					break;
 				}
-				case 66:
+				case CodeNodeType.ArrayLengthExpression:
 				{
 					this.VisitArrayLengthExpression((ArrayLengthExpression)node);
 					break;
 				}
-				case 67:
+				case CodeNodeType.ExceptionStatement:
 				{
 					this.VisitExceptionStatement((ExceptionStatement)node);
 					break;
 				}
-				case 68:
+				case CodeNodeType.BreakSwitchCaseStatement:
 				{
 					this.VisitBreakSwitchCaseStatement((BreakSwitchCaseStatement)node);
 					break;
 				}
-				case 69:
+				case CodeNodeType.CaseGotoStatement:
 				{
 					this.VisitCaseGotoStatement((CaseGotoStatement)node);
 					break;
 				}
-				case 70:
+				case CodeNodeType.FinallyClause:
 				{
 					this.VisitFinallyClause((FinallyClause)node);
 					break;
 				}
-				case 71:
+				case CodeNodeType.ShortFormReturnExpression:
 				{
 					this.VisitShortFormReturnExpression((ShortFormReturnExpression)node);
 					break;
 				}
-				case 72:
+				case CodeNodeType.AnonymousObjectCreationExpression:
 				{
 					this.VisitAnonymousObjectCreationExpression((AnonymousObjectCreationExpression)node);
 					break;
 				}
-				case 73:
+				case CodeNodeType.FromClause:
 				{
 					this.VisitFromClause((FromClause)node);
 					break;
 				}
-				case 74:
+				case CodeNodeType.SelectClause:
 				{
 					this.VisitSelectClause((SelectClause)node);
 					break;
 				}
-				case 75:
+				case CodeNodeType.WhereClause:
 				{
 					this.VisitWhereClause((WhereClause)node);
 					break;
 				}
-				case 76:
+				case CodeNodeType.GroupClause:
 				{
 					this.VisitGroupClause((GroupClause)node);
 					break;
 				}
-				case 77:
+				case CodeNodeType.OrderByClause:
 				{
 					this.VisitOrderByClause((OrderByClause)node);
 					break;
 				}
-				case 78:
+				case CodeNodeType.JoinClause:
 				{
 					this.VisitJoinClause((JoinClause)node);
 					break;
 				}
-				case 79:
+				case CodeNodeType.LetClause:
 				{
 					this.VisitLetClause((LetClause)node);
 					break;
 				}
-				case 80:
+				case CodeNodeType.IntoClause:
 				{
 					this.VisitIntoClause((IntoClause)node);
 					break;
 				}
-				case 81:
+				case CodeNodeType.LinqQueryExpression:
 				{
 					this.VisitLinqQueryExpression((LinqQueryExpression)node);
 					break;
 				}
-				case 82:
+				case CodeNodeType.ArrayVariableCreationExpression:
 				{
 					this.VisitArrayVariableDeclarationExpression((ArrayVariableDeclarationExpression)node);
 					break;
 				}
-				case 83:
+				case CodeNodeType.ArrayAssignmentVariableReferenceExpression:
 				{
 					this.VisitArrayAssignmentVariableReferenceExpression((ArrayVariableReferenceExpression)node);
 					break;
 				}
-				case 84:
+				case CodeNodeType.ArrayAssignmentFieldReferenceExpression:
 				{
 					this.VisitArrayAssignmentFieldReferenceExpression((ArrayAssignmentFieldReferenceExpression)node);
 					break;
 				}
-				case 85:
+				case CodeNodeType.PropertyInitializerExpression:
 				{
 					this.VisitPropertyInitializerExpression((PropertyInitializerExpression)node);
 					break;
 				}
-				case 86:
+				case CodeNodeType.FieldInitializerExpression:
 				{
 					this.VisitFieldInitializerExpression((FieldInitializerExpression)node);
 					break;
 				}
-				case 87:
+				case CodeNodeType.ParenthesesExpression:
 				{
 					this.VisitParenthesesExpression((ParenthesesExpression)node);
 					break;
 				}
-				case 88:
+				case CodeNodeType.InitializerExpression:
 				{
 					this.VisitInitializerExpression((InitializerExpression)node);
 					break;
 				}
-				case 89:
+				case CodeNodeType.CheckedExpression:
 				{
 					this.VisitCheckedExpression((CheckedExpression)node);
 					break;
 				}
-				case 90:
+				case CodeNodeType.MemberHandleExpression:
 				{
 					this.VisitMemberHandleExpression((MemberHandleExpression)node);
 					break;
 				}
-				case 91:
+				case CodeNodeType.AutoPropertyConstructorInitializerExpression:
 				{
 					this.VisitAutoPropertyConstructorInitializerExpression((AutoPropertyConstructorInitializerExpression)node);
 					break;
 				}
-				case 92:
+				case CodeNodeType.RaiseEventExpression:
 				{
 					this.VisitRaiseEventExpression((RaiseEventExpression)node);
 					break;
 				}
-				case 93:
+				case CodeNodeType.RefVariableDeclarationExpression:
 				{
 					this.VisitRefVariableDeclarationExpression((RefVariableDeclarationExpression)node);
 					break;
 				}
-				case 94:
+				case CodeNodeType.RefReturnExpression:
 				{
 					this.VisitRefReturnExpression((RefReturnExpression)node);
 					break;
 				}
 				default:
 				{
-					goto Label0;
+					throw new ArgumentException();
 				}
 			}
-			this.visitsOnStack = this.visitsOnStack - (long)1;
-			return;
-		Label0:
-			throw new ArgumentException();
+			this.visitsOnStack -= (long)1;
 		}
 
 		public virtual void Visit(IEnumerable collection)
 		{
-			V_0 = collection.GetEnumerator();
-			try
+			foreach (ICodeNode codeNode in collection)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = (ICodeNode)V_0.get_Current();
-					this.Visit(V_1);
-				}
+				this.Visit(codeNode);
 			}
-			finally
-			{
-				V_2 = V_0 as IDisposable;
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
-			}
-			return;
 		}
 
 		public virtual void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpression node)
 		{
-			this.Visit(node.get_Initializer());
-			return;
+			this.Visit(node.Initializer);
 		}
 
 		public virtual void VisitAnonymousPropertyInitializerExpression(AnonymousPropertyInitializerExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitArgumentReferenceExpression(ArgumentReferenceExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitArrayAssignmentFieldReferenceExpression(ArrayAssignmentFieldReferenceExpression node)
 		{
-			this.Visit(node.get_Field());
-			this.Visit(node.get_Dimensions());
-			return;
+			this.Visit(node.Field);
+			this.Visit(node.Dimensions);
 		}
 
 		public virtual void VisitArrayAssignmentVariableReferenceExpression(ArrayVariableReferenceExpression node)
 		{
-			this.Visit(node.get_Variable());
-			this.Visit(node.get_Dimensions());
-			return;
+			this.Visit(node.Variable);
+			this.Visit(node.Dimensions);
 		}
 
 		public virtual void VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			this.Visit(node.get_Dimensions());
-			this.Visit(node.get_Initializer());
-			return;
+			this.Visit(node.Dimensions);
+			this.Visit(node.Initializer);
 		}
 
 		public virtual void VisitArrayIndexerExpression(ArrayIndexerExpression node)
 		{
 			this.VisitIIndexerExpression(node);
-			return;
 		}
 
 		public virtual void VisitArrayLengthExpression(ArrayLengthExpression node)
 		{
-			this.Visit(node.get_Target());
-			return;
+			this.Visit(node.Target);
 		}
 
 		public virtual void VisitArrayVariableDeclarationExpression(ArrayVariableDeclarationExpression node)
 		{
-			this.Visit(node.get_Variable());
-			this.Visit(node.get_Dimensions());
-			return;
+			this.Visit(node.Variable);
+			this.Visit(node.Dimensions);
 		}
 
 		public virtual void VisitAutoPropertyConstructorInitializerExpression(AutoPropertyConstructorInitializerExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitAwaitExpression(AwaitExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitBaseReferenceExpression(BaseReferenceExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitBinaryExpression(BinaryExpression node)
 		{
-			this.Visit(node.get_Left());
-			this.Visit(node.get_Right());
-			return;
+			this.Visit(node.Left);
+			this.Visit(node.Right);
 		}
 
 		public virtual void VisitBlockExpression(BlockExpression node)
 		{
-			this.Visit(node.get_Expressions());
-			return;
+			this.Visit(node.Expressions);
 		}
 
 		public virtual void VisitBlockStatement(BlockStatement node)
 		{
-			this.Visit(node.get_Statements());
-			return;
+			this.Visit(node.Statements);
 		}
 
 		public virtual void VisitBoxExpression(BoxExpression node)
 		{
-			this.Visit(node.get_BoxedExpression());
-			return;
+			this.Visit(node.BoxedExpression);
 		}
 
 		public virtual void VisitBreakStatement(BreakStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitBreakSwitchCaseStatement(BreakSwitchCaseStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitCanCastExpression(CanCastExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitCaseGotoStatement(CaseGotoStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitCatchClause(CatchClause node)
 		{
-			this.Visit(node.get_Body());
-			this.Visit(node.get_Variable());
-			this.Visit(node.get_Filter());
-			return;
+			this.Visit(node.Body);
+			this.Visit(node.Variable);
+			this.Visit(node.Filter);
 		}
 
 		public virtual void VisitCheckedExpression(CheckedExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitConditionCase(ConditionCase node)
 		{
-			this.Visit(node.get_Condition());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Condition);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitConditionExpression(ConditionExpression node)
 		{
-			this.Visit(node.get_Condition());
-			this.Visit(node.get_Then());
-			this.Visit(node.get_Else());
-			return;
+			this.Visit(node.Condition);
+			this.Visit(node.Then);
+			this.Visit(node.Else);
 		}
 
 		public virtual void VisitContinueStatement(ContinueStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitDefaultCase(DefaultCase node)
 		{
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitDefaultObjectExpression(DefaultObjectExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitDelegateCreationExpression(DelegateCreationExpression node)
 		{
-			this.Visit(node.get_Target());
-			this.Visit(node.get_MethodExpression());
-			return;
+			this.Visit(node.Target);
+			this.Visit(node.MethodExpression);
 		}
 
 		public virtual void VisitDelegateInvokeExpression(DelegateInvokeExpression node)
 		{
-			this.Visit(node.get_Target());
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Target);
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitDoWhileStatement(DoWhileStatement node)
 		{
-			this.Visit(node.get_Body());
-			this.Visit(node.get_Condition());
-			return;
+			this.Visit(node.Body);
+			this.Visit(node.Condition);
 		}
 
 		public virtual void VisitDynamicConstructorInvocationExpression(DynamicConstructorInvocationExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitDynamicIndexerExpression(DynamicIndexerExpression node)
 		{
 			this.VisitIIndexerExpression(node);
-			return;
 		}
 
 		public virtual void VisitDynamicMemberReferenceExpression(DynamicMemberReferenceExpression node)
 		{
-			this.Visit(node.get_Target());
-			if (node.get_IsMethodInvocation())
+			this.Visit(node.Target);
+			if (node.IsMethodInvocation)
 			{
-				this.Visit(node.get_InvocationArguments());
+				this.Visit(node.InvocationArguments);
 			}
-			return;
 		}
 
 		public virtual void VisitEmptyStatement(EmptyStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitEnumExpression(EnumExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitEventReferenceExpression(EventReferenceExpression node)
 		{
-			this.Visit(node.get_Target());
-			return;
+			this.Visit(node.Target);
 		}
 
 		public virtual void VisitExceptionStatement(ExceptionStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitExplicitCastExpression(ExplicitCastExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitExpressionStatement(ExpressionStatement node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitFieldInitializerExpression(FieldInitializerExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			this.Visit(node.get_Target());
-			return;
+			this.Visit(node.Target);
 		}
 
 		public void VisitFinallyClause(FinallyClause node)
 		{
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitFixedStatement(FixedStatement node)
 		{
-			this.Visit(node.get_Expression());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Expression);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitForEachStatement(ForEachStatement node)
 		{
-			this.Visit(node.get_Variable());
-			this.Visit(node.get_Collection());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Variable);
+			this.Visit(node.Collection);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitForStatement(ForStatement node)
 		{
-			this.Visit(node.get_Initializer());
-			this.Visit(node.get_Condition());
-			this.Visit(node.get_Increment());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Initializer);
+			this.Visit(node.Condition);
+			this.Visit(node.Increment);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitFromClause(FromClause node)
 		{
-			this.Visit(node.get_Identifier());
-			this.Visit(node.get_Collection());
-			return;
+			this.Visit(node.Identifier);
+			this.Visit(node.Collection);
 		}
 
 		public virtual void VisitGotoStatement(GotoStatement node)
 		{
-			return;
 		}
 
 		public virtual void VisitGroupClause(GroupClause node)
 		{
-			this.Visit(node.get_Expression());
-			this.Visit(node.get_GroupKey());
-			return;
+			this.Visit(node.Expression);
+			this.Visit(node.GroupKey);
 		}
 
 		public virtual void VisitIfElseIfStatement(IfElseIfStatement node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_ConditionBlocks().get_Count())
+			for (int i = 0; i < node.ConditionBlocks.Count; i++)
 			{
-				V_1 = node.get_ConditionBlocks().get_Item(V_0);
-				this.Visit(V_1.get_Key());
-				this.Visit(V_1.get_Value());
-				V_0 = V_0 + 1;
+				KeyValuePair<Expression, BlockStatement> item = node.ConditionBlocks[i];
+				this.Visit(item.Key);
+				this.Visit(item.Value);
 			}
-			this.Visit(node.get_Else());
-			return;
+			this.Visit(node.Else);
 		}
 
 		public virtual void VisitIfStatement(IfStatement node)
 		{
-			this.Visit(node.get_Condition());
-			this.Visit(node.get_Then());
-			this.Visit(node.get_Else());
-			return;
+			this.Visit(node.Condition);
+			this.Visit(node.Then);
+			this.Visit(node.Else);
 		}
 
 		protected virtual void VisitIIndexerExpression(IIndexerExpression node)
 		{
-			this.Visit(node.get_Target());
-			this.Visit(node.get_Indices());
-			return;
+			this.Visit(node.Target);
+			this.Visit(node.Indices);
 		}
 
 		public virtual void VisitImplicitCastExpression(ImplicitCastExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitInitializerExpression(InitializerExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitIntoClause(IntoClause node)
 		{
-			this.Visit(node.get_Identifier());
-			return;
+			this.Visit(node.Identifier);
 		}
 
 		public virtual void VisitJoinClause(JoinClause node)
 		{
-			this.Visit(node.get_InnerIdentifier());
-			this.Visit(node.get_InnerCollection());
-			this.Visit(node.get_OuterKey());
-			this.Visit(node.get_InnerKey());
-			return;
+			this.Visit(node.InnerIdentifier);
+			this.Visit(node.InnerCollection);
+			this.Visit(node.OuterKey);
+			this.Visit(node.InnerKey);
 		}
 
 		public virtual void VisitLambdaExpression(LambdaExpression node)
 		{
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitLambdaParameterExpression(LambdaParameterExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitLetClause(LetClause node)
 		{
-			this.Visit(node.get_Identifier());
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Identifier);
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitLinqQueryExpression(LinqQueryExpression node)
 		{
-			V_0 = node.get_Clauses().GetEnumerator();
-			try
+			foreach (QueryClause clause in node.Clauses)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.Visit(V_1);
-				}
+				this.Visit(clause);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public virtual void VisitLiteralExpression(LiteralExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitLockStatement(LockStatement node)
 		{
-			this.Visit(node.get_Expression());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Expression);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitMakeRefExpression(MakeRefExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitMemberHandleExpression(MemberHandleExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			this.Visit(node.get_MethodExpression());
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.MethodExpression);
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			this.Visit(node.get_Target());
-			return;
+			this.Visit(node.Target);
 		}
 
 		public virtual void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			this.Visit(node.get_Initializer());
-			return;
+			this.Visit(node.Arguments);
+			this.Visit(node.Initializer);
 		}
 
 		public virtual void VisitOrderByClause(OrderByClause node)
 		{
-			V_0 = node.get_ExpressionToOrderDirectionMap().GetEnumerator();
-			try
+			foreach (KeyValuePair<Expression, OrderDirection> expressionToOrderDirectionMap in node.ExpressionToOrderDirectionMap)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.Visit(V_1.get_Key());
-				}
+				this.Visit(expressionToOrderDirectionMap.Key);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public virtual void VisitParenthesesExpression(ParenthesesExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitPropertyInitializerExpression(PropertyInitializerExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.Visit(node.get_Target());
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Target);
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitRaiseEventExpression(RaiseEventExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitRefReturnExpression(RefReturnExpression node)
 		{
-			this.Visit(node.get_Value());
-			return;
+			this.Visit(node.Value);
 		}
 
 		public virtual void VisitRefVariableDeclarationExpression(RefVariableDeclarationExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitReturnExpression(ReturnExpression node)
 		{
-			this.Visit(node.get_Value());
-			return;
+			this.Visit(node.Value);
 		}
 
 		public virtual void VisitSafeCastExpression(SafeCastExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitSelectClause(SelectClause node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitShortFormReturnExpression(ShortFormReturnExpression node)
 		{
-			this.Visit(node.get_Value());
-			return;
+			this.Visit(node.Value);
 		}
 
 		public virtual void VisitSizeOfExpression(SizeOfExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitStackAllocExpression(StackAllocExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitSwitchStatement(SwitchStatement node)
 		{
-			this.Visit(node.get_Condition());
-			this.Visit(node.get_Cases());
-			return;
+			this.Visit(node.Condition);
+			this.Visit(node.Cases);
 		}
 
 		public virtual void VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Arguments);
 		}
 
 		public virtual void VisitThisReferenceExpression(ThisReferenceExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitThrowExpression(ThrowExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 
 		public virtual void VisitTryStatement(TryStatement node)
 		{
-			this.Visit(node.get_Try());
-			this.Visit(node.get_CatchClauses());
-			this.Visit(node.get_Fault());
-			this.Visit(node.get_Finally());
-			return;
+			this.Visit(node.Try);
+			this.Visit(node.CatchClauses);
+			this.Visit(node.Fault);
+			this.Visit(node.Finally);
 		}
 
 		public virtual void VisitTypeOfExpression(TypeOfExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitTypeReferenceExpression(TypeReferenceExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitUnaryExpression(UnaryExpression node)
 		{
-			this.Visit(node.get_Operand());
-			return;
+			this.Visit(node.Operand);
 		}
 
 		public virtual void VisitUnsafeBlockStatement(UnsafeBlockStatement unsafeBlock)
 		{
-			this.Visit(unsafeBlock.get_Statements());
-			return;
+			this.Visit(unsafeBlock.Statements);
 		}
 
 		public virtual void VisitUsingStatement(UsingStatement node)
 		{
-			this.Visit(node.get_Expression());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Expression);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitWhereClause(WhereClause node)
 		{
-			this.Visit(node.get_Condition());
-			return;
+			this.Visit(node.Condition);
 		}
 
 		public virtual void VisitWhileStatement(WhileStatement node)
 		{
-			this.Visit(node.get_Condition());
-			this.Visit(node.get_Body());
-			return;
+			this.Visit(node.Condition);
+			this.Visit(node.Body);
 		}
 
 		public virtual void VisitYieldBreakExpression(YieldBreakExpression node)
 		{
-			return;
 		}
 
 		public virtual void VisitYieldReturnExpression(YieldReturnExpression node)
 		{
-			this.Visit(node.get_Expression());
-			return;
+			this.Visit(node.Expression);
 		}
 	}
 }

@@ -6,8 +6,6 @@ namespace Piranha.Extend
 	{
 		protected Field()
 		{
-			base();
-			return;
 		}
 
 		public abstract string GetTitle();

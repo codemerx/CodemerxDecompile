@@ -20,13 +20,11 @@ namespace Piranha.Models
 
 		public ContentTypeRoute()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator String(ContentTypeRoute r)
 		{
-			return r.get_Route();
+			return r.Route;
 		}
 	}
 }

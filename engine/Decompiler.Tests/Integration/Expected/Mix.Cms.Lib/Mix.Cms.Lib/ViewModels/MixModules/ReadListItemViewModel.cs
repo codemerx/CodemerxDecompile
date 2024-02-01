@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
@@ -47,7 +49,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				return string.Format("/module/{0}/{1}/{2}", this.get_Specificulture(), this.get_Id(), SeoHelper.GetSEOString(this.get_Title(), '-'));
+				return string.Format("/module/{0}/{1}/{2}", this.Specificulture, this.Id, SeoHelper.GetSEOString(this.Title, '-'));
 			}
 		}
 
@@ -91,11 +93,11 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				if (string.IsNullOrWhiteSpace(this.get_Image()) || this.get_Image().IndexOf("http") != -1 || this.get_Image().get_Chars(0) == '/')
+				if (string.IsNullOrWhiteSpace(this.Image) || this.Image.IndexOf("http") != -1 || this.Image[0] == '/')
 				{
-					return this.get_Image();
+					return this.Image;
 				}
-				return string.Concat(MixService.GetConfig<string>("Domain"), "/", this.get_Image());
+				return string.Concat(MixService.GetConfig<string>("Domain"), "/", this.Image);
 			}
 		}
 
@@ -168,15 +170,15 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				if (this.get_Thumbnail() != null && this.get_Thumbnail().IndexOf("http") == -1 && this.get_Thumbnail().get_Chars(0) != '/')
+				if (this.Thumbnail != null && this.Thumbnail.IndexOf("http") == -1 && this.Thumbnail[0] != '/')
 				{
-					return string.Concat(MixService.GetConfig<string>("Domain"), "/", this.get_Thumbnail());
+					return string.Concat(MixService.GetConfig<string>("Domain"), "/", this.Thumbnail);
 				}
-				if (!string.IsNullOrEmpty(this.get_Thumbnail()))
+				if (!string.IsNullOrEmpty(this.Thumbnail))
 				{
-					return this.get_Thumbnail();
+					return this.Thumbnail;
 				}
-				return this.get_ImageUrl();
+				return this.ImageUrl;
 			}
 		}
 
@@ -196,24 +198,19 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 
 		public ReadListItemViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadListItemViewModel(MixModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadListItemViewModel(MixModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return;
 		}
 
 		public override Task<bool> ExpandViewAsync(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return this.ExpandViewAsync(_context, _transaction);
+			return base.ExpandViewAsync(_context, _transaction);
 		}
 	}
 }

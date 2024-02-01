@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new LambdaParameterExpression.u003cget_Childrenu003ed__15(-2);
 			}
 		}
 
@@ -23,7 +22,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 64;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.LambdaParameterExpression;
 			}
 		}
 
@@ -37,7 +36,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Parameter().get_ParameterType();
+				return this.Parameter.get_ParameterType();
 			}
 			set
 			{
@@ -51,26 +50,24 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			private set;
 		}
 
-		public LambdaParameterExpression(ParameterReference parameterRef, bool displayType, IEnumerable<Instruction> instructions)
+		public LambdaParameterExpression(ParameterReference parameterRef, bool displayType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
 			if (parameterRef == null)
 			{
 				throw new ArgumentNullException("parameterRef");
 			}
-			this.set_Parameter(parameterRef);
-			this.set_DisplayType(displayType);
-			return;
+			this.Parameter = parameterRef;
+			this.DisplayType = displayType;
 		}
 
 		public override Expression Clone()
 		{
-			return new LambdaParameterExpression(this.get_Parameter(), this.get_DisplayType(), this.instructions);
+			return new LambdaParameterExpression(this.Parameter, this.DisplayType, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new LambdaParameterExpression(this.get_Parameter(), this.get_DisplayType(), null);
+			return new LambdaParameterExpression(this.Parameter, this.DisplayType, null);
 		}
 
 		public override bool Equals(Expression other)

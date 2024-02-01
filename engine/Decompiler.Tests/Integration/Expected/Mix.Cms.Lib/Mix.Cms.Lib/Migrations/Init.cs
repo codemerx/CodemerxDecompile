@@ -1,12 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations.Builders;
 using Mix.Cms.Lib.Models.Cms;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.Migrations
@@ -17,1101 +20,2849 @@ namespace Mix.Cms.Lib.Migrations
 	{
 		public Init()
 		{
-			base();
-			return;
 		}
 
 		protected override void BuildTargetModel(ModelBuilder modelBuilder)
 		{
-			dummyVar0 = modelBuilder.HasAnnotation("ProductVersion", "3.1.3").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", (SqlServerValueGenerationStrategy)2);
-			stackVariable12 = modelBuilder;
-			stackVariable14 = Init.u003cu003ec.u003cu003e9__2_0;
-			if (stackVariable14 == null)
-			{
-				dummyVar1 = stackVariable14;
-				stackVariable14 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_0);
-				Init.u003cu003ec.u003cu003e9__2_0 = stackVariable14;
-			}
-			dummyVar2 = stackVariable12.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeField", stackVariable14);
-			stackVariable16 = modelBuilder;
-			stackVariable18 = Init.u003cu003ec.u003cu003e9__2_1;
-			if (stackVariable18 == null)
-			{
-				dummyVar3 = stackVariable18;
-				stackVariable18 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_1);
-				Init.u003cu003ec.u003cu003e9__2_1 = stackVariable18;
-			}
-			dummyVar4 = stackVariable16.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSet", stackVariable18);
-			stackVariable20 = modelBuilder;
-			stackVariable22 = Init.u003cu003ec.u003cu003e9__2_2;
-			if (stackVariable22 == null)
-			{
-				dummyVar5 = stackVariable22;
-				stackVariable22 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_2);
-				Init.u003cu003ec.u003cu003e9__2_2 = stackVariable22;
-			}
-			dummyVar6 = stackVariable20.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetData", stackVariable22);
-			stackVariable24 = modelBuilder;
-			stackVariable26 = Init.u003cu003ec.u003cu003e9__2_3;
-			if (stackVariable26 == null)
-			{
-				dummyVar7 = stackVariable26;
-				stackVariable26 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_3);
-				Init.u003cu003ec.u003cu003e9__2_3 = stackVariable26;
-			}
-			dummyVar8 = stackVariable24.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetReference", stackVariable26);
-			stackVariable28 = modelBuilder;
-			stackVariable30 = Init.u003cu003ec.u003cu003e9__2_4;
-			if (stackVariable30 == null)
-			{
-				dummyVar9 = stackVariable30;
-				stackVariable30 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_4);
-				Init.u003cu003ec.u003cu003e9__2_4 = stackVariable30;
-			}
-			dummyVar10 = stackVariable28.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetValue", stackVariable30);
-			stackVariable32 = modelBuilder;
-			stackVariable34 = Init.u003cu003ec.u003cu003e9__2_5;
-			if (stackVariable34 == null)
-			{
-				dummyVar11 = stackVariable34;
-				stackVariable34 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_5);
-				Init.u003cu003ec.u003cu003e9__2_5 = stackVariable34;
-			}
-			dummyVar12 = stackVariable32.Entity("Mix.Cms.Lib.Models.Cms.MixCache", stackVariable34);
-			stackVariable36 = modelBuilder;
-			stackVariable38 = Init.u003cu003ec.u003cu003e9__2_6;
-			if (stackVariable38 == null)
-			{
-				dummyVar13 = stackVariable38;
-				stackVariable38 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_6);
-				Init.u003cu003ec.u003cu003e9__2_6 = stackVariable38;
-			}
-			dummyVar14 = stackVariable36.Entity("Mix.Cms.Lib.Models.Cms.MixCmsUser", stackVariable38);
-			stackVariable40 = modelBuilder;
-			stackVariable42 = Init.u003cu003ec.u003cu003e9__2_7;
-			if (stackVariable42 == null)
-			{
-				dummyVar15 = stackVariable42;
-				stackVariable42 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_7);
-				Init.u003cu003ec.u003cu003e9__2_7 = stackVariable42;
-			}
-			dummyVar16 = stackVariable40.Entity("Mix.Cms.Lib.Models.Cms.MixConfiguration", stackVariable42);
-			stackVariable44 = modelBuilder;
-			stackVariable46 = Init.u003cu003ec.u003cu003e9__2_8;
-			if (stackVariable46 == null)
-			{
-				dummyVar17 = stackVariable46;
-				stackVariable46 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_8);
-				Init.u003cu003ec.u003cu003e9__2_8 = stackVariable46;
-			}
-			dummyVar18 = stackVariable44.Entity("Mix.Cms.Lib.Models.Cms.MixCulture", stackVariable46);
-			stackVariable48 = modelBuilder;
-			stackVariable50 = Init.u003cu003ec.u003cu003e9__2_9;
-			if (stackVariable50 == null)
-			{
-				dummyVar19 = stackVariable50;
-				stackVariable50 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_9);
-				Init.u003cu003ec.u003cu003e9__2_9 = stackVariable50;
-			}
-			dummyVar20 = stackVariable48.Entity("Mix.Cms.Lib.Models.Cms.MixFile", stackVariable50);
-			stackVariable52 = modelBuilder;
-			stackVariable54 = Init.u003cu003ec.u003cu003e9__2_10;
-			if (stackVariable54 == null)
-			{
-				dummyVar21 = stackVariable54;
-				stackVariable54 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_10);
-				Init.u003cu003ec.u003cu003e9__2_10 = stackVariable54;
-			}
-			dummyVar22 = stackVariable52.Entity("Mix.Cms.Lib.Models.Cms.MixLanguage", stackVariable54);
-			stackVariable56 = modelBuilder;
-			stackVariable58 = Init.u003cu003ec.u003cu003e9__2_11;
-			if (stackVariable58 == null)
-			{
-				dummyVar23 = stackVariable58;
-				stackVariable58 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_11);
-				Init.u003cu003ec.u003cu003e9__2_11 = stackVariable58;
-			}
-			dummyVar24 = stackVariable56.Entity("Mix.Cms.Lib.Models.Cms.MixMedia", stackVariable58);
-			stackVariable60 = modelBuilder;
-			stackVariable62 = Init.u003cu003ec.u003cu003e9__2_12;
-			if (stackVariable62 == null)
-			{
-				dummyVar25 = stackVariable62;
-				stackVariable62 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_12);
-				Init.u003cu003ec.u003cu003e9__2_12 = stackVariable62;
-			}
-			dummyVar26 = stackVariable60.Entity("Mix.Cms.Lib.Models.Cms.MixModule", stackVariable62);
-			stackVariable64 = modelBuilder;
-			stackVariable66 = Init.u003cu003ec.u003cu003e9__2_13;
-			if (stackVariable66 == null)
-			{
-				dummyVar27 = stackVariable66;
-				stackVariable66 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_13);
-				Init.u003cu003ec.u003cu003e9__2_13 = stackVariable66;
-			}
-			dummyVar28 = stackVariable64.Entity("Mix.Cms.Lib.Models.Cms.MixModuleData", stackVariable66);
-			stackVariable68 = modelBuilder;
-			stackVariable70 = Init.u003cu003ec.u003cu003e9__2_14;
-			if (stackVariable70 == null)
-			{
-				dummyVar29 = stackVariable70;
-				stackVariable70 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_14);
-				Init.u003cu003ec.u003cu003e9__2_14 = stackVariable70;
-			}
-			dummyVar30 = stackVariable68.Entity("Mix.Cms.Lib.Models.Cms.MixModulePost", stackVariable70);
-			stackVariable72 = modelBuilder;
-			stackVariable74 = Init.u003cu003ec.u003cu003e9__2_15;
-			if (stackVariable74 == null)
-			{
-				dummyVar31 = stackVariable74;
-				stackVariable74 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_15);
-				Init.u003cu003ec.u003cu003e9__2_15 = stackVariable74;
-			}
-			dummyVar32 = stackVariable72.Entity("Mix.Cms.Lib.Models.Cms.MixPage", stackVariable74);
-			stackVariable76 = modelBuilder;
-			stackVariable78 = Init.u003cu003ec.u003cu003e9__2_16;
-			if (stackVariable78 == null)
-			{
-				dummyVar33 = stackVariable78;
-				stackVariable78 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_16);
-				Init.u003cu003ec.u003cu003e9__2_16 = stackVariable78;
-			}
-			dummyVar34 = stackVariable76.Entity("Mix.Cms.Lib.Models.Cms.MixPageModule", stackVariable78);
-			stackVariable80 = modelBuilder;
-			stackVariable82 = Init.u003cu003ec.u003cu003e9__2_17;
-			if (stackVariable82 == null)
-			{
-				dummyVar35 = stackVariable82;
-				stackVariable82 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_17);
-				Init.u003cu003ec.u003cu003e9__2_17 = stackVariable82;
-			}
-			dummyVar36 = stackVariable80.Entity("Mix.Cms.Lib.Models.Cms.MixPagePost", stackVariable82);
-			stackVariable84 = modelBuilder;
-			stackVariable86 = Init.u003cu003ec.u003cu003e9__2_18;
-			if (stackVariable86 == null)
-			{
-				dummyVar37 = stackVariable86;
-				stackVariable86 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_18);
-				Init.u003cu003ec.u003cu003e9__2_18 = stackVariable86;
-			}
-			dummyVar38 = stackVariable84.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPage", stackVariable86);
-			stackVariable88 = modelBuilder;
-			stackVariable90 = Init.u003cu003ec.u003cu003e9__2_19;
-			if (stackVariable90 == null)
-			{
-				dummyVar39 = stackVariable90;
-				stackVariable90 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_19);
-				Init.u003cu003ec.u003cu003e9__2_19 = stackVariable90;
-			}
-			dummyVar40 = stackVariable88.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageNavigation", stackVariable90);
-			stackVariable92 = modelBuilder;
-			stackVariable94 = Init.u003cu003ec.u003cu003e9__2_20;
-			if (stackVariable94 == null)
-			{
-				dummyVar41 = stackVariable94;
-				stackVariable94 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_20);
-				Init.u003cu003ec.u003cu003e9__2_20 = stackVariable94;
-			}
-			dummyVar42 = stackVariable92.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageRole", stackVariable94);
-			stackVariable96 = modelBuilder;
-			stackVariable98 = Init.u003cu003ec.u003cu003e9__2_21;
-			if (stackVariable98 == null)
-			{
-				dummyVar43 = stackVariable98;
-				stackVariable98 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_21);
-				Init.u003cu003ec.u003cu003e9__2_21 = stackVariable98;
-			}
-			dummyVar44 = stackVariable96.Entity("Mix.Cms.Lib.Models.Cms.MixPost", stackVariable98);
-			stackVariable100 = modelBuilder;
-			stackVariable102 = Init.u003cu003ec.u003cu003e9__2_22;
-			if (stackVariable102 == null)
-			{
-				dummyVar45 = stackVariable102;
-				stackVariable102 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_22);
-				Init.u003cu003ec.u003cu003e9__2_22 = stackVariable102;
-			}
-			dummyVar46 = stackVariable100.Entity("Mix.Cms.Lib.Models.Cms.MixPostMedia", stackVariable102);
-			stackVariable104 = modelBuilder;
-			stackVariable106 = Init.u003cu003ec.u003cu003e9__2_23;
-			if (stackVariable106 == null)
-			{
-				dummyVar47 = stackVariable106;
-				stackVariable106 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_23);
-				Init.u003cu003ec.u003cu003e9__2_23 = stackVariable106;
-			}
-			dummyVar48 = stackVariable104.Entity("Mix.Cms.Lib.Models.Cms.MixPostModule", stackVariable106);
-			stackVariable108 = modelBuilder;
-			stackVariable110 = Init.u003cu003ec.u003cu003e9__2_24;
-			if (stackVariable110 == null)
-			{
-				dummyVar49 = stackVariable110;
-				stackVariable110 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_24);
-				Init.u003cu003ec.u003cu003e9__2_24 = stackVariable110;
-			}
-			dummyVar50 = stackVariable108.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedAttributeData", stackVariable110);
-			stackVariable112 = modelBuilder;
-			stackVariable114 = Init.u003cu003ec.u003cu003e9__2_25;
-			if (stackVariable114 == null)
-			{
-				dummyVar51 = stackVariable114;
-				stackVariable114 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_25);
-				Init.u003cu003ec.u003cu003e9__2_25 = stackVariable114;
-			}
-			dummyVar52 = stackVariable112.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedAttributeSet", stackVariable114);
-			stackVariable116 = modelBuilder;
-			stackVariable118 = Init.u003cu003ec.u003cu003e9__2_26;
-			if (stackVariable118 == null)
-			{
-				dummyVar53 = stackVariable118;
-				stackVariable118 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_26);
-				Init.u003cu003ec.u003cu003e9__2_26 = stackVariable118;
-			}
-			dummyVar54 = stackVariable116.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedData", stackVariable118);
-			stackVariable120 = modelBuilder;
-			stackVariable122 = Init.u003cu003ec.u003cu003e9__2_27;
-			if (stackVariable122 == null)
-			{
-				dummyVar55 = stackVariable122;
-				stackVariable122 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_27);
-				Init.u003cu003ec.u003cu003e9__2_27 = stackVariable122;
-			}
-			dummyVar56 = stackVariable120.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedPost", stackVariable122);
-			stackVariable124 = modelBuilder;
-			stackVariable126 = Init.u003cu003ec.u003cu003e9__2_28;
-			if (stackVariable126 == null)
-			{
-				dummyVar57 = stackVariable126;
-				stackVariable126 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_28);
-				Init.u003cu003ec.u003cu003e9__2_28 = stackVariable126;
-			}
-			dummyVar58 = stackVariable124.Entity("Mix.Cms.Lib.Models.Cms.MixTemplate", stackVariable126);
-			stackVariable128 = modelBuilder;
-			stackVariable130 = Init.u003cu003ec.u003cu003e9__2_29;
-			if (stackVariable130 == null)
-			{
-				dummyVar59 = stackVariable130;
-				stackVariable130 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_29);
-				Init.u003cu003ec.u003cu003e9__2_29 = stackVariable130;
-			}
-			dummyVar60 = stackVariable128.Entity("Mix.Cms.Lib.Models.Cms.MixTheme", stackVariable130);
-			stackVariable132 = modelBuilder;
-			stackVariable134 = Init.u003cu003ec.u003cu003e9__2_30;
-			if (stackVariable134 == null)
-			{
-				dummyVar61 = stackVariable134;
-				stackVariable134 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_30);
-				Init.u003cu003ec.u003cu003e9__2_30 = stackVariable134;
-			}
-			dummyVar62 = stackVariable132.Entity("Mix.Cms.Lib.Models.Cms.MixUrlAlias", stackVariable134);
-			stackVariable136 = modelBuilder;
-			stackVariable138 = Init.u003cu003ec.u003cu003e9__2_31;
-			if (stackVariable138 == null)
-			{
-				dummyVar63 = stackVariable138;
-				stackVariable138 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_31);
-				Init.u003cu003ec.u003cu003e9__2_31 = stackVariable138;
-			}
-			dummyVar64 = stackVariable136.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeField", stackVariable138);
-			stackVariable140 = modelBuilder;
-			stackVariable142 = Init.u003cu003ec.u003cu003e9__2_32;
-			if (stackVariable142 == null)
-			{
-				dummyVar65 = stackVariable142;
-				stackVariable142 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_32);
-				Init.u003cu003ec.u003cu003e9__2_32 = stackVariable142;
-			}
-			dummyVar66 = stackVariable140.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetData", stackVariable142);
-			stackVariable144 = modelBuilder;
-			stackVariable146 = Init.u003cu003ec.u003cu003e9__2_33;
-			if (stackVariable146 == null)
-			{
-				dummyVar67 = stackVariable146;
-				stackVariable146 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_33);
-				Init.u003cu003ec.u003cu003e9__2_33 = stackVariable146;
-			}
-			dummyVar68 = stackVariable144.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetReference", stackVariable146);
-			stackVariable148 = modelBuilder;
-			stackVariable150 = Init.u003cu003ec.u003cu003e9__2_34;
-			if (stackVariable150 == null)
-			{
-				dummyVar69 = stackVariable150;
-				stackVariable150 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_34);
-				Init.u003cu003ec.u003cu003e9__2_34 = stackVariable150;
-			}
-			dummyVar70 = stackVariable148.Entity("Mix.Cms.Lib.Models.Cms.MixConfiguration", stackVariable150);
-			stackVariable152 = modelBuilder;
-			stackVariable154 = Init.u003cu003ec.u003cu003e9__2_35;
-			if (stackVariable154 == null)
-			{
-				dummyVar71 = stackVariable154;
-				stackVariable154 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_35);
-				Init.u003cu003ec.u003cu003e9__2_35 = stackVariable154;
-			}
-			dummyVar72 = stackVariable152.Entity("Mix.Cms.Lib.Models.Cms.MixFile", stackVariable154);
-			stackVariable156 = modelBuilder;
-			stackVariable158 = Init.u003cu003ec.u003cu003e9__2_36;
-			if (stackVariable158 == null)
-			{
-				dummyVar73 = stackVariable158;
-				stackVariable158 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_36);
-				Init.u003cu003ec.u003cu003e9__2_36 = stackVariable158;
-			}
-			dummyVar74 = stackVariable156.Entity("Mix.Cms.Lib.Models.Cms.MixLanguage", stackVariable158);
-			stackVariable160 = modelBuilder;
-			stackVariable162 = Init.u003cu003ec.u003cu003e9__2_37;
-			if (stackVariable162 == null)
-			{
-				dummyVar75 = stackVariable162;
-				stackVariable162 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_37);
-				Init.u003cu003ec.u003cu003e9__2_37 = stackVariable162;
-			}
-			dummyVar76 = stackVariable160.Entity("Mix.Cms.Lib.Models.Cms.MixModule", stackVariable162);
-			stackVariable164 = modelBuilder;
-			stackVariable166 = Init.u003cu003ec.u003cu003e9__2_38;
-			if (stackVariable166 == null)
-			{
-				dummyVar77 = stackVariable166;
-				stackVariable166 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_38);
-				Init.u003cu003ec.u003cu003e9__2_38 = stackVariable166;
-			}
-			dummyVar78 = stackVariable164.Entity("Mix.Cms.Lib.Models.Cms.MixModuleData", stackVariable166);
-			stackVariable168 = modelBuilder;
-			stackVariable170 = Init.u003cu003ec.u003cu003e9__2_39;
-			if (stackVariable170 == null)
-			{
-				dummyVar79 = stackVariable170;
-				stackVariable170 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_39);
-				Init.u003cu003ec.u003cu003e9__2_39 = stackVariable170;
-			}
-			dummyVar80 = stackVariable168.Entity("Mix.Cms.Lib.Models.Cms.MixModulePost", stackVariable170);
-			stackVariable172 = modelBuilder;
-			stackVariable174 = Init.u003cu003ec.u003cu003e9__2_40;
-			if (stackVariable174 == null)
-			{
-				dummyVar81 = stackVariable174;
-				stackVariable174 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_40);
-				Init.u003cu003ec.u003cu003e9__2_40 = stackVariable174;
-			}
-			dummyVar82 = stackVariable172.Entity("Mix.Cms.Lib.Models.Cms.MixPage", stackVariable174);
-			stackVariable176 = modelBuilder;
-			stackVariable178 = Init.u003cu003ec.u003cu003e9__2_41;
-			if (stackVariable178 == null)
-			{
-				dummyVar83 = stackVariable178;
-				stackVariable178 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_41);
-				Init.u003cu003ec.u003cu003e9__2_41 = stackVariable178;
-			}
-			dummyVar84 = stackVariable176.Entity("Mix.Cms.Lib.Models.Cms.MixPageModule", stackVariable178);
-			stackVariable180 = modelBuilder;
-			stackVariable182 = Init.u003cu003ec.u003cu003e9__2_42;
-			if (stackVariable182 == null)
-			{
-				dummyVar85 = stackVariable182;
-				stackVariable182 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_42);
-				Init.u003cu003ec.u003cu003e9__2_42 = stackVariable182;
-			}
-			dummyVar86 = stackVariable180.Entity("Mix.Cms.Lib.Models.Cms.MixPagePost", stackVariable182);
-			stackVariable184 = modelBuilder;
-			stackVariable186 = Init.u003cu003ec.u003cu003e9__2_43;
-			if (stackVariable186 == null)
-			{
-				dummyVar87 = stackVariable186;
-				stackVariable186 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_43);
-				Init.u003cu003ec.u003cu003e9__2_43 = stackVariable186;
-			}
-			dummyVar88 = stackVariable184.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageNavigation", stackVariable186);
-			stackVariable188 = modelBuilder;
-			stackVariable190 = Init.u003cu003ec.u003cu003e9__2_44;
-			if (stackVariable190 == null)
-			{
-				dummyVar89 = stackVariable190;
-				stackVariable190 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_44);
-				Init.u003cu003ec.u003cu003e9__2_44 = stackVariable190;
-			}
-			dummyVar90 = stackVariable188.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageRole", stackVariable190);
-			stackVariable192 = modelBuilder;
-			stackVariable194 = Init.u003cu003ec.u003cu003e9__2_45;
-			if (stackVariable194 == null)
-			{
-				dummyVar91 = stackVariable194;
-				stackVariable194 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_45);
-				Init.u003cu003ec.u003cu003e9__2_45 = stackVariable194;
-			}
-			dummyVar92 = stackVariable192.Entity("Mix.Cms.Lib.Models.Cms.MixPost", stackVariable194);
-			stackVariable196 = modelBuilder;
-			stackVariable198 = Init.u003cu003ec.u003cu003e9__2_46;
-			if (stackVariable198 == null)
-			{
-				dummyVar93 = stackVariable198;
-				stackVariable198 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_46);
-				Init.u003cu003ec.u003cu003e9__2_46 = stackVariable198;
-			}
-			dummyVar94 = stackVariable196.Entity("Mix.Cms.Lib.Models.Cms.MixPostMedia", stackVariable198);
-			stackVariable200 = modelBuilder;
-			stackVariable202 = Init.u003cu003ec.u003cu003e9__2_47;
-			if (stackVariable202 == null)
-			{
-				dummyVar95 = stackVariable202;
-				stackVariable202 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_47);
-				Init.u003cu003ec.u003cu003e9__2_47 = stackVariable202;
-			}
-			dummyVar96 = stackVariable200.Entity("Mix.Cms.Lib.Models.Cms.MixPostModule", stackVariable202);
-			stackVariable204 = modelBuilder;
-			stackVariable206 = Init.u003cu003ec.u003cu003e9__2_48;
-			if (stackVariable206 == null)
-			{
-				dummyVar97 = stackVariable206;
-				stackVariable206 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_48);
-				Init.u003cu003ec.u003cu003e9__2_48 = stackVariable206;
-			}
-			dummyVar98 = stackVariable204.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedAttributeSet", stackVariable206);
-			stackVariable208 = modelBuilder;
-			stackVariable210 = Init.u003cu003ec.u003cu003e9__2_49;
-			if (stackVariable210 == null)
-			{
-				dummyVar99 = stackVariable210;
-				stackVariable210 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_49);
-				Init.u003cu003ec.u003cu003e9__2_49 = stackVariable210;
-			}
-			dummyVar100 = stackVariable208.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedPost", stackVariable210);
-			stackVariable212 = modelBuilder;
-			stackVariable214 = Init.u003cu003ec.u003cu003e9__2_50;
-			if (stackVariable214 == null)
-			{
-				dummyVar101 = stackVariable214;
-				stackVariable214 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_50);
-				Init.u003cu003ec.u003cu003e9__2_50 = stackVariable214;
-			}
-			dummyVar102 = stackVariable212.Entity("Mix.Cms.Lib.Models.Cms.MixTemplate", stackVariable214);
-			stackVariable216 = modelBuilder;
-			stackVariable218 = Init.u003cu003ec.u003cu003e9__2_51;
-			if (stackVariable218 == null)
-			{
-				dummyVar103 = stackVariable218;
-				stackVariable218 = new Action<EntityTypeBuilder>(Init.u003cu003ec.u003cu003e9.u003cBuildTargetModelu003eb__2_51);
-				Init.u003cu003ec.u003cu003e9__2_51 = stackVariable218;
-			}
-			dummyVar104 = stackVariable216.Entity("Mix.Cms.Lib.Models.Cms.MixUrlAlias", stackVariable218);
-			return;
+			modelBuilder.HasAnnotation("ProductVersion", "3.1.3").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", (SqlServerValueGenerationStrategy)2);
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeField", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AttributeSetId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AttributeSetName"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("DataType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("DefaultValue"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("IsEncrypt"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("IsMultiple"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("IsRequire"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("IsSelect"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<bool>(b.Property<bool>("IsUnique"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Options"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("ReferenceId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Regex"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "AttributeSetId" });
+				b.HasIndex(new string[] { "ReferenceId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_attribute_field");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSet", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool?>(b.Property<bool?>("EdmAutoSend"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("EdmFrom"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("EdmSubject"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("EdmTemplate"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FormTemplate"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Type"), "int");
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_attribute_set");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetData", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AttributeSetId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AttributeSetName"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "AttributeSetId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_attribute_set_data");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetReference", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AttributeSetId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ParentId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ParentType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "AttributeSetId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_attribute_set_reference");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetValue", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AttributeFieldId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AttributeFieldName").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AttributeSetName"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<bool?>(b.Property<bool?>("BooleanValue"), "bit");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("DataId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("DataType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("DateTimeValue"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<double?>(b.Property<double?>("DoubleValue"), "float");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("EncryptKey"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("EncryptType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("EncryptValue"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("IntegerValue"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Regex"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture").IsRequired(true), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("StringValue"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "DataId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_attribute_set_value");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixCache", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("ExpiredDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Value").IsRequired(true), "nvarchar(4000)").HasMaxLength(0xfa0);
+				b.HasKey(new string[] { "Id" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "ExpiredDateTime" }), "Index_ExpiresAtTime");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_cache");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixCmsUser", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Address"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Avatar"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Email"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FirstName"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("LastName"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("MiddleName"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("PhoneNumber"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Username"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_cms_user");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixConfiguration", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Category"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("DataType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Keyword").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Value"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalKeyBuilderExtensions.HasName(b.HasKey(new string[] { "Id", "Specificulture" }), "PK_mix_configuration_1");
+				b.HasIndex(new string[] { "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_configuration");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixCulture", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Alias"), "nvarchar(150)").HasMaxLength(150);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FullName"), "nvarchar(150)").HasMaxLength(150);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Icon"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(RelationalPropertyBuilderExtensions.HasColumnName<string>(b.Property<string>("Lcid"), "LCID"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture").IsRequired(true), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "Specificulture" }).IsUnique(true), "IX_Mix_Culture");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_culture");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixFile", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id").ValueGeneratedOnAdd(), "int").HasAnnotation("SqlServer:ValueGenerationStrategy", (SqlServerValueGenerationStrategy)2);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Extension").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileFolder").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileName").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FolderType").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("StringContent").IsRequired(true), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("ThemeId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ThemeName").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "ThemeId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_file");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixLanguage", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Category"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("DataType"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("DefaultValue"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Keyword").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Value"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalKeyBuilderExtensions.HasName(b.HasKey(new string[] { "Id", "Specificulture" }), "PK_mix_language_1");
+				b.HasIndex(new string[] { "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_language");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixMedia", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Extension").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileFolder").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileName").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileProperties"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<long>(b.Property<long>("FileSize"), "bigint");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileType").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Source"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Tags"), "nvarchar(400)").HasMaxLength(0x190);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("TargetUrl"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_media");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixModule", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("EdmTemplate"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Fields"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FormTemplate"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("PageSize"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Template"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Thumbnail"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Type"), "int");
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_module");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixModuleData", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Fields").IsRequired(true), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ModuleId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("PageId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("PostId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Value"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "ModuleId", "Specificulture" });
+				b.HasIndex(new string[] { "PageId", "Specificulture" });
+				b.HasIndex(new string[] { "PostId", "Specificulture" });
+				b.HasIndex(new string[] { "ModuleId", "PageId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_module_data");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixModulePost", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ModuleId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PostId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "ModuleId", "Specificulture" });
+				b.HasIndex(new string[] { "PostId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_module_post");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPage", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Content"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CssClass"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Excerpt"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ExtraFields"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Icon"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Layout"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("Level"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("PageSize"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoDescription"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoKeywords"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoName"), "varchar(500)").HasMaxLength(0x1f4).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoTitle"), "varchar(250)").HasMaxLength(250).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("StaticUrl"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Tags"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Template"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Type"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("Views"), "int");
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_page");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPageModule", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ModuleId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PageId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Position"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "ModuleId", "Specificulture" });
+				b.HasIndex(new string[] { "PageId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_page_module");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPagePost", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PageId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PostId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "PageId", "Specificulture" });
+				b.HasIndex(new string[] { "PostId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_page_post");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPage", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Icon"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Level"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("TextDefault"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("TextKeyword"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Url"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_portal_page");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageNavigation", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PageId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ParentId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id" });
+				b.HasIndex(new string[] { "ParentId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_portal_page_navigation");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageRole", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("RoleId"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PageId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "RoleId", "PageId" });
+				b.HasIndex(new string[] { "PageId" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_portal_page_role");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPost", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Content"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Excerpt"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ExtraFields"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ExtraProperties"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Icon"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("PublishedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoDescription"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoKeywords"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoName"), "varchar(500)").HasMaxLength(0x1f4).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SeoTitle"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Source"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Tags"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Template"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Thumbnail"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Type"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int?>(b.Property<int?>("Views"), "int");
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_post");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPostMedia", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("MediaId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Position"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PostId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "MediaId", "Specificulture" });
+				b.HasIndex(new string[] { "PostId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_post_media");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPostModule", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ModuleId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Position"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("PostId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "ModuleId", "Specificulture" });
+				b.HasIndex(new string[] { "PostId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_post_module");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedAttributeData", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Id"), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AttributeSetId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AttributeSetName"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("DataId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ParentId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ParentType").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalKeyBuilderExtensions.HasName(b.HasKey(new string[] { "Id", "Specificulture" }), "PK_mix_related_attribute_data_1");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_related_attribute_data");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedAttributeSet", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ParentId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ParentType").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("SetId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_related_attribute_set");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedData", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("AttributeSetId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("AttributeSetName"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("DataId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ParentId").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ParentType").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Type"), "int");
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_related_data");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedPost", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("DestinationId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("SourceId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "DestinationId", "Specificulture" });
+				b.HasIndex(new string[] { "SourceId", "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_related_post");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixTemplate", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Content").IsRequired(true), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Extension").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileFolder").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FileName").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("FolderType").IsRequired(true), "nvarchar(50)").HasMaxLength(50);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("MobileContent"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Scripts"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SpaContent"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Styles"), "text");
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("ThemeId"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ThemeName").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalIndexBuilderExtensions.HasName(b.HasIndex(new string[] { "ThemeId" }), "IX_mix_template_file_TemplateId");
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_template");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixTheme", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Image"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Name").IsRequired(true), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("PreviewUrl"), "nvarchar(450)").HasMaxLength(0x1c2);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Thumbnail"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Title"), "nvarchar(250)").HasMaxLength(250);
+				b.HasKey(new string[] { "Id" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_theme");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixUrlAlias", (EntityTypeBuilder b) => {
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Id"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Specificulture"), "nvarchar(10)").HasMaxLength(10);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Alias"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("CreatedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime>(b.Property<DateTime>("CreatedDateTime"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Description"), "nvarchar(4000)").HasMaxLength(0xfa0);
+				RelationalPropertyBuilderExtensions.HasColumnType<DateTime?>(b.Property<DateTime?>("LastModified"), "datetime");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("ModifiedBy"), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Priority"), "int");
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("SourceId"), "nvarchar(250)").HasMaxLength(250);
+				RelationalPropertyBuilderExtensions.HasColumnType<string>(b.Property<string>("Status").IsRequired(true), "varchar(50)").HasMaxLength(50).IsUnicode(false);
+				RelationalPropertyBuilderExtensions.HasColumnType<int>(b.Property<int>("Type"), "int");
+				b.HasKey(new string[] { "Id", "Specificulture" });
+				b.HasIndex(new string[] { "Specificulture" });
+				RelationalEntityTypeBuilderExtensions.ToTable(b, "mix_url_alias");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeField", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixAttributeSet", "AttributeSet").WithMany("MixAttributeFieldAttributeSet").HasForeignKey(new string[] { "AttributeSetId" }), "FK_mix_attribute_field_mix_attribute_set").IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixAttributeSet", "Reference").WithMany("MixAttributeFieldReference").HasForeignKey(new string[] { "ReferenceId" }), "FK_mix_attribute_field_mix_attribute_set1");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetData", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixAttributeSet", "AttributeSet").WithMany("MixAttributeSetData").HasForeignKey(new string[] { "AttributeSetId" }), "FK_mix_attribute_set_data_mix_attribute_set").IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixAttributeSetReference", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixAttributeSet", "AttributeSet").WithMany("MixAttributeSetReference").HasForeignKey(new string[] { "AttributeSetId" }), "FK_mix_attribute_set_reference_mix_attribute_set").IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixConfiguration", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixCulture", "SpecificultureNavigation").WithMany("MixConfiguration").HasForeignKey(new string[] { "Specificulture" }), "FK_Mix_Configuration_Mix_Culture").HasPrincipalKey(new string[] { "Specificulture" }).OnDelete(3).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixFile", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixTheme", "Theme").WithMany("MixFile").HasForeignKey(new string[] { "ThemeId" }), "FK_mix_file_mix_template"));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixLanguage", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixCulture", "SpecificultureNavigation").WithMany("MixLanguage").HasForeignKey(new string[] { "Specificulture" }), "FK_Mix_Language_Mix_Culture").HasPrincipalKey(new string[] { "Specificulture" }).OnDelete(3).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixModule", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixCulture", "SpecificultureNavigation").WithMany("MixModule").HasForeignKey(new string[] { "Specificulture" }), "FK_Mix_Module_Mix_Culture").HasPrincipalKey(new string[] { "Specificulture" }).OnDelete(3).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixModuleData", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixModule", "MixModule").WithMany("MixModuleData").HasForeignKey(new string[] { "ModuleId", "Specificulture" }), "FK_Mix_Module_Data_Mix_Module").OnDelete(3).IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPage", "MixPage").WithMany("MixModuleData").HasForeignKey(new string[] { "PageId", "Specificulture" }), "FK_mix_module_data_mix_page");
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "MixPost").WithMany("MixModuleData").HasForeignKey(new string[] { "PostId", "Specificulture" }), "FK_mix_module_data_mix_post");
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixModulePost", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixModule", "MixModule").WithMany("MixModulePost").HasForeignKey(new string[] { "ModuleId", "Specificulture" }), "FK_Mix_Module_Post_Mix_Module").IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "MixPost").WithMany("MixModulePost").HasForeignKey(new string[] { "PostId", "Specificulture" }), "FK_Mix_Module_Post_Mix_Post").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPage", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixCulture", "SpecificultureNavigation").WithMany("MixPage").HasForeignKey(new string[] { "Specificulture" }), "FK_Mix_Page_Mix_Culture").HasPrincipalKey(new string[] { "Specificulture" }).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPageModule", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixModule", "MixModule").WithMany("MixPageModule").HasForeignKey(new string[] { "ModuleId", "Specificulture" }), "FK_Mix_Menu_Module_Mix_Module1").OnDelete(3).IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPage", "MixPage").WithMany("MixPageModule").HasForeignKey(new string[] { "PageId", "Specificulture" }), "FK_Mix_Page_Module_Mix_Page").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPagePost", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPage", "MixPage").WithMany("MixPagePost").HasForeignKey(new string[] { "PageId", "Specificulture" }), "FK_Mix_Page_Post_Mix_Page").IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "MixPost").WithMany("MixPagePost").HasForeignKey(new string[] { "PostId", "Specificulture" }), "FK_Mix_Page_Post_Mix_Post").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageNavigation", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPortalPage", "IdNavigation").WithOne("MixPortalPageNavigationIdNavigation").HasForeignKey("Mix.Cms.Lib.Models.Cms.MixPortalPageNavigation", new string[] { "Id" }), "FK_mix_portal_page_navigation_mix_portal_page").IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPortalPage", "Parent").WithMany("MixPortalPageNavigationParent").HasForeignKey(new string[] { "ParentId" }), "FK_mix_portal_page_navigation_mix_portal_page1").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPortalPageRole", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPortalPage", "Page").WithMany("MixPortalPageRole").HasForeignKey(new string[] { "PageId" }), "FK_mix_portal_page_role_mix_portal_page").OnDelete(3).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPost", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixCulture", "SpecificultureNavigation").WithMany("MixPost").HasForeignKey(new string[] { "Specificulture" }), "FK_Mix_Post_Mix_Culture").HasPrincipalKey(new string[] { "Specificulture" }).IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPostMedia", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixMedia", "MixMedia").WithMany("MixPostMedia").HasForeignKey(new string[] { "MediaId", "Specificulture" }), "FK_mix_post_media_mix_media").IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "MixPost").WithMany("MixPostMedia").HasForeignKey(new string[] { "PostId", "Specificulture" }), "FK_mix_post_media_mix_post").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixPostModule", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixModule", "MixModule").WithMany("MixPostModule").HasForeignKey(new string[] { "ModuleId", "Specificulture" }), "FK_Mix_Post_Module_Mix_Module1").OnDelete(3).IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "MixPost").WithMany("MixPostModule").HasForeignKey(new string[] { "PostId", "Specificulture" }), "FK_Mix_Post_Module_Mix_Post").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedAttributeSet", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixAttributeSet", "IdNavigation").WithMany("MixRelatedAttributeSet").HasForeignKey(new string[] { "Id" }), "FK_mix_related_attribute_set_mix_attribute_set").IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixRelatedPost", (EntityTypeBuilder b) => {
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "MixPost").WithMany("MixRelatedPostMixPost").HasForeignKey(new string[] { "DestinationId", "Specificulture" }), "FK_mix_related_post_mix_post1").IsRequired(true);
+				RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixPost", "S").WithMany("MixRelatedPostS").HasForeignKey(new string[] { "SourceId", "Specificulture" }), "FK_mix_related_post_mix_post").IsRequired(true);
+			});
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixTemplate", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixTheme", "Theme").WithMany("MixTemplate").HasForeignKey(new string[] { "ThemeId" }), "FK_mix_template_mix_theme").IsRequired(true));
+			modelBuilder.Entity("Mix.Cms.Lib.Models.Cms.MixUrlAlias", (EntityTypeBuilder b) => RelationalForeignKeyBuilderExtensions.HasConstraintName(b.HasOne("Mix.Cms.Lib.Models.Cms.MixCulture", "SpecificultureNavigation").WithMany("MixUrlAlias").HasForeignKey(new string[] { "Specificulture" }), "FK_Mix_Url_Alias_Mix_Culture").HasPrincipalKey(new string[] { "Specificulture" }).OnDelete(3).IsRequired(true));
 		}
 
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
-			dummyVar0 = migrationBuilder.DropTable("mix_attribute_field", null);
-			dummyVar1 = migrationBuilder.DropTable("mix_attribute_set_data", null);
-			dummyVar2 = migrationBuilder.DropTable("mix_attribute_set_reference", null);
-			dummyVar3 = migrationBuilder.DropTable("mix_attribute_set_value", null);
-			dummyVar4 = migrationBuilder.DropTable("mix_cache", null);
-			dummyVar5 = migrationBuilder.DropTable("mix_cms_user", null);
-			dummyVar6 = migrationBuilder.DropTable("mix_configuration", null);
-			dummyVar7 = migrationBuilder.DropTable("mix_file", null);
-			dummyVar8 = migrationBuilder.DropTable("mix_language", null);
-			dummyVar9 = migrationBuilder.DropTable("mix_module_data", null);
-			dummyVar10 = migrationBuilder.DropTable("mix_module_post", null);
-			dummyVar11 = migrationBuilder.DropTable("mix_page_module", null);
-			dummyVar12 = migrationBuilder.DropTable("mix_page_post", null);
-			dummyVar13 = migrationBuilder.DropTable("mix_portal_page_navigation", null);
-			dummyVar14 = migrationBuilder.DropTable("mix_portal_page_role", null);
-			dummyVar15 = migrationBuilder.DropTable("mix_post_media", null);
-			dummyVar16 = migrationBuilder.DropTable("mix_post_module", null);
-			dummyVar17 = migrationBuilder.DropTable("mix_related_attribute_data", null);
-			dummyVar18 = migrationBuilder.DropTable("mix_related_attribute_set", null);
-			dummyVar19 = migrationBuilder.DropTable("mix_related_data", null);
-			dummyVar20 = migrationBuilder.DropTable("mix_related_post", null);
-			dummyVar21 = migrationBuilder.DropTable("mix_template", null);
-			dummyVar22 = migrationBuilder.DropTable("mix_url_alias", null);
-			dummyVar23 = migrationBuilder.DropTable("mix_page", null);
-			dummyVar24 = migrationBuilder.DropTable("mix_portal_page", null);
-			dummyVar25 = migrationBuilder.DropTable("mix_media", null);
-			dummyVar26 = migrationBuilder.DropTable("mix_module", null);
-			dummyVar27 = migrationBuilder.DropTable("mix_attribute_set", null);
-			dummyVar28 = migrationBuilder.DropTable("mix_post", null);
-			dummyVar29 = migrationBuilder.DropTable("mix_theme", null);
-			dummyVar30 = migrationBuilder.DropTable("mix_culture", null);
-			return;
+			migrationBuilder.DropTable("mix_attribute_field", null);
+			migrationBuilder.DropTable("mix_attribute_set_data", null);
+			migrationBuilder.DropTable("mix_attribute_set_reference", null);
+			migrationBuilder.DropTable("mix_attribute_set_value", null);
+			migrationBuilder.DropTable("mix_cache", null);
+			migrationBuilder.DropTable("mix_cms_user", null);
+			migrationBuilder.DropTable("mix_configuration", null);
+			migrationBuilder.DropTable("mix_file", null);
+			migrationBuilder.DropTable("mix_language", null);
+			migrationBuilder.DropTable("mix_module_data", null);
+			migrationBuilder.DropTable("mix_module_post", null);
+			migrationBuilder.DropTable("mix_page_module", null);
+			migrationBuilder.DropTable("mix_page_post", null);
+			migrationBuilder.DropTable("mix_portal_page_navigation", null);
+			migrationBuilder.DropTable("mix_portal_page_role", null);
+			migrationBuilder.DropTable("mix_post_media", null);
+			migrationBuilder.DropTable("mix_post_module", null);
+			migrationBuilder.DropTable("mix_related_attribute_data", null);
+			migrationBuilder.DropTable("mix_related_attribute_set", null);
+			migrationBuilder.DropTable("mix_related_data", null);
+			migrationBuilder.DropTable("mix_related_post", null);
+			migrationBuilder.DropTable("mix_template", null);
+			migrationBuilder.DropTable("mix_url_alias", null);
+			migrationBuilder.DropTable("mix_page", null);
+			migrationBuilder.DropTable("mix_portal_page", null);
+			migrationBuilder.DropTable("mix_media", null);
+			migrationBuilder.DropTable("mix_module", null);
+			migrationBuilder.DropTable("mix_attribute_set", null);
+			migrationBuilder.DropTable("mix_post", null);
+			migrationBuilder.DropTable("mix_theme", null);
+			migrationBuilder.DropTable("mix_culture", null);
 		}
 
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
-			stackVariable0 = migrationBuilder;
-			stackVariable2 = Init.u003cu003ec.u003cu003e9__0_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType0<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_0);
-				Init.u003cu003ec.u003cu003e9__0_0 = stackVariable2;
-			}
-			stackVariable4 = Init.u003cu003ec.u003cu003e9__0_1;
-			if (stackVariable4 == null)
-			{
-				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType0<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_1);
-				Init.u003cu003ec.u003cu003e9__0_1 = stackVariable4;
-			}
-			dummyVar2 = stackVariable0.CreateTable("mix_attribute_set", stackVariable2, null, stackVariable4, null);
-			stackVariable7 = migrationBuilder;
-			stackVariable9 = Init.u003cu003ec.u003cu003e9__0_2;
-			if (stackVariable9 == null)
-			{
-				dummyVar3 = stackVariable9;
-				stackVariable9 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType1<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_2);
-				Init.u003cu003ec.u003cu003e9__0_2 = stackVariable9;
-			}
-			stackVariable11 = Init.u003cu003ec.u003cu003e9__0_3;
-			if (stackVariable11 == null)
-			{
-				dummyVar4 = stackVariable11;
-				stackVariable11 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType1<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_3);
-				Init.u003cu003ec.u003cu003e9__0_3 = stackVariable11;
-			}
-			dummyVar5 = stackVariable7.CreateTable("mix_attribute_set_value", stackVariable9, null, stackVariable11, null);
-			stackVariable14 = migrationBuilder;
-			stackVariable16 = Init.u003cu003ec.u003cu003e9__0_4;
-			if (stackVariable16 == null)
-			{
-				dummyVar6 = stackVariable16;
-				stackVariable16 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType2<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_4);
-				Init.u003cu003ec.u003cu003e9__0_4 = stackVariable16;
-			}
-			stackVariable18 = Init.u003cu003ec.u003cu003e9__0_5;
-			if (stackVariable18 == null)
-			{
-				dummyVar7 = stackVariable18;
-				stackVariable18 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType2<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_5);
-				Init.u003cu003ec.u003cu003e9__0_5 = stackVariable18;
-			}
-			dummyVar8 = stackVariable14.CreateTable("mix_cache", stackVariable16, null, stackVariable18, null);
-			stackVariable21 = migrationBuilder;
-			stackVariable23 = Init.u003cu003ec.u003cu003e9__0_6;
-			if (stackVariable23 == null)
-			{
-				dummyVar9 = stackVariable23;
-				stackVariable23 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType3<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_6);
-				Init.u003cu003ec.u003cu003e9__0_6 = stackVariable23;
-			}
-			stackVariable25 = Init.u003cu003ec.u003cu003e9__0_7;
-			if (stackVariable25 == null)
-			{
-				dummyVar10 = stackVariable25;
-				stackVariable25 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType3<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_7);
-				Init.u003cu003ec.u003cu003e9__0_7 = stackVariable25;
-			}
-			dummyVar11 = stackVariable21.CreateTable("mix_cms_user", stackVariable23, null, stackVariable25, null);
-			stackVariable28 = migrationBuilder;
-			stackVariable30 = Init.u003cu003ec.u003cu003e9__0_8;
-			if (stackVariable30 == null)
-			{
-				dummyVar12 = stackVariable30;
-				stackVariable30 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType4<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_8);
-				Init.u003cu003ec.u003cu003e9__0_8 = stackVariable30;
-			}
-			stackVariable32 = Init.u003cu003ec.u003cu003e9__0_9;
-			if (stackVariable32 == null)
-			{
-				dummyVar13 = stackVariable32;
-				stackVariable32 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType4<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_9);
-				Init.u003cu003ec.u003cu003e9__0_9 = stackVariable32;
-			}
-			dummyVar14 = stackVariable28.CreateTable("mix_culture", stackVariable30, null, stackVariable32, null);
-			stackVariable35 = migrationBuilder;
-			stackVariable37 = Init.u003cu003ec.u003cu003e9__0_10;
-			if (stackVariable37 == null)
-			{
-				dummyVar15 = stackVariable37;
-				stackVariable37 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_10);
-				Init.u003cu003ec.u003cu003e9__0_10 = stackVariable37;
-			}
-			stackVariable39 = Init.u003cu003ec.u003cu003e9__0_11;
-			if (stackVariable39 == null)
-			{
-				dummyVar16 = stackVariable39;
-				stackVariable39 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_11);
-				Init.u003cu003ec.u003cu003e9__0_11 = stackVariable39;
-			}
-			dummyVar17 = stackVariable35.CreateTable("mix_media", stackVariable37, null, stackVariable39, null);
-			stackVariable42 = migrationBuilder;
-			stackVariable44 = Init.u003cu003ec.u003cu003e9__0_12;
-			if (stackVariable44 == null)
-			{
-				dummyVar18 = stackVariable44;
-				stackVariable44 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType7<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_12);
-				Init.u003cu003ec.u003cu003e9__0_12 = stackVariable44;
-			}
-			stackVariable46 = Init.u003cu003ec.u003cu003e9__0_13;
-			if (stackVariable46 == null)
-			{
-				dummyVar19 = stackVariable46;
-				stackVariable46 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType7<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_13);
-				Init.u003cu003ec.u003cu003e9__0_13 = stackVariable46;
-			}
-			dummyVar20 = stackVariable42.CreateTable("mix_portal_page", stackVariable44, null, stackVariable46, null);
-			stackVariable49 = migrationBuilder;
-			stackVariable51 = Init.u003cu003ec.u003cu003e9__0_14;
-			if (stackVariable51 == null)
-			{
-				dummyVar21 = stackVariable51;
-				stackVariable51 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_14);
-				Init.u003cu003ec.u003cu003e9__0_14 = stackVariable51;
-			}
-			stackVariable53 = Init.u003cu003ec.u003cu003e9__0_15;
-			if (stackVariable53 == null)
-			{
-				dummyVar22 = stackVariable53;
-				stackVariable53 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_15);
-				Init.u003cu003ec.u003cu003e9__0_15 = stackVariable53;
-			}
-			dummyVar23 = stackVariable49.CreateTable("mix_related_attribute_data", stackVariable51, null, stackVariable53, null);
-			stackVariable56 = migrationBuilder;
-			stackVariable58 = Init.u003cu003ec.u003cu003e9__0_16;
-			if (stackVariable58 == null)
-			{
-				dummyVar24 = stackVariable58;
-				stackVariable58 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_16);
-				Init.u003cu003ec.u003cu003e9__0_16 = stackVariable58;
-			}
-			stackVariable60 = Init.u003cu003ec.u003cu003e9__0_17;
-			if (stackVariable60 == null)
-			{
-				dummyVar25 = stackVariable60;
-				stackVariable60 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_17);
-				Init.u003cu003ec.u003cu003e9__0_17 = stackVariable60;
-			}
-			dummyVar26 = stackVariable56.CreateTable("mix_related_data", stackVariable58, null, stackVariable60, null);
-			stackVariable63 = migrationBuilder;
-			stackVariable65 = Init.u003cu003ec.u003cu003e9__0_18;
-			if (stackVariable65 == null)
-			{
-				dummyVar27 = stackVariable65;
-				stackVariable65 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType10<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_18);
-				Init.u003cu003ec.u003cu003e9__0_18 = stackVariable65;
-			}
-			stackVariable67 = Init.u003cu003ec.u003cu003e9__0_19;
-			if (stackVariable67 == null)
-			{
-				dummyVar28 = stackVariable67;
-				stackVariable67 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType10<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_19);
-				Init.u003cu003ec.u003cu003e9__0_19 = stackVariable67;
-			}
-			dummyVar29 = stackVariable63.CreateTable("mix_theme", stackVariable65, null, stackVariable67, null);
-			stackVariable70 = migrationBuilder;
-			stackVariable72 = Init.u003cu003ec.u003cu003e9__0_20;
-			if (stackVariable72 == null)
-			{
-				dummyVar30 = stackVariable72;
-				stackVariable72 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType11<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_20);
-				Init.u003cu003ec.u003cu003e9__0_20 = stackVariable72;
-			}
-			stackVariable74 = Init.u003cu003ec.u003cu003e9__0_21;
-			if (stackVariable74 == null)
-			{
-				dummyVar31 = stackVariable74;
-				stackVariable74 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType11<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_21);
-				Init.u003cu003ec.u003cu003e9__0_21 = stackVariable74;
-			}
-			dummyVar32 = stackVariable70.CreateTable("mix_attribute_field", stackVariable72, null, stackVariable74, null);
-			stackVariable77 = migrationBuilder;
-			stackVariable79 = Init.u003cu003ec.u003cu003e9__0_22;
-			if (stackVariable79 == null)
-			{
-				dummyVar33 = stackVariable79;
-				stackVariable79 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_22);
-				Init.u003cu003ec.u003cu003e9__0_22 = stackVariable79;
-			}
-			stackVariable81 = Init.u003cu003ec.u003cu003e9__0_23;
-			if (stackVariable81 == null)
-			{
-				dummyVar34 = stackVariable81;
-				stackVariable81 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_23);
-				Init.u003cu003ec.u003cu003e9__0_23 = stackVariable81;
-			}
-			dummyVar35 = stackVariable77.CreateTable("mix_attribute_set_data", stackVariable79, null, stackVariable81, null);
-			stackVariable84 = migrationBuilder;
-			stackVariable86 = Init.u003cu003ec.u003cu003e9__0_24;
-			if (stackVariable86 == null)
-			{
-				dummyVar36 = stackVariable86;
-				stackVariable86 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType13<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_24);
-				Init.u003cu003ec.u003cu003e9__0_24 = stackVariable86;
-			}
-			stackVariable88 = Init.u003cu003ec.u003cu003e9__0_25;
-			if (stackVariable88 == null)
-			{
-				dummyVar37 = stackVariable88;
-				stackVariable88 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType13<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_25);
-				Init.u003cu003ec.u003cu003e9__0_25 = stackVariable88;
-			}
-			dummyVar38 = stackVariable84.CreateTable("mix_attribute_set_reference", stackVariable86, null, stackVariable88, null);
-			stackVariable91 = migrationBuilder;
-			stackVariable93 = Init.u003cu003ec.u003cu003e9__0_26;
-			if (stackVariable93 == null)
-			{
-				dummyVar39 = stackVariable93;
-				stackVariable93 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_26);
-				Init.u003cu003ec.u003cu003e9__0_26 = stackVariable93;
-			}
-			stackVariable95 = Init.u003cu003ec.u003cu003e9__0_27;
-			if (stackVariable95 == null)
-			{
-				dummyVar40 = stackVariable95;
-				stackVariable95 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_27);
-				Init.u003cu003ec.u003cu003e9__0_27 = stackVariable95;
-			}
-			dummyVar41 = stackVariable91.CreateTable("mix_related_attribute_set", stackVariable93, null, stackVariable95, null);
-			stackVariable98 = migrationBuilder;
-			stackVariable100 = Init.u003cu003ec.u003cu003e9__0_28;
-			if (stackVariable100 == null)
-			{
-				dummyVar42 = stackVariable100;
-				stackVariable100 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_28);
-				Init.u003cu003ec.u003cu003e9__0_28 = stackVariable100;
-			}
-			stackVariable102 = Init.u003cu003ec.u003cu003e9__0_29;
-			if (stackVariable102 == null)
-			{
-				dummyVar43 = stackVariable102;
-				stackVariable102 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_29);
-				Init.u003cu003ec.u003cu003e9__0_29 = stackVariable102;
-			}
-			dummyVar44 = stackVariable98.CreateTable("mix_configuration", stackVariable100, null, stackVariable102, null);
-			stackVariable105 = migrationBuilder;
-			stackVariable107 = Init.u003cu003ec.u003cu003e9__0_30;
-			if (stackVariable107 == null)
-			{
-				dummyVar45 = stackVariable107;
-				stackVariable107 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_30);
-				Init.u003cu003ec.u003cu003e9__0_30 = stackVariable107;
-			}
-			stackVariable109 = Init.u003cu003ec.u003cu003e9__0_31;
-			if (stackVariable109 == null)
-			{
-				dummyVar46 = stackVariable109;
-				stackVariable109 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_31);
-				Init.u003cu003ec.u003cu003e9__0_31 = stackVariable109;
-			}
-			dummyVar47 = stackVariable105.CreateTable("mix_language", stackVariable107, null, stackVariable109, null);
-			stackVariable112 = migrationBuilder;
-			stackVariable114 = Init.u003cu003ec.u003cu003e9__0_32;
-			if (stackVariable114 == null)
-			{
-				dummyVar48 = stackVariable114;
-				stackVariable114 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_32);
-				Init.u003cu003ec.u003cu003e9__0_32 = stackVariable114;
-			}
-			stackVariable116 = Init.u003cu003ec.u003cu003e9__0_33;
-			if (stackVariable116 == null)
-			{
-				dummyVar49 = stackVariable116;
-				stackVariable116 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_33);
-				Init.u003cu003ec.u003cu003e9__0_33 = stackVariable116;
-			}
-			dummyVar50 = stackVariable112.CreateTable("mix_module", stackVariable114, null, stackVariable116, null);
-			stackVariable119 = migrationBuilder;
-			stackVariable121 = Init.u003cu003ec.u003cu003e9__0_34;
-			if (stackVariable121 == null)
-			{
-				dummyVar51 = stackVariable121;
-				stackVariable121 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_34);
-				Init.u003cu003ec.u003cu003e9__0_34 = stackVariable121;
-			}
-			stackVariable123 = Init.u003cu003ec.u003cu003e9__0_35;
-			if (stackVariable123 == null)
-			{
-				dummyVar52 = stackVariable123;
-				stackVariable123 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_35);
-				Init.u003cu003ec.u003cu003e9__0_35 = stackVariable123;
-			}
-			dummyVar53 = stackVariable119.CreateTable("mix_page", stackVariable121, null, stackVariable123, null);
-			stackVariable126 = migrationBuilder;
-			stackVariable128 = Init.u003cu003ec.u003cu003e9__0_36;
-			if (stackVariable128 == null)
-			{
-				dummyVar54 = stackVariable128;
-				stackVariable128 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_36);
-				Init.u003cu003ec.u003cu003e9__0_36 = stackVariable128;
-			}
-			stackVariable130 = Init.u003cu003ec.u003cu003e9__0_37;
-			if (stackVariable130 == null)
-			{
-				dummyVar55 = stackVariable130;
-				stackVariable130 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_37);
-				Init.u003cu003ec.u003cu003e9__0_37 = stackVariable130;
-			}
-			dummyVar56 = stackVariable126.CreateTable("mix_post", stackVariable128, null, stackVariable130, null);
-			stackVariable133 = migrationBuilder;
-			stackVariable135 = Init.u003cu003ec.u003cu003e9__0_38;
-			if (stackVariable135 == null)
-			{
-				dummyVar57 = stackVariable135;
-				stackVariable135 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_38);
-				Init.u003cu003ec.u003cu003e9__0_38 = stackVariable135;
-			}
-			stackVariable137 = Init.u003cu003ec.u003cu003e9__0_39;
-			if (stackVariable137 == null)
-			{
-				dummyVar58 = stackVariable137;
-				stackVariable137 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_39);
-				Init.u003cu003ec.u003cu003e9__0_39 = stackVariable137;
-			}
-			dummyVar59 = stackVariable133.CreateTable("mix_url_alias", stackVariable135, null, stackVariable137, null);
-			stackVariable140 = migrationBuilder;
-			stackVariable142 = Init.u003cu003ec.u003cu003e9__0_40;
-			if (stackVariable142 == null)
-			{
-				dummyVar60 = stackVariable142;
-				stackVariable142 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType21<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_40);
-				Init.u003cu003ec.u003cu003e9__0_40 = stackVariable142;
-			}
-			stackVariable144 = Init.u003cu003ec.u003cu003e9__0_41;
-			if (stackVariable144 == null)
-			{
-				dummyVar61 = stackVariable144;
-				stackVariable144 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType21<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_41);
-				Init.u003cu003ec.u003cu003e9__0_41 = stackVariable144;
-			}
-			dummyVar62 = stackVariable140.CreateTable("mix_portal_page_navigation", stackVariable142, null, stackVariable144, null);
-			stackVariable147 = migrationBuilder;
-			stackVariable149 = Init.u003cu003ec.u003cu003e9__0_42;
-			if (stackVariable149 == null)
-			{
-				dummyVar63 = stackVariable149;
-				stackVariable149 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_42);
-				Init.u003cu003ec.u003cu003e9__0_42 = stackVariable149;
-			}
-			stackVariable151 = Init.u003cu003ec.u003cu003e9__0_43;
-			if (stackVariable151 == null)
-			{
-				dummyVar64 = stackVariable151;
-				stackVariable151 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_43);
-				Init.u003cu003ec.u003cu003e9__0_43 = stackVariable151;
-			}
-			dummyVar65 = stackVariable147.CreateTable("mix_portal_page_role", stackVariable149, null, stackVariable151, null);
-			stackVariable154 = migrationBuilder;
-			stackVariable156 = Init.u003cu003ec.u003cu003e9__0_44;
-			if (stackVariable156 == null)
-			{
-				dummyVar66 = stackVariable156;
-				stackVariable156 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType24<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_44);
-				Init.u003cu003ec.u003cu003e9__0_44 = stackVariable156;
-			}
-			stackVariable158 = Init.u003cu003ec.u003cu003e9__0_45;
-			if (stackVariable158 == null)
-			{
-				dummyVar67 = stackVariable158;
-				stackVariable158 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType24<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_45);
-				Init.u003cu003ec.u003cu003e9__0_45 = stackVariable158;
-			}
-			dummyVar68 = stackVariable154.CreateTable("mix_file", stackVariable156, null, stackVariable158, null);
-			stackVariable161 = migrationBuilder;
-			stackVariable163 = Init.u003cu003ec.u003cu003e9__0_46;
-			if (stackVariable163 == null)
-			{
-				dummyVar69 = stackVariable163;
-				stackVariable163 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType25<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_46);
-				Init.u003cu003ec.u003cu003e9__0_46 = stackVariable163;
-			}
-			stackVariable165 = Init.u003cu003ec.u003cu003e9__0_47;
-			if (stackVariable165 == null)
-			{
-				dummyVar70 = stackVariable165;
-				stackVariable165 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType25<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_47);
-				Init.u003cu003ec.u003cu003e9__0_47 = stackVariable165;
-			}
-			dummyVar71 = stackVariable161.CreateTable("mix_template", stackVariable163, null, stackVariable165, null);
-			stackVariable168 = migrationBuilder;
-			stackVariable170 = Init.u003cu003ec.u003cu003e9__0_48;
-			if (stackVariable170 == null)
-			{
-				dummyVar72 = stackVariable170;
-				stackVariable170 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_48);
-				Init.u003cu003ec.u003cu003e9__0_48 = stackVariable170;
-			}
-			stackVariable172 = Init.u003cu003ec.u003cu003e9__0_49;
-			if (stackVariable172 == null)
-			{
-				dummyVar73 = stackVariable172;
-				stackVariable172 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_49);
-				Init.u003cu003ec.u003cu003e9__0_49 = stackVariable172;
-			}
-			dummyVar74 = stackVariable168.CreateTable("mix_page_module", stackVariable170, null, stackVariable172, null);
-			stackVariable175 = migrationBuilder;
-			stackVariable177 = Init.u003cu003ec.u003cu003e9__0_50;
-			if (stackVariable177 == null)
-			{
-				dummyVar75 = stackVariable177;
-				stackVariable177 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_50);
-				Init.u003cu003ec.u003cu003e9__0_50 = stackVariable177;
-			}
-			stackVariable179 = Init.u003cu003ec.u003cu003e9__0_51;
-			if (stackVariable179 == null)
-			{
-				dummyVar76 = stackVariable179;
-				stackVariable179 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_51);
-				Init.u003cu003ec.u003cu003e9__0_51 = stackVariable179;
-			}
-			dummyVar77 = stackVariable175.CreateTable("mix_module_data", stackVariable177, null, stackVariable179, null);
-			stackVariable182 = migrationBuilder;
-			stackVariable184 = Init.u003cu003ec.u003cu003e9__0_52;
-			if (stackVariable184 == null)
-			{
-				dummyVar78 = stackVariable184;
-				stackVariable184 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_52);
-				Init.u003cu003ec.u003cu003e9__0_52 = stackVariable184;
-			}
-			stackVariable186 = Init.u003cu003ec.u003cu003e9__0_53;
-			if (stackVariable186 == null)
-			{
-				dummyVar79 = stackVariable186;
-				stackVariable186 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_53);
-				Init.u003cu003ec.u003cu003e9__0_53 = stackVariable186;
-			}
-			dummyVar80 = stackVariable182.CreateTable("mix_module_post", stackVariable184, null, stackVariable186, null);
-			stackVariable189 = migrationBuilder;
-			stackVariable191 = Init.u003cu003ec.u003cu003e9__0_54;
-			if (stackVariable191 == null)
-			{
-				dummyVar81 = stackVariable191;
-				stackVariable191 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_54);
-				Init.u003cu003ec.u003cu003e9__0_54 = stackVariable191;
-			}
-			stackVariable193 = Init.u003cu003ec.u003cu003e9__0_55;
-			if (stackVariable193 == null)
-			{
-				dummyVar82 = stackVariable193;
-				stackVariable193 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_55);
-				Init.u003cu003ec.u003cu003e9__0_55 = stackVariable193;
-			}
-			dummyVar83 = stackVariable189.CreateTable("mix_page_post", stackVariable191, null, stackVariable193, null);
-			stackVariable196 = migrationBuilder;
-			stackVariable198 = Init.u003cu003ec.u003cu003e9__0_56;
-			if (stackVariable198 == null)
-			{
-				dummyVar84 = stackVariable198;
-				stackVariable198 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_56);
-				Init.u003cu003ec.u003cu003e9__0_56 = stackVariable198;
-			}
-			stackVariable200 = Init.u003cu003ec.u003cu003e9__0_57;
-			if (stackVariable200 == null)
-			{
-				dummyVar85 = stackVariable200;
-				stackVariable200 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_57);
-				Init.u003cu003ec.u003cu003e9__0_57 = stackVariable200;
-			}
-			dummyVar86 = stackVariable196.CreateTable("mix_post_media", stackVariable198, null, stackVariable200, null);
-			stackVariable203 = migrationBuilder;
-			stackVariable205 = Init.u003cu003ec.u003cu003e9__0_58;
-			if (stackVariable205 == null)
-			{
-				dummyVar87 = stackVariable205;
-				stackVariable205 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_58);
-				Init.u003cu003ec.u003cu003e9__0_58 = stackVariable205;
-			}
-			stackVariable207 = Init.u003cu003ec.u003cu003e9__0_59;
-			if (stackVariable207 == null)
-			{
-				dummyVar88 = stackVariable207;
-				stackVariable207 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_59);
-				Init.u003cu003ec.u003cu003e9__0_59 = stackVariable207;
-			}
-			dummyVar89 = stackVariable203.CreateTable("mix_post_module", stackVariable205, null, stackVariable207, null);
-			stackVariable210 = migrationBuilder;
-			stackVariable212 = Init.u003cu003ec.u003cu003e9__0_60;
-			if (stackVariable212 == null)
-			{
-				dummyVar90 = stackVariable212;
-				stackVariable212 = new Func<ColumnsBuilder, u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_60);
-				Init.u003cu003ec.u003cu003e9__0_60 = stackVariable212;
-			}
-			stackVariable214 = Init.u003cu003ec.u003cu003e9__0_61;
-			if (stackVariable214 == null)
-			{
-				dummyVar91 = stackVariable214;
-				stackVariable214 = new Action<CreateTableBuilder<u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>>>(Init.u003cu003ec.u003cu003e9.u003cUpu003eb__0_61);
-				Init.u003cu003ec.u003cu003e9__0_61 = stackVariable214;
-			}
-			dummyVar92 = stackVariable210.CreateTable("mix_related_post", stackVariable212, null, stackVariable214, null);
-			dummyVar93 = migrationBuilder.CreateIndex("IX_mix_attribute_field_AttributeSetId", "mix_attribute_field", "AttributeSetId", null, false, null);
-			dummyVar94 = migrationBuilder.CreateIndex("IX_mix_attribute_field_ReferenceId", "mix_attribute_field", "ReferenceId", null, false, null);
-			dummyVar95 = migrationBuilder.CreateIndex("IX_mix_attribute_set_data_AttributeSetId", "mix_attribute_set_data", "AttributeSetId", null, false, null);
-			dummyVar96 = migrationBuilder.CreateIndex("IX_mix_attribute_set_reference_AttributeSetId", "mix_attribute_set_reference", "AttributeSetId", null, false, null);
-			dummyVar97 = migrationBuilder.CreateIndex("IX_mix_attribute_set_value_DataId", "mix_attribute_set_value", "DataId", null, false, null);
-			dummyVar98 = migrationBuilder.CreateIndex("Index_ExpiresAtTime", "mix_cache", "ExpiredDateTime", null, false, null);
-			dummyVar99 = migrationBuilder.CreateIndex("IX_mix_configuration_Specificulture", "mix_configuration", "Specificulture", null, false, null);
-			dummyVar100 = migrationBuilder.CreateIndex("IX_Mix_Culture", "mix_culture", "Specificulture", null, true, null);
-			dummyVar101 = migrationBuilder.CreateIndex("IX_mix_file_ThemeId", "mix_file", "ThemeId", null, false, null);
-			dummyVar102 = migrationBuilder.CreateIndex("IX_mix_language_Specificulture", "mix_language", "Specificulture", null, false, null);
-			dummyVar103 = migrationBuilder.CreateIndex("IX_mix_module_Specificulture", "mix_module", "Specificulture", null, false, null);
-			stackVariable309 = new string[2];
-			stackVariable309[0] = "ModuleId";
-			stackVariable309[1] = "Specificulture";
-			dummyVar104 = migrationBuilder.CreateIndex("IX_mix_module_data_ModuleId_Specificulture", "mix_module_data", stackVariable309, null, false, null);
-			stackVariable322 = new string[2];
-			stackVariable322[0] = "PageId";
-			stackVariable322[1] = "Specificulture";
-			dummyVar105 = migrationBuilder.CreateIndex("IX_mix_module_data_PageId_Specificulture", "mix_module_data", stackVariable322, null, false, null);
-			stackVariable335 = new string[2];
-			stackVariable335[0] = "PostId";
-			stackVariable335[1] = "Specificulture";
-			dummyVar106 = migrationBuilder.CreateIndex("IX_mix_module_data_PostId_Specificulture", "mix_module_data", stackVariable335, null, false, null);
-			stackVariable348 = new string[3];
-			stackVariable348[0] = "ModuleId";
-			stackVariable348[1] = "PageId";
-			stackVariable348[2] = "Specificulture";
-			dummyVar107 = migrationBuilder.CreateIndex("IX_mix_module_data_ModuleId_PageId_Specificulture", "mix_module_data", stackVariable348, null, false, null);
-			stackVariable363 = new string[2];
-			stackVariable363[0] = "ModuleId";
-			stackVariable363[1] = "Specificulture";
-			dummyVar108 = migrationBuilder.CreateIndex("IX_mix_module_post_ModuleId_Specificulture", "mix_module_post", stackVariable363, null, false, null);
-			stackVariable376 = new string[2];
-			stackVariable376[0] = "PostId";
-			stackVariable376[1] = "Specificulture";
-			dummyVar109 = migrationBuilder.CreateIndex("IX_mix_module_post_PostId_Specificulture", "mix_module_post", stackVariable376, null, false, null);
-			dummyVar110 = migrationBuilder.CreateIndex("IX_mix_page_Specificulture", "mix_page", "Specificulture", null, false, null);
-			stackVariable397 = new string[2];
-			stackVariable397[0] = "ModuleId";
-			stackVariable397[1] = "Specificulture";
-			dummyVar111 = migrationBuilder.CreateIndex("IX_mix_page_module_ModuleId_Specificulture", "mix_page_module", stackVariable397, null, false, null);
-			stackVariable410 = new string[2];
-			stackVariable410[0] = "PageId";
-			stackVariable410[1] = "Specificulture";
-			dummyVar112 = migrationBuilder.CreateIndex("IX_mix_page_module_PageId_Specificulture", "mix_page_module", stackVariable410, null, false, null);
-			stackVariable423 = new string[2];
-			stackVariable423[0] = "PageId";
-			stackVariable423[1] = "Specificulture";
-			dummyVar113 = migrationBuilder.CreateIndex("IX_mix_page_post_PageId_Specificulture", "mix_page_post", stackVariable423, null, false, null);
-			stackVariable436 = new string[2];
-			stackVariable436[0] = "PostId";
-			stackVariable436[1] = "Specificulture";
-			dummyVar114 = migrationBuilder.CreateIndex("IX_mix_page_post_PostId_Specificulture", "mix_page_post", stackVariable436, null, false, null);
-			dummyVar115 = migrationBuilder.CreateIndex("IX_mix_portal_page_navigation_ParentId", "mix_portal_page_navigation", "ParentId", null, false, null);
-			dummyVar116 = migrationBuilder.CreateIndex("IX_mix_portal_page_role_PageId", "mix_portal_page_role", "PageId", null, false, null);
-			dummyVar117 = migrationBuilder.CreateIndex("IX_mix_post_Specificulture", "mix_post", "Specificulture", null, false, null);
-			stackVariable473 = new string[2];
-			stackVariable473[0] = "MediaId";
-			stackVariable473[1] = "Specificulture";
-			dummyVar118 = migrationBuilder.CreateIndex("IX_mix_post_media_MediaId_Specificulture", "mix_post_media", stackVariable473, null, false, null);
-			stackVariable486 = new string[2];
-			stackVariable486[0] = "PostId";
-			stackVariable486[1] = "Specificulture";
-			dummyVar119 = migrationBuilder.CreateIndex("IX_mix_post_media_PostId_Specificulture", "mix_post_media", stackVariable486, null, false, null);
-			stackVariable499 = new string[2];
-			stackVariable499[0] = "ModuleId";
-			stackVariable499[1] = "Specificulture";
-			dummyVar120 = migrationBuilder.CreateIndex("IX_mix_post_module_ModuleId_Specificulture", "mix_post_module", stackVariable499, null, false, null);
-			stackVariable512 = new string[2];
-			stackVariable512[0] = "PostId";
-			stackVariable512[1] = "Specificulture";
-			dummyVar121 = migrationBuilder.CreateIndex("IX_mix_post_module_PostId_Specificulture", "mix_post_module", stackVariable512, null, false, null);
-			stackVariable525 = new string[2];
-			stackVariable525[0] = "DestinationId";
-			stackVariable525[1] = "Specificulture";
-			dummyVar122 = migrationBuilder.CreateIndex("IX_mix_related_post_DestinationId_Specificulture", "mix_related_post", stackVariable525, null, false, null);
-			stackVariable538 = new string[2];
-			stackVariable538[0] = "SourceId";
-			stackVariable538[1] = "Specificulture";
-			dummyVar123 = migrationBuilder.CreateIndex("IX_mix_related_post_SourceId_Specificulture", "mix_related_post", stackVariable538, null, false, null);
-			dummyVar124 = migrationBuilder.CreateIndex("IX_mix_template_file_TemplateId", "mix_template", "ThemeId", null, false, null);
-			dummyVar125 = migrationBuilder.CreateIndex("IX_mix_url_alias_Specificulture", "mix_url_alias", "Specificulture", null, false, null);
-			return;
+			migrationBuilder.CreateTable("mix_attribute_set", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<int>(null, nullable3, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, nullable10, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<bool>(null, nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<DateTime>("datetime", nullable12, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<DateTime>("datetime", nullable13, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<int>(null, nullable14, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Type = operationBuilder1, Title = operationBuilder2, Name = operationBuilder3, Description = operationBuilder4, FormTemplate = operationBuilder5, EdmTemplate = operationBuilder6, EdmSubject = operationBuilder7, EdmFrom = operationBuilder8, EdmAutoSend = operationBuilder9, ModifiedBy = operationBuilder10, CreatedBy = operationBuilder11, LastModified = operationBuilder12, CreatedDateTime = operationBuilder13, Priority = operationBuilder14, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_mix_attribute_set", (x) => x.Id), null);
+			migrationBuilder.CreateTable("mix_attribute_set_value", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				int? nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable3, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable8, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<bool>(null, nullable9, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, nullable10, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable11, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<double>(null, nullable12, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable13, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<string>(null, nullable14, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<string>(null, nullable15, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<string>(null, nullable16, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<int>(null, nullable17, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable18 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder18 = table.Column<DateTime>("datetime", nullable18, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable19 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder19 = table.Column<DateTime>("datetime", nullable19, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable20 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder20 = table.Column<int>(null, nullable20, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, AttributeFieldId = operationBuilder2, AttributeFieldName = operationBuilder3, AttributeSetName = operationBuilder4, Regex = operationBuilder5, DataType = operationBuilder6, BooleanValue = operationBuilder7, DataId = operationBuilder8, DateTimeValue = operationBuilder9, DoubleValue = operationBuilder10, IntegerValue = operationBuilder11, StringValue = operationBuilder12, EncryptValue = operationBuilder13, EncryptKey = operationBuilder14, EncryptType = operationBuilder15, ModifiedBy = operationBuilder16, CreatedBy = operationBuilder17, LastModified = operationBuilder18, CreatedDateTime = operationBuilder19, Priority = operationBuilder20, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_mix_attribute_set_value", (x) => x.Id), null);
+			migrationBuilder.CreateTable("mix_cache", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(0xfa0), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				int? nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<DateTime>("datetime", nullable3, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<DateTime>("datetime", nullable5, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<DateTime>("datetime", nullable6, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<int>(null, nullable7, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Value = operationBuilder1, ExpiredDateTime = operationBuilder2, ModifiedBy = operationBuilder3, CreatedBy = operationBuilder4, LastModified = operationBuilder5, CreatedDateTime = operationBuilder6, Priority = operationBuilder7, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_mix_cache", (x) => x.Id), null);
+			migrationBuilder.CreateTable("mix_cms_user", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable3, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable4, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable5, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable6, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable7, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable8, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, nullable9, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				int? nullable11 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<DateTime>("datetime", nullable10, nullable11, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable11 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<DateTime>("datetime", nullable12, nullable11, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable11 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<int>(null, nullable13, nullable11, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Address = operationBuilder1, Avatar = operationBuilder2, FirstName = operationBuilder3, LastName = operationBuilder4, MiddleName = operationBuilder5, PhoneNumber = operationBuilder6, Username = operationBuilder7, Email = operationBuilder8, ModifiedBy = operationBuilder9, CreatedBy = operationBuilder10, LastModified = operationBuilder11, CreatedDateTime = operationBuilder12, Priority = operationBuilder13, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_mix_cms_user", (x) => x.Id), null);
+			migrationBuilder.CreateTable("mix_culture", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(150), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(150), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Alias = operationBuilder1, Description = operationBuilder2, FullName = operationBuilder3, Icon = operationBuilder4, LCID = operationBuilder5, Specificulture = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_mix_culture", (x) => x.Id);
+				table.UniqueConstraint("AK_mix_culture_Specificulture", (x) => x.Specificulture);
+			}, null);
+			migrationBuilder.CreateTable("mix_media", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<long>(null, nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, nullable10, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, nullable11, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, nullable12, new int?(0x190), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<string>(null, nullable13, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<string>(null, nullable14, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<DateTime>("datetime", nullable15, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<DateTime>("datetime", nullable16, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<int>(null, nullable17, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, Description = operationBuilder2, Extension = operationBuilder3, FileFolder = operationBuilder4, FileName = operationBuilder5, FileProperties = operationBuilder6, FileSize = operationBuilder7, FileType = operationBuilder8, Title = operationBuilder9, Tags = operationBuilder10, Source = operationBuilder11, TargetUrl = operationBuilder12, CreatedBy = operationBuilder13, CreatedDateTime = operationBuilder14, ModifiedBy = operationBuilder15, LastModified = operationBuilder16, Priority = operationBuilder17, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType5<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_media", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+			}, null);
+			migrationBuilder.CreateTable("mix_portal_page", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Icon = operationBuilder1, TextKeyword = operationBuilder2, Url = operationBuilder3, Description = operationBuilder4, TextDefault = operationBuilder5, Level = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_mix_portal_page", (x) => x.Id), null);
+			migrationBuilder.CreateTable("mix_related_attribute_data", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable3, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable4, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				int? nullable6 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<int>(null, nullable5, nullable6, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable8, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable6 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable6, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable6 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<DateTime>("datetime", nullable10, nullable6, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable6 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<int>(null, nullable11, nullable6, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, DataId = operationBuilder2, ParentId = operationBuilder3, ParentType = operationBuilder4, AttributeSetId = operationBuilder5, AttributeSetName = operationBuilder6, Description = operationBuilder7, CreatedBy = operationBuilder8, CreatedDateTime = operationBuilder9, ModifiedBy = operationBuilder10, LastModified = operationBuilder11, Priority = operationBuilder12, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType8<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_related_attribute_data_1", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+			}, null);
+			migrationBuilder.CreateTable("mix_related_data", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable7, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable8, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, nullable9, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<DateTime>("datetime", nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<int>(null, nullable12, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, DataId = operationBuilder2, Type = operationBuilder3, ParentId = operationBuilder4, ParentType = operationBuilder5, AttributeSetId = operationBuilder6, AttributeSetName = operationBuilder7, Description = operationBuilder8, CreatedBy = operationBuilder9, CreatedDateTime = operationBuilder10, ModifiedBy = operationBuilder11, LastModified = operationBuilder12, Priority = operationBuilder13, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType9<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_related_data", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+			}, null);
+			migrationBuilder.CreateTable("mix_theme", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Thumbnail = operationBuilder1, Image = operationBuilder2, Title = operationBuilder3, Name = operationBuilder4, PreviewUrl = operationBuilder5, CreatedBy = operationBuilder6, CreatedDateTime = operationBuilder7, ModifiedBy = operationBuilder8, LastModified = operationBuilder9, Priority = operationBuilder10, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => table.PrimaryKey("PK_mix_theme", (x) => x.Id), null);
+			migrationBuilder.CreateTable("mix_attribute_field", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<int>(null, nullable3, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<int>(null, nullable7, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>("text", nullable8, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>("text", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<bool>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<bool>(null, nullable12, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<bool>(null, nullable13, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<bool>(null, nullable14, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<bool>(null, nullable15, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<int>(null, nullable16, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<DateTime>("datetime", nullable17, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable18 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder18 = table.Column<DateTime>("datetime", nullable18, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable19 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder19 = table.Column<int>(null, nullable19, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, AttributeSetId = operationBuilder1, AttributeSetName = operationBuilder2, Regex = operationBuilder3, Title = operationBuilder4, DataType = operationBuilder5, DefaultValue = operationBuilder6, Name = operationBuilder7, Options = operationBuilder8, IsRequire = operationBuilder9, IsEncrypt = operationBuilder10, IsMultiple = operationBuilder11, IsSelect = operationBuilder12, IsUnique = operationBuilder13, ReferenceId = operationBuilder14, ModifiedBy = operationBuilder15, CreatedBy = operationBuilder16, LastModified = operationBuilder17, CreatedDateTime = operationBuilder18, Priority = operationBuilder19, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_mix_attribute_field", (x) => x.Id);
+				table.ForeignKey("FK_mix_attribute_field_mix_attribute_set", (x) => x.AttributeSetId, "mix_attribute_set", "Id", null, 0, 1);
+				table.ForeignKey("FK_mix_attribute_field_mix_attribute_set1", (x) => x.ReferenceId, "mix_attribute_set", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_attribute_set_data", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				int? nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable3, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<DateTime>("datetime", nullable6, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<DateTime>("datetime", nullable7, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<int>(null, nullable8, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, AttributeSetId = operationBuilder2, AttributeSetName = operationBuilder3, ModifiedBy = operationBuilder4, CreatedBy = operationBuilder5, LastModified = operationBuilder6, CreatedDateTime = operationBuilder7, Priority = operationBuilder8, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_attribute_set_data", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_mix_attribute_set_data_mix_attribute_set", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_AttributeSetId").MethodHandle, typeof(u003cu003ef__AnonymousType12<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_attribute_set", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_attribute_set_reference", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<int>(null, nullable3, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<int>(null, nullable7, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, ParentId = operationBuilder1, ParentType = operationBuilder2, Description = operationBuilder3, Image = operationBuilder4, AttributeSetId = operationBuilder5, ModifiedBy = operationBuilder6, CreatedBy = operationBuilder7, LastModified = operationBuilder8, CreatedDateTime = operationBuilder9, Priority = operationBuilder10, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_mix_attribute_set_reference", (x) => x.Id);
+				table.ForeignKey("FK_mix_attribute_set_reference_mix_attribute_set", (x) => x.AttributeSetId, "mix_attribute_set", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_related_attribute_set", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable6, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable7, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, SetId = operationBuilder2, ParentId = operationBuilder3, ParentType = operationBuilder4, Description = operationBuilder5, Image = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_related_attribute_set", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_mix_related_attribute_set_mix_attribute_set", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType14<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_attribute_set", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_configuration", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<int>(null, nullable6, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, Keyword = operationBuilder2, Category = operationBuilder3, DataType = operationBuilder4, Description = operationBuilder5, Value = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_configuration_1", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_Mix_Configuration_Mix_Culture", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType15<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_culture", "Specificulture", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("mix_language", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<int>(null, nullable6, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<DateTime>("datetime", nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<int>(null, nullable12, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, Keyword = operationBuilder2, Category = operationBuilder3, DataType = operationBuilder4, Description = operationBuilder5, Value = operationBuilder6, DefaultValue = operationBuilder7, CreatedBy = operationBuilder8, CreatedDateTime = operationBuilder9, ModifiedBy = operationBuilder10, LastModified = operationBuilder11, Priority = operationBuilder12, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_language_1", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_Mix_Language_Mix_Culture", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType16<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_culture", "Specificulture", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("mix_module", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, nullable10, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, nullable11, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, nullable12, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable13, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<int>(null, nullable14, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<DateTime>("datetime", nullable15, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<DateTime>("datetime", nullable16, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<int>(null, nullable17, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, Description = operationBuilder2, Fields = operationBuilder3, Thumbnail = operationBuilder4, Image = operationBuilder5, Name = operationBuilder6, Template = operationBuilder7, FormTemplate = operationBuilder8, EdmTemplate = operationBuilder9, Title = operationBuilder10, Type = operationBuilder11, PageSize = operationBuilder12, CreatedBy = operationBuilder13, CreatedDateTime = operationBuilder14, ModifiedBy = operationBuilder15, LastModified = operationBuilder16, Priority = operationBuilder17, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_module", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_Mix_Module_Mix_Culture", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType17<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_culture", "Specificulture", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("mix_page", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>("text", nullable4, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>("text", nullable6, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<int>(null, nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>("text", nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>("text", nullable12, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<string>(null, new bool?(false), new int?(0x1f4), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<string>(null, new bool?(false), new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<string>(null, nullable13, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<string>("text", nullable14, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<string>(null, nullable15, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<string>("text", nullable16, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder18 = table.Column<int>(null, nullable17, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable18 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder19 = table.Column<int>(null, nullable18, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable19 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder20 = table.Column<string>("text", nullable19, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder21 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable20 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder22 = table.Column<DateTime>("datetime", nullable20, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder23 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable21 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder24 = table.Column<DateTime>("datetime", nullable21, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable22 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder25 = table.Column<int>(null, nullable22, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, Content = operationBuilder2, CssClass = operationBuilder3, Excerpt = operationBuilder4, Icon = operationBuilder5, Image = operationBuilder6, Layout = operationBuilder7, Level = operationBuilder8, SeoDescription = operationBuilder9, SeoKeywords = operationBuilder10, SeoName = operationBuilder11, SeoTitle = operationBuilder12, StaticUrl = operationBuilder13, Tags = operationBuilder14, Template = operationBuilder15, Title = operationBuilder16, Type = operationBuilder17, Views = operationBuilder18, PageSize = operationBuilder19, ExtraFields = operationBuilder20, CreatedBy = operationBuilder21, CreatedDateTime = operationBuilder22, ModifiedBy = operationBuilder23, LastModified = operationBuilder24, Priority = operationBuilder25, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_page", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_Mix_Page_Mix_Culture", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType18<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_culture", "Specificulture", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_post", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>("text", nullable4, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<DateTime>("datetime", nullable5, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>("text", nullable6, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>("text", nullable7, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>("text", nullable8, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>("text", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>("text", nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, new bool?(false), new int?(0x1f4), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<string>("text", nullable12, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<string>(null, nullable13, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<string>("text", nullable14, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<string>(null, nullable15, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<string>(null, nullable16, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable17 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<string>("text", nullable17, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder17 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable18 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder18 = table.Column<int>(null, nullable18, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable19 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder19 = table.Column<string>("text", nullable19, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder20 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable20 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder21 = table.Column<DateTime>("datetime", nullable20, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder22 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable21 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder23 = table.Column<DateTime>("datetime", nullable21, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable22 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder24 = table.Column<int>(null, nullable22, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, Content = operationBuilder2, PublishedDateTime = operationBuilder3, Excerpt = operationBuilder4, ExtraProperties = operationBuilder5, Icon = operationBuilder6, Image = operationBuilder7, SeoDescription = operationBuilder8, SeoKeywords = operationBuilder9, SeoName = operationBuilder10, SeoTitle = operationBuilder11, Source = operationBuilder12, Tags = operationBuilder13, Template = operationBuilder14, Thumbnail = operationBuilder15, Title = operationBuilder16, Type = operationBuilder17, Views = operationBuilder18, ExtraFields = operationBuilder19, CreatedBy = operationBuilder20, CreatedDateTime = operationBuilder21, ModifiedBy = operationBuilder22, LastModified = operationBuilder23, Priority = operationBuilder24, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_post", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_Mix_Post_Mix_Culture", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType19<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_culture", "Specificulture", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_url_alias", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, SourceId = operationBuilder2, Type = operationBuilder3, Description = operationBuilder4, Alias = operationBuilder5, CreatedBy = operationBuilder6, CreatedDateTime = operationBuilder7, ModifiedBy = operationBuilder8, LastModified = operationBuilder9, Priority = operationBuilder10, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_url_alias", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_Mix_Url_Alias_Mix_Culture", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType20<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_culture", "Specificulture", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("mix_portal_page_navigation", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<int>(null, nullable3, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<DateTime>("datetime", nullable7, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<int>(null, nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, PageId = operationBuilder1, ParentId = operationBuilder2, Description = operationBuilder3, Image = operationBuilder4, CreatedBy = operationBuilder5, CreatedDateTime = operationBuilder6, ModifiedBy = operationBuilder7, LastModified = operationBuilder8, Priority = operationBuilder9, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_mix_portal_page_navigation", (x) => x.Id);
+				table.ForeignKey("FK_mix_portal_page_navigation_mix_portal_page", (x) => x.Id, "mix_portal_page", "Id", null, 0, 1);
+				table.ForeignKey("FK_mix_portal_page_navigation_mix_portal_page1", (x) => x.ParentId, "mix_portal_page", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_portal_page_role", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<DateTime>("datetime", nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<DateTime>("datetime", nullable5, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable6, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { PageId = operationBuilder, RoleId = operationBuilder1, CreatedBy = operationBuilder2, CreatedDateTime = operationBuilder3, ModifiedBy = operationBuilder4, LastModified = operationBuilder5, Priority = operationBuilder6, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType23<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cRoleIdu003ej__TPar), typeof(u003cPageIdu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType23<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_RoleId").MethodHandle, typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType23<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_RoleId").MethodHandle, typeof(u003cu003ef__AnonymousType23<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType23<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType23<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_portal_page_role", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				table.ForeignKey("FK_mix_portal_page_role_mix_portal_page", Expression.Lambda(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType22<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), new ParameterExpression[] { parameterExpression }), "mix_portal_page", "Id", null, 0, 2);
+			}, null);
+			migrationBuilder.CreateTable("mix_file", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null).Annotation("SqlServer:Identity", "1, 1");
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(0xfa0), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable8, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, nullable9, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<DateTime>("datetime", nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<int>(null, nullable12, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, StringContent = operationBuilder1, Extension = operationBuilder2, FileFolder = operationBuilder3, FileName = operationBuilder4, FolderType = operationBuilder5, ThemeId = operationBuilder6, ThemeName = operationBuilder7, CreatedBy = operationBuilder8, CreatedDateTime = operationBuilder9, ModifiedBy = operationBuilder10, LastModified = operationBuilder11, Priority = operationBuilder12, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_mix_file", (x) => x.Id);
+				table.ForeignKey("FK_mix_file_mix_template", (x) => x.ThemeId, "mix_theme", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_template", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>("text", nullable3, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<string>(null, nullable4, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<string>(null, nullable5, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>("text", nullable8, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>("text", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>("text", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>("text", nullable11, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable12 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable12, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable13 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<string>(null, nullable13, new int?(250), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder12 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable14 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder13 = table.Column<DateTime>("datetime", nullable14, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder14 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable15 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder15 = table.Column<DateTime>("datetime", nullable15, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable16 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder16 = table.Column<int>(null, nullable16, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Content = operationBuilder1, Extension = operationBuilder2, FileFolder = operationBuilder3, FileName = operationBuilder4, FolderType = operationBuilder5, MobileContent = operationBuilder6, Scripts = operationBuilder7, SpaContent = operationBuilder8, Styles = operationBuilder9, ThemeId = operationBuilder10, ThemeName = operationBuilder11, CreatedBy = operationBuilder12, CreatedDateTime = operationBuilder13, ModifiedBy = operationBuilder14, LastModified = operationBuilder15, Priority = operationBuilder16, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				table.PrimaryKey("PK_mix_template", (x) => x.Id);
+				table.ForeignKey("FK_mix_template_mix_theme", (x) => x.ThemeId, "mix_theme", "Id", null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_page_module", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, ModuleId = operationBuilder2, PageId = operationBuilder3, Description = operationBuilder4, Image = operationBuilder5, Position = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_page_module", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cModuleIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Menu_Module_Mix_Module1", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_module", new string[] { "Id", "Specificulture" }, null, 0, 2);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPageIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType26<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Page_Module_Mix_Page", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_page", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_module_data", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<string>(null, nullable1, new int?(50), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable2 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable2, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				int? nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable3, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<int>(null, nullable6, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(0xfa0), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, nullable8, new int?(0xfa0), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable4, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable4 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable4, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, ModuleId = operationBuilder2, PageId = operationBuilder3, PostId = operationBuilder4, Fields = operationBuilder5, Value = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_module_data", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cModuleIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Module_Data_Mix_Module", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_module", new string[] { "Id", "Specificulture" }, null, 0, 2);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPageIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_mix_module_data_mix_page", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_page", new string[] { "Id", "Specificulture" }, null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle2 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPostIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray3 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType29<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray2 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_mix_module_data_mix_post", Expression.Lambda(Expression.New(methodFromHandle2, (IEnumerable<Expression>)expressionArray3, memberInfoArray2), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_module_post", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, PostId = operationBuilder2, ModuleId = operationBuilder3, Description = operationBuilder4, Image = operationBuilder5, CreatedBy = operationBuilder6, CreatedDateTime = operationBuilder7, ModifiedBy = operationBuilder8, LastModified = operationBuilder9, Priority = operationBuilder10, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_module_post", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cModuleIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Module_Post_Mix_Module", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_module", new string[] { "Id", "Specificulture" }, null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPostIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType31<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Module_Post_Mix_Post", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_page_post", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, PostId = operationBuilder2, PageId = operationBuilder3, Description = operationBuilder4, Image = operationBuilder5, CreatedBy = operationBuilder6, CreatedDateTime = operationBuilder7, ModifiedBy = operationBuilder8, LastModified = operationBuilder9, Priority = operationBuilder10, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_page_post", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPageIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PageId").MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType28<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Page_Post_Mix_Page", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_page", new string[] { "Id", "Specificulture" }, null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPostIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType32<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Page_Post_Mix_Post", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_post_media", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, MediaId = operationBuilder2, PostId = operationBuilder3, Description = operationBuilder4, Image = operationBuilder5, Position = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_post_media", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType34<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cMediaIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType34<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_MediaId").MethodHandle, typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType34<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_MediaId").MethodHandle, typeof(u003cu003ef__AnonymousType34<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType34<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType34<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_mix_post_media_mix_media", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_media", new string[] { "Id", "Specificulture" }, null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPostIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType33<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_mix_post_media_mix_post", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_post_module", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(250), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<int>(null, nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<DateTime>("datetime", nullable10, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable11 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder11 = table.Column<int>(null, nullable11, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, ModuleId = operationBuilder2, PostId = operationBuilder3, Description = operationBuilder4, Image = operationBuilder5, Position = operationBuilder6, CreatedBy = operationBuilder7, CreatedDateTime = operationBuilder8, ModifiedBy = operationBuilder9, LastModified = operationBuilder10, Priority = operationBuilder11, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_post_module", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cModuleIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_ModuleId").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType27<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Post_Module_Mix_Module1", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_module", new string[] { "Id", "Specificulture" }, null, 0, 2);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cPostIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType35<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_PostId").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType30<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_Mix_Post_Module_Mix_Post", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateTable("mix_related_post", (ColumnsBuilder table) => {
+				bool? nullable = null;
+				bool? nullable1 = nullable;
+				int? nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder = table.Column<int>(null, nullable1, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable3 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder1 = table.Column<string>(null, nullable3, new int?(10), false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable4 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder2 = table.Column<int>(null, nullable4, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable5 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder3 = table.Column<int>(null, nullable5, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable6 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder4 = table.Column<string>(null, nullable6, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable7 = nullable;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder5 = table.Column<string>(null, nullable7, new int?(0x1c2), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder6 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable8 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder7 = table.Column<DateTime>("datetime", nullable8, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder8 = table.Column<string>(null, new bool?(false), new int?(50), false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable9 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder9 = table.Column<DateTime>("datetime", nullable9, nullable2, false, null, true, null, null, null, nullable, null);
+				nullable = null;
+				bool? nullable10 = nullable;
+				nullable2 = null;
+				nullable = null;
+				OperationBuilder<AddColumnOperation> operationBuilder10 = table.Column<int>(null, nullable10, nullable2, false, null, false, null, null, null, nullable, null);
+				nullable = null;
+				return new { Id = operationBuilder, Specificulture = operationBuilder1, SourceId = operationBuilder2, DestinationId = operationBuilder3, Description = operationBuilder4, Image = operationBuilder5, CreatedBy = operationBuilder6, CreatedDateTime = operationBuilder7, ModifiedBy = operationBuilder8, LastModified = operationBuilder9, Priority = operationBuilder10, Status = table.Column<string>(null, new bool?(false), new int?(50), false, null, false, null, null, null, nullable, null) };
+			}, null, (table) => {
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo methodFromHandle = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Id").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType6<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.PrimaryKey("PK_mix_related_post", Expression.Lambda(Expression.New(methodFromHandle, (IEnumerable<Expression>)expressionArray, memberInfoArray), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType37<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cDestinationIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType37<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_DestinationId").MethodHandle, typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] methodFromHandle1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType37<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_DestinationId").MethodHandle, typeof(u003cu003ef__AnonymousType37<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType37<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType37<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_mix_related_post_mix_post1", Expression.Lambda(Expression.New(constructorInfo, (IEnumerable<Expression>)expressionArray1, methodFromHandle1), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+				parameterExpression = Expression.Parameter(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>), "x");
+				ConstructorInfo constructorInfo1 = (ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType38<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod(".ctor", new Type[] { typeof(u003cSourceIdu003ej__TPar), typeof(u003cSpecificultureu003ej__TPar) }).MethodHandle, typeof(u003cu003ef__AnonymousType38<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle);
+				Expression[] expressionArray2 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_SourceId").MethodHandle, typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType36<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle)) };
+				MemberInfo[] memberInfoArray1 = new MemberInfo[] { (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType38<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_SourceId").MethodHandle, typeof(u003cu003ef__AnonymousType38<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(u003cu003ef__AnonymousType38<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).GetMethod("get_Specificulture").MethodHandle, typeof(u003cu003ef__AnonymousType38<OperationBuilder<AddColumnOperation>, OperationBuilder<AddColumnOperation>>).TypeHandle) };
+				table.ForeignKey("FK_mix_related_post_mix_post", Expression.Lambda(Expression.New(constructorInfo1, (IEnumerable<Expression>)expressionArray2, memberInfoArray1), new ParameterExpression[] { parameterExpression }), "mix_post", new string[] { "Id", "Specificulture" }, null, 0, 1);
+			}, null);
+			migrationBuilder.CreateIndex("IX_mix_attribute_field_AttributeSetId", "mix_attribute_field", "AttributeSetId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_attribute_field_ReferenceId", "mix_attribute_field", "ReferenceId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_attribute_set_data_AttributeSetId", "mix_attribute_set_data", "AttributeSetId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_attribute_set_reference_AttributeSetId", "mix_attribute_set_reference", "AttributeSetId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_attribute_set_value_DataId", "mix_attribute_set_value", "DataId", null, false, null);
+			migrationBuilder.CreateIndex("Index_ExpiresAtTime", "mix_cache", "ExpiredDateTime", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_configuration_Specificulture", "mix_configuration", "Specificulture", null, false, null);
+			migrationBuilder.CreateIndex("IX_Mix_Culture", "mix_culture", "Specificulture", null, true, null);
+			migrationBuilder.CreateIndex("IX_mix_file_ThemeId", "mix_file", "ThemeId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_language_Specificulture", "mix_language", "Specificulture", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_Specificulture", "mix_module", "Specificulture", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_data_ModuleId_Specificulture", "mix_module_data", new string[] { "ModuleId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_data_PageId_Specificulture", "mix_module_data", new string[] { "PageId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_data_PostId_Specificulture", "mix_module_data", new string[] { "PostId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_data_ModuleId_PageId_Specificulture", "mix_module_data", new string[] { "ModuleId", "PageId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_post_ModuleId_Specificulture", "mix_module_post", new string[] { "ModuleId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_module_post_PostId_Specificulture", "mix_module_post", new string[] { "PostId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_page_Specificulture", "mix_page", "Specificulture", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_page_module_ModuleId_Specificulture", "mix_page_module", new string[] { "ModuleId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_page_module_PageId_Specificulture", "mix_page_module", new string[] { "PageId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_page_post_PageId_Specificulture", "mix_page_post", new string[] { "PageId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_page_post_PostId_Specificulture", "mix_page_post", new string[] { "PostId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_portal_page_navigation_ParentId", "mix_portal_page_navigation", "ParentId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_portal_page_role_PageId", "mix_portal_page_role", "PageId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_post_Specificulture", "mix_post", "Specificulture", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_post_media_MediaId_Specificulture", "mix_post_media", new string[] { "MediaId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_post_media_PostId_Specificulture", "mix_post_media", new string[] { "PostId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_post_module_ModuleId_Specificulture", "mix_post_module", new string[] { "ModuleId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_post_module_PostId_Specificulture", "mix_post_module", new string[] { "PostId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_related_post_DestinationId_Specificulture", "mix_related_post", new string[] { "DestinationId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_related_post_SourceId_Specificulture", "mix_related_post", new string[] { "SourceId", "Specificulture" }, null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_template_file_TemplateId", "mix_template", "ThemeId", null, false, null);
+			migrationBuilder.CreateIndex("IX_mix_url_alias_Specificulture", "mix_url_alias", "Specificulture", null, false, null);
 		}
 	}
 }

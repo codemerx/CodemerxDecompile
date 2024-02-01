@@ -1,170 +1,138 @@
 using Piranha.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Piranha.Runtime
 {
 	public class MediaManager
 	{
-		public MediaManager.MediaTypeList Audio
-		{
-			get;
-			set;
-		}
+		public MediaManager.MediaTypeList Audio { get; set; } = new MediaManager.MediaTypeList(false);
 
-		public MediaManager.MediaTypeList Documents
-		{
-			get;
-			set;
-		}
+		public MediaManager.MediaTypeList Documents { get; set; } = new MediaManager.MediaTypeList(false);
 
-		public MediaManager.MediaTypeList Images
-		{
-			get;
-			set;
-		}
+		public MediaManager.MediaTypeList Images { get; set; } = new MediaManager.MediaTypeList(true);
 
-		public IList<string> MetaProperties
-		{
-			get;
-			set;
-		}
+		public IList<string> MetaProperties { get; set; } = new List<string>();
 
-		public MediaManager.MediaTypeList Resources
-		{
-			get;
-			set;
-		}
+		public MediaManager.MediaTypeList Resources { get; set; } = new MediaManager.MediaTypeList(false);
 
-		public MediaManager.MediaTypeList Videos
-		{
-			get;
-			set;
-		}
+		public MediaManager.MediaTypeList Videos { get; set; } = new MediaManager.MediaTypeList(false);
 
 		public MediaManager()
 		{
-			this.u003cDocumentsu003ek__BackingField = new MediaManager.MediaTypeList(false);
-			this.u003cImagesu003ek__BackingField = new MediaManager.MediaTypeList(true);
-			this.u003cVideosu003ek__BackingField = new MediaManager.MediaTypeList(false);
-			this.u003cAudiou003ek__BackingField = new MediaManager.MediaTypeList(false);
-			this.u003cResourcesu003ek__BackingField = new MediaManager.MediaTypeList(false);
-			this.u003cMetaPropertiesu003ek__BackingField = new List<string>();
-			base();
-			return;
 		}
 
 		public string GetContentType(string filename)
 		{
-			V_0 = new MediaManager.u003cu003ec__DisplayClass28_0();
-			V_0.extension = Path.GetExtension(filename).ToLower();
-			V_1 = null;
-			stackVariable11 = this.get_Documents().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetContentTypeu003eb__0));
-			V_1 = stackVariable11;
-			if (stackVariable11 != null)
+			string lower = Path.GetExtension(filename).ToLower();
+			MediaManager.MediaTypeItem mediaTypeItem = null;
+			MediaManager.MediaTypeItem mediaTypeItem1 = this.Documents.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem1;
+			if (mediaTypeItem1 != null)
 			{
-				return V_1.get_ContentType();
+				return mediaTypeItem.ContentType;
 			}
-			stackVariable17 = this.get_Images().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetContentTypeu003eb__1));
-			V_1 = stackVariable17;
-			if (stackVariable17 != null)
+			MediaManager.MediaTypeItem mediaTypeItem2 = this.Images.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem2;
+			if (mediaTypeItem2 != null)
 			{
-				return V_1.get_ContentType();
+				return mediaTypeItem.ContentType;
 			}
-			stackVariable23 = this.get_Videos().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetContentTypeu003eb__2));
-			V_1 = stackVariable23;
-			if (stackVariable23 != null)
+			MediaManager.MediaTypeItem mediaTypeItem3 = this.Videos.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem3;
+			if (mediaTypeItem3 != null)
 			{
-				return V_1.get_ContentType();
+				return mediaTypeItem.ContentType;
 			}
-			stackVariable29 = this.get_Audio().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetContentTypeu003eb__3));
-			V_1 = stackVariable29;
-			if (stackVariable29 != null)
+			MediaManager.MediaTypeItem mediaTypeItem4 = this.Audio.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem4;
+			if (mediaTypeItem4 != null)
 			{
-				return V_1.get_ContentType();
+				return mediaTypeItem.ContentType;
 			}
-			stackVariable35 = this.get_Resources().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetContentTypeu003eb__4));
-			V_1 = stackVariable35;
-			if (stackVariable35 == null)
+			MediaManager.MediaTypeItem mediaTypeItem5 = this.Resources.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem5;
+			if (mediaTypeItem5 == null)
 			{
 				return "application/octet-stream";
 			}
-			return V_1.get_ContentType();
+			return mediaTypeItem.ContentType;
 		}
 
 		public MediaManager.MediaTypeItem GetItem(string filename)
 		{
-			V_0 = new MediaManager.u003cu003ec__DisplayClass29_0();
-			V_0.extension = Path.GetExtension(filename).ToLower();
-			V_1 = null;
-			stackVariable11 = this.get_Documents().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetItemu003eb__0));
-			V_1 = stackVariable11;
-			if (stackVariable11 != null)
+			string lower = Path.GetExtension(filename).ToLower();
+			MediaManager.MediaTypeItem mediaTypeItem = null;
+			MediaManager.MediaTypeItem mediaTypeItem1 = this.Documents.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem1;
+			if (mediaTypeItem1 != null)
 			{
-				return V_1;
+				return mediaTypeItem;
 			}
-			stackVariable17 = this.get_Images().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetItemu003eb__1));
-			V_1 = stackVariable17;
-			if (stackVariable17 != null)
+			MediaManager.MediaTypeItem mediaTypeItem2 = this.Images.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem2;
+			if (mediaTypeItem2 != null)
 			{
-				return V_1;
+				return mediaTypeItem;
 			}
-			stackVariable23 = this.get_Videos().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetItemu003eb__2));
-			V_1 = stackVariable23;
-			if (stackVariable23 != null)
+			MediaManager.MediaTypeItem mediaTypeItem3 = this.Videos.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem3;
+			if (mediaTypeItem3 != null)
 			{
-				return V_1;
+				return mediaTypeItem;
 			}
-			stackVariable29 = this.get_Audio().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetItemu003eb__3));
-			V_1 = stackVariable29;
-			if (stackVariable29 != null)
+			MediaManager.MediaTypeItem mediaTypeItem4 = this.Audio.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem4;
+			if (mediaTypeItem4 != null)
 			{
-				return V_1;
+				return mediaTypeItem;
 			}
-			stackVariable35 = this.get_Resources().SingleOrDefault<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cGetItemu003eb__4));
-			V_1 = stackVariable35;
-			if (stackVariable35 != null)
+			MediaManager.MediaTypeItem mediaTypeItem5 = this.Resources.SingleOrDefault<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension == lower);
+			mediaTypeItem = mediaTypeItem5;
+			if (mediaTypeItem5 != null)
 			{
-				return V_1;
+				return mediaTypeItem;
 			}
 			return null;
 		}
 
 		public MediaType GetMediaType(string filename)
 		{
-			V_0 = Path.GetExtension(filename);
-			if (this.get_Documents().ContainsExtension(V_0))
+			string extension = Path.GetExtension(filename);
+			if (this.Documents.ContainsExtension(extension))
 			{
-				return 1;
+				return MediaType.Document;
 			}
-			if (this.get_Images().ContainsExtension(V_0))
+			if (this.Images.ContainsExtension(extension))
 			{
-				return 2;
+				return MediaType.Image;
 			}
-			if (this.get_Videos().ContainsExtension(V_0))
+			if (this.Videos.ContainsExtension(extension))
 			{
-				return 3;
+				return MediaType.Video;
 			}
-			if (this.get_Audio().ContainsExtension(V_0))
+			if (this.Audio.ContainsExtension(extension))
 			{
-				return 4;
+				return MediaType.Audio;
 			}
-			if (this.get_Resources().ContainsExtension(V_0))
+			if (this.Resources.ContainsExtension(extension))
 			{
-				return 5;
+				return MediaType.Resource;
 			}
-			return 0;
+			return MediaType.Unknown;
 		}
 
 		public bool IsSupported(string filename)
 		{
-			V_0 = Path.GetExtension(filename);
-			if (this.get_Documents().ContainsExtension(V_0) || this.get_Images().ContainsExtension(V_0) || this.get_Videos().ContainsExtension(V_0) || this.get_Audio().ContainsExtension(V_0))
+			string extension = Path.GetExtension(filename);
+			if (this.Documents.ContainsExtension(extension) || this.Images.ContainsExtension(extension) || this.Videos.ContainsExtension(extension) || this.Audio.ContainsExtension(extension))
 			{
 				return true;
 			}
-			return this.get_Resources().ContainsExtension(V_0);
+			return this.Resources.ContainsExtension(extension);
 		}
 
 		public class MediaTypeItem
@@ -189,8 +157,6 @@ namespace Piranha.Runtime
 
 			public MediaTypeItem()
 			{
-				base();
-				return;
 			}
 		}
 
@@ -200,34 +166,22 @@ namespace Piranha.Runtime
 
 			public MediaTypeList(bool allowProcessing = false)
 			{
-				base();
 				this._allowProcessing = allowProcessing;
-				return;
 			}
 
 			public void Add(string extension, string contentType, bool? allowProcessing = null)
 			{
-				stackVariable1 = new MediaManager.MediaTypeItem();
-				stackVariable1.set_Extension(extension.ToLower());
-				stackVariable1.set_ContentType(contentType);
-				if (allowProcessing.get_HasValue())
+				base.Add(new MediaManager.MediaTypeItem()
 				{
-					stackVariable8 = allowProcessing.get_Value();
-				}
-				else
-				{
-					stackVariable8 = this._allowProcessing;
-				}
-				stackVariable1.set_AllowProcessing(stackVariable8);
-				this.Add(stackVariable1);
-				return;
+					Extension = extension.ToLower(),
+					ContentType = contentType,
+					AllowProcessing = (allowProcessing.HasValue ? allowProcessing.Value : this._allowProcessing)
+				});
 			}
 
 			public bool ContainsExtension(string extension)
 			{
-				V_0 = new MediaManager.MediaTypeList.u003cu003ec__DisplayClass3_0();
-				V_0.extension = extension;
-				return this.Any<MediaManager.MediaTypeItem>(new Func<MediaManager.MediaTypeItem, bool>(V_0.u003cContainsExtensionu003eb__0));
+				return this.Any<MediaManager.MediaTypeItem>((MediaManager.MediaTypeItem t) => t.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase));
 			}
 		}
 	}

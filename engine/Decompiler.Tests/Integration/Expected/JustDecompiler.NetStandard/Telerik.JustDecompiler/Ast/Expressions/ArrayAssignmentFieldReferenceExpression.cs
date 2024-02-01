@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -21,9 +22,18 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ArrayAssignmentFieldReferenceExpression.u003cget_Childrenu003ed__18(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ArrayAssignmentFieldReferenceExpression arrayAssignmentFieldReferenceExpression = null;
+				if (arrayAssignmentFieldReferenceExpression.Field != null)
+				{
+					yield return arrayAssignmentFieldReferenceExpression.Field;
+				}
+				if (arrayAssignmentFieldReferenceExpression.Dimensions != null)
+				{
+					foreach (ICodeNode dimension in arrayAssignmentFieldReferenceExpression.Dimensions)
+					{
+						yield return dimension;
+					}
+				}
 			}
 		}
 
@@ -31,7 +41,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 84;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ArrayAssignmentFieldReferenceExpression;
 			}
 		}
 
@@ -45,7 +55,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Field().get_ExpressionType();
+				return this.Field.ExpressionType;
 			}
 			set
 			{
@@ -73,46 +83,44 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public ArrayAssignmentFieldReferenceExpression(FieldReferenceExpression field, TypeReference arrayType, ExpressionCollection dimensions, bool hasInitializer, IEnumerable<Instruction> instructions)
+		public ArrayAssignmentFieldReferenceExpression(FieldReferenceExpression field, TypeReference arrayType, ExpressionCollection dimensions, bool hasInitializer, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Field(field);
-			this.set_ArrayType(arrayType);
-			this.set_Dimensions(dimensions);
-			this.set_HasInitializer(hasInitializer);
-			return;
+			this.Field = field;
+			this.ArrayType = arrayType;
+			this.Dimensions = dimensions;
+			this.HasInitializer = hasInitializer;
 		}
 
 		public override Expression Clone()
 		{
-			return new ArrayAssignmentFieldReferenceExpression(this.get_Field(), this.get_ArrayType(), this.get_Dimensions().CloneExpressionsOnly(), this.get_HasInitializer(), this.instructions);
+			return new ArrayAssignmentFieldReferenceExpression(this.Field, this.ArrayType, this.Dimensions.CloneExpressionsOnly(), this.HasInitializer, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ArrayAssignmentFieldReferenceExpression(this.get_Field(), this.get_ArrayType(), this.get_Dimensions().CloneExpressionsOnly(), this.get_HasInitializer(), null);
+			return new ArrayAssignmentFieldReferenceExpression(this.Field, this.ArrayType, this.Dimensions.CloneExpressionsOnly(), this.HasInitializer, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as ArrayAssignmentFieldReferenceExpression == null)
+			if (!(other is ArrayAssignmentFieldReferenceExpression))
 			{
 				return false;
 			}
-			V_0 = other as ArrayAssignmentFieldReferenceExpression;
-			if (!this.get_Field().Equals(V_0.get_Field()))
+			ArrayAssignmentFieldReferenceExpression arrayAssignmentFieldReferenceExpression = other as ArrayAssignmentFieldReferenceExpression;
+			if (!this.Field.Equals(arrayAssignmentFieldReferenceExpression.Field))
 			{
 				return false;
 			}
-			if (String.op_Inequality(this.get_ArrayType().get_FullName(), V_0.get_ArrayType().get_FullName()))
+			if (this.ArrayType.get_FullName() != arrayAssignmentFieldReferenceExpression.ArrayType.get_FullName())
 			{
 				return false;
 			}
-			if (!this.get_Dimensions().Equals(V_0.get_Dimensions()))
+			if (!this.Dimensions.Equals(arrayAssignmentFieldReferenceExpression.Dimensions))
 			{
 				return false;
 			}
-			if (this.get_HasInitializer() != V_0.get_HasInitializer())
+			if (this.HasInitializer != arrayAssignmentFieldReferenceExpression.HasInitializer)
 			{
 				return false;
 			}

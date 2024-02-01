@@ -2,6 +2,7 @@ using Piranha.Extend;
 using Piranha.Extend.Fields;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace Piranha.Extend.Blocks
 {
@@ -16,41 +17,39 @@ namespace Piranha.Extend.Blocks
 
 		public HtmlBlock()
 		{
-			base();
-			return;
 		}
 
 		public string GetIndexedContent()
 		{
-			if (String.IsNullOrEmpty(this.get_Body().get_Value()))
+			if (String.IsNullOrEmpty(this.Body.Value))
 			{
 				return "";
 			}
-			return this.get_Body().get_Value();
+			return this.Body.Value;
 		}
 
 		public override string GetTitle()
 		{
-			stackVariable1 = this.get_Body();
-			if (stackVariable1 != null)
+			bool value;
+			HtmlField body = this.Body;
+			if (body != null)
 			{
-				stackVariable2 = stackVariable1.get_Value();
+				value = body.Value;
 			}
 			else
 			{
-				dummyVar0 = stackVariable1;
-				stackVariable2 = false;
+				value = false;
 			}
-			if (!stackVariable2)
+			if (!value)
 			{
 				return "Empty";
 			}
-			V_0 = Regex.Replace(this.get_Body().get_Value(), "<[^>]*>", "");
-			if (V_0.get_Length() > 40)
+			string str = Regex.Replace(this.Body.Value, "<[^>]*>", "");
+			if (str.Length > 40)
 			{
-				V_0 = String.Concat(V_0.Substring(0, 40), "...");
+				str = String.Concat(str.Substring(0, 40), "...");
 			}
-			return V_0;
+			return str;
 		}
 	}
 }

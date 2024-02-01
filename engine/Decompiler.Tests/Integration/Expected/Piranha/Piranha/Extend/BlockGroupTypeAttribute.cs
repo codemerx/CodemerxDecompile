@@ -21,8 +21,6 @@ namespace Piranha.Extend
 
 		public BlockGroupTypeAttribute()
 		{
-			base();
-			return;
 		}
 	}
 }

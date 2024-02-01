@@ -37,8 +37,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public ExtraProperty()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -1,8 +1,10 @@
 using Mono.Cecil.Cil;
 using System;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
@@ -11,8 +13,6 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public RebuildForStatements()
 		{
-			base();
-			return;
 		}
 
 		private bool CheckTheInitializer(ExpressionStatement statement, out VariableReference forVariable)
@@ -27,40 +27,41 @@ namespace Telerik.JustDecompiler.Steps
 
 		protected virtual bool CheckTheLoop(WhileStatement theWhile, VariableReference forVariable)
 		{
-			if (theWhile == null || theWhile.get_Body().get_Statements().get_Count() < 2)
+			VariableReference variableReference;
+			if (theWhile == null || theWhile.Body.Statements.Count < 2)
 			{
 				return false;
 			}
-			if (!(new VariableFinder(forVariable)).FindVariable(theWhile.get_Condition()))
+			if (!(new VariableFinder(forVariable)).FindVariable(theWhile.Condition))
 			{
 				return false;
 			}
-			V_0 = theWhile.get_Body().get_Statements().get_Item(theWhile.get_Body().get_Statements().get_Count() - 1) as ExpressionStatement;
-			if (V_0 == null || !this.TryGetAssignedVariable(V_0, out V_1) || (object)forVariable != (object)V_1)
+			ExpressionStatement item = theWhile.Body.Statements[theWhile.Body.Statements.Count - 1] as ExpressionStatement;
+			if (item == null || !this.TryGetAssignedVariable(item, out variableReference) || (object)forVariable != (object)variableReference)
 			{
 				return false;
 			}
-			return !(new RebuildForStatements.ContinueFinder()).FindContinue(theWhile.get_Body());
+			return !(new RebuildForStatements.ContinueFinder()).FindContinue(theWhile.Body);
 		}
 
 		private ForStatement CreateForStatement(Statement initializer, WhileStatement theWhile)
 		{
-			V_0 = theWhile.get_Body().get_Statements().get_Count() - 1;
-			V_1 = theWhile.get_Body().get_Statements().get_Item(V_0).get_Label();
-			V_2 = new ForStatement((initializer as ExpressionStatement).get_Expression(), theWhile.get_Condition(), (theWhile.get_Body().get_Statements().get_Item(V_0) as ExpressionStatement).get_Expression(), new BlockStatement());
-			V_3 = 0;
-			while (V_3 < V_0)
+			int count = theWhile.Body.Statements.Count - 1;
+			string label = theWhile.Body.Statements[count].Label;
+			ForStatement forStatement = new ForStatement((initializer as ExpressionStatement).Expression, theWhile.Condition, (theWhile.Body.Statements[count] as ExpressionStatement).Expression, new BlockStatement());
+			for (int i = 0; i < count; i++)
 			{
-				V_2.get_Body().AddStatement(theWhile.get_Body().get_Statements().get_Item(V_3));
-				V_3 = V_3 + 1;
+				forStatement.Body.AddStatement(theWhile.Body.Statements[i]);
 			}
-			if (!String.IsNullOrEmpty(V_1))
+			if (!String.IsNullOrEmpty(label))
 			{
-				stackVariable42 = new EmptyStatement();
-				stackVariable42.set_Label(V_1);
-				V_2.get_Body().AddStatement(stackVariable42);
+				EmptyStatement emptyStatement = new EmptyStatement()
+				{
+					Label = label
+				};
+				forStatement.Body.AddStatement(emptyStatement);
 			}
-			return V_2;
+			return forStatement;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -71,57 +72,53 @@ namespace Telerik.JustDecompiler.Steps
 
 		protected bool TryGetAssignedVariable(ExpressionStatement node, out VariableReference variable)
 		{
+			Expression left;
 			variable = null;
-			V_1 = node.get_Expression() as BinaryExpression;
-			if (V_1 != null && !V_1.get_IsAssignmentExpression())
+			BinaryExpression expression = node.Expression as BinaryExpression;
+			if (expression != null && !expression.IsAssignmentExpression)
 			{
-				V_1 = null;
+				expression = null;
 			}
-			if (V_1 != null)
+			if (expression != null)
 			{
-				V_0 = V_1.get_Left();
+				left = expression.Left;
 			}
 			else
 			{
-				V_2 = node.get_Expression() as UnaryExpression;
-				if (V_2 == null || V_2.get_Operator() != 3 && V_2.get_Operator() != 4 && V_2.get_Operator() != 5 && V_2.get_Operator() != 6)
+				UnaryExpression unaryExpression = node.Expression as UnaryExpression;
+				if (unaryExpression == null || unaryExpression.Operator != UnaryOperator.PostDecrement && unaryExpression.Operator != UnaryOperator.PostIncrement && unaryExpression.Operator != UnaryOperator.PreDecrement && unaryExpression.Operator != UnaryOperator.PreIncrement)
 				{
 					return false;
 				}
-				V_0 = V_2.get_Operand();
+				left = unaryExpression.Operand;
 			}
-			if (V_0.get_CodeNodeType() != 27)
+			if (left.CodeNodeType == CodeNodeType.VariableDeclarationExpression)
 			{
-				if (V_0.get_CodeNodeType() == 26)
-				{
-					variable = ((VariableReferenceExpression)V_0).get_Variable();
-				}
+				variable = ((VariableDeclarationExpression)left).Variable;
 			}
-			else
+			else if (left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 			{
-				variable = ((VariableDeclarationExpression)V_0).get_Variable();
+				variable = ((VariableReferenceExpression)left).Variable;
 			}
 			return (object)variable != (object)null;
 		}
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_Statements().get_Count() - 1)
+			VariableReference variableReference;
+			for (int i = 0; i < node.Statements.Count - 1; i++)
 			{
-				V_2 = node.get_Statements().get_Item(V_0) as ExpressionStatement;
-				V_3 = node.get_Statements().get_Item(V_0 + 1) as WhileStatement;
-				if (this.CheckTheInitializer(V_2, out V_1) && this.CheckTheLoop(V_3, V_1))
+				ExpressionStatement item = node.Statements[i] as ExpressionStatement;
+				WhileStatement whileStatement = node.Statements[i + 1] as WhileStatement;
+				if (this.CheckTheInitializer(item, out variableReference) && this.CheckTheLoop(whileStatement, variableReference))
 				{
-					V_4 = this.CreateForStatement(V_2, V_3);
-					V_4.set_Parent(node);
-					node.get_Statements().set_Item(V_0, V_4);
-					node.get_Statements().RemoveAt(V_0 + 1);
+					ForStatement forStatement = this.CreateForStatement(item, whileStatement);
+					forStatement.Parent = node;
+					node.Statements[i] = forStatement;
+					node.Statements.RemoveAt(i + 1);
 				}
-				V_0 = V_0 + 1;
 			}
-			this.VisitBlockStatement(node);
-			return;
+			base.VisitBlockStatement(node);
 		}
 
 		private class ContinueFinder : BaseCodeVisitor
@@ -130,8 +127,6 @@ namespace Telerik.JustDecompiler.Steps
 
 			public ContinueFinder()
 			{
-				base();
-				return;
 			}
 
 			public bool FindContinue(ICodeNode node)
@@ -145,35 +140,29 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (!this.found)
 				{
-					this.Visit(node);
+					base.Visit(node);
 				}
-				return;
 			}
 
 			public override void VisitContinueStatement(ContinueStatement node)
 			{
 				this.found = true;
-				return;
 			}
 
 			public override void VisitDoWhileStatement(DoWhileStatement node)
 			{
-				return;
 			}
 
 			public override void VisitForEachStatement(ForEachStatement node)
 			{
-				return;
 			}
 
 			public override void VisitForStatement(ForStatement node)
 			{
-				return;
 			}
 
 			public override void VisitWhileStatement(WhileStatement node)
 			{
-				return;
 			}
 		}
 	}

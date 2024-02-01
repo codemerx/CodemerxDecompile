@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Piranha.Models
@@ -10,118 +11,93 @@ namespace Piranha.Models
 	{
 		protected Structure()
 		{
-			base();
-			return;
 		}
 
 		public IList<T> GetBreadcrumb(Guid? id)
 		{
-			if (!id.get_HasValue())
+			if (!id.HasValue)
 			{
 				return new List<T>();
 			}
-			return this.GetBreadcrumbRecursive(this, id.get_Value());
+			return this.GetBreadcrumbRecursive(this, id.Value);
 		}
 
 		private IList<T> GetBreadcrumbRecursive(IList<T> items, Guid id)
 		{
-			V_0 = items.GetEnumerator();
-			try
+			IList<T> ts;
+			using (IEnumerator<T> enumerator = items.GetEnumerator())
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (!Guid.op_Equality(V_1.get_Id(), id))
+					T current = enumerator.Current;
+					if (current.Id != id)
 					{
-						V_2 = this.GetBreadcrumbRecursive(V_1.get_Items(), id);
-						if (V_2 == null)
+						IList<T> breadcrumbRecursive = this.GetBreadcrumbRecursive(current.Items, id);
+						if (breadcrumbRecursive == null)
 						{
 							continue;
 						}
-						V_2.Insert(0, V_1);
-						V_3 = V_2;
-						goto Label1;
+						breadcrumbRecursive.Insert(0, current);
+						ts = breadcrumbRecursive;
+						return ts;
 					}
 					else
 					{
-						stackVariable24 = new List<T>();
-						stackVariable24.Add(V_1);
-						V_3 = stackVariable24;
-						goto Label1;
+						ts = new List<T>()
+						{
+							current
+						};
+						return ts;
 					}
 				}
-				goto Label0;
+				return null;
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-		Label1:
-			return V_3;
-		Label0:
-			return null;
+			return ts;
 		}
 
 		public TThis GetPartial(Guid? id, bool includeRootNode = false)
 		{
-			if (!id.get_HasValue())
+			if (!id.HasValue)
 			{
 				return (TThis)this;
 			}
-			return this.GetPartialRecursive(this, id.get_Value(), includeRootNode);
+			return this.GetPartialRecursive(this, id.Value, includeRootNode);
 		}
 
 		private TThis GetPartialRecursive(IList<T> items, Guid id, bool includeRootNode)
 		{
-			V_0 = items.GetEnumerator();
-			try
+			TThis tThi;
+			using (IEnumerator<T> enumerator = items.GetEnumerator())
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (!Guid.op_Equality(V_1.get_Id(), id))
+					T current = enumerator.Current;
+					if (current.Id != id)
 					{
-						V_2 = this.GetPartialRecursive(V_1.get_Items(), id, includeRootNode);
-						if (V_2 == null)
+						TThis partialRecursive = this.GetPartialRecursive(current.Items, id, includeRootNode);
+						if (partialRecursive == null)
 						{
 							continue;
 						}
-						V_3 = V_2;
-						goto Label1;
+						tThi = partialRecursive;
+						return tThi;
+					}
+					else if (!includeRootNode)
+					{
+						tThi = current.Items;
+						return tThi;
 					}
 					else
 					{
-						if (!includeRootNode)
-						{
-							V_3 = V_1.get_Items();
-							goto Label1;
-						}
-						else
-						{
-							stackVariable27 = Activator.CreateInstance<TThis>();
-							stackVariable27.Add(V_1);
-							V_3 = stackVariable27;
-							goto Label1;
-						}
+						TThis tThi1 = Activator.CreateInstance<TThis>();
+						tThi1.Add(current);
+						tThi = tThi1;
+						return tThi;
 					}
 				}
-				goto Label0;
+				return default(TThis);
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-		Label1:
-			return V_3;
-		Label0:
-			V_4 = default(TThis);
-			return V_4;
+			return tThi;
 		}
 	}
 }

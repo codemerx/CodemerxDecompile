@@ -7,8 +7,6 @@ namespace Piranha.Models
 	{
 		public Sitemap()
 		{
-			base();
-			return;
 		}
 	}
 }

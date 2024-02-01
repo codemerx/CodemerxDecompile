@@ -1,8 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages;
+using Mix.Common.Helper;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -10,6 +15,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -132,55 +138,66 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPages
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(MixPortalPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixPortalPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixPortalPageNavigation, Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>> modelListBy = ViewModelBase<MixCmsContext, MixPortalPageNavigation, Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>.Repository.GetModelListBy((MixPortalPageNavigation n) => n.ParentId == this.Id, _context, _transaction);
+			if (modelListBy.get_IsSucceed())
+			{
+				this.ChildNavs = (
+					from c in modelListBy.get_Data()
+					orderby c.Priority
+					select c).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel>();
+			}
+		}
 
 		public override MixPortalPage ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = this.get_CreatedDateTime();
-			V_0 = new DateTime();
-			if (DateTime.op_Equality(stackVariable1, V_0))
+			if (this.CreatedDateTime == new DateTime())
 			{
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
+				this.CreatedDateTime = DateTime.UtcNow;
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel.u003cRemoveRelatedModelsAsyncu003ed__68>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			DbSet<MixPortalPageNavigation> mixPortalPageNavigation = _context.MixPortalPageNavigation;
+			IQueryable<MixPortalPageNavigation> parentId = 
+				from p in mixPortalPageNavigation
+				where p.ParentId == this.Id || p.Id == this.Id
+				select p;
+			IQueryable<MixPortalPageNavigation> mixPortalPageNavigations = parentId;
+			Action<MixPortalPageNavigation> action = (MixPortalPageNavigation n) => _context.Entry<MixPortalPageNavigation>(n).set_State(2);
+			CancellationToken cancellationToken = new CancellationToken();
+			await EntityFrameworkQueryableExtensions.ForEachAsync<MixPortalPageNavigation>(mixPortalPageNavigations, action, cancellationToken);
+			DbSet<MixPortalPageRole> mixPortalPageRole = _context.MixPortalPageRole;
+			IQueryable<MixPortalPageNavigation> mixPortalPageNavigations1 = parentId;
+			Action<MixPortalPageNavigation> action1 = (MixPortalPageNavigation n) => _context.Entry<MixPortalPageNavigation>(n).set_State(2);
+			cancellationToken = new CancellationToken();
+			await EntityFrameworkQueryableExtensions.ForEachAsync<MixPortalPageNavigation>(mixPortalPageNavigations1, action1, cancellationToken);
+			MixCmsContext mixCmsContext = _context;
+			cancellationToken = new CancellationToken();
+			await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+			return repositoryResponse1;
 		}
 
 		public static async Task<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel>>> UpdateInfosAsync(List<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel> cates)
 		{
-			V_0.cates = cates;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel>>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel.u003cUpdateInfosAsyncu003ed__69>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel.u003cUpdateInfosAsyncu003ed__69 variable = new Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel.u003cUpdateInfosAsyncu003ed__69();
+			variable.cates = cates;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel>>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.ReadViewModel.u003cUpdateInfosAsyncu003ed__69>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

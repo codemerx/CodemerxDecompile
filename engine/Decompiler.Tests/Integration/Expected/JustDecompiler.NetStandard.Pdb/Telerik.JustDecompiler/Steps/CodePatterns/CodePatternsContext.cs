@@ -24,24 +24,18 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private CodePatternsContext()
 		{
-			base();
-			this.set_VariableToSingleAssignmentMap(new Dictionary<VariableDefinition, ExpressionStatement>());
-			this.set_VariableToDefineUseCountContext(new Dictionary<VariableDefinition, DefineUseCount>());
-			return;
+			this.VariableToSingleAssignmentMap = new Dictionary<VariableDefinition, ExpressionStatement>();
+			this.VariableToDefineUseCountContext = new Dictionary<VariableDefinition, DefineUseCount>();
 		}
 
-		public CodePatternsContext(BlockStatement body)
+		public CodePatternsContext(BlockStatement body) : this()
 		{
-			this();
 			(new CodePatternsContext.VariableDefineUseCounter(this)).Visit(body);
-			return;
 		}
 
-		public CodePatternsContext(StatementCollection statements)
+		public CodePatternsContext(StatementCollection statements) : this()
 		{
-			this();
 			(new CodePatternsContext.VariableDefineUseCounter(this)).Visit(statements);
-			return;
 		}
 
 		private class VariableDefineUseCounter : BaseCodeVisitor
@@ -52,101 +46,89 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 			public VariableDefineUseCounter(CodePatternsContext patternContext)
 			{
-				this.bannedVariables = new HashSet<VariableDefinition>();
-				base();
 				this.patternContext = patternContext;
-				return;
 			}
 
 			private void AddDefinition(VariableDefinition variable, ExpressionStatement expressionStatement)
 			{
+				DefineUseCount defineUseCount;
 				if (!this.bannedVariables.Contains(variable))
 				{
-					if (this.patternContext.get_VariableToDefineUseCountContext().TryGetValue(variable, out V_0))
+					if (this.patternContext.VariableToDefineUseCountContext.TryGetValue(variable, out defineUseCount))
 					{
-						stackVariable25 = V_0;
-						stackVariable25.DefineCount = stackVariable25.DefineCount + 1;
-						dummyVar0 = this.patternContext.get_VariableToSingleAssignmentMap().Remove(variable);
+						defineUseCount.DefineCount++;
+						this.patternContext.VariableToSingleAssignmentMap.Remove(variable);
 						return;
 					}
-					V_1 = new DefineUseCount();
-					stackVariable11 = V_1;
-					stackVariable11.DefineCount = stackVariable11.DefineCount + 1;
-					this.patternContext.get_VariableToDefineUseCountContext().Add(variable, V_1);
-					this.patternContext.get_VariableToSingleAssignmentMap().Add(variable, expressionStatement);
+					DefineUseCount defineUseCount1 = new DefineUseCount();
+					defineUseCount1.DefineCount++;
+					this.patternContext.VariableToDefineUseCountContext.Add(variable, defineUseCount1);
+					this.patternContext.VariableToSingleAssignmentMap.Add(variable, expressionStatement);
 				}
-				return;
 			}
 
 			private void AddUsage(VariableDefinition variable)
 			{
-				if (!this.patternContext.get_VariableToDefineUseCountContext().TryGetValue(variable, out V_0))
+				DefineUseCount defineUseCount;
+				if (!this.patternContext.VariableToDefineUseCountContext.TryGetValue(variable, out defineUseCount))
 				{
 					this.RemoveVariable(variable);
 					return;
 				}
-				stackVariable8 = V_0;
-				stackVariable8.UseCount = stackVariable8.UseCount + 1;
-				return;
+				defineUseCount.UseCount++;
 			}
 
 			private void RemoveVariable(VariableDefinition variable)
 			{
 				if (this.bannedVariables.Add(variable))
 				{
-					dummyVar0 = this.patternContext.get_VariableToDefineUseCountContext().Remove(variable);
-					dummyVar1 = this.patternContext.get_VariableToSingleAssignmentMap().Remove(variable);
+					this.patternContext.VariableToDefineUseCountContext.Remove(variable);
+					this.patternContext.VariableToSingleAssignmentMap.Remove(variable);
 				}
-				return;
 			}
 
 			public override void VisitBinaryExpression(BinaryExpression node)
 			{
-				if (node.get_IsAssignmentExpression() && node.get_Left().get_CodeNodeType() == 26)
+				if (node.IsAssignmentExpression && node.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 				{
-					this.RemoveVariable((node.get_Left() as VariableReferenceExpression).get_Variable().Resolve());
+					this.RemoveVariable((node.Left as VariableReferenceExpression).Variable.Resolve());
 				}
-				this.VisitBinaryExpression(node);
-				return;
+				base.VisitBinaryExpression(node);
 			}
 
 			public override void VisitExpressionStatement(ExpressionStatement node)
 			{
-				if (node.IsAssignmentStatement() && node.get_Parent().get_CodeNodeType() == CodeNodeType.BlockStatement)
+				if (node.IsAssignmentStatement() && node.Parent.CodeNodeType == CodeNodeType.BlockStatement)
 				{
-					V_0 = node.get_Expression() as BinaryExpression;
-					if (V_0.get_Left().get_CodeNodeType() == 26)
+					BinaryExpression expression = node.Expression as BinaryExpression;
+					if (expression.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 					{
-						this.Visit(V_0.get_Right());
-						this.AddDefinition((V_0.get_Left() as VariableReferenceExpression).get_Variable().Resolve(), node);
+						this.Visit(expression.Right);
+						this.AddDefinition((expression.Left as VariableReferenceExpression).Variable.Resolve(), node);
 						return;
 					}
 				}
-				this.VisitExpressionStatement(node);
-				return;
+				base.VisitExpressionStatement(node);
 			}
 
 			public override void VisitUnaryExpression(UnaryExpression node)
 			{
-				if (node.get_Operator() != 9 && node.get_Operator() != 7 || node.get_Operand().get_CodeNodeType() != 26)
+				if (node.Operator != UnaryOperator.AddressOf && node.Operator != UnaryOperator.AddressReference || node.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 				{
-					this.VisitUnaryExpression(node);
+					base.VisitUnaryExpression(node);
 					return;
 				}
-				this.RemoveVariable((node.get_Operand() as VariableReferenceExpression).get_Variable().Resolve());
-				return;
+				this.RemoveVariable((node.Operand as VariableReferenceExpression).Variable.Resolve());
 			}
 
 			public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 			{
-				this.RemoveVariable(node.get_Variable().Resolve());
-				return;
+				this.RemoveVariable(node.Variable.Resolve());
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				this.AddUsage(node.get_Variable().Resolve());
-				return;
+				this.AddUsage(node.Variable.Resolve());
 			}
 		}
 	}

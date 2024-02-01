@@ -1,12 +1,17 @@
+using Newtonsoft.Json;
 using Piranha.Cache;
 using Piranha.Extend;
+using Piranha.Extend.Fields;
+using Piranha.Extend.Serializers;
 using Piranha.Models;
 using Piranha.Runtime;
 using Piranha.Security;
+using Piranha.Services;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Piranha
 {
@@ -32,7 +37,7 @@ namespace Piranha
 
 		private readonly PermissionManager _permissions;
 
-		private Piranha.Cache.CacheLevel _cacheLevel;
+		private Piranha.Cache.CacheLevel _cacheLevel = Piranha.Cache.CacheLevel.Full;
 
 		private IMarkdown _markdown;
 
@@ -59,7 +64,6 @@ namespace Piranha
 			set
 			{
 				App.Instance._cacheLevel = value;
-				return;
 			}
 		}
 
@@ -131,7 +135,7 @@ namespace Piranha
 		{
 			get
 			{
-				return 21;
+				return BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public;
 			}
 		}
 
@@ -155,20 +159,20 @@ namespace Piranha
 		{
 			App._mutex = new Object();
 			App.Instance = new App();
-			V_0 = null;
-			App.Instance._mediaTypes.get_Documents().Add(".pdf", "application/pdf", V_0);
-			V_0 = null;
-			App.Instance._mediaTypes.get_Images().Add(".jpg", "image/jpeg", V_0);
-			V_0 = null;
-			App.Instance._mediaTypes.get_Images().Add(".jpeg", "image/jpeg", V_0);
-			V_0 = null;
-			App.Instance._mediaTypes.get_Images().Add(".png", "image/png", V_0);
-			V_0 = null;
-			App.Instance._mediaTypes.get_Videos().Add(".mp4", "video/mp4", V_0);
-			V_0 = null;
-			App.Instance._mediaTypes.get_Audio().Add(".mp3", "audio/mpeg", V_0);
-			V_0 = null;
-			App.Instance._mediaTypes.get_Audio().Add(".wav", "audio/wav", V_0);
+			bool? nullable = null;
+			App.Instance._mediaTypes.Documents.Add(".pdf", "application/pdf", nullable);
+			nullable = null;
+			App.Instance._mediaTypes.Images.Add(".jpg", "image/jpeg", nullable);
+			nullable = null;
+			App.Instance._mediaTypes.Images.Add(".jpeg", "image/jpeg", nullable);
+			nullable = null;
+			App.Instance._mediaTypes.Images.Add(".png", "image/png", nullable);
+			nullable = null;
+			App.Instance._mediaTypes.Videos.Add(".mp4", "video/mp4", nullable);
+			nullable = null;
+			App.Instance._mediaTypes.Audio.Add(".mp3", "audio/mpeg", nullable);
+			nullable = null;
+			App.Instance._mediaTypes.Audio.Add(".wav", "audio/wav", nullable);
 			App.Instance._fields.Register<AudioField>();
 			App.Instance._fields.Register<CheckBoxField>();
 			App.Instance._fields.Register<DateField>();
@@ -212,25 +216,22 @@ namespace Piranha
 			App.Instance._serializers.Register<VideoField>(new VideoFieldSerializer());
 			App.Instance._serializers.Register<AudioField>(new AudioFieldSerializer());
 			App.Instance._markdown = new DefaultMarkdown();
-			stackVariable154 = App.Instance._permissions.get_Item("Core");
-			stackVariable155 = new PermissionItem();
-			stackVariable155.set_Name("PiranhaPagePreview");
-			stackVariable155.set_Title("Page Preview");
-			stackVariable155.set_IsInternal(true);
-			stackVariable154.Add(stackVariable155);
-			stackVariable162 = App.Instance._permissions.get_Item("Core");
-			stackVariable163 = new PermissionItem();
-			stackVariable163.set_Name("PiranhaPostPreview");
-			stackVariable163.set_Title("Post Preview");
-			stackVariable163.set_IsInternal(true);
-			stackVariable162.Add(stackVariable163);
-			return;
+			App.Instance._permissions["Core"].Add(new PermissionItem()
+			{
+				Name = "PiranhaPagePreview",
+				Title = "Page Preview",
+				IsInternal = true
+			});
+			App.Instance._permissions["Core"].Add(new PermissionItem()
+			{
+				Name = "PiranhaPostPreview",
+				Title = "Post Preview",
+				IsInternal = true
+			});
 		}
 
 		private App()
 		{
-			this._cacheLevel = 3;
-			base();
 			this._blocks = new AppBlockList();
 			this._fields = new AppFieldList();
 			this._modules = new AppModuleList();
@@ -241,15 +242,14 @@ namespace Piranha
 			this._pageTypes = new ContentTypeList<PageType>();
 			this._postTypes = new ContentTypeList<PostType>();
 			this._siteTypes = new ContentTypeList<SiteType>();
-			return;
 		}
 
 		public static object DeserializeObject(string value, Type type)
 		{
-			V_0 = App.Instance._serializers.get_Item(type);
-			if (V_0 != null)
+			ISerializer item = App.Instance._serializers[type];
+			if (item != null)
 			{
-				return V_0.Deserialize(value);
+				return item.Deserialize(value);
 			}
 			return JsonConvert.DeserializeObject(value, type);
 		}
@@ -257,66 +257,43 @@ namespace Piranha
 		public static void Init(IApi api)
 		{
 			App.Instance.InitApp(api);
-			return;
 		}
 
 		private void InitApp(IApi api)
 		{
 			if (!App._isInitialized)
 			{
-				V_0 = App._mutex;
-				V_1 = false;
-				try
+				lock (App._mutex)
 				{
-					Monitor.Enter(V_0, ref V_1);
 					if (!App._isInitialized)
 					{
-						stackVariable7 = this._pageTypes;
-						V_2 = api.get_PageTypes().GetAllAsync().GetAwaiter();
-						stackVariable7.Init(V_2.GetResult());
-						stackVariable15 = this._postTypes;
-						V_3 = api.get_PostTypes().GetAllAsync().GetAwaiter();
-						stackVariable15.Init(V_3.GetResult());
-						stackVariable23 = this._siteTypes;
-						V_4 = api.get_SiteTypes().GetAllAsync().GetAwaiter();
-						stackVariable23.Init(V_4.GetResult());
-						V_5 = this._modules.GetEnumerator();
-						try
+						ContentTypeList<PageType> contentTypeList = this._pageTypes;
+						TaskAwaiter<IEnumerable<PageType>> awaiter = api.PageTypes.GetAllAsync().GetAwaiter();
+						contentTypeList.Init(awaiter.GetResult());
+						ContentTypeList<PostType> contentTypeList1 = this._postTypes;
+						TaskAwaiter<IEnumerable<PostType>> taskAwaiter = api.PostTypes.GetAllAsync().GetAwaiter();
+						contentTypeList1.Init(taskAwaiter.GetResult());
+						ContentTypeList<SiteType> contentTypeList2 = this._siteTypes;
+						TaskAwaiter<IEnumerable<SiteType>> awaiter1 = api.SiteTypes.GetAllAsync().GetAwaiter();
+						contentTypeList2.Init(awaiter1.GetResult());
+						foreach (AppModule _module in this._modules)
 						{
-							while (V_5.MoveNext())
-							{
-								V_5.get_Current().get_Instance().Init();
-							}
-						}
-						finally
-						{
-							if (V_5 != null)
-							{
-								V_5.Dispose();
-							}
+							_module.Instance.Init();
 						}
 						App._isInitialized = true;
 					}
 				}
-				finally
-				{
-					if (V_1)
-					{
-						Monitor.Exit(V_0);
-					}
-				}
 			}
-			return;
 		}
 
 		public static string SerializeObject(object obj, Type type)
 		{
-			V_0 = App.Instance._serializers.get_Item(type);
-			if (V_0 == null)
+			ISerializer item = App.Instance._serializers[type];
+			if (item == null)
 			{
 				return JsonConvert.SerializeObject(obj);
 			}
-			return V_0.Serialize(obj);
+			return item.Serialize(obj);
 		}
 	}
 }

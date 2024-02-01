@@ -12,141 +12,103 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		private MethodSpecificContext context;
 
-		private readonly Stack<Expression> parentExpressions;
+		private readonly Stack<Expression> parentExpressions = new Stack<Expression>();
 
 		public FindAutoBoxesStep()
 		{
-			this.parentExpressions = new Stack<Expression>();
-			base();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.context = context.get_MethodContext();
-			V_0 = context.get_MethodContext().get_Expressions().get_BlockExpressions().GetEnumerator();
-			try
+			this.context = context.MethodContext;
+			foreach (KeyValuePair<int, IList<Expression>> blockExpression in context.MethodContext.Expressions.BlockExpressions)
 			{
-				while (V_0.MoveNext())
+				this.parentExpressions.Clear();
+				foreach (Expression value in blockExpression.Value)
 				{
-					V_1 = V_0.get_Current();
-					this.parentExpressions.Clear();
-					V_2 = V_1.get_Value().GetEnumerator();
-					try
-					{
-						while (V_2.MoveNext())
-						{
-							V_3 = V_2.get_Current();
-							this.Visit(V_3);
-						}
-					}
-					finally
-					{
-						if (V_2 != null)
-						{
-							V_2.Dispose();
-						}
-					}
+					this.Visit(value);
 				}
-			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
 			}
 			return body;
 		}
 
 		public override void Visit(ICodeNode node)
 		{
-			if (node as Expression != null)
+			if (node is Expression)
 			{
 				this.parentExpressions.Push(node as Expression);
 			}
-			this.Visit(node);
-			if (node as Expression != null)
+			base.Visit(node);
+			if (node is Expression)
 			{
-				dummyVar0 = this.parentExpressions.Pop();
+				this.parentExpressions.Pop();
 			}
-			return;
 		}
 
 		public override void VisitBoxExpression(BoxExpression node)
 		{
-			V_0 = new Stack<Expression>();
-			V_0.Push(this.parentExpressions.Pop());
-			if (this.parentExpressions.get_Count() > 0)
+			Stack<Expression> expressions = new Stack<Expression>();
+			expressions.Push(this.parentExpressions.Pop());
+			if (this.parentExpressions.Count > 0)
 			{
-				V_1 = this.parentExpressions.Peek();
-				if (V_1 as MemberReferenceExpresion == null)
+				Expression expression = this.parentExpressions.Peek();
+				if (expression is MemberReferenceExpresion)
 				{
-					if (V_1 as MethodInvocationExpression != null || V_1 as FieldReferenceExpression != null || V_1 as PropertyReferenceExpression != null)
+					MemberReferenceExpresion memberReferenceExpresion = this.parentExpressions.Pop() as MemberReferenceExpresion;
+					expressions.Push(memberReferenceExpresion);
+					if (memberReferenceExpresion.Member is MethodReference)
 					{
-						node.set_IsAutoBox(true);
+						node.IsAutoBox = true;
+					}
+				}
+				else if (expression is MethodInvocationExpression || expression is FieldReferenceExpression || expression is PropertyReferenceExpression)
+				{
+					node.IsAutoBox = true;
+				}
+				else if (expression is BinaryExpression)
+				{
+					BinaryExpression binaryExpression = expression as BinaryExpression;
+					if (binaryExpression.IsAssignmentExpression && binaryExpression.Right.Equals(node))
+					{
+						node.IsAutoBox = true;
+					}
+					if (binaryExpression.IsComparisonExpression && node.BoxedAs.get_IsGenericParameter())
+					{
+						if (binaryExpression.Left == node && binaryExpression.Right is LiteralExpression && (binaryExpression.Right as LiteralExpression).Value == null)
+						{
+							node.IsAutoBox = true;
+						}
+						if (binaryExpression.Right == node && binaryExpression.Left is LiteralExpression && (binaryExpression.Left as LiteralExpression).Value == null)
+						{
+							node.IsAutoBox = true;
+						}
+					}
+				}
+				else if (expression is ReturnExpression)
+				{
+					if (this.context.Method.get_ReturnType().get_FullName() != "System.Object")
+					{
+						TypeDefinition typeDefinition = node.BoxedExpression.ExpressionType.Resolve();
+						if (typeDefinition != null && typeDefinition.get_IsValueType())
+						{
+							node.IsAutoBox = true;
+						}
 					}
 					else
 					{
-						if (V_1 as BinaryExpression == null)
-						{
-							if (V_1 as ReturnExpression == null)
-							{
-								if (V_1 as YieldReturnExpression != null && (V_1 as YieldReturnExpression).get_Expression().Equals(node))
-								{
-									node.set_IsAutoBox(true);
-								}
-							}
-							else
-							{
-								if (!String.op_Equality(this.context.get_Method().get_ReturnType().get_FullName(), "System.Object"))
-								{
-									V_4 = node.get_BoxedExpression().get_ExpressionType().Resolve();
-									if (V_4 != null && V_4.get_IsValueType())
-									{
-										node.set_IsAutoBox(true);
-									}
-								}
-								else
-								{
-									node.set_IsAutoBox(true);
-								}
-							}
-						}
-						else
-						{
-							V_3 = V_1 as BinaryExpression;
-							if (V_3.get_IsAssignmentExpression() && V_3.get_Right().Equals(node))
-							{
-								node.set_IsAutoBox(true);
-							}
-							if (V_3.get_IsComparisonExpression() && node.get_BoxedAs().get_IsGenericParameter())
-							{
-								if (V_3.get_Left() == node && V_3.get_Right() as LiteralExpression != null && (V_3.get_Right() as LiteralExpression).get_Value() == null)
-								{
-									node.set_IsAutoBox(true);
-								}
-								if (V_3.get_Right() == node && V_3.get_Left() as LiteralExpression != null && (V_3.get_Left() as LiteralExpression).get_Value() == null)
-								{
-									node.set_IsAutoBox(true);
-								}
-							}
-						}
+						node.IsAutoBox = true;
 					}
 				}
-				else
+				else if (expression is YieldReturnExpression && (expression as YieldReturnExpression).Expression.Equals(node))
 				{
-					V_2 = this.parentExpressions.Pop() as MemberReferenceExpresion;
-					V_0.Push(V_2);
-					if (V_2.get_Member() as MethodReference != null)
-					{
-						node.set_IsAutoBox(true);
-					}
+					node.IsAutoBox = true;
 				}
 			}
-			while (V_0.get_Count() > 0)
+			while (expressions.Count > 0)
 			{
-				this.parentExpressions.Push(V_0.Pop());
+				this.parentExpressions.Push(expressions.Pop());
 			}
-			this.VisitBoxExpression(node);
-			return;
+			base.VisitBoxExpression(node);
 		}
 	}
 }

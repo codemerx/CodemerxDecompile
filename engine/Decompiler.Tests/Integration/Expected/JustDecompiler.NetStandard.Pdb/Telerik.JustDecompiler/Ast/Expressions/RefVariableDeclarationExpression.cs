@@ -11,34 +11,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 93;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.RefVariableDeclarationExpression;
 			}
 		}
 
-		public RefVariableDeclarationExpression(VariableDefinition variable, IEnumerable<Instruction> instructions)
+		public RefVariableDeclarationExpression(VariableDefinition variable, IEnumerable<Instruction> instructions) : base(variable, instructions)
 		{
-			base(variable, instructions);
-			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new RefVariableDeclarationExpression(this.get_Variable(), this.instructions);
+			return new RefVariableDeclarationExpression(base.Variable, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new RefVariableDeclarationExpression(this.get_Variable(), null);
+			return new RefVariableDeclarationExpression(base.Variable, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as RefVariableDeclarationExpression == null)
+			if (!(other is RefVariableDeclarationExpression))
 			{
 				return false;
 			}
-			V_0 = other as RefVariableDeclarationExpression;
-			return (object)this.get_Variable().Resolve() == (object)V_0.get_Variable().Resolve();
+			RefVariableDeclarationExpression refVariableDeclarationExpression = other as RefVariableDeclarationExpression;
+			return (object)base.Variable.Resolve() == (object)refVariableDeclarationExpression.Variable.Resolve();
 		}
 	}
 }

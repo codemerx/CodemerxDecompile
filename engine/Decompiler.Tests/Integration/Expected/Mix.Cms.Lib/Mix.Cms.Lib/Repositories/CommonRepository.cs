@@ -3,6 +3,8 @@ using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixCultures;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
+using Mix.Domain.Data.ViewModels;
 using System;
 using System.Collections.Generic;
 
@@ -20,21 +22,11 @@ namespace Mix.Cms.Lib.Repositories
 			{
 				if (CommonRepository.instance == null)
 				{
-					V_0 = CommonRepository.syncRoot;
-					V_1 = false;
-					try
+					lock (CommonRepository.syncRoot)
 					{
-						Monitor.Enter(V_0, ref V_1);
 						if (CommonRepository.instance == null)
 						{
 							CommonRepository.instance = new CommonRepository();
-						}
-					}
-					finally
-					{
-						if (V_1)
-						{
-							Monitor.Exit(V_0);
 						}
 					}
 				}
@@ -45,45 +37,33 @@ namespace Mix.Cms.Lib.Repositories
 		static CommonRepository()
 		{
 			CommonRepository.syncRoot = new object();
-			return;
 		}
 
 		private CommonRepository()
 		{
-			base();
-			return;
 		}
 
 		public List<SupportedCulture> LoadCultures(string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
-			V_1 = new List<SupportedCulture>();
-			if (V_0.get_IsSucceed())
+			RepositoryResponse<List<SystemCultureViewModel>> modelList = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
+			List<SupportedCulture> supportedCultures = new List<SupportedCulture>();
+			if (modelList.get_IsSucceed())
 			{
-				V_2 = V_0.get_Data().GetEnumerator();
-				try
+				foreach (SystemCultureViewModel datum in modelList.get_Data())
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = V_2.get_Current();
-						stackVariable16 = new SupportedCulture();
-						stackVariable16.set_Icon(V_3.get_Icon());
-						stackVariable16.set_Specificulture(V_3.get_Specificulture());
-						stackVariable16.set_Alias(V_3.get_Alias());
-						stackVariable16.set_FullName(V_3.get_FullName());
-						stackVariable16.set_Description(V_3.get_FullName());
-						stackVariable16.set_Id(V_3.get_Id());
-						stackVariable16.set_Lcid(V_3.get_Lcid());
-						stackVariable16.set_IsSupported(string.op_Equality(V_3.get_Specificulture(), initCulture));
-						V_1.Add(stackVariable16);
-					}
-				}
-				finally
-				{
-					((IDisposable)V_2).Dispose();
+					SupportedCulture supportedCulture = new SupportedCulture();
+					supportedCulture.set_Icon(datum.Icon);
+					supportedCulture.set_Specificulture(datum.Specificulture);
+					supportedCulture.set_Alias(datum.Alias);
+					supportedCulture.set_FullName(datum.FullName);
+					supportedCulture.set_Description(datum.FullName);
+					supportedCulture.set_Id(datum.Id);
+					supportedCulture.set_Lcid(datum.Lcid);
+					supportedCulture.set_IsSupported(datum.Specificulture == initCulture);
+					supportedCultures.Add(supportedCulture);
 				}
 			}
-			return V_1;
+			return supportedCultures;
 		}
 	}
 }

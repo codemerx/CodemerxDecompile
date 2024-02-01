@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
+using Mix.Common.Helper;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -23,7 +25,7 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 		{
 			get
 			{
-				return string.Concat("wwwroot/content/templates/", this.get_Name(), "/assets");
+				return string.Concat("wwwroot/content/templates/", this.Name, "/assets");
 			}
 		}
 
@@ -69,14 +71,11 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_Image()) || this.get_Image().IndexOf("http") != -1 || this.get_Image().get_Chars(0) == '/')
+				if (string.IsNullOrEmpty(this.Image) || this.Image.IndexOf("http") != -1 || this.Image[0] == '/')
 				{
-					return this.get_Image();
+					return this.Image;
 				}
-				stackVariable16 = new string[2];
-				stackVariable16[0] = this.get_Domain();
-				stackVariable16[1] = this.get_Image();
-				return CommonHelper.GetFullPath(stackVariable16);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Image });
 			}
 		}
 
@@ -134,7 +133,7 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 		{
 			get
 			{
-				return string.Concat("Views/Shared/Templates/", this.get_Name());
+				return string.Concat("Views/Shared/Templates/", this.Name);
 			}
 		}
 
@@ -150,18 +149,15 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 		{
 			get
 			{
-				if (this.get_Thumbnail() == null || this.get_Thumbnail().IndexOf("http") != -1 || this.get_Thumbnail().get_Chars(0) == '/')
+				if (this.Thumbnail == null || this.Thumbnail.IndexOf("http") != -1 || this.Thumbnail[0] == '/')
 				{
-					if (!string.IsNullOrEmpty(this.get_Thumbnail()))
+					if (!string.IsNullOrEmpty(this.Thumbnail))
 					{
-						return this.get_Thumbnail();
+						return this.Thumbnail;
 					}
-					return this.get_ImageUrl();
+					return this.ImageUrl;
 				}
-				stackVariable20 = new string[2];
-				stackVariable20[0] = this.get_Domain();
-				stackVariable20[1] = this.get_Thumbnail();
-				return CommonHelper.GetFullPath(stackVariable20);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Thumbnail });
 			}
 		}
 
@@ -176,20 +172,16 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 		{
 			get
 			{
-				return string.Concat("wwwroot/content/templates/", this.get_Name(), "/uploads");
+				return string.Concat("wwwroot/content/templates/", this.Name, "/uploads");
 			}
 		}
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(MixTheme model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixTheme model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 	}
 }

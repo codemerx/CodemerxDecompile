@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels.MixAttributeSetDatas;
 using Mix.Cms.Lib.ViewModels.MixAttributeSets;
 using Mix.Cms.Lib.ViewModels.MixModulePosts;
@@ -111,11 +112,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		}
 
 		[JsonProperty("listTag")]
-		public JArray ListTag
-		{
-			get;
-			set;
-		}
+		public JArray ListTag { get; set; } = new JArray();
 
 		[JsonProperty("mediaNavs")]
 		public List<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel> MediaNavs
@@ -230,11 +227,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		}
 
 		[JsonProperty("tags")]
-		public string Tags
-		{
-			get;
-			set;
-		}
+		public string Tags { get; set; } = "[]";
 
 		[JsonProperty("template")]
 		public string Template
@@ -281,102 +274,127 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		public ImportViewModel()
 		{
-			this.u003cTagsu003ek__BackingField = "[]";
-			this.u003cListTagu003ek__BackingField = new JArray();
-			base();
-			return;
 		}
 
-		public ImportViewModel(MixPost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ImportViewModel(MixPost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cTagsu003ek__BackingField = "[]";
-			this.u003cListTagu003ek__BackingField = new JArray();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveAttributeAsync(int parentId, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parentId = parentId;
-			V_0.context = context;
-			V_0.transaction = transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveAttributeAsyncu003ed__145>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			this.AttributeData.ParentId = parentId.ToString();
+			this.AttributeData.ParentType = MixEnums.MixAttributeSetDataType.Post;
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> repositoryResponse2 = await this.AttributeData.Data.SaveModelAsync(true, context, transaction);
+			ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>(repositoryResponse2, ref repositoryResponse1);
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				this.AttributeData.DataId = repositoryResponse2.get_Data().Id;
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel>(await this.AttributeData.SaveModelAsync(true, context, transaction), ref repositoryResponse1);
+			}
+			foreach (Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel sysCategory in this.SysCategories)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					continue;
+				}
+				sysCategory.ParentId = parentId.ToString();
+				sysCategory.ParentType = MixEnums.MixAttributeSetDataType.Post;
+				sysCategory.Specificulture = this.Specificulture;
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel>(await sysCategory.SaveModelAsync(false, context, transaction), ref repositoryResponse1);
+			}
+			foreach (Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel sysTag in this.SysTags)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					continue;
+				}
+				sysTag.ParentId = parentId.ToString();
+				sysTag.ParentType = MixEnums.MixAttributeSetDataType.Post;
+				sysTag.Specificulture = this.Specificulture;
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel>(await sysTag.SaveModelAsync(false, context, transaction), ref repositoryResponse1);
+			}
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveMediasAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveMediasAsyncu003ed__149>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveMediasAsyncu003ed__149 variable = new Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveMediasAsyncu003ed__149();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveMediasAsyncu003ed__149>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveParentModulesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentModulesAsyncu003ed__146>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentModulesAsyncu003ed__146 variable = new Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentModulesAsyncu003ed__146();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentModulesAsyncu003ed__146>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveParentPagesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentPagesAsyncu003ed__147>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentPagesAsyncu003ed__147 variable = new Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentPagesAsyncu003ed__147();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveParentPagesAsyncu003ed__147>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveRelatedPostAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveRelatedPostAsyncu003ed__148>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveRelatedPostAsyncu003ed__148 variable = new Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveRelatedPostAsyncu003ed__148();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveRelatedPostAsyncu003ed__148>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPost parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parent = parent;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveSubModelsAsyncu003ed__144>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveSubModelsAsyncu003ed__144 variable = new Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveSubModelsAsyncu003ed__144();
+			variable.u003cu003e4__this = this;
+			variable.parent = parent;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveSubModelsAsyncu003ed__144>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveUrlAliasAsync(int parentId, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parentId = parentId;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveUrlAliasAsyncu003ed__150>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveUrlAliasAsyncu003ed__150 variable = new Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveUrlAliasAsyncu003ed__150();
+			variable.u003cu003e4__this = this;
+			variable.parentId = parentId;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.ImportViewModel.u003cSaveUrlAliasAsyncu003ed__150>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

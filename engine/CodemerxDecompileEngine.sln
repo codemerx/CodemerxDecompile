@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Decompiler", "Decompiler", "{BA3E9C54-C13F-491A-BB0A-56BA256C0000}"
 EndProject
@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustDecompileCmd", "JustDec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.MSBuildProjectBuilder", "MSBuildProjectCreator\Tools.MSBuildProjectBuilder.csproj", "{F7BBB403-7142-4F8D-8E65-5ABA94502D3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleRunner", "ConsoleRunner\ConsoleRunner.csproj", "{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleRunner", "ConsoleRunner\ConsoleRunner.csproj", "{BBE3B8C5-69CF-4598-AAB2-8EEC3D2842FC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemInformationHelpers", "SystemInformationHelpers\SystemInformationHelpers.csproj", "{CED63F54-9464-4CC0-9F3F-D42014C85AC6}"
 EndProject
@@ -79,44 +79,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodemerxDecompile.Service",
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CodemerxDecompile.Shared", "CodemerxDecompile.Shared\CodemerxDecompile.Shared.shproj", "{F82C685F-D633-4E27-B9A3-578418D1BF85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleRunnerDotNet6", "ConsoleRunnerDotNet6\ConsoleRunnerDotNet6.csproj", "{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{14094c83-0bb3-4fc1-9c4d-2babd8702ec9}*SharedItemsImports = 5
-		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{14094c83-0bb3-4fc1-9c4d-2babd8702ec9}*SharedItemsImports = 5
-		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{246289a4-53fd-4bb3-923a-08b1d3d905aa}*SharedItemsImports = 4
-		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{25402fc2-9163-41a8-b9f4-0f8e4f44ab27}*SharedItemsImports = 13
-		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{345f3323-ad79-4c98-aed6-cc04554b788f}*SharedItemsImports = 13
-		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{3948e64b-987d-4391-9142-1abce4bb4b34}*SharedItemsImports = 13
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{4185cfad-af67-45a2-82da-ca718f9dd8bd}*SharedItemsImports = 5
-		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{4185cfad-af67-45a2-82da-ca718f9dd8bd}*SharedItemsImports = 5
-		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{4588ebf7-b0ac-4c58-9841-e8c8353f8e50}*SharedItemsImports = 13
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{4a6a17f7-845c-4120-8a13-d7fade67722d}*SharedItemsImports = 5
-		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{4a6a17f7-845c-4120-8a13-d7fade67722d}*SharedItemsImports = 5
-		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{4d460b44-5552-4fb6-ac35-725e4d1bd9f8}*SharedItemsImports = 13
-		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{4f6e327d-4d0a-485c-9eda-67c52d593aa2}*SharedItemsImports = 13
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{53602c83-eea3-467d-8938-b05bf90aff0f}*SharedItemsImports = 5
-		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{53602c83-eea3-467d-8938-b05bf90aff0f}*SharedItemsImports = 5
-		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{63e6915c-7ea4-4d76-ab28-0d7191eea626}*SharedItemsImports = 4
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{655dbed7-0875-49d6-b3c5-43cba8f73e79}*SharedItemsImports = 5
-		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{655dbed7-0875-49d6-b3c5-43cba8f73e79}*SharedItemsImports = 5
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{66b438a6-b3c6-49e9-b2f0-0a1ad1cd92c3}*SharedItemsImports = 5
-		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{66b438a6-b3c6-49e9-b2f0-0a1ad1cd92c3}*SharedItemsImports = 5
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{7459f141-1a80-46df-9b9d-fec5b27dbfc3}*SharedItemsImports = 5
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{75c8d888-eb42-401e-9cd4-6303fbe4194c}*SharedItemsImports = 5
-		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{75c8d888-eb42-401e-9cd4-6303fbe4194c}*SharedItemsImports = 5
-		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{8559dd7f-a16f-46d0-a05a-9139faeba8fd}*SharedItemsImports = 4
-		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{952f860a-d311-49c6-9b1d-7f1fe1c0d85c}*SharedItemsImports = 13
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{a4728fc0-f6c0-449e-b917-44a8a87f3d19}*SharedItemsImports = 5
-		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{af96d2a3-bbec-473f-ab8b-875b724d0919}*SharedItemsImports = 13
-		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{ced63f54-9464-4cc0-9f3f-d42014c85ac6}*SharedItemsImports = 4
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{d5409b23-4a84-4999-aa11-898f46f30954}*SharedItemsImports = 5
-		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{d5409b23-4a84-4999-aa11-898f46f30954}*SharedItemsImports = 5
-		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{d68133bd-1e63-496e-9ede-4fbdbf77b486}*SharedItemsImports = 4
-		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{e6b1469d-911c-4afc-a0f8-1ed00886910b}*SharedItemsImports = 4
-		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{ed1be103-1699-4116-a732-616beb142eb2}*SharedItemsImports = 4
-		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{f7bbb403-7142-4f8d-8e65-5aba94502d3d}*SharedItemsImports = 4
-		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{f82c685f-d633-4e27-b9a3-578418d1bf85}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		.NET 3.5 Debug|Any CPU = .NET 3.5 Debug|Any CPU
 		.NET 3.5 Debug|x86 = .NET 3.5 Debug|x86
@@ -2226,6 +2191,114 @@ Global
 		{7459F141-1A80-46DF-9B9D-FEC5B27DBFC3}.winphone_Release|Any CPU.Build.0 = Release|Any CPU
 		{7459F141-1A80-46DF-9B9D-FEC5B27DBFC3}.winphone_Release|x86.ActiveCfg = Release|Any CPU
 		{7459F141-1A80-46DF-9B9D-FEC5B27DBFC3}.winphone_Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Release Server EngineOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Release Server EngineOnly|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Release Server EngineOnly|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}..NET 3.5 Release Server EngineOnly|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug .NET 3.5|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug .NET 3.5|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug .NET 3.5|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug .NET 3.5|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug EngineOnly|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug EngineOnly|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug EngineOnly|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug EngineOnly|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug JustAssembly|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug JustAssembly|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug JustAssembly|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug JustAssembly|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.GenerateProject|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.GenerateProject|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.GenerateProject|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.GenerateProject|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_2_0_Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_ReleaseServer|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_ReleaseServer|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_ReleaseServer|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_3_5_ReleaseServer|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_0_Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.net_4_5_Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.NET3.5 Release Server EngineOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.NET3.5 Release Server EngineOnly|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.NET3.5 Release Server EngineOnly|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.NET3.5 Release Server EngineOnly|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release EngineOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release EngineOnly|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release EngineOnly|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release EngineOnly|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release JustAssembly|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release JustAssembly|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release JustAssembly|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release JustAssembly|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server EngineOnly|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server EngineOnly|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server EngineOnly|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server EngineOnly|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server JustAssembly|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server JustAssembly|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server JustAssembly|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release Server JustAssembly|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.RunSikuliTests|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.RunSikuliTests|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.RunSikuliTests|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.RunSikuliTests|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.silverlight_Release|x86.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Debug|x86.Build.0 = Debug|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Release|x86.ActiveCfg = Release|Any CPU
+		{F1C17476-BFA6-4150-9BC4-E6785B6A76D6}.winphone_Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2265,5 +2338,42 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C89FC548-875F-4A22-9AD6-683E562B396A}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{14094c83-0bb3-4fc1-9c4d-2babd8702ec9}*SharedItemsImports = 5
+		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{14094c83-0bb3-4fc1-9c4d-2babd8702ec9}*SharedItemsImports = 5
+		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{246289a4-53fd-4bb3-923a-08b1d3d905aa}*SharedItemsImports = 4
+		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{25402fc2-9163-41a8-b9f4-0f8e4f44ab27}*SharedItemsImports = 13
+		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{345f3323-ad79-4c98-aed6-cc04554b788f}*SharedItemsImports = 13
+		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{3948e64b-987d-4391-9142-1abce4bb4b34}*SharedItemsImports = 13
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{4185cfad-af67-45a2-82da-ca718f9dd8bd}*SharedItemsImports = 5
+		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{4185cfad-af67-45a2-82da-ca718f9dd8bd}*SharedItemsImports = 5
+		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{4588ebf7-b0ac-4c58-9841-e8c8353f8e50}*SharedItemsImports = 13
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{4a6a17f7-845c-4120-8a13-d7fade67722d}*SharedItemsImports = 5
+		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{4a6a17f7-845c-4120-8a13-d7fade67722d}*SharedItemsImports = 5
+		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{4d460b44-5552-4fb6-ac35-725e4d1bd9f8}*SharedItemsImports = 13
+		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{4f6e327d-4d0a-485c-9eda-67c52d593aa2}*SharedItemsImports = 13
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{53602c83-eea3-467d-8938-b05bf90aff0f}*SharedItemsImports = 5
+		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{53602c83-eea3-467d-8938-b05bf90aff0f}*SharedItemsImports = 5
+		Mono.Cecil.Pdb.Shared\Mono.Cecil.Pdb.Shared.projitems*{63e6915c-7ea4-4d76-ab28-0d7191eea626}*SharedItemsImports = 4
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{655dbed7-0875-49d6-b3c5-43cba8f73e79}*SharedItemsImports = 5
+		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{655dbed7-0875-49d6-b3c5-43cba8f73e79}*SharedItemsImports = 5
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{66b438a6-b3c6-49e9-b2f0-0a1ad1cd92c3}*SharedItemsImports = 5
+		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{66b438a6-b3c6-49e9-b2f0-0a1ad1cd92c3}*SharedItemsImports = 5
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{7459f141-1a80-46df-9b9d-fec5b27dbfc3}*SharedItemsImports = 5
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{75c8d888-eb42-401e-9cd4-6303fbe4194c}*SharedItemsImports = 5
+		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{75c8d888-eb42-401e-9cd4-6303fbe4194c}*SharedItemsImports = 5
+		Mono.Cecil.Mdb.Shared\Mono.Cecil.Mdb.Shared.projitems*{8559dd7f-a16f-46d0-a05a-9139faeba8fd}*SharedItemsImports = 4
+		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{952f860a-d311-49c6-9b1d-7f1fe1c0d85c}*SharedItemsImports = 13
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{a4728fc0-f6c0-449e-b917-44a8a87f3d19}*SharedItemsImports = 5
+		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{af96d2a3-bbec-473f-ab8b-875b724d0919}*SharedItemsImports = 13
+		SystemInformationHelpers.Shared\SystemInformationHelpers.Shared.projitems*{ced63f54-9464-4cc0-9f3f-d42014c85ac6}*SharedItemsImports = 4
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{d5409b23-4a84-4999-aa11-898f46f30954}*SharedItemsImports = 5
+		JustDecompile.EngineInfrastructure.Shared\JustDecompile.EngineInfrastructure.Shared.projitems*{d5409b23-4a84-4999-aa11-898f46f30954}*SharedItemsImports = 5
+		Mono.Cecil.Shared\Mono.Cecil.Shared.projitems*{d68133bd-1e63-496e-9ede-4fbdbf77b486}*SharedItemsImports = 4
+		JustDecompileCmd.Shared\JustDecompileCmd.Shared.projitems*{e6b1469d-911c-4afc-a0f8-1ed00886910b}*SharedItemsImports = 4
+		JustDecompiler.Shared\JustDecompiler.Shared.projitems*{ed1be103-1699-4116-a732-616beb142eb2}*SharedItemsImports = 4
+		Tools.MSBuildProjectBuilder.Shared\Tools.MSBuildProjectBuilder.Shared.projitems*{f7bbb403-7142-4f8d-8e65-5aba94502d3d}*SharedItemsImports = 4
+		CodemerxDecompile.Shared\CodemerxDecompile.Shared.projitems*{f82c685f-d633-4e27-b9a3-578418d1bf85}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

@@ -14,9 +14,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new CheckedExpression.u003cget_Childrenu003ed__11(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				CheckedExpression checkedExpression = null;
+				yield return checkedExpression.Expression;
 			}
 		}
 
@@ -24,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 89;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.CheckedExpression;
 			}
 		}
 
@@ -34,31 +33,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public CheckedExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions)
+		public CheckedExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			return;
+			this.Expression = expression;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new CheckedExpression(this.get_Expression().Clone(), this.instructions);
+			return new CheckedExpression(this.Expression.Clone(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new CheckedExpression(this.get_Expression().CloneExpressionOnly(), null);
+			return new CheckedExpression(this.Expression.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			V_0 = other as CheckedExpression;
-			if (V_0 == null)
+			CheckedExpression checkedExpression = other as CheckedExpression;
+			if (checkedExpression == null)
 			{
 				return false;
 			}
-			return this.get_Expression().Equals(V_0.get_Expression());
+			return this.Expression.Equals(checkedExpression.Expression);
 		}
 	}
 }

@@ -218,15 +218,13 @@ namespace Mix.Cms.Lib.Models.Account
 
 		public AspNetUsers()
 		{
-			base();
-			this.set_AspNetUserClaimsApplicationUser(new HashSet<AspNetUserClaims>());
-			this.set_AspNetUserClaimsUser(new HashSet<AspNetUserClaims>());
-			this.set_AspNetUserLoginsApplicationUser(new HashSet<AspNetUserLogins>());
-			this.set_AspNetUserLoginsUser(new HashSet<AspNetUserLogins>());
-			this.set_AspNetUserRolesApplicationUser(new HashSet<AspNetUserRoles>());
-			this.set_AspNetUserRolesUser(new HashSet<AspNetUserRoles>());
-			this.set_AspNetUserTokens(new HashSet<Mix.Cms.Lib.Models.Account.AspNetUserTokens>());
-			return;
+			this.AspNetUserClaimsApplicationUser = new HashSet<AspNetUserClaims>();
+			this.AspNetUserClaimsUser = new HashSet<AspNetUserClaims>();
+			this.AspNetUserLoginsApplicationUser = new HashSet<AspNetUserLogins>();
+			this.AspNetUserLoginsUser = new HashSet<AspNetUserLogins>();
+			this.AspNetUserRolesApplicationUser = new HashSet<AspNetUserRoles>();
+			this.AspNetUserRolesUser = new HashSet<AspNetUserRoles>();
+			this.AspNetUserTokens = new HashSet<Mix.Cms.Lib.Models.Account.AspNetUserTokens>();
 		}
 	}
 }

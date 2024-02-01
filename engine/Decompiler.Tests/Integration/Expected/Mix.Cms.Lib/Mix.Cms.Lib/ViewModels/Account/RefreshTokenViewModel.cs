@@ -46,14 +46,10 @@ namespace Mix.Cms.Lib.ViewModels.Account
 
 		public RefreshTokenViewModel()
 		{
-			base();
-			return;
 		}
 
-		public RefreshTokenViewModel(RefreshTokens model, MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null)
+		public RefreshTokenViewModel(RefreshTokens model, MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 	}
 }

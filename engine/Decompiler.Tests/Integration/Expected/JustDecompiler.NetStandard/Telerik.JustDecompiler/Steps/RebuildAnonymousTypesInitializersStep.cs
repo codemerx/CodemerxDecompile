@@ -1,6 +1,9 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
@@ -16,106 +19,97 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildAnonymousTypesInitializersStep(BaseCodeTransformer transformer, TypeSystem typeSystem)
 		{
-			base();
 			this.transformer = transformer;
 			this.typeSystem = typeSystem;
-			return;
 		}
 
 		private PropertyDefinition FindPropertyOfType(TypeDefinition typeDefinition, TypeReference parameterType)
 		{
-			V_0 = typeDefinition.get_Properties().GetEnumerator();
+			PropertyDefinition propertyDefinition;
+			Mono.Collections.Generic.Collection<PropertyDefinition>.Enumerator enumerator = typeDefinition.get_Properties().GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if ((object)V_1.get_PropertyType() != (object)parameterType)
+					PropertyDefinition current = enumerator.get_Current();
+					if ((object)current.get_PropertyType() != (object)parameterType)
 					{
 						continue;
 					}
-					V_2 = V_1;
-					goto Label1;
+					propertyDefinition = current;
+					return propertyDefinition;
 				}
-				goto Label0;
+				return null;
 			}
 			finally
 			{
-				V_0.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return null;
+			return propertyDefinition;
 		}
 
 		private int GetParameterIndexWithType(MethodDefinition methodDef, TypeReference typeReference)
 		{
-			V_0 = 0;
-			V_1 = methodDef.get_Parameters().GetEnumerator();
+			int num;
+			int num1 = 0;
+			Mono.Collections.Generic.Collection<ParameterDefinition>.Enumerator enumerator = methodDef.get_Parameters().GetEnumerator();
 			try
 			{
-				while (V_1.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					if ((object)V_1.get_Current().get_ParameterType() != (object)typeReference)
+					if ((object)enumerator.get_Current().get_ParameterType() != (object)typeReference)
 					{
-						V_0 = V_0 + 1;
+						num1++;
 					}
 					else
 					{
-						V_2 = V_0;
-						goto Label1;
+						num = num1;
+						return num;
 					}
 				}
-				goto Label0;
+				return -1;
 			}
 			finally
 			{
-				V_1.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return -1;
+			return num;
 		}
 
 		private void ProcessAnonymousType(TypeDefinition anonymousTypeDefinition, GenericInstanceType anonymousInstanceType, MethodDefinition constructorDefinition, ExpressionCollection constructorArguments)
 		{
-			V_0 = 0;
-			while (V_0 < constructorDefinition.get_Parameters().get_Count())
+			for (int i = 0; i < constructorDefinition.get_Parameters().get_Count(); i++)
 			{
-				V_1 = constructorDefinition.get_Parameters().get_Item(V_0);
-				V_2 = anonymousTypeDefinition.get_GenericParameters().IndexOf(V_1.get_ParameterType() as GenericParameter);
-				stackVariable19 = this.FindPropertyOfType(anonymousTypeDefinition, V_1.get_ParameterType());
-				V_3 = anonymousInstanceType.get_GenericArguments().get_Item(V_2);
-				if (anonymousInstanceType.get_PostionToArgument().ContainsKey(V_2))
+				ParameterDefinition item = constructorDefinition.get_Parameters().get_Item(i);
+				int num = anonymousTypeDefinition.get_GenericParameters().IndexOf(item.get_ParameterType() as GenericParameter);
+				PropertyDefinition propertyDefinition = this.FindPropertyOfType(anonymousTypeDefinition, item.get_ParameterType());
+				TypeReference typeReference = anonymousInstanceType.get_GenericArguments().get_Item(num);
+				if (anonymousInstanceType.get_PostionToArgument().ContainsKey(num))
 				{
-					V_3 = anonymousInstanceType.get_PostionToArgument().get_Item(V_2);
+					typeReference = anonymousInstanceType.get_PostionToArgument()[num];
 				}
-				V_4 = new AnonymousPropertyInitializerExpression(stackVariable19, V_3);
-				V_5 = this.GetParameterIndexWithType(constructorDefinition, V_1.get_ParameterType());
-				V_6 = this.transformer.Visit(constructorArguments.get_Item(V_5).Clone()) as Expression;
-				this.initializerExpressions.get_Expressions().Add(new BinaryExpression(26, V_4, V_6, this.typeSystem, null, false));
-				V_0 = V_0 + 1;
+				Expression anonymousPropertyInitializerExpression = new AnonymousPropertyInitializerExpression(propertyDefinition, typeReference);
+				int parameterIndexWithType = this.GetParameterIndexWithType(constructorDefinition, item.get_ParameterType());
+				Expression expression = this.transformer.Visit(constructorArguments[parameterIndexWithType].Clone()) as Expression;
+				this.initializerExpressions.Expressions.Add(new BinaryExpression(BinaryOperator.Assign, anonymousPropertyInitializerExpression, expression, this.typeSystem, null, false));
 			}
-			return;
 		}
 
 		public ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			if (node.get_Type() == null || node.get_Constructor() == null || !node.get_Type().get_IsGenericInstance())
+			if (node.Type == null || node.Constructor == null || !node.Type.get_IsGenericInstance())
 			{
 				return null;
 			}
-			V_0 = node.get_Type().Resolve();
-			if (!V_0.IsAnonymous())
+			TypeDefinition typeDefinition = node.Type.Resolve();
+			if (!typeDefinition.IsAnonymous())
 			{
 				return null;
 			}
 			this.initializerExpressions = new BlockExpression(null);
-			this.ProcessAnonymousType(V_0, node.get_Type() as GenericInstanceType, node.get_Constructor().Resolve(), node.get_Arguments());
-			V_1 = new InitializerExpression(this.initializerExpressions, 3);
-			return new AnonymousObjectCreationExpression(node.get_Constructor(), V_0, V_1, node.get_MappedInstructions());
+			this.ProcessAnonymousType(typeDefinition, node.Type as GenericInstanceType, node.Constructor.Resolve(), node.Arguments);
+			InitializerExpression initializerExpression = new InitializerExpression(this.initializerExpressions, InitializerType.AnonymousInitializer);
+			return new AnonymousObjectCreationExpression(node.Constructor, typeDefinition, initializerExpression, node.MappedInstructions);
 		}
 	}
 }

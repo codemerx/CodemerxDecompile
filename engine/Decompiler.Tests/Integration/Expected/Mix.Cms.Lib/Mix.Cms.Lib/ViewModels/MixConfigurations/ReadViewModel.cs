@@ -114,14 +114,10 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 	}
 }

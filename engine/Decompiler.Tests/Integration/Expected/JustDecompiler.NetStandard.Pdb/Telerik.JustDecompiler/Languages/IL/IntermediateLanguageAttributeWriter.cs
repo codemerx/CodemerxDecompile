@@ -1,7 +1,9 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Languages;
 
@@ -11,10 +13,8 @@ namespace Telerik.JustDecompiler.Languages.IL
 	{
 		private const string SyntaxProblemsDueToNotResolvedType = "Enum keyword might be missing. Please, locate the assembly where the type is defined.";
 
-		public IntermediateLanguageAttributeWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
+		public IntermediateLanguageAttributeWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings) : base(language, formatter, exceptionFormatter, settings)
 		{
-			base(language, formatter, exceptionFormatter, settings);
-			return;
 		}
 
 		private int CompareSecurityDeclaration(SecurityDeclaration first, SecurityDeclaration second)
@@ -23,71 +23,70 @@ namespace Telerik.JustDecompiler.Languages.IL
 			{
 				return 0;
 			}
-			stackVariable5 = this.GetActionKeyword(first.get_Action());
-			return stackVariable5.CompareTo(this.GetActionKeyword(second.get_Action()));
+			return this.GetActionKeyword(first.get_Action()).CompareTo(this.GetActionKeyword(second.get_Action()));
 		}
 
 		private string GetActionKeyword(SecurityAction action)
 		{
-			switch (action - 1)
+			switch (action)
 			{
-				case 0:
+				case 1:
 				{
 					return "request";
 				}
-				case 1:
+				case 2:
 				{
 					return "demand";
 				}
-				case 2:
+				case 3:
 				{
 					return "assert";
 				}
-				case 3:
+				case 4:
 				{
 					return "deny";
 				}
-				case 4:
+				case 5:
 				{
 					return "permitonly";
 				}
-				case 5:
+				case 6:
 				{
 					return "linkcheck";
 				}
-				case 6:
+				case 7:
 				{
 					return "inheritcheck";
 				}
-				case 7:
+				case 8:
 				{
 					return "reqmin";
 				}
-				case 8:
+				case 9:
 				{
 					return "reqopt";
 				}
-				case 9:
+				case 10:
 				{
 					return "reqrefuse";
 				}
-				case 10:
+				case 11:
 				{
 					return "prejitgrant";
 				}
-				case 11:
+				case 12:
 				{
 					return "prejitdeny";
 				}
-				case 12:
+				case 13:
 				{
 					return "noncasdemand";
 				}
-				case 13:
+				case 14:
 				{
 					return "noncaslinkdemand";
 				}
-				case 14:
+				case 15:
 				{
 					return "noncasinheritance";
 				}
@@ -97,51 +96,34 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		private TypeReference GetEnumerationUnderlayingType(TypeDefinition argumetType)
 		{
-			stackVariable1 = argumetType.get_Fields();
-			stackVariable2 = IntermediateLanguageAttributeWriter.u003cu003ec.u003cu003e9__20_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<FieldDefinition, bool>(IntermediateLanguageAttributeWriter.u003cu003ec.u003cu003e9.u003cGetEnumerationUnderlayingTypeu003eb__20_0);
-				IntermediateLanguageAttributeWriter.u003cu003ec.u003cu003e9__20_0 = stackVariable2;
-			}
-			return stackVariable1.First<FieldDefinition>(stackVariable2).get_FieldType();
+			return argumetType.get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_Name() == "value__").get_FieldType();
 		}
 
 		private void WriteArrayValues(CustomAttributeArgument[] array)
 		{
-			V_0 = 0;
-			while (V_0 < (int)array.Length)
+			for (int i = 0; i < (int)array.Length; i++)
 			{
-				if (array[V_0].get_Value() as Boolean == false)
+				if (array[i].get_Value() is Boolean)
 				{
-					if (array[V_0].get_Value() as String == null)
-					{
-						if (array[V_0].get_Value() as CustomAttributeArgument[] == null)
-						{
-							this.WriteLiteral(array[V_0].get_Value().ToString());
-						}
-						else
-						{
-							this.WriteArrayValues(array[V_0].get_Value() as CustomAttributeArgument[]);
-						}
-					}
-					else
-					{
-						this.WriteStringLiteral((String)array[V_0].get_Value());
-					}
+					this.WriteBooleanLiteral((Boolean)array[i].get_Value());
+				}
+				else if (array[i].get_Value() is String)
+				{
+					this.WriteStringLiteral((String)array[i].get_Value());
+				}
+				else if (!(array[i].get_Value() is CustomAttributeArgument[]))
+				{
+					this.WriteLiteral(array[i].get_Value().ToString());
 				}
 				else
 				{
-					this.WriteBooleanLiteral((Boolean)array[V_0].get_Value());
+					this.WriteArrayValues(array[i].get_Value() as CustomAttributeArgument[]);
 				}
-				if (V_0 < (int)array.Length - 1)
+				if (i < (int)array.Length - 1)
 				{
 					this.WriteSpace();
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		public void WriteAssemblyAttributes(AssemblyDefinition assembly, ICollection<string> attributesToIgnore = null)
@@ -151,7 +133,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteSecurityAttributes(assembly);
 			this.WriteCustomAttributes(assembly);
 			this.WriteAssemblyDeclarationClosing();
-			return;
 		}
 
 		private void WriteAssemblyDeclarationClosing()
@@ -159,7 +140,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.Outdent();
 			this.WriteLine();
 			this.WriteEndBreckets();
-			return;
 		}
 
 		private void WriteAssemblyDeclarationOpening(AssemblyDefinition assembly)
@@ -177,7 +157,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteOpenBreckets();
 			this.WriteLine();
 			this.Indent();
-			return;
 		}
 
 		private void WriteAssemblyLocale(AssemblyDefinition assembly)
@@ -188,7 +167,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteLiteral("\"");
 			this.WriteLiteral(assembly.get_Name().get_Culture());
 			this.WriteLiteral("\"");
-			return;
 		}
 
 		private void WriteAssemblyPublicKey(AssemblyDefinition assembly)
@@ -203,7 +181,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteLine();
 			this.Outdent();
 			this.Write(")");
-			return;
 		}
 
 		private void WriteAssemblyVersion(AssemblyDefinition assembly)
@@ -211,18 +188,17 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteDot();
 			this.WriteKeyword("ver");
 			this.WriteSpace();
-			V_0 = assembly.get_Name().get_Version().get_Major();
-			this.WriteLiteral(V_0.ToString());
+			int major = assembly.get_Name().get_Version().Major;
+			this.WriteLiteral(major.ToString());
 			this.Write(":");
-			V_0 = assembly.get_Name().get_Version().get_Minor();
-			this.WriteLiteral(V_0.ToString());
+			major = assembly.get_Name().get_Version().Minor;
+			this.WriteLiteral(major.ToString());
 			this.Write(":");
-			V_0 = assembly.get_Name().get_Version().get_Build();
-			this.WriteLiteral(V_0.ToString());
+			major = assembly.get_Name().get_Version().Build;
+			this.WriteLiteral(major.ToString());
 			this.Write(":");
-			V_0 = assembly.get_Name().get_Version().get_Revision();
-			this.WriteLiteral(V_0.ToString());
-			return;
+			major = assembly.get_Name().get_Version().Revision;
+			this.WriteLiteral(major.ToString());
 		}
 
 		private void WriteBooleanLiteral(bool value)
@@ -233,23 +209,19 @@ namespace Telerik.JustDecompiler.Languages.IL
 				return;
 			}
 			this.WriteLiteral("false");
-			return;
 		}
 
 		private void WriteByteArray(byte[] blob)
 		{
-			V_0 = 0;
-			while (V_0 < (int)blob.Length)
+			for (int i = 0; i < (int)blob.Length; i++)
 			{
-				this.WriteLiteral(blob[V_0].ToString("X2"));
+				this.WriteLiteral(blob[i].ToString("X2"));
 				this.WriteSpace();
-				if (V_0 + 1 % 16 == 0 && V_0 + 1 < (int)blob.Length)
+				if ((i + 1) % 16 == 0 && i + 1 < (int)blob.Length)
 				{
 					this.WriteLine();
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		private void WriteCustomAttribute(CustomAttribute custom)
@@ -258,17 +230,17 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteDot();
 			this.WriteKeyword("custom");
 			this.WriteSpace();
-			this.WriteMethodReference(custom.get_Constructor(), true);
+			base.WriteMethodReference(custom.get_Constructor(), true);
 			this.WriteSpace();
 			this.Write("=");
 			this.WriteLine();
 			if (!custom.get_HasConstructorArguments() && !custom.get_HasProperties() && !custom.get_HasFields())
 			{
-				V_0 = custom.GetBlob();
+				byte[] blob = custom.GetBlob();
 				this.Write("(");
 				this.WriteLine();
 				this.Indent();
-				this.WriteByteArray(V_0);
+				this.WriteByteArray(blob);
 				this.WriteLine();
 				this.Outdent();
 				this.Write(")");
@@ -292,282 +264,191 @@ namespace Telerik.JustDecompiler.Languages.IL
 			}
 			this.Outdent();
 			this.WriteEndBreckets();
-			return;
 		}
 
 		private void WriteCustomAttributeConstructorArguments(Collection<CustomAttributeArgument> constructorArguments)
 		{
-			V_0 = constructorArguments.GetEnumerator();
-			try
+			IntermediateLanguageWriter.ILNameSyntax lNameSyntax;
+			foreach (CustomAttributeArgument constructorArgument in constructorArguments)
 			{
-				while (V_0.MoveNext())
+				TypeReference type = constructorArgument.get_Type();
+				if (!type.get_IsArray())
 				{
-					V_1 = V_0.get_Current();
-					V_2 = V_1.get_Type();
-					if (!V_2.get_IsArray())
+					IntermediateLanguageWriter.ILNameSyntax lNameSyntax1 = IntermediateLanguageWriter.ILNameSyntax.TypeName;
+					if (type.get_IsPrimitive() || type.get_FullName() == "System.String")
 					{
-						V_5 = 2;
-						if (V_2.get_IsPrimitive() || String.op_Equality(V_2.get_FullName(), "System.String"))
-						{
-							V_5 = 3;
-						}
-						V_6 = V_2.Resolve();
-						if (V_6 == null)
-						{
-							this.WriteNotResolvedReference(V_2.get_FullName(), V_2, "Enum keyword might be missing. Please, locate the assembly where the type is defined.");
-						}
-						else
-						{
-							if (V_6.get_IsEnum())
-							{
-								V_2 = this.GetEnumerationUnderlayingType(V_6);
-								V_5 = 3;
-							}
-							this.WriteType(V_2, V_5);
-						}
+						lNameSyntax1 = IntermediateLanguageWriter.ILNameSyntax.ShortTypeName;
+					}
+					TypeDefinition typeDefinition = type.Resolve();
+					if (typeDefinition == null)
+					{
+						this.WriteNotResolvedReference(type.get_FullName(), type, "Enum keyword might be missing. Please, locate the assembly where the type is defined.");
 					}
 					else
 					{
-						if ((V_2 as ArrayType).get_ElementType().get_IsPrimitive() || String.op_Equality(V_2.get_FullName(), "System.String"))
+						if (typeDefinition.get_IsEnum())
 						{
-							V_3 = 3;
+							type = this.GetEnumerationUnderlayingType(typeDefinition);
+							lNameSyntax1 = IntermediateLanguageWriter.ILNameSyntax.ShortTypeName;
 						}
-						else
-						{
-							V_3 = 2;
-						}
-						this.WriteType((V_2 as ArrayType).get_ElementType(), V_3);
-						this.Write("[");
-						V_4 = (V_1.get_Value() as Array).get_Length();
-						this.WriteLiteral(V_4.ToString());
-						this.Write("]");
+						base.WriteType(type, lNameSyntax1);
 					}
-					this.Write("(");
-					this.WriteSpace();
-					if (V_1.get_Value() as Boolean == false)
-					{
-						if (V_1.get_Value() as String == null)
-						{
-							if (V_1.get_Value() as CustomAttributeArgument[] == null)
-							{
-								this.WriteLiteral(V_1.get_Value().ToString());
-							}
-							else
-							{
-								this.WriteArrayValues(V_1.get_Value() as CustomAttributeArgument[]);
-							}
-						}
-						else
-						{
-							this.WriteStringLiteral((String)V_1.get_Value());
-						}
-					}
-					else
-					{
-						this.WriteBooleanLiteral((Boolean)V_1.get_Value());
-					}
-					this.WriteSpace();
-					this.Write(")");
-					this.WriteLine();
 				}
+				else
+				{
+					lNameSyntax = ((type as ArrayType).get_ElementType().get_IsPrimitive() || type.get_FullName() == "System.String" ? IntermediateLanguageWriter.ILNameSyntax.ShortTypeName : IntermediateLanguageWriter.ILNameSyntax.TypeName);
+					base.WriteType((type as ArrayType).get_ElementType(), lNameSyntax);
+					this.Write("[");
+					int length = (constructorArgument.get_Value() as Array).Length;
+					this.WriteLiteral(length.ToString());
+					this.Write("]");
+				}
+				this.Write("(");
+				this.WriteSpace();
+				if (constructorArgument.get_Value() is Boolean)
+				{
+					this.WriteBooleanLiteral((Boolean)constructorArgument.get_Value());
+				}
+				else if (constructorArgument.get_Value() is String)
+				{
+					this.WriteStringLiteral((String)constructorArgument.get_Value());
+				}
+				else if (!(constructorArgument.get_Value() is CustomAttributeArgument[]))
+				{
+					this.WriteLiteral(constructorArgument.get_Value().ToString());
+				}
+				else
+				{
+					this.WriteArrayValues(constructorArgument.get_Value() as CustomAttributeArgument[]);
+				}
+				this.WriteSpace();
+				this.Write(")");
+				this.WriteLine();
 			}
-			finally
-			{
-				V_0.Dispose();
-			}
-			return;
 		}
 
 		private void WriteCustomAttributeFields(CustomAttribute attribute)
 		{
-			V_0 = attribute.get_Fields().GetEnumerator();
-			try
+			IntermediateLanguageWriter.ILNameSyntax lNameSyntax;
+			foreach (CustomAttributeNamedArgument field in attribute.get_Fields())
 			{
-				while (V_0.MoveNext())
+				this.WriteKeyword("field");
+				this.WriteSpace();
+				CustomAttributeArgument argument = field.get_Argument();
+				TypeDefinition typeDefinition = argument.get_Type().Resolve();
+				lNameSyntax = (field.get_Argument().get_Type().get_IsPrimitive() || field.get_Argument().get_Type().get_FullName() == "System.String" ? IntermediateLanguageWriter.ILNameSyntax.ShortTypeName : IntermediateLanguageWriter.ILNameSyntax.TypeName);
+				argument = field.get_Argument();
+				TypeReference type = argument.get_Type();
+				if (typeDefinition == null)
 				{
-					V_1 = new IntermediateLanguageAttributeWriter.u003cu003ec__DisplayClass19_0();
-					V_1.field = V_0.get_Current();
-					this.WriteKeyword("field");
-					this.WriteSpace();
-					V_7 = V_1.field.get_Argument();
-					V_2 = V_7.get_Type().Resolve();
-					if (V_1.field.get_Argument().get_Type().get_IsPrimitive() || String.op_Equality(V_1.field.get_Argument().get_Type().get_FullName(), "System.String"))
-					{
-						V_3 = 3;
-					}
-					else
-					{
-						V_3 = 2;
-					}
-					V_7 = V_1.field.get_Argument();
-					V_4 = V_7.get_Type();
-					if (V_2 == null)
-					{
-						V_7 = V_1.field.get_Argument();
-						stackVariable39 = V_7.get_Type().GetFriendlyFullName(this.get_Language());
-						V_7 = V_1.field.get_Argument();
-						this.WriteNotResolvedReference(stackVariable39, V_7.get_Type(), "Enum keyword might be missing. Please, locate the assembly where the type is defined.");
-					}
-					else
-					{
-						if (!V_2.get_IsEnum())
-						{
-							V_7 = V_1.field.get_Argument();
-							this.WriteType(V_7.get_Type(), V_3);
-						}
-						else
-						{
-							V_4 = this.GetEnumerationUnderlayingType(V_2);
-							this.WriteKeyword("enum");
-							this.WriteSpace();
-							V_7 = V_1.field.get_Argument();
-							this.WriteType(V_7.get_Type(), V_3);
-							V_3 = 3;
-						}
-					}
-					this.WriteSpace();
-					V_5 = null;
-					V_6 = attribute.get_AttributeType().Resolve();
-					if (V_6 != null)
-					{
-						V_5 = V_6.get_Fields().First<FieldDefinition>(new Func<FieldDefinition, bool>(V_1.u003cWriteCustomAttributeFieldsu003eb__0));
-					}
-					this.WriteReference(V_1.field.get_Name(), V_5);
-					this.WriteSpace();
-					this.Write("=");
-					this.WriteSpace();
-					this.WriteType(V_4, V_3);
-					this.Write("(");
-					V_7 = V_1.field.get_Argument();
-					this.Write(V_7.get_Value().ToString());
-					this.Write(")");
-					this.WriteLine();
+					argument = field.get_Argument();
+					string friendlyFullName = argument.get_Type().GetFriendlyFullName(base.Language);
+					argument = field.get_Argument();
+					this.WriteNotResolvedReference(friendlyFullName, argument.get_Type(), "Enum keyword might be missing. Please, locate the assembly where the type is defined.");
 				}
+				else if (!typeDefinition.get_IsEnum())
+				{
+					argument = field.get_Argument();
+					base.WriteType(argument.get_Type(), lNameSyntax);
+				}
+				else
+				{
+					type = this.GetEnumerationUnderlayingType(typeDefinition);
+					this.WriteKeyword("enum");
+					this.WriteSpace();
+					argument = field.get_Argument();
+					base.WriteType(argument.get_Type(), lNameSyntax);
+					lNameSyntax = IntermediateLanguageWriter.ILNameSyntax.ShortTypeName;
+				}
+				this.WriteSpace();
+				FieldDefinition fieldDefinition = null;
+				TypeDefinition typeDefinition1 = attribute.get_AttributeType().Resolve();
+				if (typeDefinition1 != null)
+				{
+					fieldDefinition = typeDefinition1.get_Fields().First<FieldDefinition>((FieldDefinition x) => x.get_Name() == field.get_Name());
+				}
+				this.WriteReference(field.get_Name(), fieldDefinition);
+				this.WriteSpace();
+				this.Write("=");
+				this.WriteSpace();
+				base.WriteType(type, lNameSyntax);
+				this.Write("(");
+				argument = field.get_Argument();
+				this.Write(argument.get_Value().ToString());
+				this.Write(")");
+				this.WriteLine();
 			}
-			finally
-			{
-				V_0.Dispose();
-			}
-			return;
 		}
 
 		private void WriteCustomAttributeProperties(CustomAttribute attribute)
 		{
-			V_0 = attribute.get_Properties().GetEnumerator();
-			try
+			IntermediateLanguageWriter.ILNameSyntax lNameSyntax;
+			foreach (CustomAttributeNamedArgument property in attribute.get_Properties())
 			{
-				while (V_0.MoveNext())
+				this.WriteKeyword("property");
+				this.WriteSpace();
+				lNameSyntax = (property.get_Argument().get_Type().get_IsPrimitive() || property.get_Argument().get_Type().get_FullName() == "System.String" ? IntermediateLanguageWriter.ILNameSyntax.ShortTypeName : IntermediateLanguageWriter.ILNameSyntax.TypeName);
+				CustomAttributeArgument argument = property.get_Argument();
+				base.WriteType(argument.get_Type(), lNameSyntax);
+				this.WriteSpace();
+				TypeDefinition typeDefinition = attribute.get_AttributeType().Resolve();
+				PropertyDefinition propertyDefinition = null;
+				if (typeDefinition != null)
 				{
-					V_1 = new IntermediateLanguageAttributeWriter.u003cu003ec__DisplayClass21_0();
-					V_1.property = V_0.get_Current();
-					this.WriteKeyword("property");
-					this.WriteSpace();
-					if (V_1.property.get_Argument().get_Type().get_IsPrimitive() || String.op_Equality(V_1.property.get_Argument().get_Type().get_FullName(), "System.String"))
-					{
-						V_2 = 3;
-					}
-					else
-					{
-						V_2 = 2;
-					}
-					V_5 = V_1.property.get_Argument();
-					this.WriteType(V_5.get_Type(), V_2);
-					this.WriteSpace();
-					V_3 = attribute.get_AttributeType().Resolve();
-					V_4 = null;
-					if (V_3 != null)
-					{
-						V_4 = V_3.get_Properties().First<PropertyDefinition>(new Func<PropertyDefinition, bool>(V_1.u003cWriteCustomAttributePropertiesu003eb__0));
-					}
-					this.WriteReference(V_1.property.get_Name(), V_4);
-					this.WriteSpace();
-					this.Write("=");
-					this.WriteSpace();
-					V_5 = V_1.property.get_Argument();
-					this.WriteType(V_5.get_Type(), V_2);
-					this.Write("(");
-					if (V_1.property.get_Argument().get_Value() as Boolean == false)
-					{
-						if (V_1.property.get_Argument().get_Value() as String == null)
-						{
-							V_5 = V_1.property.get_Argument();
-							this.WriteLiteral(V_5.get_Value().ToString());
-						}
-						else
-						{
-							V_5 = V_1.property.get_Argument();
-							this.WriteStringLiteral((String)V_5.get_Value());
-						}
-					}
-					else
-					{
-						V_5 = V_1.property.get_Argument();
-						this.WriteBooleanLiteral((Boolean)V_5.get_Value());
-					}
-					this.Write(")");
-					this.WriteLine();
+					propertyDefinition = typeDefinition.get_Properties().First<PropertyDefinition>((PropertyDefinition x) => x.get_Name() == property.get_Name());
 				}
+				this.WriteReference(property.get_Name(), propertyDefinition);
+				this.WriteSpace();
+				this.Write("=");
+				this.WriteSpace();
+				argument = property.get_Argument();
+				base.WriteType(argument.get_Type(), lNameSyntax);
+				this.Write("(");
+				if (property.get_Argument().get_Value() is Boolean)
+				{
+					argument = property.get_Argument();
+					this.WriteBooleanLiteral((Boolean)argument.get_Value());
+				}
+				else if (!(property.get_Argument().get_Value() is String))
+				{
+					argument = property.get_Argument();
+					this.WriteLiteral(argument.get_Value().ToString());
+				}
+				else
+				{
+					argument = property.get_Argument();
+					this.WriteStringLiteral((String)argument.get_Value());
+				}
+				this.Write(")");
+				this.WriteLine();
 			}
-			finally
-			{
-				V_0.Dispose();
-			}
-			return;
 		}
 
 		private void WriteCustomAttributes(AssemblyDefinition assembly)
 		{
-			V_0 = new List<CustomAttribute>(assembly.get_CustomAttributes());
-			V_1 = V_0.GetEnumerator();
-			try
+			List<CustomAttribute> customAttributes = new List<CustomAttribute>(assembly.get_CustomAttributes());
+			foreach (CustomAttribute customAttribute in customAttributes)
 			{
-				while (V_1.MoveNext())
-				{
-					V_1.get_Current().Resolve();
-				}
+				customAttribute.Resolve();
 			}
-			finally
+			customAttributes.Sort((CustomAttribute x, CustomAttribute y) => x.CompareToCustomAttribute(y, true));
+			foreach (CustomAttribute customAttribute1 in customAttributes)
 			{
-				((IDisposable)V_1).Dispose();
+				this.WriteLine();
+				this.WriteCustomAttribute(customAttribute1);
+				this.WriteLine();
 			}
-			stackVariable9 = V_0;
-			stackVariable10 = IntermediateLanguageAttributeWriter.u003cu003ec.u003cu003e9__17_0;
-			if (stackVariable10 == null)
-			{
-				dummyVar0 = stackVariable10;
-				stackVariable10 = new Comparison<CustomAttribute>(IntermediateLanguageAttributeWriter.u003cu003ec.u003cu003e9.u003cWriteCustomAttributesu003eb__17_0);
-				IntermediateLanguageAttributeWriter.u003cu003ec.u003cu003e9__17_0 = stackVariable10;
-			}
-			stackVariable9.Sort(stackVariable10);
-			V_1 = V_0.GetEnumerator();
-			try
-			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					this.WriteLine();
-					this.WriteCustomAttribute(V_2);
-					this.WriteLine();
-				}
-			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return;
 		}
 
 		private void WriteDot()
 		{
 			this.Write(".");
-			return;
 		}
 
 		private void WriteEndBreckets()
 		{
 			this.Write("}");
 			this.formatter.WriteEndBlock();
-			return;
 		}
 
 		private void WriteHashAlgorithm(AssemblyDefinition assembly)
@@ -576,14 +457,13 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.WriteKeyword("hash algorithm");
 			this.WriteSpace();
 			this.WriteLiteral("0x");
-			V_0 = assembly.get_Name().get_HashAlgorithm();
-			this.WriteLiteral(V_0.ToString("X8"));
+			int hashAlgorithm = assembly.get_Name().get_HashAlgorithm();
+			this.WriteLiteral(hashAlgorithm.ToString("X8"));
 			this.WriteSpace();
 			this.Write("//");
 			this.WriteSpace();
-			V_1 = assembly.get_Name().get_HashAlgorithm();
-			this.Write(V_1.ToString());
-			return;
+			AssemblyHashAlgorithm assemblyHashAlgorithm = assembly.get_Name().get_HashAlgorithm();
+			this.Write(assemblyHashAlgorithm.ToString());
 		}
 
 		private void WriteKeywordAttributes(AssemblyDefinition assembly)
@@ -599,20 +479,18 @@ namespace Telerik.JustDecompiler.Languages.IL
 				this.WriteAssemblyPublicKey(assembly);
 				this.WriteLine();
 			}
-			if (String.op_Inequality(assembly.get_Name().get_Culture(), String.Empty))
+			if (assembly.get_Name().get_Culture() != String.Empty)
 			{
 				this.WriteLine();
 				this.WriteAssemblyLocale(assembly);
 				this.WriteLine();
 			}
-			return;
 		}
 
 		private void WriteOpenBreckets()
 		{
 			this.formatter.WriteStartBlock();
 			this.Write("{");
-			return;
 		}
 
 		private void WriteSecurityAttributes(AssemblyDefinition assembly)
@@ -621,66 +499,44 @@ namespace Telerik.JustDecompiler.Languages.IL
 			{
 				return;
 			}
-			stackVariable4 = new List<SecurityDeclaration>(assembly.get_SecurityDeclarations());
-			stackVariable4.Sort(new Comparison<SecurityDeclaration>(this.u003cWriteSecurityAttributesu003eb__10_0));
-			V_0 = stackVariable4.GetEnumerator();
-			try
+			List<SecurityDeclaration> securityDeclarations = new List<SecurityDeclaration>(assembly.get_SecurityDeclarations());
+			securityDeclarations.Sort((SecurityDeclaration x, SecurityDeclaration y) => this.CompareSecurityDeclaration(x, y));
+			foreach (SecurityDeclaration securityDeclaration in securityDeclarations)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.WriteSecurityDeclaration(V_1);
-					this.WriteLine();
-				}
+				this.WriteSecurityDeclaration(securityDeclaration);
+				this.WriteLine();
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void WriteSecurityDeclaration(SecurityDeclaration declaration)
 		{
-			V_0 = new IntermediateLanguageAttributeWriter.u003cu003ec__DisplayClass12_0();
-			V_0.declaration = declaration;
 			this.WriteDot();
 			this.WriteKeyword("permissionset");
 			this.WriteSpace();
-			this.WriteKeyword(this.GetActionKeyword(V_0.declaration.get_Action()));
+			this.WriteKeyword(this.GetActionKeyword(declaration.get_Action()));
 			this.WriteSpace();
 			this.Write("=");
 			this.WriteLine();
 			this.WriteOpenBreckets();
 			this.WriteLine();
 			this.Indent();
-			if (V_0.declaration.get_HasSecurityAttributes())
+			if (declaration.get_HasSecurityAttributes())
 			{
-				stackVariable29 = new List<SecurityAttribute>(V_0.declaration.get_SecurityAttributes());
-				stackVariable29.Sort(new Comparison<SecurityAttribute>(V_0.u003cWriteSecurityDeclarationu003eb__0));
-				V_2 = stackVariable29.GetEnumerator();
-				try
+				List<SecurityAttribute> securityAttributes = new List<SecurityAttribute>(declaration.get_SecurityAttributes());
+				securityAttributes.Sort((SecurityAttribute x, SecurityAttribute y) => x.CompareToSecurityAttribute(y, declaration, declaration));
+				foreach (SecurityAttribute securityAttribute in securityAttributes)
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = V_2.get_Current();
-						this.WriteSingleSecurityAttributes(V_3);
-						this.WriteLine();
-					}
-				}
-				finally
-				{
-					((IDisposable)V_2).Dispose();
+					this.WriteSingleSecurityAttributes(securityAttribute);
+					this.WriteLine();
 				}
 			}
 			this.Outdent();
 			this.WriteEndBreckets();
-			return;
 		}
 
 		private void WriteSingleSecurityAttributes(SecurityAttribute attribute)
 		{
-			this.WriteType(attribute.get_AttributeType(), 2);
+			base.WriteType(attribute.get_AttributeType(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
 			if (attribute.get_HasProperties())
 			{
 				this.WriteSpace();
@@ -689,57 +545,44 @@ namespace Telerik.JustDecompiler.Languages.IL
 				this.WriteOpenBreckets();
 				this.WriteLine();
 				this.Indent();
-				V_0 = attribute.get_Properties().GetEnumerator();
-				try
+				foreach (CustomAttributeNamedArgument property in attribute.get_Properties())
 				{
-					while (V_0.MoveNext())
+					this.WriteKeyword("property");
+					this.WriteSpace();
+					CustomAttributeArgument argument = property.get_Argument();
+					base.WriteType(argument.get_Type(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
+					this.WriteSpace();
+					this.WriteLiteral("'");
+					this.WriteLiteral(property.get_Name());
+					this.WriteLiteral("'");
+					this.WriteSpace();
+					this.Write("=");
+					this.WriteSpace();
+					argument = property.get_Argument();
+					base.WriteType(argument.get_Type(), IntermediateLanguageWriter.ILNameSyntax.TypeName);
+					this.WriteSpace();
+					this.Write("(");
+					if (property.get_Argument().get_Value() is Boolean)
 					{
-						V_1 = V_0.get_Current();
-						this.WriteKeyword("property");
-						this.WriteSpace();
-						V_2 = V_1.get_Argument();
-						this.WriteType(V_2.get_Type(), 2);
-						this.WriteSpace();
-						this.WriteLiteral("'");
-						this.WriteLiteral(V_1.get_Name());
-						this.WriteLiteral("'");
-						this.WriteSpace();
-						this.Write("=");
-						this.WriteSpace();
-						V_2 = V_1.get_Argument();
-						this.WriteType(V_2.get_Type(), 2);
-						this.WriteSpace();
-						this.Write("(");
-						if (V_1.get_Argument().get_Value() as Boolean == false)
-						{
-							if (V_1.get_Argument().get_Value() as String == null)
-							{
-								V_2 = V_1.get_Argument();
-								this.WriteLiteral(V_2.get_Value().ToString());
-							}
-							else
-							{
-								V_2 = V_1.get_Argument();
-								this.WriteStringLiteral((String)V_2.get_Value());
-							}
-						}
-						else
-						{
-							V_2 = V_1.get_Argument();
-							this.WriteBooleanLiteral((Boolean)V_2.get_Value());
-						}
-						this.Write(")");
-						this.WriteLine();
+						argument = property.get_Argument();
+						this.WriteBooleanLiteral((Boolean)argument.get_Value());
 					}
-				}
-				finally
-				{
-					V_0.Dispose();
+					else if (!(property.get_Argument().get_Value() is String))
+					{
+						argument = property.get_Argument();
+						this.WriteLiteral(argument.get_Value().ToString());
+					}
+					else
+					{
+						argument = property.get_Argument();
+						this.WriteStringLiteral((String)argument.get_Value());
+					}
+					this.Write(")");
+					this.WriteLine();
 				}
 				this.Outdent();
 				this.WriteEndBreckets();
 			}
-			return;
 		}
 
 		private void WriteStringLiteral(string str)
@@ -747,7 +590,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 			this.Write("'");
 			this.WriteLiteral(str);
 			this.Write("'");
-			return;
 		}
 	}
 }

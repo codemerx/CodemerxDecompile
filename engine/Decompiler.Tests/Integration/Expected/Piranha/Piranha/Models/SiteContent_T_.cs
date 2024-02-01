@@ -1,4 +1,5 @@
 using Piranha;
+using Piranha.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -10,13 +11,11 @@ namespace Piranha.Models
 	{
 		public SiteContent()
 		{
-			base();
-			return;
 		}
 
 		public static Task<T> CreateAsync(IApi api, string typeId = null)
 		{
-			return api.get_Sites().CreateContentAsync<T>(typeId);
+			return api.Sites.CreateContentAsync<T>(typeId);
 		}
 	}
 }

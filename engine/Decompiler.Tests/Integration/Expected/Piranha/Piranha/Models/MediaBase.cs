@@ -100,8 +100,6 @@ namespace Piranha.Models
 
 		protected MediaBase()
 		{
-			base();
-			return;
 		}
 	}
 }

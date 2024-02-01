@@ -11,12 +11,11 @@ namespace Piranha.Models
 		{
 			get
 			{
-				if (!this.get_Published().get_HasValue())
+				if (!this.Published.HasValue)
 				{
 					return false;
 				}
-				V_0 = this.get_Published();
-				return DateTime.op_LessThanOrEqual(V_0.get_Value(), DateTime.get_Now());
+				return this.Published.Value <= DateTime.Now;
 			}
 		}
 
@@ -62,8 +61,6 @@ namespace Piranha.Models
 
 		protected RoutedContentBase()
 		{
-			base();
-			return;
 		}
 	}
 }

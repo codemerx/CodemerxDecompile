@@ -1,17 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib.Models.Account;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.ViewModels.Account;
 using Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages;
 using Mix.Cms.Lib.ViewModels.MixPortalPageRoles;
 using Mix.Cms.Lib.ViewModels.MixPortalPages;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -57,64 +64,65 @@ namespace Mix.Cms.Lib.ViewModels.Account.MixRoles
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(AspNetRoles model, MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(AspNetRoles model, MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = ViewModelBase<MixCmsContext, MixPortalPage, ReadRolePermissionViewModel>.Repository;
-			V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel::ExpandView(Mix.Cms.Lib.Models.Account.MixCmsAccountContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Account.MixCmsAccountContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			this.Permissions = ViewModelBase<MixCmsContext, MixPortalPage, ReadRolePermissionViewModel>.Repository.GetModelListBy((MixPortalPage p) => p.Level == 0 && (p.MixPortalPageRole.Any<MixPortalPageRole>((MixPortalPageRole r) => r.RoleId == this.Id) || this.Name == "SuperAdmin"), null, null).get_Data();
+			foreach (ReadRolePermissionViewModel permission in this.Permissions)
+			{
+				permission.NavPermission = ViewModelBase<MixCmsContext, MixPortalPageRole, Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel>.Repository.GetSingleModel((MixPortalPageRole n) => n.PageId == permission.Id && n.RoleId == this.Id, null, null).get_Data();
+				foreach (Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.ReadViewModel childPage in permission.ChildPages)
+				{
+					childPage.Page.NavPermission = ViewModelBase<MixCmsContext, MixPortalPageRole, Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel>.Repository.GetSingleModel((MixPortalPageRole n) => n.PageId == childPage.Page.Id && n.RoleId == this.Id, null, null).get_Data();
+				}
+			}
+		}
 
 		private List<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel> GetPermission()
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_0();
-			V_0.u003cu003e4__this = this;
-			V_0.context = new MixCmsContext();
-			try
+			Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_1 variable = null;
+			List<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel> list;
+			using (MixCmsContext mixCmsContext = new MixCmsContext())
 			{
-				V_1 = new Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_1();
-				V_1.CSu0024u003cu003e8__locals1 = V_0;
-				V_1.transaction = V_1.CSu0024u003cu003e8__locals1.context.get_Database().BeginTransaction();
-				stackVariable17 = V_1.CSu0024u003cu003e8__locals1.context.get_MixPortalPage();
-				V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel> Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel::GetPermission()
-				// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel> GetPermission()
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				IDbContextTransaction dbContextTransaction = mixCmsContext.get_Database().BeginTransaction();
+				DbSet<MixPortalPage> mixPortalPage = mixCmsContext.MixPortalPage;
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(MixPortalPage), "cp");
+				IIncludableQueryable<MixPortalPage, ICollection<MixPortalPageRole>> includableQueryable = EntityFrameworkQueryableExtensions.Include<MixPortalPage, ICollection<MixPortalPageRole>>(mixPortalPage, Expression.Lambda<Func<MixPortalPage, ICollection<MixPortalPageRole>>>(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPortalPage).GetMethod("get_MixPortalPageRole").MethodHandle)), new ParameterExpression[] { parameterExpression }));
+				parameterExpression = Expression.Parameter(typeof(MixPortalPage), "Category");
+				List<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel> readViewModels = includableQueryable.Select<MixPortalPage, Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel>(Expression.Lambda<Func<MixPortalPage, Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel>>(Expression.New((ConstructorInfo)MethodBase.GetMethodFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel).GetMethod(".ctor", new Type[] { typeof(MixPortalPageRole), typeof(MixCmsContext), typeof(IDbContextTransaction) }).MethodHandle), (IEnumerable<Expression>)(new Expression[] { Expression.MemberInit(Expression.New(typeof(MixPortalPageRole)), new MemberBinding[] { Expression.Bind((MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPortalPageRole).GetMethod("set_RoleId", new Type[] { typeof(string) }).MethodHandle), Expression.Property(Expression.Constant(this, typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel).GetMethod("get_Id").MethodHandle))), Expression.Bind((MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPortalPageRole).GetMethod("set_PageId", new Type[] { typeof(int) }).MethodHandle), Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPortalPage).GetMethod("get_Id").MethodHandle))) }), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_1).GetField("CS$<>8__locals1").FieldHandle)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_0).GetField("context").FieldHandle)), Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cu003ec__DisplayClass25_1).GetField("transaction").FieldHandle)) })), new ParameterExpression[] { parameterExpression })).ToList<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel>();
+				readViewModels.ForEach((Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel nav) => nav.IsActived = this.context.MixPortalPageRole.Any<MixPortalPageRole>((MixPortalPageRole m) => m.PageId == nav.PageId && m.RoleId == this.u003cu003e4__this.Id));
+				dbContextTransaction.Commit();
+				list = (
+					from m in readViewModels
+					orderby m.Priority
+					select m).ToList<Mix.Cms.Lib.ViewModels.MixPortalPageRoles.ReadViewModel>();
+			}
+			return list;
+		}
 
 		public override AspNetRoles ParseModel(MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (string.IsNullOrEmpty(this.get_Id()))
+			if (string.IsNullOrEmpty(this.Id))
 			{
-				this.set_Id(Guid.NewGuid().ToString());
+				this.Id = Guid.NewGuid().ToString();
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel view, MixCmsAccountContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.Account.MixRoles.ReadViewModel.u003cRemoveRelatedModelsAsyncu003ed__23>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsAccountContext, AspNetUserRoles, UserRoleViewModel>.Repository;
+			RepositoryResponse<List<AspNetUserRoles>> repositoryResponse = await repository.RemoveListModelAsync(false, (AspNetUserRoles ur) => ur.RoleId == this.Id, _context, _transaction);
+			RepositoryResponse<bool> repositoryResponse1 = new RepositoryResponse<bool>();
+			repositoryResponse1.set_IsSucceed(repositoryResponse.get_IsSucceed());
+			repositoryResponse1.set_Errors(repositoryResponse.get_Errors());
+			repositoryResponse1.set_Exception(repositoryResponse.get_Exception());
+			return repositoryResponse1;
 		}
 	}
 }

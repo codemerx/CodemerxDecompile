@@ -6,6 +6,7 @@ using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Decompiler.AssignmentAnalysis;
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -13,47 +14,44 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		private DecompilationContext context;
 
-		private readonly Dictionary<VariableDefinition, BinaryExpression> variableToAssignExpression;
+		private readonly Dictionary<VariableDefinition, BinaryExpression> variableToAssignExpression = new Dictionary<VariableDefinition, BinaryExpression>();
 
 		public ManagedPointersRemovalStep()
 		{
-			this.variableToAssignExpression = new Dictionary<VariableDefinition, BinaryExpression>();
-			base();
-			return;
 		}
 
 		private bool CheckForAssignment(BinaryExpression node)
 		{
-			if (node.get_Left().get_CodeNodeType() == 25 && (node.get_Left() as ArgumentReferenceExpression).get_Parameter().get_ParameterType().get_IsByReference())
+			if (node.Left.CodeNodeType == CodeNodeType.ArgumentReferenceExpression && (node.Left as ArgumentReferenceExpression).Parameter.get_ParameterType().get_IsByReference())
 			{
 				throw new Exception("Managed pointer usage not in SSA");
 			}
-			if (node.get_Left().get_CodeNodeType() != 26 || !(node.get_Left() as VariableReferenceExpression).get_Variable().get_VariableType().get_IsByReference())
+			if (node.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || !(node.Left as VariableReferenceExpression).Variable.get_VariableType().get_IsByReference())
 			{
 				return false;
 			}
-			V_0 = (node.get_Left() as VariableReferenceExpression).get_Variable().Resolve();
-			if (this.variableToAssignExpression.ContainsKey(V_0))
+			VariableDefinition variableDefinition = (node.Left as VariableReferenceExpression).Variable.Resolve();
+			if (this.variableToAssignExpression.ContainsKey(variableDefinition))
 			{
 				throw new Exception("Managed pointer usage not in SSA");
 			}
-			if (node.get_Right().get_CodeNodeType() != 26 && node.get_Right().get_CodeNodeType() != 25 && node.get_Right().get_CodeNodeType() != 23)
+			if (node.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression && node.Right.CodeNodeType != CodeNodeType.ArgumentReferenceExpression && node.Right.CodeNodeType != CodeNodeType.UnaryExpression)
 			{
 				return false;
 			}
-			if (node.get_Right().get_CodeNodeType() == 23)
+			if (node.Right.CodeNodeType == CodeNodeType.UnaryExpression)
 			{
-				V_1 = node.get_Right() as UnaryExpression;
-				if (V_1.get_Operator() != 7)
+				UnaryExpression right = node.Right as UnaryExpression;
+				if (right.Operator != UnaryOperator.AddressReference)
 				{
 					return false;
 				}
-				if (V_1.get_Operand().get_CodeNodeType() != 26 && V_1.get_Operand().get_CodeNodeType() != 25)
+				if (right.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression && right.Operand.CodeNodeType != CodeNodeType.ArgumentReferenceExpression)
 				{
 					return false;
 				}
 			}
-			this.variableToAssignExpression.Add(V_0, node);
+			this.variableToAssignExpression.Add(variableDefinition, node);
 			return true;
 		}
 
@@ -69,153 +67,104 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void RemoveVariablesFromContext()
 		{
-			V_0 = this.variableToAssignExpression.get_Keys().GetEnumerator();
-			try
+			foreach (VariableDefinition key in this.variableToAssignExpression.Keys)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.context.get_MethodContext().RemoveVariable(V_1);
-					dummyVar0 = this.context.get_MethodContext().get_VariablesToRename().Remove(V_1);
-					dummyVar1 = this.context.get_MethodContext().get_VariableAssignmentData().Remove(V_1);
-				}
+				this.context.MethodContext.RemoveVariable(key);
+				this.context.MethodContext.VariablesToRename.Remove(key);
+				this.context.MethodContext.VariableAssignmentData.Remove(key);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public void TransformExpressions(BaseCodeTransformer transformer)
 		{
-			V_0 = this.context.get_MethodContext().get_Expressions().get_BlockExpressions().get_Values().GetEnumerator();
-			try
+			foreach (IList<Expression> value in this.context.MethodContext.Expressions.BlockExpressions.Values)
 			{
-				while (V_0.MoveNext())
+				int num = 0;
+				for (int i = 0; i < value.Count; i++)
 				{
-					V_1 = V_0.get_Current();
-					V_2 = 0;
-					V_3 = 0;
-					while (V_3 < V_1.get_Count())
+					Expression expression = (Expression)transformer.Visit(value[i]);
+					if (expression != null)
 					{
-						V_4 = (Expression)transformer.Visit(V_1.get_Item(V_3));
-						if (V_4 != null)
-						{
-							stackVariable27 = V_2;
-							V_2 = stackVariable27 + 1;
-							V_1.set_Item(stackVariable27, V_4);
-						}
-						V_3 = V_3 + 1;
-					}
-					V_5 = V_1.get_Count() - V_2;
-					while (V_5 > 0)
-					{
-						V_1.RemoveAt(V_2 + V_5 - 1);
-						V_5 = V_5 - 1;
+						int num1 = num;
+						num = num1 + 1;
+						value[num1] = expression;
 					}
 				}
+				for (int j = value.Count - num; j > 0; j--)
+				{
+					value.RemoveAt(num + j - 1);
+				}
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			if (!node.get_IsAssignmentExpression() || !this.CheckForAssignment(node))
+			if (!node.IsAssignmentExpression || !this.CheckForAssignment(node))
 			{
-				this.VisitBinaryExpression(node);
+				base.VisitBinaryExpression(node);
 			}
-			return;
 		}
 
 		public void VisitExpressions()
 		{
-			V_0 = this.context.get_MethodContext().get_Expressions().get_BlockExpressions().get_Values().GetEnumerator();
-			try
+			foreach (IList<Expression> value in this.context.MethodContext.Expressions.BlockExpressions.Values)
 			{
-				while (V_0.MoveNext())
+				foreach (Expression expression in value)
 				{
-					V_1 = V_0.get_Current().GetEnumerator();
-					try
-					{
-						while (V_1.MoveNext())
-						{
-							V_2 = V_1.get_Current();
-							this.Visit(V_2);
-						}
-					}
-					finally
-					{
-						if (V_1 != null)
-						{
-							V_1.Dispose();
-						}
-					}
+					this.Visit(expression);
 				}
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public override void VisitUnaryExpression(UnaryExpression node)
 		{
-			if (node.get_Operator() != 8 || node.get_Operand().get_CodeNodeType() != 26 || !this.variableToAssignExpression.ContainsKey((node.get_Operand() as VariableReferenceExpression).get_Variable().Resolve()))
+			if (node.Operator != UnaryOperator.AddressDereference || node.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || !this.variableToAssignExpression.ContainsKey((node.Operand as VariableReferenceExpression).Variable.Resolve()))
 			{
-				this.VisitUnaryExpression(node);
+				base.VisitUnaryExpression(node);
 			}
-			return;
 		}
 
 		private class ComplexDereferencer : SimpleDereferencer
 		{
 			public ComplexDereferencer()
 			{
-				base();
-				return;
 			}
 
 			public override ICodeNode VisitArrayIndexerExpression(ArrayIndexerExpression node)
 			{
-				node.set_Target((Expression)this.VisitTargetExpression(node.get_Target()));
-				node.set_Indices((ExpressionCollection)this.Visit(node.get_Indices()));
+				node.Target = (Expression)this.VisitTargetExpression(node.Target);
+				node.Indices = (ExpressionCollection)this.Visit(node.Indices);
 				return node;
 			}
 
 			public override ICodeNode VisitArrayLengthExpression(ArrayLengthExpression node)
 			{
-				node.set_Target((Expression)this.VisitTargetExpression(node.get_Target()));
+				node.Target = (Expression)this.VisitTargetExpression(node.Target);
 				return node;
 			}
 
 			public override ICodeNode VisitEventReferenceExpression(EventReferenceExpression node)
 			{
-				node.set_Target((Expression)this.VisitTargetExpression(node.get_Target()));
+				node.Target = (Expression)this.VisitTargetExpression(node.Target);
 				return node;
 			}
 
 			public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 			{
-				node.set_Target((Expression)this.VisitTargetExpression(node.get_Target()));
+				node.Target = (Expression)this.VisitTargetExpression(node.Target);
 				return node;
 			}
 
 			public override ICodeNode VisitMethodReferenceExpression(MethodReferenceExpression node)
 			{
-				node.set_Target((Expression)this.VisitTargetExpression(node.get_Target()));
+				node.Target = (Expression)this.VisitTargetExpression(node.Target);
 				return node;
 			}
 
 			public override ICodeNode VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 			{
-				node.set_Target((Expression)this.VisitTargetExpression(node.get_Target()));
-				node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
+				node.Target = (Expression)this.VisitTargetExpression(node.Target);
+				node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
 				return node;
 			}
 
@@ -232,20 +181,20 @@ namespace Telerik.JustDecompiler.Steps
 
 			public override ICodeNode VisitUnaryExpression(UnaryExpression node)
 			{
-				if (node.get_Operator() == 8)
+				if (node.Operator == UnaryOperator.AddressDereference)
 				{
-					if (node.get_Operand().get_CodeNodeType() == 28)
+					if (node.Operand.CodeNodeType == CodeNodeType.ThisReferenceExpression)
 					{
-						return node.get_Operand();
+						return node.Operand;
 					}
-					V_0 = node.get_Operand() as ExplicitCastExpression;
-					if (V_0 != null && V_0.get_TargetType().get_IsByReference())
+					ExplicitCastExpression operand = node.Operand as ExplicitCastExpression;
+					if (operand != null && operand.TargetType.get_IsByReference())
 					{
-						V_1 = (V_0.get_TargetType() as ByReferenceType).get_ElementType();
-						return new ExplicitCastExpression((Expression)this.Visit(V_0.get_Expression()), V_1, null);
+						TypeReference elementType = (operand.TargetType as ByReferenceType).get_ElementType();
+						return new ExplicitCastExpression((Expression)this.Visit(operand.Expression), elementType, null);
 					}
 				}
-				return this.VisitUnaryExpression(node);
+				return base.VisitUnaryExpression(node);
 			}
 		}
 
@@ -257,21 +206,19 @@ namespace Telerik.JustDecompiler.Steps
 
 			public VariableReplacer(Dictionary<VariableDefinition, BinaryExpression> variableToAssignExpression)
 			{
-				this.expressionsToSkip = new HashSet<BinaryExpression>();
-				base();
 				this.variableToAssignExpression = variableToAssignExpression;
-				this.expressionsToSkip = new HashSet<BinaryExpression>(variableToAssignExpression.get_Values());
-				return;
+				this.expressionsToSkip = new HashSet<BinaryExpression>(variableToAssignExpression.Values);
 			}
 
 			private bool TryGetVariableValue(VariableDefinition variable, out Expression value)
 			{
-				if (!this.variableToAssignExpression.TryGetValue(variable, out V_0))
+				BinaryExpression binaryExpression;
+				if (!this.variableToAssignExpression.TryGetValue(variable, out binaryExpression))
 				{
 					value = null;
 					return false;
 				}
-				value = V_0.get_Right().CloneExpressionOnly();
+				value = binaryExpression.Right.CloneExpressionOnly();
 				return true;
 			}
 
@@ -279,19 +226,20 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (!this.expressionsToSkip.Contains(node))
 				{
-					return this.VisitBinaryExpression(node);
+					return base.VisitBinaryExpression(node);
 				}
-				dummyVar0 = this.VisitBinaryExpression(node);
+				base.VisitBinaryExpression(node);
 				return null;
 			}
 
 			public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if (!this.TryGetVariableValue(node.get_Variable().Resolve(), out V_0))
+				Expression expression;
+				if (!this.TryGetVariableValue(node.Variable.Resolve(), out expression))
 				{
 					return node;
 				}
-				return V_0;
+				return expression;
 			}
 		}
 	}

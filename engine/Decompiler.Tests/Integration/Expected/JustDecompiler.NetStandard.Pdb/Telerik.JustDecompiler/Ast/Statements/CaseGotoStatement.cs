@@ -12,7 +12,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 69;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.CaseGotoStatement;
 			}
 		}
 
@@ -22,32 +22,28 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			private set;
 		}
 
-		public CaseGotoStatement(GotoStatement transformedGoto, SwitchCase targetedCase)
+		public CaseGotoStatement(GotoStatement transformedGoto, SwitchCase targetedCase) : base(transformedGoto.Label, transformedGoto.UnderlyingSameMethodInstructions)
 		{
-			base(transformedGoto.get_Label(), transformedGoto.get_UnderlyingSameMethodInstructions());
-			this.set_TargetedSwitchCase(targetedCase);
-			return;
+			this.TargetedSwitchCase = targetedCase;
 		}
 
-		private CaseGotoStatement(CaseGotoStatement toClone, IEnumerable<Instruction> instructions)
+		private CaseGotoStatement(CaseGotoStatement toClone, IEnumerable<Instruction> instructions) : base(toClone.Label, instructions)
 		{
-			base(toClone.get_Label(), instructions);
-			this.set_TargetedSwitchCase(toClone.get_TargetedSwitchCase());
-			return;
+			this.TargetedSwitchCase = toClone.TargetedSwitchCase;
 		}
 
 		public override Statement Clone()
 		{
-			V_0 = new CaseGotoStatement(this, this.get_UnderlyingSameMethodInstructions());
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			CaseGotoStatement caseGotoStatement = new CaseGotoStatement(this, base.UnderlyingSameMethodInstructions);
+			base.CopyParentAndLabel(caseGotoStatement);
+			return caseGotoStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new CaseGotoStatement(this, null);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			CaseGotoStatement caseGotoStatement = new CaseGotoStatement(this, (IEnumerable<Instruction>)null);
+			base.CopyParentAndLabel(caseGotoStatement);
+			return caseGotoStatement;
 		}
 	}
 }

@@ -1,9 +1,13 @@
+using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Steps;
 
@@ -13,133 +17,100 @@ namespace Telerik.JustDecompiler.Decompiler
 	{
 		public static BlockStatement Decompile(this MethodBody body, ILanguage language, TypeSpecificContext typeContext = null)
 		{
-			return body.Decompile(language, out V_0, typeContext);
+			DecompilationContext decompilationContext;
+			return body.Decompile(language, out decompilationContext, typeContext);
 		}
 
 		public static BlockStatement Decompile(this MethodBody body, ILanguage language, out DecompilationContext context, TypeSpecificContext typeContext = null)
 		{
-			if (typeContext == null)
-			{
-				V_0 = language.CreatePipeline();
-			}
-			else
-			{
-				V_0 = language.CreatePipeline(new DecompilationContext(new MethodSpecificContext(body), typeContext, language));
-			}
-			return Extensions.RunPipeline(V_0, language, body, out context);
+			DecompilationPipeline decompilationPipeline;
+			decompilationPipeline = (typeContext == null ? language.CreatePipeline() : language.CreatePipeline(new DecompilationContext(new MethodSpecificContext(body), typeContext, language)));
+			return Telerik.JustDecompiler.Decompiler.Extensions.RunPipeline(decompilationPipeline, language, body, out context);
 		}
 
 		public static BlockStatement Decompile(this MethodBody body, ILanguage language, DecompilationContext context)
 		{
 			if (body != null)
 			{
-				dummyVar0 = body.get_Method();
+				body.get_Method();
 			}
-			return Extensions.RunPipeline(language.CreatePipeline(context), language, body, out context);
+			return Telerik.JustDecompiler.Decompiler.Extensions.RunPipeline(language.CreatePipeline(context), language, body, out context);
 		}
 
 		internal static BlockStatement DecompileAsyncStateMachine(this MethodBody body, DecompilationContext enclosingContext, out AsyncData asyncData)
 		{
-			stackVariable0 = body;
-			stackVariable1 = enclosingContext;
-			stackVariable2 = new RemoveAsyncStateMachineStep();
-			stackVariable3 = Extensions.u003cu003ec.u003cu003e9__8_0;
-			if (stackVariable3 == null)
-			{
-				dummyVar0 = stackVariable3;
-				stackVariable3 = new Func<DecompilationContext, IStateMachineData>(Extensions.u003cu003ec.u003cu003e9.u003cDecompileAsyncStateMachineu003eb__8_0);
-				Extensions.u003cu003ec.u003cu003e9__8_0 = stackVariable3;
-			}
-			stackVariable5 = stackVariable0.DecompileStateMachine(stackVariable1, stackVariable2, stackVariable3, out V_0);
-			asyncData = V_0.get_MethodContext().get_AsyncData();
-			return stackVariable5;
+			DecompilationContext decompilationContext;
+			BlockStatement blockStatement = body.DecompileStateMachine(enclosingContext, new RemoveAsyncStateMachineStep(), (DecompilationContext context) => context.MethodContext.AsyncData, out decompilationContext);
+			asyncData = decompilationContext.MethodContext.AsyncData;
+			return blockStatement;
 		}
 
 		internal static BlockStatement DecompileLambda(this MethodBody body, ILanguage language, DecompilationContext context)
 		{
 			if (body != null)
 			{
-				dummyVar0 = body.get_Method();
+				body.get_Method();
 			}
-			return Extensions.RunPipeline(language.CreateLambdaPipeline(context), language, body, out context);
+			return Telerik.JustDecompiler.Decompiler.Extensions.RunPipeline(language.CreateLambdaPipeline(context), language, body, out context);
 		}
 
 		private static BlockStatement DecompileStateMachine(this MethodBody body, DecompilationContext enclosingContext, BaseStateMachineRemoverStep removeStateMachineStep, Func<DecompilationContext, IStateMachineData> stateMachineDataSelector, out DecompilationContext decompilationContext)
 		{
-			V_0 = Extensions.GetStateMachineRemovalPipeline(removeStateMachineStep, stateMachineDataSelector);
-			decompilationContext = V_0.Run(body, enclosingContext.get_Language());
-			enclosingContext.get_MethodContext().get_Variables().AddRange(decompilationContext.get_MethodContext().get_Variables());
-			enclosingContext.get_MethodContext().get_VariableDefinitionToNameMap().AddRange<VariableDefinition, string>(decompilationContext.get_MethodContext().get_VariableDefinitionToNameMap());
-			enclosingContext.get_MethodContext().AddInnerMethodParametersToContext(decompilationContext.get_MethodContext());
-			enclosingContext.get_MethodContext().get_VariableAssignmentData().AddRange<VariableDefinition, AssignmentType>(decompilationContext.get_MethodContext().get_VariableAssignmentData());
-			enclosingContext.get_MethodContext().get_GotoLabels().AddRange<string, Statement>(decompilationContext.get_MethodContext().get_GotoLabels());
-			enclosingContext.get_MethodContext().get_GotoStatements().AddRange(decompilationContext.get_MethodContext().get_GotoStatements());
-			return V_0.get_Body();
+			DecompilationPipeline stateMachineRemovalPipeline = Telerik.JustDecompiler.Decompiler.Extensions.GetStateMachineRemovalPipeline(removeStateMachineStep, stateMachineDataSelector);
+			decompilationContext = stateMachineRemovalPipeline.Run(body, enclosingContext.Language);
+			enclosingContext.MethodContext.Variables.AddRange(decompilationContext.MethodContext.Variables);
+			enclosingContext.MethodContext.VariableDefinitionToNameMap.AddRange<VariableDefinition, string>(decompilationContext.MethodContext.VariableDefinitionToNameMap);
+			enclosingContext.MethodContext.AddInnerMethodParametersToContext(decompilationContext.MethodContext);
+			enclosingContext.MethodContext.VariableAssignmentData.AddRange<VariableDefinition, AssignmentType>(decompilationContext.MethodContext.VariableAssignmentData);
+			enclosingContext.MethodContext.GotoLabels.AddRange<string, Statement>(decompilationContext.MethodContext.GotoLabels);
+			enclosingContext.MethodContext.GotoStatements.AddRange(decompilationContext.MethodContext.GotoStatements);
+			return stateMachineRemovalPipeline.Body;
 		}
 
 		internal static BlockStatement DecompileYieldStateMachine(this MethodBody body, DecompilationContext enclosingContext, out YieldData yieldData)
 		{
-			stackVariable0 = body;
-			stackVariable1 = enclosingContext;
-			stackVariable2 = new RemoveYieldStateMachineStep();
-			stackVariable3 = Extensions.u003cu003ec.u003cu003e9__7_0;
-			if (stackVariable3 == null)
-			{
-				dummyVar0 = stackVariable3;
-				stackVariable3 = new Func<DecompilationContext, IStateMachineData>(Extensions.u003cu003ec.u003cu003e9.u003cDecompileYieldStateMachineu003eb__7_0);
-				Extensions.u003cu003ec.u003cu003e9__7_0 = stackVariable3;
-			}
-			stackVariable5 = stackVariable0.DecompileStateMachine(stackVariable1, stackVariable2, stackVariable3, out V_0);
-			yieldData = V_0.get_MethodContext().get_YieldData();
-			return stackVariable5;
+			DecompilationContext decompilationContext;
+			BlockStatement blockStatement = body.DecompileStateMachine(enclosingContext, new RemoveYieldStateMachineStep(), (DecompilationContext context) => context.MethodContext.YieldData, out decompilationContext);
+			yieldData = decompilationContext.MethodContext.YieldData;
+			return blockStatement;
 		}
 
 		internal static TElement First<TElement>(this IList<TElement> list)
 		{
-			return list.get_Item(0);
+			return list[0];
 		}
 
 		private static DecompilationPipeline GetStateMachineRemovalPipeline(BaseStateMachineRemoverStep removeStateMachineStep, Func<DecompilationContext, IStateMachineData> stateMachineDataSelector)
 		{
-			stackVariable0 = BaseLanguage.get_IntermediateRepresenationPipeline();
-			V_0 = new List<IDecompilationStep>();
-			V_0.Add(removeStateMachineStep);
-			V_1 = stackVariable0.get_Steps().GetEnumerator();
-			try
+			DecompilationPipeline intermediateRepresenationPipeline = BaseLanguage.IntermediateRepresenationPipeline;
+			List<IDecompilationStep> decompilationSteps = new List<IDecompilationStep>()
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.Add(V_2);
-					if (V_2 as VariableAssignmentAnalysisStep == null)
-					{
-						continue;
-					}
-					V_0.Add(new FieldAssignmentAnalysisStep(stateMachineDataSelector));
-				}
-			}
-			finally
+				removeStateMachineStep
+			};
+			foreach (IDecompilationStep step in intermediateRepresenationPipeline.Steps)
 			{
-				if (V_1 != null)
+				decompilationSteps.Add(step);
+				if (!(step is VariableAssignmentAnalysisStep))
 				{
-					V_1.Dispose();
+					continue;
 				}
+				decompilationSteps.Add(new FieldAssignmentAnalysisStep(stateMachineDataSelector));
 			}
-			return new DecompilationPipeline(V_0);
+			return new DecompilationPipeline(decompilationSteps);
 		}
 
 		internal static bool IsArgumentReferenceToRefParameter(this Expression expression)
 		{
-			if (expression.get_CodeNodeType() != 23)
+			if (expression.CodeNodeType != CodeNodeType.UnaryExpression)
 			{
 				return false;
 			}
-			V_0 = expression as UnaryExpression;
-			if (V_0.get_Operator() != 8 || V_0.get_Operand().get_CodeNodeType() != 25)
+			UnaryExpression unaryExpression = expression as UnaryExpression;
+			if (unaryExpression.Operator != UnaryOperator.AddressDereference || unaryExpression.Operand.CodeNodeType != CodeNodeType.ArgumentReferenceExpression)
 			{
 				return false;
 			}
-			if (!(V_0.get_Operand() as ArgumentReferenceExpression).get_Parameter().get_ParameterType().get_IsByReference())
+			if (!(unaryExpression.Operand as ArgumentReferenceExpression).Parameter.get_ParameterType().get_IsByReference())
 			{
 				return false;
 			}
@@ -148,13 +119,13 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		internal static TElement Last<TElement>(this IList<TElement> list)
 		{
-			return list.get_Item(list.get_Count() - 1);
+			return list[list.Count - 1];
 		}
 
 		private static BlockStatement RunPipeline(DecompilationPipeline pipeline, ILanguage language, MethodBody body, out DecompilationContext context)
 		{
 			context = pipeline.Run(body, language);
-			return pipeline.get_Body();
+			return pipeline.Body;
 		}
 	}
 }

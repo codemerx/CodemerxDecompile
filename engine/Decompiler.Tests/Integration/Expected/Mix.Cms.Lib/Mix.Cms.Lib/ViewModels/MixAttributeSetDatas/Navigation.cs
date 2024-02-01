@@ -37,8 +37,6 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public Navigation()
 		{
-			base();
-			return;
 		}
 	}
 }

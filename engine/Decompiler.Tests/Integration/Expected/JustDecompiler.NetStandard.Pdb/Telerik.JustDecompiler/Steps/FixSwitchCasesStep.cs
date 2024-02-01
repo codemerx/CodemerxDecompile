@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast.Statements;
 
@@ -9,103 +11,103 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public FixSwitchCasesStep()
 		{
-			base();
-			return;
 		}
 
 		public void FixCases(SwitchStatement theSwitch)
 		{
-			V_0 = new FixSwitchCasesStep.u003cu003ec__DisplayClass0_0();
-			V_1 = theSwitch.get_Cases().LastOrDefault<SwitchCase>() as DefaultCase;
-			V_2 = 0;
-			V_3 = null;
-			if (V_1 != null && !this.TryGetSimpleCaseStatementType(V_1, out V_2, out V_3))
+			FixSwitchCasesStep.StatementType statementType;
+			string str;
+			DefaultCase defaultCase = theSwitch.Cases.LastOrDefault<SwitchCase>() as DefaultCase;
+			FixSwitchCasesStep.StatementType statementType1 = FixSwitchCasesStep.StatementType.None;
+			string str1 = null;
+			if (defaultCase != null && !this.TryGetSimpleCaseStatementType(defaultCase, out statementType1, out str1))
 			{
 				return;
 			}
-			V_0.casesToRemove = new HashSet<SwitchCase>();
-			V_4 = new List<SwitchCase>(theSwitch.get_Cases());
-			V_5 = V_4.GetEnumerator();
-			try
+			HashSet<SwitchCase> switchCases = new HashSet<SwitchCase>();
+			List<SwitchCase> switchCases1 = new List<SwitchCase>(theSwitch.Cases);
+			foreach (SwitchCase switchCase in switchCases1)
 			{
-				while (V_5.MoveNext())
+				if (switchCase == defaultCase)
 				{
-					V_6 = V_5.get_Current();
-					if (V_6 != V_1)
+					if (switchCases.Count > 0)
 					{
-						if (V_6.get_Body() != null)
+						theSwitch.Cases = 
+							from case in switchCases1
+							where !switchCases.Contains(case)
+							select case;
+					}
+					return;
+				}
+				else if (switchCase.Body != null)
+				{
+					if (this.TryGetSimpleCaseStatementType(switchCase, out statementType, out str))
+					{
+						if (defaultCase != null)
 						{
-							if (this.TryGetSimpleCaseStatementType(V_6, out V_7, out V_8))
+							if (statementType1 == statementType && str1 == str)
 							{
-								if (V_1 == null)
+								switchCases.Add(switchCase);
+								if (switchCases.Count > 0)
 								{
-									if (V_7 == 2)
-									{
-										dummyVar2 = V_0.casesToRemove.Add(V_6);
-										goto Label0;
-									}
+									theSwitch.Cases = 
+										from case in switchCases1
+										where !switchCases.Contains(case)
+										select case;
 								}
-								else
-								{
-									if (V_2 == V_7 && String.op_Equality(V_3, V_8))
-									{
-										dummyVar1 = V_0.casesToRemove.Add(V_6);
-										goto Label0;
-									}
-								}
+								return;
 							}
-							V_0.casesToRemove.Clear();
 						}
-						else
+						else if (statementType == FixSwitchCasesStep.StatementType.Break)
 						{
-							dummyVar0 = V_0.casesToRemove.Add(V_6);
+							switchCases.Add(switchCase);
+							if (switchCases.Count > 0)
+							{
+								theSwitch.Cases = 
+									from case in switchCases1
+									where !switchCases.Contains(case)
+									select case;
+							}
+							return;
 						}
 					}
-					else
-					{
-						goto Label0;
-					}
+					switchCases.Clear();
+				}
+				else
+				{
+					switchCases.Add(switchCase);
 				}
 			}
-			finally
+			if (switchCases.Count > 0)
 			{
-				((IDisposable)V_5).Dispose();
+				theSwitch.Cases = 
+					from case in switchCases1
+					where !switchCases.Contains(case)
+					select case;
 			}
-		Label0:
-			if (V_0.casesToRemove.get_Count() > 0)
-			{
-				theSwitch.set_Cases(V_4.Where<SwitchCase>(new Func<SwitchCase, bool>(V_0.u003cFixCasesu003eb__0)));
-			}
-			return;
 		}
 
 		private bool TryGetSimpleCaseStatementType(SwitchCase theCase, out FixSwitchCasesStep.StatementType statementType, out string gotoLabel)
 		{
 			gotoLabel = null;
-			statementType = 0;
-			if (theCase.get_Body().get_Statements().get_Count() != 1 || !String.IsNullOrEmpty(theCase.get_Body().get_Statements().get_Item(0).get_Label()))
+			statementType = FixSwitchCasesStep.StatementType.None;
+			if (theCase.Body.Statements.Count != 1 || !String.IsNullOrEmpty(theCase.Body.Statements[0].Label))
 			{
 				return false;
 			}
-			V_0 = theCase.get_Body().get_Statements().get_Item(0);
-			if (V_0 as GotoStatement == null)
+			Statement item = theCase.Body.Statements[0];
+			if (item is GotoStatement)
 			{
-				if (V_0 as BreakStatement == null)
-				{
-					if (V_0 as ContinueStatement != null)
-					{
-						statementType = 3;
-					}
-				}
-				else
-				{
-					statementType = 2;
-				}
+				statementType = FixSwitchCasesStep.StatementType.Goto;
+				gotoLabel = (item as GotoStatement).TargetLabel;
 			}
-			else
+			else if (item is BreakStatement)
 			{
-				statementType = 1;
-				gotoLabel = (V_0 as GotoStatement).get_TargetLabel();
+				statementType = FixSwitchCasesStep.StatementType.Break;
+			}
+			else if (item is ContinueStatement)
+			{
+				statementType = FixSwitchCasesStep.StatementType.Continue;
 			}
 			return (int)statementType != 0;
 		}

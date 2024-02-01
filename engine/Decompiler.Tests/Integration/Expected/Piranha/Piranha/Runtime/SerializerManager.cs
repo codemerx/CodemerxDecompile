@@ -13,10 +13,10 @@ namespace Piranha.Runtime
 		{
 			get
 			{
-				V_0 = null;
-				if (this._serializers.TryGetValue(type, out V_0))
+				ISerializer serializer = null;
+				if (this._serializers.TryGetValue(type, out serializer))
 				{
-					return V_0;
+					return serializer;
 				}
 				return null;
 			}
@@ -24,29 +24,17 @@ namespace Piranha.Runtime
 
 		public SerializerManager()
 		{
-			base();
 			this._serializers = new Dictionary<Type, ISerializer>();
-			return;
 		}
 
 		public void Register<T>(ISerializer serializer)
 		{
-			this._serializers.set_Item(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Piranha.Runtime.SerializerManager::Register(Piranha.Extend.ISerializer)
-			// Exception in: System.Void Register(Piranha.Extend.ISerializer)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			this._serializers[typeof(T)] = serializer;
+		}
 
 		public void UnRegister<T>()
 		{
-			dummyVar0 = this._serializers.Remove(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Piranha.Runtime.SerializerManager::UnRegister()
-			// Exception in: System.Void UnRegister()
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			this._serializers.Remove(typeof(T));
+		}
 	}
 }

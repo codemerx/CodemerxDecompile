@@ -1,7 +1,9 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -17,147 +19,133 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RenameEnumValues()
 		{
-			base();
-			return;
 		}
 
 		private bool NeedsCast(TypeReference from, TypeReference to)
 		{
-			V_0 = to.Resolve();
-			if (V_0 == null || from == null || !V_0.get_IsEnum() || to.get_IsArray())
+			TypeDefinition typeDefinition = to.Resolve();
+			if (typeDefinition == null || from == null || !typeDefinition.get_IsEnum() || to.get_IsArray())
 			{
 				return false;
 			}
-			return String.op_Inequality(from.get_FullName(), to.get_FullName());
+			return from.get_FullName() != to.get_FullName();
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.context = context;
 			return (BlockStatement)this.VisitBlockStatement(block);
 		}
 
 		public override ICodeNode VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			node = (BaseCtorExpression)this.VisitBaseCtorExpression(node);
-			this.VisitInvocationArguments(node.get_Arguments(), node.get_MethodExpression().get_Method());
+			node = (BaseCtorExpression)base.VisitBaseCtorExpression(node);
+			this.VisitInvocationArguments(node.Arguments, node.MethodExpression.Method);
 			return node;
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			node = (BinaryExpression)this.VisitBinaryExpression(node);
-			if (!node.get_Left().get_HasType())
+			node = (BinaryExpression)base.VisitBinaryExpression(node);
+			if (!node.Left.HasType)
 			{
 				return node;
 			}
-			V_0 = node.get_Left().get_ExpressionType().Resolve();
-			if (V_0 == null)
+			TypeDefinition typeDefinition = node.Left.ExpressionType.Resolve();
+			if (typeDefinition == null)
 			{
 				return node;
 			}
-			if (!V_0.get_IsEnum() || node.get_Left().get_ExpressionType().get_IsArray())
+			if (!typeDefinition.get_IsEnum() || node.Left.ExpressionType.get_IsArray())
 			{
-				if (!node.get_Right().get_HasType())
+				if (!node.Right.HasType)
 				{
 					return node;
 				}
-				V_1 = node.get_Right().get_ExpressionType().Resolve();
-				if (V_1 == null)
+				TypeDefinition typeDefinition1 = node.Right.ExpressionType.Resolve();
+				if (typeDefinition1 == null)
 				{
 					return node;
 				}
-				if (V_1.get_IsEnum() && !node.get_Right().get_ExpressionType().get_IsArray())
+				if (typeDefinition1.get_IsEnum() && !node.Right.ExpressionType.get_IsArray())
 				{
-					if (node.get_Left() as LiteralExpression == null)
+					if (node.Left is LiteralExpression)
 					{
-						if (node.get_Left() as ExplicitCastExpression != null && (node.get_Left() as ExplicitCastExpression).get_Expression() as LiteralExpression != null)
-						{
-							node.set_Left(EnumHelper.GetEnumExpression(V_1, (node.get_Left() as ExplicitCastExpression).get_Expression() as LiteralExpression, this.typeSystem));
-						}
+						node.Left = EnumHelper.GetEnumExpression(typeDefinition1, node.Left as LiteralExpression, this.typeSystem);
 					}
-					else
+					else if (node.Left is ExplicitCastExpression && (node.Left as ExplicitCastExpression).Expression is LiteralExpression)
 					{
-						node.set_Left(EnumHelper.GetEnumExpression(V_1, node.get_Left() as LiteralExpression, this.typeSystem));
+						node.Left = EnumHelper.GetEnumExpression(typeDefinition1, (node.Left as ExplicitCastExpression).Expression as LiteralExpression, this.typeSystem);
 					}
 				}
 			}
-			else
+			else if (node.Right is LiteralExpression)
 			{
-				if (node.get_Right() as LiteralExpression == null)
-				{
-					if (node.get_Right() as ExplicitCastExpression != null && (node.get_Right() as ExplicitCastExpression).get_Expression() as LiteralExpression != null)
-					{
-						node.set_Right(EnumHelper.GetEnumExpression(V_0, (node.get_Right() as ExplicitCastExpression).get_Expression() as LiteralExpression, this.typeSystem));
-					}
-				}
-				else
-				{
-					node.set_Right(EnumHelper.GetEnumExpression(V_0, node.get_Right() as LiteralExpression, this.typeSystem));
-				}
+				node.Right = EnumHelper.GetEnumExpression(typeDefinition, node.Right as LiteralExpression, this.typeSystem);
+			}
+			else if (node.Right is ExplicitCastExpression && (node.Right as ExplicitCastExpression).Expression is LiteralExpression)
+			{
+				node.Right = EnumHelper.GetEnumExpression(typeDefinition, (node.Right as ExplicitCastExpression).Expression as LiteralExpression, this.typeSystem);
 			}
 			return node;
 		}
 
 		public override ICodeNode VisitBoxExpression(BoxExpression node)
 		{
-			node = (BoxExpression)this.VisitBoxExpression(node);
-			V_0 = node.get_BoxedAs().Resolve();
-			if (V_0 != null && V_0.get_IsEnum() && !node.get_BoxedAs().get_IsArray() && node.get_BoxedExpression() as LiteralExpression != null)
+			node = (BoxExpression)base.VisitBoxExpression(node);
+			TypeDefinition typeDefinition = node.BoxedAs.Resolve();
+			if (typeDefinition != null && typeDefinition.get_IsEnum() && !node.BoxedAs.get_IsArray() && node.BoxedExpression is LiteralExpression)
 			{
-				node.set_BoxedExpression(EnumHelper.GetEnumExpression(V_0, node.get_BoxedExpression() as LiteralExpression, this.typeSystem));
+				node.BoxedExpression = EnumHelper.GetEnumExpression(typeDefinition, node.BoxedExpression as LiteralExpression, this.typeSystem);
 			}
 			return node;
 		}
 
 		public override ICodeNode VisitExplicitCastExpression(ExplicitCastExpression node)
 		{
-			if (node.get_Expression().get_CodeNodeType() != 22)
+			if (node.Expression.CodeNodeType != CodeNodeType.LiteralExpression)
 			{
-				return this.VisitExplicitCastExpression(node);
+				return base.VisitExplicitCastExpression(node);
 			}
-			V_0 = node.get_ExpressionType().Resolve();
-			if (V_0 == null || !V_0.get_IsEnum() || node.get_ExpressionType().get_IsArray())
+			TypeDefinition typeDefinition = node.ExpressionType.Resolve();
+			if (typeDefinition == null || !typeDefinition.get_IsEnum() || node.ExpressionType.get_IsArray())
 			{
 				return node;
 			}
-			return EnumHelper.GetEnumExpression(node.get_ExpressionType().Resolve(), node.get_Expression() as LiteralExpression, this.typeSystem);
+			return EnumHelper.GetEnumExpression(node.ExpressionType.Resolve(), node.Expression as LiteralExpression, this.typeSystem);
 		}
 
 		private void VisitInvocationArguments(ExpressionCollection arguments, MethodReference method)
 		{
-			V_0 = method.get_Parameters();
-			V_1 = 0;
-			while (V_1 < arguments.get_Count())
+			Mono.Collections.Generic.Collection<ParameterDefinition> parameters = method.get_Parameters();
+			for (int i = 0; i < arguments.Count; i++)
 			{
-				V_2 = V_0.get_Item(V_1).ResolveParameterType(method);
-				if (this.NeedsCast(arguments.get_Item(V_1).get_ExpressionType(), V_2))
+				TypeReference typeReference = parameters.get_Item(i).ResolveParameterType(method);
+				if (this.NeedsCast(arguments[i].ExpressionType, typeReference))
 				{
-					if (arguments.get_Item(V_1).get_CodeNodeType() != 22)
+					if (arguments[i].CodeNodeType != CodeNodeType.LiteralExpression)
 					{
-						arguments.set_Item(V_1, new ExplicitCastExpression(arguments.get_Item(V_1), V_2, null));
+						arguments[i] = new ExplicitCastExpression(arguments[i], typeReference, null);
 					}
 					else
 					{
-						arguments.set_Item(V_1, EnumHelper.GetEnumExpression(V_2.Resolve(), arguments.get_Item(V_1) as LiteralExpression, this.typeSystem));
+						arguments[i] = EnumHelper.GetEnumExpression(typeReference.Resolve(), arguments[i] as LiteralExpression, this.typeSystem);
 					}
 				}
-				V_1 = V_1 + 1;
 			}
-			return;
 		}
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			node = (MethodInvocationExpression)this.VisitMethodInvocationExpression(node);
-			this.VisitInvocationArguments(node.get_Arguments(), node.get_MethodExpression().get_Method());
-			if (node.get_IsConstrained() && node.get_MethodExpression().get_Target().get_CodeNodeType() == 22)
+			node = (MethodInvocationExpression)base.VisitMethodInvocationExpression(node);
+			this.VisitInvocationArguments(node.Arguments, node.MethodExpression.Method);
+			if (node.IsConstrained && node.MethodExpression.Target.CodeNodeType == CodeNodeType.LiteralExpression)
 			{
-				V_0 = node.get_ConstraintType().Resolve();
-				if (V_0.get_IsEnum())
+				TypeDefinition typeDefinition = node.ConstraintType.Resolve();
+				if (typeDefinition.get_IsEnum())
 				{
-					node.get_MethodExpression().set_Target(EnumHelper.GetEnumExpression(V_0, node.get_MethodExpression().get_Target() as LiteralExpression, this.typeSystem));
+					node.MethodExpression.Target = EnumHelper.GetEnumExpression(typeDefinition, node.MethodExpression.Target as LiteralExpression, this.typeSystem);
 				}
 			}
 			return node;
@@ -165,55 +153,49 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			node = (ObjectCreationExpression)this.VisitObjectCreationExpression(node);
-			if (node.get_Arguments().get_Count() != 0)
+			node = (ObjectCreationExpression)base.VisitObjectCreationExpression(node);
+			if (node.Arguments.Count != 0)
 			{
-				this.VisitInvocationArguments(node.get_Arguments(), node.get_Constructor());
+				this.VisitInvocationArguments(node.Arguments, node.Constructor);
 			}
 			return node;
 		}
 
 		public override ICodeNode VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			V_0 = (PropertyReferenceExpression)this.VisitPropertyReferenceExpression(node);
-			if (node.get_Arguments().get_Count() > 0)
+			PropertyReferenceExpression propertyReferenceExpression = (PropertyReferenceExpression)base.VisitPropertyReferenceExpression(node);
+			if (node.Arguments.Count > 0)
 			{
-				this.VisitInvocationArguments(V_0.get_Arguments(), V_0.get_MethodExpression().get_Method());
+				this.VisitInvocationArguments(propertyReferenceExpression.Arguments, propertyReferenceExpression.MethodExpression.Method);
 			}
-			return V_0;
+			return propertyReferenceExpression;
 		}
 
 		public override ICodeNode VisitReturnExpression(ReturnExpression node)
 		{
-			node = (ReturnExpression)this.VisitReturnExpression(node);
-			V_0 = this.context.get_MethodContext().get_Method().get_ReturnType().Resolve();
-			if (V_0 == null)
+			node = (ReturnExpression)base.VisitReturnExpression(node);
+			TypeDefinition typeDefinition = this.context.MethodContext.Method.get_ReturnType().Resolve();
+			if (typeDefinition == null)
 			{
 				return node;
 			}
-			if (node.get_Value() == null)
+			if (node.Value == null)
 			{
 				return node;
 			}
-			if (V_0.get_IsEnum() && !this.context.get_MethodContext().get_Method().get_ReturnType().get_IsArray() && node.get_Value().get_ExpressionType() == null || String.op_Inequality(node.get_Value().get_ExpressionType().get_FullName(), V_0.get_FullName()))
+			if (typeDefinition.get_IsEnum() && !this.context.MethodContext.Method.get_ReturnType().get_IsArray() && (node.Value.ExpressionType == null || node.Value.ExpressionType.get_FullName() != typeDefinition.get_FullName()))
 			{
-				if (node.get_Value() as LiteralExpression == null)
+				if (node.Value is LiteralExpression)
 				{
-					if (node.get_Value() as ExplicitCastExpression == null || (node.get_Value() as ExplicitCastExpression).get_Expression() as LiteralExpression == null)
-					{
-						if (node.get_Value().get_HasType() && this.NeedsCast(node.get_Value().get_ExpressionType(), V_0))
-						{
-							node.set_Value(new ExplicitCastExpression(node.get_Value(), V_0, null));
-						}
-					}
-					else
-					{
-						node.set_Value(EnumHelper.GetEnumExpression(V_0, (node.get_Value() as ExplicitCastExpression).get_Expression() as LiteralExpression, this.typeSystem));
-					}
+					node.Value = EnumHelper.GetEnumExpression(typeDefinition, node.Value as LiteralExpression, this.typeSystem);
 				}
-				else
+				else if (node.Value is ExplicitCastExpression && (node.Value as ExplicitCastExpression).Expression is LiteralExpression)
 				{
-					node.set_Value(EnumHelper.GetEnumExpression(V_0, node.get_Value() as LiteralExpression, this.typeSystem));
+					node.Value = EnumHelper.GetEnumExpression(typeDefinition, (node.Value as ExplicitCastExpression).Expression as LiteralExpression, this.typeSystem);
+				}
+				else if (node.Value.HasType && this.NeedsCast(node.Value.ExpressionType, typeDefinition))
+				{
+					node.Value = new ExplicitCastExpression(node.Value, typeDefinition, null);
 				}
 			}
 			return node;
@@ -221,47 +203,35 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override ICodeNode VisitSwitchStatement(SwitchStatement node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			V_0 = node.get_Cases().GetEnumerator();
-			try
+			node.Condition = (Expression)this.Visit(node.Condition);
+			foreach (SwitchCase @case in node.Cases)
 			{
-				while (V_0.MoveNext())
+				if (!(@case is ConditionCase))
 				{
-					V_1 = V_0.get_Current();
-					if (V_1 as ConditionCase == null)
-					{
-						continue;
-					}
-					V_2 = V_1 as ConditionCase;
-					if (!this.NeedsCast(V_2.get_Condition().get_ExpressionType(), node.get_Condition().get_ExpressionType()))
-					{
-						continue;
-					}
-					if (V_2.get_Condition() as LiteralExpression == null)
-					{
-						V_2.set_Condition(new ExplicitCastExpression(V_2.get_Condition(), node.get_Condition().get_ExpressionType(), null));
-					}
-					else
-					{
-						V_2.set_Condition(EnumHelper.GetEnumExpression(node.get_Condition().get_ExpressionType().Resolve(), V_2.get_Condition() as LiteralExpression, this.typeSystem));
-					}
+					continue;
+				}
+				ConditionCase explicitCastExpression = @case as ConditionCase;
+				if (!this.NeedsCast(explicitCastExpression.Condition.ExpressionType, node.Condition.ExpressionType))
+				{
+					continue;
+				}
+				if (!(explicitCastExpression.Condition is LiteralExpression))
+				{
+					explicitCastExpression.Condition = new ExplicitCastExpression(explicitCastExpression.Condition, node.Condition.ExpressionType, null);
+				}
+				else
+				{
+					explicitCastExpression.Condition = EnumHelper.GetEnumExpression(node.Condition.ExpressionType.Resolve(), explicitCastExpression.Condition as LiteralExpression, this.typeSystem);
 				}
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			node = (SwitchStatement)this.VisitSwitchStatement(node);
+			node = (SwitchStatement)base.VisitSwitchStatement(node);
 			return node;
 		}
 
 		public override ICodeNode VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			node = (ThisCtorExpression)this.VisitThisCtorExpression(node);
-			this.VisitInvocationArguments(node.get_Arguments(), node.get_MethodExpression().get_Method());
+			node = (ThisCtorExpression)base.VisitThisCtorExpression(node);
+			this.VisitInvocationArguments(node.Arguments, node.MethodExpression.Method);
 			return node;
 		}
 	}

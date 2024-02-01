@@ -13,15 +13,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = this.get_ExpressionToOrderDirectionMap();
-				stackVariable2 = OrderByClause.u003cu003ec.u003cu003e9__11_0;
-				if (stackVariable2 == null)
-				{
-					dummyVar0 = stackVariable2;
-					stackVariable2 = new Func<KeyValuePair<Expression, OrderDirection>, ICodeNode>(OrderByClause.u003cu003ec.u003cu003e9.u003cget_Childrenu003eb__11_0);
-					OrderByClause.u003cu003ec.u003cu003e9__11_0 = stackVariable2;
-				}
-				return stackVariable1.Select<KeyValuePair<Expression, OrderDirection>, ICodeNode>(stackVariable2);
+				return 
+					from pair in this.ExpressionToOrderDirectionMap
+					select pair.Key;
 			}
 		}
 
@@ -29,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 77;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.OrderByClause;
 			}
 		}
 
@@ -39,56 +33,40 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public OrderByClause(PairList<Expression, OrderDirection> expressionToOrderMap, IEnumerable<Instruction> instructions)
+		public OrderByClause(PairList<Expression, OrderDirection> expressionToOrderMap, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_ExpressionToOrderDirectionMap(expressionToOrderMap);
-			return;
+			this.ExpressionToOrderDirectionMap = expressionToOrderMap;
 		}
 
 		public override Expression Clone()
 		{
-			stackVariable1 = this.get_ExpressionToOrderDirectionMap();
-			stackVariable2 = OrderByClause.u003cu003ec.u003cu003e9__6_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<KeyValuePair<Expression, OrderDirection>, KeyValuePair<Expression, OrderDirection>>(OrderByClause.u003cu003ec.u003cu003e9.u003cCloneu003eb__6_0);
-				OrderByClause.u003cu003ec.u003cu003e9__6_0 = stackVariable2;
-			}
-			return new OrderByClause(new PairList<Expression, OrderDirection>(stackVariable1.Select<KeyValuePair<Expression, OrderDirection>, KeyValuePair<Expression, OrderDirection>>(stackVariable2)), this.instructions);
+			return new OrderByClause(new PairList<Expression, OrderDirection>(
+				from pair in this.ExpressionToOrderDirectionMap
+				select new KeyValuePair<Expression, OrderDirection>(pair.Key.Clone(), pair.Value)), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			stackVariable1 = this.get_ExpressionToOrderDirectionMap();
-			stackVariable2 = OrderByClause.u003cu003ec.u003cu003e9__7_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<KeyValuePair<Expression, OrderDirection>, KeyValuePair<Expression, OrderDirection>>(OrderByClause.u003cu003ec.u003cu003e9.u003cCloneExpressionOnlyu003eb__7_0);
-				OrderByClause.u003cu003ec.u003cu003e9__7_0 = stackVariable2;
-			}
-			return new OrderByClause(new PairList<Expression, OrderDirection>(stackVariable1.Select<KeyValuePair<Expression, OrderDirection>, KeyValuePair<Expression, OrderDirection>>(stackVariable2)), null);
+			return new OrderByClause(new PairList<Expression, OrderDirection>(
+				from pair in this.ExpressionToOrderDirectionMap
+				select new KeyValuePair<Expression, OrderDirection>(pair.Key.CloneExpressionOnly(), pair.Value)), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as OrderByClause;
-			if (V_0 == null || this.get_ExpressionToOrderDirectionMap().get_Count() != V_0.get_ExpressionToOrderDirectionMap().get_Count())
+			OrderByClause orderByClause = other as OrderByClause;
+			if (orderByClause == null || this.ExpressionToOrderDirectionMap.Count != orderByClause.ExpressionToOrderDirectionMap.Count)
 			{
 				return false;
 			}
-			V_1 = 0;
-			while (V_1 < this.get_ExpressionToOrderDirectionMap().get_Count())
+			for (int i = 0; i < this.ExpressionToOrderDirectionMap.Count; i++)
 			{
-				V_2 = this.get_ExpressionToOrderDirectionMap().get_Item(V_1);
-				V_3 = V_0.get_ExpressionToOrderDirectionMap().get_Item(V_1);
-				if (!V_2.get_Key().Equals(V_3.get_Key()) || V_2.get_Value() != V_3.get_Value())
+				KeyValuePair<Expression, OrderDirection> item = this.ExpressionToOrderDirectionMap[i];
+				KeyValuePair<Expression, OrderDirection> keyValuePair = orderByClause.ExpressionToOrderDirectionMap[i];
+				if (!item.Key.Equals(keyValuePair.Key) || item.Value != keyValuePair.Value)
 				{
 					return false;
 				}
-				V_1 = V_1 + 1;
 			}
 			return true;
 		}

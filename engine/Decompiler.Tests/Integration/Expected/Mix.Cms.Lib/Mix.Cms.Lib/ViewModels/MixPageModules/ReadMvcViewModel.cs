@@ -3,6 +3,7 @@ using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixModules;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -111,40 +112,30 @@ namespace Mix.Cms.Lib.ViewModels.MixPageModules
 			set;
 		}
 
-		public ReadMvcViewModel(MixPageModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixPageModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public ReadMvcViewModel()
 		{
-			base();
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> singleModel = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>.Repository.GetSingleModel((MixModule p) => p.Id == this.ModuleId && p.Specificulture == this.Specificulture, _context, _transaction);
+			if (singleModel.get_IsSucceed())
+			{
+				this.Module = singleModel.get_Data();
+			}
+		}
 
 		public override MixPageModule ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				stackVariable7 = ViewModelBase<MixCmsContext, MixPageModule, Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel>.Repository;
-				V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixPageModule Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixPageModule ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixPageModule, Mix.Cms.Lib.ViewModels.MixPageModules.ReadMvcViewModel>.Repository.Max((MixPageModule m) => m.Id, _context, _transaction).get_Data() + 1;
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 	}
 }

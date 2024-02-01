@@ -1,10 +1,13 @@
 using Piranha;
+using Piranha.Cache;
 using Piranha.Models;
 using Piranha.Repositories;
+using Piranha.Runtime;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -18,33 +21,37 @@ namespace Piranha.Services
 
 		public PageTypeService(IPageTypeRepository repo, ICache cache)
 		{
-			base();
 			this._repo = repo;
-			if (App.get_CacheLevel() > 1)
+			if (App.CacheLevel > CacheLevel.Minimal)
 			{
 				this._cache = cache;
 			}
-			return;
 		}
 
 		public async Task DeleteAsync(string id)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PageTypeService.u003cDeleteAsyncu003ed__6>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ConfiguredTaskAwaitable<PageType> configuredTaskAwaitable = this._repo.GetById(id).ConfigureAwait(false);
+			PageType pageType = await configuredTaskAwaitable;
+			if (pageType != null)
+			{
+				await this.DeleteAsync(pageType).ConfigureAwait(false);
+			}
 		}
 
 		public async Task DeleteAsync(PageType model)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.model = model;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PageTypeService.u003cDeleteAsyncu003ed__7>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			App.Hooks.OnBeforeDelete<PageType>(model);
+			ConfiguredTaskAwaitable configuredTaskAwaitable = this._repo.Delete(model.Id).ConfigureAwait(false);
+			await configuredTaskAwaitable;
+			App.Hooks.OnAfterDelete<PageType>(model);
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				cache.Remove("Piranha_PageTypes");
+			}
+			else
+			{
+			}
 		}
 
 		public Task<IEnumerable<PageType>> GetAllAsync()
@@ -54,31 +61,54 @@ namespace Piranha.Services
 
 		public async Task<PageType> GetByIdAsync(string id)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<PageType>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PageTypeService.u003cGetByIdAsyncu003ed__4>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ConfiguredTaskAwaitable<IEnumerable<PageType>> configuredTaskAwaitable = this.GetTypes().ConfigureAwait(false);
+			PageType pageType = await configuredTaskAwaitable.FirstOrDefault<PageType>((PageType t) => t.Id == id);
+			return pageType;
 		}
 
 		private async Task<IEnumerable<PageType>> GetTypes()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<IEnumerable<PageType>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PageTypeService.u003cGetTypesu003ed__8>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			IEnumerable<PageType> pageTypes;
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				pageTypes = cache.Get<IEnumerable<PageType>>("Piranha_PageTypes");
+			}
+			else
+			{
+				pageTypes = null;
+			}
+			IEnumerable<PageType> pageTypes1 = pageTypes;
+			if (pageTypes1 == null)
+			{
+				ConfiguredTaskAwaitable<IEnumerable<PageType>> configuredTaskAwaitable = this._repo.GetAll().ConfigureAwait(false);
+				pageTypes1 = await configuredTaskAwaitable;
+				ICache cache1 = this._cache;
+				if (cache1 != null)
+				{
+					cache1.Set<IEnumerable<PageType>>("Piranha_PageTypes", pageTypes1);
+				}
+				else
+				{
+				}
+			}
+			return pageTypes1;
 		}
 
 		public async Task SaveAsync(PageType model)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.model = model;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PageTypeService.u003cSaveAsyncu003ed__5>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Validator.ValidateObject(model, new ValidationContext(model), true);
+			App.Hooks.OnBeforeSave<PageType>(model);
+			await this._repo.Save(model).ConfigureAwait(false);
+			App.Hooks.OnAfterSave<PageType>(model);
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				cache.Remove("Piranha_PageTypes");
+			}
+			else
+			{
+			}
 		}
 	}
 }

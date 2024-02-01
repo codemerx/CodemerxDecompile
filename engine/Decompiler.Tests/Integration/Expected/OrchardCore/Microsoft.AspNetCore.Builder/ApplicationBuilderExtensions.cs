@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using OrchardCore.Modules;
 using System;
@@ -9,22 +11,17 @@ namespace Microsoft.AspNetCore.Builder
 	{
 		public static IApplicationBuilder UseOrchardCore(this IApplicationBuilder app, Action<IApplicationBuilder> configure = null)
 		{
-			V_0 = ServiceProviderServiceExtensions.GetRequiredService<IHostEnvironment>(app.get_ApplicationServices());
-			V_1 = ServiceProviderServiceExtensions.GetRequiredService<IApplicationContext>(app.get_ApplicationServices());
-			stackVariable8 = new IFileProvider[2];
-			stackVariable8[0] = new ModuleEmbeddedFileProvider(V_1);
-			stackVariable8[1] = V_0.get_ContentRootFileProvider();
-			V_0.set_ContentRootFileProvider(new CompositeFileProvider(stackVariable8));
-			ServiceProviderServiceExtensions.GetRequiredService<IWebHostEnvironment>(app.get_ApplicationServices()).set_ContentRootFileProvider(V_0.get_ContentRootFileProvider());
-			dummyVar0 = UseMiddlewareExtensions.UseMiddleware<PoweredByMiddleware>(app, Array.Empty<object>());
-			dummyVar1 = UseMiddlewareExtensions.UseMiddleware<ModularTenantContainerMiddleware>(app, Array.Empty<object>());
+			IHostEnvironment requiredService = ServiceProviderServiceExtensions.GetRequiredService<IHostEnvironment>(app.get_ApplicationServices());
+			IApplicationContext applicationContext = ServiceProviderServiceExtensions.GetRequiredService<IApplicationContext>(app.get_ApplicationServices());
+			requiredService.set_ContentRootFileProvider(new CompositeFileProvider(new IFileProvider[] { new ModuleEmbeddedFileProvider(applicationContext), requiredService.get_ContentRootFileProvider() }));
+			ServiceProviderServiceExtensions.GetRequiredService<IWebHostEnvironment>(app.get_ApplicationServices()).set_ContentRootFileProvider(requiredService.get_ContentRootFileProvider());
+			UseMiddlewareExtensions.UseMiddleware<PoweredByMiddleware>(app, Array.Empty<object>());
+			UseMiddlewareExtensions.UseMiddleware<ModularTenantContainerMiddleware>(app, Array.Empty<object>());
 			if (configure != null)
 			{
-				configure.Invoke(app);
+				configure(app);
 			}
-			stackVariable30 = new object[1];
-			stackVariable30[0] = app.get_ServerFeatures();
-			dummyVar2 = UseMiddlewareExtensions.UseMiddleware<ModularTenantRouterMiddleware>(app, stackVariable30);
+			UseMiddlewareExtensions.UseMiddleware<ModularTenantRouterMiddleware>(app, new object[] { app.get_ServerFeatures() });
 			return app;
 		}
 	}

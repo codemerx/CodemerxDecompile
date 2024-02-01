@@ -6,6 +6,7 @@ using OrchardCore.Environment.Shell.Descriptor.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -29,91 +30,131 @@ namespace OrchardCore.Environment.Shell
 
 		public ShellDescriptorFeaturesManager(IExtensionManager extensionManager, IEnumerable<ShellFeature> shellFeatures, IShellDescriptorManager shellDescriptorManager, ILogger<ShellFeaturesManager> logger)
 		{
-			base();
 			this._extensionManager = extensionManager;
-			stackVariable4 = shellFeatures;
-			stackVariable5 = ShellDescriptorFeaturesManager.u003cu003ec.u003cu003e9__8_0;
-			if (stackVariable5 == null)
-			{
-				dummyVar0 = stackVariable5;
-				stackVariable5 = new Func<ShellFeature, bool>(ShellDescriptorFeaturesManager.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__8_0);
-				ShellDescriptorFeaturesManager.u003cu003ec.u003cu003e9__8_0 = stackVariable5;
-			}
-			this._alwaysEnabledFeatures = stackVariable4.Where<ShellFeature>(stackVariable5).ToArray<ShellFeature>();
+			this._alwaysEnabledFeatures = (
+				from f in shellFeatures
+				where f.get_AlwaysEnabled()
+				select f).ToArray<ShellFeature>();
 			this._shellDescriptorManager = shellDescriptorManager;
 			this._logger = logger;
-			return;
 		}
 
 		private IEnumerable<IFeatureInfo> GetFeaturesToDisable(IFeatureInfo featureInfo, IEnumerable<string> enabledFeatureIds, bool force)
 		{
-			V_0 = new ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass11_0();
-			V_0.enabledFeatureIds = enabledFeatureIds;
-			V_0.featureInfo = featureInfo;
-			V_1 = this._extensionManager.GetDependentFeatures(V_0.featureInfo.get_Id()).Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToDisableu003eb__0)).ToList<IFeatureInfo>();
-			if (V_1.get_Count() <= 1 || force)
+			List<IFeatureInfo> list = (
+				from f in this._extensionManager.GetDependentFeatures(featureInfo.get_Id())
+				where enabledFeatureIds.Contains<string>(f.get_Id())
+				select f).ToList<IFeatureInfo>();
+			if (list.Count <= 1 || force)
 			{
-				return V_1;
+				return list;
 			}
 			if (this._logger.IsEnabled(3))
 			{
-				stackVariable37 = this._logger;
-				stackVariable40 = new object[1];
-				stackVariable40[0] = V_0.featureInfo.get_Id();
-				LoggerExtensions.LogWarning(stackVariable37, " To disable '{FeatureId}', additional features need to be disabled.", stackVariable40);
+				LoggerExtensions.LogWarning(this._logger, " To disable '{FeatureId}', additional features need to be disabled.", new object[] { featureInfo.get_Id() });
 			}
-			stackVariable26 = this.get_FeatureDependencyNotification();
-			if (stackVariable26 != null)
+			FeatureDependencyNotificationHandler featureDependencyNotification = this.FeatureDependencyNotification;
+			if (featureDependencyNotification != null)
 			{
-				stackVariable26.Invoke("If {0} is disabled, then you'll also need to disable {1}.", V_0.featureInfo, V_1.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToDisableu003eb__1)));
+				featureDependencyNotification.Invoke("If {0} is disabled, then you'll also need to disable {1}.", featureInfo, 
+					from f in list
+					where f.get_Id() != featureInfo.get_Id()
+					select f);
 			}
 			else
 			{
-				dummyVar0 = stackVariable26;
 			}
 			return Enumerable.Empty<IFeatureInfo>();
 		}
 
 		private IEnumerable<IFeatureInfo> GetFeaturesToEnable(IFeatureInfo featureInfo, IEnumerable<string> enabledFeatureIds, bool force)
 		{
-			V_0 = new ShellDescriptorFeaturesManager.u003cu003ec__DisplayClass10_0();
-			V_0.enabledFeatureIds = enabledFeatureIds;
-			V_0.featureInfo = featureInfo;
-			V_1 = this._extensionManager.GetFeatureDependencies(V_0.featureInfo.get_Id()).Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToEnableu003eb__0)).ToList<IFeatureInfo>();
-			if (V_1.get_Count() <= 1 || force)
+			List<IFeatureInfo> list = (
+				from f in this._extensionManager.GetFeatureDependencies(featureInfo.get_Id())
+				where !enabledFeatureIds.Contains<string>(f.get_Id())
+				select f).ToList<IFeatureInfo>();
+			if (list.Count <= 1 || force)
 			{
-				return V_1;
+				return list;
 			}
 			if (this._logger.IsEnabled(3))
 			{
-				stackVariable37 = this._logger;
-				stackVariable40 = new object[1];
-				stackVariable40[0] = V_0.featureInfo.get_Id();
-				LoggerExtensions.LogWarning(stackVariable37, " To enable '{FeatureId}', additional features need to be enabled.", stackVariable40);
+				LoggerExtensions.LogWarning(this._logger, " To enable '{FeatureId}', additional features need to be enabled.", new object[] { featureInfo.get_Id() });
 			}
-			stackVariable26 = this.get_FeatureDependencyNotification();
-			if (stackVariable26 != null)
+			FeatureDependencyNotificationHandler featureDependencyNotification = this.FeatureDependencyNotification;
+			if (featureDependencyNotification != null)
 			{
-				stackVariable26.Invoke("If {0} is enabled, then you'll also need to enable {1}.", V_0.featureInfo, V_1.Where<IFeatureInfo>(new Func<IFeatureInfo, bool>(V_0.u003cGetFeaturesToEnableu003eb__1)));
+				featureDependencyNotification.Invoke("If {0} is enabled, then you'll also need to enable {1}.", featureInfo, 
+					from f in list
+					where f.get_Id() != featureInfo.get_Id()
+					select f);
 			}
 			else
 			{
-				dummyVar0 = stackVariable26;
 			}
 			return Enumerable.Empty<IFeatureInfo>();
 		}
 
 		public async Task<ValueTuple<IEnumerable<IFeatureInfo>, IEnumerable<IFeatureInfo>>> UpdateFeaturesAsync(ShellDescriptor shellDescriptor, IEnumerable<IFeatureInfo> featuresToDisable, IEnumerable<IFeatureInfo> featuresToEnable, bool force)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.shellDescriptor = shellDescriptor;
-			V_0.featuresToDisable = featuresToDisable;
-			V_0.featuresToEnable = featuresToEnable;
-			V_0.force = force;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<ValueTuple<IEnumerable<IFeatureInfo>, IEnumerable<IFeatureInfo>>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellDescriptorFeaturesManager.u003cUpdateFeaturesAsyncu003ed__9>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			IEnumerable<ShellFeature> shellFeatures = this._alwaysEnabledFeatures;
+			string[] array = (
+				from sf in shellFeatures
+				select sf.get_Id()).ToArray<string>();
+			List<IFeatureInfo> list = (
+				from f in this._extensionManager.GetFeatures()
+				where shellDescriptor.get_Features().Any<ShellFeature>((ShellFeature sf) => sf.get_Id() == f.get_Id())
+				select f).ToList<IFeatureInfo>();
+			List<IFeatureInfo> featureInfos = list;
+			string[] strArrays = (
+				from f in featureInfos
+				select f.get_Id()).ToArray<string>();
+			List<IFeatureInfo> list1 = (
+				from f in featuresToDisable
+				where !array.Contains<string>(f.get_Id())
+				select f).SelectMany<IFeatureInfo, IFeatureInfo>((IFeatureInfo feature) => this.GetFeaturesToDisable(feature, strArrays, force)).Distinct<IFeatureInfo>().ToList<IFeatureInfo>();
+			if (list1.Count > 0)
+			{
+				foreach (IFeatureInfo featureInfo in list1)
+				{
+					list.Remove(featureInfo);
+					if (!this._logger.IsEnabled(2))
+					{
+						continue;
+					}
+					ILogger logger = this._logger;
+					object[] id = new object[] { featureInfo.get_Id() };
+					LoggerExtensions.LogInformation(logger, "Feature '{FeatureName}' was disabled", id);
+				}
+			}
+			List<IFeatureInfo> featureInfos1 = list;
+			strArrays = (
+				from f in featureInfos1
+				select f.get_Id()).ToArray<string>();
+			List<IFeatureInfo> list2 = featuresToEnable.SelectMany<IFeatureInfo, IFeatureInfo>((IFeatureInfo feature) => this.GetFeaturesToEnable(feature, strArrays, force)).Distinct<IFeatureInfo>().ToList<IFeatureInfo>();
+			if (list2.Count > 0)
+			{
+				if (this._logger.IsEnabled(2))
+				{
+					foreach (IFeatureInfo featureInfo1 in list2)
+					{
+						ILogger logger1 = this._logger;
+						object[] objArray = new object[] { featureInfo1.get_Id() };
+						LoggerExtensions.LogInformation(logger1, "Enabling feature '{FeatureName}'", objArray);
+					}
+				}
+				list = list.Concat<IFeatureInfo>(list2).Distinct<IFeatureInfo>().ToList<IFeatureInfo>();
+			}
+			if (list1.Count > 0 || list2.Count > 0)
+			{
+				IShellDescriptorManager shellDescriptorManager = this._shellDescriptorManager;
+				int serialNumber = shellDescriptor.get_SerialNumber();
+				List<IFeatureInfo> featureInfos2 = list;
+				await shellDescriptorManager.UpdateShellDescriptorAsync(serialNumber, (
+					from x in featureInfos2
+					select new ShellFeature(x.get_Id(), false)).ToList<ShellFeature>(), shellDescriptor.get_Parameters());
+			}
+			return new ValueTuple<IEnumerable<IFeatureInfo>, IEnumerable<IFeatureInfo>>(list1, list2);
 		}
 	}
 }

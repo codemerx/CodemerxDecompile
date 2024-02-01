@@ -5,17 +5,26 @@ using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.StaticFiles.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
+using OrchardCore.Environment.Extensions;
 using OrchardCore.Environment.Shell;
+using OrchardCore.Environment.Shell.Builders;
 using OrchardCore.Environment.Shell.Configuration;
 using OrchardCore.Environment.Shell.Descriptor.Models;
 using OrchardCore.Modules;
 using OrchardCore.Modules.FileProviders;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Web;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -23,255 +32,207 @@ namespace Microsoft.Extensions.DependencyInjection
 	{
 		private static void AddAntiForgery(OrchardCoreBuilder builder)
 		{
-			dummyVar0 = AntiforgeryServiceCollectionExtensions.AddAntiforgery(builder.get_ApplicationServices());
-			stackVariable3 = builder;
-			stackVariable4 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__7_0;
-			if (stackVariable4 == null)
-			{
-				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<IServiceCollection, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddAntiForgeryu003eb__7_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__7_0 = stackVariable4;
-			}
-			dummyVar2 = stackVariable3.ConfigureServices(stackVariable4, 0);
-			return;
+			AntiforgeryServiceCollectionExtensions.AddAntiforgery(builder.get_ApplicationServices());
+			builder.ConfigureServices((IServiceCollection services, IServiceProvider serviceProvider) => {
+				ShellSettings requiredService = ServiceProviderServiceExtensions.GetRequiredService<ShellSettings>(serviceProvider);
+				IHostEnvironment hostEnvironment = ServiceProviderServiceExtensions.GetRequiredService<IHostEnvironment>(serviceProvider);
+				string str = string.Concat("orchantiforgery_", HttpUtility.UrlEncode(string.Concat(requiredService.get_Name(), hostEnvironment.get_ContentRootPath())));
+				if (requiredService.get_State() != null)
+				{
+					ServiceCollectionDescriptorExtensions.Add(services, AntiforgeryServiceCollectionExtensions.AddAntiforgery(new ServiceCollection(), (AntiforgeryOptions options) => options.get_Cookie().set_Name(str)));
+					return;
+				}
+				IHttpContextAccessor httpContextAccessor = ServiceProviderServiceExtensions.GetRequiredService<IHttpContextAccessor>(serviceProvider);
+				if (!httpContextAccessor.get_HttpContext().get_Response().get_HasStarted())
+				{
+					httpContextAccessor.get_HttpContext().get_Response().get_Cookies().Delete(str);
+				}
+			}, 0);
 		}
 
 		private static void AddAuthentication(OrchardCoreBuilder builder)
 		{
-			dummyVar0 = AuthenticationServiceCollectionExtensions.AddAuthentication(builder.get_ApplicationServices());
-			stackVariable3 = builder;
-			stackVariable4 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__10_0;
-			if (stackVariable4 == null)
-			{
-				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddAuthenticationu003eb__10_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__10_0 = stackVariable4;
-			}
-			stackVariable6 = stackVariable3.ConfigureServices(stackVariable4, 0);
-			stackVariable7 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__10_1;
-			if (stackVariable7 == null)
-			{
-				dummyVar2 = stackVariable7;
-				stackVariable7 = new Action<IApplicationBuilder>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddAuthenticationu003eb__10_1);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__10_1 = stackVariable7;
-			}
-			dummyVar3 = stackVariable6.Configure(stackVariable7, 0);
-			return;
+			AuthenticationServiceCollectionExtensions.AddAuthentication(builder.get_ApplicationServices());
+			builder.ConfigureServices((IServiceCollection services) => {
+				AuthenticationServiceCollectionExtensions.AddAuthentication(services);
+				ServiceCollectionServiceExtensions.AddSingleton<IAuthenticationSchemeProvider, AuthenticationSchemeProvider>(services);
+			}, 0).Configure((IApplicationBuilder app) => AuthAppBuilderExtensions.UseAuthentication(app), 0);
 		}
 
 		private static void AddDataProtection(OrchardCoreBuilder builder)
 		{
-			stackVariable0 = builder;
-			stackVariable1 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__11_0;
-			if (stackVariable1 == null)
-			{
-				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddDataProtectionu003eb__11_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__11_0 = stackVariable1;
-			}
-			dummyVar1 = stackVariable0.ConfigureServices(stackVariable1, 0);
-			return;
+			// 
+			// Current member / type: System.Void Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions::AddDataProtection(Microsoft.Extensions.DependencyInjection.OrchardCoreBuilder)
+			// Exception in: System.Void AddDataProtection(Microsoft.Extensions.DependencyInjection.OrchardCoreBuilder)
+			// Object reference not set to an instance of an object.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 		}
 
 		private static void AddDefaultServices(IServiceCollection services)
 		{
-			dummyVar0 = LoggingServiceCollectionExtensions.AddLogging(services);
-			dummyVar1 = OptionsServiceCollectionExtensions.AddOptions(services);
-			dummyVar2 = LocalizationServiceCollectionExtensions.AddLocalization(services);
-			dummyVar3 = ServiceCollectionServiceExtensions.AddSingleton<IStringLocalizerFactory, NullStringLocalizerFactory>(services);
-			dummyVar4 = ServiceCollectionServiceExtensions.AddSingleton<IHtmlLocalizerFactory, NullHtmlLocalizerFactory>(services);
-			dummyVar5 = EncoderServiceCollectionExtensions.AddWebEncoders(services);
-			dummyVar6 = HttpServiceCollectionExtensions.AddHttpContextAccessor(services);
-			dummyVar7 = ServiceCollectionServiceExtensions.AddSingleton<IClock, Clock>(services);
-			dummyVar8 = ServiceCollectionServiceExtensions.AddScoped<ILocalClock, LocalClock>(services);
-			dummyVar9 = ServiceCollectionServiceExtensions.AddScoped<ILocalizationService, DefaultLocalizationService>(services);
-			dummyVar10 = ServiceCollectionServiceExtensions.AddScoped<ICalendarManager, DefaultCalendarManager>(services);
-			dummyVar11 = ServiceCollectionServiceExtensions.AddScoped<ICalendarSelector, DefaultCalendarSelector>(services);
-			dummyVar12 = ServiceCollectionServiceExtensions.AddSingleton<IPoweredByMiddlewareOptions, PoweredByMiddlewareOptions>(services);
-			dummyVar13 = ServiceCollectionServiceExtensions.AddScoped<IOrchardHelper, DefaultOrchardHelper>(services);
-			return;
+			LoggingServiceCollectionExtensions.AddLogging(services);
+			OptionsServiceCollectionExtensions.AddOptions(services);
+			LocalizationServiceCollectionExtensions.AddLocalization(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IStringLocalizerFactory, NullStringLocalizerFactory>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IHtmlLocalizerFactory, NullHtmlLocalizerFactory>(services);
+			EncoderServiceCollectionExtensions.AddWebEncoders(services);
+			HttpServiceCollectionExtensions.AddHttpContextAccessor(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IClock, Clock>(services);
+			ServiceCollectionServiceExtensions.AddScoped<ILocalClock, LocalClock>(services);
+			ServiceCollectionServiceExtensions.AddScoped<ILocalizationService, DefaultLocalizationService>(services);
+			ServiceCollectionServiceExtensions.AddScoped<ICalendarManager, DefaultCalendarManager>(services);
+			ServiceCollectionServiceExtensions.AddScoped<ICalendarSelector, DefaultCalendarSelector>(services);
+			ServiceCollectionServiceExtensions.AddSingleton<IPoweredByMiddlewareOptions, PoweredByMiddlewareOptions>(services);
+			ServiceCollectionServiceExtensions.AddScoped<IOrchardHelper, DefaultOrchardHelper>(services);
 		}
 
 		private static void AddExtensionServices(OrchardCoreBuilder builder)
 		{
-			dummyVar0 = ServiceCollectionServiceExtensions.AddSingleton<IModuleNamesProvider, AssemblyAttributeModuleNamesProvider>(builder.get_ApplicationServices());
-			dummyVar1 = ServiceCollectionServiceExtensions.AddSingleton<IApplicationContext, ModularApplicationContext>(builder.get_ApplicationServices());
-			dummyVar2 = builder.get_ApplicationServices().AddExtensionManagerHost();
-			stackVariable9 = builder;
-			stackVariable10 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__4_0;
-			if (stackVariable10 == null)
-			{
-				dummyVar3 = stackVariable10;
-				stackVariable10 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddExtensionServicesu003eb__4_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__4_0 = stackVariable10;
-			}
-			dummyVar4 = stackVariable9.ConfigureServices(stackVariable10, 0);
-			return;
+			ServiceCollectionServiceExtensions.AddSingleton<IModuleNamesProvider, AssemblyAttributeModuleNamesProvider>(builder.get_ApplicationServices());
+			ServiceCollectionServiceExtensions.AddSingleton<IApplicationContext, ModularApplicationContext>(builder.get_ApplicationServices());
+			builder.get_ApplicationServices().AddExtensionManagerHost();
+			builder.ConfigureServices((IServiceCollection services) => services.AddExtensionManager(), 0);
 		}
 
 		public static OrchardCoreBuilder AddOrchardCore(this IServiceCollection services)
 		{
+			object implementationInstance;
 			if (services == null)
 			{
 				throw new ArgumentNullException("services");
 			}
-			stackVariable1 = services;
-			stackVariable2 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__0_0;
-			if (stackVariable2 == null)
+			ServiceDescriptor serviceDescriptor = services.LastOrDefault<ServiceDescriptor>((ServiceDescriptor d) => d.get_ServiceType() == typeof(OrchardCoreBuilder));
+			if (serviceDescriptor != null)
 			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<ServiceDescriptor, bool>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddOrchardCoreu003eb__0_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__0_0 = stackVariable2;
-			}
-			stackVariable3 = stackVariable1.LastOrDefault<ServiceDescriptor>(stackVariable2);
-			if (stackVariable3 != null)
-			{
-				stackVariable4 = stackVariable3.get_ImplementationInstance();
+				implementationInstance = serviceDescriptor.get_ImplementationInstance();
 			}
 			else
 			{
-				dummyVar1 = stackVariable3;
-				stackVariable4 = null;
+				implementationInstance = null;
 			}
-			V_0 = stackVariable4 as OrchardCoreBuilder;
-			if (V_0 == null)
+			OrchardCoreBuilder orchardCoreBuilder = implementationInstance as OrchardCoreBuilder;
+			if (orchardCoreBuilder == null)
 			{
-				V_0 = new OrchardCoreBuilder(services);
-				dummyVar2 = ServiceCollectionServiceExtensions.AddSingleton<OrchardCoreBuilder>(services, V_0);
+				orchardCoreBuilder = new OrchardCoreBuilder(services);
+				ServiceCollectionServiceExtensions.AddSingleton<OrchardCoreBuilder>(services, orchardCoreBuilder);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddDefaultServices(services);
 				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddShellServices(services);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddExtensionServices(V_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddStaticFiles(V_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddRouting(V_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddAntiForgery(V_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddSameSiteCookieBackwardsCompatibility(V_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddAuthentication(V_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddDataProtection(V_0);
-				dummyVar3 = ServiceCollectionServiceExtensions.AddSingleton<IServiceCollection>(services, services);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddExtensionServices(orchardCoreBuilder);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddStaticFiles(orchardCoreBuilder);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddRouting(orchardCoreBuilder);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddAntiForgery(orchardCoreBuilder);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddSameSiteCookieBackwardsCompatibility(orchardCoreBuilder);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddAuthentication(orchardCoreBuilder);
+				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddDataProtection(orchardCoreBuilder);
+				ServiceCollectionServiceExtensions.AddSingleton<IServiceCollection>(services, services);
 			}
-			return V_0;
+			return orchardCoreBuilder;
 		}
 
 		public static IServiceCollection AddOrchardCore(this IServiceCollection services, Action<OrchardCoreBuilder> configure)
 		{
-			V_0 = services.AddOrchardCore();
+			OrchardCoreBuilder orchardCoreBuilder = services.AddOrchardCore();
 			if (configure != null)
 			{
-				configure.Invoke(V_0);
+				configure(orchardCoreBuilder);
 			}
 			return services;
 		}
 
 		private static void AddRouting(OrchardCoreBuilder builder)
 		{
-			stackVariable0 = builder;
-			stackVariable1 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__6_0;
-			if (stackVariable1 == null)
-			{
-				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddRoutingu003eb__6_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__6_0 = stackVariable1;
-			}
-			dummyVar1 = stackVariable0.ConfigureServices(stackVariable1, -2147483548);
-			return;
+			builder.ConfigureServices((IServiceCollection collection) => {
+				Type[] array = RoutingServiceCollectionExtensions.AddRouting(new ServiceCollection()).Where<ServiceDescriptor>((ServiceDescriptor sd) => {
+					if (sd.get_Lifetime() == null)
+					{
+						return true;
+					}
+					return sd.get_ServiceType() == typeof(IConfigureOptions<RouteOptions>);
+				}).Select<ServiceDescriptor, Type>((ServiceDescriptor sd) => ServiceDescriptorExtensions.GetImplementationType(sd)).ToArray<Type>();
+				ServiceDescriptor[] serviceDescriptorArray = collection.Where<ServiceDescriptor>((ServiceDescriptor sd) => {
+					if (!(sd is ClonedSingletonDescriptor) && !(sd.get_ServiceType() == typeof(IConfigureOptions<RouteOptions>)))
+					{
+						return false;
+					}
+					return array.Contains<Type>(ServiceDescriptorExtensions.GetImplementationType(sd));
+				}).ToArray<ServiceDescriptor>();
+				for (int i = 0; i < (int)serviceDescriptorArray.Length; i++)
+				{
+					collection.Remove(serviceDescriptorArray[i]);
+				}
+				RoutingServiceCollectionExtensions.AddRouting(collection);
+			}, -2147483548);
 		}
 
 		private static void AddSameSiteCookieBackwardsCompatibility(OrchardCoreBuilder builder)
 		{
-			stackVariable0 = builder;
-			stackVariable1 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__8_0;
-			if (stackVariable1 == null)
-			{
-				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddSameSiteCookieBackwardsCompatibilityu003eb__8_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__8_0 = stackVariable1;
-			}
-			stackVariable3 = stackVariable0.ConfigureServices(stackVariable1, 0);
-			stackVariable4 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__8_1;
-			if (stackVariable4 == null)
-			{
-				dummyVar1 = stackVariable4;
-				stackVariable4 = new Action<IApplicationBuilder>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddSameSiteCookieBackwardsCompatibilityu003eb__8_1);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__8_1 = stackVariable4;
-			}
-			dummyVar2 = stackVariable3.Configure(stackVariable4, 0);
-			return;
+			builder.ConfigureServices((IServiceCollection services) => OptionsServiceCollectionExtensions.Configure<CookiePolicyOptions>(services, (CookiePolicyOptions options) => {
+				options.set_MinimumSameSitePolicy(-1);
+				options.set_OnAppendCookie((AppendCookieContext cookieContext) => Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.CheckSameSiteBackwardsCompatiblity(cookieContext.get_Context(), cookieContext.get_CookieOptions()));
+				options.set_OnDeleteCookie((DeleteCookieContext cookieContext) => Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.CheckSameSiteBackwardsCompatiblity(cookieContext.get_Context(), cookieContext.get_CookieOptions()));
+			}), 0).Configure((IApplicationBuilder app) => CookiePolicyAppBuilderExtensions.UseCookiePolicy(app), 0);
 		}
 
 		private static void AddShellServices(IServiceCollection services)
 		{
-			dummyVar0 = services.AddHostingShellServices();
-			dummyVar1 = services.AddAllFeaturesDescriptor();
-			stackVariable4 = services;
-			stackVariable5 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__3_0;
-			if (stackVariable5 == null)
-			{
-				dummyVar2 = stackVariable5;
-				stackVariable5 = new Func<IServiceProvider, ShellFeature>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddShellServicesu003eb__3_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__3_0 = stackVariable5;
-			}
-			dummyVar3 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(stackVariable4, stackVariable5);
-			stackVariable7 = services;
-			stackVariable8 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__3_1;
-			if (stackVariable8 == null)
-			{
-				dummyVar4 = stackVariable8;
-				stackVariable8 = new Func<IServiceProvider, ShellFeature>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddShellServicesu003eb__3_1);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__3_1 = stackVariable8;
-			}
-			dummyVar5 = ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(stackVariable7, stackVariable8);
-			return;
+			services.AddHostingShellServices();
+			services.AddAllFeaturesDescriptor();
+			ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(services, (IServiceProvider sp) => new ShellFeature(ServiceProviderServiceExtensions.GetRequiredService<IHostEnvironment>(sp).get_ApplicationName(), true));
+			ServiceCollectionServiceExtensions.AddTransient<ShellFeature>(services, (IServiceProvider sp) => new ShellFeature("Application.Default", true));
 		}
 
 		private static void AddStaticFiles(OrchardCoreBuilder builder)
 		{
-			stackVariable0 = builder;
-			stackVariable1 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__5_0;
-			if (stackVariable1 == null)
-			{
-				dummyVar0 = stackVariable1;
-				stackVariable1 = new Action<IServiceCollection>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddStaticFilesu003eb__5_0);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__5_0 = stackVariable1;
-			}
-			dummyVar1 = stackVariable0.ConfigureServices(stackVariable1, 0);
-			stackVariable4 = builder;
-			stackVariable5 = Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__5_1;
-			if (stackVariable5 == null)
-			{
-				dummyVar2 = stackVariable5;
-				stackVariable5 = new Action<IApplicationBuilder, IEndpointRouteBuilder, IServiceProvider>(Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9.u003cAddStaticFilesu003eb__5_1);
-				Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.u003cu003ec.u003cu003e9__5_1 = stackVariable5;
-			}
-			dummyVar3 = stackVariable4.Configure(stackVariable5, 0);
-			return;
+			builder.ConfigureServices((IServiceCollection services) => {
+				ServiceCollectionServiceExtensions.AddSingleton<IModuleStaticFileProvider>(services, (IServiceProvider serviceProvider) => {
+					IHostEnvironment requiredService = ServiceProviderServiceExtensions.GetRequiredService<IHostEnvironment>(serviceProvider);
+					IApplicationContext applicationContext = ServiceProviderServiceExtensions.GetRequiredService<IApplicationContext>(serviceProvider);
+					return (!HostEnvironmentEnvExtensions.IsDevelopment(requiredService) ? new ModuleEmbeddedStaticFileProvider(applicationContext) : new ModuleCompositeStaticFileProvider(new List<IStaticFileProvider>()
+					{
+						new ModuleProjectStaticFileProvider(applicationContext),
+						new ModuleEmbeddedStaticFileProvider(applicationContext)
+					}));
+				});
+				ServiceCollectionServiceExtensions.AddSingleton<IStaticFileProvider>(services, (IServiceProvider serviceProvider) => ServiceProviderServiceExtensions.GetRequiredService<IModuleStaticFileProvider>(serviceProvider));
+			}, 0);
+			builder.Configure((IApplicationBuilder app, IEndpointRouteBuilder routes, IServiceProvider serviceProvider) => {
+				IModuleStaticFileProvider requiredService = ServiceProviderServiceExtensions.GetRequiredService<IModuleStaticFileProvider>(serviceProvider);
+				StaticFileOptions value = ServiceProviderServiceExtensions.GetRequiredService<IOptions<StaticFileOptions>>(serviceProvider).get_Value();
+				value.set_RequestPath("");
+				value.set_FileProvider(requiredService);
+				string str = ConfigurationBinder.GetValue<string>(ServiceProviderServiceExtensions.GetRequiredService<IShellConfiguration>(serviceProvider), "StaticFileOptions:CacheControl", "public, max-age=2592000, s-max-age=31557600");
+				value.set_OnPrepareResponse((StaticFileResponseContext ctx) => ctx.get_Context().get_Response().get_Headers().set_Item(HeaderNames.CacheControl, str));
+				StaticFileExtensions.UseStaticFiles(app, value);
+			}, 0);
 		}
 
 		private static void CheckSameSiteBackwardsCompatiblity(HttpContext httpContext, CookieOptions options)
 		{
-			V_1 = httpContext.get_Request().get_Headers().get_Item("User-Agent");
-			V_0 = V_1.ToString();
+			StringValues item = httpContext.get_Request().get_Headers().get_Item("User-Agent");
+			string str = item.ToString();
 			if (options.get_SameSite() == null)
 			{
-				if (string.IsNullOrEmpty(V_0))
+				if (string.IsNullOrEmpty(str))
 				{
 					return;
 				}
-				if (V_0.Contains("CPU iPhone OS 12") || V_0.Contains("iPad; CPU OS 12"))
-				{
-					options.set_SameSite(-1);
-					return;
-				}
-				if (V_0.Contains("Macintosh; Intel Mac OS X 10_14") && V_0.Contains("Version/") && V_0.Contains("Safari"))
+				if (str.Contains("CPU iPhone OS 12") || str.Contains("iPad; CPU OS 12"))
 				{
 					options.set_SameSite(-1);
 					return;
 				}
-				if (V_0.Contains("Chrome/5") || V_0.Contains("Chrome/6"))
+				if (str.Contains("Macintosh; Intel Mac OS X 10_14") && str.Contains("Version/") && str.Contains("Safari"))
+				{
+					options.set_SameSite(-1);
+					return;
+				}
+				if (str.Contains("Chrome/5") || str.Contains("Chrome/6"))
 				{
 					options.set_SameSite(-1);
 				}
 			}
-			return;
 		}
 	}
 }

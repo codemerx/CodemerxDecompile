@@ -14,9 +14,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new FromClause.u003cget_Childrenu003ed__15(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				FromClause fromClause = null;
+				yield return fromClause.Identifier;
+				yield return fromClause.Collection;
 			}
 		}
 
@@ -24,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 73;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.FromClause;
 			}
 		}
 
@@ -40,32 +40,30 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public FromClause(Expression identifier, Expression collectionExpression, IEnumerable<Instruction> instructions)
+		public FromClause(Expression identifier, Expression collectionExpression, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Identifier(identifier);
-			this.set_Collection(collectionExpression);
-			return;
+			this.Identifier = identifier;
+			this.Collection = collectionExpression;
 		}
 
 		public override Expression Clone()
 		{
-			return new FromClause(this.get_Identifier().Clone(), this.get_Collection().Clone(), this.instructions);
+			return new FromClause(this.Identifier.Clone(), this.Collection.Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new FromClause(this.get_Identifier().CloneExpressionOnly(), this.get_Collection().CloneExpressionOnly(), null);
+			return new FromClause(this.Identifier.CloneExpressionOnly(), this.Collection.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as FromClause;
-			if (V_0 == null || !this.get_Identifier().Equals(V_0.get_Identifier()))
+			FromClause fromClause = other as FromClause;
+			if (fromClause == null || !this.Identifier.Equals(fromClause.Identifier))
 			{
 				return false;
 			}
-			return this.get_Collection().Equals(V_0.get_Collection());
+			return this.Collection.Equals(fromClause.Collection);
 		}
 	}
 }

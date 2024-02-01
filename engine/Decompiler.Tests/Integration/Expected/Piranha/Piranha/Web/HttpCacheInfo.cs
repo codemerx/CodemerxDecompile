@@ -19,8 +19,6 @@ namespace Piranha.Web
 
 		public HttpCacheInfo()
 		{
-			base();
-			return;
 		}
 	}
 }

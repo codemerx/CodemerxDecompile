@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -15,9 +16,18 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ArrayCreationExpression.u003cget_Childrenu003ed__14(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ArrayCreationExpression arrayCreationExpression = null;
+				if (arrayCreationExpression.Initializer != null)
+				{
+					yield return arrayCreationExpression.Initializer;
+				}
+				if (arrayCreationExpression.Dimensions != null)
+				{
+					foreach (ICodeNode dimension in arrayCreationExpression.Dimensions)
+					{
+						yield return dimension;
+					}
+				}
 			}
 		}
 
@@ -25,7 +35,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 38;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ArrayCreationExpression;
 			}
 		}
 
@@ -45,7 +55,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new ArrayType(this.get_ElementType(), this.get_Dimensions().get_Count());
+				return new ArrayType(this.ElementType, this.Dimensions.Count);
 			}
 			set
 			{
@@ -67,71 +77,70 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ArrayCreationExpression(TypeReference type, InitializerExpression initializer, IEnumerable<Instruction> instructions)
+		public ArrayCreationExpression(TypeReference type, InitializerExpression initializer, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_ElementType(type);
-			this.set_Initializer(initializer);
-			this.set_Dimensions(new ExpressionCollection());
-			return;
+			this.ElementType = type;
+			this.Initializer = initializer;
+			this.Dimensions = new ExpressionCollection();
 		}
 
 		public override Expression Clone()
 		{
-			if (this.get_Initializer() != null)
+			InitializerExpression initializerExpression;
+			if (this.Initializer != null)
 			{
-				stackVariable5 = (InitializerExpression)this.get_Initializer().Clone();
+				initializerExpression = (InitializerExpression)this.Initializer.Clone();
 			}
 			else
 			{
-				stackVariable5 = null;
+				initializerExpression = null;
 			}
-			stackVariable11 = new ArrayCreationExpression(this.get_ElementType(), stackVariable5, this.instructions);
-			stackVariable11.set_Dimensions(this.get_Dimensions().Clone());
-			return stackVariable11;
+			return new ArrayCreationExpression(this.ElementType, initializerExpression, this.instructions)
+			{
+				Dimensions = this.Dimensions.Clone()
+			};
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			if (this.get_Initializer() != null)
+			InitializerExpression initializerExpression;
+			if (this.Initializer != null)
 			{
-				stackVariable5 = (InitializerExpression)this.get_Initializer().CloneExpressionOnly();
+				initializerExpression = (InitializerExpression)this.Initializer.CloneExpressionOnly();
 			}
 			else
 			{
-				stackVariable5 = null;
+				initializerExpression = null;
 			}
-			stackVariable10 = new ArrayCreationExpression(this.get_ElementType(), stackVariable5, null);
-			stackVariable10.set_Dimensions(this.get_Dimensions().CloneExpressionsOnly());
-			return stackVariable10;
+			return new ArrayCreationExpression(this.ElementType, initializerExpression, null)
+			{
+				Dimensions = this.Dimensions.CloneExpressionsOnly()
+			};
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as ArrayCreationExpression == null)
+			if (!(other is ArrayCreationExpression))
 			{
 				return false;
 			}
-			V_0 = other as ArrayCreationExpression;
-			if (this.get_Initializer() != null)
+			ArrayCreationExpression arrayCreationExpression = other as ArrayCreationExpression;
+			if (this.Initializer == null)
 			{
-				if (!this.get_Initializer().Equals(V_0.get_Initializer()))
+				if (arrayCreationExpression.Initializer != null)
 				{
 					return false;
 				}
 			}
-			else
-			{
-				if (V_0.get_Initializer() != null)
-				{
-					return false;
-				}
-			}
-			if (!String.op_Equality(this.get_ElementType().get_FullName(), V_0.get_ElementType().get_FullName()))
+			else if (!this.Initializer.Equals(arrayCreationExpression.Initializer))
 			{
 				return false;
 			}
-			return this.get_Dimensions().Equals(V_0.get_Dimensions());
+			if (this.ElementType.get_FullName() != arrayCreationExpression.ElementType.get_FullName())
+			{
+				return false;
+			}
+			return this.Dimensions.Equals(arrayCreationExpression.Dimensions);
 		}
 	}
 }

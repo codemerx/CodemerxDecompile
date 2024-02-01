@@ -14,10 +14,10 @@ namespace Mix.Cms.Lib.Extensions
 
 		public static string AbsoluteContent(this IUrlHelper url, string contentPath)
 		{
-			V_0 = url.get_ActionContext().get_HttpContext().get_Request();
-			stackVariable5 = V_0.get_Scheme();
-			V_1 = V_0.get_Host();
-			return (new Uri(new Uri(string.Concat(stackVariable5, "://", V_1.get_Value())), url.Content(contentPath))).ToString();
+			HttpRequest request = url.get_ActionContext().get_HttpContext().get_Request();
+			string scheme = request.get_Scheme();
+			HostString host = request.get_Host();
+			return (new Uri(new Uri(string.Concat(scheme, "://", host.get_Value())), url.Content(contentPath))).ToString();
 		}
 
 		public static string AbsoluteRouteUrl(this IUrlHelper url, string routeName, object routeValues = null)

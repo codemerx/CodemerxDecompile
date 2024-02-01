@@ -16,7 +16,6 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return new GotoStatement.u003cget_Childrenu003ed__4(-2);
 			}
 		}
 
@@ -24,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 2;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.GotoStatement;
 			}
 		}
 
@@ -36,44 +35,36 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public GotoStatement(string label, IEnumerable<Instruction> gotoJumps)
 		{
-			base();
-			this.set_TargetLabel(label);
+			this.TargetLabel = label;
 			this.jumps = new List<Instruction>();
 			if (gotoJumps != null)
 			{
 				this.jumps.AddRange(gotoJumps);
-				stackVariable10 = this.jumps;
-				stackVariable11 = GotoStatement.u003cu003ec.u003cu003e9__1_0;
-				if (stackVariable11 == null)
-				{
-					dummyVar0 = stackVariable11;
-					stackVariable11 = new Comparison<Instruction>(GotoStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__1_0);
-					GotoStatement.u003cu003ec.u003cu003e9__1_0 = stackVariable11;
-				}
-				stackVariable10.Sort(stackVariable11);
+				this.jumps.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
-			return;
 		}
 
 		public override Statement Clone()
 		{
-			V_0 = new GotoStatement(this.get_TargetLabel(), this.jumps);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			GotoStatement gotoStatement = new GotoStatement(this.TargetLabel, this.jumps);
+			base.CopyParentAndLabel(gotoStatement);
+			return gotoStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new GotoStatement(this.get_TargetLabel(), null);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			GotoStatement gotoStatement = new GotoStatement(this.TargetLabel, null);
+			base.CopyParentAndLabel(gotoStatement);
+			return gotoStatement;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			stackVariable1 = new GotoStatement.u003cGetOwnInstructionsu003ed__2(-2);
-			stackVariable1.u003cu003e4__this = this;
-			return stackVariable1;
+			GotoStatement gotoStatement = null;
+			foreach (Instruction jump in gotoStatement.jumps)
+			{
+				yield return jump;
+			}
 		}
 	}
 }

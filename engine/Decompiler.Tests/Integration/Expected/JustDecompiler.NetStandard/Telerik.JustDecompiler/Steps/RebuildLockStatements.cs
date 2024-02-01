@@ -1,7 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -11,11 +14,11 @@ namespace Telerik.JustDecompiler.Steps
 {
 	internal class RebuildLockStatements : BaseCodeVisitor, IDecompilationStep
 	{
-		private TryStatement try;
+		private TryStatement @try;
 
 		private BlockStatement body;
 
-		private LockStatement lock;
+		private LockStatement @lock;
 
 		private VariableReference theFlagVariable;
 
@@ -27,7 +30,7 @@ namespace Telerik.JustDecompiler.Steps
 
 		private VariableReference thePhiVariable;
 
-		private readonly List<Instruction> lockingInstructions;
+		private readonly List<Instruction> lockingInstructions = new List<Instruction>();
 
 		private StatementCollection statements;
 
@@ -37,342 +40,290 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			get
 			{
-				stackVariable2 = this.lock;
-				if (stackVariable2 == null)
-				{
-					dummyVar0 = stackVariable2;
-					stackVariable2 = new LockStatement(this.lockObjectExpression.CloneAndAttachInstructions(this.lockingInstructions), this.body, this.try.get_Finally().get_UnderlyingSameMethodInstructions());
-				}
-				this.lock = stackVariable2;
-				return this.lock;
+				this.@lock = this.@lock ?? new LockStatement(this.lockObjectExpression.CloneAndAttachInstructions(this.lockingInstructions), this.body, this.@try.Finally.UnderlyingSameMethodInstructions);
+				return this.@lock;
 			}
 		}
 
 		public RebuildLockStatements()
 		{
-			this.lockingInstructions = new List<Instruction>();
-			base();
-			return;
 		}
 
 		private bool CheckLockVariableAssignmentExpression(Statement statement)
 		{
-			if (statement.get_CodeNodeType() != 5)
+			if (statement.CodeNodeType != CodeNodeType.ExpressionStatement)
 			{
 				return false;
 			}
-			V_0 = statement as ExpressionStatement;
-			if (V_0.get_Expression().get_CodeNodeType() != 24)
+			ExpressionStatement expressionStatement = statement as ExpressionStatement;
+			if (expressionStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
 				return false;
 			}
-			V_1 = V_0.get_Expression() as BinaryExpression;
-			if (!V_1.get_IsAssignmentExpression() || V_1.get_Left().get_CodeNodeType() != 26)
+			BinaryExpression expression = expressionStatement.Expression as BinaryExpression;
+			if (!expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return false;
 			}
-			this.theLocalVariable = (V_1.get_Left() as VariableReferenceExpression).get_Variable();
-			this.lockObjectExpression = V_1.get_Right();
+			this.theLocalVariable = (expression.Left as VariableReferenceExpression).Variable;
+			this.lockObjectExpression = expression.Right;
 			return true;
 		}
 
 		private bool CheckTheAssignExpressions(Statement firstAssign, Statement secondAssign)
 		{
-			V_0 = null;
-			if (firstAssign.get_CodeNodeType() == 5)
+			VariableReferenceExpression left = null;
+			if (firstAssign.CodeNodeType == CodeNodeType.ExpressionStatement)
 			{
-				V_1 = (firstAssign as ExpressionStatement).get_Expression() as BinaryExpression;
-				if (V_1 == null || !V_1.get_IsAssignmentExpression())
+				BinaryExpression expression = (firstAssign as ExpressionStatement).Expression as BinaryExpression;
+				if (expression == null || !expression.IsAssignmentExpression)
 				{
 					return false;
 				}
-				V_0 = V_1.get_Left() as VariableReferenceExpression;
-				this.lockObjectExpression = V_1.get_Right();
-				this.lockingInstructions.AddRange(V_1.get_Left().get_UnderlyingSameMethodInstructions());
-				this.lockingInstructions.AddRange(V_1.get_MappedInstructions());
+				left = expression.Left as VariableReferenceExpression;
+				this.lockObjectExpression = expression.Right;
+				this.lockingInstructions.AddRange(expression.Left.UnderlyingSameMethodInstructions);
+				this.lockingInstructions.AddRange(expression.MappedInstructions);
 			}
-			if (V_0 != null && secondAssign.get_CodeNodeType() == 5)
+			if (left != null && secondAssign.CodeNodeType == CodeNodeType.ExpressionStatement)
 			{
-				V_2 = (secondAssign as ExpressionStatement).get_Expression() as BinaryExpression;
-				if (V_2 == null || !V_2.get_IsAssignmentExpression() || V_2.get_Left().get_CodeNodeType() != 26 || V_2.get_Right().get_CodeNodeType() != 26)
+				BinaryExpression binaryExpression = (secondAssign as ExpressionStatement).Expression as BinaryExpression;
+				if (binaryExpression == null || !binaryExpression.IsAssignmentExpression || binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 				{
 					return false;
 				}
-				this.theLocalVariable = (V_2.get_Left() as VariableReferenceExpression).get_Variable();
-				if ((object)(V_2.get_Right() as VariableReferenceExpression).get_Variable() != (object)V_0.get_Variable())
+				this.theLocalVariable = (binaryExpression.Left as VariableReferenceExpression).Variable;
+				if ((object)(binaryExpression.Right as VariableReferenceExpression).Variable != (object)left.Variable)
 				{
 					return false;
 				}
 			}
-			this.lockingInstructions.AddRange(secondAssign.get_UnderlyingSameMethodInstructions());
-			if (V_0 != null)
+			this.lockingInstructions.AddRange(secondAssign.UnderlyingSameMethodInstructions);
+			if (left != null)
 			{
-				this.thePhiVariable = V_0.get_Variable();
+				this.thePhiVariable = left.Variable;
 			}
 			return true;
 		}
 
 		private bool CheckTheFinallyClause(BlockStatement theFinally)
 		{
-			V_0 = theFinally.get_Statements().get_Count();
-			if (V_0 > 2 && V_0 == 0)
+			int count = theFinally.Statements.Count;
+			if (count > 2 && count == 0)
 			{
 				return false;
 			}
-			V_1 = null;
-			if (this.lockType != 1 && this.lockType != 2 && this.lockType != 3)
+			MethodInvocationExpression expression = null;
+			if (this.lockType != RebuildLockStatements.LockType.WithFlagV1 && this.lockType != RebuildLockStatements.LockType.WithFlagV2 && this.lockType != RebuildLockStatements.LockType.WithFlagV3)
 			{
-				if (V_0 > 1 || theFinally.get_Statements().get_Item(0).get_CodeNodeType() != 5)
+				if (count > 1 || theFinally.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
 				{
 					return false;
 				}
-				V_1 = (theFinally.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as MethodInvocationExpression;
-				return this.CheckTheMethodInvocation(V_1, "Exit");
+				expression = (theFinally.Statements[0] as ExpressionStatement).Expression as MethodInvocationExpression;
+				return this.CheckTheMethodInvocation(expression, "Exit");
 			}
-			V_2 = null;
-			if (V_0 == 2)
+			VariableReference variable = null;
+			if (count == 2)
 			{
-				if (theFinally.get_Statements().get_Item(0).get_CodeNodeType() != 5)
+				if (theFinally.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
 				{
 					return false;
 				}
-				V_4 = (theFinally.get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
-				if (V_4 == null || !V_4.get_IsAssignmentExpression() || V_4.get_Left().get_CodeNodeType() != 26)
+				BinaryExpression binaryExpression = (theFinally.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
+				if (binaryExpression == null || !binaryExpression.IsAssignmentExpression || binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 				{
 					return false;
 				}
-				V_2 = (V_4.get_Left() as VariableReferenceExpression).get_Variable();
+				variable = (binaryExpression.Left as VariableReferenceExpression).Variable;
 			}
-			if (V_0 == 0)
+			if (count == 0)
 			{
 				return false;
 			}
-			V_3 = theFinally.get_Statements().get_Item(V_0 - 1) as IfStatement;
-			if (V_3 == null)
+			IfStatement item = theFinally.Statements[count - 1] as IfStatement;
+			if (item == null)
 			{
 				return false;
 			}
-			if (V_2 != null && V_3.get_Condition().get_CodeNodeType() != 23 || (V_3.get_Condition() as UnaryExpression).get_Operator() != 1 || (V_3.get_Condition() as UnaryExpression).get_Operand().get_CodeNodeType() != 26 || (object)((V_3.get_Condition() as UnaryExpression).get_Operand() as VariableReferenceExpression).get_Variable() != (object)V_2)
+			if (variable != null && (item.Condition.CodeNodeType != CodeNodeType.UnaryExpression || (item.Condition as UnaryExpression).Operator != UnaryOperator.LogicalNot || (item.Condition as UnaryExpression).Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)((item.Condition as UnaryExpression).Operand as VariableReferenceExpression).Variable != (object)variable))
 			{
 				return false;
 			}
-			return this.CheckTheIfStatement(V_3);
+			return this.CheckTheIfStatement(item);
 		}
 
 		private bool CheckTheIfStatement(IfStatement theIf)
 		{
-			if (theIf == null || theIf.get_Else() != null || theIf.get_Then() == null || theIf.get_Then().get_Statements() == null || theIf.get_Then().get_Statements().get_Count() != 1 || theIf.get_Then().get_Statements().get_Item(0).get_CodeNodeType() != 5)
+			if (theIf == null || theIf.Else != null || theIf.Then == null || theIf.Then.Statements == null || theIf.Then.Statements.Count != 1 || theIf.Then.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
 			{
 				return false;
 			}
-			V_0 = (theIf.get_Then().get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as MethodInvocationExpression;
-			return this.CheckTheMethodInvocation(V_0, "Exit");
+			MethodInvocationExpression expression = (theIf.Then.Statements[0] as ExpressionStatement).Expression as MethodInvocationExpression;
+			return this.CheckTheMethodInvocation(expression, "Exit");
 		}
 
 		private bool CheckTheMethodInvocation(MethodInvocationExpression theMethodInvocation, string methodName)
 		{
-			if (theMethodInvocation == null || theMethodInvocation.get_MethodExpression().get_CodeNodeType() != 20)
+			if (theMethodInvocation == null || theMethodInvocation.MethodExpression.CodeNodeType != CodeNodeType.MethodReferenceExpression)
 			{
 				return false;
 			}
-			V_0 = theMethodInvocation.get_MethodExpression().get_Method();
-			if (!String.op_Equality(V_0.get_DeclaringType().get_FullName(), Type.GetTypeFromHandle(// 
-			// Current member / type: System.Boolean Telerik.JustDecompiler.Steps.RebuildLockStatements::CheckTheMethodInvocation(Telerik.JustDecompiler.Ast.Expressions.MethodInvocationExpression,System.String)
-			// Exception in: System.Boolean CheckTheMethodInvocation(Telerik.JustDecompiler.Ast.Expressions.MethodInvocationExpression,System.String)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
+			MethodReference method = theMethodInvocation.MethodExpression.Method;
+			if (method.get_DeclaringType().get_FullName() != typeof(Monitor).FullName)
+			{
+				return false;
+			}
+			return method.get_Name() == methodName;
+		}
 
-
-		private bool DetermineWithFlagLockTypeVersion(TryStatement try)
+		private bool DetermineWithFlagLockTypeVersion(TryStatement @try)
 		{
-			if (try == null || try.get_Try() == null || try.get_Try().get_Statements().get_Count() == 0)
+			if (@try == null || @try.Try == null || @try.Try.Statements.Count == 0)
 			{
 				return false;
 			}
-			if (try.get_Try().get_Statements().get_Item(0).get_CodeNodeType() != 5)
+			if (@try.Try.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
 			{
 				return false;
 			}
-			V_0 = try.get_Try().get_Statements().get_Item(0) as ExpressionStatement;
-			if (V_0.get_Expression().get_CodeNodeType() != 24)
+			ExpressionStatement item = @try.Try.Statements[0] as ExpressionStatement;
+			if (item.Expression.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
-				if (V_0.get_Expression().get_CodeNodeType() != 19)
+				if (item.Expression.CodeNodeType != CodeNodeType.MethodInvocationExpression)
 				{
 					return false;
 				}
-				this.lockType = 2;
+				this.lockType = RebuildLockStatements.LockType.WithFlagV2;
+			}
+			else if (@try.Try.Statements.Count <= 1 || @try.Try.Statements[1].CodeNodeType != CodeNodeType.ExpressionStatement || (@try.Try.Statements[1] as ExpressionStatement).Expression.CodeNodeType != CodeNodeType.BinaryExpression)
+			{
+				this.lockType = RebuildLockStatements.LockType.WithFlagV3;
 			}
 			else
 			{
-				if (try.get_Try().get_Statements().get_Count() <= 1 || try.get_Try().get_Statements().get_Item(1).get_CodeNodeType() != 5 || (try.get_Try().get_Statements().get_Item(1) as ExpressionStatement).get_Expression().get_CodeNodeType() != 24)
-				{
-					this.lockType = 3;
-				}
-				else
-				{
-					this.lockType = 1;
-				}
+				this.lockType = RebuildLockStatements.LockType.WithFlagV1;
 			}
 			return true;
 		}
 
 		private VariableReference GetTheFlagVariable(MethodInvocationExpression methodInvocation)
 		{
-			V_0 = methodInvocation.get_Arguments().get_Item(1);
-			V_1 = null;
-			if (V_0.get_CodeNodeType() != 23 || (V_0 as UnaryExpression).get_Operator() != 7)
-			{
-				V_1 = V_0 as VariableReferenceExpression;
-			}
-			else
-			{
-				V_1 = (V_0 as UnaryExpression).get_Operand() as VariableReferenceExpression;
-			}
-			if (V_1 == null)
+			Expression item = methodInvocation.Arguments[1];
+			VariableReferenceExpression variableReferenceExpression = null;
+			variableReferenceExpression = (item.CodeNodeType != CodeNodeType.UnaryExpression || (item as UnaryExpression).Operator != UnaryOperator.AddressReference ? item as VariableReferenceExpression : (item as UnaryExpression).Operand as VariableReferenceExpression);
+			if (variableReferenceExpression == null)
 			{
 				return null;
 			}
-			return V_1.get_Variable();
+			return variableReferenceExpression.Variable;
 		}
 
-		private bool IsLockStatement(TryStatement try)
+		private bool IsLockStatement(TryStatement @try)
 		{
-			if (try == null)
+			int num;
+			bool flag;
+			if (@try == null)
 			{
 				return false;
 			}
-			if (this.lockType != 1 || try.get_Try().get_Statements().get_Count() <= 2 && this.lockType != RebuildLockStatements.LockType.Simple && this.lockType != 2 || try.get_Try().get_Statements().get_Count() <= 0)
+			if ((this.lockType != RebuildLockStatements.LockType.WithFlagV1 || @try.Try.Statements.Count <= 2) && this.lockType != RebuildLockStatements.LockType.Simple && (this.lockType != RebuildLockStatements.LockType.WithFlagV2 || @try.Try.Statements.Count <= 0))
 			{
-				if (this.lockType != 3)
-				{
-					stackVariable6 = false;
-				}
-				else
-				{
-					stackVariable6 = try.get_Try().get_Statements().get_Count() > 1;
-				}
+				flag = (this.lockType != RebuildLockStatements.LockType.WithFlagV3 ? false : @try.Try.Statements.Count > 1);
 			}
 			else
 			{
-				stackVariable6 = true;
+				flag = true;
 			}
-			V_0 = stackVariable6;
-			stackVariable7 = V_0;
-			if (try.get_CatchClauses().get_Count() != 0)
+			bool codeNodeType = flag;
+			codeNodeType = codeNodeType & (@try.CatchClauses.Count != 0 ? false : @try.Finally != null);
+			if (codeNodeType)
 			{
-				stackVariable11 = false;
-			}
-			else
-			{
-				stackVariable11 = try.get_Finally() != null;
-			}
-			V_0 = stackVariable7 & stackVariable11;
-			if (V_0)
-			{
-				if (this.lockType == 1 || this.lockType == 2 || this.lockType == 3)
+				if (this.lockType == RebuildLockStatements.LockType.WithFlagV1 || this.lockType == RebuildLockStatements.LockType.WithFlagV2 || this.lockType == RebuildLockStatements.LockType.WithFlagV3)
 				{
-					if (this.lockType != 1)
+					if (this.lockType == RebuildLockStatements.LockType.WithFlagV1)
 					{
-						if (this.lockType != 2)
-						{
-							V_0 = V_0 & this.CheckLockVariableAssignmentExpression(try.get_Try().get_Statements().get_Item(0));
-							V_1 = 1;
-						}
-						else
-						{
-							V_1 = 0;
-						}
+						codeNodeType &= this.CheckTheAssignExpressions(@try.Try.Statements[0], @try.Try.Statements[1]);
+						num = 2;
+					}
+					else if (this.lockType != RebuildLockStatements.LockType.WithFlagV2)
+					{
+						codeNodeType &= this.CheckLockVariableAssignmentExpression(@try.Try.Statements[0]);
+						num = 1;
 					}
 					else
 					{
-						V_0 = V_0 & this.CheckTheAssignExpressions(try.get_Try().get_Statements().get_Item(0), try.get_Try().get_Statements().get_Item(1));
-						V_1 = 2;
+						num = 0;
 					}
-					V_0 = V_0 & try.get_Try().get_Statements().get_Item(V_1).get_CodeNodeType() == 5;
-					if (V_0)
+					codeNodeType = codeNodeType & @try.Try.Statements[num].CodeNodeType == CodeNodeType.ExpressionStatement;
+					if (codeNodeType)
 					{
-						V_2 = try.get_Try().get_Statements().get_Item(V_1) as ExpressionStatement;
-						V_0 = V_0 & V_2.get_Expression().get_CodeNodeType() == 19;
-						V_3 = V_2.get_Expression() as MethodInvocationExpression;
-						stackVariable68 = V_0;
-						if (!this.CheckTheMethodInvocation(V_3, "Enter"))
+						ExpressionStatement item = @try.Try.Statements[num] as ExpressionStatement;
+						codeNodeType = codeNodeType & item.Expression.CodeNodeType == CodeNodeType.MethodInvocationExpression;
+						MethodInvocationExpression expression = item.Expression as MethodInvocationExpression;
+						codeNodeType = codeNodeType & (!this.CheckTheMethodInvocation(expression, "Enter") ? false : expression.MethodExpression.Method.get_Parameters().get_Count() == 2);
+						if (codeNodeType)
 						{
-							stackVariable73 = false;
-						}
-						else
-						{
-							stackVariable73 = V_3.get_MethodExpression().get_Method().get_Parameters().get_Count() == 2;
-						}
-						V_0 = stackVariable68 & stackVariable73;
-						if (V_0)
-						{
-							this.lockingInstructions.AddRange(V_3.get_UnderlyingSameMethodInstructions());
-							this.theFlagVariable = this.GetTheFlagVariable(V_3);
+							this.lockingInstructions.AddRange(expression.UnderlyingSameMethodInstructions);
+							this.theFlagVariable = this.GetTheFlagVariable(expression);
 						}
 					}
 				}
-				V_0 = V_0 & this.CheckTheFinallyClause(try.get_Finally().get_Body());
+				codeNodeType &= this.CheckTheFinallyClause(@try.Finally.Body);
 			}
-			return V_0;
+			return codeNodeType;
 		}
 
 		private bool Match(StatementCollection statements, int statementIndex)
 		{
 			this.PrepareMatcher(statements, statementIndex);
-			V_0 = statements.get_Item(statementIndex);
-			if (V_0.get_CodeNodeType() != 17)
+			Statement item = statements[statementIndex];
+			if (item.CodeNodeType == CodeNodeType.TryStatement)
 			{
-				if (V_0.get_CodeNodeType() == 5 && this.CheckTheMethodInvocation((V_0 as ExpressionStatement).get_Expression() as MethodInvocationExpression, "Enter"))
-				{
-					if (((V_0 as ExpressionStatement).get_Expression() as MethodInvocationExpression).get_MethodExpression().get_Method().get_Parameters().get_Count() != 1)
-					{
-						return false;
-					}
-					if (statementIndex + 1 >= statements.get_Count() || statementIndex - 2 < 0)
-					{
-						return false;
-					}
-					this.try = statements.get_Item(statementIndex + 1) as TryStatement;
-					this.lockType = 0;
-					if (!this.CheckTheAssignExpressions(statements.get_Item(statementIndex - 2), statements.get_Item(statementIndex - 1)))
-					{
-						return false;
-					}
-					this.lockingInstructions.AddRange(V_0.get_UnderlyingSameMethodInstructions());
-				}
-			}
-			else
-			{
-				this.try = V_0 as TryStatement;
-				if (!this.DetermineWithFlagLockTypeVersion(this.try))
+				this.@try = item as TryStatement;
+				if (!this.DetermineWithFlagLockTypeVersion(this.@try))
 				{
 					return false;
 				}
-				if (this.lockType != 2)
+				if (this.lockType == RebuildLockStatements.LockType.WithFlagV2)
 				{
-					if (this.lockType == 3 && statementIndex - 1 < 0)
+					if (statementIndex - 2 < 0 || !this.CheckLockVariableAssignmentExpression(statements[statementIndex - 2]))
 					{
 						return false;
 					}
 				}
-				else
+				else if (this.lockType == RebuildLockStatements.LockType.WithFlagV3 && statementIndex - 1 < 0)
 				{
-					if (statementIndex - 2 < 0 || !this.CheckLockVariableAssignmentExpression(statements.get_Item(statementIndex - 2)))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
-			if (this.try == null)
+			else if (item.CodeNodeType == CodeNodeType.ExpressionStatement && this.CheckTheMethodInvocation((item as ExpressionStatement).Expression as MethodInvocationExpression, "Enter"))
+			{
+				if (((item as ExpressionStatement).Expression as MethodInvocationExpression).MethodExpression.Method.get_Parameters().get_Count() != 1)
+				{
+					return false;
+				}
+				if (statementIndex + 1 >= statements.Count || statementIndex - 2 < 0)
+				{
+					return false;
+				}
+				this.@try = statements[statementIndex + 1] as TryStatement;
+				this.lockType = RebuildLockStatements.LockType.Simple;
+				if (!this.CheckTheAssignExpressions(statements[statementIndex - 2], statements[statementIndex - 1]))
+				{
+					return false;
+				}
+				this.lockingInstructions.AddRange(item.UnderlyingSameMethodInstructions);
+			}
+			if (this.@try == null)
 			{
 				return false;
 			}
-			if (!this.IsLockStatement(this.try))
+			if (!this.IsLockStatement(this.@try))
 			{
 				return false;
 			}
-			this.body = this.try.get_Try();
+			this.body = this.@try.Try;
 			return true;
 		}
 
@@ -380,14 +331,13 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			this.statements = statements;
 			this.statementIndex = statementIndex;
-			this.try = null;
+			this.@try = null;
 			this.body = null;
-			this.lock = null;
+			this.@lock = null;
 			this.lockObjectExpression = null;
 			this.theLocalVariable = null;
 			this.thePhiVariable = null;
 			this.lockingInstructions.Clear();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -398,64 +348,53 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_Statements().get_Count())
+			int num;
+			for (int i = 0; i < node.Statements.Count; i++)
 			{
-				if (this.Match(node.get_Statements(), V_0))
+				if (this.Match(node.Statements, i))
 				{
-					node.get_Statements().RemoveAt(V_0);
-					node.AddStatementAt(V_0, this.get_Lock());
+					node.Statements.RemoveAt(i);
+					node.AddStatementAt(i, this.Lock);
 					if (this.lockType != RebuildLockStatements.LockType.Simple)
 					{
-						if (this.lockType != 1)
+						if (this.lockType != RebuildLockStatements.LockType.WithFlagV1)
 						{
-							if (this.lockType != 2)
-							{
-								V_1 = 2;
-							}
-							else
-							{
-								V_1 = 1;
-							}
+							num = (this.lockType != RebuildLockStatements.LockType.WithFlagV2 ? 2 : 1);
 						}
 						else
 						{
-							V_1 = 3;
+							num = 3;
 						}
-						V_2 = 0;
-						while (V_2 < V_1)
+						for (int j = 0; j < num; j++)
 						{
-							this.get_Lock().get_Body().get_Statements().RemoveAt(0);
-							V_2 = V_2 + 1;
+							this.Lock.Body.Statements.RemoveAt(0);
 						}
-						if (V_0 > 0)
+						if (i > 0)
 						{
-							stackVariable46 = V_0 - 1;
-							V_0 = stackVariable46;
-							node.get_Statements().RemoveAt(stackVariable46);
-							if (this.lockType == 2)
+							int num1 = i - 1;
+							i = num1;
+							node.Statements.RemoveAt(num1);
+							if (this.lockType == RebuildLockStatements.LockType.WithFlagV2)
 							{
-								stackVariable54 = V_0 - 1;
-								V_0 = stackVariable54;
-								node.get_Statements().RemoveAt(stackVariable54);
+								int num2 = i - 1;
+								i = num2;
+								node.Statements.RemoveAt(num2);
 							}
 						}
 					}
 					else
 					{
-						node.get_Statements().RemoveAt(V_0 + 1);
-						stackVariable66 = V_0 - 1;
-						V_0 = stackVariable66;
-						node.get_Statements().RemoveAt(stackVariable66);
-						stackVariable71 = V_0 - 1;
-						V_0 = stackVariable71;
-						node.get_Statements().RemoveAt(stackVariable71);
+						node.Statements.RemoveAt(i + 1);
+						int num3 = i - 1;
+						i = num3;
+						node.Statements.RemoveAt(num3);
+						int num4 = i - 1;
+						i = num4;
+						node.Statements.RemoveAt(num4);
 					}
 				}
-				V_0 = V_0 + 1;
 			}
-			this.Visit(node.get_Statements());
-			return;
+			this.Visit(node.Statements);
 		}
 
 		private enum LockType

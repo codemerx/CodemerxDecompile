@@ -25,11 +25,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public IList<FieldType> Fields
-		{
-			get;
-			set;
-		}
+		public IList<FieldType> Fields { get; set; } = new List<FieldType>();
 
 		public string Icon
 		{
@@ -43,11 +39,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public bool ListExpand
-		{
-			get;
-			set;
-		}
+		public bool ListExpand { get; set; } = true;
 
 		public string ListTitleField
 		{
@@ -69,10 +61,6 @@ namespace Piranha.Models
 
 		public RegionType()
 		{
-			this.u003cListExpandu003ek__BackingField = true;
-			this.u003cFieldsu003ek__BackingField = new List<FieldType>();
-			base();
-			return;
 		}
 	}
 }

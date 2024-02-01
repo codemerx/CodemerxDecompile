@@ -9,101 +9,96 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 	{
 		public static void FixInstructionConnections(InstructionBlock[] orderedBlocks)
 		{
-			orderedBlocks[0].get_First().set_Previous(null);
-			V_0 = 0;
-			while (V_0 < (int)orderedBlocks.Length - 1)
+			orderedBlocks[0].First.set_Previous(null);
+			for (int i = 0; i < (int)orderedBlocks.Length - 1; i++)
 			{
-				orderedBlocks[V_0].get_Last().set_Next(orderedBlocks[V_0 + 1].get_First());
-				orderedBlocks[V_0 + 1].get_First().set_Previous(orderedBlocks[V_0].get_Last());
-				V_0 = V_0 + 1;
+				orderedBlocks[i].Last.set_Next(orderedBlocks[i + 1].First);
+				orderedBlocks[i + 1].First.set_Previous(orderedBlocks[i].Last);
 			}
-			orderedBlocks[(int)orderedBlocks.Length - 1].get_Last().set_Next(null);
-			return;
+			orderedBlocks[(int)orderedBlocks.Length - 1].Last.set_Next(null);
 		}
 
 		public static bool IsUnconditionalBranch(Instruction instruction)
 		{
-			V_0 = instruction.get_OpCode().get_Code();
-			if (V_0 == 55 || V_0 == 42 || V_0 == 187)
+			Code code = instruction.get_OpCode().get_Code();
+			if (code == 55 || code == 42 || code == 187)
 			{
 				return true;
 			}
-			return V_0 == 188;
+			return code == 188;
 		}
 
 		public static bool TryGetOperandOfLdc(Instruction instruction, out int operand)
 		{
-			switch (instruction.get_OpCode().get_Code() - 21)
+			switch (instruction.get_OpCode().get_Code())
 			{
-				case 0:
+				case 21:
 				{
 					operand = -1;
 					break;
 				}
-				case 1:
+				case 22:
 				{
 					operand = 0;
 					break;
 				}
-				case 2:
+				case 23:
 				{
 					operand = 1;
 					break;
 				}
-				case 3:
+				case 24:
 				{
 					operand = 2;
 					break;
 				}
-				case 4:
+				case 25:
 				{
 					operand = 3;
 					break;
 				}
-				case 5:
+				case 26:
 				{
 					operand = 4;
 					break;
 				}
-				case 6:
+				case 27:
 				{
 					operand = 5;
 					break;
 				}
-				case 7:
+				case 28:
 				{
 					operand = 6;
 					break;
 				}
-				case 8:
+				case 29:
 				{
 					operand = 7;
 					break;
 				}
-				case 9:
+				case 30:
 				{
 					operand = 8;
 					break;
 				}
-				case 10:
+				case 31:
 				{
 					operand = (SByte)instruction.get_Operand();
 					break;
 				}
-				case 11:
+				case 32:
 				{
 					operand = (Int32)instruction.get_Operand();
 					break;
 				}
 				default:
 				{
-					goto Label0;
+					operand = 0;
+					return false;
 				}
 			}
 			return true;
-		Label0:
-			operand = 0;
-			return false;
 		}
 
 		public static bool TryGetVariableFromInstruction(Instruction instruction, IList<VariableDefinition> variableCollection, out VariableReference varReference)

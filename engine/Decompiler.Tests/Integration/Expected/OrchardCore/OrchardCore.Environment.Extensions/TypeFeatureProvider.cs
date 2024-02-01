@@ -1,34 +1,31 @@
 using OrchardCore.Environment.Extensions.Features;
 using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace OrchardCore.Environment.Extensions
 {
 	public class TypeFeatureProvider : ITypeFeatureProvider
 	{
-		private readonly ConcurrentDictionary<Type, IFeatureInfo> _features;
+		private readonly ConcurrentDictionary<Type, IFeatureInfo> _features = new ConcurrentDictionary<Type, IFeatureInfo>();
 
 		public TypeFeatureProvider()
 		{
-			this._features = new ConcurrentDictionary<Type, IFeatureInfo>();
-			base();
-			return;
 		}
 
 		public IFeatureInfo GetFeatureForDependency(Type dependency)
 		{
-			V_0 = null;
-			if (!this._features.TryGetValue(dependency, out V_0))
+			IFeatureInfo featureInfo = null;
+			if (!this._features.TryGetValue(dependency, out featureInfo))
 			{
-				throw new InvalidOperationException(string.Concat("Could not resolve feature for type ", dependency.get_Name()));
+				throw new InvalidOperationException(string.Concat("Could not resolve feature for type ", dependency.Name));
 			}
-			return V_0;
+			return featureInfo;
 		}
 
 		public void TryAdd(Type type, IFeatureInfo feature)
 		{
-			dummyVar0 = this._features.TryAdd(type, feature);
-			return;
+			this._features.TryAdd(type, feature);
 		}
 	}
 }

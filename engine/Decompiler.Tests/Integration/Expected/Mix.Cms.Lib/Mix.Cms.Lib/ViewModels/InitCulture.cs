@@ -43,8 +43,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public InitCulture()
 		{
-			base();
-			return;
 		}
 	}
 }

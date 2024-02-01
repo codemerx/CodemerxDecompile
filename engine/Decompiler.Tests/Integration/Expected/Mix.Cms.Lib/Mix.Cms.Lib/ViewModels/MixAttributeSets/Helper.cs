@@ -6,8 +6,6 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSets
 	{
 		public Helper()
 		{
-			base();
-			return;
 		}
 	}
 }

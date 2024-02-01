@@ -1,6 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -16,64 +17,54 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		public CommonPatterns(CodePatternsContext patternsContext, TypeSystem typeSystem)
 		{
-			base();
 			this.typeSystem = typeSystem;
 			this.patternsContext = patternsContext;
-			return;
 		}
 
 		protected void FixContext(VariableDefinition variable, int removedDefinitions, int removedUsages, ExpressionStatement newDefinition)
 		{
-			if (this.patternsContext.get_VariableToDefineUseCountContext().TryGetValue(variable, out V_0))
+			DefineUseCount defineUseCount;
+			if (this.patternsContext.VariableToDefineUseCountContext.TryGetValue(variable, out defineUseCount))
 			{
-				stackVariable6 = V_0;
-				stackVariable6.DefineCount = stackVariable6.DefineCount - removedDefinitions;
-				stackVariable10 = V_0;
-				stackVariable10.UseCount = stackVariable10.UseCount - removedUsages;
-				if (V_0.DefineCount == 1 && newDefinition != null)
+				defineUseCount.DefineCount -= removedDefinitions;
+				defineUseCount.UseCount -= removedUsages;
+				if (defineUseCount.DefineCount == 1 && newDefinition != null)
 				{
-					this.patternsContext.get_VariableToSingleAssignmentMap().set_Item(variable, newDefinition);
+					this.patternsContext.VariableToSingleAssignmentMap[variable] = newDefinition;
 				}
 			}
-			return;
 		}
 
 		protected VariableReference GetVariableReferenceFromExpression(Expression theVariableExpression)
 		{
-			if (theVariableExpression.get_CodeNodeType() == 26)
+			if (theVariableExpression.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 			{
-				return (theVariableExpression as VariableReferenceExpression).get_Variable();
+				return (theVariableExpression as VariableReferenceExpression).Variable;
 			}
-			if (theVariableExpression.get_CodeNodeType() != 27)
+			if (theVariableExpression.CodeNodeType != CodeNodeType.VariableDeclarationExpression)
 			{
 				return null;
 			}
-			return (theVariableExpression as VariableDeclarationExpression).get_Variable();
+			return (theVariableExpression as VariableDeclarationExpression).Variable;
 		}
 
 		protected bool IsAssignToVariableExpression(BinaryExpression theAssignExpression, out VariableReference theVariable)
 		{
+			bool flag;
 			theVariable = null;
-			if (theAssignExpression == null || !theAssignExpression.get_IsAssignmentExpression())
+			if (theAssignExpression == null || !theAssignExpression.IsAssignmentExpression)
 			{
-				stackVariable3 = false;
+				flag = false;
 			}
 			else
 			{
-				if (theAssignExpression.get_Left().get_CodeNodeType() == 26)
-				{
-					stackVariable3 = true;
-				}
-				else
-				{
-					stackVariable3 = theAssignExpression.get_Left().get_CodeNodeType() == 27;
-				}
+				flag = (theAssignExpression.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression ? true : theAssignExpression.Left.CodeNodeType == CodeNodeType.VariableDeclarationExpression);
 			}
-			if (stackVariable3)
+			if (flag)
 			{
-				theVariable = this.GetVariableReferenceFromExpression(theAssignExpression.get_Left());
+				theVariable = this.GetVariableReferenceFromExpression(theAssignExpression.Left);
 			}
-			return stackVariable3;
+			return flag;
 		}
 
 		protected class VariableUsageFinder : BaseCodeVisitor
@@ -88,21 +79,18 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 			public VariableUsageFinder(VariableReference theVariable)
 			{
-				base();
 				this.theVariable = theVariable;
-				this.set_Used(false);
-				return;
+				this.Used = false;
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if ((object)node.get_Variable() == (object)this.theVariable)
+				if ((object)node.Variable == (object)this.theVariable)
 				{
-					this.set_Used(true);
+					this.Used = true;
 					return;
 				}
-				this.VisitVariableReferenceExpression(node);
-				return;
+				base.VisitVariableReferenceExpression(node);
 			}
 		}
 	}

@@ -5,7 +5,7 @@ namespace Telerik.JustDecompiler.Steps
 {
 	internal abstract class Matcher : BaseCodeVisitor
 	{
-		private bool continue;
+		private bool @continue = true;
 
 		private bool match;
 
@@ -13,12 +13,11 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			get
 			{
-				return this.continue;
+				return this.@continue;
 			}
 			set
 			{
-				this.continue = value;
-				return;
+				this.@continue = value;
 			}
 		}
 
@@ -31,24 +30,19 @@ namespace Telerik.JustDecompiler.Steps
 			set
 			{
 				this.match = value;
-				return;
 			}
 		}
 
 		protected Matcher()
 		{
-			this.continue = true;
-			base();
-			return;
 		}
 
 		public override void Visit(ICodeNode node)
 		{
-			if (this.continue)
+			if (this.@continue)
 			{
-				this.Visit(node);
+				base.Visit(node);
 			}
-			return;
 		}
 	}
 }

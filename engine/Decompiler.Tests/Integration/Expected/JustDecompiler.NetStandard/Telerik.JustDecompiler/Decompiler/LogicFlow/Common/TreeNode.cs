@@ -27,11 +27,9 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Common
 
 		protected TreeNode(ISingleEntrySubGraph construct)
 		{
-			base();
-			this.set_Construct(construct);
-			this.set_Predecessor(null);
-			this.set_TreeEdgeSuccessors(new HashSet<TreeNode>());
-			return;
+			this.Construct = construct;
+			this.Predecessor = null;
+			this.TreeEdgeSuccessors = new HashSet<TreeNode>();
 		}
 	}
 }

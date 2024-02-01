@@ -1,250 +1,219 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Cil;
+using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.StateMachines;
 
 namespace Telerik.JustDecompiler.Steps
 {
 	internal class RemoveAsyncStateMachineStep : BaseStateMachineRemoverStep
 	{
-		private readonly HashSet<VariableReference> awaiterVariables;
+		private readonly HashSet<VariableReference> awaiterVariables = new HashSet<VariableReference>();
 
 		private FieldDefinition stateField;
 
 		public RemoveAsyncStateMachineStep()
 		{
-			this.awaiterVariables = new HashSet<VariableReference>();
-			base();
-			return;
 		}
 
 		private bool CheckForIsCompletedCall(InstructionBlock theBlock)
 		{
-			V_0 = theBlock.get_First();
-			while ((object)V_0 != (object)theBlock.get_Last())
+			VariableReference variableReference;
+			for (Instruction i = theBlock.First; (object)i != (object)theBlock.Last; i = i.get_Next())
 			{
-				if (V_0.get_OpCode().get_Code() == 39 || V_0.get_OpCode().get_Code() == 110 && String.op_Equality(((MethodReference)V_0.get_Operand()).get_Name(), "get_IsCompleted"))
+				if ((i.get_OpCode().get_Code() == 39 || i.get_OpCode().get_Code() == 110) && ((MethodReference)i.get_Operand()).get_Name() == "get_IsCompleted")
 				{
-					if (!StateMachineUtilities.TryGetVariableFromInstruction(V_0.get_Previous(), this.moveNextMethodContext.get_Body().get_Variables(), out V_2))
+					if (!StateMachineUtilities.TryGetVariableFromInstruction(i.get_Previous(), this.moveNextMethodContext.Body.get_Variables(), out variableReference))
 					{
 						return false;
 					}
-					dummyVar0 = this.awaiterVariables.Add(V_2);
+					this.awaiterVariables.Add(variableReference);
 					return true;
 				}
-				V_0 = V_0.get_Next();
 			}
 			return false;
 		}
 
 		private bool CheckForStateFieldSet(InstructionBlock theBlock)
 		{
-			V_0 = theBlock.get_First();
-			while ((object)V_0 != (object)theBlock.get_Last())
+			for (Instruction i = theBlock.First; (object)i != (object)theBlock.Last; i = i.get_Next())
 			{
-				if (V_0.get_OpCode().get_Code() == 122 && (object)((FieldReference)V_0.get_Operand()).Resolve() == (object)this.stateField)
+				if (i.get_OpCode().get_Code() == 122 && (object)((FieldReference)i.get_Operand()).Resolve() == (object)this.stateField)
 				{
 					return true;
 				}
-				V_0 = V_0.get_Next();
 			}
 			return false;
 		}
 
 		private bool CreateFakeSwitchData(out SwitchData switchData)
 		{
-			if (!this.GetMethodEntry(out V_0))
+			InstructionBlock instructionBlocks;
+			if (!this.GetMethodEntry(out instructionBlocks))
 			{
 				switchData = null;
 				return false;
 			}
-			switchData = new SwitchData(null, V_0, new InstructionBlock[0]);
+			switchData = new SwitchData(null, instructionBlocks, new InstructionBlock[0]);
 			return true;
 		}
 
 		private T GetFirst<T>(IEnumerable<T> collection)
 		{
-			V_0 = collection.GetEnumerator();
-			try
+			T current;
+			using (IEnumerator<T> enumerator = collection.GetEnumerator())
 			{
-				if (V_0.MoveNext())
+				if (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
+					current = enumerator.Current;
 				}
 				else
 				{
-					goto Label0;
+					throw new Exception("Collection empty");
 				}
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return V_1;
-		Label0:
-			throw new Exception("Collection empty");
+			return current;
 		}
 
 		private bool GetMethodEntry(out InstructionBlock methodEntry)
 		{
-			V_0 = this.theCFG.get_Blocks()[0];
-			while (this.toBeRemoved.Contains(V_0))
+			InstructionBlock i;
+			for (i = this.theCFG.Blocks[0]; this.toBeRemoved.Contains(i); i = i.Successors[0])
 			{
-				if ((int)V_0.get_Successors().Length != 1)
+				if ((int)i.Successors.Length != 1)
 				{
 					methodEntry = null;
 					return false;
 				}
-				V_0 = V_0.get_Successors()[0];
 			}
-			methodEntry = V_0;
+			methodEntry = i;
 			return true;
 		}
 
 		private bool GetStateField()
 		{
-			if ((int)this.theCFG.get_Blocks().Length < 2)
+			if ((int)this.theCFG.Blocks.Length < 2)
 			{
 				return false;
 			}
-			V_0 = this.theCFG.get_Blocks()[(int)this.theCFG.get_Blocks().Length - 2];
-			V_1 = V_0.get_First();
-			while ((object)V_1 != (object)V_0.get_Last())
+			InstructionBlock blocks = this.theCFG.Blocks[(int)this.theCFG.Blocks.Length - 2];
+			for (Instruction i = blocks.First; (object)i != (object)blocks.Last; i = i.get_Next())
 			{
-				if (V_1.get_OpCode().get_Code() == 122)
+				if (i.get_OpCode().get_Code() == 122)
 				{
-					this.stateField = ((FieldReference)V_1.get_Operand()).Resolve();
-					return (object)this.stateField.get_DeclaringType() == (object)this.moveNextMethodContext.get_Method().get_DeclaringType();
+					this.stateField = ((FieldReference)i.get_Operand()).Resolve();
+					return (object)this.stateField.get_DeclaringType() == (object)this.moveNextMethodContext.Method.get_DeclaringType();
 				}
-				V_1 = V_1.get_Next();
 			}
 			return false;
 		}
 
 		protected override bool ProcessCFG()
 		{
+			StateMachineFinallyCheckRemoverBase stateMachineFinallyStateCheckRemover;
+			SwitchData switchData;
 			if (!this.GetStateField() || !this.RemoveStateSavingBlocks())
 			{
 				return false;
 			}
-			V_0 = new AsyncMoveNextMethodAnalyzer(this.moveNextMethodContext, this.stateField);
-			if (V_0.get_StateMachineVersion() != AsyncStateMachineVersion.V1)
+			AsyncMoveNextMethodAnalyzer asyncMoveNextMethodAnalyzer = new AsyncMoveNextMethodAnalyzer(this.moveNextMethodContext, this.stateField);
+			if (asyncMoveNextMethodAnalyzer.StateMachineVersion != AsyncStateMachineVersion.V1)
 			{
-				V_1 = new StateMachineFinallyStateCheckRemover(this.moveNextMethodContext);
-				V_1.MarkFinallyConditionsForRemoval(V_0.get_StateVariable());
+				stateMachineFinallyStateCheckRemover = new StateMachineFinallyStateCheckRemover(this.moveNextMethodContext);
+				stateMachineFinallyStateCheckRemover.MarkFinallyConditionsForRemoval(asyncMoveNextMethodAnalyzer.StateVariable);
 			}
 			else
 			{
-				V_1 = new StateMachineDoFinallyCheckRemover(this.moveNextMethodContext);
-				V_1.MarkFinallyConditionsForRemoval(V_0.get_DoFinallyVariable());
+				stateMachineFinallyStateCheckRemover = new StateMachineDoFinallyCheckRemover(this.moveNextMethodContext);
+				stateMachineFinallyStateCheckRemover.MarkFinallyConditionsForRemoval(asyncMoveNextMethodAnalyzer.DoFinallyVariable);
 			}
-			this.toBeRemoved.UnionWith(V_1.get_BlocksMarkedForRemoval());
-			V_2 = new AsyncStateControllerRemover(this.moveNextMethodContext, this.stateField, V_0.get_DoFinallyVariable(), V_0.get_StateMachineVersion());
-			if (!V_2.RemoveStateMachineController() && V_2.get_FoundControllerBlocks())
+			this.toBeRemoved.UnionWith(stateMachineFinallyStateCheckRemover.BlocksMarkedForRemoval);
+			AsyncStateControllerRemover asyncStateControllerRemover = new AsyncStateControllerRemover(this.moveNextMethodContext, this.stateField, asyncMoveNextMethodAnalyzer.DoFinallyVariable, asyncMoveNextMethodAnalyzer.StateMachineVersion);
+			if (!asyncStateControllerRemover.RemoveStateMachineController() && asyncStateControllerRemover.FoundControllerBlocks)
 			{
 				return false;
 			}
-			this.toBeRemoved.UnionWith(V_2.get_BlocksMarkedForRemoval());
-			if (V_2.get_SwitchData() == null)
+			this.toBeRemoved.UnionWith(asyncStateControllerRemover.BlocksMarkedForRemoval);
+			if (asyncStateControllerRemover.SwitchData != null)
 			{
-				if (!this.CreateFakeSwitchData(out V_3))
-				{
-					return false;
-				}
+				switchData = asyncStateControllerRemover.SwitchData;
 			}
-			else
-			{
-				V_3 = V_2.get_SwitchData();
-			}
-			if (!(new StateMachineCFGCleaner(this.theCFG, V_3, V_3.get_DefaultCase())).CleanUpTheCFG(this.toBeRemoved))
+			else if (!this.CreateFakeSwitchData(out switchData))
 			{
 				return false;
 			}
-			this.moveNextMethodContext.set_AsyncData(new AsyncData(this.stateField, this.awaiterVariables, V_0.variableToFieldMap));
+			if (!(new StateMachineCFGCleaner(this.theCFG, switchData, switchData.DefaultCase)).CleanUpTheCFG(this.toBeRemoved))
+			{
+				return false;
+			}
+			this.moveNextMethodContext.AsyncData = new AsyncData(this.stateField, this.awaiterVariables, asyncMoveNextMethodAnalyzer.variableToFieldMap);
 			return true;
 		}
 
 		private bool RemoveStateSavingBlocks()
 		{
-			V_0 = this.theCFG.get_Blocks()[(int)this.theCFG.get_Blocks().Length - 1];
-			V_1 = V_0.get_First();
-			while (V_1.get_OpCode().get_Code() == null && (object)V_1 != (object)V_0.get_Last())
+			bool flag;
+			InstructionBlock blocks = this.theCFG.Blocks[(int)this.theCFG.Blocks.Length - 1];
+			Instruction first = blocks.First;
+			while (first.get_OpCode().get_Code() == null && (object)first != (object)blocks.Last)
 			{
-				V_1 = V_1.get_Next();
+				first = first.get_Next();
 			}
-			if (V_1.get_OpCode().get_Code() != 41)
+			if (first.get_OpCode().get_Code() != 41)
 			{
 				return false;
 			}
-			V_2 = 0;
-			V_4 = (new HashSet<InstructionBlock>(V_0.get_Predecessors())).GetEnumerator();
+			int num = 0;
+			HashSet<InstructionBlock>.Enumerator enumerator = (new HashSet<InstructionBlock>(blocks.Predecessors)).GetEnumerator();
 			try
 			{
-				while (V_4.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_5 = V_4.get_Current();
-					if ((int)V_5.get_Successors().Length <= 1)
+					InstructionBlock current = enumerator.Current;
+					if ((int)current.Successors.Length > 1)
 					{
-						if (V_5.get_Predecessors().get_Count() != 1 || !InstructionBlock.op_Inequality(this.theCFG.get_Blocks()[(int)this.theCFG.get_Blocks().Length - 2], V_5))
-						{
-							V_5.set_Successors(new InstructionBlock[0]);
-							V_2 = V_2 + 1;
-						}
-						else
-						{
-							if (this.CheckForStateFieldSet(V_5) && this.TryRemoveStateSavingBlock(V_5))
-							{
-								continue;
-							}
-							V_6 = false;
-							goto Label1;
-						}
+						flag = false;
+						return flag;
+					}
+					else if (current.Predecessors.Count != 1 || !(this.theCFG.Blocks[(int)this.theCFG.Blocks.Length - 2] != current))
+					{
+						current.Successors = new InstructionBlock[0];
+						num++;
 					}
 					else
 					{
-						V_6 = false;
-						goto Label1;
+						if (this.CheckForStateFieldSet(current) && this.TryRemoveStateSavingBlock(current))
+						{
+							continue;
+						}
+						flag = false;
+						return flag;
 					}
 				}
-				goto Label0;
+				this.toBeRemoved.Add(blocks);
+				return num == 2;
 			}
 			finally
 			{
-				((IDisposable)V_4).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_6;
-		Label0:
-			dummyVar0 = this.toBeRemoved.Add(V_0);
-			return V_2 == 2;
+			return flag;
 		}
 
 		private bool TryRemoveStateSavingBlock(InstructionBlock theBlock)
 		{
-			V_0 = this.GetFirst<InstructionBlock>(theBlock.get_Predecessors());
-			if ((int)V_0.get_Successors().Length != 2 || !this.CheckForIsCompletedCall(V_0))
+			InstructionBlock first = this.GetFirst<InstructionBlock>(theBlock.Predecessors);
+			if ((int)first.Successors.Length != 2 || !this.CheckForIsCompletedCall(first))
 			{
 				return false;
 			}
-			if (InstructionBlock.op_Equality(V_0.get_Successors()[0], theBlock))
-			{
-				stackVariable22 = V_0.get_Successors()[1];
-			}
-			else
-			{
-				stackVariable22 = V_0.get_Successors()[0];
-			}
-			V_1 = stackVariable22;
-			theBlock.set_Successors(new InstructionBlock[0]);
-			stackVariable28 = new InstructionBlock[1];
-			stackVariable28[0] = V_1;
-			V_0.set_Successors(stackVariable28);
-			dummyVar0 = this.toBeRemoved.Add(theBlock);
+			InstructionBlock instructionBlocks = (first.Successors[0] == theBlock ? first.Successors[1] : first.Successors[0]);
+			theBlock.Successors = new InstructionBlock[0];
+			first.Successors = new InstructionBlock[] { instructionBlocks };
+			this.toBeRemoved.Add(theBlock);
 			return true;
 		}
 	}

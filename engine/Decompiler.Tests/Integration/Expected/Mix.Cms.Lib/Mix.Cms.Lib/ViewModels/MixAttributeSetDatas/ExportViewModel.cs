@@ -1,13 +1,20 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Primitives;
 using Mix.Cms.Lib;
+using Mix.Cms.Lib.Helpers;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.ViewModels;
 using Mix.Cms.Lib.ViewModels.MixAttributeFields;
 using Mix.Cms.Lib.ViewModels.MixAttributeSetValues;
+using Mix.Cms.Lib.ViewModels.MixMedias;
 using Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
+using Mix.Heart.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -98,18 +105,10 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 			set;
 		}
 
-		public List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> RefData
-		{
-			get;
-			set;
-		}
+		public List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> RefData { get; set; } = new List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>();
 
 		[JsonProperty("relatedData")]
-		public List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel> RelatedData
-		{
-			get;
-			set;
-		}
+		public List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel> RelatedData { get; set; } = new List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel>();
 
 		[JsonProperty("specificulture")]
 		public string Specificulture
@@ -134,253 +133,330 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public ExportViewModel()
 		{
-			this.u003cRefDatau003ek__BackingField = new List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>();
-			this.u003cRelatedDatau003ek__BackingField = new List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel>();
-			base();
-			return;
 		}
 
-		public ExportViewModel(MixAttributeSetData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ExportViewModel(MixAttributeSetData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cRefDatau003ek__BackingField = new List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>();
-			this.u003cRelatedDatau003ek__BackingField = new List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel>();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixAttributeSetValue, Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ExportViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>> modelListBy = ViewModelBase<MixCmsContext, MixAttributeSetValue, Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>.Repository.GetModelListBy((MixAttributeSetValue a) => a.DataId == this.Id && a.Specificulture == this.Specificulture, _context, _transaction);
+			if (modelListBy.get_IsSucceed())
+			{
+				this.Values = (
+					from a in modelListBy.get_Data()
+					orderby a.Priority
+					select a).ToList<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>();
+				this.ParseData();
+			}
+		}
 
 		public static Task<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>> FilterByValueAsync(string culture, string attributeSetName, Dictionary<string, StringValues> queryDictionary, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = new ExportViewModel.u003cu003ec__DisplayClass70_0();
-			V_0.culture = culture;
-			V_0.attributeSetName = attributeSetName;
-			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref V_1, ref V_2, ref V_3);
+			ExportViewModel.u003cu003ec__DisplayClass70_0 variable = null;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			ExportViewModel.u003cu003ec__DisplayClass70_1 variable1 = null;
+			Task<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>> task;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
 			try
 			{
 				try
 				{
-					V_4 = new ExportViewModel.u003cu003ec__DisplayClass70_1();
-					V_4.CSu0024u003cu003e8__locals1 = V_0;
-					V_7 = Expression.Parameter(Type.GetTypeFromHandle(// 
-					// Current member / type: System.Threading.Tasks.Task`1<Mix.Domain.Core.ViewModels.RepositoryResponse`1<System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>> Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ExportViewModel::FilterByValueAsync(System.String,System.String,System.Collections.Generic.Dictionary`2<System.String,Microsoft.Extensions.Primitives.StringValues>,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Exception in: System.Threading.Tasks.Task<Mix.Domain.Core.ViewModels.RepositoryResponse<System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>> FilterByValueAsync(System.String,System.String,System.Collections.Generic.Dictionary<System.String,Microsoft.Extensions.Primitives.StringValues>,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
-
-		private void ParseData()
-		{
-			this.set_Data(new JObject());
-			stackVariable3 = this.get_Values();
-			stackVariable4 = ExportViewModel.u003cu003ec.u003cu003e9__71_0;
-			if (stackVariable4 == null)
-			{
-				dummyVar0 = stackVariable4;
-				stackVariable4 = new Func<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(ExportViewModel.u003cu003ec.u003cu003e9.u003cParseDatau003eb__71_0);
-				ExportViewModel.u003cu003ec.u003cu003e9__71_0 = stackVariable4;
-			}
-			V_0 = stackVariable3.OrderBy<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel, int>(stackVariable4).GetEnumerator();
-			try
-			{
-				while (V_0.MoveNext())
+					Expression<Func<MixAttributeSetValue, bool>> specificulture = (MixAttributeSetValue m) => m.Specificulture == variable.culture;
+					List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> updateViewModels = new List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>();
+					foreach (KeyValuePair<string, StringValues> keyValuePair in queryDictionary)
+					{
+						Expression<Func<MixAttributeSetValue, bool>> expression = (MixAttributeSetValue m) => m.Specificulture == variable1.CSu0024u003cu003e8__locals1.culture && m.AttributeSetName == variable1.CSu0024u003cu003e8__locals1.attributeSetName && m.AttributeFieldName == keyValuePair.Key && m.StringValue.Contains((string)keyValuePair.Value);
+						specificulture = ODataHelper<MixAttributeSetValue>.CombineExpression<MixAttributeSetValue>(specificulture, expression, 1, "model");
+					}
+					IQueryable<MixAttributeSetValue> mixAttributeSetValues = mixCmsContext.MixAttributeSetValue.Where<MixAttributeSetValue>(specificulture);
+					foreach (MixAttributeSetData mixAttributeSetDatum in 
+						from m in mixCmsContext.MixAttributeSetData
+						where mixAttributeSetValues.Any<MixAttributeSetValue>((MixAttributeSetValue q) => q.DataId == m.Id) && m.Specificulture == variable.culture
+						select m)
+					{
+						updateViewModels.Add(new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel(mixAttributeSetDatum, mixCmsContext, dbContextTransaction));
+					}
+					RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>> repositoryResponse = new RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>();
+					repositoryResponse.set_IsSucceed(true);
+					repositoryResponse.set_Data(updateViewModels);
+					task = Task.FromResult<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>>(repositoryResponse);
+				}
+				catch (Exception exception)
 				{
-					V_1 = V_0.get_Current();
-					V_1.set_AttributeFieldName(V_1.get_Field().get_Name());
-					this.get_Data().Add(this.ParseValue(V_1));
+					task = Task.FromResult<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>>(UnitOfWorkHelper<MixCmsContext>.HandleException<List<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>(exception, flag, dbContextTransaction));
 				}
 			}
 			finally
 			{
-				if (V_0 != null)
+				if (flag)
 				{
-					V_0.Dispose();
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
 				}
 			}
-			this.get_Data().Add(new JProperty("createdDateTime", (object)this.get_CreatedDateTime()));
-			return;
+			return task;
+		}
+
+		private void ParseData()
+		{
+			this.Data = new JObject();
+			foreach (Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel name in 
+				from v in this.Values
+				orderby v.Priority
+				select v)
+			{
+				name.AttributeFieldName = name.Field.Name;
+				this.Data.Add(this.ParseValue(name));
+			}
+			this.Data.Add(new JProperty("createdDateTime", (object)this.CreatedDateTime));
 		}
 
 		public override MixAttributeSetData ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (string.IsNullOrEmpty(this.get_Id()))
+			string str;
+			string name;
+			if (string.IsNullOrEmpty(this.Id))
 			{
-				this.set_Id(Guid.NewGuid().ToString());
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
-				stackVariable221 = ViewModelBase<MixCmsContext, MixAttributeSetData, ExportViewModel>.Repository;
-				V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixAttributeSetData Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ExportViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixAttributeSetData ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = Guid.NewGuid().ToString();
+				this.CreatedDateTime = DateTime.UtcNow;
+				this.Priority = ViewModelBase<MixCmsContext, MixAttributeSetData, ExportViewModel>.Repository.Count((MixAttributeSetData m) => m.AttributeSetName == this.AttributeSetName && m.Specificulture == this.Specificulture, _context, _transaction).get_Data() + 1;
+			}
+			this.Values = this.Values ?? (
+				from a in ViewModelBase<MixCmsContext, MixAttributeSetValue, Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>.Repository.GetModelListBy((MixAttributeSetValue a) => a.DataId == this.Id && a.Specificulture == this.Specificulture, _context, _transaction).get_Data()
+				orderby a.Priority
+				select a).ToList<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>();
+			this.Fields = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository.GetModelListBy((MixAttributeField f) => f.AttributeSetId == this.AttributeSetId, _context, _transaction).get_Data();
+			if (string.IsNullOrEmpty(this.AttributeSetName))
+			{
+				MixAttributeSet mixAttributeSet = _context.MixAttributeSet.First<MixAttributeSet>((MixAttributeSet m) => m.Id == this.AttributeSetId);
+				if (mixAttributeSet != null)
+				{
+					name = mixAttributeSet.Name;
+				}
+				else
+				{
+					name = null;
+				}
+				this.AttributeSetName = name;
+			}
+			foreach (Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel updateViewModel in 
+				from f in this.Fields
+				orderby f.Priority
+				select f)
+			{
+				Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel priority = this.Values.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>((Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel v) => v.AttributeFieldId == updateViewModel.Id);
+				if (priority == null)
+				{
+					priority = new Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel(new MixAttributeSetValue()
+					{
+						AttributeFieldId = updateViewModel.Id,
+						AttributeFieldName = updateViewModel.Name
+					}, _context, _transaction)
+					{
+						StringValue = updateViewModel.DefaultValue,
+						Priority = updateViewModel.Priority,
+						Field = updateViewModel
+					};
+					this.Values.Add(priority);
+				}
+				priority.Priority = updateViewModel.Priority;
+				priority.AttributeSetName = this.AttributeSetName;
+				if (this.Data.get_Item(priority.AttributeFieldName) == null)
+				{
+					this.Data.Add(this.ParseValue(priority));
+				}
+				else if (priority.Field.DataType != MixEnums.MixDataType.Reference)
+				{
+					this.ParseModelValue(this.Data.get_Item(priority.AttributeFieldName), priority);
+				}
+				else
+				{
+					foreach (JObject jObject in Newtonsoft.Json.Linq.Extensions.Value<JArray>(this.Data.get_Item(priority.AttributeFieldName)))
+					{
+						JToken item = jObject.get_Item("id");
+						if (item != null)
+						{
+							str = Newtonsoft.Json.Linq.Extensions.Value<string>(item);
+						}
+						else
+						{
+							str = null;
+						}
+						if (!string.IsNullOrEmpty(str))
+						{
+							continue;
+						}
+						this.RefData.Add(new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel()
+						{
+							Specificulture = this.Specificulture,
+							AttributeSetId = updateViewModel.ReferenceId.Value,
+							Data = jObject
+						});
+					}
+				}
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 
 		private void ParseModelValue(JToken property, Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel item)
 		{
-			switch (item.get_Field().get_DataType())
+			switch (item.Field.DataType)
 			{
-				case 0:
-				case 4:
-				case 5:
-				case 7:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-				case 12:
-				case 13:
-				case 14:
-				case 15:
-				case 17:
-				case 19:
-				case 20:
-				case 21:
+				case MixEnums.MixDataType.Custom:
+				case MixEnums.MixDataType.Duration:
+				case MixEnums.MixDataType.PhoneNumber:
+				case MixEnums.MixDataType.Text:
+				case MixEnums.MixDataType.Html:
+				case MixEnums.MixDataType.MultilineText:
+				case MixEnums.MixDataType.EmailAddress:
+				case MixEnums.MixDataType.Password:
+				case MixEnums.MixDataType.Url:
+				case MixEnums.MixDataType.ImageUrl:
+				case MixEnums.MixDataType.CreditCard:
+				case MixEnums.MixDataType.PostalCode:
+				case MixEnums.MixDataType.Color:
+				case MixEnums.MixDataType.Icon:
+				case MixEnums.MixDataType.VideoYoutube:
+				case MixEnums.MixDataType.TuiEditor:
 				{
-				Label0:
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					break;
 				}
-				case 1:
+				case MixEnums.MixDataType.DateTime:
 				{
-					item.set_DateTimeValue(Newtonsoft.Json.Linq.Extensions.Value<DateTime?>(property));
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.DateTimeValue = Newtonsoft.Json.Linq.Extensions.Value<DateTime?>(property);
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					return;
 				}
-				case 2:
+				case MixEnums.MixDataType.Date:
 				{
-					item.set_DateTimeValue(Newtonsoft.Json.Linq.Extensions.Value<DateTime?>(property));
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.DateTimeValue = Newtonsoft.Json.Linq.Extensions.Value<DateTime?>(property);
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					return;
 				}
-				case 3:
+				case MixEnums.MixDataType.Time:
 				{
-					item.set_DateTimeValue(Newtonsoft.Json.Linq.Extensions.Value<DateTime?>(property));
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.DateTimeValue = Newtonsoft.Json.Linq.Extensions.Value<DateTime?>(property);
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					return;
 				}
-				case 6:
+				case MixEnums.MixDataType.Double:
 				{
-					item.set_DoubleValue(Newtonsoft.Json.Linq.Extensions.Value<double?>(property));
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.DoubleValue = Newtonsoft.Json.Linq.Extensions.Value<double?>(property);
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					return;
 				}
-				case 16:
+				case MixEnums.MixDataType.Upload:
 				{
-					V_0 = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
-					if (!StringExtension.IsBase64(V_0))
+					string str = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
+					if (!StringExtension.IsBase64(str))
 					{
-						item.set_StringValue(V_0);
+						item.StringValue = str;
 						return;
 					}
-					stackVariable37 = new Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel();
-					stackVariable37.set_Specificulture(this.get_Specificulture());
-					stackVariable37.set_Status(2);
-					stackVariable41 = new FileViewModel();
-					stackVariable41.set_FileStream(V_0);
-					stackVariable41.set_Extension(".png");
-					stackVariable41.set_Filename(Guid.NewGuid().ToString());
-					stackVariable41.set_FileFolder("Attributes");
-					stackVariable37.set_MediaFile(stackVariable41);
-					V_2 = ((ViewModelBase<MixCmsContext, MixMedia, Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel>)stackVariable37).SaveModel(true, null, null);
-					if (!V_2.get_IsSucceed())
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel> repositoryResponse = ((ViewModelBase<MixCmsContext, MixMedia, Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel>)(new Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel()
+					{
+						Specificulture = this.Specificulture,
+						Status = MixEnums.MixContentStatus.Published,
+						MediaFile = new FileViewModel()
+						{
+							FileStream = str,
+							Extension = ".png",
+							Filename = Guid.NewGuid().ToString(),
+							FileFolder = "Attributes"
+						}
+					})).SaveModel(true, null, null);
+					if (!repositoryResponse.get_IsSucceed())
 					{
 						break;
 					}
-					item.set_StringValue(V_2.get_Data().get_FullPath());
+					item.StringValue = repositoryResponse.get_Data().FullPath;
 					return;
 				}
-				case 18:
+				case MixEnums.MixDataType.Boolean:
 				{
-					item.set_BooleanValue(Newtonsoft.Json.Linq.Extensions.Value<bool?>(property));
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property).ToLower());
+					item.BooleanValue = Newtonsoft.Json.Linq.Extensions.Value<bool?>(property);
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property).ToLower();
 					return;
 				}
-				case 22:
+				case MixEnums.MixDataType.Integer:
 				{
-					item.set_IntegerValue(Newtonsoft.Json.Linq.Extensions.Value<int?>(property));
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.IntegerValue = Newtonsoft.Json.Linq.Extensions.Value<int?>(property);
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					return;
 				}
-				case 23:
+				case MixEnums.MixDataType.Reference:
 				{
-					item.set_StringValue(Newtonsoft.Json.Linq.Extensions.Value<string>(property));
+					item.StringValue = Newtonsoft.Json.Linq.Extensions.Value<string>(property);
 					return;
 				}
 				default:
 				{
-					goto Label0;
+					goto case MixEnums.MixDataType.TuiEditor;
 				}
 			}
-			return;
 		}
 
 		private JProperty ParseValue(Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel item)
 		{
-			switch (item.get_DataType())
+			switch (item.DataType)
 			{
-				case 0:
-				case 4:
-				case 5:
-				case 7:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-				case 12:
-				case 13:
-				case 14:
-				case 15:
-				case 16:
-				case 17:
-				case 19:
-				case 20:
-				case 21:
+				case MixEnums.MixDataType.Custom:
+				case MixEnums.MixDataType.Duration:
+				case MixEnums.MixDataType.PhoneNumber:
+				case MixEnums.MixDataType.Text:
+				case MixEnums.MixDataType.Html:
+				case MixEnums.MixDataType.MultilineText:
+				case MixEnums.MixDataType.EmailAddress:
+				case MixEnums.MixDataType.Password:
+				case MixEnums.MixDataType.Url:
+				case MixEnums.MixDataType.ImageUrl:
+				case MixEnums.MixDataType.CreditCard:
+				case MixEnums.MixDataType.PostalCode:
+				case MixEnums.MixDataType.Upload:
+				case MixEnums.MixDataType.Color:
+				case MixEnums.MixDataType.Icon:
+				case MixEnums.MixDataType.VideoYoutube:
+				case MixEnums.MixDataType.TuiEditor:
 				{
-				Label0:
-					return new JProperty(item.get_AttributeFieldName(), item.get_StringValue());
+					return new JProperty(item.AttributeFieldName, item.StringValue);
 				}
-				case 1:
+				case MixEnums.MixDataType.DateTime:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DateTimeValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DateTimeValue);
 				}
-				case 2:
+				case MixEnums.MixDataType.Date:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DateTimeValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DateTimeValue);
 				}
-				case 3:
+				case MixEnums.MixDataType.Time:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DateTimeValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DateTimeValue);
 				}
-				case 6:
+				case MixEnums.MixDataType.Double:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DoubleValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DoubleValue);
 				}
-				case 18:
+				case MixEnums.MixDataType.Boolean:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_BooleanValue());
+					return new JProperty(item.AttributeFieldName, (object)item.BooleanValue);
 				}
-				case 22:
+				case MixEnums.MixDataType.Integer:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_IntegerValue());
+					return new JProperty(item.AttributeFieldName, (object)item.IntegerValue);
 				}
-				case 23:
+				case MixEnums.MixDataType.Reference:
 				{
-					return new JProperty(item.get_AttributeFieldName(), new JArray());
+					return new JProperty(item.AttributeFieldName, new JArray());
 				}
 				default:
 				{
-					goto Label0;
+					return new JProperty(item.AttributeFieldName, item.StringValue);
 				}
 			}
 		}

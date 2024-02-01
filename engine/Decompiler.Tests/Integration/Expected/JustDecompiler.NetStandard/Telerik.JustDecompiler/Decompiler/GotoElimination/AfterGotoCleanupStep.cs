@@ -2,6 +2,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -21,66 +22,44 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		public AfterGotoCleanupStep()
 		{
-			base();
 			this.statementsToRemove = new List<ExpressionStatement>();
 			this.emptyThenIfs = new List<IfStatement>();
-			return;
 		}
 
 		private void CleanupEmptyIfs(BlockStatement body)
 		{
 			do
 			{
-				V_0 = this.emptyThenIfs.GetEnumerator();
-				try
+				foreach (IfStatement emptyThenIf in this.emptyThenIfs)
 				{
-					while (V_0.MoveNext())
+					if (emptyThenIf.Else == null || emptyThenIf.Else.Statements.Count == 0)
 					{
-						V_1 = V_0.get_Current();
-						if (V_1.get_Else() == null || V_1.get_Else().get_Statements().get_Count() == 0)
-						{
-							dummyVar0 = (V_1.get_Parent() as BlockStatement).get_Statements().Remove(V_1);
-						}
-						else
-						{
-							V_1.set_Then(V_1.get_Else());
-							V_1.set_Else(null);
-							dummyVar1 = Negator.Negate(V_1.get_Condition(), this.typeSystem);
-						}
+						(emptyThenIf.Parent as BlockStatement).Statements.Remove(emptyThenIf);
 					}
-				}
-				finally
-				{
-					((IDisposable)V_0).Dispose();
+					else
+					{
+						emptyThenIf.Then = emptyThenIf.Else;
+						emptyThenIf.Else = null;
+						Negator.Negate(emptyThenIf.Condition, this.typeSystem);
+					}
 				}
 				this.emptyThenIfs = new List<IfStatement>();
 				this.Visit(body);
 			}
-			while (this.emptyThenIfs.get_Count() != 0);
-			return;
+			while (this.emptyThenIfs.Count != 0);
 		}
 
 		private void CleanupRedundantAssignments()
 		{
-			V_0 = this.statementsToRemove.GetEnumerator();
-			try
+			foreach (ExpressionStatement expressionStatement in this.statementsToRemove)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					dummyVar0 = (V_1.get_Parent() as BlockStatement).get_Statements().Remove(V_1);
-				}
+				(expressionStatement.Parent as BlockStatement).Statements.Remove(expressionStatement);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.Visit(body);
 			this.CleanupRedundantAssignments();
 			this.CleanupEmptyIfs(body);
@@ -89,30 +68,28 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		public override void VisitExpressionStatement(ExpressionStatement node)
 		{
-			if (node.get_Expression() as BinaryExpression != null)
+			if (node.Expression is BinaryExpression)
 			{
-				V_0 = node.get_Expression() as BinaryExpression;
-				if (V_0.get_Operator() == 26 && V_0.get_Left() as VariableReferenceExpression != null && V_0.get_Right() as VariableReferenceExpression != null)
+				BinaryExpression expression = node.Expression as BinaryExpression;
+				if (expression.Operator == BinaryOperator.Assign && expression.Left is VariableReferenceExpression && expression.Right is VariableReferenceExpression)
 				{
-					stackVariable18 = (V_0.get_Left() as VariableReferenceExpression).get_Variable();
-					V_1 = (V_0.get_Right() as VariableReferenceExpression).get_Variable();
-					if ((object)stackVariable18 == (object)V_1)
+					VariableReference variable = (expression.Left as VariableReferenceExpression).Variable;
+					VariableReference variableReference = (expression.Right as VariableReferenceExpression).Variable;
+					if ((object)variable == (object)variableReference)
 					{
 						this.statementsToRemove.Add(node);
 					}
 				}
 			}
-			return;
 		}
 
 		public override void VisitIfStatement(IfStatement node)
 		{
-			if (node.get_Then().get_Statements().get_Count() == 0)
+			if (node.Then.Statements.Count == 0)
 			{
 				this.emptyThenIfs.Add(node);
 			}
-			this.VisitIfStatement(node);
-			return;
+			base.VisitIfStatement(node);
 		}
 	}
 }

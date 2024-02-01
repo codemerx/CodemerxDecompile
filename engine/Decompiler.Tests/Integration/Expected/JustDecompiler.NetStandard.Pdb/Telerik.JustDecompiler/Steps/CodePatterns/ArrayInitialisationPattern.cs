@@ -1,8 +1,13 @@
 using Mono.Cecil;
+using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Steps;
 
 namespace Telerik.JustDecompiler.Steps.CodePatterns
 {
@@ -10,111 +15,109 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 	{
 		private const uint MaxDefaultValues = 10;
 
-		public ArrayInitialisationPattern(CodePatternsContext patternsContext, TypeSystem ts)
+		public ArrayInitialisationPattern(CodePatternsContext patternsContext, TypeSystem ts) : base(patternsContext, ts)
 		{
-			base(patternsContext, ts);
-			return;
 		}
 
 		private uint GetAssignmentIndex(Expression assignee)
 		{
-			if (assignee.get_CodeNodeType() != 39)
+			if (assignee.CodeNodeType != CodeNodeType.ArrayIndexerExpression)
 			{
 				throw new ArgumentOutOfRangeException("Expected ArrayIndexerExpression.");
 			}
-			stackVariable4 = assignee as ArrayIndexerExpression;
-			if (stackVariable4.get_Indices().get_Count() != 1)
+			ArrayIndexerExpression arrayIndexerExpression = assignee as ArrayIndexerExpression;
+			if (arrayIndexerExpression.Indices.Count != 1)
 			{
 				throw new ArgumentOutOfRangeException("Expected one-dimentional array.");
 			}
-			V_0 = stackVariable4.get_Indices().get_Item(0);
-			if (V_0.get_CodeNodeType() != 22)
+			Expression item = arrayIndexerExpression.Indices[0];
+			if (item.CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				throw new IndexOutOfRangeException();
 			}
-			return this.GetIndexFromLiteralExpression(V_0 as LiteralExpression);
+			return this.GetIndexFromLiteralExpression(item as LiteralExpression);
 		}
 
 		private uint GetCreatedArraySize(ArrayCreationExpression arrayCreation)
 		{
-			if (arrayCreation.get_Dimensions().get_Count() != 1)
+			if (arrayCreation.Dimensions.Count != 1)
 			{
 				throw new ArgumentOutOfRangeException("Expected one dimentional array creation.");
 			}
-			V_0 = arrayCreation.get_Dimensions().get_Item(0) as LiteralExpression;
-			if (V_0 == null)
+			LiteralExpression item = arrayCreation.Dimensions[0] as LiteralExpression;
+			if (item == null)
 			{
 				throw new ArgumentOutOfRangeException("Expected constant-size array");
 			}
-			return this.GetIndexFromLiteralExpression(V_0);
+			return this.GetIndexFromLiteralExpression(item);
 		}
 
 		private uint GetIndexFromLiteralExpression(LiteralExpression dimention)
 		{
-			V_0 = dimention.get_Value();
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.Int32"))
+			object value = dimention.Value;
+			if (dimention.ExpressionType.get_FullName() == "System.Int32")
 			{
-				stackVariable80 = (Int32)V_0;
-				if (stackVariable80 < 0)
+				Int32 num = (Int32)value;
+				if (num < 0)
 				{
 					throw new IndexOutOfRangeException();
 				}
-				return stackVariable80;
+				return (uint)num;
 			}
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.UInt32"))
+			if (dimention.ExpressionType.get_FullName() == "System.UInt32")
 			{
-				return (UInt32)V_0;
+				return (UInt32)value;
 			}
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.Int16"))
+			if (dimention.ExpressionType.get_FullName() == "System.Int16")
 			{
-				stackVariable74 = (Int16)V_0;
-				if (stackVariable74 < 0)
+				Int16 num1 = (Int16)value;
+				if (num1 < 0)
 				{
 					throw new IndexOutOfRangeException();
 				}
-				return stackVariable74;
+				return (uint)num1;
 			}
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.UInt16"))
+			if (dimention.ExpressionType.get_FullName() == "System.UInt16")
 			{
-				return (UInt16)V_0;
+				return (UInt16)value;
 			}
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.Int8"))
+			if (dimention.ExpressionType.get_FullName() == "System.Int8")
 			{
-				stackVariable68 = (SByte)V_0;
-				if (stackVariable68 < 0)
+				SByte num2 = (SByte)value;
+				if (num2 < 0)
 				{
 					throw new IndexOutOfRangeException();
 				}
-				return stackVariable68;
+				return (uint)num2;
 			}
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.UInt8"))
+			if (dimention.ExpressionType.get_FullName() == "System.UInt8")
 			{
-				return (Byte)V_0;
+				return (Byte)value;
 			}
-			if (String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.Int64"))
+			if (dimention.ExpressionType.get_FullName() == "System.Int64")
 			{
-				V_1 = (Int64)V_0;
-				if (V_1 < (long)0 || V_1 > (ulong)-1)
+				long num3 = (Int64)value;
+				if (num3 < (long)0 || num3 > (ulong)-1)
 				{
 					throw new IndexOutOfRangeException();
 				}
-				return (uint)V_1;
+				return (uint)num3;
 			}
-			if (!String.op_Equality(dimention.get_ExpressionType().get_FullName(), "System.UInt64"))
+			if (dimention.ExpressionType.get_FullName() != "System.UInt64")
 			{
 				throw new IndexOutOfRangeException();
 			}
-			V_2 = (UInt64)V_0;
-			if (V_2 < (long)0 || V_2 > (ulong)-1)
+			ulong num4 = (UInt64)value;
+			if (num4 < (long)0 || num4 > (ulong)-1)
 			{
 				throw new IndexOutOfRangeException();
 			}
-			return (uint)V_2;
+			return (uint)num4;
 		}
 
 		private Expression GetTypeDefaultLiteralExpression(TypeReference arrayElementType)
 		{
-			if (String.op_Equality(arrayElementType.get_FullName(), "System.Boolean"))
+			if (arrayElementType.get_FullName() == "System.Boolean")
 			{
 				return new LiteralExpression(false, this.typeSystem, null);
 			}
@@ -122,16 +125,16 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return new LiteralExpression((object)0, this.typeSystem, null);
 			}
-			V_0 = arrayElementType.Resolve();
-			if (V_0 == null)
+			TypeDefinition typeDefinition = arrayElementType.Resolve();
+			if (typeDefinition == null)
 			{
 				return new DefaultObjectExpression(arrayElementType, null);
 			}
-			if (V_0 != null && V_0.get_IsEnum())
+			if (typeDefinition != null && typeDefinition.get_IsEnum())
 			{
-				return EnumHelper.GetEnumExpression(V_0, new LiteralExpression((object)0, this.typeSystem, null), this.typeSystem);
+				return EnumHelper.GetEnumExpression(typeDefinition, new LiteralExpression((object)0, this.typeSystem, null), this.typeSystem);
 			}
-			if (V_0.get_IsValueType())
+			if (typeDefinition.get_IsValueType())
 			{
 				return new DefaultObjectExpression(arrayElementType, null);
 			}
@@ -140,20 +143,20 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		private bool IsArrayElementAssignment(BinaryExpression assignment, Expression assignee)
 		{
-			if (assignment == null || !assignment.get_IsAssignmentExpression())
+			if (assignment == null || !assignment.IsAssignmentExpression)
 			{
 				return false;
 			}
-			if (assignment.get_Left().get_CodeNodeType() != 39)
+			if (assignment.Left.CodeNodeType != CodeNodeType.ArrayIndexerExpression)
 			{
 				return false;
 			}
-			V_0 = assignment.get_Left() as ArrayIndexerExpression;
-			if (V_0.get_Indices().get_Count() != 1 || V_0.get_Indices().get_Item(0).get_CodeNodeType() != 22)
+			ArrayIndexerExpression left = assignment.Left as ArrayIndexerExpression;
+			if (left.Indices.Count != 1 || left.Indices[0].CodeNodeType != CodeNodeType.LiteralExpression)
 			{
 				return false;
 			}
-			if (!this.CompareTargets(assignee, V_0.get_Target()))
+			if (!base.CompareTargets(assignee, left.Target))
 			{
 				return false;
 			}
@@ -162,61 +165,54 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 
 		protected override bool TryMatchInternal(StatementCollection statements, int startIndex, out Statement result, out int replacedStatementsCount)
 		{
+			ArrayCreationExpression initializerExpression;
+			Expression expression;
+			Expression expression1;
+			Expression expression2;
 			result = null;
 			replacedStatementsCount = 0;
-			if (!this.TryGetArrayCreation(statements, startIndex, out V_0, out V_1))
+			if (!base.TryGetArrayCreation(statements, startIndex, out initializerExpression, out expression))
 			{
 				return false;
 			}
-			if (V_0.get_Initializer() != null && V_0.get_Initializer().get_Expressions().get_Count() != 0)
+			if (initializerExpression.Initializer != null && initializerExpression.Initializer.Expressions.Count != 0)
 			{
 				return false;
 			}
-			V_2 = this.GetCreatedArraySize(V_0);
-			V_3 = new Dictionary<uint, Expression>();
-			V_4 = (long)-1;
-			V_7 = startIndex + 1;
-			while (V_7 < statements.get_Count() && this.TryGetNextExpression(statements.get_Item(V_7), out V_8))
+			uint createdArraySize = this.GetCreatedArraySize(initializerExpression);
+			Dictionary<uint, Expression> nums = new Dictionary<uint, Expression>();
+			long num = (long)-1;
+			for (int i = startIndex + 1; i < statements.Count && base.TryGetNextExpression(statements[i], out expression1); i++)
 			{
-				V_9 = (statements.get_Item(V_7) as ExpressionStatement).get_Expression() as BinaryExpression;
-				if (!this.IsArrayElementAssignment(V_9, V_1))
+				BinaryExpression binaryExpression = (statements[i] as ExpressionStatement).Expression as BinaryExpression;
+				if (!this.IsArrayElementAssignment(binaryExpression, expression))
 				{
 					break;
 				}
-				V_10 = this.GetAssignmentIndex(V_9.get_Left());
-				if (V_10 >= V_2 || (ulong)V_10 <= V_4)
+				uint assignmentIndex = this.GetAssignmentIndex(binaryExpression.Left);
+				if (assignmentIndex >= createdArraySize || (ulong)assignmentIndex <= num)
 				{
 					break;
 				}
-				V_11 = new List<Instruction>(V_9.get_Left().get_UnderlyingSameMethodInstructions());
-				V_11.AddRange(V_9.get_MappedInstructions());
-				V_3.set_Item(V_10, V_9.get_Right().CloneAndAttachInstructions(V_11));
-				V_4 = (ulong)V_10;
-				V_7 = V_7 + 1;
+				List<Instruction> instructions = new List<Instruction>(binaryExpression.Left.UnderlyingSameMethodInstructions);
+				instructions.AddRange(binaryExpression.MappedInstructions);
+				nums[assignmentIndex] = binaryExpression.Right.CloneAndAttachInstructions(instructions);
+				num = (long)assignmentIndex;
 			}
-			if (V_3.get_Count() == 0 || (ulong)V_2 - (long)V_3.get_Count() > (long)10)
+			if (nums.Count == 0 || (ulong)createdArraySize - (long)nums.Count > (long)10)
 			{
 				return false;
 			}
-			V_5 = V_0.get_ElementType();
-			V_6 = new ExpressionCollection();
-			V_12 = 0;
-			while (V_12 < V_2)
+			TypeReference elementType = initializerExpression.ElementType;
+			ExpressionCollection expressionCollection = new ExpressionCollection();
+			for (uint j = 0; j < createdArraySize; j++)
 			{
-				if (V_3.ContainsKey(V_12))
-				{
-					V_13 = V_3.get_Item(V_12);
-				}
-				else
-				{
-					V_13 = this.GetTypeDefaultLiteralExpression(V_5);
-				}
-				V_6.Add(V_13);
-				V_12 = V_12 + 1;
+				expression2 = (nums.ContainsKey(j) ? nums[j] : this.GetTypeDefaultLiteralExpression(elementType));
+				expressionCollection.Add(expression2);
 			}
-			V_0.set_Initializer(new InitializerExpression(V_6, 2));
-			result = statements.get_Item(startIndex);
-			replacedStatementsCount = V_3.get_Count() + 1;
+			initializerExpression.Initializer = new InitializerExpression(expressionCollection, InitializerType.ArrayInitializer);
+			result = statements[startIndex];
+			replacedStatementsCount = nums.Count + 1;
 			return true;
 		}
 	}

@@ -10,11 +10,7 @@ namespace Piranha.Models
 	[Serializable]
 	public abstract class PageBase : RoutedContentBase, IBlockContent, IMeta, ICommentModel
 	{
-		public IList<Block> Blocks
-		{
-			get;
-			set;
-		}
+		public IList<Block> Blocks { get; set; } = new List<Block>();
 
 		public int CloseCommentsAfterDays
 		{
@@ -44,16 +40,16 @@ namespace Piranha.Models
 		{
 			get
 			{
-				if (!this.get_EnableComments() || !this.get_Published().get_HasValue())
+				if (!this.EnableComments || !base.Published.HasValue)
 				{
 					return false;
 				}
-				if (this.get_CloseCommentsAfterDays() == 0)
+				if (this.CloseCommentsAfterDays == 0)
 				{
 					return true;
 				}
-				V_1 = this.get_Published().get_Value();
-				return DateTime.op_GreaterThan(V_1.AddDays((double)this.get_CloseCommentsAfterDays()), DateTime.get_Now());
+				DateTime value = base.Published.Value;
+				return value.AddDays((double)this.CloseCommentsAfterDays) > DateTime.Now;
 			}
 		}
 
@@ -82,11 +78,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public ImageField PrimaryImage
-		{
-			get;
-			set;
-		}
+		public ImageField PrimaryImage { get; set; } = new ImageField();
 
 		public Piranha.Models.RedirectType RedirectType
 		{
@@ -115,10 +107,6 @@ namespace Piranha.Models
 
 		protected PageBase()
 		{
-			this.u003cPrimaryImageu003ek__BackingField = new ImageField();
-			this.u003cBlocksu003ek__BackingField = new List<Block>();
-			base();
-			return;
 		}
 	}
 }

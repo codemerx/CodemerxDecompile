@@ -23,22 +23,20 @@ namespace Piranha.Extend.Blocks
 
 		public HtmlColumnBlock()
 		{
-			base();
-			return;
 		}
 
 		public string GetIndexedContent()
 		{
-			V_0 = new StringBuilder();
-			if (!String.IsNullOrEmpty(this.get_Column1().get_Value()))
+			StringBuilder stringBuilder = new StringBuilder();
+			if (!String.IsNullOrEmpty(this.Column1.Value))
 			{
-				dummyVar0 = V_0.AppendLine(this.get_Column1().get_Value());
+				stringBuilder.AppendLine(this.Column1.Value);
 			}
-			if (!String.IsNullOrEmpty(this.get_Column2().get_Value()))
+			if (!String.IsNullOrEmpty(this.Column2.Value))
 			{
-				dummyVar1 = V_0.AppendLine(this.get_Column2().get_Value());
+				stringBuilder.AppendLine(this.Column2.Value);
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 	}
 }

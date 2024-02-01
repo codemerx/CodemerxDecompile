@@ -8,29 +8,28 @@ namespace Piranha.Extend.Fields
 	{
 		public StringField()
 		{
-			base();
-			return;
 		}
 
 		public string GetIndexedContent()
 		{
-			if (String.IsNullOrEmpty(this.get_Value()))
+			if (String.IsNullOrEmpty(base.Value))
 			{
 				return "";
 			}
-			return this.get_Value();
+			return base.Value;
 		}
 
 		public static implicit operator StringField(string str)
 		{
-			stackVariable0 = new StringField();
-			stackVariable0.set_Value(str);
-			return stackVariable0;
+			return new StringField()
+			{
+				Value = str
+			};
 		}
 
 		public static implicit operator String(StringField field)
 		{
-			return field.get_Value();
+			return field.Value;
 		}
 	}
 }

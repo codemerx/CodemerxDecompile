@@ -10,11 +10,7 @@ namespace Piranha.Models
 	[Serializable]
 	public abstract class PostBase : RoutedContentBase, IBlockContent, IMeta, ICommentModel
 	{
-		public IList<Block> Blocks
-		{
-			get;
-			set;
-		}
+		public IList<Block> Blocks { get; set; } = new List<Block>();
 
 		[Required]
 		public Guid BlogId
@@ -42,11 +38,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public bool EnableComments
-		{
-			get;
-			set;
-		}
+		public bool EnableComments { get; set; } = true;
 
 		public string Excerpt
 		{
@@ -58,24 +50,20 @@ namespace Piranha.Models
 		{
 			get
 			{
-				if (!this.get_EnableComments() || !this.get_Published().get_HasValue())
+				if (!this.EnableComments || !base.Published.HasValue)
 				{
 					return false;
 				}
-				if (this.get_CloseCommentsAfterDays() == 0)
+				if (this.CloseCommentsAfterDays == 0)
 				{
 					return true;
 				}
-				V_1 = this.get_Published().get_Value();
-				return DateTime.op_GreaterThan(V_1.AddDays((double)this.get_CloseCommentsAfterDays()), DateTime.get_Now());
+				DateTime value = base.Published.Value;
+				return value.AddDays((double)this.CloseCommentsAfterDays) > DateTime.Now;
 			}
 		}
 
-		public ImageField PrimaryImage
-		{
-			get;
-			set;
-		}
+		public ImageField PrimaryImage { get; set; } = new ImageField();
 
 		public Piranha.Models.RedirectType RedirectType
 		{
@@ -90,20 +78,10 @@ namespace Piranha.Models
 			set;
 		}
 
-		public IList<Taxonomy> Tags
-		{
-			get;
-			set;
-		}
+		public IList<Taxonomy> Tags { get; set; } = new List<Taxonomy>();
 
 		protected PostBase()
 		{
-			this.u003cPrimaryImageu003ek__BackingField = new ImageField();
-			this.u003cTagsu003ek__BackingField = new List<Taxonomy>();
-			this.u003cBlocksu003ek__BackingField = new List<Block>();
-			this.u003cEnableCommentsu003ek__BackingField = true;
-			base();
-			return;
 		}
 	}
 }

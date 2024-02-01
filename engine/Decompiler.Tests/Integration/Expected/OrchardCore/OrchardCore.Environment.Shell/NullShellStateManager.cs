@@ -11,9 +11,7 @@ namespace OrchardCore.Environment.Shell
 
 		public NullShellStateManager(ILogger<NullShellStateManager> logger)
 		{
-			base();
 			this._logger = logger;
-			return;
 		}
 
 		public Task<ShellState> GetShellStateAsync()
@@ -25,28 +23,18 @@ namespace OrchardCore.Environment.Shell
 		{
 			if (this._logger.IsEnabled(1))
 			{
-				stackVariable6 = this._logger;
-				stackVariable9 = new object[3];
-				stackVariable9[0] = featureState.get_Id();
-				stackVariable9[1] = featureState.get_EnableState();
-				stackVariable9[2] = value;
-				LoggerExtensions.LogDebug(stackVariable6, "Feature '{FeatureName}' EnableState changed from '{FeatureState}' to '{FeatureState}'", stackVariable9);
+				LoggerExtensions.LogDebug(this._logger, "Feature '{FeatureName}' EnableState changed from '{FeatureState}' to '{FeatureState}'", new object[] { featureState.get_Id(), featureState.get_EnableState(), value });
 			}
-			return Task.get_CompletedTask();
+			return Task.CompletedTask;
 		}
 
 		public Task UpdateInstalledStateAsync(ShellFeatureState featureState, ShellFeatureState.State value)
 		{
 			if (this._logger.IsEnabled(1))
 			{
-				stackVariable6 = this._logger;
-				stackVariable9 = new object[3];
-				stackVariable9[0] = featureState.get_Id();
-				stackVariable9[1] = featureState.get_InstallState();
-				stackVariable9[2] = value;
-				LoggerExtensions.LogDebug(stackVariable6, "Feature '{FeatureName}' InstallState changed from '{FeatureState}' to '{FeatureState}'", stackVariable9);
+				LoggerExtensions.LogDebug(this._logger, "Feature '{FeatureName}' InstallState changed from '{FeatureState}' to '{FeatureState}'", new object[] { featureState.get_Id(), featureState.get_InstallState(), value });
 			}
-			return Task.get_CompletedTask();
+			return Task.CompletedTask;
 		}
 	}
 }

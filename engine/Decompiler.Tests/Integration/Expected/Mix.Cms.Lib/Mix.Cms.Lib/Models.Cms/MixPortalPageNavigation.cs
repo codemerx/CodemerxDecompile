@@ -85,8 +85,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixPortalPageNavigation()
 		{
-			base();
-			return;
 		}
 	}
 }

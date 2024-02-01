@@ -4,6 +4,6 @@ namespace Telerik.JustDecompiler.Pattern
 {
 	public interface ICodePattern
 	{
-		bool Match(MatchContext context, object object);
+		bool Match(MatchContext context, object @object);
 	}
 }

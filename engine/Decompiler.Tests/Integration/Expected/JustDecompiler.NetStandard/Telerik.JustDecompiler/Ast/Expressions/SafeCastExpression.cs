@@ -15,9 +15,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new SafeCastExpression.u003cget_Childrenu003ed__2(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				SafeCastExpression safeCastExpression = null;
+				yield return safeCastExpression.Expression;
 			}
 		}
 
@@ -25,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 33;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.SafeCastExpression;
 			}
 		}
 
@@ -39,12 +38,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_TargetType();
+				return this.TargetType;
 			}
 			set
 			{
-				this.set_TargetType(value);
-				return;
+				this.TargetType = value;
 			}
 		}
 
@@ -52,7 +50,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.get_TargetType() != (object)null;
+				return (object)this.TargetType != (object)null;
 			}
 		}
 
@@ -62,36 +60,34 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			private set;
 		}
 
-		public SafeCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions)
+		public SafeCastExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference targetType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			this.set_TargetType(targetType);
-			return;
+			this.Expression = expression;
+			this.TargetType = targetType;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new SafeCastExpression(this.get_Expression().Clone(), this.get_TargetType(), this.instructions);
+			return new SafeCastExpression(this.Expression.Clone(), this.TargetType, this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new SafeCastExpression(this.get_Expression().CloneExpressionOnly(), this.get_TargetType(), null);
+			return new SafeCastExpression(this.Expression.CloneExpressionOnly(), this.TargetType, null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (other as SafeCastExpression == null)
+			if (!(other is SafeCastExpression))
 			{
 				return false;
 			}
-			V_0 = other as SafeCastExpression;
-			if (String.op_Inequality(this.get_TargetType().get_FullName(), V_0.get_TargetType().get_FullName()))
+			SafeCastExpression safeCastExpression = other as SafeCastExpression;
+			if (this.TargetType.get_FullName() != safeCastExpression.TargetType.get_FullName())
 			{
 				return false;
 			}
-			return this.get_Expression().Equals(V_0.get_Expression());
+			return this.Expression.Equals(safeCastExpression.Expression);
 		}
 	}
 }

@@ -14,15 +14,11 @@ namespace Piranha.Extend
 
 		public BlockItemTypeAttribute()
 		{
-			base();
-			return;
 		}
 
 		public BlockItemTypeAttribute(System.Type type)
 		{
-			base();
-			this.set_Type(type);
-			return;
+			this.Type = type;
 		}
 	}
 }

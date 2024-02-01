@@ -12,87 +12,79 @@ namespace Telerik.JustDecompiler.External
 		{
 			get
 			{
-				return get_HasStructuralProblems();
+				return JustDecompileGenerated_get_HasStructuralProblems();
 			}
 			set
 			{
-				set_HasStructuralProblems(value);
+				JustDecompileGenerated_set_HasStructuralProblems(value);
 			}
 		}
 
-		// <HasStructuralProblems>k__BackingField
-		private bool u003cHasStructuralProblemsu003ek__BackingField;
+		private bool JustDecompileGenerated_HasStructuralProblems_k__BackingField;
 
-		public bool get_HasStructuralProblems()
+		public bool JustDecompileGenerated_get_HasStructuralProblems()
 		{
-			return this.u003cHasStructuralProblemsu003ek__BackingField;
+			return this.JustDecompileGenerated_HasStructuralProblems_k__BackingField;
 		}
 
-		public void set_HasStructuralProblems(bool value)
+		public void JustDecompileGenerated_set_HasStructuralProblems(bool value)
 		{
-			this.u003cHasStructuralProblemsu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_HasStructuralProblems_k__BackingField = value;
 		}
 
 		public Dictionary<MemberIdentifier, CodeSpan> MemberMapping
 		{
 			get
 			{
-				return get_MemberMapping();
+				return JustDecompileGenerated_get_MemberMapping();
 			}
 			set
 			{
-				set_MemberMapping(value);
+				JustDecompileGenerated_set_MemberMapping(value);
 			}
 		}
 
-		// <MemberMapping>k__BackingField
-		private Dictionary<MemberIdentifier, CodeSpan> u003cMemberMappingu003ek__BackingField;
+		private Dictionary<MemberIdentifier, CodeSpan> JustDecompileGenerated_MemberMapping_k__BackingField;
 
-		public Dictionary<MemberIdentifier, CodeSpan> get_MemberMapping()
+		public Dictionary<MemberIdentifier, CodeSpan> JustDecompileGenerated_get_MemberMapping()
 		{
-			return this.u003cMemberMappingu003ek__BackingField;
+			return this.JustDecompileGenerated_MemberMapping_k__BackingField;
 		}
 
-		private void set_MemberMapping(Dictionary<MemberIdentifier, CodeSpan> value)
+		private void JustDecompileGenerated_set_MemberMapping(Dictionary<MemberIdentifier, CodeSpan> value)
 		{
-			this.u003cMemberMappingu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_MemberMapping_k__BackingField = value;
 		}
 
 		public IUniqueMemberIdentifier UniqueMemberIdentifier
 		{
 			get
 			{
-				return get_UniqueMemberIdentifier();
+				return JustDecompileGenerated_get_UniqueMemberIdentifier();
 			}
 			set
 			{
-				set_UniqueMemberIdentifier(value);
+				JustDecompileGenerated_set_UniqueMemberIdentifier(value);
 			}
 		}
 
-		// <UniqueMemberIdentifier>k__BackingField
-		private IUniqueMemberIdentifier u003cUniqueMemberIdentifieru003ek__BackingField;
+		private IUniqueMemberIdentifier JustDecompileGenerated_UniqueMemberIdentifier_k__BackingField;
 
-		public IUniqueMemberIdentifier get_UniqueMemberIdentifier()
+		public IUniqueMemberIdentifier JustDecompileGenerated_get_UniqueMemberIdentifier()
 		{
-			return this.u003cUniqueMemberIdentifieru003ek__BackingField;
+			return this.JustDecompileGenerated_UniqueMemberIdentifier_k__BackingField;
 		}
 
-		private void set_UniqueMemberIdentifier(IUniqueMemberIdentifier value)
+		private void JustDecompileGenerated_set_UniqueMemberIdentifier(IUniqueMemberIdentifier value)
 		{
-			this.u003cUniqueMemberIdentifieru003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_UniqueMemberIdentifier_k__BackingField = value;
 		}
 
-		public TypeGeneratedInfo(string fullPath, bool hasErrors, bool hasStructuralProblems, IUniqueMemberIdentifier uniqueMemberIdentifier, Dictionary<MemberIdentifier, CodeSpan> memberMapping)
+		public TypeGeneratedInfo(string fullPath, bool hasErrors, bool hasStructuralProblems, IUniqueMemberIdentifier uniqueMemberIdentifier, Dictionary<MemberIdentifier, CodeSpan> memberMapping) : base(fullPath, hasErrors)
 		{
-			base(fullPath, hasErrors);
-			this.set_UniqueMemberIdentifier(uniqueMemberIdentifier);
-			this.set_MemberMapping(memberMapping);
-			this.set_HasStructuralProblems(hasStructuralProblems);
-			return;
+			this.UniqueMemberIdentifier = uniqueMemberIdentifier;
+			this.MemberMapping = memberMapping;
+			this.HasStructuralProblems = hasStructuralProblems;
 		}
 	}
 }

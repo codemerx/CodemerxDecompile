@@ -14,16 +14,12 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public AssemblySpecificContext()
 		{
-			base();
-			this.set_AssemblyNamespaceUsings(new HashSet<string>());
-			return;
+			this.AssemblyNamespaceUsings = new HashSet<string>();
 		}
 
 		public AssemblySpecificContext(ICollection<string> assemblyNamespaceUsings)
 		{
-			base();
-			this.set_AssemblyNamespaceUsings(assemblyNamespaceUsings);
-			return;
+			this.AssemblyNamespaceUsings = assemblyNamespaceUsings;
 		}
 	}
 }

@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			this.Start = start;
 			this.End = end;
-			return;
 		}
 	}
 }

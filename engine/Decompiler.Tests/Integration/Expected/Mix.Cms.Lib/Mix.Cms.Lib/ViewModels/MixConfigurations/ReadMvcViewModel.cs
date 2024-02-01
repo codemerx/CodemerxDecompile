@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Data.ViewModels;
@@ -61,7 +62,7 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 		{
 			get
 			{
-				return MixService.GetConfig<string>("Domain", this.get_Specificulture());
+				return MixService.GetConfig<string>("Domain", this.Specificulture);
 			}
 		}
 
@@ -131,24 +132,20 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 
 		public ReadMvcViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadMvcViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = new DataValueViewModel();
-			stackVariable1.set_DataType(this.get_DataType());
-			stackVariable1.set_Value(this.get_Value());
-			stackVariable1.set_Name(this.get_Keyword());
-			this.set_Property(stackVariable1);
-			return;
+			this.Property = new DataValueViewModel()
+			{
+				DataType = this.DataType,
+				Value = this.Value,
+				Name = this.Keyword
+			};
 		}
 	}
 }

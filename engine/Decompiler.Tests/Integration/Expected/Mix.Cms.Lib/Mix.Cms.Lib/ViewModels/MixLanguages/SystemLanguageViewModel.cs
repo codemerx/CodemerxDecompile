@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
 using Mix.Domain.Data.ViewModels;
@@ -124,24 +126,21 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 
 		public SystemLanguageViewModel()
 		{
-			base();
-			return;
 		}
 
-		public SystemLanguageViewModel(MixLanguage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public SystemLanguageViewModel(MixLanguage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public static async Task<RepositoryResponse<bool>> ImportLanguages(List<MixLanguage> arrLanguage, string destCulture)
 		{
-			V_0.arrLanguage = arrLanguage;
-			V_0.destCulture = destCulture;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<SystemLanguageViewModel.u003cImportLanguagesu003ed__62>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			SystemLanguageViewModel.u003cImportLanguagesu003ed__62 variable = new SystemLanguageViewModel.u003cImportLanguagesu003ed__62();
+			variable.arrLanguage = arrLanguage;
+			variable.destCulture = destCulture;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<SystemLanguageViewModel.u003cImportLanguagesu003ed__62>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

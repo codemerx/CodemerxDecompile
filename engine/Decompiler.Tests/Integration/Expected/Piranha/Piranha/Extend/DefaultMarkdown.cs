@@ -14,8 +14,6 @@ namespace Piranha.Extend
 
 		public DefaultMarkdown()
 		{
-			base();
-			return;
 		}
 
 		public string Transform(string md)
@@ -24,7 +22,7 @@ namespace Piranha.Extend
 			{
 				return md;
 			}
-			return Markdown.ToHtml(md, this.get__pipeline());
+			return Markdown.ToHtml(md, this._pipeline);
 		}
 	}
 }

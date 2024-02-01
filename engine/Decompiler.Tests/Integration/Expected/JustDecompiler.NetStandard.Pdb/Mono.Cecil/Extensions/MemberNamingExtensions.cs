@@ -1,6 +1,7 @@
 using Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Telerik.JustDecompiler.Languages;
@@ -11,34 +12,31 @@ namespace Mono.Cecil.Extensions
 	{
 		private static void GenericInstanceFriendlyFullName(this IGenericInstance self, ILanguage language, StringBuilder builder, bool useGenericName, string leftBracket, string rightBracket)
 		{
-			dummyVar0 = builder.Append(leftBracket);
-			V_0 = self.get_GenericArguments();
-			V_1 = 0;
-			while (V_1 < V_0.get_Count())
+			builder.Append(leftBracket);
+			Collection<TypeReference> genericArguments = self.get_GenericArguments();
+			for (int i = 0; i < genericArguments.get_Count(); i++)
 			{
-				V_2 = V_0.get_Item(V_1);
-				if (self.get_PostionToArgument().ContainsKey(V_1))
+				TypeReference item = genericArguments.get_Item(i);
+				if (self.get_PostionToArgument().ContainsKey(i))
 				{
-					V_2 = self.get_PostionToArgument().get_Item(V_1);
+					item = self.get_PostionToArgument()[i];
 				}
-				if (V_1 > 0)
+				if (i > 0)
 				{
-					dummyVar1 = builder.Append(",");
+					builder.Append(",");
 				}
-				V_3 = V_2.GetFriendlyFullName(language);
+				string friendlyFullName = item.GetFriendlyFullName(language);
 				if (useGenericName)
 				{
-					V_4 = V_2.Resolve();
-					if (V_4 != null)
+					TypeDefinition typeDefinition = item.Resolve();
+					if (typeDefinition != null)
 					{
-						V_3 = V_4.GetGenericFullName(language);
+						friendlyFullName = typeDefinition.GetGenericFullName(language);
 					}
 				}
-				dummyVar2 = builder.Append(V_3);
-				V_1 = V_1 + 1;
+				builder.Append(friendlyFullName);
 			}
-			dummyVar3 = builder.Append(rightBracket);
-			return;
+			builder.Append(rightBracket);
 		}
 
 		private static string GenericMemberFullName(this MethodDefinition self, ILanguage language)
@@ -72,56 +70,51 @@ namespace Mono.Cecil.Extensions
 
 		private static string GetFriendlyFullFunctionPointerTypeName(this FunctionPointerType self, ILanguage language)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append(self.get_Function().get_Name());
-			dummyVar1 = V_0.Append(" ");
-			dummyVar2 = V_0.Append(self.get_Function().get_FixedReturnType().GetFriendlyFullName(language));
-			dummyVar3 = V_0.Append(" *");
-			self.MethodSignatureFriendlyFullName(language, V_0, false);
-			return V_0.ToString();
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(self.get_Function().get_Name());
+			stringBuilder.Append(" ");
+			stringBuilder.Append(self.get_Function().get_FixedReturnType().GetFriendlyFullName(language));
+			stringBuilder.Append(" *");
+			self.MethodSignatureFriendlyFullName(language, stringBuilder, false);
+			return stringBuilder.ToString();
 		}
 
 		private static string GetFriendlyFullGenericInstanceMethodName(this GenericInstanceMethod self, ILanguage language)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append(self.get_FixedReturnType().get_FullName()).Append(" ").Append(self.MemberFriendlyFullName(language));
-			self.GenericInstanceFriendlyFullName(language, V_0, false, "<", ">");
-			self.MethodSignatureFriendlyFullName(language, V_0, false);
-			return V_0.ToString();
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(self.get_FixedReturnType().get_FullName()).Append(" ").Append(self.MemberFriendlyFullName(language));
+			self.GenericInstanceFriendlyFullName(language, stringBuilder, false, "<", ">");
+			self.MethodSignatureFriendlyFullName(language, stringBuilder, false);
+			return stringBuilder.ToString();
 		}
 
 		private static string GetFriendlyFullGenericInstanceTypeName(this GenericInstanceType self, ILanguage language)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append(self.GetFriendlyFullTypeSpecificationName(language));
-			V_1 = V_0.ToString().LastIndexOf('<');
-			if (V_1 >= 0 && V_1 < V_0.get_Length())
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(self.GetFriendlyFullTypeSpecificationName(language));
+			int num = stringBuilder.ToString().LastIndexOf('<');
+			if (num >= 0 && num < stringBuilder.Length)
 			{
-				dummyVar1 = V_0.Remove(V_1, V_0.get_Length() - V_1);
-				self.GenericInstanceFriendlyFullName(language, V_0, false, "<", ">");
-				V_2 = 0;
-				V_3 = 0;
-				while (V_3 < V_0.get_Length())
+				stringBuilder.Remove(num, stringBuilder.Length - num);
+				self.GenericInstanceFriendlyFullName(language, stringBuilder, false, "<", ">");
+				int num1 = 0;
+				for (int i = 0; i < stringBuilder.Length; i++)
 				{
-					if (V_0.get_Chars(V_3) != '<')
+					if (stringBuilder[i] == '<')
 					{
-						if (V_0.get_Chars(V_3) == '>')
-						{
-							V_2 = V_2 - 1;
-						}
+						num1++;
 					}
-					else
+					else if (stringBuilder[i] == '>')
 					{
-						V_2 = V_2 + 1;
+						num1--;
 					}
-					V_3 = V_3 + 1;
 				}
-				if (V_2 > 0)
+				if (num1 > 0)
 				{
-					dummyVar2 = V_0.Append(new String('>', V_2));
+					stringBuilder.Append(new String('>', num1));
 				}
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		private static string GetFriendlyFullGenericParameterName(this GenericParameter self)
@@ -136,80 +129,80 @@ namespace Mono.Cecil.Extensions
 
 		private static string GetFriendlyFullMethodReferenceName(this MethodReference self, ILanguage language, string memberFriendlyFullName, bool useGenericName)
 		{
-			V_0 = new StringBuilder();
-			V_1 = self.get_FixedReturnType().GetFriendlyFullName(language);
+			StringBuilder stringBuilder = new StringBuilder();
+			string friendlyFullName = self.get_FixedReturnType().GetFriendlyFullName(language);
 			if (useGenericName)
 			{
-				V_2 = self.get_FixedReturnType().Resolve();
-				if (V_2 != null)
+				TypeDefinition typeDefinition = self.get_FixedReturnType().Resolve();
+				if (typeDefinition != null)
 				{
-					V_1 = V_2.GetGenericFullName(language);
+					friendlyFullName = typeDefinition.GetGenericFullName(language);
 				}
 			}
-			dummyVar0 = V_0.Append(V_1).Append(" ").Append(memberFriendlyFullName);
-			self.MethodSignatureFriendlyFullName(language, V_0, useGenericName);
-			return V_0.ToString();
+			stringBuilder.Append(friendlyFullName).Append(" ").Append(memberFriendlyFullName);
+			self.MethodSignatureFriendlyFullName(language, stringBuilder, useGenericName);
+			return stringBuilder.ToString();
 		}
 
 		public static string GetFriendlyFullName(this MemberReference self, ILanguage language)
 		{
-			if (self as ArrayType != null)
+			if (self is ArrayType)
 			{
 				return (self as ArrayType).GetFriendlyFullArrayTypeName(language);
 			}
-			if (self as FunctionPointerType != null)
+			if (self is FunctionPointerType)
 			{
 				return (self as FunctionPointerType).GetFriendlyFullFunctionPointerTypeName(language);
 			}
-			if (self as GenericInstanceType != null)
+			if (self is GenericInstanceType)
 			{
 				return (self as GenericInstanceType).GetFriendlyFullGenericInstanceTypeName(language);
 			}
-			if (self as OptionalModifierType != null)
+			if (self is OptionalModifierType)
 			{
 				return (self as OptionalModifierType).GetFriendlyFullOptionalModifierTypeName(language);
 			}
-			if (self as RequiredModifierType != null)
+			if (self is RequiredModifierType)
 			{
 				return (self as RequiredModifierType).GetFriendlyFullRequiredModifierTypeName(language);
 			}
-			if (self as PointerType != null)
+			if (self is PointerType)
 			{
 				return (self as PointerType).GetFriendlyFullPointerTypeName(language);
 			}
-			if (self as ByReferenceType != null)
+			if (self is ByReferenceType)
 			{
 				return (self as ByReferenceType).GetFriendlyFullByReferenceTypeName(language);
 			}
-			if (self as TypeSpecification != null)
+			if (self is TypeSpecification)
 			{
 				return (self as TypeSpecification).GetFriendlyFullTypeSpecificationName(language);
 			}
-			if (self as GenericParameter != null)
+			if (self is GenericParameter)
 			{
 				return (self as GenericParameter).GetFriendlyFullGenericParameterName();
 			}
-			if (self as TypeReference != null)
+			if (self is TypeReference)
 			{
 				return (self as TypeReference).GetFriendlyFullTypeReferenceName(language);
 			}
-			if (self as PropertyDefinition != null)
+			if (self is PropertyDefinition)
 			{
 				return (self as PropertyDefinition).GetFriendlyFullPropertyDefinitionName(language);
 			}
-			if (self as GenericInstanceMethod != null)
+			if (self is GenericInstanceMethod)
 			{
 				return (self as GenericInstanceMethod).GetFriendlyFullGenericInstanceMethodName(language);
 			}
-			if (self as MethodReference != null)
+			if (self is MethodReference)
 			{
 				return (self as MethodReference).GetFriendlyFullMethodReferenceName(language);
 			}
-			if (self as FieldReference != null)
+			if (self is FieldReference)
 			{
 				return (self as FieldReference).GetFriendlyFullFieldReferenceName(language);
 			}
-			if (self as EventReference == null)
+			if (!(self is EventReference))
 			{
 				throw new Exception("Invalid member type.");
 			}
@@ -268,27 +261,25 @@ namespace Mono.Cecil.Extensions
 
 		private static string GetFriendlyFullPropertyDefinitionName(this PropertyDefinition self, ILanguage language, string memberFriendlyFullName)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.Append(self.get_PropertyType().GetFriendlyFullName(language));
-			dummyVar1 = V_0.Append(' ');
-			dummyVar2 = V_0.Append(memberFriendlyFullName);
-			dummyVar3 = V_0.Append('(');
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append(self.get_PropertyType().GetFriendlyFullName(language));
+			stringBuilder.Append(' ');
+			stringBuilder.Append(memberFriendlyFullName);
+			stringBuilder.Append('(');
 			if (self.get_HasParameters())
 			{
-				V_1 = self.get_Parameters();
-				V_2 = 0;
-				while (V_2 < V_1.get_Count())
+				Collection<ParameterDefinition> parameters = self.get_Parameters();
+				for (int i = 0; i < parameters.get_Count(); i++)
 				{
-					if (V_2 > 0)
+					if (i > 0)
 					{
-						dummyVar4 = V_0.Append(',');
+						stringBuilder.Append(',');
 					}
-					dummyVar5 = V_0.Append(V_1.get_Item(V_2).get_ParameterType().GetFriendlyFullName(language));
-					V_2 = V_2 + 1;
+					stringBuilder.Append(parameters.get_Item(i).get_ParameterType().GetFriendlyFullName(language));
 				}
 			}
-			dummyVar6 = V_0.Append(')');
-			return V_0.ToString();
+			stringBuilder.Append(')');
+			return stringBuilder.ToString();
 		}
 
 		private static string GetFriendlyFullRequiredModifierTypeName(this RequiredModifierType self, ILanguage language)
@@ -316,28 +307,26 @@ namespace Mono.Cecil.Extensions
 
 		private static string GetFriendlyGenericInstanceName(this GenericInstanceType self, ILanguage language, string leftBracket, string rightbracket)
 		{
-			V_0 = new StringBuilder();
-			V_1 = GenericHelper.GetNonGenericName(self.get_Name());
-			dummyVar0 = V_0.Append(GenericHelper.ReplaceInvalidCharactersName(language, V_1));
-			if (language != null && String.op_Equality(language.get_Name(), "IL"))
+			StringBuilder stringBuilder = new StringBuilder();
+			string nonGenericName = GenericHelper.GetNonGenericName(self.get_Name());
+			stringBuilder.Append(GenericHelper.ReplaceInvalidCharactersName(language, nonGenericName));
+			if (language != null && language.Name == "IL")
 			{
-				V_2 = self.get_GenericArguments().get_Count();
-				V_1 = String.Concat(V_1, "`", V_2.ToString());
-				return V_1;
+				int count = self.get_GenericArguments().get_Count();
+				nonGenericName = String.Concat(nonGenericName, "`", count.ToString());
+				return nonGenericName;
 			}
-			dummyVar1 = V_0.Append(leftBracket);
-			V_3 = 0;
-			while (V_3 < self.get_GenericArguments().get_Count())
+			stringBuilder.Append(leftBracket);
+			for (int i = 0; i < self.get_GenericArguments().get_Count(); i++)
 			{
-				if (V_3 > 0)
+				if (i > 0)
 				{
-					dummyVar2 = V_0.Append(", ");
+					stringBuilder.Append(", ");
 				}
-				dummyVar3 = V_0.Append(self.get_GenericArguments().get_Item(V_3).GetGenericName(language, leftBracket, rightbracket));
-				V_3 = V_3 + 1;
+				stringBuilder.Append(self.get_GenericArguments().get_Item(i).GetGenericName(language, leftBracket, rightbracket));
 			}
-			dummyVar4 = V_0.Append(rightbracket);
-			return V_0.ToString();
+			stringBuilder.Append(rightbracket);
+			return stringBuilder.ToString();
 		}
 
 		public static string GetFriendlyMemberName(this IMemberDefinition self, ILanguage language)
@@ -347,7 +336,7 @@ namespace Mono.Cecil.Extensions
 
 		public static string GetFriendlyMemberName(this IMemberDefinition self, ILanguage language, string leftBracket, string rightBracket)
 		{
-			if (self as IGenericDefinition == null)
+			if (!(self is IGenericDefinition))
 			{
 				return self.GetFullMemberName(language);
 			}
@@ -369,115 +358,105 @@ namespace Mono.Cecil.Extensions
 			{
 				return self.GetGenericName(language, leftBracket, rightBracket);
 			}
-			V_0 = self.GetFriendlyFullName(language).IndexOf('/');
-			if (V_0 <= 0)
+			int num = self.GetFriendlyFullName(language).IndexOf('/');
+			if (num <= 0)
 			{
 				return self.GetGenericName(language, leftBracket, rightBracket);
 			}
-			V_1 = self.GetFriendlyFullName(language).Substring(0, V_0);
-			V_2 = V_1.LastIndexOf('.');
-			if (V_2 <= 0)
+			string str = self.GetFriendlyFullName(language).Substring(0, num);
+			int num1 = str.LastIndexOf('.');
+			if (num1 <= 0)
 			{
-				return V_1;
+				return str;
 			}
-			return V_1.Substring(V_2 + 1);
+			return str.Substring(num1 + 1);
 		}
 
 		public static string GetFullMemberName(this IMemberDefinition self, ILanguage language)
 		{
-			if (self as TypeDefinition != null || self as FieldDefinition != null)
+			if (self is TypeDefinition || self is FieldDefinition)
 			{
 				return GenericHelper.ReplaceInvalidCharactersName(language, self.get_Name());
 			}
-			if (self as EventDefinition != null)
+			if (self is EventDefinition)
 			{
-				V_0 = self as EventDefinition;
-				if (!V_0.IsExplicitImplementation())
+				EventDefinition eventDefinition = self as EventDefinition;
+				if (!eventDefinition.IsExplicitImplementation())
 				{
 					return GenericHelper.ReplaceInvalidCharactersName(language, self.get_Name());
 				}
-				stackVariable85 = V_0.get_Name();
-				stackVariable87 = new Char[1];
-				stackVariable87[0] = '.';
-				V_1 = stackVariable85.Split(stackVariable87);
-				V_2 = new StringBuilder((int)V_1.Length * 2);
-				V_3 = 0;
-				while (V_3 < (int)V_1.Length)
+				string[] strArray = eventDefinition.get_Name().Split(new Char[] { '.' });
+				StringBuilder stringBuilder = new StringBuilder((int)strArray.Length * 2);
+				for (int i = 0; i < (int)strArray.Length; i++)
 				{
-					V_4 = V_1[V_3];
-					dummyVar0 = V_2.Append(GenericHelper.ReplaceInvalidCharactersName(language, V_4));
-					if (V_3 < (int)V_1.Length - 1)
+					string str = strArray[i];
+					stringBuilder.Append(GenericHelper.ReplaceInvalidCharactersName(language, str));
+					if (i < (int)strArray.Length - 1)
 					{
-						dummyVar1 = V_2.Append(".");
+						stringBuilder.Append(".");
 					}
-					V_3 = V_3 + 1;
 				}
-				return V_2.ToString();
+				return stringBuilder.ToString();
 			}
-			if (self as MethodDefinition != null)
+			if (self is MethodDefinition)
 			{
 				return (self as MethodDefinition).GetFriendlyFullMethodReferenceName(language, self.get_Name(), false);
 			}
-			if (self as PropertyDefinition == null)
+			if (!(self is PropertyDefinition))
 			{
 				throw new Exception("Invalid member definition type.");
 			}
-			V_5 = self as PropertyDefinition;
-			if (!V_5.IsExplicitImplementation())
+			PropertyDefinition propertyDefinition = self as PropertyDefinition;
+			if (!propertyDefinition.IsExplicitImplementation())
 			{
 				return (self as PropertyDefinition).GetFriendlyFullPropertyDefinitionName(language, self.get_Name());
 			}
-			stackVariable27 = V_5.get_Name();
-			stackVariable29 = new Char[1];
-			stackVariable29[0] = '.';
-			V_6 = stackVariable27.Split(stackVariable29);
-			V_7 = new StringBuilder((int)V_6.Length * 2);
-			V_8 = 0;
-			while (V_8 < (int)V_6.Length)
+			string[] strArray1 = propertyDefinition.get_Name().Split(new Char[] { '.' });
+			StringBuilder stringBuilder1 = new StringBuilder((int)strArray1.Length * 2);
+			for (int j = 0; j < (int)strArray1.Length; j++)
 			{
-				V_9 = V_6[V_8];
-				dummyVar2 = V_7.Append(GenericHelper.ReplaceInvalidCharactersName(language, V_9));
-				if (V_8 < (int)V_6.Length - 1)
+				string str1 = strArray1[j];
+				stringBuilder1.Append(GenericHelper.ReplaceInvalidCharactersName(language, str1));
+				if (j < (int)strArray1.Length - 1)
 				{
-					dummyVar3 = V_7.Append(".");
+					stringBuilder1.Append(".");
 				}
-				V_8 = V_8 + 1;
 			}
-			dummyVar4 = V_7.Append("()");
-			return V_7.ToString();
+			stringBuilder1.Append("()");
+			return stringBuilder1.ToString();
 		}
 
 		public static string GetGenericFullName(this IGenericDefinition self, ILanguage language)
 		{
-			if (self as TypeDefinition != null)
+			if (self is TypeDefinition)
 			{
 				return (self as TypeDefinition).GetGenericFullTypeDefinitionName(language);
 			}
-			if (self as MethodDefinition == null)
+			if (!(self is MethodDefinition))
 			{
 				throw new Exception("Invalid generic member definition type.");
 			}
-			V_0 = self as MethodDefinition;
-			return V_0.GetFriendlyFullMethodReferenceName(language, V_0.GenericMemberFullName(language), true);
+			MethodDefinition methodDefinition = self as MethodDefinition;
+			return methodDefinition.GetFriendlyFullMethodReferenceName(language, methodDefinition.GenericMemberFullName(language), true);
 		}
 
 		private static string GetGenericFullTypeDefinitionName(this TypeDefinition self, ILanguage language)
 		{
-			V_0 = self.GetGenericName(language, "<", ">");
+			string genericName = self.GetGenericName(language, "<", ">");
 			if (self.get_IsNested())
 			{
-				return String.Concat(self.get_DeclaringType().GetGenericFullName(language), "/", V_0);
+				return String.Concat(self.get_DeclaringType().GetGenericFullName(language), "/", genericName);
 			}
 			if (String.IsNullOrEmpty(self.get_Namespace()))
 			{
-				return V_0;
+				return genericName;
 			}
-			return String.Concat(self.get_Namespace(), ".", V_0);
+			return String.Concat(self.get_Namespace(), ".", genericName);
 		}
 
 		public static string GetGenericName(this IGenericDefinition self, ILanguage language, string leftBracket = "<", string rightBracket = ">")
 		{
-			if (self as TypeDefinition == null && self as MethodDefinition == null)
+			if (!(self is TypeDefinition) && !(self is MethodDefinition))
 			{
 				throw new Exception("Invalid generic member definition type.");
 			}
@@ -486,7 +465,7 @@ namespace Mono.Cecil.Extensions
 
 		public static string GetGenericName(this TypeReference self, ILanguage language, string leftBracket = "<", string rightBracket = ">")
 		{
-			if (self as GenericInstanceType == null)
+			if (!(self is GenericInstanceType))
 			{
 				return GenericHelper.GetGenericName(self, leftBracket, rightBracket, language);
 			}
@@ -509,40 +488,37 @@ namespace Mono.Cecil.Extensions
 
 		private static void MethodSignatureFriendlyFullName(this IMethodSignature self, ILanguage language, StringBuilder builder, bool useGenericName)
 		{
-			dummyVar0 = builder.Append("(");
+			builder.Append("(");
 			if (self.get_HasParameters())
 			{
-				V_0 = self.get_Parameters();
-				V_1 = 0;
-				while (V_1 < V_0.get_Count())
+				Collection<ParameterDefinition> parameters = self.get_Parameters();
+				for (int i = 0; i < parameters.get_Count(); i++)
 				{
-					V_2 = V_0.get_Item(V_1);
-					if (V_1 > 0)
+					ParameterDefinition item = parameters.get_Item(i);
+					if (i > 0)
 					{
-						dummyVar1 = builder.Append(",");
+						builder.Append(",");
 					}
-					if (V_2.get_ParameterType().get_IsSentinel())
+					if (item.get_ParameterType().get_IsSentinel())
 					{
-						dummyVar2 = builder.Append("...,");
+						builder.Append("...,");
 					}
 					if (useGenericName)
 					{
-						V_3 = V_2.get_ParameterType().Resolve();
-						if (V_3 == null)
+						TypeDefinition typeDefinition = item.get_ParameterType().Resolve();
+						if (typeDefinition == null)
 						{
 							goto Label1;
 						}
-						dummyVar3 = builder.Append(V_3.GetGenericFullName(language));
+						builder.Append(typeDefinition.GetGenericFullName(language));
 						goto Label0;
 					}
 				Label1:
-					dummyVar4 = builder.Append(V_2.get_ParameterType().GetFriendlyFullName(language));
+					builder.Append(item.get_ParameterType().GetFriendlyFullName(language));
 				Label0:
-					V_1 = V_1 + 1;
 				}
 			}
-			dummyVar5 = builder.Append(")");
-			return;
+			builder.Append(")");
 		}
 	}
 }

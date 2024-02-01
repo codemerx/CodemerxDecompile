@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -23,110 +24,94 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public DependsOnAnalysisVisitor(HashSet<TypeReference> typesDependingOn, HashSet<ExplicitCastExpression> ambiguousCastsToObject)
 		{
-			base();
-			this.set_TypesDependingOn(typesDependingOn);
-			this.set_AmbiguousCastsToObject(ambiguousCastsToObject);
-			return;
+			this.TypesDependingOn = typesDependingOn;
+			this.AmbiguousCastsToObject = ambiguousCastsToObject;
 		}
 
 		public override void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
-			this.VisitAnonymousObjectCreationExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
+			base.VisitAnonymousObjectCreationExpression(node);
 		}
 
 		public override void VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ElementType()));
-			this.VisitArrayCreationExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ElementType));
+			base.VisitArrayCreationExpression(node);
 		}
 
 		public override void VisitBaseCtorExpression(BaseCtorExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Arguments);
 		}
 
 		public override void VisitCanCastExpression(CanCastExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_TargetType()));
-			this.VisitCanCastExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.TargetType));
+			base.VisitCanCastExpression(node);
 		}
 
 		public override void VisitEnumExpression(EnumExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
-			this.VisitEnumExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
+			base.VisitEnumExpression(node);
 		}
 
 		public override void VisitExplicitCastExpression(ExplicitCastExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
-			if (node.get_UnresolvedReferenceForAmbiguousCastToObject() != null)
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
+			if (node.UnresolvedReferenceForAmbiguousCastToObject != null)
 			{
-				dummyVar0 = this.get_AmbiguousCastsToObject().Add(node);
+				this.AmbiguousCastsToObject.Add(node);
 			}
-			this.VisitExplicitCastExpression(node);
-			return;
+			base.VisitExplicitCastExpression(node);
 		}
 
 		public override void VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Field().get_DeclaringType()));
-			this.VisitFieldReferenceExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Field.get_DeclaringType()));
+			base.VisitFieldReferenceExpression(node);
 		}
 
 		public override void VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Method().get_DeclaringType()));
-			this.Visit(node.get_Target());
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Method.get_DeclaringType()));
+			this.Visit(node.Target);
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
-			this.VisitObjectCreationExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
+			base.VisitObjectCreationExpression(node);
 		}
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Property().get_DeclaringType()));
-			this.VisitPropertyReferenceExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Property.get_DeclaringType()));
+			base.VisitPropertyReferenceExpression(node);
 		}
 
 		public override void VisitSafeCastExpression(SafeCastExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_ExpressionType()));
-			this.VisitSafeCastExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.ExpressionType));
+			base.VisitSafeCastExpression(node);
 		}
 
 		public override void VisitThisCtorExpression(ThisCtorExpression node)
 		{
-			this.Visit(node.get_Arguments());
-			return;
+			this.Visit(node.Arguments);
 		}
 
 		public override void VisitTypeOfExpression(TypeOfExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Type()));
-			this.VisitTypeOfExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Type));
+			base.VisitTypeOfExpression(node);
 		}
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			this.get_TypesDependingOn().UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.get_Variable().get_VariableType()));
-			this.VisitVariableDeclarationExpression(node);
-			return;
+			this.TypesDependingOn.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(node.Variable.get_VariableType()));
+			base.VisitVariableDeclarationExpression(node);
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Languages;
 
 namespace Telerik.JustDecompiler.Decompiler.Inlining
@@ -18,37 +19,18 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		public VisualBasicVariablesToNotInlineFinder(ILanguage language)
 		{
-			base();
 			this.language = language;
-			return;
 		}
 
 		public HashSet<VariableDefinition> Find(Dictionary<int, IList<Expression>> blockExpressions)
 		{
 			this.ResetInternalState();
-			V_0 = blockExpressions.get_Values().GetEnumerator();
-			try
+			foreach (IList<Expression> value in blockExpressions.Values)
 			{
-				while (V_0.MoveNext())
+				foreach (Expression expression in (List<Expression>)value)
 				{
-					V_1 = ((List<Expression>)V_0.get_Current()).GetEnumerator();
-					try
-					{
-						while (V_1.MoveNext())
-						{
-							V_2 = V_1.get_Current();
-							this.ProcessExpression(V_2);
-						}
-					}
-					finally
-					{
-						((IDisposable)V_1).Dispose();
-					}
+					this.ProcessExpression(expression);
 				}
-			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
 			}
 			return this.variablesToNotInline;
 		}
@@ -62,120 +44,108 @@ namespace Telerik.JustDecompiler.Decompiler.Inlining
 
 		private void ProcessBinaryExpression(BinaryExpression binaryExpression)
 		{
-			if (!binaryExpression.get_IsAssignmentExpression())
+			CodeNodeType codeNodeType;
+			if (!binaryExpression.IsAssignmentExpression)
 			{
 				return;
 			}
-			if (binaryExpression.get_Left().get_CodeNodeType() != 26)
+			if (binaryExpression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return;
 			}
-			if (!binaryExpression.get_Right().IsArgumentReferenceToRefParameter())
+			codeNodeType = (!binaryExpression.Right.IsArgumentReferenceToRefParameter() ? binaryExpression.Right.CodeNodeType : CodeNodeType.ArgumentReferenceExpression);
+			VariableReference variable = (binaryExpression.Left as VariableReferenceExpression).Variable;
+			if (this.variableToAssignedCodeNodeTypeMap.ContainsKey(variable))
 			{
-				V_0 = binaryExpression.get_Right().get_CodeNodeType();
-			}
-			else
-			{
-				V_0 = 25;
-			}
-			V_1 = (binaryExpression.get_Left() as VariableReferenceExpression).get_Variable();
-			if (this.variableToAssignedCodeNodeTypeMap.ContainsKey(V_1))
-			{
-				this.variableToAssignedCodeNodeTypeMap.set_Item(V_1, V_0);
+				this.variableToAssignedCodeNodeTypeMap[variable] = codeNodeType;
 				return;
 			}
-			this.variableToAssignedCodeNodeTypeMap.Add(V_1, V_0);
-			return;
+			this.variableToAssignedCodeNodeTypeMap.Add(variable, codeNodeType);
 		}
 
 		private void ProcessDelegateInvokeExpression(DelegateInvokeExpression delegateInvokeExpression)
 		{
-			if (delegateInvokeExpression.get_Target() == null || delegateInvokeExpression.get_Target().get_CodeNodeType() != 26)
+			if (delegateInvokeExpression.Target == null || delegateInvokeExpression.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return;
 			}
-			this.ProcessVariableReferenceExpression(delegateInvokeExpression.get_Target() as VariableReferenceExpression);
-			return;
+			this.ProcessVariableReferenceExpression(delegateInvokeExpression.Target as VariableReferenceExpression);
 		}
 
 		private void ProcessExpression(Expression expression)
 		{
-			if (expression.get_CodeNodeType() == 24)
+			if (expression.CodeNodeType == CodeNodeType.BinaryExpression)
 			{
 				this.ProcessBinaryExpression(expression as BinaryExpression);
 				return;
 			}
-			if (expression.get_CodeNodeType() == 19)
+			if (expression.CodeNodeType == CodeNodeType.MethodInvocationExpression)
 			{
 				this.ProcessMethodInvocation(expression as MethodInvocationExpression);
 				return;
 			}
-			if (expression.get_CodeNodeType() == 51)
+			if (expression.CodeNodeType == CodeNodeType.DelegateInvokeExpression)
 			{
 				this.ProcessDelegateInvokeExpression(expression as DelegateInvokeExpression);
 			}
-			return;
 		}
 
 		private void ProcessMethodInvocation(MethodInvocationExpression methodInvocationExpression)
 		{
-			V_0 = methodInvocationExpression.GetTarget();
-			if (V_0 == null)
+			VariableReferenceExpression operand;
+			Expression target = methodInvocationExpression.GetTarget();
+			if (target == null)
 			{
 				return;
 			}
-			if (V_0.get_CodeNodeType() != 26)
+			if (target.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
-				if (V_0.get_CodeNodeType() != 23)
+				if (target.CodeNodeType != CodeNodeType.UnaryExpression)
 				{
 					return;
 				}
-				V_2 = V_0 as UnaryExpression;
-				if (V_2.get_Operator() != 8 || V_2.get_Operand().get_CodeNodeType() != 23)
+				UnaryExpression unaryExpression = target as UnaryExpression;
+				if (unaryExpression.Operator != UnaryOperator.AddressDereference || unaryExpression.Operand.CodeNodeType != CodeNodeType.UnaryExpression)
 				{
 					return;
 				}
-				V_3 = V_2.get_Operand() as UnaryExpression;
-				if (V_3.get_Operator() != 7 || V_3.get_Operand().get_CodeNodeType() != 26)
+				UnaryExpression operand1 = unaryExpression.Operand as UnaryExpression;
+				if (operand1.Operator != UnaryOperator.AddressReference || operand1.Operand.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 				{
 					return;
 				}
-				V_1 = V_3.get_Operand() as VariableReferenceExpression;
+				operand = operand1.Operand as VariableReferenceExpression;
 			}
 			else
 			{
-				V_1 = V_0 as VariableReferenceExpression;
+				operand = target as VariableReferenceExpression;
 			}
-			this.ProcessVariableReferenceExpression(V_1);
-			return;
+			this.ProcessVariableReferenceExpression(operand);
 		}
 
 		private void ProcessVariableReferenceExpression(VariableReferenceExpression variableReferenceExpression)
 		{
-			V_0 = variableReferenceExpression.get_Variable();
-			if (this.variableToAssignedCodeNodeTypeMap.ContainsKey(V_0))
+			VariableReference variable = variableReferenceExpression.Variable;
+			if (this.variableToAssignedCodeNodeTypeMap.ContainsKey(variable))
 			{
-				V_1 = this.variableToAssignedCodeNodeTypeMap.get_Item(V_0);
-				V_2 = V_0.Resolve();
-				if (!this.variablesToNotInline.Contains(V_2) && !this.language.IsValidLineStarter(V_1))
+				CodeNodeType item = this.variableToAssignedCodeNodeTypeMap[variable];
+				VariableDefinition variableDefinition = variable.Resolve();
+				if (!this.variablesToNotInline.Contains(variableDefinition) && !this.language.IsValidLineStarter(item))
 				{
-					dummyVar0 = this.variablesToNotInline.Add(V_2);
+					this.variablesToNotInline.Add(variableDefinition);
 				}
 			}
-			return;
 		}
 
 		private void ResetInternalState()
 		{
 			this.variableToAssignedCodeNodeTypeMap = new Dictionary<VariableReference, CodeNodeType>();
 			this.variablesToNotInline = new HashSet<VariableDefinition>();
-			return;
 		}
 
 		public override void VisitExpressionStatement(ExpressionStatement node)
 		{
-			this.ProcessExpression(node.get_Expression());
-			return;
+			this.ProcessExpression(node.Expression);
 		}
 	}
 }

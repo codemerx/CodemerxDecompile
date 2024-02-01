@@ -36,6 +36,7 @@ namespace Decompiler.Tests.Integration
         [InlineData("OrchardCore", "OrchardCore")]
         [InlineData("Mix.Cms.Lib", "Mix.Cms.Lib")]
         [InlineData("Piranha", "Piranha")]
+        [InlineData("Sample3", "Sample3")]
         public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName)
         {
             // Arrange
@@ -72,7 +73,7 @@ namespace Decompiler.Tests.Integration
             preferences.WriteLargeNumbersInHex = true;
             preferences.DecompileDangerousResources = false;
 
-            ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.None);
+            ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             string projFilePath = Path.Combine(output, Path.GetFileNameWithoutExtension(target) + language.VSProjectFileExtension);
 
             TestMSBuildProjectBuilder result = new TestMSBuildProjectBuilder(target, projFilePath, language, preferences);

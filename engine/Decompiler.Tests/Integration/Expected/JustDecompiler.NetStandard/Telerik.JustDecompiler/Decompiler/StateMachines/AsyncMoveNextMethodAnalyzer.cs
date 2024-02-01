@@ -20,7 +20,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private VariableReference doFinallyVariable;
 
-		public Dictionary<VariableReference, FieldReference> variableToFieldMap;
+		public Dictionary<VariableReference, FieldReference> variableToFieldMap = new Dictionary<VariableReference, FieldReference>();
 
 		public VariableReference DoFinallyVariable
 		{
@@ -46,83 +46,80 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		public AsyncMoveNextMethodAnalyzer(MethodSpecificContext moveNextMethodContext, FieldDefinition stateField)
 		{
-			this.variableToFieldMap = new Dictionary<VariableReference, FieldReference>();
-			base();
-			this.theCFG = moveNextMethodContext.get_ControlFlowGraph();
-			this.methodVariables = moveNextMethodContext.get_Variables();
+			this.theCFG = moveNextMethodContext.ControlFlowGraph;
+			this.methodVariables = moveNextMethodContext.Variables;
 			this.stateField = stateField;
 			if (this.GetDoFinallyVariable())
 			{
-				this.set_StateMachineVersion(0);
+				this.StateMachineVersion = AsyncStateMachineVersion.V1;
 				return;
 			}
 			this.GetStateVariable();
-			this.set_StateMachineVersion(1);
-			return;
+			this.StateMachineVersion = AsyncStateMachineVersion.V2;
 		}
 
 		private bool GetDoFinallyVariable()
 		{
-			V_0 = this.theCFG.get_Blocks()[0].get_First();
-			if (V_0.get_OpCode().get_Code() != 23)
+			Instruction first = this.theCFG.Blocks[0].First;
+			if (first.get_OpCode().get_Code() != 23)
 			{
 				return false;
 			}
-			return StateMachineUtilities.TryGetVariableFromInstruction(V_0.get_Next(), this.methodVariables, out this.doFinallyVariable);
+			return StateMachineUtilities.TryGetVariableFromInstruction(first.get_Next(), this.methodVariables, out this.doFinallyVariable);
 		}
 
 		private void GetStateVariable()
 		{
-			V_0 = this.theCFG.get_Blocks()[0].get_First();
-			if (V_0.get_OpCode().get_Code() != 2)
+			VariableReference variableReference;
+			Instruction first = this.theCFG.Blocks[0].First;
+			if (first.get_OpCode().get_Code() != 2)
 			{
 				return;
 			}
-			V_0 = V_0.get_Next();
-			if (V_0.get_OpCode().get_Code() != 120)
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 120)
 			{
 				return;
 			}
-			V_1 = V_0.get_Operand() as FieldReference;
-			if (V_1 == null || (object)V_1.Resolve() != (object)this.stateField)
+			FieldReference operand = first.get_Operand() as FieldReference;
+			if (operand == null || (object)operand.Resolve() != (object)this.stateField)
 			{
 				return;
 			}
-			V_0 = V_0.get_Next();
-			dummyVar0 = StateMachineUtilities.TryGetVariableFromInstruction(V_0, this.methodVariables, out this.stateVariable);
-			if ((object)V_0 == (object)this.theCFG.get_Blocks()[0].get_Last())
+			first = first.get_Next();
+			StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out this.stateVariable);
+			if ((object)first == (object)this.theCFG.Blocks[0].Last)
 			{
 				return;
 			}
-			V_0 = V_0.get_Next();
-			V_2 = true;
-			while (V_2)
+			first = first.get_Next();
+			bool flag = true;
+			while (flag)
 			{
-				if (V_0.get_OpCode().get_Code() == 2)
+				if (first.get_OpCode().get_Code() == 2)
 				{
-					V_0 = V_0.get_Next();
-					if (V_0.get_OpCode().get_Code() == 120)
+					first = first.get_Next();
+					if (first.get_OpCode().get_Code() == 120)
 					{
-						V_4 = V_0.get_Operand() as FieldReference;
-						if (V_4 != null)
+						FieldReference fieldReference = first.get_Operand() as FieldReference;
+						if (fieldReference != null)
 						{
-							V_0 = V_0.get_Next();
-							if (StateMachineUtilities.TryGetVariableFromInstruction(V_0, this.methodVariables, out V_5))
+							first = first.get_Next();
+							if (StateMachineUtilities.TryGetVariableFromInstruction(first, this.methodVariables, out variableReference))
 							{
-								this.variableToFieldMap.Add(V_5, V_4);
-								if ((object)V_0 == (object)this.theCFG.get_Blocks()[0].get_Last())
+								this.variableToFieldMap.Add(variableReference, fieldReference);
+								if ((object)first == (object)this.theCFG.Blocks[0].Last)
 								{
 									break;
 								}
-								V_0 = V_0.get_Next();
+								first = first.get_Next();
 								continue;
 							}
 						}
 					}
 				}
-				V_2 = false;
+				flag = false;
 			}
-			return;
 		}
 	}
 }

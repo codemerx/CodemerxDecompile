@@ -2,6 +2,7 @@ using Piranha.Models;
 using Piranha.Services;
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Piranha
 {
@@ -47,28 +48,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.ARCHIVE_PAGE_SIZE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.ARCHIVE_PAGE_SIZE).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 0;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.ARCHIVE_PAGE_SIZE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.ARCHIVE_PAGE_SIZE).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.ARCHIVE_PAGE_SIZE);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.ARCHIVE_PAGE_SIZE
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -76,28 +72,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_PAGES).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_PAGES).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 0;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_PAGES).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_PAGES).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.CACHE_EXPIRES_PAGES);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.CACHE_EXPIRES_PAGES
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -105,28 +96,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_POSTS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_POSTS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 0;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_POSTS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.CACHE_EXPIRES_POSTS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.CACHE_EXPIRES_POSTS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.CACHE_EXPIRES_POSTS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -134,28 +120,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_APPROVE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_APPROVE).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return true;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_APPROVE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_APPROVE).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.COMMENTS_APPROVE);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.COMMENTS_APPROVE
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -163,28 +144,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_CLOSE_AFTER_DAYS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_CLOSE_AFTER_DAYS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 0;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_CLOSE_AFTER_DAYS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_CLOSE_AFTER_DAYS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.COMMENTS_CLOSE_AFTER_DAYS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.COMMENTS_CLOSE_AFTER_DAYS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -192,28 +168,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_PAGES_ENABLED).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_PAGES_ENABLED).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return false;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_PAGES_ENABLED).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_PAGES_ENABLED).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.COMMENTS_PAGES_ENABLED);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.COMMENTS_PAGES_ENABLED
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -221,28 +192,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_POSTS_ENABLED).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_POSTS_ENABLED).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return true;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_POSTS_ENABLED).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_POSTS_ENABLED).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.COMMENTS_POSTS_ENABLED);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.COMMENTS_POSTS_ENABLED
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -250,28 +216,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_PAGE_SIZE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_PAGE_SIZE).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 0;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.COMMENTS_PAGE_SIZE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.COMMENTS_PAGE_SIZE).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.COMMENTS_PAGE_SIZE);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.COMMENTS_PAGE_SIZE
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -279,28 +240,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.PAGES_HIERARCHICAL_SLUGS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.PAGES_HIERARCHICAL_SLUGS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return true;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.PAGES_HIERARCHICAL_SLUGS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.PAGES_HIERARCHICAL_SLUGS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.PAGES_HIERARCHICAL_SLUGS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.PAGES_HIERARCHICAL_SLUGS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -308,28 +264,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.HTML_EXCERPT).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.HTML_EXCERPT).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return false;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.HTML_EXCERPT).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.HTML_EXCERPT).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.HTML_EXCERPT);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.HTML_EXCERPT
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -337,28 +288,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return false;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -366,28 +312,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return false;
 				}
-				return Convert.ToBoolean(V_0.get_Value());
+				return Convert.ToBoolean(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.MANAGER_DEFAULT_COLLAPSED_BLOCKS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.MANAGER_DEFAULT_COLLAPSED_BLOCKS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -395,28 +336,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_EXPANDED_SITEMAP_LEVELS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_EXPANDED_SITEMAP_LEVELS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 0;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_EXPANDED_SITEMAP_LEVELS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_EXPANDED_SITEMAP_LEVELS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.MANAGER_EXPANDED_SITEMAP_LEVELS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.MANAGER_EXPANDED_SITEMAP_LEVELS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -424,28 +360,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_PAGE_SIZE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_PAGE_SIZE).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 15;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MANAGER_PAGE_SIZE).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MANAGER_PAGE_SIZE).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.MANAGER_PAGE_SIZE);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.MANAGER_PAGE_SIZE
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -453,32 +384,27 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MEDIA_CDN_URL).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MEDIA_CDN_URL).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return null;
 				}
-				return V_0.get_Value();
+				return result.Value;
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.MEDIA_CDN_URL).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.MEDIA_CDN_URL).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable24 = new Param();
-					stackVariable24.set_Key(Config.MEDIA_CDN_URL);
-					V_0 = stackVariable24;
-				}
+					Key = Config.MEDIA_CDN_URL
+				};
 				if (!String.IsNullOrWhiteSpace(value) && !value.EndsWith("/"))
 				{
 					value = String.Concat(value, "/");
 				}
-				V_0.set_Value(value);
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+				result.Value = value;
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -486,28 +412,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.PAGE_REVISIONS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.PAGE_REVISIONS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 10;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.PAGE_REVISIONS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.PAGE_REVISIONS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.PAGE_REVISIONS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.PAGE_REVISIONS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -515,28 +436,23 @@ namespace Piranha
 		{
 			get
 			{
-				V_1 = this._service.GetByKeyAsync(Config.POST_REVISIONS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.POST_REVISIONS).GetAwaiter();
+				Param result = awaiter.GetResult();
+				if (result == null)
 				{
 					return 10;
 				}
-				return Convert.ToInt32(V_0.get_Value());
+				return Convert.ToInt32(result.Value);
 			}
 			set
 			{
-				V_1 = this._service.GetByKeyAsync(Config.POST_REVISIONS).GetAwaiter();
-				V_0 = V_1.GetResult();
-				if (V_0 == null)
+				TaskAwaiter<Param> awaiter = this._service.GetByKeyAsync(Config.POST_REVISIONS).GetAwaiter();
+				Param result = awaiter.GetResult() ?? new Param()
 				{
-					stackVariable17 = new Param();
-					stackVariable17.set_Key(Config.POST_REVISIONS);
-					V_0 = stackVariable17;
-				}
-				V_0.set_Value(value.ToString());
-				V_2 = this._service.SaveAsync(V_0).GetAwaiter();
-				V_2.GetResult();
-				return;
+					Key = Config.POST_REVISIONS
+				};
+				result.Value = value.ToString();
+				this._service.SaveAsync(result).GetAwaiter().GetResult();
 			}
 		}
 
@@ -559,27 +475,21 @@ namespace Piranha
 			Config.PAGES_HIERARCHICAL_SLUGS = "HierarchicalPageSlugs";
 			Config.PAGE_REVISIONS = "PageRevisions";
 			Config.POST_REVISIONS = "PostRevisions";
-			return;
 		}
 
 		public Config(IParamService paramService)
 		{
-			base();
 			this._service = paramService;
-			return;
 		}
 
 		public Config(IApi api)
 		{
-			base();
-			this._service = api.get_Params();
-			return;
+			this._service = api.Params;
 		}
 
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
-			return;
 		}
 	}
 }

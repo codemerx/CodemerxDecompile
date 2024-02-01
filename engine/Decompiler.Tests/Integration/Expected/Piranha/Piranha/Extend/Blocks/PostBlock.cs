@@ -1,5 +1,6 @@
 using Piranha.Extend;
 using Piranha.Extend.Fields;
+using Piranha.Models;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -16,17 +17,15 @@ namespace Piranha.Extend.Blocks
 
 		public PostBlock()
 		{
-			base();
-			return;
 		}
 
 		public override string GetTitle()
 		{
-			if (!PostField.op_Inequality(this.get_Body(), null) || this.get_Body().get_Post() == null)
+			if (!(this.Body != null) || this.Body.Post == null)
 			{
 				return "No post selected";
 			}
-			return this.get_Body().get_Post().get_Title();
+			return this.Body.Post.Title;
 		}
 	}
 }

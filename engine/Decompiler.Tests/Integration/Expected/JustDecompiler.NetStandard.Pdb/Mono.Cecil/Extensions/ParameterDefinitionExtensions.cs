@@ -25,9 +25,7 @@ namespace Mono.Cecil.Extensions
 
 		public static bool IsParamArray(this ParameterDefinition self)
 		{
-			stackVariable2 = new String[1];
-			stackVariable2[0] = "System.ParamArrayAttribute";
-			return self.HasCustomAttribute(stackVariable2);
+			return self.HasCustomAttribute(new String[] { "System.ParamArrayAttribute" });
 		}
 	}
 }

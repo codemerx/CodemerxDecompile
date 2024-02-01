@@ -116,8 +116,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public GlobalSettingsViewModel()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -14,9 +14,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new IntoClause.u003cget_Childrenu003ed__11(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				IntoClause intoClause = null;
+				yield return intoClause.Identifier;
 			}
 		}
 
@@ -24,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 80;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.IntoClause;
 			}
 		}
 
@@ -34,31 +33,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public IntoClause(VariableReferenceExpression identifier, IEnumerable<Instruction> instructions)
+		public IntoClause(VariableReferenceExpression identifier, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Identifier(identifier);
-			return;
+			this.Identifier = identifier;
 		}
 
 		public override Expression Clone()
 		{
-			return new IntoClause((VariableReferenceExpression)this.get_Identifier().Clone(), this.instructions);
+			return new IntoClause((VariableReferenceExpression)this.Identifier.Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new IntoClause((VariableReferenceExpression)this.get_Identifier().CloneExpressionOnly(), null);
+			return new IntoClause((VariableReferenceExpression)this.Identifier.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as IntoClause;
-			if (V_0 == null)
+			IntoClause intoClause = other as IntoClause;
+			if (intoClause == null)
 			{
 				return false;
 			}
-			return this.get_Identifier().Equals(V_0.get_Identifier());
+			return this.Identifier.Equals(intoClause.Identifier);
 		}
 	}
 }

@@ -20,8 +20,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public CodeMappings()
 		{
-			base();
-			return;
 		}
 	}
 }

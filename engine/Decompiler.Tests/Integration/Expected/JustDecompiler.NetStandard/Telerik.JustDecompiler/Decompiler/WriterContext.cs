@@ -39,13 +39,11 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public WriterContext(AssemblySpecificContext assemblyContext, ModuleSpecificContext moduleContext, TypeSpecificContext typeContext, Dictionary<string, MethodSpecificContext> methodContexts, Dictionary<string, Statement> decompiledStatements)
 		{
-			base();
-			this.set_AssemblyContext(assemblyContext);
-			this.set_ModuleContext(moduleContext);
-			this.set_TypeContext(typeContext);
-			this.set_MethodContexts(methodContexts);
-			this.set_DecompiledStatements(decompiledStatements);
-			return;
+			this.AssemblyContext = assemblyContext;
+			this.ModuleContext = moduleContext;
+			this.TypeContext = typeContext;
+			this.MethodContexts = methodContexts;
+			this.DecompiledStatements = decompiledStatements;
 		}
 	}
 }

@@ -8,20 +8,19 @@ namespace Piranha.Extend.Fields
 	{
 		public CheckBoxField()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator CheckBoxField(bool str)
 		{
-			stackVariable0 = new CheckBoxField();
-			stackVariable0.set_Value(str);
-			return stackVariable0;
+			return new CheckBoxField()
+			{
+				Value = str
+			};
 		}
 
 		public static implicit operator Boolean(CheckBoxField field)
 		{
-			return field.get_Value();
+			return field.Value;
 		}
 	}
 }

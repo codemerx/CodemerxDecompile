@@ -37,6 +37,7 @@
     <Compile Remove="Integration\Expected\OrchardCore\**" />
     <Compile Remove="Integration\Expected\Piranha\**" />
     <Compile Remove="Integration\Expected\Sample3\**" />
+    <Compile Remove="Integration\Expected\ConsoleApp2\**" />
     <Compile Remove="Integration\Expected\Properties\**" />
     <Compile Remove="Integration\Expected\Telerik.JustDecompiler\**" />
     <EmbeddedResource Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
@@ -46,6 +47,7 @@
     <EmbeddedResource Remove="Integration\Expected\OrchardCore\**" />
     <EmbeddedResource Remove="Integration\Expected\Piranha\**" />
     <EmbeddedResource Remove="Integration\Expected\Sample3\**" />
+    <EmbeddedResource Remove="Integration\Expected\ConsoleApp2\**" />
     <EmbeddedResource Remove="Integration\Expected\Properties\**" />
     <EmbeddedResource Remove="Integration\Expected\Telerik.JustDecompiler\**" />
     <None Remove="Integration\Expected\JustDecompiler.NetStandard.Pdb\**" />
@@ -55,6 +57,7 @@
     <None Remove="Integration\Expected\OrchardCore\**" />
     <None Remove="Integration\Expected\Piranha\**" />
     <None Remove="Integration\Expected\Sample3\**" />
+    <None Remove="Integration\Expected\ConsoleApp2\**" />
     <None Remove="Integration\Expected\Properties\**" />
     <None Remove="Integration\Expected\Telerik.JustDecompiler\**" />
   </ItemGroup>
@@ -68,6 +71,7 @@
     <None Remove="Integration\Resources\OrchardCore\OrchardCore.dll" />
     <None Remove="Integration\Resources\Piranha\Piranha.dll" />
     <None Remove="Integration\Resources\Sample3\Sample3.dll" />
+    <None Remove="Integration\Resources\ConsoleApp2\ConsoleApp2.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -107,6 +111,9 @@
     <EmbeddedResource Include="Integration\Resources\Sample3\Sample3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+	<EmbeddedResource Include="Integration\Resources\ConsoleApp2\ConsoleApp2.dll">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

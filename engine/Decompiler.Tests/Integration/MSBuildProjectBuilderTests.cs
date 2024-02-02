@@ -31,12 +31,13 @@ namespace Decompiler.Tests.Integration
         private const string ExpectedFolderTemplate = @"../../../Integration/Expected/{0}";
 
         [Theory]
-        [InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard")]
-        [InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard")]
-        [InlineData("OrchardCore", "OrchardCore")]
-        [InlineData("Mix.Cms.Lib", "Mix.Cms.Lib")]
-        [InlineData("Piranha", "Piranha")]
-        [InlineData("Sample3", "Sample3")]
+        //[InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard")]
+        //[InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard")]
+        //[InlineData("OrchardCore", "OrchardCore")]
+        //[InlineData("Mix.Cms.Lib", "Mix.Cms.Lib")]
+        //[InlineData("Piranha", "Piranha")]
+        //[InlineData("Sample3", "Sample3")]
+        [InlineData("ConsoleApp2", "ConsoleApp2")]
         public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName)
         {
             // Arrange

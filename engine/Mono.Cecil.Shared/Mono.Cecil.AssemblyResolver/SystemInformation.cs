@@ -183,6 +183,7 @@ namespace Mono.Cecil.AssemblyResolver
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 directories.Add(Path.Combine("/", "usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine("/", "usr", "lib", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using CodemerxDecompile.Views;
@@ -31,7 +32,25 @@ public partial class MainWindowViewModel : ObservableObject
 
     internal void SelectNodeByMemberDefinition(IMemberDefinition memberDefinition)
     {
-        SelectedNode = MemberDefinitionToNodeMap[memberDefinition];
+        var nodeToBeSelected = MemberDefinitionToNodeMap[memberDefinition];
+        var nodesToBeExpanded = new Stack<Node>();
+        var parentNode = nodeToBeSelected.ParentNode;
+        while (parentNode != null)
+        {
+            nodesToBeExpanded.Push(parentNode);
+            parentNode = parentNode.ParentNode;
+        }
+        
+        var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+        var treeView = mainWindow.TreeView;
+
+        foreach (var nodeToBeExpanded in nodesToBeExpanded)
+        {
+            var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded);
+            treeViewItem.IsExpanded  = true;
+        }
+
+        SelectedNode = nodeToBeSelected;
     }
 
     [RelayCommand]
@@ -48,49 +67,54 @@ public partial class MainWindowViewModel : ObservableObject
         foreach (var file in files)
         {
             var assembly = Utilities.GetAssembly(file.Path.AbsolutePath);
-            var types = assembly.MainModule.GetTypes();
+            var types = assembly.MainModule.Types;
             var groupedByNamespace = types.GroupBy(t => t.Namespace);
 
-            var namespaceNodes = new ObservableCollection<Node>();
+            var assemblyNode = new Node
+            {
+                Title = assembly.Name.Name,
+                SubNodes = new ObservableCollection<Node>()
+            };
+            
             foreach (var namespaceGroup in groupedByNamespace)
             {
-                var typeNodes = new ObservableCollection<Node>();
+                var namespaceNode = new Node
+                {
+                    Title = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
+                    ParentNode = assemblyNode,
+                    SubNodes = new ObservableCollection<Node>()
+                };
+                
                 foreach (var type in namespaceGroup)
                 {
-                    var memberNodes = new ObservableCollection<Node>();
+                    var typeNode = new Node
+                    {
+                        Title = type.Name,
+                        MemberDefinition = type,
+                        ParentNode = namespaceNode,
+                        SubNodes = new ObservableCollection<Node>()
+                    };
+                    
                     foreach (var member in Utilities.GetTypeMembers(type, LanguageFactory.GetLanguage(CSharpVersion.V7)))
                     {
                         var memberNode = new Node
                         {
                             Title = member.Name,
-                            MemberDefinition = member
+                            MemberDefinition = member,
+                            ParentNode = typeNode
                         };
-                        memberNodes.Add(memberNode);
+                        typeNode.SubNodes.Add(memberNode);
                         MemberDefinitionToNodeMap.Add(member, memberNode);
                     }
                     
-                    var typeNode = new Node
-                    {
-                        Title = type.Name,
-                        MemberDefinition = type,
-                        SubNodes = memberNodes
-                    };
-                    typeNodes.Add(typeNode);
+                    namespaceNode.SubNodes.Add(typeNode);
                     MemberDefinitionToNodeMap.Add(type, typeNode);
                 }
                 
-                namespaceNodes.Add(new Node
-                {
-                    Title = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
-                    SubNodes = typeNodes
-                });
+                assemblyNode.SubNodes.Add(namespaceNode);
             }
 
-            Nodes.Add(new Node
-            {
-                Title = assembly.Name.Name,
-                SubNodes = namespaceNodes
-            });
+            Nodes.Add(assemblyNode);
         }
     }
 
@@ -153,6 +177,7 @@ public partial class MainWindowViewModel : ObservableObject
     public class Node
     {
         public required string Title { get; init; }
+        public Node? ParentNode { get; init; }
         public ObservableCollection<Node>? SubNodes { get; init; }
         public IMemberDefinition? MemberDefinition { get; init; }
     }

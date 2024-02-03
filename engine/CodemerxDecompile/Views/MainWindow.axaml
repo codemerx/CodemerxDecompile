@@ -35,9 +35,11 @@
     </NativeMenu.Menu>
 
     <Grid ColumnDefinitions="*, 4, 2*">
-        <TreeView ItemsSource="{Binding Nodes}"
+        <TreeView Name="TreeView"
+                  ItemsSource="{Binding Nodes}"
                   SelectionMode="Single"
-                  SelectedItem="{Binding SelectedNode}">
+                  SelectedItem="{Binding SelectedNode}" 
+                  AutoScrollToSelectedItem="True">
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding SubNodes}">
                     <TextBlock Text="{Binding Title}"/>

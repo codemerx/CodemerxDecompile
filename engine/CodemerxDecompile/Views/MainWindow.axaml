@@ -21,8 +21,8 @@
             <NativeMenuItem Header="Load assembly">
                 <NativeMenu>
                     <NativeMenuItem Header="From file"
-                                    Command="{Binding OpenFileCommand}" />
-                                    <!-- TODO: Add shortcut/gesture -->
+                                    Command="{Binding OpenFileCommand}"
+                                    Gesture="Meta+O" /> <!-- TODO: Make gesture platform-agnostic -->
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Assembly list">

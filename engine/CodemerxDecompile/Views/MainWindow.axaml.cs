@@ -1,5 +1,6 @@
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
@@ -10,6 +11,8 @@ using CodemerxDecompile.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Mono.Cecil;
 using TextMateSharp.Grammars;
+
+using static AvaloniaEdit.Utils.ExtensionMethods;
 
 namespace CodemerxDecompile.Views;
 
@@ -49,6 +52,8 @@ public partial class MainWindow : Window
     
     private class ReferenceVisualLineText : VisualLineText
     {
+        private static ReferenceVisualLineText? pressed;
+        
         public ReferenceVisualLineText(VisualLine parentVisualLine, int length, IMemberDefinition? memberDefinition, MemberReference? memberReference)
             : base(parentVisualLine, length)
         {
@@ -59,36 +64,75 @@ public partial class MainWindow : Window
         public IMemberDefinition? MemberDefinition { get; }
         public MemberReference? MemberReference { get; }
 
-        // For debugging purposes
-        // public override TextRun CreateTextRun(int startVisualColumn, ITextRunConstructionContext context)
-        // {
-        //     this.TextRunProperties.SetForegroundBrush(context.TextView.LinkTextForegroundBrush);
-        //     this.TextRunProperties.SetBackgroundBrush(context.TextView.LinkTextBackgroundBrush);
-        //     this.TextRunProperties.SetTextDecorations(TextDecorations.Underline);
-        //     return base.CreateTextRun(startVisualColumn, context);
-        // }
+        public override TextRun CreateTextRun(int startVisualColumn, ITextRunConstructionContext context)
+        {
+            TextRunProperties.SetTextDecorations(TextDecorations.Underline);
+            return base.CreateTextRun(startVisualColumn, context);
+        }
         
-        // Not working for now
-        // protected override void OnQueryCursor(PointerEventArgs e)
-        // {
-        //     if (e.Source is InputElement inputElement)
-        //     {
-        //         inputElement.Cursor = new Cursor(StandardCursorType.Hand);
-        //     }
-        //     
-        //     e.Handled = true;
-        // }
+        protected override void OnQueryCursor(PointerEventArgs e)
+        {
+            if (e.Handled)
+            {
+                base.OnQueryCursor(e);
+                return;
+            }
 
+            if (e.Source is InputElement inputElement)
+            {
+                inputElement.Cursor = new Cursor(StandardCursorType.Hand);
+            }
+            
+            base.OnQueryCursor(e);
+        }
+        
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
-            if (MemberReference != null)
+            if (e.Handled)
             {
-                viewModel.SelectNodeByMemberReference(MemberReference);
+                base.OnPointerPressed(e);
+                return;
             }
-            else if (MemberDefinition != null)
+            
+            var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+            var textEditor = mainWindow.TextEditor;
+            if (textEditor.TextArea.TextView.CapturePointer(e.Pointer))
             {
-                viewModel.SelectNodeByMemberFullName(null, MemberDefinition.FullName);
+                pressed = this;
+                e.Handled = true;
             }
+
+            base.OnPointerPressed(e);
+        }
+
+        protected override void OnPointerReleased(PointerEventArgs e)
+        {
+            if (e.Handled)
+            {
+                base.OnPointerReleased(e);
+                return;
+            }
+            
+            if (pressed == this)
+            {
+                var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+                var textEditor = mainWindow.TextEditor;
+                textEditor.TextArea.TextView.ReleasePointerCapture(e.Pointer);
+                
+                if (MemberReference != null)
+                {
+                    viewModel.SelectNodeByMemberReference(MemberReference);
+                }
+                else if (MemberDefinition != null)
+                {
+                    viewModel.SelectNodeByMemberFullName(null, MemberDefinition.FullName);
+                }
+                
+                pressed = null;
+                e.Handled = true;
+            }
+
+            base.OnPointerReleased(e);
         }
     }
 }

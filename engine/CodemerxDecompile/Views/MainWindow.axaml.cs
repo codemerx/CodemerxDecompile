@@ -43,19 +43,21 @@ public partial class MainWindow : Window
         public override VisualLineElement ConstructElement(int offset)
         {
             var segment = references.FindSegmentsContaining(offset).First();
-            return new ReferenceVisualLineText(CurrentContext.VisualLine, segment.Length, segment.MemberDefinition);
+            return new ReferenceVisualLineText(CurrentContext.VisualLine, segment.Length, segment.MemberDefinition, segment.MemberReference);
         }
     }
     
     private class ReferenceVisualLineText : VisualLineText
     {
-        public ReferenceVisualLineText(VisualLine parentVisualLine, int length, IMemberDefinition memberDefinition)
+        public ReferenceVisualLineText(VisualLine parentVisualLine, int length, IMemberDefinition? memberDefinition, MemberReference? memberReference)
             : base(parentVisualLine, length)
         {
             MemberDefinition = memberDefinition;
+            MemberReference = memberReference;
         }
 
-        public IMemberDefinition MemberDefinition { get; }
+        public IMemberDefinition? MemberDefinition { get; }
+        public MemberReference? MemberReference { get; }
 
         // For debugging purposes
         // public override TextRun CreateTextRun(int startVisualColumn, ITextRunConstructionContext context)
@@ -79,12 +81,20 @@ public partial class MainWindow : Window
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
-            viewModel.SelectNodeByMemberDefinition(MemberDefinition);
+            if (MemberReference != null)
+            {
+                viewModel.SelectNodeByMemberReference(MemberReference);
+            }
+            else if (MemberDefinition != null)
+            {
+                viewModel.SelectNodeByMemberFullName(null, MemberDefinition.FullName);
+            }
         }
     }
 }
 
 public class ReferenceTextSegment : TextSegment
 {
-    public required IMemberDefinition MemberDefinition { get; init; }
+    public IMemberDefinition? MemberDefinition { get; init; }
+    public MemberReference? MemberReference { get; init; }
 }

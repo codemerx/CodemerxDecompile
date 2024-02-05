@@ -21,7 +21,7 @@ namespace CodemerxDecompile.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    private readonly Dictionary<IMemberDefinition, Node> MemberDefinitionToNodeMap = new();
+    private readonly Dictionary<string, Dictionary<string, Node>> memberFullNameToNodeMap = new();
     private TypeDefinition? currentTypeDefinition;
     private WritingInfo? currentWritingInfo;
     
@@ -30,9 +30,30 @@ public partial class MainWindowViewModel : ObservableObject
 
     public ObservableCollection<Node> Nodes { get; } = new();
 
-    internal void SelectNodeByMemberDefinition(IMemberDefinition memberDefinition)
+    internal void SelectNodeByMemberReference(MemberReference memberReference)
     {
-        var nodeToBeSelected = MemberDefinitionToNodeMap[memberDefinition];
+        var toBeResolved = memberReference as TypeReference;
+        var declaringType = memberReference.DeclaringType;
+        while (declaringType != null)
+        {
+            toBeResolved = declaringType;
+            declaringType = declaringType.DeclaringType;
+        }
+
+        var typeDefinition = toBeResolved!.Resolve();
+        if (typeDefinition == null)
+        {
+            // show dialog
+        }
+        else
+        {
+            SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
+        }
+    }
+    
+    internal void SelectNodeByMemberFullName(string assemblyName, string fullName)
+    {
+        var nodeToBeSelected = memberFullNameToNodeMap[assemblyName][fullName];
         var nodesToBeExpanded = new Stack<Node>();
         var parentNode = nodeToBeSelected.ParentNode;
         while (parentNode != null)
@@ -47,7 +68,8 @@ public partial class MainWindowViewModel : ObservableObject
         foreach (var nodeToBeExpanded in nodesToBeExpanded)
         {
             var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded);
-            treeViewItem.IsExpanded  = true;
+            treeViewItem.IsExpanded = true;
+            treeViewItem.Presenter.UpdateLayout();  // Force framework to render children
         }
 
         SelectedNode = nodeToBeSelected;
@@ -66,7 +88,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         foreach (var file in files)
         {
-            var assembly = Utilities.GetAssembly(file.Path.AbsolutePath);
+            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file.Path.AbsolutePath);
             var types = assembly.MainModule.Types;
             var groupedByNamespace = types.GroupBy(t => t.Namespace);
 
@@ -76,6 +98,7 @@ public partial class MainWindowViewModel : ObservableObject
                 SubNodes = new ObservableCollection<Node>()
             };
             
+            var dict = new Dictionary<string, Node>();
             foreach (var namespaceGroup in groupedByNamespace)
             {
                 var namespaceNode = new Node
@@ -84,7 +107,7 @@ public partial class MainWindowViewModel : ObservableObject
                     ParentNode = assemblyNode,
                     SubNodes = new ObservableCollection<Node>()
                 };
-                
+
                 foreach (var type in namespaceGroup)
                 {
                     var typeNode = new Node
@@ -104,16 +127,17 @@ public partial class MainWindowViewModel : ObservableObject
                             ParentNode = typeNode
                         };
                         typeNode.SubNodes.Add(memberNode);
-                        MemberDefinitionToNodeMap.Add(member, memberNode);
+                        dict.Add(member.FullName, memberNode);
                     }
                     
                     namespaceNode.SubNodes.Add(typeNode);
-                    MemberDefinitionToNodeMap.Add(type, typeNode);
+                    dict.Add(type.FullName, typeNode);
                 }
                 
                 assemblyNode.SubNodes.Add(namespaceNode);
             }
 
+            memberFullNameToNodeMap.Add(assembly.FullName, dict);
             Nodes.Add(assemblyNode);
         }
     }
@@ -148,8 +172,9 @@ public partial class MainWindowViewModel : ObservableObject
             var language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             var stringBuilder = new StringBuilder();
             var stringWriter = new StringWriter(stringBuilder);
+            var formatter = new MemberReferenceTrackingFormatter(stringWriter);
             var writerSettings = new WriterSettings();
-            var writer = language.GetWriter(new PlainTextFormatter(stringWriter), new SimpleExceptionFormatter(), writerSettings);
+            var writer = language.GetWriter(formatter, new SimpleExceptionFormatter(), writerSettings);
             var writingInfos = (writer as NamespaceImperativeLanguageWriter)!.WriteTypeAndNamespaces(typeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
 
             textEditor.Document.Text = stringBuilder.ToString();
@@ -157,14 +182,25 @@ public partial class MainWindowViewModel : ObservableObject
             currentWritingInfo = writingInfos[0];
 
             MainWindow.references.Clear();
-            foreach (var kvp in currentWritingInfo.MemberDeclarationToCodePostionMap)
+            // foreach (var kvp in currentWritingInfo.MemberDeclarationToCodePostionMap)
+            // {
+            //     MainWindow.references.Add(new ReferenceTextSegment
+            //     {
+            //         StartOffset = kvp.Value.StartOffset,
+            //         EndOffset = kvp.Value.EndOffset,
+            //         Length = kvp.Value.EndOffset - kvp.Value.StartOffset + 1, // TODO: Figure out why we need +1 here
+            //         MemberDefinition = kvp.Key
+            //     });
+            // }
+
+            foreach (var kvp in formatter.CodeSpanToMemberReference)
             {
-                MainWindow.references.Add(new ReferenceTextSegment
+                MainWindow.references.Add(new ReferenceTextSegment()
                 {
-                    StartOffset = kvp.Value.StartOffset,
-                    EndOffset = kvp.Value.EndOffset,
-                    Length = kvp.Value.EndOffset - kvp.Value.StartOffset + 1, // TODO: Figure out why we need +1 here
-                    MemberDefinition = kvp.Key
+                    StartOffset = kvp.Key.StartOffset,
+                    EndOffset = kvp.Key.EndOffset,
+                    Length = kvp.Key.EndOffset - kvp.Key.StartOffset,
+                    MemberReference = kvp.Value
                 });
             }
         }

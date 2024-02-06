@@ -20,10 +20,10 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - fix/github-action
+      - improvement/tests
 
 jobs:
-  build:
+  test-on-windows:
 
     runs-on: windows-latest
 
@@ -40,8 +40,38 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          2.1.x
-          3.1.x
+          2.x
+          3.x
+          4.x
+          5.x
+          6.x
+          7.x
+
+    - name: Build Solution
+      run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
+
+    - name: Run Tests
+      run: dotnet test engine/Decompiler.Tests -c Release
+  
+  test-on-linux:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Restore SNK
+      uses: RollyPeres/base64-to-path@v1
+      with:
+        filePath: ${{ github.workspace }}/common/CDKey.snk
+        encodedString: ${{ secrets.CD_SNK }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.x
+          7.x
 
     - name: Build Solution
       run: dotnet build engine/CodemerxDecompileEngine.sln -c Release

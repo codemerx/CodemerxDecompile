@@ -16,6 +16,7 @@
 
 using Decompiler.Tests.Helpers;
 using JustDecompile.Tools.MSBuildProjectBuilder;
+using System;
 using System.IO;
 using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Languages;
@@ -31,15 +32,25 @@ namespace Decompiler.Tests.Integration
         private const string ExpectedFolderTemplate = @"../../../Integration/Expected/{0}";
 
         [Theory]
-        //[InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard")]
-        //[InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard")]
-        //[InlineData("OrchardCore", "OrchardCore")]
-        //[InlineData("Mix.Cms.Lib", "Mix.Cms.Lib")]
-        //[InlineData("Piranha", "Piranha")]
-        //[InlineData("Sample3", "Sample3")]
-        [InlineData("ConsoleApp2", "ConsoleApp2")]
-        public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName)
+        [InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard", true)]
+        [InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard", true)]
+        [InlineData("OrchardCore", "OrchardCore", true)]
+        [InlineData("Mix.Cms.Lib", "Mix.Cms.Lib", true)]
+        [InlineData("Piranha", "Piranha", true)]
+        //[InlineData("Sample3", "Sample3", false)]
+        //[InlineData("ConsoleApp2", "ConsoleApp2", false)]
+        [InlineData("Squidex.7.2.0.Net6", "Squidex", false)]
+        [InlineData("coolstore.ShoppingCart.Net6", "ShoppingCart", false)]
+        [InlineData("clean-architecture-manga.accounts-api.Net7", "Application", false)]
+        [InlineData("NorthwindTraders.NetStandard2.1", "Northwind.Application", false)]
+        public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName, bool windowsOnly)
         {
+            // Skip Windows Only tests
+            if (windowsOnly && !OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
             // Arrange
             string targetFolder = string.Format(TargetFolderTemplate, assemblyFolder, assemblyName);
             string outputFolder = string.Format(OutputFolderTemplate, assemblyFolder);

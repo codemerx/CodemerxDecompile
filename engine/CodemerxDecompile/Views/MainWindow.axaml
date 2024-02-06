@@ -35,18 +35,36 @@
     <!-- </NativeMenu.Menu> -->
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Load assembly">
-                <MenuItem Header="From file"
-                          Command="{Binding OpenFileCommand}"
-                          HotKey="Cmd+O"
-                          InputGesture="Cmd+O"/>
-            </MenuItem>
-            <MenuItem Header="Clear assembly list"
-                      Command="{Binding ClearAssemblyListCommand}" />
-        </Menu>
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <StackPanel.Styles>
+                <Style Selector="StackPanel">
+                    <Setter Property="Margin" Value="0 0 0 5" />
+                </Style>
+            </StackPanel.Styles>
+            
+            <Menu>
+                <MenuItem Header="Load assembly">
+                    <MenuItem Header="From file"
+                              Command="{Binding OpenFileCommand}"
+                              HotKey="Cmd+O"
+                              InputGesture="Cmd+O" />
+                </MenuItem>
+                <MenuItem Header="Clear assembly list"
+                          Command="{Binding ClearAssemblyListCommand}" />
+            </Menu>
+            
+            <ComboBox ItemsSource="{Binding Languages}"
+                      SelectedItem="{Binding SelectedLanguage}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
         
-        <Grid ColumnDefinitions="*, 4, 2*">
+        <Grid ColumnDefinitions="*, Auto, 3*">
             <TreeView Name="TreeView"
                       ItemsSource="{Binding Nodes}"
                       SelectionMode="Single"
@@ -60,8 +78,13 @@
             </TreeView>
         
             <GridSplitter Grid.Column="1"
-                          Background="Transparent"
-                          ResizeDirection="Columns" />
+                          ResizeDirection="Columns">
+                <GridSplitter.Styles>
+                    <Style Selector="GridSplitter">
+                        <Setter Property="Margin" Value="5 0 5 0" />
+                    </Style>
+                </GridSplitter.Styles>
+            </GridSplitter>
         
             <avaloniaEdit:TextEditor Grid.Column="2"
                                      Name="TextEditor"

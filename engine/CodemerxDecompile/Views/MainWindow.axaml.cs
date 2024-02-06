@@ -27,12 +27,12 @@ public partial class MainWindow : Window
         viewModel = App.Current.Services.GetService<MainWindowViewModel>()!;
         DataContext = viewModel;
 
-        TextEditor.Document = new TextDocument();
         TextEditor.TextArea.TextView.ElementGenerators.Add(new ReferenceElementGenerator());
         
         // TODO: Switch editor theme according with app theme
-        var registryOptions = new RegistryOptions(ThemeName.DarkPlus);
+        var registryOptions = new RegistryOptions(ThemeName.LightPlus);
         var installation = TextEditor.InstallTextMate(registryOptions);
+        // TODO: Set grammar according to selected language in the UI
         installation.SetGrammar(registryOptions.GetScopeByLanguageId(registryOptions.GetLanguageByExtension(".cs").Id));
     }
     

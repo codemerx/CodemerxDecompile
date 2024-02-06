@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using AvaloniaEdit.Document;
 using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -16,6 +17,8 @@ using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
+using Telerik.JustDecompiler.Languages.IL;
+using Telerik.JustDecompiler.Languages.VisualBasic;
 
 namespace CodemerxDecompile.ViewModels;
 
@@ -28,7 +31,22 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private Node? selectedNode;
 
+    [ObservableProperty]
+    private Language selectedLanguage;
+
+    public MainWindowViewModel()
+    {
+        selectedLanguage = Languages[0];
+    }
+
     public ObservableCollection<Node> Nodes { get; } = new();
+
+    public ObservableCollection<Language> Languages { get; } = new()
+    {
+        new Language("C#", LanguageFactory.GetLanguage(CSharpVersion.V7)),
+        new Language("VB.NET", LanguageFactory.GetLanguage(VisualBasicVersion.V10)),
+        new Language("IL", new IntermediateLanguage())
+    };
 
     internal void SelectNodeByMemberReference(MemberReference memberReference)
     {
@@ -150,12 +168,25 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedNodeChanged(Node? value)
     {
-        var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+        Decompile(value, false);
+    }
+
+    partial void OnSelectedLanguageChanged(Language value)
+    {
+        Decompile(SelectedNode, true);
+    }
+
+    private void Decompile(Node? value, bool forceRecompilation)
+    {
+        var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        if (mainWindow == null)
+            return;
+        
         var textEditor = mainWindow.TextEditor;
         
         if (value is null or { MemberDefinition: null })
         {
-            textEditor.Document.Text = string.Empty;
+            textEditor.Document = null;
             currentTypeDefinition = null;
             currentWritingInfo = null;
             return;
@@ -167,17 +198,26 @@ public partial class MainWindowViewModel : ObservableObject
             _ => value.MemberDefinition.DeclaringType
         };
 
-        if (typeDefinition != currentTypeDefinition)
+        if (typeDefinition != currentTypeDefinition || forceRecompilation)
         {
-            var language = LanguageFactory.GetLanguage(CSharpVersion.V7);
+            var language = SelectedLanguage.Instance;
             var stringBuilder = new StringBuilder();
             var stringWriter = new StringWriter(stringBuilder);
             var formatter = new MemberReferenceTrackingFormatter(stringWriter);
             var writerSettings = new WriterSettings();
             var writer = language.GetWriter(formatter, new SimpleExceptionFormatter(), writerSettings);
-            var writingInfos = (writer as NamespaceImperativeLanguageWriter)!.WriteTypeAndNamespaces(typeDefinition, new SimpleWriterContextService(new DefaultDecompilationCacheService(), true));
+            var writerContextService = new SimpleWriterContextService(new DefaultDecompilationCacheService(), true);
+            List<WritingInfo> writingInfos;
+            if (writer is NamespaceImperativeLanguageWriter namespaceImperativeLanguageWriter)
+            {
+                writingInfos = namespaceImperativeLanguageWriter.WriteTypeAndNamespaces(typeDefinition, writerContextService);
+            }
+            else
+            {
+                writingInfos = writer.Write(typeDefinition, writerContextService);
+            }
 
-            textEditor.Document.Text = stringBuilder.ToString();
+            textEditor.Document = new TextDocument(stringBuilder.ToString());
             currentTypeDefinition = typeDefinition;
             currentWritingInfo = writingInfos[0];
 
@@ -205,6 +245,8 @@ public partial class MainWindowViewModel : ObservableObject
             }
         }
 
+        textEditor.UpdateLayout();  // Force editor to render to ensure ScrollToLine works as expected
+        
         var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[value.MemberDefinition];
         textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
         textEditor.ScrollToLine(textEditor.Document!.GetLocation(codePosition.StartOffset).Line);
@@ -217,4 +259,6 @@ public partial class MainWindowViewModel : ObservableObject
         public ObservableCollection<Node>? SubNodes { get; init; }
         public IMemberDefinition? MemberDefinition { get; init; }
     }
+
+    public record Language(string Name, ILanguage Instance);
 }

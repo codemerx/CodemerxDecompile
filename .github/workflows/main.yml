@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - fix/github-action
 
 jobs:
   build:
@@ -37,9 +37,11 @@ jobs:
         encodedString: ${{ secrets.CD_SNK }}
 
     - name: Setup DotNet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '3.1.4'
+        dotnet-version: |
+          2.1.x
+          3.1.x
 
     - name: Build Solution
       run: dotnet build engine/CodemerxDecompileEngine.sln -c Release

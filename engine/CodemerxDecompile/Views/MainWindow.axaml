@@ -16,46 +16,58 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
     
-    <NativeMenu.Menu>
-        <NativeMenu>
-            <NativeMenuItem Header="Load assembly">
-                <NativeMenu>
-                    <NativeMenuItem Header="From file"
-                                    Command="{Binding OpenFileCommand}"
-                                    Gesture="Meta+O" /> <!-- TODO: Make gesture platform-agnostic -->
-                </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Assembly list">
-                <NativeMenu>
-                    <NativeMenuItem Header="Clear"
-                                    Command="{Binding ClearAssemblyListCommand}" />
-                </NativeMenu>
-            </NativeMenuItem>
-        </NativeMenu>
-    </NativeMenu.Menu>
+    <!-- <NativeMenu.Menu> -->
+    <!--     <NativeMenu> -->
+    <!--         <NativeMenuItem Header="Load assembly"> -->
+    <!--             <NativeMenu> -->
+    <!--                 <NativeMenuItem Header="From file" -->
+    <!--                                 Command="{Binding OpenFileCommand}" -->
+    <!--                                 Gesture="Meta+O" /> -->
+    <!--             </NativeMenu> -->
+    <!--         </NativeMenuItem> -->
+    <!--         <NativeMenuItem Header="Assembly list"> -->
+    <!--             <NativeMenu> -->
+    <!--                 <NativeMenuItem Header="Clear" -->
+    <!--                                 Command="{Binding ClearAssemblyListCommand}" /> -->
+    <!--             </NativeMenu> -->
+    <!--         </NativeMenuItem> -->
+    <!--     </NativeMenu> -->
+    <!-- </NativeMenu.Menu> -->
 
-    <Grid ColumnDefinitions="*, 4, 2*">
-        <TreeView Name="TreeView"
-                  ItemsSource="{Binding Nodes}"
-                  SelectionMode="Single"
-                  SelectedItem="{Binding SelectedNode}" 
-                  AutoScrollToSelectedItem="True">
-            <TreeView.ItemTemplate>
-                <TreeDataTemplate ItemsSource="{Binding SubNodes}">
-                    <TextBlock Text="{Binding Title}"/>
-                </TreeDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Load assembly">
+                <MenuItem Header="From file"
+                          Command="{Binding OpenFileCommand}"
+                          HotKey="Cmd+O"
+                          InputGesture="Cmd+O"/>
+            </MenuItem>
+            <MenuItem Header="Clear assembly list"
+                      Command="{Binding ClearAssemblyListCommand}" />
+        </Menu>
         
-        <GridSplitter Grid.Column="1"
-                      Background="Transparent"
-                      ResizeDirection="Columns" />
+        <Grid ColumnDefinitions="*, 4, 2*">
+            <TreeView Name="TreeView"
+                      ItemsSource="{Binding Nodes}"
+                      SelectionMode="Single"
+                      SelectedItem="{Binding SelectedNode}" 
+                      AutoScrollToSelectedItem="True">
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+                        <TextBlock Text="{Binding Title}"/>
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
         
-        <avaloniaEdit:TextEditor Grid.Column="2"
-                                 Name="TextEditor"
-                                 ShowLineNumbers="True"
-                                 FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
-                                 IsReadOnly="True" />
-    </Grid>
-
+            <GridSplitter Grid.Column="1"
+                          Background="Transparent"
+                          ResizeDirection="Columns" />
+        
+            <avaloniaEdit:TextEditor Grid.Column="2"
+                                     Name="TextEditor"
+                                     ShowLineNumbers="True"
+                                     FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                     IsReadOnly="True" />
+        </Grid>
+    </DockPanel>
 </Window>

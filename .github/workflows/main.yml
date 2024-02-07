@@ -72,8 +72,8 @@ jobs:
           6.x
           7.x
 
-    - name: Build Solution
-      run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
+    - name: Build Tests Project
+      run: dotnet build engine/Decompiler.Tests.csproj -c Release
 
     - name: Run Tests
       run: dotnet test engine/Decompiler.Tests -c Release

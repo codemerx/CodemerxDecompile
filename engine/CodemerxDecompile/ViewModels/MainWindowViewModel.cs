@@ -152,11 +152,33 @@ public partial class MainWindowViewModel : ObservableObject
 
         TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode, Dictionary<string, Node> dict)
         {
-            var typeNode = new TypeNode
+            TypeNode typeNode = typeDefinition switch
             {
-                Name = typeDefinition.Name,
-                Parent = parentNode,
-                TypeDefinition = typeDefinition
+                { IsEnum: true } => new EnumNode
+                {
+                    Name = typeDefinition.Name,
+                    Parent = parentNode,
+                    TypeDefinition = typeDefinition
+                },
+                { IsValueType: true } => new StructNode
+                {
+                    Name = typeDefinition.Name,
+                    Parent = parentNode,
+                    TypeDefinition = typeDefinition
+                },
+                { IsClass: true } => new ClassNode
+                {
+                    Name = typeDefinition.Name,
+                    Parent = parentNode,
+                    TypeDefinition = typeDefinition
+                },
+                { IsInterface: true } => new InterfaceNode
+                {
+                    Name = typeDefinition.Name,
+                    Parent = parentNode,
+                    TypeDefinition = typeDefinition
+                },
+                _ => throw new NotSupportedException()
             };
             
             var members = typeDefinition.GetMembersSorted(false, SelectedLanguage.Instance);

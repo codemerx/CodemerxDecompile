@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-blue-10{fill: #005dba; opacity: 0.1;}.light-blue{fill: #005dba; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightStructurePublic</title>
+  <g id="canvas" class="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-blue-10" d="M4.5,9.5v3h-3v-3Zm10,0v3h-3v-3Z" />
+      <path class="light-blue" d="M14.5,9h-3l-.5.5v3l.5.5h3l.5-.5v-3ZM14,12H12V10h2ZM1.5,9,1,9.5v3l.5.5h3l.5-.5v-3L4.5,9ZM4,12H2V10H4Z" />
+    </g>
+    <path class="light-blue-10" d="M14.5,4.5v3H1.5v-3Z" />
+    <path class="light-blue" d="M14.5,4H1.5L1,4.5v3l.5.5h13l.5-.5v-3ZM14,7H2V5H14Z" />
+  </g>
+</svg>

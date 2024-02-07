@@ -96,9 +96,27 @@
                             <TextBlock Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>
-                    <TreeDataTemplate DataType="nodes:TypeNode" ItemsSource="{Binding Members}">
+                    <TreeDataTemplate DataType="nodes:EnumNode" ItemsSource="{Binding Members}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/EnumerationItemPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:StructNode" ItemsSource="{Binding Members}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/StructurePublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:ClassNode" ItemsSource="{Binding Members}">
                         <StackPanel Orientation="Horizontal">
                             <Svg Path="/Assets/ClassPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:InterfaceNode" ItemsSource="{Binding Members}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/InterfacePublic.svg" />
                             <TextBlock Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-darkpurple-10{fill: #533182; opacity: 0.1;}.light-purple{fill: #6936aa; opacity: 1;}.light-defaultgrey{fill: #212121; opacity: 1;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightMethodInstance</title>
+  <g id="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-darkpurple-10" d="M15.5,3.56V8.969l-4.5,2.6-1-.577v-2.9L6.914,5H6.5V3.56l4.519-2.482Z" />
+      <path class="light-purple" d="M16,3.561V8.97l-.25.432L11.25,12h-.5L10,11.567V10.413l.5.289V6.354h1V10.7L15,8.681V3.85L11,1.539,7,3.85V5.086L6.914,5H6V3.561l.25-.433,4.5-2.6h.5l4.5,2.6Z" />
+    </g>
+    <path class="light-darkpurple-10" d="M11.492.784,16,3.367,11.484,6,6.968,3.344Z" />
+    <path class="light-purple" d="M11.263,6.648h-.506L6.241,3.991l.008-.866,4.5-2.6h.5l4.5,2.6.028.887ZM7.5,3.569l3.517,2.069,3.515-2.051-3.51-2.012Z" />
+    <path class="light-defaultgrey" d="M6.5,6l.5.5V7H6V6Zm2,2H8V9H9V8.5ZM4,7H5V6H4ZM2,6.5V7H3V6H2.5ZM8,15h.5l.5-.5V14H8Zm0-4H9V10H8Zm0,2H9V12H8Z" />
+    <path class="light-defaultgrey-10" d="M6.5,15.5H.5v-7H5L6.5,10Z" />
+    <path class="light-defaultgrey" d="M6.854,9.646l-1.5-1.5L5,8H.5L0,8.5v7l.5.5h6l.5-.5V10ZM1,15V9H4v2H6v4Z" />
+  </g>
+</svg>

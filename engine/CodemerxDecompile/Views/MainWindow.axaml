@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:nodes="clr-namespace:CodemerxDecompile.Nodes"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CodemerxDecompile.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -66,15 +67,72 @@
         
         <Grid ColumnDefinitions="*, Auto, 3*">
             <TreeView Name="TreeView"
-                      ItemsSource="{Binding Nodes}"
+                      ItemsSource="{Binding AssemblyNodes}"
                       SelectionMode="Single"
                       SelectedItem="{Binding SelectedNode}" 
                       AutoScrollToSelectedItem="True">
-                <TreeView.ItemTemplate>
-                    <TreeDataTemplate ItemsSource="{Binding SubNodes}">
-                        <TextBlock Text="{Binding Title}"/>
+                <TreeView.Styles>
+                    <Style Selector="Svg">
+                        <Setter Property="Margin" Value="0 0 5 0" />
+                    </Style>
+                </TreeView.Styles>
+                
+                <TreeView.DataTemplates>
+                    <TreeDataTemplate DataType="nodes:AssemblyNode" ItemsSource="{Binding Modules}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/Assembly.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
                     </TreeDataTemplate>
-                </TreeView.ItemTemplate>
+                    <TreeDataTemplate DataType="nodes:ModuleNode" ItemsSource="{Binding Namespaces}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/Assembly.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:NamespaceNode" ItemsSource="{Binding Types}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/Namespace.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:TypeNode" ItemsSource="{Binding Members}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/ClassPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:FieldNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/FieldPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:PropertyNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/PropertyPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:ConstructorNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/MethodInstance.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:MethodNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/MethodPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:EventNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/EventPublic.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                </TreeView.DataTemplates>
             </TreeView>
         
             <GridSplitter Grid.Column="1"

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-yellow-10{fill: #996f00; opacity: 0.1;}.light-yellow{fill: #996f00; opacity: 1;}</style>
+  </defs>
+  <title>ClassPublic</title>
+  <g id="canvas" class="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <path class="light-yellow-10" d="M5.5.5l3,3-5,5-3-3Zm10,6-2-2-3,3,2,2Zm-5,7,2,2,3-3-2-2Z" />
+    <path class="light-yellow" d="M10.146,7.854l2,2h.708l3-3V6.146l-2-2h-.708L11.293,6H6.707L8.854,3.854V3.146l-3-3H5.146l-5,5v.708l3,3h.708L5.707,7H8v5.5l.5.5h1.793l-.147.146v.708l2,2h.708l3-3v-.708l-2-2h-.708L11.293,12H9V7h1.293l-.147.146ZM3.5,7.793,1.207,5.5,5.5,1.207,7.793,3.5Zm10,3.414L14.793,12.5,12.5,14.793,11.207,13.5Zm0-6L14.793,6.5,12.5,8.793,11.207,7.5Z" />
+  </g>
+</svg>

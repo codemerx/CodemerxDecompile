@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -8,11 +9,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
+using CodemerxDecompile.Nodes;
 using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mono.Cecil;
-using Telerik.JustDecompiler.Decompiler;
+using Mono.Cecil.Extensions;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Languages;
@@ -39,7 +41,7 @@ public partial class MainWindowViewModel : ObservableObject
         selectedLanguage = Languages[0];
     }
 
-    public ObservableCollection<Node> Nodes { get; } = new();
+    public ObservableCollection<AssemblyNode> AssemblyNodes { get; } = new();
 
     public ObservableCollection<Language> Languages { get; } = new()
     {
@@ -73,11 +75,11 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var nodeToBeSelected = memberFullNameToNodeMap[assemblyName][fullName];
         var nodesToBeExpanded = new Stack<Node>();
-        var parentNode = nodeToBeSelected.ParentNode;
+        var parentNode = nodeToBeSelected.Parent;
         while (parentNode != null)
         {
             nodesToBeExpanded.Push(parentNode);
-            parentNode = parentNode.ParentNode;
+            parentNode = parentNode.Parent;
         }
         
         var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
@@ -104,66 +106,111 @@ public partial class MainWindowViewModel : ObservableObject
             // TODO: Add file type filter
         });
 
+        // TODO: Rebuild tree view upon language change
         foreach (var file in files)
         {
             var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file.Path.AbsolutePath);
-            var types = assembly.MainModule.Types;
-            var groupedByNamespace = types.GroupBy(t => t.Namespace);
-
-            var assemblyNode = new Node
+            var assemblyNode = new AssemblyNode
             {
-                Title = assembly.Name.Name,
-                SubNodes = new ObservableCollection<Node>()
+                Name = assembly.Name.Name,
+                Parent = null
             };
-            
-            var dict = new Dictionary<string, Node>();
-            foreach (var namespaceGroup in groupedByNamespace)
-            {
-                var namespaceNode = new Node
-                {
-                    Title = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
-                    ParentNode = assemblyNode,
-                    SubNodes = new ObservableCollection<Node>()
-                };
 
-                foreach (var type in namespaceGroup)
+            var dict = new Dictionary<string, Node>();
+            foreach (var module in assembly.Modules)
+            {
+                var moduleNode = new ModuleNode
                 {
-                    var typeNode = new Node
-                    {
-                        Title = type.Name,
-                        MemberDefinition = type,
-                        ParentNode = namespaceNode,
-                        SubNodes = new ObservableCollection<Node>()
-                    };
-                    
-                    foreach (var member in Utilities.GetTypeMembers(type, LanguageFactory.GetLanguage(CSharpVersion.V7)))
-                    {
-                        var memberNode = new Node
-                        {
-                            Title = member.Name,
-                            MemberDefinition = member,
-                            ParentNode = typeNode
-                        };
-                        typeNode.SubNodes.Add(memberNode);
-                        dict.Add(member.FullName, memberNode);
-                    }
-                    
-                    namespaceNode.SubNodes.Add(typeNode);
-                    dict.Add(type.FullName, typeNode);
-                }
+                    Name = module.Name,
+                    Parent = assemblyNode
+                };
                 
-                assemblyNode.SubNodes.Add(namespaceNode);
+                foreach (var namespaceGroup in module.Types.GroupBy(t => t.Namespace))
+                {
+                    var namespaceNode = new NamespaceNode
+                    {
+                        Name = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
+                        Parent = moduleNode
+                    };
+
+                    foreach (var typeDefinition in namespaceGroup)
+                    {
+                        var typeNode = BuildTypeSubtree(typeDefinition, namespaceNode, dict);
+                        namespaceNode.Types.Add(typeNode);
+                        dict.Add(typeDefinition.FullName, typeNode);
+                    }
+                
+                    moduleNode.Namespaces.Add(namespaceNode);
+                }
+
+                assemblyNode.Modules.Add(moduleNode);
             }
 
             memberFullNameToNodeMap.Add(assembly.FullName, dict);
-            Nodes.Add(assemblyNode);
+            AssemblyNodes.Add(assemblyNode);
+        }
+
+        TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode, Dictionary<string, Node> dict)
+        {
+            var typeNode = new TypeNode
+            {
+                Name = typeDefinition.Name,
+                Parent = parentNode,
+                TypeDefinition = typeDefinition
+            };
+            
+            var members = typeDefinition.GetMembersSorted(false, SelectedLanguage.Instance);
+            foreach (var memberDefinition in members)
+            {
+                MemberNode node = memberDefinition switch
+                {
+                    FieldDefinition fieldDefinition => new FieldNode
+                    {
+                        Name = fieldDefinition.Name,
+                        FieldDefinition = fieldDefinition,
+                        Parent = typeNode
+                    },
+                    MethodDefinition { IsConstructor: true } methodDefinition => new ConstructorNode
+                    {
+                        Name = methodDefinition.Name,
+                        MethodDefinition = methodDefinition,
+                        Parent = typeNode
+                    },
+                    PropertyDefinition propertyDefinition => new PropertyNode
+                    {
+                        Name = propertyDefinition.Name,
+                        PropertyDefinition = propertyDefinition,
+                        Parent = typeNode
+                    },
+                    MethodDefinition methodDefinition => new MethodNode
+                    {
+                        Name = methodDefinition.Name,
+                        MethodDefinition = methodDefinition,
+                        Parent = typeNode
+                    },
+                    EventDefinition eventDefinition => new EventNode
+                    {
+                        Name = eventDefinition.Name,
+                        EventDefinition = eventDefinition,
+                        Parent = typeNode
+                    },
+                    TypeDefinition nestedTypeDefinition => BuildTypeSubtree(nestedTypeDefinition, typeNode, dict),
+                    _ => throw new NotSupportedException()
+                };
+                
+                typeNode.Members.Add(node);
+                dict.Add(memberDefinition.FullName, node);
+            }
+
+            return typeNode;
         }
     }
 
     [RelayCommand]
     private void ClearAssemblyList()
     {
-        Nodes.Clear();
+        AssemblyNodes.Clear();
+        GlobalAssemblyResolver.Instance.ClearCache();
     }
 
     partial void OnSelectedNodeChanged(Node? value)
@@ -183,8 +230,15 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         
         var textEditor = mainWindow.TextEditor;
-        
-        if (value is null or { MemberDefinition: null })
+
+        TypeDefinition containingType;
+        IMemberDefinition memberDefinition;
+        if (value is MemberNode memberNode)
+        {
+            containingType = GetContainingTypeNode(memberNode).TypeDefinition;
+            memberDefinition = memberNode.MemberDefinition;
+        }
+        else
         {
             textEditor.Document = null;
             currentTypeDefinition = null;
@@ -192,13 +246,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var typeDefinition = value switch
-        {
-            { MemberDefinition: TypeDefinition typeDef } => typeDef,
-            _ => value.MemberDefinition.DeclaringType
-        };
-
-        if (typeDefinition != currentTypeDefinition || forceRecompilation)
+        if (containingType != currentTypeDefinition || forceRecompilation)
         {
             var language = SelectedLanguage.Instance;
             var stringBuilder = new StringBuilder();
@@ -210,29 +258,18 @@ public partial class MainWindowViewModel : ObservableObject
             List<WritingInfo> writingInfos;
             if (writer is NamespaceImperativeLanguageWriter namespaceImperativeLanguageWriter)
             {
-                writingInfos = namespaceImperativeLanguageWriter.WriteTypeAndNamespaces(typeDefinition, writerContextService);
+                writingInfos = namespaceImperativeLanguageWriter.WriteTypeAndNamespaces(containingType, writerContextService);
             }
             else
             {
-                writingInfos = writer.Write(typeDefinition, writerContextService);
+                writingInfos = writer.Write(containingType, writerContextService);
             }
 
             textEditor.Document = new TextDocument(stringBuilder.ToString());
-            currentTypeDefinition = typeDefinition;
+            currentTypeDefinition = containingType;
             currentWritingInfo = writingInfos[0];
 
             MainWindow.references.Clear();
-            // foreach (var kvp in currentWritingInfo.MemberDeclarationToCodePostionMap)
-            // {
-            //     MainWindow.references.Add(new ReferenceTextSegment
-            //     {
-            //         StartOffset = kvp.Value.StartOffset,
-            //         EndOffset = kvp.Value.EndOffset,
-            //         Length = kvp.Value.EndOffset - kvp.Value.StartOffset + 1, // TODO: Figure out why we need +1 here
-            //         MemberDefinition = kvp.Key
-            //     });
-            // }
-
             foreach (var kvp in formatter.CodeSpanToMemberReference)
             {
                 MainWindow.references.Add(new ReferenceTextSegment()
@@ -247,17 +284,27 @@ public partial class MainWindowViewModel : ObservableObject
 
         textEditor.UpdateLayout();  // Force editor to render to ensure ScrollToLine works as expected
         
-        var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[value.MemberDefinition];
+        var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[memberDefinition];
         textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
         textEditor.ScrollToLine(textEditor.Document!.GetLocation(codePosition.StartOffset).Line);
-    }
 
-    public class Node
-    {
-        public required string Title { get; init; }
-        public Node? ParentNode { get; init; }
-        public ObservableCollection<Node>? SubNodes { get; init; }
-        public IMemberDefinition? MemberDefinition { get; init; }
+        TypeNode GetContainingTypeNode(MemberNode memberNode)
+        {
+            var result = memberNode switch
+            {
+                TypeNode typeNode => typeNode,
+                _ => (TypeNode)memberNode.Parent!
+            };
+            
+            var parentNode = result!.Parent as TypeNode;
+            while (parentNode != null)
+            {
+                result = parentNode;
+                parentNode = result.Parent as TypeNode;
+            }
+
+            return result;
+        }
     }
 
     public record Language(string Name, ILanguage Instance);

@@ -27,6 +27,7 @@ namespace CodemerxDecompile.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly Dictionary<string, Dictionary<string, Node>> memberFullNameToNodeMap = new();
+    private readonly List<AssemblyDefinition> assemblies = new();
     private TypeDefinition? currentTypeDefinition;
     private WritingInfo? currentWritingInfo;
     
@@ -67,7 +68,15 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else
         {
-            SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
+            if (assemblies.Any(assembly => assembly.MainModule.FilePath == typeDefinition.Module.FilePath))
+            {
+                SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
+            }
+            else
+            {
+                LoadAssemblies(new [] { typeDefinition.Module.FilePath });
+                SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
+            }
         }
     }
     
@@ -89,7 +98,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded);
             treeViewItem.IsExpanded = true;
-            treeViewItem.Presenter.UpdateLayout();  // Force framework to render children
+            treeViewItem.UpdateLayout();  // Force framework to render children
         }
 
         SelectedNode = nodeToBeSelected;
@@ -106,10 +115,15 @@ public partial class MainWindowViewModel : ObservableObject
             // TODO: Add file type filter
         });
 
+        LoadAssemblies(files.Select(file => file.Path.AbsolutePath));
+    }
+
+    private void LoadAssemblies(IEnumerable<string> filePaths)
+    {
         // TODO: Rebuild tree view upon language change
-        foreach (var file in files)
+        foreach (var file in filePaths)
         {
-            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file.Path.AbsolutePath);
+            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file);
             var assemblyNode = new AssemblyNode
             {
                 Name = assembly.Name.Name,
@@ -148,6 +162,7 @@ public partial class MainWindowViewModel : ObservableObject
 
             memberFullNameToNodeMap.Add(assembly.FullName, dict);
             AssemblyNodes.Add(assemblyNode);
+            assemblies.Add(assembly);
         }
 
         TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode, Dictionary<string, Node> dict)
@@ -232,6 +247,8 @@ public partial class MainWindowViewModel : ObservableObject
     private void ClearAssemblyList()
     {
         AssemblyNodes.Clear();
+        assemblies.Clear();
+        memberFullNameToNodeMap.Clear();
         GlobalAssemblyResolver.Instance.ClearCache();
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -7,6 +8,7 @@ using Avalonia.Media.TextFormatting;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Rendering;
 using AvaloniaEdit.TextMate;
+using CodemerxDecompile.Extensions;
 using CodemerxDecompile.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Mono.Cecil;
@@ -46,27 +48,32 @@ public partial class MainWindow : Window
         public override VisualLineElement ConstructElement(int offset)
         {
             var segment = references.FindSegmentsContaining(offset).First();
-            return new ReferenceVisualLineText(CurrentContext.VisualLine, segment.Length, segment.MemberDefinition, segment.MemberReference);
+            return new ReferenceVisualLineText(CurrentContext.VisualLine, segment.Length, segment.MemberReference, segment.Resolved);
         }
     }
     
     private class ReferenceVisualLineText : VisualLineText
     {
         private static ReferenceVisualLineText? pressed;
+        private readonly MemberReference memberReference;
+        private readonly bool resolved;
         
-        public ReferenceVisualLineText(VisualLine parentVisualLine, int length, IMemberDefinition? memberDefinition, MemberReference? memberReference)
+        public ReferenceVisualLineText(VisualLine parentVisualLine, int length, MemberReference memberReference, bool resolved)
             : base(parentVisualLine, length)
         {
-            MemberDefinition = memberDefinition;
-            MemberReference = memberReference;
+            this.memberReference = memberReference;
+            this.resolved = resolved;
         }
-
-        public IMemberDefinition? MemberDefinition { get; }
-        public MemberReference? MemberReference { get; }
-
+        
         public override TextRun CreateTextRun(int startVisualColumn, ITextRunConstructionContext context)
         {
             TextRunProperties.SetTextDecorations(TextDecorations.Underline);
+            
+            if (!resolved)
+            {
+                TextRunProperties.SetForegroundBrush(Brushes.Red);
+            }
+            
             return base.CreateTextRun(startVisualColumn, context);
         }
         
@@ -78,14 +85,62 @@ public partial class MainWindow : Window
                 return;
             }
 
-            if (e.Source is InputElement inputElement)
+            if (e.Source is Control control)
             {
-                inputElement.Cursor = new Cursor(StandardCursorType.Hand);
+                control.Cursor = new Cursor(StandardCursorType.Hand);
             }
             
             base.OnQueryCursor(e);
         }
-        
+
+        protected override void OnPointerEntered(PointerEventArgs e)
+        {
+            if (e.Handled)
+            {
+                base.OnQueryCursor(e);
+                return;
+            }
+            
+            if (e.Source is Control control)
+            {
+                if (!resolved)
+                {
+                    var assemblyName = (memberReference.GetTopDeclaringTypeOrSelf().Scope as AssemblyNameReference)?.FullName;
+                    var message = memberReference switch
+                    {
+                        TypeReference => $"Ambiguous type reference. Generic parameters might be present. Please, locate the assembly where the type is defined.{Environment.NewLine}{Environment.NewLine}Assembly name: {assemblyName}",
+                        _ => $"Ambiguous reference. Please, locate the assembly where the member is defined.{Environment.NewLine}{Environment.NewLine}Assembly name: {assemblyName}"
+                    };
+                    
+                    ToolTip.SetPlacement(control, PlacementMode.Pointer);
+                    ToolTip.SetTip(control, message);
+                    ToolTip.SetIsOpen(control, true);
+                }
+            }
+            
+            base.OnPointerEntered(e);
+        }
+
+        protected override void OnPointerExited(PointerEventArgs e)
+        {
+            if (e.Handled)
+            {
+                base.OnPointerExited(e);
+                return;
+            }
+
+            if (!resolved)
+            {
+                if (e.Source is Control control)
+                {
+                    ToolTip.SetTip(control, null);
+                    ToolTip.SetIsOpen(control, false);
+                }
+            }
+            
+            base.OnPointerExited(e);
+        }
+
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             if (e.Handled)
@@ -93,7 +148,7 @@ public partial class MainWindow : Window
                 base.OnPointerPressed(e);
                 return;
             }
-            
+
             var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
             var textEditor = mainWindow.TextEditor;
             if (textEditor.TextArea.TextView.CapturePointer(e.Pointer))
@@ -112,20 +167,20 @@ public partial class MainWindow : Window
                 base.OnPointerReleased(e);
                 return;
             }
-            
+
             if (pressed == this)
             {
                 var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
                 var textEditor = mainWindow.TextEditor;
                 textEditor.TextArea.TextView.ReleasePointerCapture(e.Pointer);
-                
-                if (MemberReference != null)
+
+                if (resolved)
                 {
-                    viewModel.SelectNodeByMemberReference(MemberReference);
+                    viewModel.SelectNodeByMemberReference(memberReference);
                 }
-                else if (MemberDefinition != null)
+                else
                 {
-                    viewModel.SelectNodeByMemberFullName(null, MemberDefinition.FullName);
+                    viewModel.TryLoadUnresolvedReference(memberReference);
                 }
                 
                 pressed = null;
@@ -139,6 +194,6 @@ public partial class MainWindow : Window
 
 public class ReferenceTextSegment : TextSegment
 {
-    public IMemberDefinition? MemberDefinition { get; init; }
-    public MemberReference? MemberReference { get; init; }
+    public required MemberReference MemberReference { get; init; }
+    public required bool Resolved { get; init; }
 }

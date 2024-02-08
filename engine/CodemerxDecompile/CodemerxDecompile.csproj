@@ -16,7 +16,6 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.0.6" />
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.6" />
         <PackageReference Include="Avalonia.Desktop" Version="11.0.6" />
         <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0.13" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />
@@ -31,6 +30,7 @@
 
 
     <ItemGroup>
+      <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
       <ProjectReference Include="..\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj" />
       <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
     </ItemGroup>

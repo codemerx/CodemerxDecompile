@@ -9,11 +9,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
+using CodemerxDecompile.Extensions;
 using CodemerxDecompile.Nodes;
 using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mono.Cecil;
+using Mono.Cecil.AssemblyResolver;
 using Mono.Cecil.Extensions;
 using Telerik.JustDecompiler.Decompiler.Caching;
 using Telerik.JustDecompiler.Decompiler.WriterContextServices;
@@ -53,55 +55,66 @@ public partial class MainWindowViewModel : ObservableObject
 
     internal void SelectNodeByMemberReference(MemberReference memberReference)
     {
-        var toBeResolved = memberReference as TypeReference;
-        var declaringType = memberReference.DeclaringType;
-        while (declaringType != null)
+        var toBeResolved = memberReference.GetTopDeclaringTypeOrSelf();
+        var typeDefinition = toBeResolved.Resolve();
+        if (assemblies.All(assembly => assembly.MainModule.FilePath != typeDefinition.Module.FilePath))
         {
-            toBeResolved = declaringType;
-            declaringType = declaringType.DeclaringType;
-        }
-
-        var typeDefinition = toBeResolved!.Resolve();
-        if (typeDefinition == null)
-        {
-            // show dialog
-        }
-        else
-        {
-            if (assemblies.Any(assembly => assembly.MainModule.FilePath == typeDefinition.Module.FilePath))
-            {
-                SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
-            }
-            else
-            {
-                LoadAssemblies(new [] { typeDefinition.Module.FilePath });
-                SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
-            }
-        }
-    }
-    
-    internal void SelectNodeByMemberFullName(string assemblyName, string fullName)
-    {
-        var nodeToBeSelected = memberFullNameToNodeMap[assemblyName][fullName];
-        var nodesToBeExpanded = new Stack<Node>();
-        var parentNode = nodeToBeSelected.Parent;
-        while (parentNode != null)
-        {
-            nodesToBeExpanded.Push(parentNode);
-            parentNode = parentNode.Parent;
+            LoadAssemblies(new [] { typeDefinition.Module.FilePath });
         }
         
-        var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
-        var treeView = mainWindow.TreeView;
-
-        foreach (var nodeToBeExpanded in nodesToBeExpanded)
+        SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
+        
+        void SelectNodeByMemberFullName(string assemblyName, string fullName)
         {
-            var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded);
-            treeViewItem.IsExpanded = true;
-            treeViewItem.UpdateLayout();  // Force framework to render children
-        }
+            var nodeToBeSelected = memberFullNameToNodeMap[assemblyName][fullName];
+            var nodesToBeExpanded = new Stack<Node>();
+            var parentNode = nodeToBeSelected.Parent;
+            while (parentNode != null)
+            {
+                nodesToBeExpanded.Push(parentNode);
+                parentNode = parentNode.Parent;
+            }
+        
+            var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+            var treeView = mainWindow.TreeView;
 
-        SelectedNode = nodeToBeSelected;
+            foreach (var nodeToBeExpanded in nodesToBeExpanded)
+            {
+                var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded)!;
+                treeViewItem.IsExpanded = true;
+                treeViewItem.UpdateLayout();  // Force framework to render children
+            }
+
+            SelectedNode = nodeToBeSelected;
+        }
+    }
+
+    internal async void TryLoadUnresolvedReference(MemberReference memberReference)
+    {
+        var storageProvider = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!.StorageProvider;
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
+        {
+            Title = $"Load {(memberReference.GetTopDeclaringTypeOrSelf().Scope as AssemblyNameReference)?.FullName}",
+            AllowMultiple = false
+            // TODO: Add file type filter
+        });
+
+        // User closed the dialog without selecting an assembly
+        if (files.Count == 0)
+        {
+            return;
+        }
+        
+        // TODO: There has to be a better way to do this...
+        var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(files[0].Path.LocalPath);
+        var special = assembly.MainModule.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
+        var strongName = new AssemblyStrongNameExtended(assembly.Name.FullName, assembly.MainModule.GetModuleArchitecture(), special);
+        GlobalAssemblyResolver.Instance.RemoveFromFailedAssemblies(strongName);
+        
+        if (memberReference.GetTopDeclaringTypeOrSelf().Resolve() != null)
+        {
+            SelectNodeByMemberReference(memberReference);
+        }
     }
 
     [RelayCommand]
@@ -111,11 +124,19 @@ public partial class MainWindowViewModel : ObservableObject
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             Title = "Load assemblies",
-            AllowMultiple = true
-            // TODO: Add file type filter
+            AllowMultiple = true,
+            FileTypeFilter = new []
+            {
+                new FilePickerFileType("Assemblies")
+                {
+                    Patterns = new [] { "*.exe", "*.dll" },
+                    AppleUniformTypeIdentifiers = new [] { "com.microsoft.windows-executable", "com.microsoft.windows-dynamic-link-library" },
+                    MimeTypes = new [] { "application/vnd.microsoft.portable-executable" }
+                }
+            }
         });
 
-        LoadAssemblies(files.Select(file => file.Path.AbsolutePath));
+        LoadAssemblies(files.Select(file => file.Path.LocalPath));
     }
 
     private void LoadAssemblies(IEnumerable<string> filePaths)
@@ -311,12 +332,14 @@ public partial class MainWindowViewModel : ObservableObject
             MainWindow.references.Clear();
             foreach (var kvp in formatter.CodeSpanToMemberReference)
             {
-                MainWindow.references.Add(new ReferenceTextSegment()
+                var typeDefinition = kvp.Value.GetTopDeclaringTypeOrSelf().Resolve();
+                MainWindow.references.Add(new ReferenceTextSegment
                 {
                     StartOffset = kvp.Key.StartOffset,
                     EndOffset = kvp.Key.EndOffset,
                     Length = kvp.Key.EndOffset - kvp.Key.StartOffset,
-                    MemberReference = kvp.Value
+                    MemberReference = kvp.Value,
+                    Resolved = typeDefinition != null
                 });
             }
         }

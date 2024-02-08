@@ -36,34 +36,55 @@
     <!-- </NativeMenu.Menu> -->
 
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top"
-                    Orientation="Horizontal">
-            <StackPanel.Styles>
-                <Style Selector="StackPanel">
-                    <Setter Property="Margin" Value="0 0 0 5" />
+        <Border DockPanel.Dock="Top"
+                Classes="menu-bar">
+            <Border.Styles>
+                <Style Selector="Border.menu-bar">
+                    <Setter Property="Padding" Value="5" />
+                    <Setter Property="Background" Value="#F6F6F6" />
+                    <Setter Property="BorderThickness" Value="0 0 0 1" />
+                    <Setter Property="BorderBrush" Value="#DFDFDF"></Setter>
                 </Style>
-            </StackPanel.Styles>
+            </Border.Styles>
             
-            <Menu>
-                <MenuItem Header="Load assembly">
-                    <MenuItem Header="From file"
-                              Command="{Binding OpenFileCommand}"
-                              HotKey="Cmd+O"
-                              InputGesture="Cmd+O" />
-                </MenuItem>
-                <MenuItem Header="Clear assembly list"
-                          Command="{Binding ClearAssemblyListCommand}" />
-            </Menu>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Margin" Value="0 0 5 0" />
+                    </Style>
+                    <Style Selector="Border.separator">
+                        <Setter Property="Margin" Value="5 5 10 5" />
+                        <Setter Property="BorderThickness" Value="0.5" />
+                        <Setter Property="BorderBrush" Value="#DFDFDF" />
+                        <Setter Property="Width" Value="1" />
+                    </Style>
+                </StackPanel.Styles>
             
-            <ComboBox ItemsSource="{Binding Languages}"
-                      SelectedItem="{Binding SelectedLanguage}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </StackPanel>
+                <Button>
+                    <Button.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                            <MenuItem Header="File..."
+                                      Command="{Binding OpenFileCommand}" />
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    Open
+                </Button>
+                <Button Command="{Binding ClearAssemblyListCommand}">
+                    Clear list
+                </Button>
+
+                <Border Classes="separator" />
+            
+                <ComboBox ItemsSource="{Binding Languages}"
+                          SelectedItem="{Binding SelectedLanguage}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </Border>
         
         <Grid ColumnDefinitions="*, Auto, 3*">
             <TreeView Name="TreeView"

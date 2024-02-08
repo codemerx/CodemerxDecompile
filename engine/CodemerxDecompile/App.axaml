@@ -18,9 +18,9 @@
         </Style>
         
         <Style Selector="GridSplitter">
-            <Setter Property="Width" Value="2" />
-            <Setter Property="MinWidth" Value="2" />
-            <Setter Property="Background" Value="#CCCCCC" />
+            <Setter Property="Width" Value="1" />
+            <Setter Property="MinWidth" Value="1" />
+            <Setter Property="Background" Value="#DFDFDF" />
         </Style>
     </Application.Styles>
 

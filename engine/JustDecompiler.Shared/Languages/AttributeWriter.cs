@@ -576,7 +576,7 @@ namespace Telerik.JustDecompiler.Languages
             {
                 genericWriter.Write("    ");
                 string comment = genericWriter.Language.CommentLines(ASSEMBLYNOTRESOLVEDERROR);
-                genericWriter.Write(comment.Remove(comment.Length - 2));
+                genericWriter.Write(comment.Remove(comment.Length - Environment.NewLine.Length));
             }
 
             genericWriter.WriteLine();
@@ -606,7 +606,7 @@ namespace Telerik.JustDecompiler.Languages
             {
                 genericWriter.Write("    ");
                 string comment = genericWriter.Language.CommentLines(ASSEMBLYNOTRESOLVEDERROR);
-                genericWriter.Write(comment.Remove(comment.Length - 2));
+                genericWriter.Write(comment.Remove(comment.Length - Environment.NewLine.Length));
             }
 
             if (!skipNewLine)

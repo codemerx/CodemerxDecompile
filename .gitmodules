@@ -1,0 +1,3 @@
+[submodule "engine/AvaloniaEdit"]
+	path = engine/AvaloniaEdit
+	url = ../AvaloniaEdit.git

@@ -44,6 +44,9 @@ public partial class MainWindowViewModel : ObservableObject
     private Node? selectedNode;
 
     [ObservableProperty]
+    private TextDocument? document;
+
+    [ObservableProperty]
     private Language selectedLanguage;
 
     public MainWindowViewModel()
@@ -369,7 +372,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else
         {
-            textEditor.Document = null;
+            Document = null;
             currentTypeDefinition = null;
             currentWritingInfo = null;
             return;
@@ -394,7 +397,7 @@ public partial class MainWindowViewModel : ObservableObject
                 writingInfos = writer.Write(containingType, writerContextService);
             }
 
-            textEditor.Document = new TextDocument(stringBuilder.ToString());
+            Document = new TextDocument(stringBuilder.ToString());
             currentTypeDefinition = containingType;
             currentWritingInfo = writingInfos[0];
 
@@ -419,7 +422,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[memberDefinition];
             textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
-            textEditor.ScrollToLine(textEditor.Document!.GetLocation(codePosition.StartOffset).Line);
+            textEditor.ScrollToLine(Document!.GetLocation(codePosition.StartOffset).Line);
         }
         else
         {

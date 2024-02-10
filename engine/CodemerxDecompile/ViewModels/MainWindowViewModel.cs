@@ -225,6 +225,7 @@ public partial class MainWindowViewModel : ObservableObject
             memberFullNameToNodeMap.Add(assembly.FullName, dict);
             AssemblyNodes.Add(assemblyNode);
             assemblies.Add(assembly);
+            ClearAssemblyListCommand.NotifyCanExecuteChanged();
         }
 
         TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode, Dictionary<string, Node> dict)
@@ -305,13 +306,15 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanClearAssemblyList))]
     private void ClearAssemblyList()
     {
         SelectedNode = null;
         AssemblyNodes.Clear();
-        assemblies.Clear();
         memberFullNameToNodeMap.Clear();
+        
+        assemblies.Clear();
+        ClearAssemblyListCommand.NotifyCanExecuteChanged();
         
         backStack.Clear();
         forwardStack.Clear();
@@ -320,6 +323,8 @@ public partial class MainWindowViewModel : ObservableObject
         
         GlobalAssemblyResolver.Instance.ClearCache();
     }
+
+    private bool CanClearAssemblyList() => assemblies.Any();
 
     partial void OnSelectedNodeChanged(Node? oldNode, Node? newNode)
     {

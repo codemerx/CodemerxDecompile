@@ -4,5 +4,18 @@ namespace CodemerxDecompile.Nodes;
 
 public class AssemblyNode : Node
 {
-    public ObservableCollection<NamespaceNode> Namespaces { get; } = new();
+    public AssemblyNode()
+    {
+        References = new ReferencesNode
+        {
+            Name = "References",
+            Parent = this
+        };
+        Children.Add(References);
+    }
+    
+    public ReferencesNode References { get; }
+    public ObservableCollection<Node> Children { get; } = new();
+
+    public void AddNamespace(NamespaceNode @namespace) => Children.Add(@namespace);
 }

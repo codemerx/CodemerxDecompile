@@ -195,6 +195,17 @@ public partial class MainWindowViewModel : ObservableObject
                 Parent = null
             };
 
+            foreach (var reference in assembly.MainModule.AssemblyReferences)
+            {
+                var referenceNode = new ReferenceNode
+                {
+                    Name = reference.Name,
+                    Parent = assemblyNode
+                };
+                
+                assemblyNode.References.Items.Add(referenceNode);
+            }
+            
             var dict = new Dictionary<string, Node>();
             foreach (var namespaceGroup in assembly.MainModule.Types.GroupBy(t => t.Namespace))
             {
@@ -211,7 +222,7 @@ public partial class MainWindowViewModel : ObservableObject
                     dict.Add(typeDefinition.FullName, typeNode);
                 }
                 
-                assemblyNode.Namespaces.Add(namespaceNode);
+                assemblyNode.AddNamespace(namespaceNode);
             }
 
             memberFullNameToNodeMap.Add(assembly.FullName, dict);

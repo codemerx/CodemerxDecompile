@@ -132,9 +132,21 @@
                 </TreeView.Styles>
                 
                 <TreeView.DataTemplates>
-                    <TreeDataTemplate DataType="nodes:AssemblyNode" ItemsSource="{Binding Namespaces}">
+                    <TreeDataTemplate DataType="nodes:AssemblyNode" ItemsSource="{Binding Children}">
                         <StackPanel Orientation="Horizontal">
                             <Svg Path="/Assets/Assembly.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:ReferencesNode" ItemsSource="{Binding Items}">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/ReferenceGroup.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:ReferenceNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/Reference.svg" />
                             <TextBlock Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>

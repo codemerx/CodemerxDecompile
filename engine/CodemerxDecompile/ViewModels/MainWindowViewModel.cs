@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
@@ -30,8 +31,14 @@ public partial class MainWindowViewModel : ObservableObject
 {
     private readonly Dictionary<string, Dictionary<string, Node>> memberFullNameToNodeMap = new();
     private readonly List<AssemblyDefinition> assemblies = new();
+    
+    private readonly Stack<(Node, Vector)> backStack = new();
+    private readonly Stack<(Node, Vector)> forwardStack = new();
+    
     private TypeDefinition? currentTypeDefinition;
     private WritingInfo? currentWritingInfo;
+    private bool isBackForwardNavigation = false;
+    private Vector? offset = null;
     
     [ObservableProperty]
     private Node? selectedNode;
@@ -138,6 +145,40 @@ public partial class MainWindowViewModel : ObservableObject
 
         LoadAssemblies(files.Select(file => file.Path.LocalPath));
     }
+
+    [RelayCommand(CanExecute = nameof(CanGoBack))]
+    private void Back()
+    {
+        isBackForwardNavigation = true;
+        
+        var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        
+        forwardStack.Push((SelectedNode!, mainWindow!.TextEditor.TextArea.TextView.ScrollOffset));
+        var (node, offset) = backStack.Pop();
+        this.offset = offset;
+        SelectedNode = node;
+        ForwardCommand.NotifyCanExecuteChanged();
+        BackCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanGoBack() => backStack.Any();
+
+    [RelayCommand(CanExecute = nameof(CanGoForward))]
+    private void Forward()
+    {
+        isBackForwardNavigation = true;
+        
+        var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        
+        backStack.Push((SelectedNode!, mainWindow!.TextEditor.TextArea.TextView.ScrollOffset));
+        var (node, offset) = forwardStack.Pop();
+        this.offset = offset;
+        SelectedNode = node;
+        BackCommand.NotifyCanExecuteChanged();
+        ForwardCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanGoForward() => forwardStack.Any();
 
     private void LoadAssemblies(IEnumerable<string> filePaths)
     {
@@ -267,15 +308,38 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void ClearAssemblyList()
     {
+        SelectedNode = null;
         AssemblyNodes.Clear();
         assemblies.Clear();
         memberFullNameToNodeMap.Clear();
+        
+        backStack.Clear();
+        forwardStack.Clear();
+        BackCommand.NotifyCanExecuteChanged();
+        ForwardCommand.NotifyCanExecuteChanged();
+        
         GlobalAssemblyResolver.Instance.ClearCache();
     }
 
-    partial void OnSelectedNodeChanged(Node? value)
+    partial void OnSelectedNodeChanged(Node? oldNode, Node? newNode)
     {
-        Decompile(value, false);
+        if (!isBackForwardNavigation)
+        {
+            if (oldNode is MemberNode)
+            {
+                var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+                
+                backStack.Push((oldNode, mainWindow!.TextEditor.TextArea.TextView.ScrollOffset));
+                forwardStack.Clear();
+                
+                BackCommand.NotifyCanExecuteChanged();
+                ForwardCommand.NotifyCanExecuteChanged();
+            }
+        }
+        
+        Decompile(newNode, false);
+
+        isBackForwardNavigation = false;
     }
 
     partial void OnSelectedLanguageChanged(Language value)
@@ -345,10 +409,19 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         textEditor.UpdateLayout();  // Force editor to render to ensure ScrollToLine works as expected
-        
-        var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[memberDefinition];
-        textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
-        textEditor.ScrollToLine(textEditor.Document!.GetLocation(codePosition.StartOffset).Line);
+
+        if (offset == null)
+        {
+            var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[memberDefinition];
+            textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
+            textEditor.ScrollToLine(textEditor.Document!.GetLocation(codePosition.StartOffset).Line);
+        }
+        else
+        {
+            textEditor.ScrollToHorizontalOffset(offset.Value.X);
+            textEditor.ScrollToVerticalOffset(offset.Value.Y);
+            offset = null;
+        }
 
         TypeNode GetContainingTypeNode(MemberNode memberNode)
         {

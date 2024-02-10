@@ -59,6 +59,15 @@
                         <Setter Property="Width" Value="1" />
                     </Style>
                 </StackPanel.Styles>
+                
+                <Button Command="{Binding BackCommand}">
+                    &lt;
+                </Button>
+                <Button Command="{Binding ForwardCommand}">
+                    &gt;
+                </Button>
+                
+                <Border Classes="separator" />
             
                 <Button>
                     <Button.Flyout>

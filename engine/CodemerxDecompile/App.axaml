@@ -22,6 +22,10 @@
             <Setter Property="MinWidth" Value="1" />
             <Setter Property="Background" Value="#DFDFDF" />
         </Style>
+        
+        <Style Selector="Button:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
     </Application.Styles>
 
 </Application>

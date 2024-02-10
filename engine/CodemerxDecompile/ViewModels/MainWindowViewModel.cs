@@ -192,6 +192,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         // TODO: Rebuild tree view upon language change
         // TODO: Rebuild all reference nodes upon loading of a new assembly
+        AssemblyNode? firstLoadedAssemblyNode = null;
+        
         foreach (var file in filePaths)
         {
             var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file);
@@ -201,6 +203,11 @@ public partial class MainWindowViewModel : ObservableObject
                 Parent = null,
                 AssemblyDefinition = assembly
             };
+
+            if (firstLoadedAssemblyNode == null)
+            {
+                firstLoadedAssemblyNode = assemblyNode;
+            }
 
             foreach (var reference in assembly.MainModule.AssemblyReferences)
             {
@@ -251,6 +258,8 @@ public partial class MainWindowViewModel : ObservableObject
             assemblies.Add(assembly);
             ClearAssemblyListCommand.NotifyCanExecuteChanged();
         }
+
+        SelectedNode = firstLoadedAssemblyNode;
 
         TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode, Dictionary<string, Node> dict)
         {

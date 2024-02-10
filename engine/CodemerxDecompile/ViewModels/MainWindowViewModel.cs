@@ -186,6 +186,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void LoadAssemblies(IEnumerable<string> filePaths)
     {
         // TODO: Rebuild tree view upon language change
+        // TODO: Rebuild all reference nodes upon loading of a new assembly
         foreach (var file in filePaths)
         {
             var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file);
@@ -197,10 +198,24 @@ public partial class MainWindowViewModel : ObservableObject
 
             foreach (var reference in assembly.MainModule.AssemblyReferences)
             {
-                var referenceNode = new ReferenceNode
+                var moduleArchitecture = assembly.MainModule.GetModuleArchitecture();
+                var special = assembly.MainModule.IsReferenceAssembly()
+                    ? SpecialTypeAssembly.Reference
+                    : SpecialTypeAssembly.None;
+                var resolvedReference = GlobalAssemblyResolver.Instance.Resolve(reference, null, moduleArchitecture, special);
+
+                Node referenceNode = resolvedReference switch
                 {
-                    Name = reference.Name,
-                    Parent = assemblyNode
+                    not null => new ResolvedReferenceNode
+                    {
+                        Name = reference.Name,
+                        Parent = assemblyNode
+                    },
+                    null => new UnresolvedReferenceNode
+                    {
+                        Name = reference.Name,
+                        Parent = assemblyNode
+                    }
                 };
                 
                 assemblyNode.References.Items.Add(referenceNode);

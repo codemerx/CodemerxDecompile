@@ -4,5 +4,5 @@ namespace CodemerxDecompile.Nodes;
 
 public class ReferencesNode : Node
 {
-    public ObservableCollection<ReferenceNode> Items { get; } = new();
+    public ObservableCollection<Node> Items { get; } = new();
 }

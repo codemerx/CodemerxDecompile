@@ -144,9 +144,15 @@
                             <TextBlock Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>
-                    <TreeDataTemplate DataType="nodes:ReferenceNode">
+                    <TreeDataTemplate DataType="nodes:ResolvedReferenceNode">
                         <StackPanel Orientation="Horizontal">
                             <Svg Path="/Assets/Reference.svg" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </TreeDataTemplate>
+                    <TreeDataTemplate DataType="nodes:UnresolvedReferenceNode">
+                        <StackPanel Orientation="Horizontal">
+                            <Svg Path="/Assets/ReferenceWarning.svg" />
                             <TextBlock Text="{Binding Name}" />
                         </StackPanel>
                     </TreeDataTemplate>

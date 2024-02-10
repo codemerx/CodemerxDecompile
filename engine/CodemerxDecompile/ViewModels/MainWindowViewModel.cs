@@ -198,7 +198,8 @@ public partial class MainWindowViewModel : ObservableObject
             var assemblyNode = new AssemblyNode
             {
                 Name = assembly.Name.Name,
-                Parent = null
+                Parent = null,
+                AssemblyDefinition = assembly
             };
 
             foreach (var reference in assembly.MainModule.AssemblyReferences)
@@ -353,7 +354,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (!isBackForwardNavigation)
         {
-            if (oldNode is MemberNode)
+            if (oldNode is MemberNode or AssemblyNode)
             {
                 var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
                 var textEditor = mainWindow!.TextEditor;
@@ -376,7 +377,7 @@ public partial class MainWindowViewModel : ObservableObject
         Decompile(SelectedNode, true);
     }
 
-    private void Decompile(Node? value, bool forceRecompilation)
+    private void Decompile(Node? node, bool forceRecompilation)
     {
         var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
         if (mainWindow == null)
@@ -386,10 +387,30 @@ public partial class MainWindowViewModel : ObservableObject
 
         TypeDefinition containingType;
         IMemberDefinition memberDefinition;
-        if (value is MemberNode memberNode)
+        if (node is MemberNode memberNode)
         {
             containingType = GetContainingTypeNode(memberNode).TypeDefinition;
             memberDefinition = memberNode.MemberDefinition;
+        }
+        else if (node is AssemblyNode assemblyNode)
+        {
+            var language = SelectedLanguage.Instance;
+            var stringBuilder = new StringBuilder();
+            var stringWriter = new StringWriter(stringBuilder);
+            var formatter = new MemberReferenceTrackingFormatter(stringWriter);
+            var writerSettings = new WriterSettings();
+            var writer = language.GetAssemblyAttributeWriter(formatter, new SimpleExceptionFormatter(), writerSettings);
+            var writerContextService = new SimpleWriterContextService(new DefaultDecompilationCacheService(), true);
+            
+            writer.WriteAssemblyAttributes(assemblyNode.AssemblyDefinition, writerContextService);
+            
+            Document = new TextDocument(stringBuilder.ToString());
+            
+            currentTypeDefinition = null;
+            currentWritingInfo = null;
+            MainWindow.references.Clear();
+            
+            return;
         }
         else
         {

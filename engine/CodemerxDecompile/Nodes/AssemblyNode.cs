@@ -4,5 +4,5 @@ namespace CodemerxDecompile.Nodes;
 
 public class AssemblyNode : Node
 {
-    public ObservableCollection<ModuleNode> Modules { get; } = new();
+    public ObservableCollection<NamespaceNode> Namespaces { get; } = new();
 }

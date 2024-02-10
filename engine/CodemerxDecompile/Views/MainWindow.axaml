@@ -132,13 +132,7 @@
                 </TreeView.Styles>
                 
                 <TreeView.DataTemplates>
-                    <TreeDataTemplate DataType="nodes:AssemblyNode" ItemsSource="{Binding Modules}">
-                        <StackPanel Orientation="Horizontal">
-                            <Svg Path="/Assets/Assembly.svg" />
-                            <TextBlock Text="{Binding Name}" />
-                        </StackPanel>
-                    </TreeDataTemplate>
-                    <TreeDataTemplate DataType="nodes:ModuleNode" ItemsSource="{Binding Namespaces}">
+                    <TreeDataTemplate DataType="nodes:AssemblyNode" ItemsSource="{Binding Namespaces}">
                         <StackPanel Orientation="Horizontal">
                             <Svg Path="/Assets/Assembly.svg" />
                             <TextBlock Text="{Binding Name}" />

@@ -196,33 +196,22 @@ public partial class MainWindowViewModel : ObservableObject
             };
 
             var dict = new Dictionary<string, Node>();
-            foreach (var module in assembly.Modules)
+            foreach (var namespaceGroup in assembly.MainModule.Types.GroupBy(t => t.Namespace))
             {
-                var moduleNode = new ModuleNode
+                var namespaceNode = new NamespaceNode
                 {
-                    Name = module.Name,
+                    Name = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
                     Parent = assemblyNode
                 };
-                
-                foreach (var namespaceGroup in module.Types.GroupBy(t => t.Namespace))
+
+                foreach (var typeDefinition in namespaceGroup)
                 {
-                    var namespaceNode = new NamespaceNode
-                    {
-                        Name = namespaceGroup.Key == string.Empty ? "<Default namespace>" : namespaceGroup.Key,
-                        Parent = moduleNode
-                    };
-
-                    foreach (var typeDefinition in namespaceGroup)
-                    {
-                        var typeNode = BuildTypeSubtree(typeDefinition, namespaceNode, dict);
-                        namespaceNode.Types.Add(typeNode);
-                        dict.Add(typeDefinition.FullName, typeNode);
-                    }
-                
-                    moduleNode.Namespaces.Add(namespaceNode);
+                    var typeNode = BuildTypeSubtree(typeDefinition, namespaceNode, dict);
+                    namespaceNode.Types.Add(typeNode);
+                    dict.Add(typeDefinition.FullName, typeNode);
                 }
-
-                assemblyNode.Modules.Add(moduleNode);
+                
+                assemblyNode.Namespaces.Add(namespaceNode);
             }
 
             memberFullNameToNodeMap.Add(assembly.FullName, dict);

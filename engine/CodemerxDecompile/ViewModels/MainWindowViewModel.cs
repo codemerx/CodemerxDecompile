@@ -32,13 +32,14 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly Dictionary<string, Dictionary<string, Node>> memberFullNameToNodeMap = new();
     private readonly List<AssemblyDefinition> assemblies = new();
     
-    private readonly Stack<(Node, Vector)> backStack = new();
-    private readonly Stack<(Node, Vector)> forwardStack = new();
+    private readonly Stack<(Node, Vector, int)> backStack = new();
+    private readonly Stack<(Node, Vector, int)> forwardStack = new();
     
     private TypeDefinition? currentTypeDefinition;
     private WritingInfo? currentWritingInfo;
     private bool isBackForwardNavigation = false;
-    private Vector? offset = null;
+    private Vector? scrollOffset = null;
+    private int? caretOffset = null;
     
     [ObservableProperty]
     private Node? selectedNode;
@@ -155,10 +156,12 @@ public partial class MainWindowViewModel : ObservableObject
         isBackForwardNavigation = true;
         
         var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        var textEditor = mainWindow!.TextEditor;
         
-        forwardStack.Push((SelectedNode!, mainWindow!.TextEditor.TextArea.TextView.ScrollOffset));
-        var (node, offset) = backStack.Pop();
-        this.offset = offset;
+        forwardStack.Push((SelectedNode!, textEditor.TextArea.TextView.ScrollOffset, textEditor.CaretOffset));
+        var (node, offset, caretOffset) = backStack.Pop();
+        this.scrollOffset = offset;
+        this.caretOffset = caretOffset;
         SelectedNode = node;
         ForwardCommand.NotifyCanExecuteChanged();
         BackCommand.NotifyCanExecuteChanged();
@@ -172,10 +175,12 @@ public partial class MainWindowViewModel : ObservableObject
         isBackForwardNavigation = true;
         
         var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        var textEditor = mainWindow!.TextEditor;
         
-        backStack.Push((SelectedNode!, mainWindow!.TextEditor.TextArea.TextView.ScrollOffset));
-        var (node, offset) = forwardStack.Pop();
-        this.offset = offset;
+        backStack.Push((SelectedNode!, textEditor.TextArea.TextView.ScrollOffset, textEditor.CaretOffset));
+        var (node, scrollOffset, caretOffset) = forwardStack.Pop();
+        this.scrollOffset = scrollOffset;
+        this.caretOffset = caretOffset;
         SelectedNode = node;
         BackCommand.NotifyCanExecuteChanged();
         ForwardCommand.NotifyCanExecuteChanged();
@@ -351,8 +356,9 @@ public partial class MainWindowViewModel : ObservableObject
             if (oldNode is MemberNode)
             {
                 var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+                var textEditor = mainWindow!.TextEditor;
                 
-                backStack.Push((oldNode, mainWindow!.TextEditor.TextArea.TextView.ScrollOffset));
+                backStack.Push((oldNode, textEditor.TextArea.TextView.ScrollOffset, textEditor.CaretOffset));
                 forwardStack.Clear();
                 
                 BackCommand.NotifyCanExecuteChanged();
@@ -433,7 +439,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         textEditor.UpdateLayout();  // Force editor to render to ensure ScrollToLine works as expected
 
-        if (offset == null)
+        if (scrollOffset == null)
         {
             var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[memberDefinition];
             textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
@@ -441,9 +447,17 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else
         {
-            textEditor.ScrollToHorizontalOffset(offset.Value.X);
-            textEditor.ScrollToVerticalOffset(offset.Value.Y);
-            offset = null;
+            textEditor.ScrollToHorizontalOffset(scrollOffset.Value.X);
+            textEditor.ScrollToVerticalOffset(scrollOffset.Value.Y);
+            
+            scrollOffset = null;
+        }
+
+        if (caretOffset != null)
+        {
+            textEditor.CaretOffset = caretOffset.Value;
+
+            caretOffset = null;
         }
 
         TypeNode GetContainingTypeNode(MemberNode memberNode)

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
@@ -36,6 +37,30 @@ public partial class MainWindow : Window
         var installation = TextEditor.InstallTextMate(registryOptions);
         // TODO: Set grammar according to selected language in the UI
         installation.SetGrammar(registryOptions.GetScopeByLanguageId(registryOptions.GetLanguageByExtension(".cs").Id));
+
+        TextEditor.KeyDown += (_, args) =>
+        {
+            if (args.Handled)
+                return;
+
+            if (args.Key != Key.F12)
+                return;
+            
+            var reference = references.FindSegmentsContaining(TextEditor.CaretOffset).FirstOrDefault();
+            if (reference == null)
+                return;
+            
+            if (reference.Resolved)
+            {
+                viewModel.SelectNodeByMemberReference(reference.MemberReference);
+            }
+            else
+            {
+                viewModel.TryLoadUnresolvedReference(reference.MemberReference);
+            }
+                    
+            args.Handled = true;
+        };
     }
     
     private class ReferenceElementGenerator : VisualLineElementGenerator
@@ -54,6 +79,8 @@ public partial class MainWindow : Window
     
     private class ReferenceVisualLineText : VisualLineText
     {
+        private static readonly KeyModifiers NavigateToKeyModifier =
+            RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? KeyModifiers.Meta : KeyModifiers.Control;
         private static ReferenceVisualLineText? pressed;
         private readonly MemberReference memberReference;
         private readonly bool resolved;
@@ -67,8 +94,6 @@ public partial class MainWindow : Window
         
         public override TextRun CreateTextRun(int startVisualColumn, ITextRunConstructionContext context)
         {
-            TextRunProperties.SetTextDecorations(TextDecorations.Underline);
-            
             if (!resolved)
             {
                 TextRunProperties.SetForegroundBrush(Brushes.Red);
@@ -87,7 +112,10 @@ public partial class MainWindow : Window
 
             if (e.Source is Control control)
             {
-                control.Cursor = new Cursor(StandardCursorType.Hand);
+                if (e.KeyModifiers.HasFlag(NavigateToKeyModifier))
+                {
+                    control.Cursor = new Cursor(StandardCursorType.Hand);
+                }
             }
             
             base.OnQueryCursor(e);
@@ -149,12 +177,15 @@ public partial class MainWindow : Window
                 return;
             }
 
-            var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
-            var textEditor = mainWindow.TextEditor;
-            if (textEditor.TextArea.TextView.CapturePointer(e.Pointer))
+            if (e.KeyModifiers.HasFlag(NavigateToKeyModifier))
             {
-                pressed = this;
-                e.Handled = true;
+                var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+                var textEditor = mainWindow.TextEditor;
+                if (textEditor.TextArea.TextView.CapturePointer(e.Pointer))
+                {
+                    pressed = this;
+                    e.Handled = true;
+                }
             }
 
             base.OnPointerPressed(e);

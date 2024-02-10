@@ -17,25 +17,55 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
     
-    <!-- <NativeMenu.Menu> -->
-    <!--     <NativeMenu> -->
-    <!--         <NativeMenuItem Header="Load assembly"> -->
-    <!--             <NativeMenu> -->
-    <!--                 <NativeMenuItem Header="From file" -->
-    <!--                                 Command="{Binding OpenFileCommand}" -->
-    <!--                                 Gesture="Meta+O" /> -->
-    <!--             </NativeMenu> -->
-    <!--         </NativeMenuItem> -->
-    <!--         <NativeMenuItem Header="Assembly list"> -->
-    <!--             <NativeMenu> -->
-    <!--                 <NativeMenuItem Header="Clear" -->
-    <!--                                 Command="{Binding ClearAssemblyListCommand}" /> -->
-    <!--             </NativeMenu> -->
-    <!--         </NativeMenuItem> -->
-    <!--     </NativeMenu> -->
-    <!-- </NativeMenu.Menu> -->
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="File">
+                <NativeMenu>
+                    <NativeMenuItem Header="Open file..."
+                                    Command="{Binding OpenFileCommand}"
+                                    Gesture="Cmd+O" />
+                    <NativeMenuItemSeparator />
+                    <NativeMenuItem Header="Close all"
+                                    Command="{Binding ClearAssemblyListCommand}" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Go">
+                <NativeMenu>
+                    <NativeMenuItem Header="Back"
+                                    Command="{Binding BackCommand}"
+                                    Gesture="Cmd+-" />
+                    <NativeMenuItem Header="Forward"
+                                    Command="{Binding ForwardCommand}"
+                                    Gesture="Cmd+Shift+-" />
+                </NativeMenu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
 
     <DockPanel>
+        <Menu DockPanel.Dock="Top"
+              IsVisible="{OnPlatform Windows='true', Linux='true', macOS='false'}">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open file..."
+                          Command="{Binding OpenFileCommand}"
+                          HotKey="Ctrl+O"
+                          InputGesture="Ctrl+O" />
+                <Separator/>
+                <MenuItem Header="_Close all"
+                          Command="{Binding ClearAssemblyListCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Go">
+                <MenuItem Header="_Back"
+                          Command="{Binding BackCommand}"
+                          HotKey="Ctrl+-"
+                          InputGesture="Ctrl+-" />
+                <MenuItem Header="_Forward"
+                          Command="{Binding ForwardCommand}"
+                          HotKey="Ctrl+Shift+-"
+                          InputGesture="Ctrl+Shift+-" />
+            </MenuItem>
+        </Menu>
+        
         <Border DockPanel.Dock="Top"
                 Classes="menu-bar">
             <Border.Styles>
@@ -69,17 +99,11 @@
                 
                 <Border Classes="separator" />
             
-                <Button>
-                    <Button.Flyout>
-                        <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                            <MenuItem Header="File..."
-                                      Command="{Binding OpenFileCommand}" />
-                        </MenuFlyout>
-                    </Button.Flyout>
-                    Open
+                <Button Command="{Binding OpenFileCommand}">
+                    Open file
                 </Button>
                 <Button Command="{Binding ClearAssemblyListCommand}">
-                    Clear list
+                    Close all
                 </Button>
 
                 <Border Classes="separator" />

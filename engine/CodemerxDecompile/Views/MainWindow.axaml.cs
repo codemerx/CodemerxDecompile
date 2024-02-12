@@ -61,6 +61,56 @@ public partial class MainWindow : Window
                     
             args.Handled = true;
         };
+        
+        AddHandler(DragDrop.DragOverEvent, (_, args) =>
+        {
+            if (args.Handled)
+                return;
+            
+            if (args.Data.Contains(DataFormats.Files))
+            {
+                args.DragEffects &= DragDropEffects.Copy;
+            }
+            else
+            {
+                args.DragEffects &= DragDropEffects.None;
+            }
+        });
+        
+        AddHandler(DragDrop.DragEnterEvent, (_, args) =>
+        {
+            if (args.Handled)
+                return;
+            
+            if (args.Data.Contains(DataFormats.Files))
+            {
+                DragDropLabel.IsVisible = true;
+            }
+        });
+        
+        AddHandler(DragDrop.DragLeaveEvent, (_, args) =>
+        {
+            if (args.Handled)
+                return;
+            
+            DragDropLabel.IsVisible = false;
+        });
+        
+        AddHandler(DragDrop.DropEvent, (_, args) =>
+        {
+            if (args.Handled)
+                return;
+            
+            DragDropLabel.IsVisible = false;
+            
+            if (!args.Data.Contains(DataFormats.Files))
+                return;
+                
+            var files = args.Data.GetFiles()!;
+            viewModel.LoadAssemblies(files.Select(file => file.Path.LocalPath));
+
+            args.Handled = true;
+        });
     }
     
     private class ReferenceElementGenerator : VisualLineElementGenerator

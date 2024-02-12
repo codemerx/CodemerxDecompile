@@ -188,7 +188,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanGoForward() => forwardStack.Any();
 
-    private void LoadAssemblies(IEnumerable<string> filePaths)
+    internal void LoadAssemblies(IEnumerable<string> filePaths)
     {
         // TODO: Rebuild tree view upon language change
         // TODO: Rebuild all reference nodes upon loading of a new assembly

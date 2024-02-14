@@ -34,12 +34,18 @@ public partial class MainWindowViewModel : ObservableObject
     
     private readonly Stack<(Node, Vector, int)> backStack = new();
     private readonly Stack<(Node, Vector, int)> forwardStack = new();
-    
+
+    private readonly SearchService searchService = new();
+
     private TypeDefinition? currentTypeDefinition;
-    private WritingInfo? currentWritingInfo;
+    private DecompiledTypeMetadata? currentDecompiledTypeMetadata;
     private bool isBackForwardNavigation = false;
     private Vector? scrollOffset = null;
     private int? caretOffset = null;
+    private bool isSearchNavigation;
+
+    private Task? currentSearchTask;
+    private Task? lastSearchTask;
     
     [ObservableProperty]
     private Node? selectedNode;
@@ -49,6 +55,16 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private Language selectedLanguage;
+
+    [ObservableProperty]
+    private string searchText;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SearchPaneSelected))]
+    private int selectedPaneIndex;
+
+    [ObservableProperty]
+    private SearchResult? selectedSearchResult;
 
     public MainWindowViewModel()
     {
@@ -63,6 +79,10 @@ public partial class MainWindowViewModel : ObservableObject
         new Language("VB.NET", LanguageFactory.GetLanguage(VisualBasicVersion.V10)),
         new Language("IL", new IntermediateLanguage())
     };
+
+    public ObservableCollection<SearchResult> SearchResults { get; } = new();
+
+    public bool SearchPaneSelected => SelectedPaneIndex == 1;
 
     internal void SelectNodeByMemberReference(MemberReference memberReference)
     {
@@ -416,7 +436,7 @@ public partial class MainWindowViewModel : ObservableObject
             Document = new TextDocument(stringBuilder.ToString());
             
             currentTypeDefinition = null;
-            currentWritingInfo = null;
+            currentDecompiledTypeMetadata = null;
             MainWindow.references.Clear();
             
             return;
@@ -425,7 +445,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             Document = null;
             currentTypeDefinition = null;
-            currentWritingInfo = null;
+            currentDecompiledTypeMetadata = null;
             return;
         }
 
@@ -450,7 +470,7 @@ public partial class MainWindowViewModel : ObservableObject
 
             Document = new TextDocument(stringBuilder.ToString());
             currentTypeDefinition = containingType;
-            currentWritingInfo = writingInfos[0];
+            currentDecompiledTypeMetadata = CreateTypeMetadata(formatter.CodeSpanToMemberReference, writingInfos[0]);
 
             MainWindow.references.Clear();
             foreach (var kvp in formatter.CodeSpanToMemberReference)
@@ -469,25 +489,30 @@ public partial class MainWindowViewModel : ObservableObject
 
         textEditor.UpdateLayout();  // Force editor to render to ensure ScrollToLine works as expected
 
-        if (scrollOffset == null)
+        if (!isSearchNavigation)
         {
-            var codePosition = currentWritingInfo!.MemberDeclarationToCodePostionMap[memberDefinition];
-            textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
-            textEditor.ScrollToLine(Document!.GetLocation(codePosition.StartOffset).Line);
-        }
-        else
-        {
-            textEditor.ScrollToHorizontalOffset(scrollOffset.Value.X);
-            textEditor.ScrollToVerticalOffset(scrollOffset.Value.Y);
+            if (scrollOffset == null)
+            {
+                // Normal navigation
+                var codePosition = currentDecompiledTypeMetadata!.MemberDeclarationToCodePostionMap[memberDefinition];
+                textEditor.Select(codePosition.StartOffset, codePosition.EndOffset - codePosition.StartOffset + 1); // TODO: Figure out why we need +1 here
+                textEditor.ScrollToLine(Document!.GetLocation(codePosition.StartOffset).Line);
+            }
+            else
+            {
+                // History navigation
+                textEditor.ScrollToHorizontalOffset(scrollOffset.Value.X);
+                textEditor.ScrollToVerticalOffset(scrollOffset.Value.Y);
             
-            scrollOffset = null;
-        }
+                scrollOffset = null;
+            }
 
-        if (caretOffset != null)
-        {
-            textEditor.CaretOffset = caretOffset.Value;
+            if (caretOffset != null)
+            {
+                textEditor.CaretOffset = caretOffset.Value;
 
-            caretOffset = null;
+                caretOffset = null;
+            }
         }
 
         TypeNode GetContainingTypeNode(MemberNode memberNode)
@@ -507,6 +532,88 @@ public partial class MainWindowViewModel : ObservableObject
 
             return result;
         }
+
+        DecompiledTypeMetadata CreateTypeMetadata(Dictionary<OffsetSpan, MemberReference> codeSpanToMemberReference, WritingInfo info)
+        {
+            DecompiledTypeMetadata decompiledTypeMetadata = new DecompiledTypeMetadata();
+
+            decompiledTypeMetadata.CodeSpanToMemberReference.AddRange(codeSpanToMemberReference);
+
+            decompiledTypeMetadata.MemberDeclarationToCodeSpan.AddRange(info.MemberDeclarationToCodeSpan);
+            decompiledTypeMetadata.MemberDeclarationToCodePostionMap.AddRange(info.MemberDeclarationToCodePostionMap);
+
+            decompiledTypeMetadata.CodeMappingInfo.NodeToCodeMap.AddRange(info.CodeMappingInfo.NodeToCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.InstructionToCodeMap.AddRange(info.CodeMappingInfo.InstructionToCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.FieldConstantValueToCodeMap.AddRange(info.CodeMappingInfo.FieldConstantValueToCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.VariableToCodeMap.AddRange(info.CodeMappingInfo.VariableToCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.ParameterToCodeMap.AddRange(info.CodeMappingInfo.ParameterToCodeMap);
+
+            decompiledTypeMetadata.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.AddRange(info.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap.AddRange(info.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.AddRange(info.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.EventDefinitionToEventTypeCodeMap.AddRange(info.CodeMappingInfo.EventDefinitionToEventTypeCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.AddRange(info.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap);
+            decompiledTypeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.AddRange(info.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap);
+
+            return decompiledTypeMetadata;
+        }
+    }
+
+    [RelayCommand]
+    private void OpenSearchPane()
+    {
+        SelectedPaneIndex = 1;
+        
+        var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        mainWindow.SearchTextBox.SelectAll();
+        mainWindow.SearchTextBox.Focus();
+    }
+
+    partial void OnSearchTextChanged(string value)
+    {
+        lastSearchTask = currentSearchTask;
+        currentSearchTask = Task.Run(async () =>
+        {
+            if (lastSearchTask is { IsCompleted: false })
+            {
+                searchService.CancelSearch();
+                await lastSearchTask;
+            }
+
+            SearchResults.Clear();
+            
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+        
+            foreach (var searchResult in searchService.Search(assemblies.Select(a => a.MainModule.FilePath), value))
+            {
+                SearchResults.Add(searchResult);
+            }
+        });
+    }
+
+    partial void OnSelectedSearchResultChanged(SearchResult? value)
+    {
+        if (value == null)
+            return;
+        
+        isSearchNavigation = true;
+        
+        SelectNodeByMemberReference(value.Value.DeclaringType);
+
+        var codeSpan = searchService.GetSearchResultPosition(value.Value, currentDecompiledTypeMetadata!);
+        if (codeSpan == null)
+            return;
+
+        var startOffset = Document.GetOffset(codeSpan.Value.Start.Line + 1, codeSpan.Value.Start.Column);
+        var endOffset = Document.GetOffset(codeSpan.Value.End.Line + 1, codeSpan.Value.End.Column);
+        
+        var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+        var textEditor = mainWindow.TextEditor;
+        textEditor.Select(startOffset + 1, endOffset - startOffset); // TODO: Figure out why we need +1 here
+        textEditor.ScrollTo(codeSpan.Value.Start.Line, codeSpan.Value.Start.Column);
+        
+        isSearchNavigation = false;
     }
 
     public record Language(string Name, ILanguage Instance);

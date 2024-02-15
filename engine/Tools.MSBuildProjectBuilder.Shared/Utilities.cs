@@ -289,13 +289,13 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 		{
 			switch (module.GetModuleArchitecture())
 			{
-				case TargetArchitecture.AMD64:
+				case TargetArchitecture.AMD64Windows:
 					return "x64";
-				case TargetArchitecture.I386:
+				case TargetArchitecture.I386Windows:
 					return "x86";
-				case TargetArchitecture.IA64:
+				case TargetArchitecture.IA64Windows:
 					return "Itanium";
-                case TargetArchitecture.ARMv7:
+                case TargetArchitecture.ARMv7Windows:
                     return "ARM";
 				default:
                     if (separateAnyCPU)

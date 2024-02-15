@@ -22,7 +22,7 @@ namespace JustDecompile.EngineInfrastructure.AssemblyLocators
 
         protected override TargetArchitecture GetTargetArchitecture()
         {
-            return TargetArchitecture.AMD64;
+            return TargetArchitecture.AMD64Windows;
         }
 
         protected override string GetProgramFilesFolder()

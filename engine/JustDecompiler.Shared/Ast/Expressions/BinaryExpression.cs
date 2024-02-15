@@ -632,9 +632,9 @@ namespace Telerik.JustDecompiler.Ast.Expressions
         {
             if(type.FullName == "System.UIntPtr" || type.FullName == "System.IntPtr")
             {
-                if (type.Module.Architecture == TargetArchitecture.I386 || type.Module.Architecture == TargetArchitecture.ARMv7)
+                if (type.Module.Architecture == TargetArchitecture.I386Windows || type.Module.Architecture == TargetArchitecture.ARMv7Windows)
                     return 5;
-                else if (type.Module.Architecture == TargetArchitecture.IA64 || type.Module.Architecture == TargetArchitecture.AMD64)
+                else if (type.Module.Architecture == TargetArchitecture.IA64Windows || type.Module.Architecture == TargetArchitecture.AMD64Windows)
                     return 7;
                 else if (type.Module.Architecture == TargetArchitecture.AnyCPU)
                     return null;

@@ -126,7 +126,7 @@ namespace Mono.Cecil {
 		{
 			this.kind = ModuleKind.Dll;
 			this.Runtime = GetCurrentRuntime ();
-			this.architecture = TargetArchitecture.I386;
+			this.architecture = TargetArchitecture.I386Windows;
 		}
 
 		static TargetRuntime GetCurrentRuntime ()

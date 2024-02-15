@@ -176,17 +176,17 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
             if (this.IsUWPProject)
             {
                 TargetArchitecture architecture = this.assembly.MainModule.GetModuleArchitecture();
-                if (architecture == TargetArchitecture.I386)
+                if (architecture == TargetArchitecture.I386Windows)
                 {
                     this.runtimes.Add("win10-x86");
                     this.runtimes.Add("win10-x86-aot");
                 }
-                else if (architecture == TargetArchitecture.AMD64)
+                else if (architecture == TargetArchitecture.AMD64Windows)
                 {
                     this.runtimes.Add("win10-x64");
                     this.runtimes.Add("win10-x64-aot");
                 }
-                else if (architecture == TargetArchitecture.ARMv7)
+                else if (architecture == TargetArchitecture.ARMv7Windows)
                 {
                     this.runtimes.Add("win10-arm");
                     this.runtimes.Add("win10-arm-aot");

@@ -39,8 +39,8 @@ namespace Decompiler.Tests.Integration
         [InlineData("Piranha", "Piranha", true)]
         //[InlineData("Sample3", "Sample3", false)]
         //[InlineData("ConsoleApp2", "ConsoleApp2", false)]
-        // [InlineData("Squidex.7.2.0.Net6", "Squidex", false)]
-        // [InlineData("coolstore.ShoppingCart.Net6", "ShoppingCart", false)]
+        [InlineData("Squidex.7.2.0.Net6", "Squidex", false)]
+        [InlineData("coolstore.ShoppingCart.Net6", "ShoppingCart", false)]
         [InlineData("clean-architecture-manga.accounts-api.Net7", "Application", false)]
         // [InlineData("NorthwindTraders.NetStandard2.1", "Northwind.Application", false)] // Running this test in mac and ubuntu causes OOM
         public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName, bool windowsOnly)

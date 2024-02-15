@@ -6,7 +6,7 @@ namespace JustDecompile.EngineInfrastructure.AssemblyLocators
     {
         public static IFrameworkAssemblyLocator Instance(TargetArchitecture targetArchitecture)
         {
-            if (targetArchitecture == TargetArchitecture.AMD64Windows || targetArchitecture == TargetArchitecture.IA64Windows)
+            if (targetArchitecture == TargetArchitecture.AMD64 || targetArchitecture == TargetArchitecture.IA64)
             {
                 return FrameworkAssemblyLocator4x64.Instance();
             }

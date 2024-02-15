@@ -21,7 +21,7 @@ namespace JustDecompile.EngineInfrastructure.AssemblyLocators
 
         protected override TargetArchitecture GetTargetArchitecture()
         {
-            return TargetArchitecture.I386Windows;
+            return TargetArchitecture.I386;
         }
     }
 }

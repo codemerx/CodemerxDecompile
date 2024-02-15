@@ -765,11 +765,11 @@ namespace Mono.Cecil {
 			switch (architectureString)
 			{
 				case "amd64":
-					return TargetArchitecture.AMD64Windows;
+					return TargetArchitecture.AMD64;
 				case "ia64":
-					return TargetArchitecture.IA64Windows;
+					return TargetArchitecture.IA64;
 				default:
-					return TargetArchitecture.I386Windows;
+					return TargetArchitecture.I386;
 			}
 		}
 

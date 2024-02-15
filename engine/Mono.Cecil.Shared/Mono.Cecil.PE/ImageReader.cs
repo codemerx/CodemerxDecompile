@@ -93,10 +93,43 @@ namespace Mono.Cecil.PE {
 			image.Characteristics = (ModuleCharacteristics) dll_characteristics;
 		}
 
-		TargetArchitecture ReadArchitecture ()
+
+        TargetArchitecture GetTargetArchitectureByPlatformSpecificTargetArchitecture(PlatformSpecificTargetArchitecture p)
+		{
+			switch (p)
+			{
+				case PlatformSpecificTargetArchitecture.I386Windows:
+				case PlatformSpecificTargetArchitecture.I386Linux:
+				case PlatformSpecificTargetArchitecture.I386Apple:
+					return TargetArchitecture.I386;
+				case PlatformSpecificTargetArchitecture.AMD64Windows:
+				case PlatformSpecificTargetArchitecture.AMD64Linux:
+				case PlatformSpecificTargetArchitecture.AMD64Apple:
+					return TargetArchitecture.AMD64;
+				case PlatformSpecificTargetArchitecture.IA64Windows:
+				case PlatformSpecificTargetArchitecture.IA64Linux:
+				case PlatformSpecificTargetArchitecture.IA64Apple:
+					return TargetArchitecture.IA64;
+				case PlatformSpecificTargetArchitecture.ARMWindows:
+				case PlatformSpecificTargetArchitecture.ARMLinux:
+				case PlatformSpecificTargetArchitecture.ARMApple:
+					return TargetArchitecture.ARM;
+				case PlatformSpecificTargetArchitecture.ARMv7Windows:
+				case PlatformSpecificTargetArchitecture.ARMv7Linux:
+				case PlatformSpecificTargetArchitecture.ARMv7Apple:
+					return TargetArchitecture.ARMv7;
+				case PlatformSpecificTargetArchitecture.ARM64Windows:
+				case PlatformSpecificTargetArchitecture.ARM64Linux:
+				case PlatformSpecificTargetArchitecture.ARM64Apple:
+					return TargetArchitecture.ARM64;
+				default:
+					throw new Exception($"Unexpected PlatformSpecificTargetArchitecture {p}");
+            }
+        }
+        TargetArchitecture ReadArchitecture ()
 		{
 			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
-			return (TargetArchitecture)ReadUInt16 ();
+            return GetTargetArchitectureByPlatformSpecificTargetArchitecture((PlatformSpecificTargetArchitecture)ReadUInt16());
 		}
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)

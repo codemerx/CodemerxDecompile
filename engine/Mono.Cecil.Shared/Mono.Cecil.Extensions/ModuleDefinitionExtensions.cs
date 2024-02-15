@@ -24,7 +24,7 @@ namespace Mono.Cecil.Extensions
             }
 
             bool is32Bit = (module.Attributes & ModuleAttributes.Required32Bit) == ModuleAttributes.Required32Bit;
-            if (module.Architecture == TargetArchitecture.I386Windows && !is32Bit)
+            if (module.Architecture == TargetArchitecture.I386 && !is32Bit)
             {
                 return TargetArchitecture.AnyCPU;
             }

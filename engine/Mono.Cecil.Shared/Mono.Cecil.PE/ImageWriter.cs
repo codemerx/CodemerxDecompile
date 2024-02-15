@@ -54,8 +54,8 @@ namespace Mono.Cecil.PE {
 		{
 			this.module = module;
 			this.metadata = metadata;
-			this.pe64 = module.Architecture == TargetArchitecture.AMD64Windows || module.Architecture == TargetArchitecture.IA64Windows;
-			this.has_reloc = module.Architecture == TargetArchitecture.I386Windows;
+			this.pe64 = module.Architecture == TargetArchitecture.AMD64 || module.Architecture == TargetArchitecture.IA64;
+			this.has_reloc = module.Architecture == TargetArchitecture.I386;
 			this.GetDebugHeader ();
 			this.GetWin32Resources ();
 			this.text_map = BuildTextMap ();
@@ -196,13 +196,13 @@ namespace Mono.Cecil.PE {
 		ushort GetMachine ()
 		{
 			switch (module.Architecture) {
-			case TargetArchitecture.I386Windows:
+			case TargetArchitecture.I386:
 				return 0x014c;
-			case TargetArchitecture.AMD64Windows:
+			case TargetArchitecture.AMD64:
 				return 0x8664;
-			case TargetArchitecture.IA64Windows:
+			case TargetArchitecture.IA64:
 				return 0x0200;
-			case TargetArchitecture.ARMv7Windows:
+			case TargetArchitecture.ARMv7:
 				return 0x01c4;
 			}
 
@@ -617,7 +617,7 @@ namespace Mono.Cecil.PE {
 		void WriteStartupStub ()
 		{
 			switch (module.Architecture) {
-			case TargetArchitecture.I386Windows:
+			case TargetArchitecture.I386:
 				WriteUInt16 (0x25ff);
 				WriteUInt32 ((uint) image_base + text_map.GetRVA (TextSegment.ImportAddressTable));
 				return;
@@ -637,14 +637,14 @@ namespace Mono.Cecil.PE {
 			PrepareSection (reloc);
 
 			var reloc_rva = text_map.GetRVA (TextSegment.StartupStub);
-			reloc_rva += module.Architecture == TargetArchitecture.IA64Windows ? 0x20u : 2;
+			reloc_rva += module.Architecture == TargetArchitecture.IA64 ? 0x20u : 2;
 			var page_rva = reloc_rva & ~0xfffu;
 
 			WriteUInt32 (page_rva);	// PageRVA
 			WriteUInt32 (0x000c);	// Block Size
 
 			switch (module.Architecture) {
-			case TargetArchitecture.I386Windows:
+			case TargetArchitecture.I386:
 				WriteUInt32 (0x3000 + reloc_rva - page_rva);
 				break;
 			default:
@@ -707,7 +707,7 @@ namespace Mono.Cecil.PE {
 			uint import_dir_len = (import_hnt_rva - import_dir_rva) + 27u;
 
 			RVA startup_stub_rva = import_dir_rva + import_dir_len;
-			startup_stub_rva = module.Architecture == TargetArchitecture.IA64Windows
+			startup_stub_rva = module.Architecture == TargetArchitecture.IA64
 				? (startup_stub_rva + 15u) & ~15u
 				: 2 + ((startup_stub_rva + 3u) & ~3u);
 
@@ -721,7 +721,7 @@ namespace Mono.Cecil.PE {
 		uint GetStartupStubLength ()
 		{
 			switch (module.Architecture) {
-			case TargetArchitecture.I386Windows:
+			case TargetArchitecture.I386:
 				return 6;
 			default:
 				throw new NotSupportedException ();

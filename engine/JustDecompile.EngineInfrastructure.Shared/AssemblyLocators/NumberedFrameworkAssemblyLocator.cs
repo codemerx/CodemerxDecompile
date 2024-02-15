@@ -17,7 +17,7 @@ namespace JustDecompile.EngineInfrastructure.AssemblyLocators
 
             TargetArchitecture targetArchitecture = GetTargetArchitecture();
 
-            if (targetArchitecture == TargetArchitecture.AMD64Windows || targetArchitecture == TargetArchitecture.IA64Windows)
+            if (targetArchitecture == TargetArchitecture.AMD64 || targetArchitecture == TargetArchitecture.IA64)
             {
                 if (Directory.Exists(SystemInformation.CLR_Default_64))
                 {

@@ -9,13 +9,13 @@ namespace Mono.Cecil.Extensions
         {
             switch (targetArchitecture)
             {
-                case TargetArchitecture.I386Windows:
+                case TargetArchitecture.I386:
                     return "x86";
 
-                case TargetArchitecture.AMD64Windows:
+                case TargetArchitecture.AMD64:
                     return "x64";
 
-                case TargetArchitecture.IA64Windows:
+                case TargetArchitecture.IA64:
                     return "Itanium";
 
                 case TargetArchitecture.AnyCPU: 

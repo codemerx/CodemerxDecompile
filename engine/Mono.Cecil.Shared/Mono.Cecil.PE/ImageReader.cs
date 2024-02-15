@@ -67,7 +67,8 @@ namespace Mono.Cecil.PE {
 			// - PEFileHeader
 
 			// Machine				2
-			image.Architecture = ReadArchitecture ();
+			image.ExtendedArchitecture = ReadExtendedArchitecture ();
+			image.Architecture = GetTargetArchitecture(image.ExtendedArchitecture);
 
 			// NumberOfSections		2
 			ushort sections = ReadUInt16 ();
@@ -94,7 +95,7 @@ namespace Mono.Cecil.PE {
 		}
 
 
-        TargetArchitecture GetTargetArchitectureByPlatformSpecificTargetArchitecture(PlatformSpecificTargetArchitecture p)
+        TargetArchitecture GetTargetArchitecture(PlatformSpecificTargetArchitecture p)
 		{
 			switch (p)
 			{
@@ -126,10 +127,11 @@ namespace Mono.Cecil.PE {
 					throw new Exception($"Unexpected PlatformSpecificTargetArchitecture {p}");
             }
         }
-        TargetArchitecture ReadArchitecture ()
+
+		PlatformSpecificTargetArchitecture ReadExtendedArchitecture ()
 		{
 			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
-            return GetTargetArchitectureByPlatformSpecificTargetArchitecture((PlatformSpecificTargetArchitecture)ReadUInt16());
+			return (PlatformSpecificTargetArchitecture)ReadUInt16();
 		}
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)

@@ -23,6 +23,7 @@ namespace Mono.Cecil.PE {
 		public ModuleKind Kind;
 		public string RuntimeVersion;
 		public TargetArchitecture Architecture;
+		public PlatformSpecificTargetArchitecture ExtendedArchitecture;
 		public ModuleCharacteristics Characteristics;
 		public string FileName;
 

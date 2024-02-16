@@ -19,14 +19,21 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 	public static class Utilities
 	{
 		public const int MaxPathLength = 259; // 259 + NULL == 260
-
-		public static string GetLegalFileName(string legalName)
+		public static readonly char[] InvalidChars = new char[41] // Hardcoding invalid chars to get same result in different platforms
+		{
+			'"', '<', '>', '|', '\0', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005',
+			'\u0006', '\a', '\b', '\t', '\n', '\v', '\f', '\r', '\u000e', '\u000f',
+			'\u0010', '\u0011', '\u0012', '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019',
+			'\u001a', '\u001b', '\u001c', '\u001d', '\u001e', '\u001f', ':', '*', '?', '\\',
+			'/'
+		};
+        public static string GetLegalFileName(string legalName)
 		{
 			if (legalName.Length == 0)
 			{
 				return string.Empty;
 			}
-			string regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+			string regexSearch = new string(InvalidChars);
 
 			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 
@@ -41,7 +48,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 			{
 				return string.Empty;
 			}
-			string regexSearch = new string(Path.GetInvalidPathChars());
+			string regexSearch = new string(InvalidChars);
 
 			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 

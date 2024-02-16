@@ -103,3 +103,12 @@ jobs:
 
     - name: Run Tests
       run: dotnet test engine/Decompiler.Tests -c Release
+
+    - name: Compress Decompiler.Tests/bin
+      run: Compress-Archive -Path engine/Decompiler.Tests/bin/ -DestinationPath Decompiler.Tests.Bin.zip
+
+    - name: Upload Decompiler.Tests.Bin artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Decompiler.Tests.Bin
+        path: Decompiler.Tests.Bin.zip

@@ -105,9 +105,11 @@ jobs:
       run: dotnet test engine/Decompiler.Tests -c Release
 
     - name: Compress Decompiler.Tests/bin
+      if: always()
       run: Compress-Archive -Path engine/Decompiler.Tests/bin/ -DestinationPath Decompiler.Tests.Bin.zip
 
     - name: Upload Decompiler.Tests.Bin artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Decompiler.Tests.Bin

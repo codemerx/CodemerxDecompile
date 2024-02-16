@@ -56,6 +56,19 @@ namespace Decompiler.Tests.Helpers
 
             string[] expectdeSubFolderNames = Directory.GetDirectories(expectedFolderPath);
             string[] actualSubFolderNames = Directory.GetDirectories(actualFolderPath);
+            if (expectdeSubFolderNames.Length != actualSubFolderNames.Length)
+            {
+                Console.WriteLine($"expectdeSubFolderNames: {expectdeSubFolderNames} {expectdeSubFolderNames.Length}");
+                for (int i = 0; i < expectdeSubFolderNames.Length; i++)
+                {
+                    Console.WriteLine(expectdeSubFolderNames[i]);
+                }
+                Console.WriteLine($"actualSubFolderNames: {actualSubFolderNames} {actualSubFolderNames.Length}");
+                for (int i = 0; i < actualSubFolderNames.Length; i++)
+                {
+                    Console.WriteLine(actualSubFolderNames[i]);
+                }
+            }
             Assert.Equal(expectdeSubFolderNames.Length, actualSubFolderNames.Length);
 
             for (int i = 0; i < expectdeSubFolderNames.Length; i++)

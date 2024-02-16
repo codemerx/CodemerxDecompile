@@ -24,8 +24,10 @@ namespace Mono.Cecil {
 	{
 		Windows = 0,
 		Linux = 0x7B79,
-		Apple = 0x4644
-        // TODO add more platforms https://github.com/dotnet/runtime/blob/61c658183231100a5836e833c86446ff51a4654b/src/coreclr/src/inc/pedecoder.h#L90-L104
+		Apple = 0x4644,
+        FreeBSD = 0xADC4,
+        NetBSD = 0x1993,
+        Sun = 0x1992
     }
     public enum PlatformSpecificTargetArchitecture
     {
@@ -48,7 +50,28 @@ namespace Mono.Cecil {
         IA64Apple = TargetArchitecture.IA64 ^ NativeOSOverrideCode.Apple,
         ARMApple = TargetArchitecture.ARM ^ NativeOSOverrideCode.Apple,
         ARMv7Apple = TargetArchitecture.ARMv7 ^ NativeOSOverrideCode.Apple,
-        ARM64Apple = TargetArchitecture.ARM64 ^ NativeOSOverrideCode.Apple
+        ARM64Apple = TargetArchitecture.ARM64 ^ NativeOSOverrideCode.Apple,
+
+        I386FreeBSD = TargetArchitecture.I386 ^ NativeOSOverrideCode.FreeBSD,
+        AMD64FreeBSD = TargetArchitecture.AMD64 ^ NativeOSOverrideCode.FreeBSD,
+        IA64FreeBSD = TargetArchitecture.IA64 ^ NativeOSOverrideCode.FreeBSD,
+        ARMFreeBSD = TargetArchitecture.ARM ^ NativeOSOverrideCode.FreeBSD,
+        ARMv7FreeBSD = TargetArchitecture.ARMv7 ^ NativeOSOverrideCode.FreeBSD,
+        ARM64FreeBSD = TargetArchitecture.ARM64 ^ NativeOSOverrideCode.FreeBSD,
+
+        I386NetBSD = TargetArchitecture.I386 ^ NativeOSOverrideCode.NetBSD,
+        AMD64NetBSD = TargetArchitecture.AMD64 ^ NativeOSOverrideCode.NetBSD,
+        IA64NetBSD = TargetArchitecture.IA64 ^ NativeOSOverrideCode.NetBSD,
+        ARMNetBSD = TargetArchitecture.ARM ^ NativeOSOverrideCode.NetBSD,
+        ARMv7NetBSD = TargetArchitecture.ARMv7 ^ NativeOSOverrideCode.NetBSD,
+        ARM64NetBSD = TargetArchitecture.ARM64 ^ NativeOSOverrideCode.NetBSD,
+
+        I386Sun = TargetArchitecture.I386 ^ NativeOSOverrideCode.Sun,
+        AMD64Sun = TargetArchitecture.AMD64 ^ NativeOSOverrideCode.Sun,
+        IA64Sun = TargetArchitecture.IA64 ^ NativeOSOverrideCode.Sun,
+        ARMSun = TargetArchitecture.ARM ^ NativeOSOverrideCode.Sun,
+        ARMv7Sun = TargetArchitecture.ARMv7 ^ NativeOSOverrideCode.Sun,
+        ARM64Sun = TargetArchitecture.ARM64 ^ NativeOSOverrideCode.Sun
     }
 
     public enum TargetArchitecture

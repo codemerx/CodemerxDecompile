@@ -102,27 +102,45 @@ namespace Mono.Cecil.PE {
 				case PlatformSpecificTargetArchitecture.I386Windows:
 				case PlatformSpecificTargetArchitecture.I386Linux:
 				case PlatformSpecificTargetArchitecture.I386Apple:
-					return TargetArchitecture.I386;
+				case PlatformSpecificTargetArchitecture.I386FreeBSD:
+				case PlatformSpecificTargetArchitecture.I386NetBSD:
+				case PlatformSpecificTargetArchitecture.I386Sun:
+                    return TargetArchitecture.I386;
 				case PlatformSpecificTargetArchitecture.AMD64Windows:
 				case PlatformSpecificTargetArchitecture.AMD64Linux:
 				case PlatformSpecificTargetArchitecture.AMD64Apple:
-					return TargetArchitecture.AMD64;
+				case PlatformSpecificTargetArchitecture.AMD64FreeBSD:
+				case PlatformSpecificTargetArchitecture.AMD64NetBSD:
+				case PlatformSpecificTargetArchitecture.AMD64Sun:
+                    return TargetArchitecture.AMD64;
 				case PlatformSpecificTargetArchitecture.IA64Windows:
 				case PlatformSpecificTargetArchitecture.IA64Linux:
 				case PlatformSpecificTargetArchitecture.IA64Apple:
+				case PlatformSpecificTargetArchitecture.IA64FreeBSD:
+				case PlatformSpecificTargetArchitecture.IA64NetBSD:
+				case PlatformSpecificTargetArchitecture.IA64Sun:
 					return TargetArchitecture.IA64;
 				case PlatformSpecificTargetArchitecture.ARMWindows:
 				case PlatformSpecificTargetArchitecture.ARMLinux:
 				case PlatformSpecificTargetArchitecture.ARMApple:
+				case PlatformSpecificTargetArchitecture.ARMFreeBSD:
+				case PlatformSpecificTargetArchitecture.ARMNetBSD:
+				case PlatformSpecificTargetArchitecture.ARMSun:
 					return TargetArchitecture.ARM;
 				case PlatformSpecificTargetArchitecture.ARMv7Windows:
 				case PlatformSpecificTargetArchitecture.ARMv7Linux:
 				case PlatformSpecificTargetArchitecture.ARMv7Apple:
-					return TargetArchitecture.ARMv7;
+				case PlatformSpecificTargetArchitecture.ARMv7FreeBSD:
+				case PlatformSpecificTargetArchitecture.ARMv7NetBSD:
+				case PlatformSpecificTargetArchitecture.ARMv7Sun:
+                    return TargetArchitecture.ARMv7;
 				case PlatformSpecificTargetArchitecture.ARM64Windows:
 				case PlatformSpecificTargetArchitecture.ARM64Linux:
 				case PlatformSpecificTargetArchitecture.ARM64Apple:
-					return TargetArchitecture.ARM64;
+				case PlatformSpecificTargetArchitecture.ARM64FreeBSD:
+				case PlatformSpecificTargetArchitecture.ARM64NetBSD:
+				case PlatformSpecificTargetArchitecture.ARM64Sun:
+                    return TargetArchitecture.ARM64;
 				default:
 					throw new Exception($"Unexpected PlatformSpecificTargetArchitecture {p}");
             }
@@ -131,7 +149,9 @@ namespace Mono.Cecil.PE {
 		PlatformSpecificTargetArchitecture ReadExtendedArchitecture ()
 		{
 			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
-			return (PlatformSpecificTargetArchitecture)ReadUInt16();
+			ushort data = ReadUInt16();
+			Console.WriteLine($"{data} {(PlatformSpecificTargetArchitecture)data}");
+			return (PlatformSpecificTargetArchitecture)data;
 		}
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)

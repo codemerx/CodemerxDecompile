@@ -59,7 +59,7 @@ namespace Decompiler.Tests.Helpers
 
             int nReferencesInExpected = 0;
             int nReferencesInActual = 0;
-            for (int i = 0; i < expectdeSubFolderNames.Length; i++)
+            for (int i = 0; i < expectdeSubFolderNames.Length - nReferencesInExpected; i++)
             {
                 if (expectdeSubFolderNames[i].EndsWith("References")) // Temporarily skipping References folders since output differs in different operating systems
                 {
@@ -72,7 +72,7 @@ namespace Decompiler.Tests.Helpers
                     }
                 }
             }
-            for (int i = 0; i < actualSubFolderNames.Length; i++)
+            for (int i = 0; i < actualSubFolderNames.Length - nReferencesInActual; i++)
             {
                 if (actualSubFolderNames[i].EndsWith("References")) // Temporarily skipping References folders since output differs in different operating systems
                 {

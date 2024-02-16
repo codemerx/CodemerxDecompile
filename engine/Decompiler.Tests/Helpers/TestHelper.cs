@@ -35,7 +35,7 @@ namespace Decompiler.Tests.Helpers
             string[] expectedFileNames = Directory.GetFiles(expectedFolderPath);
             string[] actualFileNames = Directory.GetFiles(actualFolderPath);
 
-            if (!actualFolderPath.EndsWith("References")) // Temporarily skipping References folders since assemblies differ in different operating systems.
+            if (!actualFolderPath.EndsWith("References")) // Temporarily skipping References folders since output differs in different operating systems
             {
                 Assert.Equal(expectedFileNames.Length, actualFileNames.Length);
             }
@@ -56,22 +56,51 @@ namespace Decompiler.Tests.Helpers
 
             string[] expectdeSubFolderNames = Directory.GetDirectories(expectedFolderPath);
             string[] actualSubFolderNames = Directory.GetDirectories(actualFolderPath);
-            if (expectdeSubFolderNames.Length != actualSubFolderNames.Length)
+
+            int nReferencesInExpected = 0;
+            int nReferencesInActual = 0;
+            for (int i = 0; i < expectdeSubFolderNames.Length; i++)
             {
-                Console.WriteLine($"expectdeSubFolderNames: {expectdeSubFolderNames} {expectdeSubFolderNames.Length}");
-                for (int i = 0; i < expectdeSubFolderNames.Length; i++)
+                if (expectdeSubFolderNames[i].EndsWith("References")) // Temporarily skipping References folders since output differs in different operating systems
                 {
-                    Console.WriteLine(expectdeSubFolderNames[i]);
-                }
-                Console.WriteLine($"actualSubFolderNames: {actualSubFolderNames} {actualSubFolderNames.Length}");
-                for (int i = 0; i < actualSubFolderNames.Length; i++)
-                {
-                    Console.WriteLine(actualSubFolderNames[i]);
+                    nReferencesInExpected++;
+                    for (int j = i; j + 1 < expectdeSubFolderNames.Length; j++)
+                    {
+                        string s = expectdeSubFolderNames[j];
+                        expectdeSubFolderNames[j] = expectdeSubFolderNames[j + 1];
+                        expectdeSubFolderNames[j + 1] = s;
+                    }
                 }
             }
-            Assert.Equal(expectdeSubFolderNames.Length, actualSubFolderNames.Length);
+            for (int i = 0; i < actualSubFolderNames.Length; i++)
+            {
+                if (actualSubFolderNames[i].EndsWith("References")) // Temporarily skipping References folders since output differs in different operating systems
+                {
+                    nReferencesInActual++;
+                    for (int j = i; j + 1 < actualSubFolderNames.Length; j++)
+                    {
+                        string s = actualSubFolderNames[j];
+                        actualSubFolderNames[j] = actualSubFolderNames[j + 1];
+                        actualSubFolderNames[j + 1] = s;
+                    }
+                }
+            }
+            //if (expectdeSubFolderNames.Length != actualSubFolderNames.Length)
+            //{
+            //    Console.WriteLine($"expectdeSubFolderNames: {expectdeSubFolderNames} {expectdeSubFolderNames.Length}");
+            //    for (int i = 0; i < expectdeSubFolderNames.Length; i++)
+            //    {
+            //        Console.WriteLine(expectdeSubFolderNames[i]);
+            //    }
+            //    Console.WriteLine($"actualSubFolderNames: {actualSubFolderNames} {actualSubFolderNames.Length}");
+            //    for (int i = 0; i < actualSubFolderNames.Length; i++)
+            //    {
+            //        Console.WriteLine(actualSubFolderNames[i]);
+            //    }
+            //}
+            Assert.Equal(expectdeSubFolderNames.Length - nReferencesInExpected, actualSubFolderNames.Length - nReferencesInActual);
 
-            for (int i = 0; i < expectdeSubFolderNames.Length; i++)
+            for (int i = 0; i < Math.Min(expectdeSubFolderNames.Length, actualSubFolderNames.Length); i++)
             {
                 string expectedSubFolderFullName = expectdeSubFolderNames[i];
                 string actualSubFolderFullName = actualSubFolderNames[i];

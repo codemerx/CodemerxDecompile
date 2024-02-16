@@ -106,7 +106,7 @@ jobs:
 
     - name: Compress Decompiler.Tests/bin
       if: always()
-      run: zip Decompiler.Tests.Bin.zip engine/Decompiler.Tests/bin
+      run: zip -r Decompiler.Tests.Bin.zip engine/Decompiler.Tests/bin
 
     - name: Upload Decompiler.Tests.Bin artifact
       if: always()

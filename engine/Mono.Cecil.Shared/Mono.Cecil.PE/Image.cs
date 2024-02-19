@@ -23,10 +23,10 @@ namespace Mono.Cecil.PE {
 		public ModuleKind Kind;
 		public string RuntimeVersion;
 		public TargetArchitecture Architecture;
-        /* AGPL */
-        public PlatformSpecificTargetArchitecture ExtendedArchitecture;
-        /* End AGPL */
-        public ModuleCharacteristics Characteristics;
+		/* AGPL */
+		public PlatformSpecificTargetArchitecture ExtendedArchitecture;
+		/* End AGPL */
+		public ModuleCharacteristics Characteristics;
 		public string FileName;
 
 		public Section [] Sections;

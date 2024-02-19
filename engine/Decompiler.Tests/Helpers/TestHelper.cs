@@ -85,7 +85,7 @@ namespace Decompiler.Tests.Helpers
                     // XmlDocument actualDocument = LoadXml(actualFileName);
 
                     // XmlDiff xmldiff = new XmlDiff(XmlDiffOptions.IgnoreChildOrder |
-                    //                     XmlDiffOptions.IgnoreNamespaces |expectedFileText.Replace("\r\n", "\n")
+                    //                     XmlDiffOptions.IgnoreNamespaces |
                     //                     XmlDiffOptions.IgnorePrefixes);
 
                     // Assert.True(xmldiff.Compare(expectedDocument, actualDocument));

@@ -97,7 +97,7 @@ namespace Mono.Cecil.PE {
 		}
 
 		/* AGPL */
-        TargetArchitecture GetTargetArchitecture(PlatformSpecificTargetArchitecture p)
+		TargetArchitecture GetTargetArchitecture(PlatformSpecificTargetArchitecture p)
 		{
 			switch (p)
 			{

@@ -27,7 +27,7 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 			'\u001a', '\u001b', '\u001c', '\u001d', '\u001e', '\u001f', ':', '*', '?', '\\',
 			'/'
 		};
-        public static string GetLegalFileName(string legalName)
+		public static string GetLegalFileName(string legalName)
 		{
 			if (legalName.Length == 0)
 			{

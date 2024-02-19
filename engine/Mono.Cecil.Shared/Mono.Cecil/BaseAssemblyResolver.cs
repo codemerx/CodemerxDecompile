@@ -974,7 +974,6 @@ namespace Mono.Cecil {
 		/*Telerik Authorship*/
 		protected virtual void AddToResolvedAssembliesInternal(AssemblyStrongNameExtended assemblyKey, List<AssemblyDefinition> assemblyList)
 		{
-            Console.WriteLine($"add: {assemblyKey.StrongName} | {assemblyKey.Architecture}");
             resolvedAssemblies.Add(assemblyKey, assemblyList);
 		}
 

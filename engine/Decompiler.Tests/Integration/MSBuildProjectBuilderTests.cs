@@ -22,6 +22,7 @@ using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Decompiler.Tests.Integration
 {
@@ -37,8 +38,6 @@ namespace Decompiler.Tests.Integration
         [InlineData("OrchardCore", "OrchardCore", true)]
         [InlineData("Mix.Cms.Lib", "Mix.Cms.Lib", true)]
         [InlineData("Piranha", "Piranha", true)]
-        //[InlineData("Sample3", "Sample3", false)]
-        //[InlineData("ConsoleApp2", "ConsoleApp2", false)]
         [InlineData("Squidex.7.2.0.Net6", "Squidex", false)]
         [InlineData("coolstore.ShoppingCart.Net6", "ShoppingCart", false)]
         [InlineData("clean-architecture-manga.accounts-api.Net7", "Application", false)]

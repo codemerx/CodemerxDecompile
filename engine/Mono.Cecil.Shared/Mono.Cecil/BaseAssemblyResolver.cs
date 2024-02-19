@@ -355,17 +355,17 @@ namespace Mono.Cecil {
                     return assembly;
                 }
 
-				/*Telerik Authorship*/
-				// This code has been added by Mono.Cecil 0.9.6. It has been commented, because retargetable references should be further
-				// researched and handled appropriately across the application. TP item N. 323383
-				//if (name.IsRetargetable)
-				//{
-				//	// if the reference is retargetable, zero it
-				//	name = new AssemblyNameReference(name.Name, new Version(0, 0, 0, 0))
-				//	{
-				//		PublicKeyToken = Empty<byte>.Array,
-				//	};
-				//}
+                /*Telerik Authorship*/
+                // This code has been added by Mono.Cecil 0.9.6. It has been commented, because retargetable references should be further
+                // researched and handled appropriately across the application. TP item N. 323383
+                //if (name.IsRetargetable)
+                //{
+                //	// if the reference is retargetable, zero it
+                //	name = new AssemblyNameReference(name.Name, new Version(0, 0, 0, 0))
+                //	{
+                //		PublicKeyToken = Empty<byte>.Array,
+                //	};
+                //}
 
                 assembly = SearchDirectory(name, parameters, architecture, defaultPath) ?? TryGetTargetAssembly(name, parameters, architecture, assemblyKey);
 
@@ -974,7 +974,7 @@ namespace Mono.Cecil {
 		/*Telerik Authorship*/
 		protected virtual void AddToResolvedAssembliesInternal(AssemblyStrongNameExtended assemblyKey, List<AssemblyDefinition> assemblyList)
 		{
-            resolvedAssemblies.Add(assemblyKey, assemblyList);
+			resolvedAssemblies.Add(assemblyKey, assemblyList);
 		}
 
 		public AssemblyDefinition LoadAssemblyDefinition(string filePath, ReaderParameters parameters, bool loadPdb)

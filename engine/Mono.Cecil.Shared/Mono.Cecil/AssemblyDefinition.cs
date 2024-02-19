@@ -232,7 +232,7 @@ namespace Mono.Cecil {
 			return assembly;
 		}
 
-#if !READ_ONLY	
+#if !READ_ONLY
 		public void Write (string fileName)
 		{
 			Write (fileName, new WriterParameters ());

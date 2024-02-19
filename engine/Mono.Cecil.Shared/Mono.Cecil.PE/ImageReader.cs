@@ -67,8 +67,10 @@ namespace Mono.Cecil.PE {
 			// - PEFileHeader
 
 			// Machine				2
+			/* AGPL */
 			image.ExtendedArchitecture = ReadExtendedArchitecture ();
 			image.Architecture = GetTargetArchitecture(image.ExtendedArchitecture);
+			/* End AGPL */
 
 			// NumberOfSections		2
 			ushort sections = ReadUInt16 ();
@@ -94,7 +96,7 @@ namespace Mono.Cecil.PE {
 			image.Characteristics = (ModuleCharacteristics) dll_characteristics;
 		}
 
-
+		/* AGPL */
         TargetArchitecture GetTargetArchitecture(PlatformSpecificTargetArchitecture p)
 		{
 			switch (p)
@@ -105,14 +107,14 @@ namespace Mono.Cecil.PE {
 				case PlatformSpecificTargetArchitecture.I386FreeBSD:
 				case PlatformSpecificTargetArchitecture.I386NetBSD:
 				case PlatformSpecificTargetArchitecture.I386Sun:
-                    return TargetArchitecture.I386;
+					return TargetArchitecture.I386;
 				case PlatformSpecificTargetArchitecture.AMD64Windows:
 				case PlatformSpecificTargetArchitecture.AMD64Linux:
 				case PlatformSpecificTargetArchitecture.AMD64Apple:
 				case PlatformSpecificTargetArchitecture.AMD64FreeBSD:
 				case PlatformSpecificTargetArchitecture.AMD64NetBSD:
 				case PlatformSpecificTargetArchitecture.AMD64Sun:
-                    return TargetArchitecture.AMD64;
+					return TargetArchitecture.AMD64;
 				case PlatformSpecificTargetArchitecture.IA64Windows:
 				case PlatformSpecificTargetArchitecture.IA64Linux:
 				case PlatformSpecificTargetArchitecture.IA64Apple:
@@ -133,18 +135,18 @@ namespace Mono.Cecil.PE {
 				case PlatformSpecificTargetArchitecture.ARMv7FreeBSD:
 				case PlatformSpecificTargetArchitecture.ARMv7NetBSD:
 				case PlatformSpecificTargetArchitecture.ARMv7Sun:
-                    return TargetArchitecture.ARMv7;
+					return TargetArchitecture.ARMv7;
 				case PlatformSpecificTargetArchitecture.ARM64Windows:
 				case PlatformSpecificTargetArchitecture.ARM64Linux:
 				case PlatformSpecificTargetArchitecture.ARM64Apple:
 				case PlatformSpecificTargetArchitecture.ARM64FreeBSD:
 				case PlatformSpecificTargetArchitecture.ARM64NetBSD:
 				case PlatformSpecificTargetArchitecture.ARM64Sun:
-                    return TargetArchitecture.ARM64;
+					return TargetArchitecture.ARM64;
 				default:
 					throw new Exception($"Unexpected PlatformSpecificTargetArchitecture {p}");
-            }
-        }
+			}
+		}
 
 		PlatformSpecificTargetArchitecture ReadExtendedArchitecture ()
 		{
@@ -152,6 +154,7 @@ namespace Mono.Cecil.PE {
 			ushort data = ReadUInt16();
 			return (PlatformSpecificTargetArchitecture)data;
 		}
+		/* End AGPL */
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)
 		{

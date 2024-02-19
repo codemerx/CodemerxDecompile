@@ -19,7 +19,6 @@ using System;
 using System.IO;
 using System.Xml;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Decompiler.Tests.Helpers
 {

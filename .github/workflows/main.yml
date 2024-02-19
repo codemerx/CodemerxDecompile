@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - improvement/tests
+      - master
 
 jobs:
   test-on-windows:

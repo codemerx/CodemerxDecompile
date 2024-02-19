@@ -182,13 +182,14 @@ namespace Mono.Cecil.AssemblyResolver
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                directories.Add(Path.Combine("/", "usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
-                directories.Add(Path.Combine("/", "usr", "lib", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "lib", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                directories.Add(Path.Combine("/", "usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
-                directories.Add(Path.Combine("/", "usr", "local", "share", "dotnet", "x64", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH)); // based on https://learn.microsoft.com/en-us/dotnet/core/install/macos#path-differences
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                // based on https://learn.microsoft.com/en-us/dotnet/core/install/macos#path-differences
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "local", "share", "dotnet", "x64", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
 
             return directories;

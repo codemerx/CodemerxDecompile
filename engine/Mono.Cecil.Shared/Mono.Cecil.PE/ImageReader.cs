@@ -150,7 +150,6 @@ namespace Mono.Cecil.PE {
 		{
 			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
 			ushort data = ReadUInt16();
-			Console.WriteLine($"{data} {(PlatformSpecificTargetArchitecture)data}");
 			return (PlatformSpecificTargetArchitecture)data;
 		}
 

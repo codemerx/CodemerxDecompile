@@ -366,7 +366,7 @@ namespace Mono.Cecil {
 				//		PublicKeyToken = Empty<byte>.Array,
 				//	};
 				//}
-				Console.WriteLine($"not found: {name.FullName} | {architecture}");
+
                 assembly = SearchDirectory(name, parameters, architecture, defaultPath) ?? TryGetTargetAssembly(name, parameters, architecture, assemblyKey);
 
                 if (assembly != null)

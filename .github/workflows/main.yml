@@ -82,6 +82,9 @@ jobs:
 
     runs-on: macos-latest
 
+    env:
+      DOTNET_INSTALL_DIR: "/usr/local/share/dotnet"
+
     steps:
     - uses: actions/checkout@v3
 

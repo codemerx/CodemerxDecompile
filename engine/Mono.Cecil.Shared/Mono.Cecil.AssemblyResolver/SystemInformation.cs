@@ -188,7 +188,8 @@ namespace Mono.Cecil.AssemblyResolver
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 directories.Add(Path.Combine("/", "usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
-                directories.Add(Path.Combine("/", "Users", "runner", ".dotnet", "shared", "Microsoft.NETCore.App")); // The path of dotnet in github action runners
+                //directories.Add(Path.Combine("/", "usr", "local", "share", "dotnet", "x64", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH)); // based on https://learn.microsoft.com/en-us/dotnet/core/install/macos#path-differences
+                //directories.Add(Path.Combine("/", "Users", "runner", ".dotnet", "shared", "Microsoft.NETCore.App")); // The path of dotnet in github action runners
             }
 
             return directories;

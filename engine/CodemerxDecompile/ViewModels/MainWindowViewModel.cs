@@ -36,6 +36,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly Stack<(Node, Vector, int)> forwardStack = new();
 
     private readonly SearchService searchService = new();
+    private readonly Debouncer searchDebouncer = new(TimeSpan.FromMilliseconds(500));
 
     private TypeDefinition? currentTypeDefinition;
     private DecompiledTypeMetadata? currentDecompiledTypeMetadata;
@@ -571,24 +572,27 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSearchTextChanged(string value)
     {
-        lastSearchTask = currentSearchTask;
-        currentSearchTask = Task.Run(async () =>
+        searchDebouncer.Debounce(() =>
         {
-            if (lastSearchTask is { IsCompleted: false })
+            lastSearchTask = currentSearchTask;
+            currentSearchTask = Task.Run(async () =>
             {
-                searchService.CancelSearch();
-                await lastSearchTask;
-            }
+                if (lastSearchTask is { IsCompleted: false })
+                {
+                    searchService.CancelSearch();
+                    await lastSearchTask;
+                }
 
-            SearchResults.Clear();
+                SearchResults.Clear();
             
-            if (string.IsNullOrWhiteSpace(value))
-                return;
+                if (string.IsNullOrWhiteSpace(value))
+                    return;
         
-            foreach (var searchResult in searchService.Search(assemblies.Select(a => a.MainModule.FilePath), value))
-            {
-                SearchResults.Add(searchResult);
-            }
+                foreach (var searchResult in searchService.Search(assemblies.Select(a => a.MainModule.FilePath), value))
+                {
+                    SearchResults.Add(searchResult);
+                }
+            });
         });
     }
 

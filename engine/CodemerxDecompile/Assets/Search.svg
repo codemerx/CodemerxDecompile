@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-defaultgrey{fill: #212121; opacity: 1;}</style>
+  </defs>
+  <title>IconLightSearch</title>
+  <g id="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <path class="light-defaultgrey-10" d="M14.5,6A4.5,4.5,0,1,1,10,1.5,4.5,4.5,0,0,1,14.5,6Z" />
+    <path class="light-defaultgrey" d="M10,1A5.006,5.006,0,0,0,5,6,4.955,4.955,0,0,0,6.163,9.167L1.177,14.152l.707.707L6.874,9.87A4.946,4.946,0,0,0,10,11,5,5,0,0,0,10,1Zm0,9a4,4,0,1,1,4-4A4,4,0,0,1,10,10Z" />
+  </g>
+</svg>

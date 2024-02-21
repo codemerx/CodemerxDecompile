@@ -9,6 +9,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using CodemerxDecompile.Extensions;
 using CodemerxDecompile.Nodes;
@@ -67,6 +68,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private SearchResult? selectedSearchResult;
+
+    [ObservableProperty]
+    private string? numberOfResultsText;
 
     public MainWindowViewModel()
     {
@@ -565,10 +569,20 @@ public partial class MainWindowViewModel : ObservableObject
     private void OpenSearchPane()
     {
         SelectedPaneIndex = 1;
+    }
+
+    partial void OnSelectedPaneIndexChanged(int _)
+    {
+        if (!SearchPaneSelected)
+            return;
         
-        var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
-        mainWindow.SearchTextBox.SelectAll();
-        mainWindow.SearchTextBox.Focus();
+        // TODO: Nasty hack. Postponing the Focus() call enough to ensure the text box is rendered and can be focused.
+        Dispatcher.UIThread.Post(() =>
+        {
+            var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+            mainWindow.SearchTextBox.SelectAll();
+            mainWindow.SearchTextBox.Focus();
+        });
     }
 
     partial void OnSearchTextChanged(string value)
@@ -585,6 +599,7 @@ public partial class MainWindowViewModel : ObservableObject
                 }
 
                 SearchResults.Clear();
+                NumberOfResultsText = null;
             
                 if (string.IsNullOrWhiteSpace(value))
                     return;
@@ -592,6 +607,12 @@ public partial class MainWindowViewModel : ObservableObject
                 foreach (var searchResult in searchService.Search(assemblies.Select(a => a.MainModule.FilePath), value))
                 {
                     SearchResults.Add(searchResult);
+                    NumberOfResultsText = $"{SearchResults.Count} result{(SearchResults.Count > 1 ? "s" : string.Empty)}";
+                }
+
+                if (SearchResults.Count == 0)
+                {
+                    NumberOfResultsText = "No results";
                 }
             });
         });

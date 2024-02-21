@@ -134,16 +134,23 @@
                 <DockPanel>
                     <ListBox DockPanel.Dock="Left"
                              SelectionMode="AlwaysSelected"
-                             SelectedIndex="{Binding SelectedPaneIndex}">
+                             SelectedIndex="{Binding SelectedPaneIndex}"
+                             Background="Transparent"
+                             BorderBrush="#DFDFDF"
+                             BorderThickness="0 0 1 0">
+                        <ListBox.Styles>
+                            <Style Selector="Svg">
+                                <Setter Property="Width" Value="16" />
+                            </Style>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Style>
+                        </ListBox.Styles>
                         <ListBoxItem>
-                            <TextBlock>
-                                A
-                            </TextBlock>
+                            <Svg Path="/Assets/Assembly.svg" />
                         </ListBoxItem>
                         <ListBoxItem>
-                            <TextBlock>
-                                S
-                            </TextBlock>
+                            <Svg Path="/Assets/Search.svg" />
                         </ListBoxItem>
                     </ListBox>
                     <Grid>
@@ -253,6 +260,12 @@
                                      Watermark="Search..."
                                      Text="{Binding SearchText}"
                                      Margin="5" />
+                            <TextBlock DockPanel.Dock="Top"
+                                       Text="{Binding NumberOfResultsText}"
+                                       IsVisible="{Binding NumberOfResultsText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                       Margin="10 5 0 5"
+                                       Foreground="#919191"
+                                       FontSize="12"/>
                             <ListBox ItemsSource="{Binding SearchResults}"
                                      SelectedItem="{Binding SelectedSearchResult}"
                                      Background="Transparent">

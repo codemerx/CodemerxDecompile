@@ -229,6 +229,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         // TODO: Rebuild tree view upon language change
         // TODO: Rebuild all reference nodes upon loading of a new assembly
+        // TODO: Invalidate search results
         AssemblyNode? firstLoadedAssemblyNode = null;
         
         foreach (var file in filePaths)

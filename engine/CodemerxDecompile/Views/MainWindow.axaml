@@ -255,6 +255,15 @@
                         </TreeView>
                         <DockPanel IsVisible="{Binding SearchPaneSelected}"
                                    Background="White">
+                            <Grid DockPanel.Dock="Top"
+                                  Height="2">
+                                <ProgressBar IsVisible="{Binding IsSearching}"
+                                             IsIndeterminate="True"
+                                             Height="2"
+                                             MinHeight="2"
+                                             Background="Transparent"
+                                             CornerRadius="0" />
+                            </Grid>
                             <TextBox DockPanel.Dock="Top"
                                      Name="SearchTextBox"
                                      Watermark="Search..."

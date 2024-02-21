@@ -72,6 +72,9 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private string? numberOfResultsText;
 
+    [ObservableProperty]
+    private bool isSearching;
+
     public MainWindowViewModel()
     {
         selectedLanguage = Languages[0];
@@ -603,7 +606,9 @@ public partial class MainWindowViewModel : ObservableObject
             
                 if (string.IsNullOrWhiteSpace(value))
                     return;
-        
+
+                IsSearching = true;
+                
                 foreach (var searchResult in searchService.Search(assemblies.Select(a => a.MainModule.FilePath), value))
                 {
                     SearchResults.Add(searchResult);
@@ -614,6 +619,8 @@ public partial class MainWindowViewModel : ObservableObject
                 {
                     NumberOfResultsText = "No results";
                 }
+                
+                IsSearching = false;
             });
         });
     }

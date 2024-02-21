@@ -135,8 +135,16 @@ public partial class MainWindowViewModel : ObservableObject
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             Title = $"Load {(memberReference.GetTopDeclaringTypeOrSelf().Scope as AssemblyNameReference)?.FullName}",
-            AllowMultiple = false
-            // TODO: Add file type filter
+            AllowMultiple = false,
+            FileTypeFilter = new []
+            {
+                new FilePickerFileType("Assemblies")
+                {
+                    Patterns = new [] { "*.exe", "*.dll" },
+                    AppleUniformTypeIdentifiers = new [] { "com.microsoft.windows-executable", "com.microsoft.windows-dynamic-link-library" },
+                    MimeTypes = new [] { "application/vnd.microsoft.portable-executable" }
+                }
+            }
         });
 
         // User closed the dialog without selecting an assembly

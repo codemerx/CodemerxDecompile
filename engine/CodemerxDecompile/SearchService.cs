@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CodemerxDecompile.SearchResults;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Extensions;
@@ -48,7 +49,12 @@ public class SearchService
             {
                 if (DoesMatchSearchCriteria(query, type, matchCasing, matchWholeWord))
                 {
-                    yield return CreateSearchResult(SearchResultType.DeclaringType, type, type.Name, type);
+                    yield return new TypeNameSearchResult
+                    {
+                        DeclaringType = type,
+                        MatchedString = type.Name,
+                        TypeDefinition = type
+                    };
                 }
 
                 IEnumerable<IMemberDefinition> members = type.GetMembersSorted(false, LanguageFactory.GetLanguage(CSharpVersion.V7));
@@ -60,34 +66,82 @@ public class SearchService
 
                 foreach (var member in members)
                 {
-                    if (DoesMatchSearchCriteria(query, member.Name, matchCasing, matchWholeWord))
+                    if (member is EventDefinition eventDefinition)
                     {
-                        var memberSearchResultType = GetSearchResultTypeFromMemberDefinitionType(member);
-
-                        // Skip adding nested types when traversing the type members as they are added when traversing the module types
-                        if (memberSearchResultType != SearchResultType.DeclaringType)
+                        if (DoesMatchSearchCriteria(query, eventDefinition.Name, matchCasing, matchWholeWord))
                         {
-                            yield return CreateSearchResult(memberSearchResultType, type, member.Name, member);
+                            yield return new EventNameSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = eventDefinition.Name,
+                                EventDefinition = eventDefinition
+                            };
+                        }
+                        
+                        if (DoesMatchSearchCriteria(query, eventDefinition.EventType, matchCasing, matchWholeWord))
+                        {
+                            yield return new EventTypeSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = GetFriendlyName(eventDefinition.EventType),
+                                EventDefinition = eventDefinition
+                            };
                         }
                     }
-
-                    if (member is EventDefinition eventDefinition && DoesMatchSearchCriteria(query, eventDefinition.EventType, matchCasing, matchWholeWord))
+                    else if (member is FieldDefinition fieldDefinition)
                     {
-                        yield return CreateSearchResult(SearchResultType.EventType, type, GetFriendlyName(eventDefinition.EventType), eventDefinition);
+                        if (DoesMatchSearchCriteria(query, fieldDefinition.Name, matchCasing, matchWholeWord))
+                        {
+                            yield return new FieldNameSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = fieldDefinition.Name,
+                                FieldDefinition = fieldDefinition
+                            };
+                        }
+                        
+                        if (!fieldDefinition.DeclaringType.IsEnum && DoesMatchSearchCriteria(query, fieldDefinition.FieldType, matchCasing, matchWholeWord))
+                        {
+                            yield return new FieldTypeSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = GetFriendlyName(fieldDefinition.FieldType),
+                                FieldDefinition = fieldDefinition
+                            };
+                        }
                     }
-                    else if (member is FieldDefinition fieldDefinition && !fieldDefinition.DeclaringType.IsEnum && this.DoesMatchSearchCriteria(query, fieldDefinition.FieldType, matchCasing, matchWholeWord))
+                    else if (member is PropertyDefinition propertyDefinition)
                     {
-                        yield return CreateSearchResult(SearchResultType.FieldType, type, GetFriendlyName(fieldDefinition.FieldType), fieldDefinition);
-                    }
-                    else if (member is PropertyDefinition propertyDefinition && this.DoesMatchSearchCriteria(query, propertyDefinition.PropertyType, matchCasing, matchWholeWord))
-                    {
-                        yield return CreateSearchResult(SearchResultType.PropertyType, type, GetFriendlyName(propertyDefinition.PropertyType), propertyDefinition);
+                        if (DoesMatchSearchCriteria(query, propertyDefinition.Name, matchCasing, matchWholeWord))
+                        {
+                            yield return new PropertyNameSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = propertyDefinition.Name,
+                                PropertyDefinition = propertyDefinition
+                            };
+                        }
+                        
+                        if (DoesMatchSearchCriteria(query, propertyDefinition.PropertyType, matchCasing, matchWholeWord))
+                        {
+                            yield return new PropertyTypeSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = GetFriendlyName(propertyDefinition.PropertyType),
+                                PropertyDefinition = propertyDefinition
+                            };
+                        }
                     }
                     else if (member is MethodDefinition methodDefinition)
                     {
                         if (DoesMatchSearchCriteria(query, methodDefinition.ReturnType, matchCasing, matchWholeWord))
                         {
-                            yield return CreateSearchResult(SearchResultType.MethodReturnType, type, GetFriendlyName(methodDefinition.ReturnType), methodDefinition);
+                            yield return new MethodReturnTypeSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = GetFriendlyName(methodDefinition.ReturnType),
+                                MethodDefinition = methodDefinition
+                            };
                         }
 
                         if (methodDefinition.HasBody && methodDefinition.Body.HasVariables)
@@ -96,11 +150,21 @@ public class SearchService
                             {
                                 if (DoesMatchSearchCriteria(query, variable.Name, matchCasing, matchWholeWord))
                                 {
-                                    yield return CreateSearchResult(SearchResultType.VariableName, type, variable.Name, variable);
+                                    yield return new VariableNameSearchResult
+                                    {
+                                        DeclaringType = type,
+                                        MatchedString = variable.Name,
+                                        VariableDefinition = variable
+                                    };
                                 }
                                 else if (DoesMatchSearchCriteria(query, variable.VariableType, matchCasing, matchWholeWord))
                                 {
-                                    yield return CreateSearchResult(SearchResultType.VariableType, type, GetFriendlyName(variable.VariableType), variable);
+                                    yield return new VariableTypeSearchResult
+                                    {
+                                        DeclaringType = type,
+                                        MatchedString = GetFriendlyName(variable.VariableType),
+                                        VariableDefinition = variable
+                                    };
                                 }
                             }
                         }
@@ -111,11 +175,22 @@ public class SearchService
                             {
                                 if (DoesMatchSearchCriteria(query, parameter.Name, matchCasing, matchWholeWord))
                                 {
-                                    yield return CreateSearchResult(SearchResultType.ParameterName, type, parameter.Name, methodDefinition);
+                                    yield return new ParameterNameSearchResult
+                                    {
+                                        DeclaringType = type,
+                                        MatchedString = parameter.Name,
+                                        MethodDefinition = methodDefinition,
+                                        ParameterDefinition = parameter
+                                    };
                                 }
                                 else if (DoesMatchSearchCriteria(query, parameter.ParameterType, matchCasing, matchWholeWord))
                                 {
-                                    yield return CreateSearchResult(SearchResultType.ParameterType, type, GetFriendlyName(parameter.ParameterType), parameter);
+                                    yield return new ParameterTypeSearchResult
+                                    {
+                                        DeclaringType = type,
+                                        MatchedString = GetFriendlyName(parameter.ParameterType),
+                                        ParameterDefinition = parameter
+                                    };
                                 }
                             }
                         }
@@ -178,7 +253,12 @@ public class SearchService
 
                                 if (shouldCheckDeclaringTypeName && DoesMatchSearchCriteria(query, memberReference.DeclaringType, matchCasing, matchWholeWord))
                                 {
-                                    yield return CreateSearchResult(SearchResultType.Instruction, type, GetFriendlyName(memberReference.DeclaringType), instruction);
+                                    yield return new InstructionSearchResult
+                                    {
+                                        DeclaringType = type,
+                                        MatchedString = GetFriendlyName(memberReference.DeclaringType),
+                                        Instruction = instruction
+                                    };
                                 }
                             }
 
@@ -195,20 +275,40 @@ public class SearchService
 
                             if (DoesMatchSearchCriteria(query, memberReferenceName, matchCasing, matchWholeWord))
                             {
-                                yield return CreateSearchResult(SearchResultType.Instruction, type, memberReferenceName, instruction);
+                                yield return new InstructionSearchResult
+                                {
+                                    DeclaringType = type,
+                                    MatchedString = memberReferenceName,
+                                    Instruction = instruction
+                                };
                             }
                         }
                         else if (operand is VariableReference variableReference && this.DoesMatchSearchCriteria(query, variableReference.Name, matchCasing, matchWholeWord))
                         {
-                            yield return CreateSearchResult(SearchResultType.Instruction, type, variableReference.Name, instruction);
+                            yield return new InstructionSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = variableReference.Name,
+                                Instruction = instruction
+                            };
                         }
                         else if (operand is ParameterReference parameterReference && this.DoesMatchSearchCriteria(query, parameterReference.Name, matchCasing, matchWholeWord))
                         {
-                            yield return CreateSearchResult(SearchResultType.Instruction, type, parameterReference.Name, instruction);
+                            yield return new InstructionSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = parameterReference.Name,
+                                Instruction = instruction
+                            };
                         }
                         else if (operand is string stringLiteral && this.DoesMatchSearchCriteria(query, stringLiteral, matchCasing, matchWholeWord))
                         {
-                            yield return CreateSearchResult(SearchResultType.Instruction, type, operand as string, instruction);
+                            yield return new StringLiteralSearchResult
+                            {
+                                DeclaringType = type,
+                                MatchedString = stringLiteral,
+                                Instruction = instruction
+                            };
                         }
                     }
                 }
@@ -225,58 +325,65 @@ public class SearchService
     {
         CodeSpan codeSpan = default;
     
-        switch (searchResult.Type)
+        switch (searchResult)
         {
-            case SearchResultType.ParameterName:
+            case ParameterNameSearchResult parameterNameSearchResult:
+            {
+                var methodDefinition = parameterNameSearchResult.MethodDefinition;
+                var parameterIndex = methodDefinition.Parameters.IndexOf(parameterNameSearchResult.ParameterDefinition);
+
+                if (parameterIndex != -1)
                 {
-                    var methodDefinition = searchResult.ObjectReference as MethodDefinition;
-                    var parameterIndex = methodDefinition.Parameters.Select((p, i) => new { Item = p, Index = i })
-                                                                     .FirstOrDefault(p => p.Item.Name == searchResult.MatchedString)?.Index;
-    
-                    if (parameterIndex.HasValue)
-                    {
-                        typeMetadata.CodeMappingInfo.TryGetValue((IMemberDefinition)searchResult.ObjectReference, parameterIndex.Value, out codeSpan);
-                    }
-    
-                    break;
+                    typeMetadata.CodeMappingInfo.TryGetValue(methodDefinition, parameterIndex, out codeSpan);
                 }
-            case SearchResultType.EventType:
-                typeMetadata.CodeMappingInfo.EventDefinitionToEventTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+
                 break;
-            case SearchResultType.PropertyType:
-                typeMetadata.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+            }
+            case EventTypeSearchResult eventTypeSearchResult:
+                typeMetadata.CodeMappingInfo.EventDefinitionToEventTypeCodeMap.TryGetValue(eventTypeSearchResult.EventDefinition, out codeSpan);
                 break;
-            case SearchResultType.FieldType:
-                typeMetadata.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+            case PropertyTypeSearchResult propertyTypeSearchResult:
+                typeMetadata.CodeMappingInfo.PropertyDefinitionToPropertyTypeCodeMap.TryGetValue(propertyTypeSearchResult.PropertyDefinition, out codeSpan);
                 break;
-            case SearchResultType.MethodReturnType:
-                typeMetadata.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+            case FieldTypeSearchResult fieldTypeSearchResult:
+                typeMetadata.CodeMappingInfo.FieldDefinitionToFieldTypeCodeMap.TryGetValue(fieldTypeSearchResult.FieldDefinition, out codeSpan);
                 break;
-            case SearchResultType.ParameterType:
-                typeMetadata.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.TryGetValue((ParameterDefinition)searchResult.ObjectReference, out codeSpan);
+            case MethodReturnTypeSearchResult methodReturnTypeSearchResult:
+                typeMetadata.CodeMappingInfo.MethodDefinitionToMethodReturnTypeCodeMap.TryGetValue(methodReturnTypeSearchResult.MethodDefinition, out codeSpan);
                 break;
-            case SearchResultType.VariableType:
+            case ParameterTypeSearchResult parameterTypeSearchResult:
+                typeMetadata.CodeMappingInfo.ParameterDefinitionToParameterTypeCodeMap.TryGetValue(parameterTypeSearchResult.ParameterDefinition, out codeSpan);
+                break;
+            case VariableTypeSearchResult variableTypeSearchResult:
+            {
+                var variableDefinition = variableTypeSearchResult.VariableDefinition;
+                if (!typeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.TryGetValue(variableDefinition, out codeSpan))
                 {
-                    var variableDefinition = searchResult.ObjectReference as VariableDefinition;
-                    if (!typeMetadata.CodeMappingInfo.VariableDefinitionToVariableTypeCodeMap.TryGetValue(variableDefinition, out codeSpan))
-                    {
-                        typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(variableDefinition.ContainingMethod, out codeSpan);
-                    }
-                };
+                    typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(variableDefinition.ContainingMethod, out codeSpan);
+                }
                 break;
-            case SearchResultType.DeclaringType:
-            case SearchResultType.EventName:
-            case SearchResultType.PropertyName:
-            case SearchResultType.FieldName:
-            case SearchResultType.MethodName:
-                typeMetadata.MemberDeclarationToCodeSpan.TryGetValue((IMemberDefinition)searchResult.ObjectReference, out codeSpan);
+            }
+            case TypeNameSearchResult typeNameSearchResult:
+                typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(typeNameSearchResult.TypeDefinition, out codeSpan);
                 break;
-            case SearchResultType.VariableName:
-                typeMetadata.CodeMappingInfo.TryGetValue((VariableDefinition)searchResult.ObjectReference, out codeSpan);
+            case EventNameSearchResult eventNameSearchResult:
+                typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(eventNameSearchResult.EventDefinition, out codeSpan);
                 break;
-            case SearchResultType.Instruction:
+            case PropertyNameSearchResult propertyNameSearchResult:
+                typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(propertyNameSearchResult.PropertyDefinition, out codeSpan);
+                break;
+            case FieldNameSearchResult fieldNameSearchResult:
+                typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(fieldNameSearchResult.FieldDefinition, out codeSpan);
+                break;
+            case MethodNameSearchResult methodNameSearchResult:
+                typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(methodNameSearchResult.MethodDefinition, out codeSpan);
+                break;
+            case VariableNameSearchResult variableNameSearchResult:
+                typeMetadata.CodeMappingInfo.TryGetValue(variableNameSearchResult.VariableDefinition, out codeSpan);
+                break;
+            case InstructionSearchResult instructionSearchResult:
                 {
-                    var instruction = searchResult.ObjectReference as Instruction;
+                    var instruction = instructionSearchResult.Instruction;
                     if (!typeMetadata.CodeMappingInfo.TryGetValue(instruction, out codeSpan))
                     {
                         typeMetadata.MemberDeclarationToCodeSpan.TryGetValue(instruction.ContainingMethod, out codeSpan);
@@ -317,28 +424,5 @@ public class SearchService
         var stringComparisonType = matchCasing ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
 
         return matchWholeWord ? entityName.Equals(query, stringComparisonType) : entityName.Contains(query, stringComparisonType);
-    }
-
-    private SearchResult CreateSearchResult(SearchResultType type, TypeDefinition declaringType, string matchedString, object objectReference)
-    {
-        return new SearchResult
-        {
-            Type = type,
-            DeclaringType = declaringType,
-            MatchedString = matchedString,
-            ObjectReference = objectReference
-        };
-    }
-
-    private SearchResultType GetSearchResultTypeFromMemberDefinitionType(IMemberDefinition memberDefinition)
-    {
-        return memberDefinition switch
-        {
-            EventDefinition => SearchResultType.EventName,
-            FieldDefinition => SearchResultType.FieldName,
-            MethodDefinition => SearchResultType.MethodName,
-            PropertyDefinition => SearchResultType.PropertyName,
-            _ => SearchResultType.DeclaringType
-        };
     }
 }

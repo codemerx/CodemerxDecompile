@@ -12,6 +12,7 @@ using Avalonia.Platform.Storage;
 using AvaloniaEdit.Document;
 using CodemerxDecompile.Extensions;
 using CodemerxDecompile.Nodes;
+using CodemerxDecompile.SearchResults;
 using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -603,9 +604,9 @@ public partial class MainWindowViewModel : ObservableObject
         
         isSearchNavigation = true;
         
-        SelectNodeByMemberReference(value.Value.DeclaringType);
+        SelectNodeByMemberReference(value.DeclaringType);
 
-        var codeSpan = searchService.GetSearchResultPosition(value.Value, currentDecompiledTypeMetadata!);
+        var codeSpan = searchService.GetSearchResultPosition(value, currentDecompiledTypeMetadata!);
         if (codeSpan == null)
             return;
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         xmlns:nodes="clr-namespace:CodemerxDecompile.Nodes"
-        xmlns:codemerxDecompile="clr-namespace:CodemerxDecompile"
+        xmlns:searchResults="clr-namespace:CodemerxDecompile.SearchResults"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CodemerxDecompile.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -251,27 +251,121 @@
                             <TextBox DockPanel.Dock="Top"
                                      Name="SearchTextBox"
                                      Watermark="Search..."
-                                     Text="{Binding SearchText}" />
+                                     Text="{Binding SearchText}"
+                                     Margin="5" />
                             <ListBox ItemsSource="{Binding SearchResults}"
-                                     SelectedItem="{Binding SelectedSearchResult}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="codemerxDecompile:SearchResult">
-                                        <TextBlock Text="{Binding MatchedString}" />
+                                     SelectedItem="{Binding SelectedSearchResult}"
+                                     Background="Transparent">
+                                <ListBox.Styles>
+                                    <Style Selector="Svg">
+                                        <Setter Property="Margin" Value="0 0 5 0" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Padding" Value="5" />
+                                        <Setter Property="Cursor" Value="Hand" />
+                                    </Style>
+                                </ListBox.Styles>
+                                <ListBox.DataTemplates>
+                                    <DataTemplate DataType="searchResults:TypeNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/ClassPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
+                                    <DataTemplate DataType="searchResults:EventNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/EventPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:EventTypeSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/EventPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:FieldNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/FieldPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:FieldTypeSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/FieldPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:PropertyNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/PropertyPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:PropertyTypeSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/PropertyPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:MethodNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/MethodPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:MethodReturnTypeSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/MethodPublic.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:ParameterNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/Parameter.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:ParameterTypeSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/Parameter.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:VariableNameSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/LocalVariable.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:VariableTypeSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/LocalVariable.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:StringLiteralSearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/String.svg" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="searchResults:SearchResult">
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- Used to keep the space unoccupied and align all elements vertically -->
+                                            <Svg Path="/Assets/LocalVariable.svg" Opacity="0" />
+                                            <TextBlock Text="{Binding MatchedString}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.DataTemplates>
                             </ListBox>
                         </DockPanel>
                     </Grid>
                 </DockPanel>
             
                 <GridSplitter Grid.Column="1"
-                              ResizeDirection="Columns">
-                    <GridSplitter.Styles>
-                        <Style Selector="GridSplitter">
-                            <Setter Property="Margin" Value="5 0 5 0" />
-                        </Style>
-                    </GridSplitter.Styles>
-                </GridSplitter>
+                              ResizeDirection="Columns"
+                              Margin="0 0 5 0" />
                 
                 <!-- Empty grid to fill the space when the TextEditor is hidden to enable drag/drop events -->
                 <Grid Grid.Column="2"

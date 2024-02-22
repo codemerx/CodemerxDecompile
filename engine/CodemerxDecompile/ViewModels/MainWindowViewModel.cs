@@ -31,7 +31,7 @@ namespace CodemerxDecompile.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    private readonly Dictionary<string, Dictionary<string, Node>> memberFullNameToNodeMap = new();
+    private readonly Dictionary<IMemberDefinition, Node> memberDefinitionToNodeMap = new();
     private readonly List<AssemblyDefinition> assemblies = new();
     
     private readonly Stack<(Node, Vector, int)> backStack = new();
@@ -101,32 +101,37 @@ public partial class MainWindowViewModel : ObservableObject
         {
             LoadAssemblies(new [] { typeDefinition.Module.FilePath });
         }
-        
-        SelectNodeByMemberFullName(typeDefinition.Module.Assembly.FullName, memberReference.FullName);
-        
-        void SelectNodeByMemberFullName(string assemblyName, string fullName)
+
+        IMemberDefinition memberDefinition = memberReference switch
         {
-            var nodeToBeSelected = memberFullNameToNodeMap[assemblyName][fullName];
-            var nodesToBeExpanded = new Stack<Node>();
-            var parentNode = nodeToBeSelected.Parent;
-            while (parentNode != null)
-            {
-                nodesToBeExpanded.Push(parentNode);
-                parentNode = parentNode.Parent;
-            }
+            FieldReference fieldReference => fieldReference.Resolve(),
+            PropertyReference propertyReference => propertyReference.Resolve(),
+            MethodReference methodReference => methodReference.Resolve(),
+            EventReference eventReference => eventReference.Resolve(),
+            TypeReference typeReference => typeReference.Resolve(),
+            _ => throw new NotSupportedException()
+        };
         
-            var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
-            var treeView = mainWindow.TreeView;
-
-            foreach (var nodeToBeExpanded in nodesToBeExpanded)
-            {
-                var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded)!;
-                treeViewItem.IsExpanded = true;
-                treeViewItem.UpdateLayout();  // Force framework to render children
-            }
-
-            SelectedNode = nodeToBeSelected;
+        var nodeToBeSelected = memberDefinitionToNodeMap[memberDefinition];
+        var nodesToBeExpanded = new Stack<Node>();
+        var parentNode = nodeToBeSelected.Parent;
+        while (parentNode != null)
+        {
+            nodesToBeExpanded.Push(parentNode);
+            parentNode = parentNode.Parent;
         }
+        
+        var mainWindow = ((App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow)!;
+        var treeView = mainWindow.TreeView;
+
+        foreach (var nodeToBeExpanded in nodesToBeExpanded)
+        {
+            var treeViewItem = (TreeViewItem)treeView.TreeContainerFromItem(nodeToBeExpanded)!;
+            treeViewItem.IsExpanded = true;
+            treeViewItem.UpdateLayout();  // Force framework to render children
+        }
+
+        SelectedNode = nodeToBeSelected;
     }
 
     internal async void TryLoadUnresolvedReference(MemberReference memberReference)
@@ -272,7 +277,6 @@ public partial class MainWindowViewModel : ObservableObject
                 assemblyNode.References.Items.Add(referenceNode);
             }
             
-            var dict = new Dictionary<string, Node>();
             foreach (var namespaceGroup in assembly.MainModule.Types.GroupBy(t => t.Namespace))
             {
                 var namespaceNode = new NamespaceNode
@@ -283,15 +287,14 @@ public partial class MainWindowViewModel : ObservableObject
 
                 foreach (var typeDefinition in namespaceGroup)
                 {
-                    var typeNode = BuildTypeSubtree(typeDefinition, namespaceNode, dict);
+                    var typeNode = BuildTypeSubtree(typeDefinition, namespaceNode);
                     namespaceNode.Types.Add(typeNode);
-                    dict.Add(typeDefinition.FullName, typeNode);
+                    memberDefinitionToNodeMap.Add(typeDefinition, typeNode);
                 }
                 
                 assemblyNode.AddNamespace(namespaceNode);
             }
 
-            memberFullNameToNodeMap.Add(assembly.FullName, dict);
             AssemblyNodes.Add(assemblyNode);
             assemblies.Add(assembly);
             ClearAssemblyListCommand.NotifyCanExecuteChanged();
@@ -299,7 +302,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         SelectedNode = firstLoadedAssemblyNode;
 
-        TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode, Dictionary<string, Node> dict)
+        TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode)
         {
             TypeNode typeNode = typeDefinition switch
             {
@@ -365,12 +368,12 @@ public partial class MainWindowViewModel : ObservableObject
                         EventDefinition = eventDefinition,
                         Parent = typeNode
                     },
-                    TypeDefinition nestedTypeDefinition => BuildTypeSubtree(nestedTypeDefinition, typeNode, dict),
+                    TypeDefinition nestedTypeDefinition => BuildTypeSubtree(nestedTypeDefinition, typeNode),
                     _ => throw new NotSupportedException()
                 };
                 
                 typeNode.Members.Add(node);
-                dict.Add(memberDefinition.FullName, node);
+                memberDefinitionToNodeMap.Add(memberDefinition, node);
             }
 
             return typeNode;
@@ -382,7 +385,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         SelectedNode = null;
         AssemblyNodes.Clear();
-        memberFullNameToNodeMap.Clear();
+        memberDefinitionToNodeMap.Clear();
         
         assemblies.Clear();
         ClearAssemblyListCommand.NotifyCanExecuteChanged();

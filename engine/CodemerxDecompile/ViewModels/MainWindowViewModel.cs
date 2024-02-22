@@ -159,9 +159,11 @@ public partial class MainWindowViewModel : ObservableObject
         }
         
         // TODO: There has to be a better way to do this...
-        var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(files[0].Path.LocalPath);
+        var filePath = files[0].Path.LocalPath;
+        var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(filePath);
         var special = assembly.MainModule.IsReferenceAssembly() ? SpecialTypeAssembly.Reference : SpecialTypeAssembly.None;
         var strongName = new AssemblyStrongNameExtended(assembly.Name.FullName, assembly.MainModule.GetModuleArchitecture(), special);
+        GlobalAssemblyResolver.Instance.AddResolvedAssembly(filePath);
         GlobalAssemblyResolver.Instance.RemoveFromFailedAssemblies(strongName);
         
         if (memberReference.GetTopDeclaringTypeOrSelf().Resolve() != null)
@@ -240,6 +242,8 @@ public partial class MainWindowViewModel : ObservableObject
         foreach (var file in filePaths)
         {
             var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file);
+            GlobalAssemblyResolver.Instance.AddResolvedAssembly(file);
+            
             var assemblyNode = new AssemblyNode
             {
                 Name = assembly.Name.Name,

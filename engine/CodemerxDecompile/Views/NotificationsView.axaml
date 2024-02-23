@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:notifications="clr-namespace:CodemerxDecompile.Notifications"
+             xmlns:viewModels="clr-namespace:CodemerxDecompile.ViewModels"
+             xmlns:designViewModels="clr-namespace:CodemerxDecompile.ViewModels.Design"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CodemerxDecompile.Views.NotificationsView"
+             x:DataType="viewModels:INotificationsViewModel">
+
+    <Design.DataContext>
+        <designViewModels:DesignNotificationsViewModel />
+    </Design.DataContext>
+    
+    <ItemsControl ItemsSource="{Binding Notifications}"
+                  VerticalAlignment="Bottom"
+                  HorizontalAlignment="Right"
+                  Padding="20">
+        <ItemsControl.Styles>
+            <Style Selector="Border.notification">
+                <Setter Property="Margin" Value="0 20 0 0" />
+                <Setter Property="Padding" Value="10" />
+                <Setter Property="BoxShadow" Value="0 0 10 2 #CCCCCC" />
+                <Setter Property="CornerRadius" Value="5" />
+                <Setter Property="Background" Value="#FFFFFF" />
+            </Style>
+            
+            <Style Selector="Border.notification:pointerover">
+                <Setter Property="Background" Value="#F5F5F5" />
+            </Style>
+        </ItemsControl.Styles>
+        
+        <ItemsControl.DataTemplates>
+            <DataTemplate DataType="notifications:Notification">
+                <Border Classes="notification"
+                        MaxWidth="500">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Svg Width="18"
+                             Margin="0 0 5 0"
+                             VerticalAlignment="Top">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding Level}"
+                                                     ComparisonCondition="Equal"
+                                                     Value="{x:Static notifications:NotificationLevel.Information}">
+                                    <ChangePropertyAction PropertyName="Path"
+                                                          Value="/Assets/StatusInformationOutline.svg" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding Level}"
+                                                     ComparisonCondition="Equal"
+                                                     Value="{x:Static notifications:NotificationLevel.Success}">
+                                    <ChangePropertyAction PropertyName="Path"
+                                                          Value="/Assets/StatusOKOutline.svg" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding Level}"
+                                                     ComparisonCondition="Equal"
+                                                     Value="{x:Static notifications:NotificationLevel.Warning}">
+                                    <ChangePropertyAction PropertyName="Path"
+                                                          Value="/Assets/StatusWarningOutline.svg" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding Level}"
+                                                     ComparisonCondition="Equal"
+                                                     Value="{x:Static notifications:NotificationLevel.Error}">
+                                    <ChangePropertyAction PropertyName="Path"
+                                                          Value="/Assets/StatusErrorOutline.svg" />
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </Svg>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Message}"
+                                   TextWrapping="Wrap" />
+                        <Button Grid.Column="2"
+                                Margin="10 0 0 0"
+                                Background="Transparent"
+                                VerticalAlignment="Top"
+                                Padding="2"
+                                Cursor="Hand"
+                                Command="{Binding $parent[ItemsControl].((viewModels:INotificationsViewModel)DataContext).CloseNotificationCommand}"
+                                CommandParameter="{Binding}">
+                            <Svg Path="/Assets/Close.svg"
+                                 Width="12" />
+                        </Button>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.DataTemplates>
+    </ItemsControl>
+</UserControl>

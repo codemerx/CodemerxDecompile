@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CodemerxDecompile.Services;
 using CodemerxDecompile.ViewModels;
 using CodemerxDecompile.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,9 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<INotificationsViewModel, NotificationsViewModel>();
+
+        services.AddSingleton<INotificationService, NotificationService>();
 
         return services.BuildServiceProvider();
     }

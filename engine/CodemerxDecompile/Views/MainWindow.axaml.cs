@@ -111,6 +111,25 @@ public partial class MainWindow : Window
 
             args.Handled = true;
         });
+        
+        PointerReleased += (_, args) =>
+        {
+            if (args.Handled)
+                return;
+            
+            if (args.InitialPressMouseButton == MouseButton.XButton1 && viewModel.BackCommand.CanExecute(null))
+            {
+                viewModel.BackCommand.Execute(null);
+
+                args.Handled = true;
+            }
+            else if (args.InitialPressMouseButton == MouseButton.XButton2 && viewModel.ForwardCommand.CanExecute(null))
+            {
+                viewModel.ForwardCommand.Execute(null);
+                
+                args.Handled = true;
+            }
+        };
     }
     
     private class ReferenceElementGenerator : VisualLineElementGenerator

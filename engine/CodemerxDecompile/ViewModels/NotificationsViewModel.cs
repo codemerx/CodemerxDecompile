@@ -15,13 +15,22 @@ public partial class NotificationsViewModel : ObservableObject, INotificationsVi
 
     public ObservableCollection<Notification> Notifications { get; } = new();
 
-    public void CreateNotification(string message, NotificationLevel level)
+    public Notification ShowNotification(string message, NotificationLevel level)
     {
-        Notifications.Add(new Notification
+        var notification = new Notification
         {
             Message = message,
             Level = level
-        });
+        };
+        Notifications.Add(notification);
+
+        return notification;
+    }
+
+    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level)
+    {
+        CloseNotification(notification);
+        return ShowNotification(message, level);
     }
 
     [RelayCommand]

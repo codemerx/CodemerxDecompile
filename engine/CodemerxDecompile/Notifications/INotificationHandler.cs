@@ -2,5 +2,7 @@ namespace CodemerxDecompile.Notifications;
 
 public interface INotificationHandler
 {
-    void CreateNotification(string message, NotificationLevel level);
+    Notification ShowNotification(string message, NotificationLevel level);
+
+    Notification ReplaceNotification(Notification notification, string message, NotificationLevel level);
 }

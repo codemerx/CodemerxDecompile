@@ -7,6 +7,8 @@
         xmlns:nodes="clr-namespace:CodemerxDecompile.Nodes"
         xmlns:searchResults="clr-namespace:CodemerxDecompile.SearchResults"
         xmlns:views="clr-namespace:CodemerxDecompile.Views"
+        xmlns:msBuildProjectBuilder="clr-namespace:JustDecompile.Tools.MSBuildProjectBuilder;assembly=Tools.MSBuildProjectBuilder.NetStandard"
+        xmlns:design="clr-namespace:CodemerxDecompile.ViewModels.Design"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CodemerxDecompile.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -14,7 +16,7 @@
         Title="CodemerxDecompile">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel />
+        <design:DesignMainWindowViewModel />
     </Design.DataContext>
     
     <NativeMenu.Menu>
@@ -41,6 +43,23 @@
                     <NativeMenuItem Header="Search"
                                     Command="{Binding OpenSearchPaneCommand}"
                                     Gesture="Cmd+Shift+F" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Tools">
+                <NativeMenu>
+                    <NativeMenuItem Header="Create project">
+                        <NativeMenu>
+                            <NativeMenuItem Header="Visual Studio 2019"
+                                            Command="{Binding GenerateProjectCommand}"
+                                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}" />
+                            <NativeMenuItem Header="Visual Studio 2017"
+                                            Command="{Binding GenerateProjectCommand}"
+                                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2017}" />
+                            <NativeMenuItem Header="Visual Studio 2015"
+                                            Command="{Binding GenerateProjectCommand}"
+                                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2015}" />
+                        </NativeMenu>
+                    </NativeMenuItem>
                 </NativeMenu>
             </NativeMenuItem>
         </NativeMenu>
@@ -73,6 +92,19 @@
                               Command="{Binding OpenSearchPaneCommand}"
                               HotKey="Ctrl+Shift+F"
                               InputGesture="Ctrl+Shift+F" />
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem Header="_Create project">
+                        <MenuItem Header="Visual Studio 2019"
+                                  Command="{Binding GenerateProjectCommand}"
+                                  CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}" />
+                        <MenuItem Header="Visual Studio 2017"
+                                  Command="{Binding GenerateProjectCommand}"
+                                  CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2017}" />
+                        <MenuItem Header="Visual Studio 2015"
+                                  Command="{Binding GenerateProjectCommand}"
+                                  CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2015}" />
+                    </MenuItem>
                 </MenuItem>
             </Menu>
             
@@ -114,6 +146,13 @@
                     </Button>
                     <Button Command="{Binding ClearAssemblyListCommand}">
                         Close all
+                    </Button>
+
+                    <Border Classes="separator" />
+
+                    <Button Command="{Binding GenerateProjectCommand}"
+                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}">
+                        Create project
                     </Button>
 
                     <Border Classes="separator" />

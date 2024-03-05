@@ -13,10 +13,13 @@ using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using CodemerxDecompile.Extensions;
 using CodemerxDecompile.Nodes;
+using CodemerxDecompile.Notifications;
 using CodemerxDecompile.SearchResults;
+using CodemerxDecompile.Services;
 using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using JustDecompile.Tools.MSBuildProjectBuilder;
 using Mono.Cecil;
 using Mono.Cecil.AssemblyResolver;
 using Mono.Cecil.Extensions;
@@ -31,6 +34,13 @@ namespace CodemerxDecompile.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    private readonly IProjectGenerationService projectGenerationService;
+    private readonly INotificationService notificationService;
+
+    private readonly Language csharp = new("C#", LanguageFactory.GetLanguage(CSharpVersion.V7));
+    private readonly Language visualBasic = new("VB.NET", LanguageFactory.GetLanguage(VisualBasicVersion.V10));
+    private readonly Language intermediateLanguage = new("IL", new IntermediateLanguage());
+
     private readonly Dictionary<IMemberDefinition, Node> memberDefinitionToNodeMap = new();
     private readonly List<AssemblyDefinition> assemblies = new();
     
@@ -51,12 +61,14 @@ public partial class MainWindowViewModel : ObservableObject
     private Task? lastSearchTask;
     
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(GenerateProjectCommand))]
     private Node? selectedNode;
 
     [ObservableProperty]
     private TextDocument? document;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(GenerateProjectCommand))]
     private Language selectedLanguage;
 
     [ObservableProperty]
@@ -75,19 +87,23 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private bool isSearching;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IProjectGenerationService projectGenerationService, INotificationService notificationService)
     {
-        selectedLanguage = Languages[0];
+        this.projectGenerationService = projectGenerationService;
+        this.notificationService = notificationService;
+
+        Languages = new()
+        {
+            csharp,
+            visualBasic,
+            intermediateLanguage
+        };
+        selectedLanguage = csharp;
     }
 
     public ObservableCollection<AssemblyNode> AssemblyNodes { get; } = new();
 
-    public ObservableCollection<Language> Languages { get; } = new()
-    {
-        new Language("C#", LanguageFactory.GetLanguage(CSharpVersion.V7)),
-        new Language("VB.NET", LanguageFactory.GetLanguage(VisualBasicVersion.V10)),
-        new Language("IL", new IntermediateLanguage())
-    };
+    public ObservableCollection<Language> Languages { get; }
 
     public ObservableCollection<SearchResult> SearchResults { get; } = new();
 
@@ -664,6 +680,45 @@ public partial class MainWindowViewModel : ObservableObject
         
         isSearchNavigation = false;
     }
+
+    [RelayCommand(CanExecute = nameof(CanGenerateProject))]
+    private async Task GenerateProject(VisualStudioVersion visualStudioVersion)
+    {
+        if (SelectedNode == null || SelectedLanguage == intermediateLanguage)
+            return;
+        
+        var node = SelectedNode;
+        while (node.Parent != null)
+        {
+            node = node.Parent;
+        }
+        
+        var storageProvider = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!.StorageProvider;
+        var folders = await storageProvider.OpenFolderPickerAsync(new()
+        {
+            AllowMultiple = false,
+            Title = "Select folder for project generation"
+        });
+        
+        if (folders.Count == 0)
+            return;
+
+        var generatingProjectNotification = notificationService.ShowNotification("Generating project...", NotificationLevel.Information);
+
+        var errorMessage = await Task.Run(() => projectGenerationService.GenerateProject((node as AssemblyNode)!.AssemblyDefinition, visualStudioVersion, SelectedLanguage.Instance, folders[0].TryGetLocalPath()!));
+
+        if (string.IsNullOrEmpty(errorMessage))
+        {
+            notificationService.ReplaceNotification(generatingProjectNotification, "Project generated successfully", NotificationLevel.Success);
+        }
+        else
+        {
+            notificationService.ReplaceNotification(generatingProjectNotification, "Project generation failed.", NotificationLevel.Error);
+        }
+    }
+
+    private bool CanGenerateProject() =>
+        SelectedNode != null && SelectedLanguage != intermediateLanguage;
 
     public record Language(string Name, ILanguage Instance);
 }

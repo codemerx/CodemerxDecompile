@@ -38,6 +38,7 @@ public partial class App : Application
         services.AddSingleton<INotificationsViewModel, NotificationsViewModel>();
 
         services.AddSingleton<INotificationService, NotificationService>();
+        services.AddTransient<IProjectGenerationService, ProjectGenerationService>();
 
         return services.BuildServiceProvider();
     }

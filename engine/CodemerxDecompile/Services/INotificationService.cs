@@ -6,5 +6,7 @@ public interface INotificationService
 {
     void RegisterHandler(INotificationHandler handler);
 
-    void Show(string message, NotificationLevel level = NotificationLevel.Information);
+    Notification ShowNotification(string message, NotificationLevel level);
+
+    Notification ReplaceNotification(Notification notification, string message, NotificationLevel level);
 }

@@ -29,15 +29,21 @@ public class DesignNotificationsViewModel : NotificationsViewModel
             Level = NotificationLevel.Error
         });
     }
+}
 
-    private class DesignNotificationService : INotificationService
+file class DesignNotificationService : INotificationService
+{
+    public void RegisterHandler(INotificationHandler handler)
     {
-        public void RegisterHandler(INotificationHandler handler)
-        {
-        }
+    }
 
-        public void Show(string message, NotificationLevel level)
-        {
-        }
+    public Notification ShowNotification(string message, NotificationLevel level)
+    {
+        return null!;
+    }
+
+    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level)
+    {
+        return null!;
     }
 }

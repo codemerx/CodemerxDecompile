@@ -27,7 +27,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        viewModel = App.Current.Services.GetService<MainWindowViewModel>()!;
+        viewModel = App.Current.Services.GetRequiredService<MainWindowViewModel>();
         DataContext = viewModel;
 
         TextEditor.TextArea.TextView.ElementGenerators.Add(new ReferenceElementGenerator());

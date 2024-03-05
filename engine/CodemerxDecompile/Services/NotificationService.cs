@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CodemerxDecompile.Notifications;
 
 namespace CodemerxDecompile.Services;
@@ -13,19 +12,19 @@ public class NotificationService : INotificationService
         this.handler = handler;
     }
 
-    public Notification ShowNotification(string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
+    public void ShowNotification(Notification notification)
     {
         if (handler == null)
             throw new InvalidOperationException($"{nameof(NotificationService)} should be first initialized using {nameof(RegisterHandler)}.");
         
-        return handler.ShowNotification(message, level, actions);
+        handler.ShowNotification(notification);
     }
 
-    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
+    public void ReplaceNotification(Notification notificationToBeReplaced, Notification replacementNotification)
     {
         if (handler == null)
             throw new InvalidOperationException($"{nameof(NotificationService)} should be first initialized using {nameof(RegisterHandler)}.");
         
-        return handler.ReplaceNotification(notification, message, level, actions);
+        handler.ReplaceNotification(notificationToBeReplaced, replacementNotification);
     }
 }

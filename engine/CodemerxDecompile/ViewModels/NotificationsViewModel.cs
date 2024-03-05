@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CodemerxDecompile.Notifications;
 using CodemerxDecompile.Services;
@@ -16,23 +15,15 @@ public partial class NotificationsViewModel : ObservableObject, INotificationsVi
 
     public ObservableCollection<Notification> Notifications { get; } = new();
 
-    public Notification ShowNotification(string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
+    public void ShowNotification(Notification notification)
     {
-        var notification = new Notification
-        {
-            Message = message,
-            Level = level,
-            Actions = actions
-        };
         Notifications.Add(notification);
-
-        return notification;
     }
 
-    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
+    public void ReplaceNotification(Notification notificationToBeReplaced, Notification replacementNotification)
     {
-        CloseNotification(notification);
-        return ShowNotification(message, level, actions);
+        CloseNotification(notificationToBeReplaced);
+        ShowNotification(replacementNotification);
     }
 
     [RelayCommand]

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-
 namespace CodemerxDecompile.Notifications;
 
 public interface INotificationHandler
 {
-    Notification ShowNotification(string message, NotificationLevel level, IEnumerable<NotificationAction>? actions);
+    void ShowNotification(Notification notification);
 
-    Notification ReplaceNotification(Notification notification, string message, NotificationLevel level, IEnumerable<NotificationAction>? actions);
+    void ReplaceNotification(Notification notificationToBeReplaced, Notification replacementNotification);
 }

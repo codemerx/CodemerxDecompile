@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using CodemerxDecompile.Notifications;
 using CodemerxDecompile.Services;
@@ -52,13 +51,11 @@ file class DesignNotificationService : INotificationService
     {
     }
 
-    public Notification ShowNotification(string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
+    public void ShowNotification(Notification notification)
     {
-        return null!;
     }
 
-    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
+    public void ReplaceNotification(Notification notificationToBeReplaced, Notification replacementNotification)
     {
-        return null!;
     }
 }

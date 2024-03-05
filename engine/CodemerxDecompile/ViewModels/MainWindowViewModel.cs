@@ -703,17 +703,30 @@ public partial class MainWindowViewModel : ObservableObject
         if (folders.Count == 0)
             return;
 
-        var generatingProjectNotification = notificationService.ShowNotification("Generating project...", NotificationLevel.Information);
+        var generatingProjectNotification = new Notification
+        {
+            Message = "Generating project...",
+            Level = NotificationLevel.Information
+        };
+        notificationService.ShowNotification(generatingProjectNotification);
 
         var errorMessage = await Task.Run(() => projectGenerationService.GenerateProject((node as AssemblyNode)!.AssemblyDefinition, visualStudioVersion, SelectedLanguage.Instance, folders[0].TryGetLocalPath()!));
 
         if (string.IsNullOrEmpty(errorMessage))
         {
-            notificationService.ReplaceNotification(generatingProjectNotification, "Project generated successfully", NotificationLevel.Success);
+            notificationService.ReplaceNotification(generatingProjectNotification, new Notification
+            {
+                Message = "Project generated successfully",
+                Level = NotificationLevel.Success
+            });
         }
         else
         {
-            notificationService.ReplaceNotification(generatingProjectNotification, "Project generation failed.", NotificationLevel.Error);
+            notificationService.ReplaceNotification(generatingProjectNotification, new Notification
+            {
+                Message = "Project generation failed",
+                Level = NotificationLevel.Error
+            });
         }
     }
 

@@ -9,4 +9,6 @@ public interface INotificationsViewModel
     ObservableCollection<Notification> Notifications { get; }
     
     IRelayCommand<Notification> CloseNotificationCommand { get; }
+    
+    IRelayCommand<NotificationAction> ExecuteNotificationActionCommand { get; }
 }

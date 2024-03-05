@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CodemerxDecompile.Notifications;
 using CodemerxDecompile.Services;
 using JustDecompile.Tools.MSBuildProjectBuilder;
@@ -28,12 +29,12 @@ file class DesignNotificationService : INotificationService
     {
     }
 
-    public Notification ShowNotification(string message, NotificationLevel level)
+    public Notification ShowNotification(string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
     {
         return null!;
     }
 
-    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level)
+    public Notification ReplaceNotification(Notification notification, string message, NotificationLevel level, IEnumerable<NotificationAction>? actions)
     {
         return null!;
     }

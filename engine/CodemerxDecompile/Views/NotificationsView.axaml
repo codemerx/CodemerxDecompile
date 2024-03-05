@@ -13,7 +13,8 @@
         <designViewModels:DesignNotificationsViewModel />
     </Design.DataContext>
     
-    <ItemsControl ItemsSource="{Binding Notifications}"
+    <ItemsControl Name="root"
+                  ItemsSource="{Binding Notifications}"
                   VerticalAlignment="Bottom"
                   HorizontalAlignment="Right"
                   Padding="20">
@@ -35,51 +36,74 @@
             <DataTemplate DataType="notifications:Notification">
                 <Border Classes="notification"
                         MaxWidth="500">
-                    <Grid ColumnDefinitions="Auto,*,Auto">
-                        <Svg Width="18"
-                             Margin="0 0 5 0"
-                             VerticalAlignment="Top">
-                            <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding Level}"
-                                                     ComparisonCondition="Equal"
-                                                     Value="{x:Static notifications:NotificationLevel.Information}">
-                                    <ChangePropertyAction PropertyName="Path"
-                                                          Value="/Assets/StatusInformationOutline.svg" />
-                                </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding Level}"
-                                                     ComparisonCondition="Equal"
-                                                     Value="{x:Static notifications:NotificationLevel.Success}">
-                                    <ChangePropertyAction PropertyName="Path"
-                                                          Value="/Assets/StatusOKOutline.svg" />
-                                </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding Level}"
-                                                     ComparisonCondition="Equal"
-                                                     Value="{x:Static notifications:NotificationLevel.Warning}">
-                                    <ChangePropertyAction PropertyName="Path"
-                                                          Value="/Assets/StatusWarningOutline.svg" />
-                                </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding Level}"
-                                                     ComparisonCondition="Equal"
-                                                     Value="{x:Static notifications:NotificationLevel.Error}">
-                                    <ChangePropertyAction PropertyName="Path"
-                                                          Value="/Assets/StatusErrorOutline.svg" />
-                                </DataTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </Svg>
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding Message}"
-                                   TextWrapping="Wrap" />
-                        <Button Grid.Column="2"
-                                Margin="10 0 0 0"
-                                Background="Transparent"
-                                VerticalAlignment="Top"
-                                Padding="2"
-                                Cursor="Hand"
-                                Command="{Binding $parent[ItemsControl].((viewModels:INotificationsViewModel)DataContext).CloseNotificationCommand}"
-                                CommandParameter="{Binding}">
-                            <Svg Path="/Assets/Close.svg"
-                                 Width="12" />
-                        </Button>
+                    <Grid RowDefinitions="Auto,Auto">
+                        <Grid ColumnDefinitions="Auto,*,Auto"
+                              Margin="0 0 0 10">
+                            <Svg Width="18"
+                                 Margin="0 0 5 0"
+                                 VerticalAlignment="Top">
+                                <Interaction.Behaviors>
+                                    <DataTriggerBehavior Binding="{Binding Level}"
+                                                         ComparisonCondition="Equal"
+                                                         Value="{x:Static notifications:NotificationLevel.Information}">
+                                        <ChangePropertyAction PropertyName="Path"
+                                                              Value="/Assets/StatusInformationOutline.svg" />
+                                    </DataTriggerBehavior>
+                                    <DataTriggerBehavior Binding="{Binding Level}"
+                                                         ComparisonCondition="Equal"
+                                                         Value="{x:Static notifications:NotificationLevel.Success}">
+                                        <ChangePropertyAction PropertyName="Path"
+                                                              Value="/Assets/StatusOKOutline.svg" />
+                                    </DataTriggerBehavior>
+                                    <DataTriggerBehavior Binding="{Binding Level}"
+                                                         ComparisonCondition="Equal"
+                                                         Value="{x:Static notifications:NotificationLevel.Warning}">
+                                        <ChangePropertyAction PropertyName="Path"
+                                                              Value="/Assets/StatusWarningOutline.svg" />
+                                    </DataTriggerBehavior>
+                                    <DataTriggerBehavior Binding="{Binding Level}"
+                                                         ComparisonCondition="Equal"
+                                                         Value="{x:Static notifications:NotificationLevel.Error}">
+                                        <ChangePropertyAction PropertyName="Path"
+                                                              Value="/Assets/StatusErrorOutline.svg" />
+                                    </DataTriggerBehavior>
+                                </Interaction.Behaviors>
+                            </Svg>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Message}"
+                                       TextWrapping="Wrap" />
+                            <Button Grid.Column="2"
+                                    Margin="10 0 0 0"
+                                    Background="Transparent"
+                                    VerticalAlignment="Top"
+                                    Padding="2"
+                                    Cursor="Hand"
+                                    Command="{Binding $parent[ItemsControl].((viewModels:INotificationsViewModel)DataContext).CloseNotificationCommand}"
+                                    CommandParameter="{Binding}">
+                                <Svg Path="/Assets/Close.svg"
+                                     Width="12" />
+                            </Button>
+                        </Grid>
+                        
+                        <ItemsControl Grid.Row="1"
+                                      IsVisible="{Binding Actions, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                      ItemsSource="{Binding Actions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                Spacing="5" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="notifications:NotificationAction">
+                                    <Button Command="{Binding #root.((viewModels:INotificationsViewModel)DataContext).ExecuteNotificationActionCommand}"
+                                            CommandParameter="{Binding}">
+                                        <TextBlock Text="{Binding Title}" />
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Grid>
                 </Border>
             </DataTemplate>

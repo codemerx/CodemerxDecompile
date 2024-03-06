@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
@@ -10,6 +11,7 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Rendering;
 using AvaloniaEdit.TextMate;
 using CodemerxDecompile.Extensions;
+using CodemerxDecompile.Services;
 using CodemerxDecompile.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Mono.Cecil;
@@ -30,6 +32,10 @@ public partial class MainWindow : Window
         viewModel = App.Current.Services.GetRequiredService<MainWindowViewModel>();
         DataContext = viewModel;
 
+        var autoUpdateService = App.Current.Services.GetRequiredService<IAutoUpdateService>();
+        // Swallowing the exceptions on purpose to avoid problems in the auto-update taking down the entire app
+        _ = Task.Run(() => autoUpdateService.CheckForNewerVersionAsync());
+        
         TextEditor.TextArea.TextView.ElementGenerators.Add(new ReferenceElementGenerator());
         
         // TODO: Switch editor theme according with app theme

@@ -39,6 +39,9 @@ public partial class App : Application
 
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddTransient<IProjectGenerationService, ProjectGenerationService>();
+        services.AddTransient<IAutoUpdateService, AutoUpdateService>();
+
+        services.AddHttpClient<AutoUpdateService>();
 
         return services.BuildServiceProvider();
     }

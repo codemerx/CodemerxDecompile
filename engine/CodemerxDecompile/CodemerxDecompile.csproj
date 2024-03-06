@@ -26,6 +26,7 @@
         <PackageReference Include="AvaloniaEdit.TextMate" Version="11.0.6" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageReference Include="TextMateSharp.Grammars" Version="1.0.56" />
     </ItemGroup>
 

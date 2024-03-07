@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -732,14 +733,119 @@ namespace Piranha.Services
 		private async Task SaveAsync<T>(T model, bool isDraft)
 		where T : PageBase
 		{
-			PageService.u003cSaveAsyncu003ed__32<T> variable = new PageService.u003cSaveAsyncu003ed__32<T>();
-			variable.u003cu003e4__this = this;
-			variable.model = model;
-			variable.isDraft = isDraft;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<PageService.u003cSaveAsyncu003ed__32<T>>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			ConfiguredTaskAwaitable<PageInfo> configuredTaskAwaitable;
+			ConfiguredTaskAwaitable configuredTaskAwaitable1;
+			string str;
+			string slug;
+			if (model.Id == Guid.Empty)
+			{
+				model.Id = Guid.NewGuid();
+			}
+			ValidationContext validationContext = new ValidationContext((object)model);
+			Validator.ValidateObject(model, validationContext, true);
+			if (String.IsNullOrWhiteSpace(model.Title))
+			{
+				throw new ValidationException("The Title field is required");
+			}
+			if (String.IsNullOrWhiteSpace(model.TypeId))
+			{
+				throw new ValidationException("The TypeId field is required");
+			}
+			if (!String.IsNullOrWhiteSpace(model.Slug))
+			{
+				model.Slug = Utils.GenerateSlug(model.Slug, true);
+			}
+			else
+			{
+				string str1 = "";
+				using (Config config = new Config(this._paramService))
+				{
+					if (config.HierarchicalPageSlugs && model.ParentId.HasValue)
+					{
+						Guid? parentId = model.ParentId;
+						configuredTaskAwaitable = this.GetByIdAsync<PageInfo>(parentId.Value).ConfigureAwait(false);
+						PageInfo pageInfo = await configuredTaskAwaitable;
+						if (pageInfo != null)
+						{
+							slug = pageInfo.Slug;
+						}
+						else
+						{
+							slug = null;
+						}
+						string str2 = slug;
+						if (!String.IsNullOrWhiteSpace(str2))
+						{
+							str1 = String.Concat(str2, "/");
+						}
+					}
+					object obj = model;
+					string str3 = str1;
+					str = (!String.IsNullOrWhiteSpace(model.NavigationTitle) ? model.NavigationTitle : model.Title);
+					obj.Slug = String.Concat(str3, Utils.GenerateSlug(str, true));
+				}
+				config = null;
+				str1 = null;
+			}
+			if (String.IsNullOrWhiteSpace(model.Slug))
+			{
+				throw new ValidationException("The generated slug is empty as the title only contains special characters, please specify a slug to save the page.");
+			}
+			configuredTaskAwaitable = this._repo.GetById<PageInfo>(model.Id).ConfigureAwait(false);
+			PageInfo pageInfo1 = await configuredTaskAwaitable;
+			bool flag = this.IsPublished(pageInfo1) != this.IsPublished(model);
+			IEnumerable<Guid> guids = new Guid[0];
+			App.Hooks.OnBeforeSave<PageBase>(model);
+			if (!(this.IsPublished(pageInfo1) & isDraft))
+			{
+				if (pageInfo1 == null & isDraft)
+				{
+					model.Published = null;
+				}
+				else if (pageInfo1 != null && !isDraft)
+				{
+					using (config = new Config(this._paramService))
+					{
+						configuredTaskAwaitable1 = this._repo.DeleteDraft(model.Id).ConfigureAwait(false);
+						await configuredTaskAwaitable1;
+						configuredTaskAwaitable1 = this._repo.CreateRevision(model.Id, config.PageRevisions).ConfigureAwait(false);
+						await configuredTaskAwaitable1;
+					}
+					config = null;
+				}
+				ConfiguredTaskAwaitable<IEnumerable<Guid>> configuredTaskAwaitable2 = this._repo.Save<T>(model).ConfigureAwait(false);
+				guids = await configuredTaskAwaitable2;
+			}
+			else
+			{
+				configuredTaskAwaitable1 = this._repo.SaveDraft<T>(model).ConfigureAwait(false);
+				await configuredTaskAwaitable1;
+			}
+			App.Hooks.OnAfterSave<PageBase>(model);
+			if (!isDraft && this._search != null)
+			{
+				await this._search.SavePageAsync(model);
+			}
+			configuredTaskAwaitable1 = this.RemoveFromCache(model).ConfigureAwait(false);
+			await configuredTaskAwaitable1;
+			if (this._cache != null)
+			{
+				foreach (Guid guid in guids)
+				{
+					configuredTaskAwaitable = this.GetByIdAsync<PageInfo>(guid).ConfigureAwait(false);
+					if (await configuredTaskAwaitable == null)
+					{
+						continue;
+					}
+					configuredTaskAwaitable1 = this.RemoveFromCache(model).ConfigureAwait(false);
+					await configuredTaskAwaitable1;
+				}
+			}
+			if (flag || guids.Count<Guid>() > 0)
+			{
+				configuredTaskAwaitable1 = this._siteService.InvalidateSitemapAsync(model.SiteId, true).ConfigureAwait(false);
+				await configuredTaskAwaitable1;
+			}
 		}
 
 		public Task SaveCommentAndVerifyAsync(Guid pageId, Comment model)

@@ -37,25 +37,79 @@ namespace Piranha.Services
 
 		public async Task<object> CreateBlockAsync(string typeName)
 		{
-			ContentFactory.u003cCreateBlockAsyncu003ed__4 variable = new ContentFactory.u003cCreateBlockAsyncu003ed__4();
-			variable.u003cu003e4__this = this;
-			variable.typeName = typeName;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<object>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ContentFactory.u003cCreateBlockAsyncu003ed__4>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			object obj;
+			AppBlock byType = App.Blocks.GetByType(typeName);
+			if (byType == null)
+			{
+				obj = null;
+			}
+			else
+			{
+				using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(this._services))
+				{
+					Block block = (Block)Activator.CreateInstance(byType.Type);
+					block.Type = typeName;
+					PropertyInfo[] properties = byType.Type.GetProperties(App.PropertyBindings);
+					for (int i = 0; i < (int)properties.Length; i++)
+					{
+						PropertyInfo propertyInfo = properties[i];
+						if (typeof(IField).IsAssignableFrom(propertyInfo.PropertyType))
+						{
+							object obj1 = Activator.CreateInstance(propertyInfo.PropertyType);
+							ConfiguredTaskAwaitable<object> configuredTaskAwaitable = this.InitFieldAsync(serviceScope, obj1, false).ConfigureAwait(false);
+							await configuredTaskAwaitable;
+							propertyInfo.SetValue(block, obj1);
+							obj1 = null;
+						}
+						propertyInfo = null;
+					}
+					properties = null;
+					obj = block;
+				}
+			}
+			return obj;
 		}
 
 		private async Task<T> CreateDynamicModelAsync<T>(ContentTypeBase type)
 		where T : ContentBase
 		{
-			ContentFactory.u003cCreateDynamicModelAsyncu003ed__5<T> variable = new ContentFactory.u003cCreateDynamicModelAsyncu003ed__5<T>();
-			variable.u003cu003e4__this = this;
-			variable.type = type;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<T>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ContentFactory.u003cCreateDynamicModelAsyncu003ed__5<T>>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			T t;
+			ConfiguredTaskAwaitable<object> configuredTaskAwaitable;
+			using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(this._services))
+			{
+				T id = Activator.CreateInstance<T>();
+				id.TypeId = type.Id;
+				foreach (RegionType region in type.Regions)
+				{
+					object obj = null;
+					if (region.Collection)
+					{
+						configuredTaskAwaitable = this.CreateDynamicRegionAsync(serviceScope, region, false, false).ConfigureAwait(false);
+						object obj1 = await configuredTaskAwaitable;
+						if (obj1 != null)
+						{
+							Type type1 = typeof(RegionList<>);
+							Type[] typeArray = new Type[] { obj1.GetType() };
+							obj = Activator.CreateInstance(type1.MakeGenericType(typeArray));
+							((IRegionList)obj).Model = (IDynamicContent)(object)id;
+							((IRegionList)obj).TypeId = type.Id;
+							((IRegionList)obj).RegionId = region.Id;
+						}
+					}
+					else
+					{
+						configuredTaskAwaitable = this.CreateDynamicRegionAsync(serviceScope, region, true, false).ConfigureAwait(false);
+						obj = await configuredTaskAwaitable;
+					}
+					if (obj != null)
+					{
+						((IDictionary<string, object>)((dynamic)((IDynamicContent)(object)id).Regions)).Add(region.Id, obj);
+					}
+					obj = null;
+				}
+				t = id;
+			}
+			return t;
 		}
 
 		public Task<object> CreateDynamicRegionAsync(ContentTypeBase type, string regionId, bool managerInit = false)
@@ -134,13 +188,47 @@ namespace Piranha.Services
 		private async Task<T> CreateModelAsync<T>(ContentTypeBase type)
 		where T : ContentBase
 		{
-			ContentFactory.u003cCreateModelAsyncu003ed__6<T> variable = new ContentFactory.u003cCreateModelAsyncu003ed__6<T>();
-			variable.u003cu003e4__this = this;
-			variable.type = type;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<T>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ContentFactory.u003cCreateModelAsyncu003ed__6<T>>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			T t;
+			using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(this._services))
+			{
+				Type type1 = typeof(T);
+				if (!typeof(IContentInfo).IsAssignableFrom(type1))
+				{
+					type1 = Type.GetType(type.CLRType);
+					if (type1 != typeof(T) && !typeof(T).IsAssignableFrom(type1))
+					{
+						t = default(T);
+						return t;
+					}
+				}
+				T id = (T)Activator.CreateInstance(type1);
+				id.TypeId = type.Id;
+				foreach (RegionType region in type.Regions)
+				{
+					object obj = null;
+					if (region.Collection)
+					{
+						PropertyInfo property = type1.GetProperty(region.Id, App.PropertyBindings);
+						if (property != null)
+						{
+							Type type2 = typeof(List<>);
+							Type[] genericArguments = new Type[] { property.PropertyType.GetGenericArguments()[0] };
+							obj = Activator.CreateInstance(type2.MakeGenericType(genericArguments));
+						}
+					}
+					else
+					{
+						ConfiguredTaskAwaitable<object> configuredTaskAwaitable = this.CreateRegionAsync(serviceScope, id, type1, region, true).ConfigureAwait(false);
+						obj = await configuredTaskAwaitable;
+					}
+					if (obj != null)
+					{
+						type1.SetPropertyValue(region.Id, id, obj);
+					}
+				}
+				t = id;
+			}
+			return t;
 		}
 
 		private async Task<object> CreateRegionAsync(IServiceScope scope, object model, Type modelType, RegionType regionType, bool initFields = true)
@@ -203,15 +291,56 @@ namespace Piranha.Services
 		private async Task<T> InitAsync<T>(T model, ContentTypeBase type, bool managerInit)
 		where T : ContentBase
 		{
-			ContentFactory.u003cInitAsyncu003ed__13<T> variable = new ContentFactory.u003cInitAsyncu003ed__13<T>();
-			variable.u003cu003e4__this = this;
-			variable.model = model;
-			variable.type = type;
-			variable.managerInit = managerInit;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<T>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ContentFactory.u003cInitAsyncu003ed__13<T>>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			ConfiguredTaskAwaitable configuredTaskAwaitable;
+			if ((object)model is IDynamicContent)
+			{
+				throw new ArgumentException("For dynamic models InitDynamic should be used.");
+			}
+			using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(this._services))
+			{
+				foreach (RegionType region in type.Regions)
+				{
+					object propertyValue = model.GetType().GetPropertyValue(region.Id, model);
+					if (propertyValue != null)
+					{
+						if (region.Collection)
+						{
+							foreach (object obj in (IList)propertyValue)
+							{
+								configuredTaskAwaitable = this.InitRegionAsync(serviceScope, obj, region, managerInit).ConfigureAwait(false);
+								await configuredTaskAwaitable;
+							}
+						}
+						else
+						{
+							configuredTaskAwaitable = this.InitRegionAsync(serviceScope, propertyValue, region, managerInit).ConfigureAwait(false);
+							await configuredTaskAwaitable;
+						}
+					}
+				}
+				if (!((object)model is IContentInfo))
+				{
+					IBlockContent blockContent = (object)model as IBlockContent;
+					if (blockContent != null)
+					{
+						foreach (Block block in blockContent.Blocks)
+						{
+							configuredTaskAwaitable = this.InitBlockAsync(serviceScope, block, managerInit).ConfigureAwait(false);
+							await configuredTaskAwaitable;
+							if (block is BlockGroup)
+							{
+								foreach (Block item in ((BlockGroup)block).Items)
+								{
+									configuredTaskAwaitable = this.InitBlockAsync(serviceScope, item, managerInit).ConfigureAwait(false);
+									await configuredTaskAwaitable;
+								}
+							}
+						}
+					}
+				}
+			}
+			serviceScope = null;
+			return model;
 		}
 
 		private async Task InitBlockAsync(IServiceScope scope, Block block, bool managerInit)
@@ -246,15 +375,50 @@ namespace Piranha.Services
 		private async Task<T> InitDynamicAsync<T>(T model, ContentTypeBase type, bool managerInit)
 		where T : IDynamicContent
 		{
-			ContentFactory.u003cInitDynamicAsyncu003ed__9<T> variable = new ContentFactory.u003cInitDynamicAsyncu003ed__9<T>();
-			variable.u003cu003e4__this = this;
-			variable.model = model;
-			variable.type = type;
-			variable.managerInit = managerInit;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<T>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ContentFactory.u003cInitDynamicAsyncu003ed__9<T>>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			object obj;
+			ConfiguredTaskAwaitable configuredTaskAwaitable;
+			using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(this._services))
+			{
+				foreach (RegionType region in type.Regions)
+				{
+					if (((IDictionary<string, object>)((dynamic)model.Regions)).TryGetValue(region.Id, out obj))
+					{
+						if (region.Collection)
+						{
+							foreach (object obj1 in (IList)obj)
+							{
+								configuredTaskAwaitable = this.InitDynamicRegionAsync(serviceScope, obj1, region, managerInit).ConfigureAwait(false);
+								await configuredTaskAwaitable;
+							}
+						}
+						else
+						{
+							configuredTaskAwaitable = this.InitDynamicRegionAsync(serviceScope, obj, region, managerInit).ConfigureAwait(false);
+							await configuredTaskAwaitable;
+						}
+					}
+				}
+				IBlockContent blockContent = (object)model as IBlockContent;
+				if (blockContent != null)
+				{
+					foreach (Block block in blockContent.Blocks)
+					{
+						configuredTaskAwaitable = this.InitBlockAsync(serviceScope, block, managerInit).ConfigureAwait(false);
+						await configuredTaskAwaitable;
+						BlockGroup blockGroup = block as BlockGroup;
+						if (blockGroup != null)
+						{
+							foreach (Block item in blockGroup.Items)
+							{
+								configuredTaskAwaitable = this.InitBlockAsync(serviceScope, item, managerInit).ConfigureAwait(false);
+								await configuredTaskAwaitable;
+							}
+						}
+					}
+				}
+			}
+			serviceScope = null;
+			return model;
 		}
 
 		public Task<T> InitDynamicManagerAsync<T>(T model, ContentTypeBase type)
@@ -291,14 +455,12 @@ namespace Piranha.Services
 
 		public async Task<object> InitFieldAsync(object field, bool managerInit = false)
 		{
-			ContentFactory.u003cInitFieldAsyncu003ed__12 variable = new ContentFactory.u003cInitFieldAsyncu003ed__12();
-			variable.u003cu003e4__this = this;
-			variable.field = field;
-			variable.managerInit = managerInit;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<object>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ContentFactory.u003cInitFieldAsyncu003ed__12>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			object obj;
+			using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(this._services))
+			{
+				obj = await this.InitFieldAsync(serviceScope, field, managerInit);
+			}
+			return obj;
 		}
 
 		private async Task<object> InitFieldAsync(IServiceScope scope, object field, bool managerInit)

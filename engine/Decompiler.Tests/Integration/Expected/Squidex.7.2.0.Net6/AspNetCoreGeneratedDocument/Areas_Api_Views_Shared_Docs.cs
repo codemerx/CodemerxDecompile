@@ -115,11 +115,6 @@ namespace AspNetCoreGeneratedDocument
 			this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("head", 0, "408543084e6ec112f2adfcdd180390940a17504ab38008ec549f2f74bfcecd113739", async () => {
 				this.WriteLiteral("\n    <title>API Docs</title>\n    \n    ");
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("base", 2, "408543084e6ec112f2adfcdd180390940a17504ab38008ec549f2f74bfcecd114056", async () => {
-					Areas_Api_Views_Shared_Docs.u003cu003ec.u003cu003cExecuteAsyncu003eb__10_2u003ed _ = new Areas_Api_Views_Shared_Docs.u003cu003ec.u003cu003cExecuteAsyncu003eb__10_2u003ed();
-					_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-					_.u003cu003e1__state = -1;
-					_.u003cu003et__builder.Start<Areas_Api_Views_Shared_Docs.u003cu003ec.u003cu003cExecuteAsyncu003eb__10_2u003ed>(ref _);
-					return _.u003cu003et__builder.Task;
 				});
 				this.__Microsoft_AspNetCore_Mvc_Razor_TagHelpers_UrlResolutionTagHelper = base.CreateTagHelper<UrlResolutionTagHelper>();
 				this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_Razor_TagHelpers_UrlResolutionTagHelper);

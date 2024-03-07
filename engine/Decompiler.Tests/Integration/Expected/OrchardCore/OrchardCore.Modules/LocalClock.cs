@@ -68,12 +68,41 @@ namespace OrchardCore.Modules
 
 		private async Task<ITimeZone> LoadLocalTimeZoneAsync()
 		{
-			LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11 variable = new LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11();
-			variable.u003cu003e4__this = this;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<ITimeZone>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			ITimeZone timeZone;
+			List<TimeZoneSelectorResult> timeZoneSelectorResults = new List<TimeZoneSelectorResult>();
+			foreach (ITimeZoneSelector _timeZoneSelector in this._timeZoneSelectors)
+			{
+				TimeZoneSelectorResult timeZoneAsync = await _timeZoneSelector.GetTimeZoneAsync();
+				if (timeZoneAsync == null)
+				{
+					continue;
+				}
+				timeZoneSelectorResults.Add(timeZoneAsync);
+			}
+			if (timeZoneSelectorResults.Count != 0)
+			{
+				if (timeZoneSelectorResults.Count > 1)
+				{
+					List<TimeZoneSelectorResult> timeZoneSelectorResults1 = timeZoneSelectorResults;
+					timeZoneSelectorResults1.Sort((TimeZoneSelectorResult x, TimeZoneSelectorResult y) => y.get_Priority().CompareTo(x.get_Priority()));
+				}
+				foreach (TimeZoneSelectorResult timeZoneSelectorResult in timeZoneSelectorResults)
+				{
+					string timeZoneId = await timeZoneSelectorResult.get_TimeZoneId()();
+					if (string.IsNullOrEmpty(timeZoneId))
+					{
+						continue;
+					}
+					timeZone = this._clock.GetTimeZone(timeZoneId);
+					return timeZone;
+				}
+				timeZone = this._clock.GetSystemTimeZone();
+			}
+			else
+			{
+				timeZone = this._clock.GetSystemTimeZone();
+			}
+			return timeZone;
 		}
 	}
 }

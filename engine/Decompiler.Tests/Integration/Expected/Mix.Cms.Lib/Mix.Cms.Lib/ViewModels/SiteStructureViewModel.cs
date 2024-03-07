@@ -120,79 +120,334 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public async Task<RepositoryResponse<bool>> ImportAsync(string destCulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			SiteStructureViewModel.u003cImportAsyncu003ed__57 variable = new SiteStructureViewModel.u003cImportAsyncu003ed__57();
-			variable.u003cu003e4__this = this;
-			variable.destCulture = destCulture;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SiteStructureViewModel.u003cImportAsyncu003ed__57>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
+			try
+			{
+				try
+				{
+					if (this.Pages != null)
+					{
+						repositoryResponse1 = await this.ImportPagesAsync(destCulture, mixCmsContext, dbContextTransaction);
+					}
+					if (repositoryResponse1.get_IsSucceed() && this.Modules != null)
+					{
+						repositoryResponse1 = await this.ImportModulesAsync(destCulture, mixCmsContext, dbContextTransaction);
+					}
+					if (repositoryResponse1.get_IsSucceed() && this.AttributeSets != null)
+					{
+						repositoryResponse1 = await this.ImportAttributeSetsAsync(mixCmsContext, dbContextTransaction);
+					}
+					if (repositoryResponse1.get_IsSucceed() && this.AttributeSetDatas.Count > 0)
+					{
+						repositoryResponse1 = await this.ImportAttributeSetDatas(destCulture, mixCmsContext, dbContextTransaction);
+					}
+					if (repositoryResponse1.get_IsSucceed() && this.RelatedData.Count > 0)
+					{
+						repositoryResponse1 = await this.ImportRelatedDatas(destCulture, mixCmsContext, dbContextTransaction);
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), flag, dbContextTransaction);
+				}
+				catch (Exception exception)
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel> repositoryResponse2 = UnitOfWorkHelper<MixCmsContext>.HandleException<Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel>(exception, flag, dbContextTransaction);
+					repositoryResponse1.set_IsSucceed(false);
+					repositoryResponse1.set_Errors(repositoryResponse2.get_Errors());
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> ImportAttributeSetDatas(string destCulture, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			SiteStructureViewModel.u003cImportAttributeSetDatasu003ed__61 variable = new SiteStructureViewModel.u003cImportAttributeSetDatasu003ed__61();
-			variable.u003cu003e4__this = this;
-			variable.destCulture = destCulture;
-			variable.context = context;
-			variable.transaction = transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SiteStructureViewModel.u003cImportAttributeSetDatasu003ed__61>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel updateViewModel;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel attributeSetData in this.AttributeSetDatas)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					break;
+				}
+				DbSet<MixAttributeSetData> mixAttributeSetData = context.MixAttributeSetData;
+				if (mixAttributeSetData.Any<MixAttributeSetData>((MixAttributeSetData m) => m.Id == attributeSetData.Id && m.Specificulture == attributeSetData.Specificulture))
+				{
+					continue;
+				}
+				attributeSetData.Specificulture = destCulture;
+				if (attributeSetData.AttributeSetName.IndexOf("sys_") != 0 && this.dicAttributeSetIds.ContainsKey(attributeSetData.AttributeSetId))
+				{
+					attributeSetData.AttributeSetId = this.dicAttributeSetIds[attributeSetData.AttributeSetId];
+				}
+				Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel importViewModel = attributeSetData;
+				List<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel> fields = attributeSetData.Fields;
+				if (fields == null)
+				{
+					DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository;
+					fields = repository.GetModelListBy((MixAttributeField m) => m.AttributeSetId == attributeSetData.AttributeSetId, context, transaction).get_Data();
+				}
+				importViewModel.Fields = fields;
+				foreach (Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field in attributeSetData.Fields)
+				{
+					field.Specificulture = destCulture;
+					Mix.Cms.Lib.ViewModels.MixAttributeSets.ImportViewModel importViewModel1 = this.AttributeSets.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeSets.ImportViewModel>((Mix.Cms.Lib.ViewModels.MixAttributeSets.ImportViewModel m) => m.Name == field.AttributeSetName);
+					if (importViewModel1 != null)
+					{
+						updateViewModel = importViewModel1.Fields.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>((Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel m) => m.Name == field.Name);
+					}
+					else
+					{
+						updateViewModel = null;
+					}
+					Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel updateViewModel1 = updateViewModel;
+					if (updateViewModel1 == null)
+					{
+						continue;
+					}
+					field.Id = updateViewModel1.Id;
+					field.AttributeSetId = importViewModel1.Id;
+					field.AttributeSetName = importViewModel1.Name;
+				}
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel>(await attributeSetData.SaveModelAsync(true, context, transaction), ref repositoryResponse1);
+			}
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> ImportAttributeSetsAsync(MixCmsContext context, IDbContextTransaction transaction)
 		{
-			SiteStructureViewModel.u003cImportAttributeSetsAsyncu003ed__59 variable = new SiteStructureViewModel.u003cImportAttributeSetsAsyncu003ed__59();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.transaction = transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SiteStructureViewModel.u003cImportAttributeSetsAsyncu003ed__59>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (this.AttributeSets != null)
+			{
+				DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.ImportViewModel>.Repository;
+				int data = repository.Max((MixAttributeSet m) => m.Id, null, null).get_Data();
+				DefaultRepository<!0, !1, !2> defaultRepository = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository;
+				int num = defaultRepository.Max((MixAttributeField m) => m.Id, null, null).get_Data();
+				foreach (Mix.Cms.Lib.ViewModels.MixAttributeSets.ImportViewModel attributeSet in this.AttributeSets)
+				{
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						break;
+					}
+					data++;
+					this.dicAttributeSetIds.Add(attributeSet.Id, data);
+					DbSet<MixAttributeSet> mixAttributeSet = context.MixAttributeSet;
+					if (mixAttributeSet.Any<MixAttributeSet>((MixAttributeSet m) => m.Name == attributeSet.Name))
+					{
+						continue;
+					}
+					attributeSet.Id = data;
+					attributeSet.CreatedDateTime = DateTime.UtcNow;
+					foreach (Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field in attributeSet.Fields)
+					{
+						num++;
+						this.dicFieldIds.Add(field.Id, num);
+						field.Id = num;
+						field.CreatedDateTime = DateTime.UtcNow;
+					}
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSets.ImportViewModel>(await attributeSet.SaveModelAsync(true, context, transaction), ref repositoryResponse1);
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> ImportModulesAsync(string destCulture, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			SiteStructureViewModel.u003cImportModulesAsyncu003ed__58 variable = new SiteStructureViewModel.u003cImportModulesAsyncu003ed__58();
-			variable.u003cu003e4__this = this;
-			variable.destCulture = destCulture;
-			variable.context = context;
-			variable.transaction = transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SiteStructureViewModel.u003cImportModulesAsyncu003ed__58>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			SiteStructureViewModel.u003cu003ec__DisplayClass58_0 variable = null;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel module in this.Modules)
+			{
+				int id = module.Id;
+				DbSet<MixModule> mixModule = context.MixModule;
+				int num = mixModule.Max<MixModule, int>((MixModule m) => m.Id);
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					break;
+				}
+				DbSet<MixModule> dbSet = context.MixModule;
+				if (!dbSet.Any<MixModule>((MixModule m) => m.Name == module.Name && m.Specificulture == variable.destCulture))
+				{
+					num++;
+					module.Id = num;
+					module.Specificulture = destCulture;
+					if (!string.IsNullOrEmpty(module.Image))
+					{
+						module.Image = module.Image.Replace(string.Concat("content/templates/", this.ThemeName), string.Concat("content/templates/", MixService.GetConfig<string>("ThemeFolder", destCulture)));
+					}
+					module.CreatedDateTime = DateTime.UtcNow;
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>(await module.SaveModelAsync(true, context, transaction), ref repositoryResponse1);
+				}
+				this.dicModuleIds.Add(id, module.Id);
+			}
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> ImportPagesAsync(string destCulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			SiteStructureViewModel.u003cImportPagesAsyncu003ed__60 variable = new SiteStructureViewModel.u003cImportPagesAsyncu003ed__60();
-			variable.u003cu003e4__this = this;
-			variable.destCulture = destCulture;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SiteStructureViewModel.u003cImportPagesAsyncu003ed__60>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
+			try
+			{
+				try
+				{
+					DefaultModelRepository<!0, !1> modelRepository = ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.UpdateViewModel>.ModelRepository;
+					int data = modelRepository.Max((MixPage m) => m.Id, mixCmsContext, dbContextTransaction).get_Data();
+					DefaultModelRepository<!0, !1> defaultModelRepository = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>.ModelRepository;
+					int num = defaultModelRepository.Max((MixModule m) => m.Id, mixCmsContext, dbContextTransaction).get_Data();
+					foreach (Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel page in this.Pages)
+					{
+						DbSet<MixPage> mixPage = mixCmsContext.MixPage;
+						if (mixPage.Any<MixPage>((MixPage p) => p.SeoName == page.SeoName))
+						{
+							continue;
+						}
+						int id = page.Id;
+						data++;
+						this.dicPageIds.Add(id, data);
+						page.Id = data;
+						page.CreatedDateTime = DateTime.UtcNow;
+						page.ThemeName = this.ThemeName;
+						if (page.ModuleNavs != null)
+						{
+							foreach (Mix.Cms.Lib.ViewModels.MixPageModules.ImportViewModel moduleNav in page.ModuleNavs)
+							{
+								num++;
+								this.dicModuleIds.Add(moduleNav.Module.Id, num);
+								moduleNav.Module.Id = num;
+								moduleNav.PageId = data;
+								moduleNav.ModuleId = num;
+							}
+						}
+						if (!string.IsNullOrEmpty(page.Image))
+						{
+							page.Image = page.Image.Replace(string.Concat("content/templates/", this.ThemeName), string.Concat("content/templates/", MixService.GetConfig<string>("ThemeFolder", destCulture)));
+						}
+						if (!string.IsNullOrEmpty(page.Thumbnail))
+						{
+							page.Thumbnail = page.Thumbnail.Replace(string.Concat("content/templates/", this.ThemeName), string.Concat("content/templates/", MixService.GetConfig<string>("ThemeFolder", destCulture)));
+						}
+						page.Specificulture = destCulture;
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel> repositoryResponse2 = await page.SaveModelAsync(true, mixCmsContext, dbContextTransaction);
+						if (repositoryResponse2.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_IsSucceed(false);
+						repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+						repositoryResponse1.set_Errors(repositoryResponse2.get_Errors());
+						break;
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), flag, dbContextTransaction);
+				}
+				catch (Exception exception)
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel> repositoryResponse3 = UnitOfWorkHelper<MixCmsContext>.HandleException<Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel>(exception, flag, dbContextTransaction);
+					repositoryResponse1.set_IsSucceed(false);
+					repositoryResponse1.set_Errors(repositoryResponse3.get_Errors());
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> ImportRelatedDatas(string desCulture, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			SiteStructureViewModel.u003cImportRelatedDatasu003ed__62 variable = new SiteStructureViewModel.u003cImportRelatedDatasu003ed__62();
-			variable.u003cu003e4__this = this;
-			variable.desCulture = desCulture;
-			variable.context = context;
-			variable.transaction = transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SiteStructureViewModel.u003cImportRelatedDatasu003ed__62>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			int num;
+			int num1;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel>.Enumerator enumerator = this.RelatedData.GetEnumerator();
+			try
+			{
+				while (enumerator.MoveNext())
+				{
+					Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel current = enumerator.Current;
+					current.Id = Guid.NewGuid().ToString();
+					current.Specificulture = desCulture;
+					switch (current.ParentType)
+					{
+						case MixEnums.MixAttributeSetDataType.System:
+						case MixEnums.MixAttributeSetDataType.Post:
+						case MixEnums.MixAttributeSetDataType.Service:
+						{
+							if (!repositoryResponse1.get_IsSucceed())
+							{
+								goto Label0;
+							}
+							ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel>(await current.SaveModelAsync(false, context, transaction), ref repositoryResponse1);
+							continue;
+						}
+						case MixEnums.MixAttributeSetDataType.Set:
+						{
+							current.AttributeSetId = this.dicAttributeSetIds[int.Parse(current.ParentId)];
+							goto case MixEnums.MixAttributeSetDataType.Service;
+						}
+						case MixEnums.MixAttributeSetDataType.Page:
+						{
+							if (!this.dicPageIds.TryGetValue(int.Parse(current.ParentId), out num))
+							{
+								continue;
+							}
+							current.ParentId = num.ToString();
+							goto case MixEnums.MixAttributeSetDataType.Service;
+						}
+						case MixEnums.MixAttributeSetDataType.Module:
+						{
+							if (!this.dicModuleIds.TryGetValue(int.Parse(current.ParentId), out num1))
+							{
+								continue;
+							}
+							current.ParentId = num1.ToString();
+							goto case MixEnums.MixAttributeSetDataType.Service;
+						}
+						default:
+						{
+							goto case MixEnums.MixAttributeSetDataType.Service;
+						}
+					}
+				}
+			Label0:
+			}
+			finally
+			{
+				((IDisposable)enumerator).Dispose();
+			}
+			enumerator = new List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ImportViewModel>.Enumerator();
+			return repositoryResponse1;
 		}
 
 		public async Task InitAsync(string culture)

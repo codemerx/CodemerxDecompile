@@ -86,13 +86,93 @@ namespace Squidex.Areas.Api.Controllers.Users
 		[Route("users/{id}/picture/")]
 		public async Task<IActionResult> GetUserPicture(string id)
 		{
-			UsersController.u003cGetUserPictureu003ed__10 variable = new UsersController.u003cGetUserPictureu003ed__10();
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<IActionResult>.Create();
-			variable.u003cu003e4__this = this;
-			variable.id = id;
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<UsersController.u003cGetUserPictureu003ed__10>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			IActionResult fileCallbackResult;
+			string str;
+			string tag;
+			UsersController.u003cu003ec__DisplayClass10_0 variable;
+			try
+			{
+				IUser user = await this.userResolver.FindByIdAsync(id, base.get_HttpContext().get_RequestAborted());
+				IUser user1 = user;
+				if (user1 != null)
+				{
+					if (!SquidexClaimsExtensions.IsPictureUrlStored(user1.get_Claims()))
+					{
+						using (HttpClient httpClient = HttpClientFactoryExtensions.CreateClient(this.httpClientFactory))
+						{
+							string str1 = SquidexClaimsExtensions.PictureNormalizedUrl(user1.get_Claims());
+							if (!string.IsNullOrWhiteSpace(str1))
+							{
+								HttpResponseMessage async = await httpClient.GetAsync(str1, HttpCompletionOption.ResponseHeadersRead, base.get_HttpContext().get_RequestAborted());
+								if (!async.IsSuccessStatusCode)
+								{
+									async = null;
+								}
+								else
+								{
+									MediaTypeHeaderValue contentType = async.Content.Headers.ContentType;
+									if (contentType != null)
+									{
+										str = contentType.ToString();
+									}
+									else
+									{
+										str = null;
+									}
+									string str2 = str;
+									Stream stream = await async.Content.ReadAsStreamAsync(base.get_HttpContext().get_RequestAborted());
+									System.Net.Http.Headers.EntityTagHeaderValue eTag = async.Headers.ETag;
+									FileStreamResult fileStreamResult = new FileStreamResult(stream, str2);
+									if (eTag != null)
+									{
+										tag = eTag.Tag;
+									}
+									else
+									{
+										tag = null;
+									}
+									if (!string.IsNullOrWhiteSpace(tag))
+									{
+										fileStreamResult.set_EntityTag(new Microsoft.Net.Http.Headers.EntityTagHeaderValue(eTag.Tag, eTag.IsWeak));
+									}
+									fileCallbackResult = fileStreamResult;
+									variable = null;
+									return fileCallbackResult;
+								}
+							}
+						}
+						httpClient = null;
+					}
+					else
+					{
+						FileCallback fileCallback = new FileCallback(variable, async (Stream body, BytesRange range, CancellationToken ct) => {
+							int num = 0;
+							try
+							{
+								await this.u003cu003e4__this.userPictureStore.DownloadAsync(this.entity.get_Id(), body, ct);
+							}
+							catch
+							{
+								num = 1;
+							}
+							if (num == 1)
+							{
+								await body.WriteAsync(UsersController.AvatarBytes, ct);
+							}
+						});
+						fileCallbackResult = new FileCallbackResult("image/png", fileCallback);
+						variable = null;
+						return fileCallbackResult;
+					}
+				}
+			}
+			catch (Exception exception)
+			{
+				LoggerExtensions.LogError(this.log, exception, "Failed to return user picture, returning fallback image.", Array.Empty<object>());
+			}
+			fileCallbackResult = new FileStreamResult(new MemoryStream(UsersController.AvatarBytes), "image/png");
+			variable = null;
+			return fileCallbackResult;
 		}
 
 		[ApiPermission(new string[] {  })]

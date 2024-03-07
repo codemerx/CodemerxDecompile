@@ -131,145 +131,411 @@ namespace Mix.Cms.Lib.ViewModels.MixCultures
 
 		public async Task<RepositoryResponse<bool>> CloneConfigurationsAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneConfigurationsAsyncu003ed__73 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneConfigurationsAsyncu003ed__73();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneConfigurationsAsyncu003ed__73>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixConfiguration> instance = DefaultModelRepository<MixCmsContext, MixConfiguration>.get_Instance();
+				RepositoryResponse<List<MixConfiguration>> modelListByAsync = await instance.GetModelListByAsync((MixConfiguration c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixConfiguration datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						datum.CreatedDateTime = DateTime.UtcNow;
+						context.Entry<MixConfiguration>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> CloneLanguagesAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneLanguagesAsyncu003ed__72 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneLanguagesAsyncu003ed__72();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneLanguagesAsyncu003ed__72>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixLanguage> instance = DefaultModelRepository<MixCmsContext, MixLanguage>.get_Instance();
+				RepositoryResponse<List<MixLanguage>> modelListByAsync = await instance.GetModelListByAsync((MixLanguage c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixLanguage datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						datum.CreatedDateTime = DateTime.UtcNow;
+						context.Entry<MixLanguage>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> CloneMediasAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneMediasAsyncu003ed__64 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneMediasAsyncu003ed__64();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneMediasAsyncu003ed__64>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixMedia> instance = DefaultModelRepository<MixCmsContext, MixMedia>.get_Instance();
+				RepositoryResponse<List<MixMedia>> modelListByAsync = await instance.GetModelListByAsync((MixMedia c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixMedia datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixMedia>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> CloneModuleDatasAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModuleDatasAsyncu003ed__71 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModuleDatasAsyncu003ed__71();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModuleDatasAsyncu003ed__71>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixModulePost> instance = DefaultModelRepository<MixCmsContext, MixModulePost>.get_Instance();
+				RepositoryResponse<List<MixModulePost>> modelListByAsync = await instance.GetModelListByAsync((MixModulePost c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixModulePost datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixModulePost>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> CloneModulePostsAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModulePostsAsyncu003ed__67 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModulePostsAsyncu003ed__67();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModulePostsAsyncu003ed__67>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixModulePost> instance = DefaultModelRepository<MixCmsContext, MixModulePost>.get_Instance();
+				RepositoryResponse<List<MixModulePost>> modelListByAsync = await instance.GetModelListByAsync((MixModulePost c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixModulePost datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixModulePost>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> CloneModulesAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModulesAsyncu003ed__63 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModulesAsyncu003ed__63();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneModulesAsyncu003ed__63>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixModule> instance = DefaultModelRepository<MixCmsContext, MixModule>.get_Instance();
+				RepositoryResponse<List<MixModule>> modelListByAsync = await instance.GetModelListByAsync((MixModule c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixModule datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixModule>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> ClonePageModulesAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePageModulesAsyncu003ed__69 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePageModulesAsyncu003ed__69();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePageModulesAsyncu003ed__69>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixPageModule> instance = DefaultModelRepository<MixCmsContext, MixPageModule>.get_Instance();
+				RepositoryResponse<List<MixPageModule>> modelListByAsync = await instance.GetModelListByAsync((MixPageModule c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixPageModule datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixPageModule>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> ClonePagePostsAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePagePostsAsyncu003ed__68 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePagePostsAsyncu003ed__68();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePagePostsAsyncu003ed__68>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixPagePost> instance = DefaultModelRepository<MixCmsContext, MixPagePost>.get_Instance();
+				RepositoryResponse<List<MixPagePost>> modelListByAsync = await instance.GetModelListByAsync((MixPagePost c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixPagePost datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixPagePost>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> ClonePagesAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePagesAsyncu003ed__74 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePagesAsyncu003ed__74();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePagesAsyncu003ed__74>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixPage> instance = DefaultModelRepository<MixCmsContext, MixPage>.get_Instance();
+				RepositoryResponse<List<MixPage>> modelListByAsync = await instance.GetModelListByAsync((MixPage c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixPage datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						datum.CreatedDateTime = DateTime.UtcNow;
+						datum.LastModified = new DateTime?(DateTime.UtcNow);
+						context.Entry<MixPage>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> ClonePostMediasAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostMediasAsyncu003ed__65 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostMediasAsyncu003ed__65();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostMediasAsyncu003ed__65>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixPostMedia> instance = DefaultModelRepository<MixCmsContext, MixPostMedia>.get_Instance();
+				RepositoryResponse<List<MixPostMedia>> modelListByAsync = await instance.GetModelListByAsync((MixPostMedia c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixPostMedia datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixPostMedia>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> ClonePostPostsAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostPostsAsyncu003ed__66 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostPostsAsyncu003ed__66();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostPostsAsyncu003ed__66>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixRelatedPost> instance = DefaultModelRepository<MixCmsContext, MixRelatedPost>.get_Instance();
+				RepositoryResponse<List<MixRelatedPost>> modelListByAsync = await instance.GetModelListByAsync((MixRelatedPost c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixRelatedPost datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						datum.CreatedDateTime = DateTime.UtcNow;
+						context.Entry<MixRelatedPost>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> ClonePostsAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostsAsyncu003ed__70 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostsAsyncu003ed__70();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cClonePostsAsyncu003ed__70>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixPost> instance = DefaultModelRepository<MixCmsContext, MixPost>.get_Instance();
+				RepositoryResponse<List<MixPost>> modelListByAsync = await instance.GetModelListByAsync((MixPost c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixPost datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						context.Entry<MixPost>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public async Task<RepositoryResponse<bool>> CloneUrlAliasAsync(MixCulture parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneUrlAliasAsyncu003ed__62 variable = new Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneUrlAliasAsyncu003ed__62();
-			variable.u003cu003e4__this = this;
-			variable.context = context;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixCultures.UpdateViewModel.u003cCloneUrlAliasAsyncu003ed__62>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			try
+			{
+				DefaultModelRepository<MixCmsContext, MixUrlAlias> instance = DefaultModelRepository<MixCmsContext, MixUrlAlias>.get_Instance();
+				RepositoryResponse<List<MixUrlAlias>> modelListByAsync = await instance.GetModelListByAsync((MixUrlAlias c) => c.Specificulture == MixService.GetConfig<string>("DefaultCulture"), null, null);
+				if (modelListByAsync.get_IsSucceed())
+				{
+					foreach (MixUrlAlias datum in modelListByAsync.get_Data())
+					{
+						datum.Specificulture = this.Specificulture;
+						datum.CreatedDateTime = DateTime.UtcNow;
+						context.Entry<MixUrlAlias>(datum).set_State(4);
+					}
+					MixCmsContext mixCmsContext = context;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+				}
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse1.set_IsSucceed(false);
+				repositoryResponse1.set_Exception(exception);
+				repositoryResponse1.get_Errors().Add(exception.Message);
+			}
+			return repositoryResponse1;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)

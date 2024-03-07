@@ -17,10 +17,31 @@ namespace ShoppingCart.Infrastructure.Extensions
 	{
 		public static async Task<CartDto> CalculateCartAsync(CartDto cart, IProductCatalogGateway productCatalogService, IShippingGateway shippingGateway, IPromoGateway promoGateway)
 		{
-			CartDtoExtensions.u003cCalculateCartAsyncu003ed__1 variable = null;
-			AsyncTaskMethodBuilder<CartDto> asyncTaskMethodBuilder = AsyncTaskMethodBuilder<CartDto>.Create();
-			asyncTaskMethodBuilder.Start<CartDtoExtensions.u003cCalculateCartAsyncu003ed__1>(ref variable);
-			return asyncTaskMethodBuilder.Task;
+			if (cart.Items.Count > 0)
+			{
+				cart.CartItemTotal = 0;
+				foreach (CartItemDto item in cart.Items)
+				{
+					IProductCatalogGateway productCatalogGateway = productCatalogService;
+					Guid productId = item.ProductId;
+					ProductDto productByIdAsync = await productCatalogGateway.GetProductByIdAsync(productId, new CancellationToken());
+					ProductDto productDto = productByIdAsync;
+					productByIdAsync = null;
+					if (productDto == null)
+					{
+						throw new ProductNotFoundException(item.ProductId);
+					}
+					CartDto cartItemPromoSavings = cart;
+					cartItemPromoSavings.CartItemPromoSavings = cartItemPromoSavings.CartItemPromoSavings + item.PromoSavings * (double)item.Quantity;
+					CartDto cartItemTotal = cart;
+					cartItemTotal.CartItemTotal = cartItemTotal.CartItemTotal + productDto.Price * (double)item.Quantity;
+					productDto = null;
+				}
+				shippingGateway.CalculateShipping(cart);
+			}
+			promoGateway.ApplyShippingPromotions(cart);
+			cart.CartTotal = cart.CartItemTotal + cart.ShippingTotal;
+			return cart;
 		}
 
 		public static async Task<CartDto> InsertItemToCartAsync(CartDto cart, int quantity, Guid productId, IProductCatalogGateway productCatalogService)

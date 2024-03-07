@@ -263,14 +263,41 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 
 		private async Task<RepositoryResponse<bool>> CreateDefaultThemeTemplatesAsync(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel.u003cCreateDefaultThemeTemplatesAsyncu003ed__74 variable = new Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel.u003cCreateDefaultThemeTemplatesAsyncu003ed__74();
-			variable.u003cu003e4__this = this;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel.u003cCreateDefaultThemeTemplatesAsyncu003ed__74>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			string config = MixService.GetConfig<string>("DefaultTemplateFolder");
+			if (config == null)
+			{
+				config = "";
+			}
+			FileRepository.Instance.CopyDirectory(config, this.TemplateFolder);
+			List<FileViewModel> filesWithContent = FileRepository.Instance.GetFilesWithContent(this.TemplateFolder);
+			int num = _context.MixTemplate.Count<MixTemplate>() + 1;
+			foreach (FileViewModel fileViewModel in filesWithContent)
+			{
+				MixTemplate mixTemplate = new MixTemplate()
+				{
+					Id = num,
+					FileFolder = fileViewModel.FileFolder,
+					FileName = fileViewModel.Filename,
+					Content = fileViewModel.Content,
+					Extension = fileViewModel.Extension,
+					CreatedDateTime = DateTime.UtcNow,
+					LastModified = new DateTime?(DateTime.UtcNow),
+					ThemeId = base.get_Model().Id,
+					ThemeName = base.get_Model().Name,
+					FolderType = fileViewModel.FolderName,
+					ModifiedBy = this.CreatedBy
+				};
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixTemplates.InitViewModel>(await (new Mix.Cms.Lib.ViewModels.MixTemplates.InitViewModel(mixTemplate, _context, _transaction)).SaveModelAsync(true, _context, _transaction), ref repositoryResponse1);
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					break;
+				}
+				num++;
+			}
+			return repositoryResponse1;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
@@ -410,14 +437,22 @@ namespace Mix.Cms.Lib.ViewModels.MixThemes
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel.u003cRemoveRelatedModelsAsyncu003ed__71 variable = new Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel.u003cRemoveRelatedModelsAsyncu003ed__71();
-			variable.u003cu003e4__this = this;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixThemes.DeleteViewModel.u003cRemoveRelatedModelsAsyncu003ed__71>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixTemplates.DeleteViewModel template in this.Templates)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					continue;
+				}
+				ViewModelHelper.HandleResult<MixTemplate>(await template.RemoveModelAsync(true, _context, _transaction), ref repositoryResponse1);
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				FileRepository.Instance.DeleteFolder(this.AssetFolder);
+			}
+			return repositoryResponse1;
 		}
 	}
 }

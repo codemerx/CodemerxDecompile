@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoppingCart", "ShoppingCart.csproj", "{F0B649D0-787E-4909-A69D-212CF84EA669}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoppingCart", "ShoppingCart.csproj", "{A14001AC-5E7D-403E-BAED-C1180872DD4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,10 +8,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F0B649D0-787E-4909-A69D-212CF84EA669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0B649D0-787E-4909-A69D-212CF84EA669}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0B649D0-787E-4909-A69D-212CF84EA669}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0B649D0-787E-4909-A69D-212CF84EA669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A14001AC-5E7D-403E-BAED-C1180872DD4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14001AC-5E7D-403E-BAED-C1180872DD4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14001AC-5E7D-403E-BAED-C1180872DD4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A14001AC-5E7D-403E-BAED-C1180872DD4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -184,15 +184,64 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 
 		public static async Task<RepositoryResponse<bool>> ImportLanguages(List<MixLanguage> arrLanguage, string destCulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cImportLanguagesu003ed__76 variable = new Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cImportLanguagesu003ed__76();
-			variable.arrLanguage = arrLanguage;
-			variable.destCulture = destCulture;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel.u003cImportLanguagesu003ed__76>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			bool flag;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			bool flag1 = _context == null;
+			MixCmsContext mixCmsContext = _context;
+			if (mixCmsContext == null)
+			{
+				mixCmsContext = new MixCmsContext();
+			}
+			MixCmsContext mixCmsContext1 = mixCmsContext;
+			IDbContextTransaction dbContextTransaction = _transaction;
+			if (dbContextTransaction == null)
+			{
+				dbContextTransaction = mixCmsContext1.get_Database().BeginTransaction();
+			}
+			IDbContextTransaction dbContextTransaction1 = dbContextTransaction;
+			try
+			{
+				try
+				{
+					foreach (MixLanguage mixLanguage in arrLanguage)
+					{
+						Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel updateViewModel = new Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel(mixLanguage, mixCmsContext1, dbContextTransaction1)
+						{
+							Specificulture = destCulture,
+							CreatedDateTime = DateTime.UtcNow
+						};
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel> repositoryResponse2 = await ((ViewModelBase<MixCmsContext, MixLanguage, Mix.Cms.Lib.ViewModels.MixLanguages.UpdateViewModel>)updateViewModel).SaveModelAsync(false, mixCmsContext1, dbContextTransaction1);
+						RepositoryResponse<bool> repositoryResponse3 = repositoryResponse1;
+						flag = (!repositoryResponse1.get_IsSucceed() ? false : repositoryResponse2.get_IsSucceed());
+						repositoryResponse3.set_IsSucceed(flag);
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+						repositoryResponse1.set_Errors(repositoryResponse2.get_Errors());
+						break;
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), flag1, dbContextTransaction1);
+				}
+				catch (Exception exception)
+				{
+					RepositoryResponse<ReadMvcViewModel> repositoryResponse4 = UnitOfWorkHelper<MixCmsContext>.HandleException<ReadMvcViewModel>(exception, flag1, dbContextTransaction1);
+					repositoryResponse1.set_IsSucceed(false);
+					repositoryResponse1.set_Errors(repositoryResponse4.get_Errors());
+					repositoryResponse1.set_Exception(repositoryResponse4.get_Exception());
+				}
+			}
+			finally
+			{
+				if (flag1)
+				{
+					mixCmsContext1.Dispose();
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private List<SupportedCulture> LoadCultures(string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)

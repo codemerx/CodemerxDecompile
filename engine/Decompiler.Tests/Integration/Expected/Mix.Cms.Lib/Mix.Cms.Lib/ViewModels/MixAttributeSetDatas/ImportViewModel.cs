@@ -380,15 +380,28 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		private async Task<RepositoryResponse<bool>> SaveValues(MixAttributeSetData parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cSaveValuesu003ed__66 variable = new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cSaveValuesu003ed__66();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable.context = context;
-			variable.transaction = transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ImportViewModel.u003cSaveValuesu003ed__66>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel value in this.Values)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					break;
+				}
+				if (!this.Fields.Any<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>((Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel f) => f.Id == value.AttributeFieldId))
+				{
+					ViewModelHelper.HandleResult<MixAttributeSetValue>(await value.RemoveModelAsync(false, context, transaction), ref repositoryResponse1);
+				}
+				else
+				{
+					value.Priority = value.Field.Priority;
+					value.DataId = parent.Id;
+					value.Specificulture = parent.Specificulture;
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ImportViewModel>(await value.SaveModelAsync(false, context, transaction), ref repositoryResponse1);
+				}
+			}
+			return repositoryResponse1;
 		}
 	}
 }

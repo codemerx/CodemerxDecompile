@@ -31,14 +31,48 @@ namespace OrchardCore.Environment.Shell.Configuration
 
 		public async Task SaveAsync(string tenant, IDictionary<string, string> data)
 		{
-			ShellConfigurationSources.u003cSaveAsyncu003ed__3 variable = new ShellConfigurationSources.u003cSaveAsyncu003ed__3();
-			variable.u003cu003e4__this = this;
-			variable.tenant = tenant;
-			variable.data = data;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ShellConfigurationSources.u003cSaveAsyncu003ed__3>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			JObject jObject;
+			string str = Path.Combine(this._container, tenant);
+			string str1 = Path.Combine(str, "appsettings.json");
+			if (!File.Exists(str1))
+			{
+				jObject = new JObject();
+			}
+			else
+			{
+				using (StreamReader streamReader = File.OpenText(str1))
+				{
+					using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+					{
+						jObject = await JObject.LoadAsync(jsonTextReader, new CancellationToken());
+					}
+					jsonTextReader = null;
+				}
+				streamReader = null;
+			}
+			foreach (string key in data.Keys)
+			{
+				if (data[key] == null)
+				{
+					jObject.Remove(key);
+				}
+				else
+				{
+					jObject.set_Item(key, data[key]);
+				}
+			}
+			Directory.CreateDirectory(str);
+			using (StreamWriter streamWriter = File.CreateText(str1))
+			{
+				JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter);
+				jsonTextWriter.set_Formatting(1);
+				using (JsonTextWriter jsonTextWriter1 = jsonTextWriter)
+				{
+					await jObject.WriteToAsync(jsonTextWriter1, Array.Empty<JsonConverter>());
+				}
+				jsonTextWriter1 = null;
+			}
+			streamWriter = null;
 		}
 	}
 }

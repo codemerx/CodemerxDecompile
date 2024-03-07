@@ -174,14 +174,56 @@ namespace Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas
 
 		public override async Task<RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel>> SaveModelAsync(bool isSaveSubModels = false, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel.u003cSaveModelAsyncu003ed__68 variable = new Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel.u003cSaveModelAsyncu003ed__68();
-			variable.u003cu003e4__this = this;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel.u003cSaveModelAsyncu003ed__68>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel> repositoryResponse;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel> repositoryResponse1 = new RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel>();
+			repositoryResponse1.set_IsSucceed(true);
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel> repositoryResponse2 = repositoryResponse1;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
+			try
+			{
+				try
+				{
+					if (this.AttributeData == null || !string.IsNullOrEmpty(this.AttributeData.Id))
+					{
+						this.DataId = this.AttributeData.Id;
+					}
+					else
+					{
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.FormViewModel> repositoryResponse3 = await this.AttributeData.SaveModelAsync(true, mixCmsContext, dbContextTransaction);
+						if (repositoryResponse3.get_IsSucceed())
+						{
+							this.DataId = repositoryResponse3.get_Data().Id;
+						}
+						else
+						{
+							repositoryResponse2.set_IsSucceed(false);
+							repositoryResponse2.set_Errors(repositoryResponse3.get_Errors());
+							repositoryResponse2.set_Exception(repositoryResponse3.get_Exception());
+						}
+					}
+					if (repositoryResponse2.get_IsSucceed())
+					{
+						repositoryResponse2 = await this.u003cu003en__0(true, mixCmsContext, dbContextTransaction);
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse2.get_IsSucceed(), flag, dbContextTransaction);
+					repositoryResponse = repositoryResponse2;
+				}
+				catch (Exception exception)
+				{
+					repositoryResponse = UnitOfWorkHelper<MixCmsContext>.HandleException<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.FormViewModel>(exception, flag, dbContextTransaction);
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					mixCmsContext.Dispose();
+				}
+			}
+			return repositoryResponse;
 		}
 	}
 }

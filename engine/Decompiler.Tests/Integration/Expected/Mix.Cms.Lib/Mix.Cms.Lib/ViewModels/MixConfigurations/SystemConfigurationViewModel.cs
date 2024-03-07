@@ -156,13 +156,51 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 
 		public static async Task<RepositoryResponse<bool>> ImportConfigurations(List<MixConfiguration> arrConfiguration, string destCulture)
 		{
-			SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66 variable = new SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66();
-			variable.arrConfiguration = arrConfiguration;
-			variable.destCulture = destCulture;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			bool flag;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			MixCmsContext mixCmsContext = new MixCmsContext();
+			IDbContextTransaction dbContextTransaction = mixCmsContext.get_Database().BeginTransaction();
+			try
+			{
+				try
+				{
+					foreach (MixConfiguration mixConfiguration in arrConfiguration)
+					{
+						SystemConfigurationViewModel systemConfigurationViewModel = new SystemConfigurationViewModel(mixConfiguration, mixCmsContext, dbContextTransaction)
+						{
+							Specificulture = destCulture
+						};
+						RepositoryResponse<SystemConfigurationViewModel> repositoryResponse2 = await ((ViewModelBase<MixCmsContext, MixConfiguration, SystemConfigurationViewModel>)systemConfigurationViewModel).SaveModelAsync(false, mixCmsContext, dbContextTransaction);
+						RepositoryResponse<bool> repositoryResponse3 = repositoryResponse1;
+						flag = (!repositoryResponse1.get_IsSucceed() ? false : repositoryResponse2.get_IsSucceed());
+						repositoryResponse3.set_IsSucceed(flag);
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+						repositoryResponse1.set_Errors(repositoryResponse2.get_Errors());
+						break;
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), true, dbContextTransaction);
+				}
+				catch (Exception exception)
+				{
+					RepositoryResponse<SystemConfigurationViewModel> repositoryResponse4 = UnitOfWorkHelper<MixCmsContext>.HandleException<SystemConfigurationViewModel>(exception, true, dbContextTransaction);
+					repositoryResponse1.set_IsSucceed(false);
+					repositoryResponse1.set_Errors(repositoryResponse4.get_Errors());
+					repositoryResponse1.set_Exception(repositoryResponse4.get_Exception());
+				}
+			}
+			finally
+			{
+				RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+				dbContextTransaction.Dispose();
+				mixCmsContext.Dispose();
+			}
+			return repositoryResponse1;
 		}
 
 		public override MixConfiguration ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)

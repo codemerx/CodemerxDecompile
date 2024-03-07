@@ -940,13 +940,200 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPost parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			// 
-			// Current member / type: System.Threading.Tasks.Task`1<Mix.Domain.Core.ViewModels.RepositoryResponse`1<System.Boolean>> Mix.Cms.Lib.ViewModels.MixPosts.SyncViewModel::SaveSubModelsAsync(Mix.Cms.Lib.Models.Cms.MixPost,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Threading.Tasks.Task<Mix.Domain.Core.ViewModels.RepositoryResponse<System.Boolean>> SaveSubModelsAsync(Mix.Cms.Lib.Models.Cms.MixPost,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// GoTo misplaced.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<bool> repositoryResponse;
+			RepositoryResponse<bool> repositoryResponse1 = new RepositoryResponse<bool>();
+			repositoryResponse1.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse2 = repositoryResponse1;
+			try
+			{
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					foreach (Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel urlAlias in this.UrlAliases)
+					{
+						urlAlias.SourceId = parent.Id.ToString();
+						urlAlias.Type = MixEnums.UrlAliasType.Post;
+						urlAlias.Specificulture = this.Specificulture;
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel> repositoryResponse3 = await ((ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>)urlAlias).SaveModelAsync(false, _context, _transaction);
+						repositoryResponse2.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+						if (repositoryResponse2.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse2.set_Exception(repositoryResponse3.get_Exception());
+						repositoryResponse2.get_Errors().AddRange(repositoryResponse3.get_Errors());
+						break;
+					}
+				}
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixMedia, Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel>.Repository;
+					int data = repository.Max((MixMedia c) => c.Id, _context, _transaction).get_Data();
+					foreach (Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel mediaNav in this.MediaNavs)
+					{
+						if (mediaNav.Media != null)
+						{
+							data++;
+							mediaNav.Media.Specificulture = this.Specificulture;
+							mediaNav.Media.Id = data;
+							RepositoryResponse<Mix.Cms.Lib.ViewModels.MixMedias.UpdateViewModel> repositoryResponse4 = await mediaNav.Media.SaveModelAsync(false, _context, _transaction);
+							if (!repositoryResponse4.get_IsSucceed())
+							{
+								repositoryResponse2.set_IsSucceed(false);
+								repositoryResponse2.set_Exception(repositoryResponse4.get_Exception());
+								base.get_Errors().AddRange(repositoryResponse4.get_Errors());
+							}
+							else
+							{
+								mediaNav.PostId = parent.Id;
+								mediaNav.MediaId = repositoryResponse4.get_Data().get_Model().Id;
+								mediaNav.Specificulture = parent.Specificulture;
+								RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel> repositoryResponse5 = await mediaNav.SaveModelAsync(false, _context, _transaction);
+								repositoryResponse2.set_IsSucceed(repositoryResponse5.get_IsSucceed());
+								if (!repositoryResponse2.get_IsSucceed())
+								{
+									repositoryResponse2.set_Exception(repositoryResponse5.get_Exception());
+									base.get_Errors().AddRange(repositoryResponse5.get_Errors());
+								}
+							}
+						}
+					}
+				}
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					foreach (Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel moduleNav in this.ModuleNavs)
+					{
+						moduleNav.PostId = parent.Id;
+						moduleNav.Specificulture = parent.Specificulture;
+						moduleNav.Status = MixEnums.MixContentStatus.Published;
+						if (!moduleNav.IsActived)
+						{
+							RepositoryResponse<MixPostModule> repositoryResponse6 = await moduleNav.RemoveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse6.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse6.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse6.get_Errors());
+						}
+						else
+						{
+							RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel> repositoryResponse7 = await moduleNav.SaveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse7.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse7.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse7.get_Errors());
+						}
+					}
+				}
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					foreach (Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel postNav in this.PostNavs)
+					{
+						postNav.SourceId = parent.Id;
+						postNav.Status = MixEnums.MixContentStatus.Published;
+						postNav.Specificulture = parent.Specificulture;
+						if (!postNav.IsActived)
+						{
+							RepositoryResponse<MixRelatedPost> repositoryResponse8 = await postNav.RemoveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse8.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse8.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse8.get_Errors());
+						}
+						else
+						{
+							RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> repositoryResponse9 = await postNav.SaveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse9.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse9.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse9.get_Errors());
+						}
+					}
+				}
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					foreach (Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel page in this.Pages)
+					{
+						page.PostId = parent.Id;
+						page.Description = parent.Title;
+						page.Image = this.ThumbnailUrl;
+						page.Status = MixEnums.MixContentStatus.Published;
+						if (!page.IsActived)
+						{
+							RepositoryResponse<MixPagePost> repositoryResponse10 = await page.RemoveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse10.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse10.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse10.get_Errors());
+						}
+						else
+						{
+							RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel> repositoryResponse11 = await page.SaveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse11.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse11.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse11.get_Errors());
+						}
+					}
+				}
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					foreach (Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel module in this.Modules)
+					{
+						module.PostId = parent.Id;
+						module.Description = parent.Title;
+						module.Image = this.ThumbnailUrl;
+						module.Status = MixEnums.MixContentStatus.Published;
+						if (!module.IsActived)
+						{
+							RepositoryResponse<MixModulePost> repositoryResponse12 = await module.RemoveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse12.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse12.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse12.get_Errors());
+						}
+						else
+						{
+							RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel> repositoryResponse13 = await module.SaveModelAsync(false, _context, _transaction);
+							repositoryResponse2.set_IsSucceed(repositoryResponse13.get_IsSucceed());
+							if (repositoryResponse2.get_IsSucceed())
+							{
+								continue;
+							}
+							repositoryResponse2.set_Exception(repositoryResponse13.get_Exception());
+							base.get_Errors().AddRange(repositoryResponse13.get_Errors());
+						}
+					}
+				}
+				repositoryResponse = repositoryResponse2;
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse2.set_IsSucceed(false);
+				repositoryResponse2.set_Exception(exception);
+				repositoryResponse = repositoryResponse2;
+			}
+			return repositoryResponse;
 		}
 	}
 }

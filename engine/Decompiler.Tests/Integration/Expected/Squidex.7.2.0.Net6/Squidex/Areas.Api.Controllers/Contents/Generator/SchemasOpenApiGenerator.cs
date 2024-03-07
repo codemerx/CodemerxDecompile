@@ -77,16 +77,40 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
 		public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat)
 		{
-			SchemasOpenApiGenerator.u003cGenerateAsyncu003ed__6 variable = new SchemasOpenApiGenerator.u003cGenerateAsyncu003ed__6();
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<OpenApiDocument>.Create();
-			variable.u003cu003e4__this = this;
-			variable.httpContext = httpContext;
-			variable.app = app;
-			variable.schemas = schemas;
-			variable.flat = flat;
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<SchemasOpenApiGenerator.u003cGenerateAsyncu003ed__6>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			OpenApiDocument openApiDocument = this.CreateApiDocument(httpContext, app);
+			OpenApiSchemaResolver openApiSchemaResolver = new OpenApiSchemaResolver(openApiDocument, this.schemaSettings);
+			this.requestCache.AddDependency(app.get_UniqueId(), app.get_Version());
+			foreach (ISchemaEntity schema in schemas)
+			{
+				this.requestCache.AddDependency(schema.get_UniqueId(), schema.get_Version());
+			}
+			Builder builder = new Builder(app, openApiDocument, openApiSchemaResolver, this.schemaGenerator);
+			IEnumerable<ISchemaEntity> schemaEntities = schemas;
+			IEnumerable<ISchemaEntity> schemaEntities1 = schemaEntities.Where<ISchemaEntity>((ISchemaEntity x) => {
+				if (!x.get_SchemaDef().get_IsPublished() || x.get_SchemaDef().get_Type() == 2)
+				{
+					return false;
+				}
+				return x.get_SchemaDef().get_Fields().Count > 0;
+			});
+			PartitionResolver partitionResolver = AppEntityExtensions.PartitionResolver(app);
+			foreach (ISchemaEntity schemaEntity in schemaEntities1)
+			{
+				ResolvedComponents componentsAsync = await AppProviderExtensions.GetComponentsAsync(this.appProvider, schemaEntity, httpContext.get_RequestAborted());
+				SchemasOpenApiGenerator.GenerateSchemaOperations(builder.Schema(schemaEntity.get_SchemaDef(), partitionResolver, componentsAsync, flat));
+			}
+			SchemasOpenApiGenerator.GenerateSharedOperations(builder.Shared());
+			DocumentProcessorContext documentProcessorContext = new DocumentProcessorContext(openApiDocument, Enumerable.Empty<Type>(), Enumerable.Empty<Type>(), openApiSchemaResolver, this.schemaGenerator, this.schemaSettings);
+			foreach (IDocumentProcessor documentProcessor in this.schemaSettings.get_DocumentProcessors())
+			{
+				documentProcessor.Process(documentProcessorContext);
+			}
+			OpenApiDocument openApiDocument1 = openApiDocument;
+			openApiDocument = null;
+			openApiSchemaResolver = null;
+			builder = null;
+			partitionResolver = null;
+			return openApiDocument1;
 		}
 
 		private static void GenerateSchemaOperations(OperationsBuilder builder)

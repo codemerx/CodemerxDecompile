@@ -34,24 +34,140 @@ namespace Mix.Cms.Lib.Services
 
 		public static async Task<RepositoryResponse<bool>> InitAttributeSetsAsync(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			InitCmsService.u003cInitAttributeSetsAsyncu003ed__3 variable = new InitCmsService.u003cInitAttributeSetsAsyncu003ed__3();
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<InitCmsService.u003cInitAttributeSetsAsyncu003ed__3>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			List<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel> obj = JObject.Parse(FileRepository.Instance.GetFile("attribute_sets.json", "data", true, "{}").Content).get_Item("data").ToObject<List<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>>();
+			foreach (Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel utcNow in obj)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					break;
+				}
+				utcNow.CreatedDateTime = DateTime.UtcNow;
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>(await utcNow.SaveModelAsync(true, mixCmsContext, dbContextTransaction), ref repositoryResponse1);
+			}
+			UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), flag, dbContextTransaction);
+			return repositoryResponse1;
 		}
 
 		public static async Task<RepositoryResponse<bool>> InitCms(string siteName, InitCulture culture)
 		{
-			InitCmsService.u003cInitCmsu003ed__1 variable = new InitCmsService.u003cInitCmsu003ed__1();
-			variable.siteName = siteName;
-			variable.culture = culture;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<InitCmsService.u003cInitCmsu003ed__1>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse;
+			RepositoryResponse<bool> repositoryResponse1 = new RepositoryResponse<bool>();
+			MixCmsContext mixCmsContext = null;
+			MixCmsAccountContext mixCmsAccountContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			IDbContextTransaction dbContextTransaction1 = null;
+			bool isSucceed = true;
+			try
+			{
+				try
+				{
+					if (!string.IsNullOrEmpty(MixService.GetConnectionString("MixCmsConnection")))
+					{
+						mixCmsContext = new MixCmsContext();
+						mixCmsAccountContext = new MixCmsAccountContext();
+						MixChatServiceContext mixChatServiceContext = new MixChatServiceContext();
+						DatabaseFacade database = mixCmsContext.get_Database();
+						CancellationToken cancellationToken = new CancellationToken();
+						await RelationalDatabaseFacadeExtensions.MigrateAsync(database, cancellationToken);
+						DatabaseFacade databaseFacade = mixCmsAccountContext.get_Database();
+						cancellationToken = new CancellationToken();
+						await RelationalDatabaseFacadeExtensions.MigrateAsync(databaseFacade, cancellationToken);
+						DatabaseFacade database1 = mixChatServiceContext.get_Database();
+						cancellationToken = new CancellationToken();
+						await RelationalDatabaseFacadeExtensions.MigrateAsync(database1, cancellationToken);
+						dbContextTransaction = mixCmsContext.get_Database().BeginTransaction();
+						mixCmsContext.MixCulture.Count<MixCulture>();
+						if (MixService.GetConfig<bool>("IsInit"))
+						{
+							isSucceed = InitCmsService.InitCultures(culture, mixCmsContext, dbContextTransaction);
+							if (!isSucceed || mixCmsContext.MixConfiguration.Count<MixConfiguration>() != 0)
+							{
+								repositoryResponse1.get_Errors().Add("Cannot init Configurations");
+							}
+							else
+							{
+								isSucceed = await InitCmsService.InitConfigurationsAsync(siteName, culture.Specificulture, mixCmsContext, dbContextTransaction).get_IsSucceed();
+							}
+						}
+						if (!isSucceed)
+						{
+							dbContextTransaction.Rollback();
+						}
+						else
+						{
+							dbContextTransaction.Commit();
+						}
+					}
+					repositoryResponse1.set_IsSucceed(isSucceed);
+					repositoryResponse = repositoryResponse1;
+				}
+				catch (Exception exception1)
+				{
+					Exception exception = exception1;
+					IDbContextTransaction dbContextTransaction2 = dbContextTransaction;
+					if (dbContextTransaction2 != null)
+					{
+						dbContextTransaction2.Rollback();
+					}
+					else
+					{
+					}
+					IDbContextTransaction dbContextTransaction3 = dbContextTransaction1;
+					if (dbContextTransaction3 != null)
+					{
+						dbContextTransaction3.Rollback();
+					}
+					else
+					{
+					}
+					repositoryResponse1.set_IsSucceed(false);
+					repositoryResponse1.set_Exception(exception);
+					repositoryResponse = repositoryResponse1;
+				}
+			}
+			finally
+			{
+				MixCmsContext mixCmsContext1 = mixCmsContext;
+				if (mixCmsContext1 != null)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(((DbContext)mixCmsContext1).get_Database());
+				}
+				else
+				{
+				}
+				MixCmsContext mixCmsContext2 = mixCmsContext;
+				if (mixCmsContext2 != null)
+				{
+					((DbContext)mixCmsContext2).Dispose();
+				}
+				else
+				{
+				}
+				MixCmsAccountContext mixCmsAccountContext1 = mixCmsAccountContext;
+				if (mixCmsAccountContext1 != null)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(((DbContext)mixCmsAccountContext1).get_Database());
+				}
+				else
+				{
+				}
+				MixCmsAccountContext mixCmsAccountContext2 = mixCmsAccountContext;
+				if (mixCmsAccountContext2 != null)
+				{
+					((DbContext)mixCmsAccountContext2).Dispose();
+				}
+				else
+				{
+				}
+			}
+			return repositoryResponse;
 		}
 
 		public static async Task<RepositoryResponse<bool>> InitConfigurationsAsync(string siteName, string specifiCulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)

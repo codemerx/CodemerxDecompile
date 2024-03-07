@@ -327,28 +327,80 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public override async Task<RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>> SaveModelAsync(bool isSaveSubModels = false, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveModelAsyncu003ed__76 variable = new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveModelAsyncu003ed__76();
-			variable.u003cu003e4__this = this;
-			variable.isSaveSubModels = isSaveSubModels;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveModelAsyncu003ed__76>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> repositoryResponse;
+			bool flag;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag1 = false;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag1);
+			try
+			{
+				try
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> repositoryResponse1 = await this.u003cu003en__0(isSaveSubModels, mixCmsContext, dbContextTransaction);
+					if (repositoryResponse1.get_IsSucceed() && !string.IsNullOrEmpty(this.ParentId))
+					{
+						Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel updateViewModel = new Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel()
+						{
+							DataId = repositoryResponse1.get_Data().Id,
+							Specificulture = this.Specificulture,
+							AttributeSetId = repositoryResponse1.get_Data().AttributeSetId,
+							AttributeSetName = repositoryResponse1.get_Data().AttributeSetName,
+							ParentId = this.ParentId,
+							ParentType = this.ParentType
+						};
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel> repositoryResponse2 = await ((ViewModelBase<MixCmsContext, MixRelatedAttributeData, Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel>)updateViewModel).SaveModelAsync(true, mixCmsContext, dbContextTransaction);
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> repositoryResponse3 = repositoryResponse1;
+						flag = (!repositoryResponse1.get_IsSucceed() ? false : repositoryResponse2.get_IsSucceed());
+						repositoryResponse3.set_IsSucceed(flag);
+						repositoryResponse1.set_Errors(repositoryResponse2.get_Errors());
+						repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), flag1, dbContextTransaction);
+					repositoryResponse = repositoryResponse1;
+				}
+				catch (Exception exception)
+				{
+					repositoryResponse = UnitOfWorkHelper<MixCmsContext>.HandleException<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel>(exception, flag1, dbContextTransaction);
+				}
+			}
+			finally
+			{
+				if (flag1)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
+				}
+			}
+			return repositoryResponse;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveRelatedDataAsync(MixAttributeSetData parent, MixCmsContext context, IDbContextTransaction transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveRelatedDataAsyncu003ed__79 variable = new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveRelatedDataAsyncu003ed__79();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable.context = context;
-			variable.transaction = transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveRelatedDataAsyncu003ed__79>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel relatedDatum in this.RelatedData)
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					break;
+				}
+				if (string.IsNullOrEmpty(relatedDatum.ParentId) && relatedDatum.ParentType == MixEnums.MixAttributeSetDataType.Set)
+				{
+					DbSet<MixAttributeSet> mixAttributeSet = context.MixAttributeSet;
+					MixAttributeSet mixAttributeSet1 = mixAttributeSet.First<MixAttributeSet>((MixAttributeSet s) => s.Name == relatedDatum.ParentName);
+					relatedDatum.ParentId = mixAttributeSet1.Id.ToString();
+				}
+				relatedDatum.Specificulture = this.Specificulture;
+				relatedDatum.AttributeSetId = parent.AttributeSetId;
+				relatedDatum.AttributeSetName = parent.AttributeSetName;
+				relatedDatum.Id = parent.Id;
+				relatedDatum.CreatedDateTime = DateTime.UtcNow;
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel>(await relatedDatum.SaveModelAsync(true, context, transaction), ref repositoryResponse1);
+			}
+			return repositoryResponse1;
 		}
 
 		public override RepositoryResponse<bool> SaveSubModels(MixAttributeSetData parent, MixCmsContext _context, IDbContextTransaction _transaction)
@@ -387,15 +439,49 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixAttributeSetData parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__77 variable = new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__77();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__77>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			int priority;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixAttributeSet> mixAttributeSet = _context.MixAttributeSet;
+				MixAttributeSet mixAttributeSet1 = mixAttributeSet.FirstOrDefault<MixAttributeSet>((MixAttributeSet m) => m.Name == "sys_additional_field");
+				foreach (Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel value in this.Values)
+				{
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						break;
+					}
+					if (mixAttributeSet1 != null && value.Field != null && value.Field.Id == 0)
+					{
+						value.Field.AttributeSetId = mixAttributeSet1.Id;
+						value.Field.AttributeSetName = mixAttributeSet1.Name;
+						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>(await value.Field.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+					}
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						value.AttributeFieldId = value.Field.Id;
+						value.AttributeFieldName = value.Field.Name;
+						Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel updateViewModel = value;
+						Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field = value.Field;
+						if (field != null)
+						{
+							priority = field.Priority;
+						}
+						else
+						{
+							priority = value.Priority;
+						}
+						updateViewModel.Priority = priority;
+						value.DataId = parent.Id;
+						value.Specificulture = parent.Specificulture;
+						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.UpdateViewModel>(await value.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+					}
+				}
+				mixAttributeSet1 = null;
+			}
+			return repositoryResponse1;
 		}
 	}
 }

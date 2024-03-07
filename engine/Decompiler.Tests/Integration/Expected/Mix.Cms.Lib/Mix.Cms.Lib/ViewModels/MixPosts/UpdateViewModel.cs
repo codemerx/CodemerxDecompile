@@ -1110,15 +1110,23 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		private async Task<RepositoryResponse<bool>> SaveMediasAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveMediasAsyncu003ed__201 variable = new Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveMediasAsyncu003ed__201();
-			variable.u003cu003e4__this = this;
-			variable.id = id;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveMediasAsyncu003ed__201>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel mediaNav in this.MediaNavs)
+			{
+				mediaNav.PostId = id;
+				mediaNav.Specificulture = this.Specificulture;
+				if (!mediaNav.IsActived)
+				{
+					ViewModelHelper.HandleResult<MixPostMedia>(await mediaNav.RemoveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+				}
+				else
+				{
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>(await mediaNav.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private RepositoryResponse<bool> SaveParentModules(int id, MixCmsContext _context, IDbContextTransaction _transaction)
@@ -1166,15 +1174,38 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		private async Task<RepositoryResponse<bool>> SaveParentModulesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveParentModulesAsyncu003ed__198 variable = new Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveParentModulesAsyncu003ed__198();
-			variable.u003cu003e4__this = this;
-			variable.id = id;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveParentModulesAsyncu003ed__198>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel module in this.Modules)
+			{
+				module.Specificulture = this.Specificulture;
+				module.PostId = id;
+				module.Status = MixEnums.MixContentStatus.Published;
+				if (!module.IsActived)
+				{
+					RepositoryResponse<MixModulePost> repositoryResponse2 = await module.RemoveModelAsync(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+				}
+				else
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel> repositoryResponse3 = await module.SaveModelAsync(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse3.get_Errors());
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private RepositoryResponse<bool> SaveParentPages(int id, MixCmsContext _context, IDbContextTransaction _transaction)
@@ -1222,15 +1253,38 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		private async Task<RepositoryResponse<bool>> SaveParentPagesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveParentPagesAsyncu003ed__199 variable = new Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveParentPagesAsyncu003ed__199();
-			variable.u003cu003e4__this = this;
-			variable.id = id;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveParentPagesAsyncu003ed__199>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel page in this.Pages)
+			{
+				page.Specificulture = this.Specificulture;
+				page.PostId = id;
+				page.Status = MixEnums.MixContentStatus.Published;
+				if (!page.IsActived)
+				{
+					RepositoryResponse<MixPagePost> repositoryResponse2 = await page.RemoveModelAsync(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+				}
+				else
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel> repositoryResponse3 = await page.SaveModelAsync(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse3.get_Errors());
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		private RepositoryResponse<bool> SaveRelatedPost(int id, MixCmsContext _context, IDbContextTransaction _transaction)
@@ -1277,15 +1331,38 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		private async Task<RepositoryResponse<bool>> SaveRelatedPostAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveRelatedPostAsyncu003ed__200 variable = new Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveRelatedPostAsyncu003ed__200();
-			variable.u003cu003e4__this = this;
-			variable.id = id;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveRelatedPostAsyncu003ed__200>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel postNav in this.PostNavs)
+			{
+				postNav.SourceId = id;
+				postNav.Status = MixEnums.MixContentStatus.Published;
+				postNav.Specificulture = this.Specificulture;
+				if (!postNav.IsActived)
+				{
+					RepositoryResponse<MixRelatedPost> repositoryResponse2 = await postNav.RemoveModelAsync(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+				}
+				else
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> repositoryResponse3 = await postNav.SaveModelAsync(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse3.get_Errors());
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		public override RepositoryResponse<bool> SaveSubModels(MixPost parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
@@ -1337,15 +1414,52 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPost parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__196 variable = new Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__196();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__196>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse;
+			bool flag;
+			RepositoryResponse<bool> repositoryResponse1 = new RepositoryResponse<bool>();
+			repositoryResponse1.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse2 = repositoryResponse1;
+			try
+			{
+				RepositoryResponse<Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel> repositoryResponse3 = await this.View.SaveModelAsync(true, _context, _transaction);
+				RepositoryResponse<bool> repositoryResponse4 = repositoryResponse2;
+				flag = (!repositoryResponse2.get_IsSucceed() ? false : repositoryResponse3.get_IsSucceed());
+				repositoryResponse4.set_IsSucceed(flag);
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel>(repositoryResponse3, ref repositoryResponse2);
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					repositoryResponse2 = await this.SaveUrlAliasAsync(parent.Id, _context, _transaction);
+				}
+				if (repositoryResponse2.get_IsSucceed() && this.MediaNavs != null)
+				{
+					repositoryResponse2 = await this.SaveMediasAsync(parent.Id, _context, _transaction);
+				}
+				if (repositoryResponse2.get_IsSucceed())
+				{
+					repositoryResponse2 = await this.SaveAttributeAsync(parent.Id, _context, _transaction);
+				}
+				if (repositoryResponse2.get_IsSucceed() && this.PostNavs != null)
+				{
+					repositoryResponse2 = await this.SaveRelatedPostAsync(parent.Id, _context, _transaction);
+				}
+				if (repositoryResponse2.get_IsSucceed() && this.Pages != null)
+				{
+					repositoryResponse2 = await this.SaveParentPagesAsync(parent.Id, _context, _transaction);
+				}
+				if (repositoryResponse2.get_IsSucceed() && this.Modules != null)
+				{
+					repositoryResponse2 = await this.SaveParentModulesAsync(parent.Id, _context, _transaction);
+				}
+				repositoryResponse = repositoryResponse2;
+			}
+			catch (Exception exception1)
+			{
+				Exception exception = exception1;
+				repositoryResponse2.set_IsSucceed(false);
+				repositoryResponse2.set_Exception(exception);
+				repositoryResponse = repositoryResponse2;
+			}
+			return repositoryResponse;
 		}
 
 		private RepositoryResponse<bool> SaveUrlAlias(int parentId, MixCmsContext _context, IDbContextTransaction _transaction)
@@ -1370,15 +1484,13 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		private async Task<RepositoryResponse<bool>> SaveUrlAliasAsync(int parentId, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveUrlAliasAsyncu003ed__202 variable = new Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveUrlAliasAsyncu003ed__202();
-			variable.u003cu003e4__this = this;
-			variable.parentId = parentId;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel.u003cSaveUrlAliasAsyncu003ed__202>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			// 
+			// Current member / type: System.Threading.Tasks.Task`1<Mix.Domain.Core.ViewModels.RepositoryResponse`1<System.Boolean>> Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel::SaveUrlAliasAsync(System.Int32,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
+			// Exception in: System.Threading.Tasks.Task<Mix.Domain.Core.ViewModels.RepositoryResponse<System.Boolean>> SaveUrlAliasAsync(System.Int32,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
+			// Invalid entry of new construct
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 		}
 	}
 }

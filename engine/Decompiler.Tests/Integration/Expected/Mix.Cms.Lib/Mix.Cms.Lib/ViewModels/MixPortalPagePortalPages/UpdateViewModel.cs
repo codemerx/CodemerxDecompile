@@ -164,12 +164,48 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages
 
 		public static async Task<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>> UpdateInfosAsync(List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> cates)
 		{
-			Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64 variable = new Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64();
-			variable.cates = cates;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>> repositoryResponse;
+			MixCmsContext mixCmsContext = new MixCmsContext();
+			IDbContextTransaction dbContextTransaction = mixCmsContext.get_Database().BeginTransaction();
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>> repositoryResponse1 = new RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>();
+			try
+			{
+				try
+				{
+					foreach (Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel cate in cates)
+					{
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> repositoryResponse2 = await cate.SaveModelAsync(false, mixCmsContext, dbContextTransaction);
+						repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.get_Errors().AddRange(repositoryResponse2.get_Errors());
+						repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+						break;
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), true, dbContextTransaction);
+					repositoryResponse = repositoryResponse1;
+				}
+				catch (Exception exception1)
+				{
+					Exception exception = exception1;
+					UnitOfWorkHelper<MixCmsContext>.HandleException<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>(exception, true, dbContextTransaction);
+					RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>> repositoryResponse3 = new RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>();
+					repositoryResponse3.set_IsSucceed(false);
+					repositoryResponse3.set_Data(null);
+					repositoryResponse3.set_Exception(exception);
+					repositoryResponse = repositoryResponse3;
+				}
+			}
+			finally
+			{
+				dbContextTransaction.Dispose();
+				RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+				dbContextTransaction.Dispose();
+				mixCmsContext.Dispose();
+			}
+			return repositoryResponse;
 		}
 	}
 }

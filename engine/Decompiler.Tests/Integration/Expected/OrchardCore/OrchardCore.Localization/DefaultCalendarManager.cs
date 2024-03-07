@@ -21,12 +21,39 @@ namespace OrchardCore.Localization
 
 		public async Task<CalendarName> GetCurrentCalendar()
 		{
-			DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3 variable = new DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3();
-			variable.u003cu003e4__this = this;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<CalendarName>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<DefaultCalendarManager.u003cGetCurrentCalendaru003ed__3>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			CalendarName value;
+			if (!this._calendarName.HasValue)
+			{
+				List<CalendarSelectorResult> calendarSelectorResults = new List<CalendarSelectorResult>();
+				foreach (ICalendarSelector _calendarSelector in this._calendarSelectors)
+				{
+					CalendarSelectorResult calendarAsync = await _calendarSelector.GetCalendarAsync();
+					if (calendarAsync == null)
+					{
+						continue;
+					}
+					calendarSelectorResults.Add(calendarAsync);
+				}
+				if (calendarSelectorResults.Count != 0)
+				{
+					if (calendarSelectorResults.Count > 1)
+					{
+						List<CalendarSelectorResult> calendarSelectorResults1 = calendarSelectorResults;
+						calendarSelectorResults1.Sort((CalendarSelectorResult x, CalendarSelectorResult y) => y.get_Priority().CompareTo(x.get_Priority()));
+					}
+					this._calendarName = new CalendarName?(await calendarSelectorResults.First<CalendarSelectorResult>().get_CalendarName()());
+					value = this._calendarName.Value;
+				}
+				else
+				{
+					value = 6;
+				}
+			}
+			else
+			{
+				value = this._calendarName.Value;
+			}
+			return value;
 		}
 	}
 }

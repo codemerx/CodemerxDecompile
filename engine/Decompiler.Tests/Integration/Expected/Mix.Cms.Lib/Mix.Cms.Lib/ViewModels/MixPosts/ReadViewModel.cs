@@ -334,21 +334,68 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		public static async Task<RepositoryResponse<PaginationModel<ReadViewModel>>> GetModelListByCategoryAsync(int pageId, string specificulture, string orderByPropertyName, MixHeartEnums.DisplayDirection direction, int? pageSize = 1, int? pageIndex = 0, int? skip = null, int? top = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			ReadViewModel.u003cGetModelListByCategoryAsyncu003ed__123 variable = new ReadViewModel.u003cGetModelListByCategoryAsyncu003ed__123();
-			variable.pageId = pageId;
-			variable.specificulture = specificulture;
-			variable.orderByPropertyName = orderByPropertyName;
-			variable.direction = direction;
-			variable.pageSize = pageSize;
-			variable.pageIndex = pageIndex;
-			variable.skip = skip;
-			variable.top = top;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<PaginationModel<ReadViewModel>>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ReadViewModel.u003cGetModelListByCategoryAsyncu003ed__123>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<PaginationModel<ReadViewModel>> repositoryResponse;
+			ReadViewModel.u003cu003ec__DisplayClass123_0 variable = null;
+			MixCmsContext mixCmsContext = _context;
+			if (mixCmsContext == null)
+			{
+				mixCmsContext = new MixCmsContext();
+			}
+			MixCmsContext mixCmsContext1 = mixCmsContext;
+			IDbContextTransaction dbContextTransaction = _transaction;
+			if (dbContextTransaction == null)
+			{
+				dbContextTransaction = mixCmsContext1.get_Database().BeginTransaction();
+			}
+			IDbContextTransaction dbContextTransaction1 = dbContextTransaction;
+			try
+			{
+				try
+				{
+					DbSet<MixPagePost> mixPagePost = mixCmsContext1.MixPagePost;
+					ParameterExpression parameterExpression = Expression.Parameter(typeof(MixPagePost), "ac");
+					MemberExpression memberExpression = Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_MixPost").MethodHandle));
+					ParameterExpression[] parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					IIncludableQueryable<MixPagePost, MixPost> includableQueryable = EntityFrameworkQueryableExtensions.Include<MixPagePost, MixPost>(mixPagePost, Expression.Lambda<Func<MixPagePost, MixPost>>(memberExpression, parameterExpressionArray));
+					parameterExpression = Expression.Parameter(typeof(MixPagePost), "ac");
+					BinaryExpression binaryExpression = Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_PageId").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(ReadViewModel.u003cu003ec__DisplayClass123_0)), FieldInfo.GetFieldFromHandle(typeof(ReadViewModel.u003cu003ec__DisplayClass123_0).GetField("pageId").FieldHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(ReadViewModel.u003cu003ec__DisplayClass123_0)), FieldInfo.GetFieldFromHandle(typeof(ReadViewModel.u003cu003ec__DisplayClass123_0).GetField("specificulture").FieldHandle)))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_Status").MethodHandle)), Expression.Call(Expression.Constant(MixEnums.MixContentStatus.Published, typeof(MixEnums.MixContentStatus)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(object).GetMethod("ToString").MethodHandle), Array.Empty<Expression>())));
+					ParameterExpression[] parameterExpressionArray1 = new ParameterExpression[] { parameterExpression };
+					IQueryable<MixPagePost> mixPagePosts = includableQueryable.Where<MixPagePost>(Expression.Lambda<Func<MixPagePost, bool>>(binaryExpression, parameterExpressionArray1));
+					parameterExpression = Expression.Parameter(typeof(MixPagePost), "ac");
+					MemberExpression memberExpression1 = Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_MixPost").MethodHandle));
+					ParameterExpression[] parameterExpressionArray2 = new ParameterExpression[] { parameterExpression };
+					IQueryable<MixPost> mixPosts = mixPagePosts.Select<MixPagePost, MixPost>(Expression.Lambda<Func<MixPagePost, MixPost>>(memberExpression1, parameterExpressionArray2));
+					PaginationModel<ReadViewModel> paginationModel = await ViewModelBase<MixCmsContext, MixPost, ReadViewModel>.Repository.ParsePagingQueryAsync(mixPosts, orderByPropertyName, direction, pageSize, pageIndex, skip, top, mixCmsContext1, dbContextTransaction1);
+					RepositoryResponse<PaginationModel<ReadViewModel>> repositoryResponse1 = new RepositoryResponse<PaginationModel<ReadViewModel>>();
+					repositoryResponse1.set_IsSucceed(true);
+					repositoryResponse1.set_Data(paginationModel);
+					repositoryResponse = repositoryResponse1;
+				}
+				catch (Exception exception1)
+				{
+					Exception exception = exception1;
+					ViewModelBase<MixCmsContext, MixPost, ReadViewModel>.Repository.LogErrorMessage(exception);
+					if (_transaction == null)
+					{
+						dbContextTransaction1.Rollback();
+					}
+					RepositoryResponse<PaginationModel<ReadViewModel>> repositoryResponse2 = new RepositoryResponse<PaginationModel<ReadViewModel>>();
+					repositoryResponse2.set_IsSucceed(false);
+					repositoryResponse2.set_Data(null);
+					repositoryResponse2.set_Exception(exception);
+					repositoryResponse = repositoryResponse2;
+				}
+			}
+			finally
+			{
+				if (_context == null)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext1.get_Database());
+					dbContextTransaction1.Dispose();
+					mixCmsContext1.Dispose();
+				}
+			}
+			return repositoryResponse;
 		}
 
 		public static RepositoryResponse<PaginationModel<ReadViewModel>> GetModelListByModule(int ModuleId, string specificulture, string orderByPropertyName, MixHeartEnums.DisplayDirection direction, int? pageSize = 1, int? pageIndex = 0, MixCmsContext _context = null, IDbContextTransaction _transaction = null)

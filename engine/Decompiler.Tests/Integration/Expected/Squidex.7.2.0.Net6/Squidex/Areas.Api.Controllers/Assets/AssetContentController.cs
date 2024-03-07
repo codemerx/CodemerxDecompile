@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 		private async Task<IActionResult> DeliverAssetAsync(Context context, [Nullable(2)] IAssetEntity asset, AssetContentQueryDto request)
 		{
 			IActionResult actionResult;
-			string str = null;
+			string str1 = null;
 			AssetContentController.u003cu003ec__DisplayClass7_0 variable = null;
 			AssetContentQueryDto assetContentQueryDto = request;
 			IAssetEntity assetEntity = asset;
@@ -91,24 +92,40 @@ namespace Squidex.Areas.Api.Controllers.Assets
 					long? nullable = null;
 					FileCallback fileCallback = null;
 					string mimeType = assetEntity.get_MimeType();
-					if (assetEntity.get_Type() != 1 || !this.assetThumbnailGenerator.IsResizable(assetEntity.get_MimeType(), resizeOptions, ref str))
+					if (assetEntity.get_Type() != 1 || !this.assetThumbnailGenerator.IsResizable(assetEntity.get_MimeType(), resizeOptions, ref str1))
 					{
 						nullable = new long?(assetEntity.get_FileSize());
 						fileCallback = new FileCallback(variable, async (Stream body, BytesRange range, CancellationToken ct) => await this.u003cu003e4__this.DownloadAsync(this.asset, body, null, range, ct));
 					}
 					else
 					{
-						mimeType = str;
+						mimeType = str1;
 						fileCallback = new FileCallback(variable, async (Stream body, BytesRange range, CancellationToken ct) => {
-							AssetContentController.u003cu003ec__DisplayClass7_0.u003cu003cDeliverAssetAsyncu003eb__0u003ed _ = new AssetContentController.u003cu003ec__DisplayClass7_0.u003cu003cDeliverAssetAsyncu003eb__0u003ed();
-							_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-							_.u003cu003e4__this = this;
-							_.body = body;
-							_.range = range;
-							_.ct = ct;
-							_.u003cu003e1__state = -1;
-							_.u003cu003et__builder.Start<AssetContentController.u003cu003ec__DisplayClass7_0.u003cu003cDeliverAssetAsyncu003eb__0u003ed>(ref _);
-							return _.u003cu003et__builder.Task;
+							string str = this.resizeOptions.ToString();
+							if (!this.request.Force)
+							{
+								int num = 0;
+								try
+								{
+									await this.u003cu003e4__this.DownloadAsync(this.asset, body, str, range, ct);
+								}
+								catch (AssetNotFoundException assetNotFoundException)
+								{
+									num = 1;
+								}
+								if (num == 1)
+								{
+									await this.u003cu003e4__this.ResizeAsync(this.asset, str, body, this.resizeOptions, false, ct);
+								}
+							}
+							else
+							{
+								using (Activity activity = Telemetry.Activities.StartActivity("Resize", ActivityKind.Internal))
+								{
+									await this.u003cu003e4__this.ResizeAsync(this.asset, str, body, this.resizeOptions, true, ct);
+								}
+							}
+							str = null;
 						});
 					}
 					FileCallbackResult fileCallbackResult = new FileCallbackResult(mimeType, fileCallback);
@@ -177,13 +194,358 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
 		private async Task ResizeAsync(IAssetEntity asset, string suffix, Stream target, ResizeOptions resizeOptions, bool overwrite, CancellationToken ct)
 		{
-			// 
-			// Current member / type: System.Threading.Tasks.Task Squidex.Areas.Api.Controllers.Assets.AssetContentController::ResizeAsync(Squidex.Domain.Apps.Entities.Assets.IAssetEntity,System.String,System.IO.Stream,Squidex.Assets.ResizeOptions,System.Boolean,System.Threading.CancellationToken)
-			// Exception in: System.Threading.Tasks.Task ResizeAsync(Squidex.Domain.Apps.Entities.Assets.IAssetEntity,System.String,System.IO.Stream,Squidex.Assets.ResizeOptions,System.Boolean,System.Threading.CancellationToken)
-			// GoTo misplaced.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			int num;
+			CancellationToken cancellationToken;
+			object obj;
+			ValueTask valueTask;
+			Exception exception;
+			object obj1;
+			TempAssetFile tempAssetFile;
+			TempAssetFile tempAssetFile1;
+			Stream stream;
+			object obj2;
+			int num1;
+			int num2;
+			Stream stream1;
+			object obj3;
+			int num3;
+			using (Activity activity = Telemetry.Activities.StartActivity("Resize", ActivityKind.Internal))
+			{
+				tempAssetFile = new TempAssetFile(asset.get_FileName(), asset.get_MimeType(), (long)0);
+				object obj4 = null;
+				int num4 = 0;
+				try
+				{
+					tempAssetFile1 = new TempAssetFile(asset.get_FileName(), asset.get_MimeType(), (long)0);
+					object obj5 = null;
+					int num5 = 0;
+					try
+					{
+						using (Activity activity1 = Telemetry.Activities.StartActivity("Read", ActivityKind.Internal))
+						{
+							stream = tempAssetFile.OpenWrite();
+							obj2 = null;
+							num1 = 0;
+							try
+							{
+								IAssetFileStore assetFileStore = this.assetFileStore;
+								DomainId id = asset.get_AppId().get_Id();
+								DomainId domainId = asset.get_Id();
+								long fileVersion = asset.get_FileVersion();
+								Stream stream2 = stream;
+								BytesRange bytesRange = new BytesRange();
+								cancellationToken = new CancellationToken();
+								await assetFileStore.DownloadAsync(id, domainId, fileVersion, null, stream2, bytesRange, cancellationToken);
+							}
+							catch
+							{
+								obj = obj6;
+								obj2 = obj;
+							}
+							if (stream != null)
+							{
+								valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+								await valueTask;
+							}
+							obj = obj2;
+							if (obj != null)
+							{
+								exception = obj as Exception;
+								if (exception == null)
+								{
+									throw obj;
+								}
+								ExceptionDispatchInfo.Capture(exception).Throw();
+							}
+							obj2 = null;
+							stream = null;
+						}
+						activity1 = null;
+						using (activity1 = Telemetry.Activities.StartActivity("Resize", ActivityKind.Internal))
+						{
+							num1 = 0;
+							try
+							{
+								stream = tempAssetFile.OpenRead();
+								obj2 = null;
+								num2 = 0;
+								try
+								{
+									stream1 = tempAssetFile1.OpenWrite();
+									obj3 = null;
+									num3 = 0;
+									try
+									{
+										IAssetThumbnailGenerator assetThumbnailGenerator = this.assetThumbnailGenerator;
+										Stream stream3 = stream;
+										string mimeType = asset.get_MimeType();
+										Stream stream4 = stream1;
+										ResizeOptions resizeOption = resizeOptions;
+										cancellationToken = new CancellationToken();
+										await assetThumbnailGenerator.CreateThumbnailAsync(stream3, mimeType, stream4, resizeOption, cancellationToken);
+									}
+									catch
+									{
+										obj = obj7;
+										obj3 = obj;
+									}
+									if (stream1 != null)
+									{
+										valueTask = ((IAsyncDisposable)stream1).DisposeAsync();
+										await valueTask;
+									}
+									obj = obj3;
+									if (obj != null)
+									{
+										exception = obj as Exception;
+										if (exception == null)
+										{
+											throw obj;
+										}
+										ExceptionDispatchInfo.Capture(exception).Throw();
+									}
+									obj3 = null;
+									stream1 = null;
+								}
+								catch
+								{
+									obj = obj8;
+									obj2 = obj;
+								}
+								if (stream != null)
+								{
+									valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+									await valueTask;
+								}
+								obj = obj2;
+								if (obj != null)
+								{
+									exception = obj as Exception;
+									if (exception == null)
+									{
+										throw obj;
+									}
+									ExceptionDispatchInfo.Capture(exception).Throw();
+								}
+								obj2 = null;
+								stream = null;
+							}
+							catch
+							{
+								obj = obj9;
+								num1 = 1;
+							}
+							if (num1 == 1)
+							{
+								stream = tempAssetFile.OpenRead();
+								obj2 = null;
+								num2 = 0;
+								try
+								{
+									stream1 = tempAssetFile1.OpenWrite();
+									obj3 = null;
+									num3 = 0;
+									try
+									{
+										await stream.CopyToAsync(stream1);
+									}
+									catch
+									{
+										obj1 = obj10;
+										obj3 = obj1;
+									}
+									if (stream1 != null)
+									{
+										valueTask = ((IAsyncDisposable)stream1).DisposeAsync();
+										await valueTask;
+									}
+									obj1 = obj3;
+									if (obj1 != null)
+									{
+										exception = obj1 as Exception;
+										if (exception == null)
+										{
+											throw obj1;
+										}
+										ExceptionDispatchInfo.Capture(exception).Throw();
+									}
+									obj3 = null;
+									stream1 = null;
+								}
+								catch
+								{
+									obj1 = obj11;
+									obj2 = obj1;
+								}
+								if (stream != null)
+								{
+									valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+									await valueTask;
+								}
+								obj1 = obj2;
+								if (obj1 != null)
+								{
+									exception = obj1 as Exception;
+									if (exception == null)
+									{
+										throw obj1;
+									}
+									ExceptionDispatchInfo.Capture(exception).Throw();
+								}
+								obj2 = null;
+								stream = null;
+							}
+						}
+						activity1 = null;
+						using (activity1 = Telemetry.Activities.StartActivity("Save", ActivityKind.Internal))
+						{
+							try
+							{
+								stream = tempAssetFile1.OpenRead();
+								obj2 = null;
+								num1 = 0;
+								try
+								{
+									IAssetFileStore assetFileStore1 = this.assetFileStore;
+									DomainId id1 = asset.get_AppId().get_Id();
+									DomainId domainId1 = asset.get_Id();
+									long fileVersion1 = asset.get_FileVersion();
+									string str = suffix;
+									Stream stream5 = stream;
+									bool flag = overwrite;
+									cancellationToken = new CancellationToken();
+									await assetFileStore1.UploadAsync(id1, domainId1, fileVersion1, str, stream5, flag, cancellationToken);
+								}
+								catch
+								{
+									obj1 = obj12;
+									obj2 = obj1;
+								}
+								if (stream != null)
+								{
+									valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+									await valueTask;
+								}
+								obj1 = obj2;
+								if (obj1 != null)
+								{
+									exception = obj1 as Exception;
+									if (exception == null)
+									{
+										throw obj1;
+									}
+									ExceptionDispatchInfo.Capture(exception).Throw();
+								}
+								obj2 = null;
+								stream = null;
+							}
+							catch (AssetAlreadyExistsException assetAlreadyExistsException)
+							{
+								goto Label1;
+							}
+						}
+						activity1 = null;
+						using (activity1 = Telemetry.Activities.StartActivity("Write", ActivityKind.Internal))
+						{
+							stream = tempAssetFile1.OpenRead();
+							obj2 = null;
+							num1 = 0;
+							try
+							{
+								await stream.CopyToAsync(target, ct);
+							}
+							catch
+							{
+								obj1 = obj13;
+								obj2 = obj1;
+							}
+							if (stream != null)
+							{
+								valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+								await valueTask;
+							}
+							obj1 = obj2;
+							if (obj1 != null)
+							{
+								exception = obj1 as Exception;
+								if (exception == null)
+								{
+									throw obj1;
+								}
+								ExceptionDispatchInfo.Capture(exception).Throw();
+							}
+							obj2 = null;
+							stream = null;
+						}
+						activity1 = null;
+					Label1:
+						num5 = 1;
+					}
+					catch
+					{
+						obj1 = obj14;
+						obj5 = obj1;
+					}
+					if (tempAssetFile1 != null)
+					{
+						await tempAssetFile1.DisposeAsync();
+					}
+					obj1 = obj5;
+					if (obj1 != null)
+					{
+						exception = obj1 as Exception;
+						if (exception == null)
+						{
+							throw obj1;
+						}
+						ExceptionDispatchInfo.Capture(exception).Throw();
+					}
+					if (num5 == 1)
+					{
+						num4 = 1;
+					}
+					else
+					{
+						obj5 = null;
+					}
+				}
+				catch
+				{
+					obj1 = obj15;
+					obj4 = obj1;
+				}
+				if (tempAssetFile != null)
+				{
+					await tempAssetFile.DisposeAsync();
+				}
+				obj1 = obj4;
+				if (obj1 != null)
+				{
+					exception = obj1 as Exception;
+					if (exception == null)
+					{
+						throw obj1;
+					}
+					ExceptionDispatchInfo.Capture(exception).Throw();
+				}
+				if (num4 != 1)
+				{
+					obj4 = null;
+				}
+				else
+				{
+					activity = null;
+					tempAssetFile = null;
+					tempAssetFile1 = null;
+					return;
+				}
+			}
+			activity = null;
+			tempAssetFile = null;
+			tempAssetFile1 = null;
+			activity = null;
+			tempAssetFile = null;
+			tempAssetFile1 = null;
 		}
 	}
 }

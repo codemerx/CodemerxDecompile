@@ -225,15 +225,21 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixModule parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101 variable = new Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (ReadViewModel item in this.Data.get_Items())
+			{
+				if (!repositoryResponse1.get_IsSucceed())
+				{
+					continue;
+				}
+				item.Specificulture = parent.Specificulture;
+				item.ModuleId = parent.Id;
+				item.CreatedDateTime = DateTime.UtcNow;
+				ViewModelHelper.HandleResult<ReadViewModel>(await item.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+			}
+			return repositoryResponse1;
 		}
 
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)

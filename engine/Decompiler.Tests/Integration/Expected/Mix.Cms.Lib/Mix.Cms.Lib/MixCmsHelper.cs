@@ -171,22 +171,92 @@ namespace Mix.Cms.Lib
 		public static async Task<RepositoryResponse<PaginationModel<TView>>> GetListPostByAddictionalField<TView>(string fieldName, object fieldValue, string culture, MixEnums.MixDataType dataType, MixEnums.CompareType filterType = 1, string orderByPropertyName = null, MixHeartEnums.DisplayDirection direction = 0, int? pageSize = null, int? pageIndex = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		where TView : ViewModelBase<MixCmsContext, MixPost, TView>
 		{
-			MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView> variable = new MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView>();
-			variable.fieldName = fieldName;
-			variable.fieldValue = fieldValue;
-			variable.culture = culture;
-			variable.dataType = dataType;
-			variable.filterType = filterType;
-			variable.orderByPropertyName = orderByPropertyName;
-			variable.direction = direction;
-			variable.pageSize = pageSize;
-			variable.pageIndex = pageIndex;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<PaginationModel<TView>>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView>>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<PaginationModel<TView>> modelListByAsync;
+			MixCmsHelper.u003cu003ec__DisplayClass15_1<TView> variable = null;
+			int num;
+			int num1;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
+			try
+			{
+				try
+				{
+					RepositoryResponse<PaginationModel<TView>> repositoryResponse = new RepositoryResponse<PaginationModel<TView>>();
+					repositoryResponse.set_IsSucceed(true);
+					PaginationModel<TView> paginationModel = new PaginationModel<TView>();
+					num = (pageIndex.HasValue ? pageIndex.Value : 0);
+					paginationModel.set_PageIndex(num);
+					paginationModel.set_PageSize(pageSize);
+					repositoryResponse.set_Data(paginationModel);
+					ParameterExpression parameterExpression = Expression.Parameter(typeof(MixAttributeSetValue), "m");
+					BinaryExpression binaryExpression = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixAttributeSetValue).GetMethod("get_AttributeSetName").MethodHandle)), Expression.Constant("sys_additional_field_post", typeof(string))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixAttributeSetValue).GetMethod("get_AttributeFieldName").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).GetField("CS$<>8__locals1").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).TypeHandle)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_0<TView>).GetField("fieldName").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_0<TView>).TypeHandle))));
+					ParameterExpression[] parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					Expression<Func<MixAttributeSetValue, bool>> expression = Expression.Lambda<Func<MixAttributeSetValue, bool>>(binaryExpression, parameterExpressionArray);
+					Expression<Func<MixAttributeSetValue, bool>> valuePredicate = MixCmsHelper.GetValuePredicate(fieldValue.ToString(), filterType, dataType);
+					if (valuePredicate != null)
+					{
+						expression = ReflectionHelper.CombineExpression<MixAttributeSetValue>(expression, valuePredicate, 6, "model");
+					}
+					IQueryable<MixAttributeSetValue> mixAttributeSetValues = mixCmsContext.MixAttributeSetValue.Where<MixAttributeSetValue>(expression);
+					parameterExpression = Expression.Parameter(typeof(MixAttributeSetValue), "m");
+					MemberExpression memberExpression = Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixAttributeSetValue).GetMethod("get_DataId").MethodHandle));
+					ParameterExpression[] parameterExpressionArray1 = new ParameterExpression[] { parameterExpression };
+					IQueryable<string> strs = mixAttributeSetValues.Select<MixAttributeSetValue, string>(Expression.Lambda<Func<MixAttributeSetValue, string>>(memberExpression, parameterExpressionArray1)).Distinct<string>();
+					strs.ToList<string>();
+					DbSet<MixRelatedAttributeData> mixRelatedAttributeData = mixCmsContext.MixRelatedAttributeData;
+					parameterExpression = Expression.Parameter(typeof(MixRelatedAttributeData), "m");
+					BinaryExpression binaryExpression1 = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentType").MethodHandle)), Expression.Call(Expression.Constant(MixEnums.MixAttributeSetDataType.Post, typeof(MixEnums.MixAttributeSetDataType)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(object).GetMethod("ToString").MethodHandle), Array.Empty<Expression>())), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).GetField("CS$<>8__locals1").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).TypeHandle)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_0<TView>).GetField("culture").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_0<TView>).TypeHandle))));
+					MethodInfo methodFromHandle = (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Enumerable).GetMethod("Any", new Type[] { typeof(IEnumerable<string>), typeof(Func<string, bool>) }).MethodHandle);
+					Expression[] expressionArray = new Expression[] { Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).GetField("dataIds").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).TypeHandle)), null };
+					ParameterExpression parameterExpression1 = Expression.Parameter(typeof(string), "d");
+					BinaryExpression binaryExpression2 = Expression.Equal(parameterExpression1, Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_DataId").MethodHandle)));
+					ParameterExpression[] parameterExpressionArray2 = new ParameterExpression[] { parameterExpression1 };
+					expressionArray[1] = Expression.Lambda<Func<string, bool>>(binaryExpression2, parameterExpressionArray2);
+					BinaryExpression binaryExpression3 = Expression.AndAlso(binaryExpression1, Expression.Call(null, methodFromHandle, expressionArray));
+					ParameterExpression[] parameterExpressionArray3 = new ParameterExpression[] { parameterExpression };
+					IQueryable<MixRelatedAttributeData> mixRelatedAttributeDatas = mixRelatedAttributeData.Where<MixRelatedAttributeData>(Expression.Lambda<Func<MixRelatedAttributeData, bool>>(binaryExpression3, parameterExpressionArray3));
+					parameterExpression = Expression.Parameter(typeof(MixRelatedAttributeData), "m");
+					MethodInfo methodInfo = (MethodInfo)MethodBase.GetMethodFromHandle(typeof(int).GetMethod("Parse", new Type[] { typeof(string) }).MethodHandle);
+					Expression[] expressionArray1 = new Expression[] { Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentId").MethodHandle)) };
+					MethodCallExpression methodCallExpression = Expression.Call(null, methodInfo, expressionArray1);
+					ParameterExpression[] parameterExpressionArray4 = new ParameterExpression[] { parameterExpression };
+					mixRelatedAttributeDatas.Select<MixRelatedAttributeData, int>(Expression.Lambda<Func<MixRelatedAttributeData, int>>(methodCallExpression, parameterExpressionArray4)).Distinct<int>().AsEnumerable<int>().ToList<int>();
+					DefaultRepository<MixCmsContext, MixPost, TView> instance = DefaultRepository<MixCmsContext, MixPost, TView>.get_Instance();
+					parameterExpression = Expression.Parameter(typeof(MixPost), "m");
+					BinaryExpression binaryExpression4 = Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPost).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).GetField("CS$<>8__locals1").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).TypeHandle)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_0<TView>).GetField("culture").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_0<TView>).TypeHandle)));
+					MethodInfo methodFromHandle1 = (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Enumerable).GetMethod("Any", new Type[] { typeof(IEnumerable<int>), typeof(Func<int, bool>) }).MethodHandle);
+					Expression[] expressionArray2 = new Expression[] { Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).GetField("postIds").FieldHandle, typeof(MixCmsHelper.u003cu003ec__DisplayClass15_1<TView>).TypeHandle)), null };
+					parameterExpression1 = Expression.Parameter(typeof(int), "p");
+					BinaryExpression binaryExpression5 = Expression.Equal(parameterExpression1, Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPost).GetMethod("get_Id").MethodHandle)));
+					ParameterExpression[] parameterExpressionArray5 = new ParameterExpression[] { parameterExpression1 };
+					expressionArray2[1] = Expression.Lambda<Func<int, bool>>(binaryExpression5, parameterExpressionArray5);
+					BinaryExpression binaryExpression6 = Expression.AndAlso(binaryExpression4, Expression.Call(null, methodFromHandle1, expressionArray2));
+					ParameterExpression[] parameterExpressionArray6 = new ParameterExpression[] { parameterExpression };
+					Expression<Func<MixPost, bool>> expression1 = Expression.Lambda<Func<MixPost, bool>>(binaryExpression6, parameterExpressionArray6);
+					string str = orderByPropertyName;
+					MixHeartEnums.DisplayDirection displayDirection = direction;
+					int? nullable = pageSize;
+					num1 = (nullable.HasValue ? nullable.GetValueOrDefault() : 100);
+					nullable = null;
+					int? nullable1 = nullable;
+					nullable = null;
+					modelListByAsync = await instance.GetModelListByAsync(expression1, str, displayDirection, new int?(num1), new int?(pageIndex.GetValueOrDefault()), nullable1, nullable, mixCmsContext, dbContextTransaction);
+				}
+				catch (Exception exception)
+				{
+					modelListByAsync = UnitOfWorkHelper<MixCmsContext>.HandleException<PaginationModel<TView>>(exception, flag, dbContextTransaction);
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					mixCmsContext.Dispose();
+				}
+			}
+			return modelListByAsync;
 		}
 
 		public static Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel GetModule(string name, string culture)

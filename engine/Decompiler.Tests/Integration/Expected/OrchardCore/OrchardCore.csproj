@@ -1,7 +1,7 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{92A1BF61-1BCE-4289-8289-58D3EBCDC41D}</ProjectGuid>
+    <ProjectGuid>{6D1E29C1-7D30-4318-99BB-A5DBF159AD60}</ProjectGuid>
     <SchemaVersion>2</SchemaVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -91,10 +91,6 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Extensions\ExtensionInfo.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="OrchardCore.Environment.Shell\Descriptor.Settings\AllFeaturesShellDescriptorManager.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
@@ -103,15 +99,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="OrchardCore.Environment.Extensions\ExtensionInfo.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="OrchardCore.Localization\NullStringLocalizerFactory.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Modules\Clock.cs">
+    <Compile Include="OrchardCore.Environment.Cache\Signal.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Cache\Signal.cs">
+    <Compile Include="OrchardCore.Modules\Clock.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -131,11 +131,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\Builders\FeatureAwareServiceCollection.cs">
+    <Compile Include="OrchardCore.Environment.Shell\RunningShellTable.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\RunningShellTable.cs">
+    <Compile Include="OrchardCore.Environment.Shell\Builders\FeatureAwareServiceCollection.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -147,23 +147,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\Configuration\ShellsConfigurationSources.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="OrchardCore.Modules\LocalClock.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\Configuration\ShellsSettingsSources.cs">
+    <Compile Include="OrchardCore.Environment.Shell\Configuration\ShellsConfigurationSources.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="OrchardCore.Localization\BclCalendars.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\Builders\ShellContainerFactory.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -175,11 +167,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Microsoft.AspNetCore.Builder\PoweredByOrchardCoreExtensions.cs">
+    <Compile Include="OrchardCore.Environment.Shell\Builders\ShellContainerFactory.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Localization\DefaultCalendarManager.cs">
+    <Compile Include="Microsoft.AspNetCore.Builder\PoweredByOrchardCoreExtensions.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -187,15 +179,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="OrchardCore.Localization\DefaultCalendarManager.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="OrchardCore.Modules\RunningShellTableExtensions.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\Builders\CompositionStrategy.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="OrchardCore.Modules\TimeZone.cs">
+    <Compile Include="OrchardCore.Environment.Shell\Configuration\ShellsSettingsSources.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -203,7 +195,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Extensions\TypeFeatureProvider.cs">
+    <Compile Include="OrchardCore.Modules\TimeZone.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -211,11 +203,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="OrchardCore.Environment.Shell\ShellDescriptorFeaturesManager.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="OrchardCore.Environment.Shell\ShellHost.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Extensions\ServiceCollectionExtensions.cs">
+    <Compile Include="OrchardCore.Localization\NullHtmlLocalizerFactory.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -227,19 +223,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Shell\ShellDescriptorFeaturesManager.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="OrchardCore.Localization\NullHtmlLocalizerFactory.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="OrchardCore.Environment.Extensions\Manifests\ManifestInfo.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="OrchardCore.Environment.Shell\Builders\ShellContextFactory.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OrchardCore.Environment.Shell\Builders\CompositionStrategy.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OrchardCore.Environment.Extensions\TypeFeatureProvider.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OrchardCore.Environment.Extensions\ServiceCollectionExtensions.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -255,19 +251,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Extensions\Features\FeatureInfo.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="OrchardCore.Environment.Extensions\ExtensionDependencyStrategy.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Environment.Extensions\Features\FeatureHash.cs">
+    <Compile Include="OrchardCore.Environment.Extensions\Features\FeatureInfo.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Modules\ModularBackgroundService.cs">
+    <Compile Include="OrchardCore.Environment.Extensions\Manifests\ManifestInfo.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -291,11 +283,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="OrchardCore.Modules\PoweredByMiddlewareOptions.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="OrchardCore.Environment.Extensions\Features\FeaturesProvider.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="OrchardCore.Modules\PoweredByMiddlewareOptions.cs">
+    <Compile Include="OrchardCore.Modules\ModularBackgroundService.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OrchardCore.Environment.Extensions\Features\FeatureHash.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>

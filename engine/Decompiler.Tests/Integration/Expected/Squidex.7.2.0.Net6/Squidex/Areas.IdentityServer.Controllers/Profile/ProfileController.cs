@@ -16,12 +16,14 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+using Squidex.Web;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,7 +63,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
 		private async Task AddLoginAsync(string id, CancellationToken ct)
 		{
-			ExternalLoginInfo externalLoginInfoWithDisplayNameAsync = await Extensions.GetExternalLoginInfoWithDisplayNameAsync(base.SignInManager, id);
+			ExternalLoginInfo externalLoginInfoWithDisplayNameAsync = await Squidex.Areas.IdentityServer.Controllers.Extensions.GetExternalLoginInfoWithDisplayNameAsync(base.SignInManager, id);
 			await this.userService.AddLoginAsync(id, externalLoginInfoWithDisplayNameAsync, ct);
 		}
 
@@ -103,7 +105,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 			{
 				throw new DomainException(T.Get("users.userNotFound", null), null);
 			}
-			ValueTuple<List<ExternalProvider>, bool, IList<UserLoginInfo>> valueTuple = await AsyncHelper.WhenAll<List<ExternalProvider>, bool, IList<UserLoginInfo>>(Extensions.GetExternalProvidersAsync(base.SignInManager), this.userService.HasPasswordAsync(user, base.get_HttpContext().get_RequestAborted()), this.userService.GetLoginsAsync(user, base.get_HttpContext().get_RequestAborted()));
+			ValueTuple<List<ExternalProvider>, bool, IList<UserLoginInfo>> valueTuple = await AsyncHelper.WhenAll<List<ExternalProvider>, bool, IList<UserLoginInfo>>(Squidex.Areas.IdentityServer.Controllers.Extensions.GetExternalProvidersAsync(base.SignInManager), this.userService.HasPasswordAsync(user, base.get_HttpContext().get_RequestAborted()), this.userService.GetLoginsAsync(user, base.get_HttpContext().get_RequestAborted()));
 			List<ExternalProvider> item1 = valueTuple.Item1;
 			bool item2 = valueTuple.Item2;
 			IList<UserLoginInfo> item3 = valueTuple.Item3;
@@ -234,13 +236,140 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
 		private async Task UploadResizedAsync(IFormFile file, string id, CancellationToken ct)
 		{
-			// 
-			// Current member / type: System.Threading.Tasks.Task Squidex.Areas.IdentityServer.Controllers.Profile.ProfileController::UploadResizedAsync(Microsoft.AspNetCore.Http.IFormFile,System.String,System.Threading.CancellationToken)
-			// Exception in: System.Threading.Tasks.Task UploadResizedAsync(Microsoft.AspNetCore.Http.IFormFile,System.String,System.Threading.CancellationToken)
-			// GoTo misplaced.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			object obj;
+			ValueTask valueTask;
+			Exception exception;
+			Stream stream;
+			object obj1;
+			int num;
+			TempAssetFile tempAssetFile = TempAssetFile.Create(Squidex.Web.FileExtensions.ToAssetFile(file));
+			object obj2 = null;
+			int num1 = 0;
+			try
+			{
+				ResizeOptions resizeOption = new ResizeOptions();
+				resizeOption.set_TargetWidth(new int?(128));
+				resizeOption.set_TargetHeight(new int?(128));
+				ResizeOptions resizeOption1 = resizeOption;
+				try
+				{
+					stream = file.OpenReadStream();
+					obj1 = null;
+					num = 0;
+					try
+					{
+						Stream stream1 = tempAssetFile.OpenWrite();
+						object obj3 = null;
+						try
+						{
+							await this.assetThumbnailGenerator.CreateThumbnailAsync(stream, file.get_ContentType(), stream1, resizeOption1, ct);
+						}
+						catch
+						{
+							obj = obj4;
+							obj3 = obj;
+						}
+						if (stream1 != null)
+						{
+							valueTask = ((IAsyncDisposable)stream1).DisposeAsync();
+							await valueTask;
+						}
+						obj = obj3;
+						if (obj != null)
+						{
+							exception = obj as Exception;
+							if (exception == null)
+							{
+								throw obj;
+							}
+							ExceptionDispatchInfo.Capture(exception).Throw();
+						}
+						obj3 = null;
+						stream1 = null;
+					}
+					catch
+					{
+						obj = obj5;
+						obj1 = obj;
+					}
+					if (stream != null)
+					{
+						valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+						await valueTask;
+					}
+					obj = obj1;
+					if (obj != null)
+					{
+						exception = obj as Exception;
+						if (exception == null)
+						{
+							throw obj;
+						}
+						ExceptionDispatchInfo.Capture(exception).Throw();
+					}
+					obj1 = null;
+					stream = null;
+				}
+				catch
+				{
+					throw new ValidationException(T.Get("validation.notAnImage", null), null);
+				}
+				stream = tempAssetFile.OpenWrite();
+				obj1 = null;
+				num = 0;
+				try
+				{
+					await this.userPictureStore.UploadAsync(id, stream, ct);
+				}
+				catch
+				{
+					obj = obj7;
+					obj1 = obj;
+				}
+				if (stream != null)
+				{
+					valueTask = ((IAsyncDisposable)stream).DisposeAsync();
+					await valueTask;
+				}
+				obj = obj1;
+				if (obj != null)
+				{
+					exception = obj as Exception;
+					if (exception == null)
+					{
+						throw obj;
+					}
+					ExceptionDispatchInfo.Capture(exception).Throw();
+				}
+				obj1 = null;
+				stream = null;
+				num1 = 1;
+			}
+			catch
+			{
+				obj = obj8;
+				obj2 = obj;
+			}
+			if (tempAssetFile != null)
+			{
+				await tempAssetFile.DisposeAsync();
+			}
+			obj = obj2;
+			if (obj != null)
+			{
+				exception = obj as Exception;
+				if (exception == null)
+				{
+					throw obj;
+				}
+				ExceptionDispatchInfo.Capture(exception).Throw();
+			}
+			if (num1 != 1)
+			{
+				obj2 = null;
+				tempAssetFile = null;
+			}
+			tempAssetFile = null;
 		}
 	}
 }

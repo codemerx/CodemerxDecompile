@@ -172,15 +172,151 @@ namespace Piranha.Services
 
 		public async Task<string> EnsureVersionAsync(Media media, int width, int? height = null)
 		{
-			MediaService.u003cEnsureVersionAsyncu003ed__22 variable = new MediaService.u003cEnsureVersionAsyncu003ed__22();
-			variable.u003cu003e4__this = this;
-			variable.media = media;
-			variable.width = width;
-			variable.height = height;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<string>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<MediaService.u003cEnsureVersionAsyncu003ed__22>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			string publicUrl;
+			int? nullable1;
+			IEnumerable<MediaVersion> hasValue;
+			string str;
+			if (App.MediaTypes.GetItem(media.Filename).AllowProcessing)
+			{
+				nullable1 = media.Width;
+				int value = width;
+				if (nullable1.GetValueOrDefault() == value & nullable1.HasValue)
+				{
+					if (height.HasValue)
+					{
+						nullable1 = media.Height;
+						value = height.Value;
+						if (!(nullable1.GetValueOrDefault() == value & nullable1.HasValue))
+						{
+							goto Label1;
+						}
+					}
+					nullable1 = null;
+					int? nullable2 = nullable1;
+					nullable1 = null;
+					publicUrl = this.GetPublicUrl(media, nullable2, nullable1, null);
+					return publicUrl;
+				}
+			Label1:
+				IEnumerable<MediaVersion> versions = 
+					from v in media.Versions
+					where v.Width == width
+					select v;
+				if (height.HasValue)
+				{
+					hasValue = versions.Where<MediaVersion>((MediaVersion v) => {
+						int? nullable3 = v.Height;
+						int? nullable = height;
+						return nullable3.GetValueOrDefault() == nullable.GetValueOrDefault() & nullable3.HasValue == nullable.HasValue;
+					});
+				}
+				else
+				{
+					IEnumerable<MediaVersion> mediaVersions = versions;
+					hasValue = 
+						from v in mediaVersions
+						where !v.Height.HasValue
+						select v;
+				}
+				versions = hasValue;
+				MediaVersion mediaVersion = versions.FirstOrDefault<MediaVersion>();
+				if (mediaVersion == null)
+				{
+					using (MemoryStream memoryStream = new MemoryStream())
+					{
+						ConfiguredTaskAwaitable<IStorageSession> configuredTaskAwaitable = this._storage.OpenAsync().ConfigureAwait(false);
+						using (IStorageSession storageSession = await configuredTaskAwaitable)
+						{
+							ConfiguredTaskAwaitable<bool> configuredTaskAwaitable1 = storageSession.GetAsync(media, media.Filename, memoryStream).ConfigureAwait(false);
+							if (await configuredTaskAwaitable1)
+							{
+								memoryStream.Position = (long)0;
+								using (MemoryStream memoryStream1 = new MemoryStream())
+								{
+									if (!height.HasValue)
+									{
+										this._processor.Scale(memoryStream, memoryStream1, width);
+									}
+									else
+									{
+										this._processor.CropScale(memoryStream, memoryStream1, width, height.Value);
+									}
+									memoryStream1.Position = (long)0;
+									bool flag = false;
+									lock (MediaService.ScaleMutex)
+									{
+										mediaVersion = versions.FirstOrDefault<MediaVersion>();
+										if (mediaVersion == null)
+										{
+											FileInfo fileInfo = new FileInfo(media.Filename);
+											MediaVersion mediaVersion1 = new MediaVersion()
+											{
+												Id = Guid.NewGuid(),
+												Size = memoryStream1.Length,
+												Width = width,
+												Height = height,
+												FileExtension = fileInfo.Extension
+											};
+											mediaVersion = mediaVersion1;
+											media.Versions.Add(mediaVersion);
+											this._repo.Save(media).Wait();
+											this.RemoveFromCache(media);
+											flag = true;
+										}
+									}
+									if (!flag)
+									{
+										publicUrl = this.GetPublicUrl(media, new int?(width), height, mediaVersion.FileExtension);
+									}
+									else
+									{
+										ConfiguredTaskAwaitable<string> configuredTaskAwaitable2 = storageSession.PutAsync(media, this.GetResourceName(media, new int?(width), height, null), media.ContentType, memoryStream1).ConfigureAwait(false);
+										publicUrl = await configuredTaskAwaitable2;
+									}
+								}
+							}
+							else
+							{
+								publicUrl = null;
+							}
+						}
+					}
+				}
+				else
+				{
+					nullable1 = media.Width;
+					value = width;
+					if (nullable1.GetValueOrDefault() == value & nullable1.HasValue)
+					{
+						if (height.HasValue)
+						{
+							nullable1 = media.Height;
+							value = height.Value;
+							if (nullable1.GetValueOrDefault() != value | !nullable1.HasValue)
+							{
+								goto Label3;
+							}
+						}
+						nullable1 = null;
+						int? nullable4 = nullable1;
+						nullable1 = null;
+						str = this.GetPublicUrl(media, nullable4, nullable1, null);
+						goto Label2;
+					}
+				Label3:
+					str = this.GetPublicUrl(media, new int?(width), height, mediaVersion.FileExtension);
+				Label2:
+					publicUrl = str;
+				}
+			}
+			else
+			{
+				nullable1 = null;
+				int? nullable5 = nullable1;
+				nullable1 = null;
+				publicUrl = this.GetPublicUrl(media, nullable5, nullable1, null);
+			}
+			return publicUrl;
 		}
 
 		public Task<IEnumerable<Media>> GetAllByFolderIdAsync(Guid? folderId = null)

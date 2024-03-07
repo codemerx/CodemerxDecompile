@@ -38,15 +38,60 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 
 		public static async Task<RepositoryResponse<bool>> Import(List<MixModule> arrModule, string destCulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Helper.u003cImportu003ed__0 variable = new Helper.u003cImportu003ed__0();
-			variable.arrModule = arrModule;
-			variable.destCulture = destCulture;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Helper.u003cImportu003ed__0>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			bool flag = _context == null;
+			MixCmsContext mixCmsContext = _context;
+			if (mixCmsContext == null)
+			{
+				mixCmsContext = new MixCmsContext();
+			}
+			MixCmsContext mixCmsContext1 = mixCmsContext;
+			IDbContextTransaction dbContextTransaction = _transaction;
+			if (dbContextTransaction == null)
+			{
+				dbContextTransaction = mixCmsContext1.get_Database().BeginTransaction();
+			}
+			IDbContextTransaction dbContextTransaction1 = dbContextTransaction;
+			try
+			{
+				try
+				{
+					DefaultModelRepository<!0, !1> modelRepository = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>.ModelRepository;
+					int data = modelRepository.Max((MixModule m) => m.Id, mixCmsContext1, dbContextTransaction1).get_Data() + 1;
+					foreach (MixModule utcNow in arrModule)
+					{
+						utcNow.Id = data;
+						utcNow.CreatedDateTime = DateTime.UtcNow;
+						utcNow.Specificulture = destCulture;
+						mixCmsContext1.MixModule.Add(utcNow);
+						data++;
+					}
+					MixCmsContext mixCmsContext2 = mixCmsContext1;
+					CancellationToken cancellationToken = new CancellationToken();
+					await ((DbContext)mixCmsContext2).SaveChangesAsync(cancellationToken);
+					repositoryResponse1.set_Data(true);
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), flag, dbContextTransaction1);
+				}
+				catch (Exception exception)
+				{
+					RepositoryResponse<ReadMvcViewModel> repositoryResponse2 = UnitOfWorkHelper<MixCmsContext>.HandleException<ReadMvcViewModel>(exception, flag, dbContextTransaction1);
+					repositoryResponse1.set_IsSucceed(false);
+					repositoryResponse1.set_Errors(repositoryResponse2.get_Errors());
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext1.get_Database());
+					dbContextTransaction1.Dispose();
+					mixCmsContext1.Dispose();
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		public static List<SupportedCulture> LoadCultures(int id, string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)

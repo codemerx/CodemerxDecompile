@@ -760,18 +760,117 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 
 		public static async Task<RepositoryResponse<JObject>> SaveByModuleName(string culture, string createdBy, string name, string formName, JObject obj, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cSaveByModuleNameu003ed__174 variable = new Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cSaveByModuleNameu003ed__174();
-			variable.culture = culture;
-			variable.createdBy = createdBy;
-			variable.name = name;
-			variable.formName = formName;
-			variable.obj = obj;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<JObject>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cSaveByModuleNameu003ed__174>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<JObject> repositoryResponse;
+			string str;
+			JObject data;
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1 variable = null;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
+			try
+			{
+				try
+				{
+					DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>.Repository;
+					ParameterExpression parameterExpression = Expression.Parameter(typeof(MixModule), "m");
+					BinaryExpression binaryExpression = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixModule).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1).GetField("CS$<>8__locals1").FieldHandle)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_0).GetField("culture").FieldHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixModule).GetMethod("get_Name").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1).GetField("CS$<>8__locals1").FieldHandle)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_0).GetField("name").FieldHandle))));
+					ParameterExpression[] parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel> singleModelAsync = await repository.GetSingleModelAsync(Expression.Lambda<Func<MixModule, bool>>(binaryExpression, parameterExpressionArray), mixCmsContext, dbContextTransaction);
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel> repositoryResponse1 = singleModelAsync;
+					JToken item = obj.get_Item("id");
+					if (item != null)
+					{
+						str = Newtonsoft.Json.Linq.Extensions.Value<string>(item);
+					}
+					else
+					{
+						str = null;
+					}
+					string str1 = str;
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						RepositoryResponse<JObject> repositoryResponse2 = new RepositoryResponse<JObject>();
+						repositoryResponse2.set_IsSucceed(false);
+						repositoryResponse2.set_Status(0x190);
+						repositoryResponse = repositoryResponse2;
+					}
+					else
+					{
+						DefaultRepository<!0, !1, !2> defaultRepository = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadViewModel>.Repository;
+						parameterExpression = Expression.Parameter(typeof(MixAttributeSet), "m");
+						BinaryExpression binaryExpression1 = Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixAttributeSet).GetMethod("get_Name").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1).GetField("CS$<>8__locals1").FieldHandle)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_0).GetField("formName").FieldHandle)));
+						ParameterExpression[] parameterExpressionArray1 = new ParameterExpression[] { parameterExpression };
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadViewModel> singleModelAsync1 = await defaultRepository.GetSingleModelAsync(Expression.Lambda<Func<MixAttributeSet, bool>>(binaryExpression1, parameterExpressionArray1), mixCmsContext, dbContextTransaction);
+						if (!singleModelAsync1.get_IsSucceed())
+						{
+							RepositoryResponse<JObject> repositoryResponse3 = new RepositoryResponse<JObject>();
+							repositoryResponse3.set_IsSucceed(false);
+							repositoryResponse3.set_Status(0x190);
+							repositoryResponse = repositoryResponse3;
+						}
+						else
+						{
+							Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel updateViewModel = new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel()
+							{
+								Id = str1,
+								CreatedBy = createdBy,
+								AttributeSetId = singleModelAsync1.get_Data().Id,
+								AttributeSetName = singleModelAsync1.get_Data().Name,
+								Specificulture = culture,
+								Data = obj
+							};
+							Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel updateViewModel1 = updateViewModel;
+							DefaultRepository<!0, !1, !2> repository1 = ViewModelBase<MixCmsContext, MixRelatedAttributeData, Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ReadViewModel>.Repository;
+							parameterExpression = Expression.Parameter(typeof(MixRelatedAttributeData), "m");
+							BinaryExpression binaryExpression2 = Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentId").MethodHandle)), Expression.Call(Expression.Property(Expression.Property(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1).GetField("getModule").FieldHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>).GetMethod("get_Data").MethodHandle, typeof(RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel>).TypeHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel).GetMethod("get_Id").MethodHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(int).GetMethod("ToString").MethodHandle), Array.Empty<Expression>())), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentType").MethodHandle)), Expression.Call(Expression.Constant(MixEnums.MixAttributeSetDataType.Module, typeof(MixEnums.MixAttributeSetDataType)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(object).GetMethod("ToString").MethodHandle), Array.Empty<Expression>()))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_1).GetField("CS$<>8__locals1").FieldHandle)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.UpdateViewModel.u003cu003ec__DisplayClass174_0).GetField("culture").FieldHandle))));
+							ParameterExpression[] parameterExpressionArray2 = new ParameterExpression[] { parameterExpression };
+							if (!await repository1.GetSingleModelAsync(Expression.Lambda<Func<MixRelatedAttributeData, bool>>(binaryExpression2, parameterExpressionArray2), mixCmsContext, dbContextTransaction).get_IsSucceed())
+							{
+								List<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel> relatedData = updateViewModel1.RelatedData;
+								Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel updateViewModel2 = new Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.UpdateViewModel()
+								{
+									ParentId = repositoryResponse1.get_Data().Id.ToString(),
+									Specificulture = culture,
+									ParentType = MixEnums.MixAttributeSetDataType.Module
+								};
+								relatedData.Add(updateViewModel2);
+							}
+							RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel> repositoryResponse4 = await updateViewModel1.SaveModelAsync(true, mixCmsContext, dbContextTransaction);
+							UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse4.get_IsSucceed(), flag, dbContextTransaction);
+							RepositoryResponse<JObject> repositoryResponse5 = new RepositoryResponse<JObject>();
+							repositoryResponse5.set_IsSucceed(repositoryResponse4.get_IsSucceed());
+							Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.UpdateViewModel data1 = repositoryResponse4.get_Data();
+							if (data1 != null)
+							{
+								data = data1.Data;
+							}
+							else
+							{
+								data = null;
+							}
+							repositoryResponse5.set_Data(data);
+							repositoryResponse5.set_Exception(repositoryResponse4.get_Exception());
+							repositoryResponse5.set_Errors(repositoryResponse4.get_Errors());
+							repositoryResponse = repositoryResponse5;
+						}
+					}
+				}
+				catch (Exception exception)
+				{
+					repositoryResponse = UnitOfWorkHelper<MixCmsContext>.HandleException<JObject>(exception, flag, dbContextTransaction);
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
+				}
+			}
+			return repositoryResponse;
 		}
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixModule parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)

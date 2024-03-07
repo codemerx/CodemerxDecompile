@@ -13,11 +13,14 @@ public class AutoUpdateService : IAutoUpdateService
 {
     private readonly HttpClient httpClient;
     private readonly INotificationService notificationService;
+    private readonly IAnalyticsService analyticsService;
 
-    public AutoUpdateService(HttpClient httpClient, INotificationService notificationService)
+    public AutoUpdateService(HttpClient httpClient, INotificationService notificationService,
+        IAnalyticsService analyticsService)
     {
         this.httpClient = httpClient;
         this.notificationService = notificationService;
+        this.analyticsService = analyticsService;
     }
 
     public Task CheckForNewerVersionAsync() => Task.Run(async () =>
@@ -47,7 +50,10 @@ public class AutoUpdateService : IAutoUpdateService
                     {
                         Title = "Download",
                         Action = () =>
-                            Process.Start(new ProcessStartInfo(latestRelease.HtmlUrl) { UseShellExecute = true })
+                        {
+                            _ = analyticsService.TrackEventAsync(AnalyticsEvents.DownloadNewVersion);
+                            Process.Start(new ProcessStartInfo(latestRelease.HtmlUrl) { UseShellExecute = true });
+                        }
                     }
                 }
             });

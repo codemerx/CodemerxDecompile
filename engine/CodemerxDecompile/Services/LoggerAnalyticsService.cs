@@ -18,12 +18,17 @@ public class LoggerAnalyticsService : IAnalyticsService
         this.systemInformationProvider = systemInformationProvider;
     }
 
-    public Task TrackEventAsync(string @event)
+    public void TrackEvent(AnalyticsEvent @event)
     {
         logger.LogInformation(
             "Event: {Event}; Device identifier: {DeviceIdentifier}; System information: {SystemInformation}",
             @event, deviceIdentifierProvider.GetDeviceIdentifier(), systemInformationProvider.GetSystemInformation());
+    }
 
+    public Task TrackEventAsync(AnalyticsEvent @event)
+    {
+        TrackEvent(@event);
+        
         return Task.CompletedTask;
     }
 }

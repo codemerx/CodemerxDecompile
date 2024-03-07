@@ -4,5 +4,6 @@ namespace CodemerxDecompile.Services;
 
 public interface IAnalyticsService
 {
-    Task TrackEventAsync(string @event);
+    void TrackEvent(AnalyticsEvent @event);
+    Task TrackEventAsync(AnalyticsEvent @event);
 }

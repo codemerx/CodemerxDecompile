@@ -34,12 +34,17 @@ namespace CodemerxDecompile.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
+    private const string CSharpName = "C#";
+    private const string VisualBasicName = "VB.NET";
+    private const string IntermediateLanguageName = "IL";
+
     private readonly IProjectGenerationService projectGenerationService;
     private readonly INotificationService notificationService;
+    private readonly IAnalyticsService analyticsService;
 
-    private readonly Language csharp = new("C#", LanguageFactory.GetLanguage(CSharpVersion.V7));
-    private readonly Language visualBasic = new("VB.NET", LanguageFactory.GetLanguage(VisualBasicVersion.V10));
-    private readonly Language intermediateLanguage = new("IL", new IntermediateLanguage());
+    private readonly Language cSharp = new(CSharpName, LanguageFactory.GetLanguage(CSharpVersion.V7));
+    private readonly Language visualBasic = new(VisualBasicName, LanguageFactory.GetLanguage(VisualBasicVersion.V10));
+    private readonly Language intermediateLanguage = new(IntermediateLanguageName, new IntermediateLanguage());
 
     private readonly Dictionary<IMemberDefinition, Node> memberDefinitionToNodeMap = new();
     private readonly List<AssemblyDefinition> assemblies = new();
@@ -87,18 +92,20 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private bool isSearching;
 
-    public MainWindowViewModel(IProjectGenerationService projectGenerationService, INotificationService notificationService)
+    public MainWindowViewModel(IProjectGenerationService projectGenerationService,
+        INotificationService notificationService, IAnalyticsService analyticsService)
     {
         this.projectGenerationService = projectGenerationService;
         this.notificationService = notificationService;
+        this.analyticsService = analyticsService;
 
         Languages = new()
         {
-            csharp,
+            cSharp,
             visualBasic,
             intermediateLanguage
         };
-        selectedLanguage = csharp;
+        selectedLanguage = cSharp;
     }
 
     public ObservableCollection<AssemblyNode> AssemblyNodes { get; } = new();
@@ -111,6 +118,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     internal void SelectNodeByMemberReference(MemberReference memberReference)
     {
+        if (!isSearchNavigation)
+            _ = analyticsService.TrackEventAsync(AnalyticsEvents.GoToDefinition);
+        
         var toBeResolved = memberReference.GetTopDeclaringTypeOrSelf();
         var typeDefinition = toBeResolved.Resolve();
         if (assemblies.All(assembly => assembly.MainModule.FilePath != typeDefinition.Module.FilePath))
@@ -173,6 +183,8 @@ public partial class MainWindowViewModel : ObservableObject
         {
             return;
         }
+
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.ResolveReference);
         
         // TODO: There has to be a better way to do this...
         var filePath = files[0].Path.LocalPath;
@@ -206,6 +218,11 @@ public partial class MainWindowViewModel : ObservableObject
                 }
             }
         });
+        
+        if (files.Count == 0)
+            return;
+
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.OpenFile);
 
         LoadAssemblies(files.Select(file => file.Path.LocalPath));
     }
@@ -213,6 +230,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanGoBack))]
     private void Back()
     {
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.GoBack);
+        
         isBackForwardNavigation = true;
         
         var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
@@ -232,6 +251,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanGoForward))]
     private void Forward()
     {
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.GoForward);
+
         isBackForwardNavigation = true;
         
         var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
@@ -403,6 +424,8 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanClearAssemblyList))]
     private void ClearAssemblyList()
     {
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.CloseAll);
+        
         SelectedNode = null;
         AssemblyNodes.Clear();
         memberDefinitionToNodeMap.Clear();
@@ -444,6 +467,14 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedLanguageChanged(Language value)
     {
+        _ = analyticsService.TrackEventAsync(value.Name switch
+        {
+            CSharpName => AnalyticsEvents.ChangeLanguageToCSharp,
+            VisualBasicName => AnalyticsEvents.ChangeLanguageToVisualBasic,
+            IntermediateLanguageName => AnalyticsEvents.ChangeLanguageToIntermediateLanguage,
+            _ => throw new NotImplementedException()
+        });
+        
         Decompile(SelectedNode, true);
     }
 
@@ -624,6 +655,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         searchDebouncer.Debounce(() =>
         {
+            _ = analyticsService.TrackEventAsync(AnalyticsEvents.Search);
+            
             lastSearchTask = currentSearchTask;
             currentSearchTask = Task.Run(async () =>
             {
@@ -661,6 +694,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (value == null)
             return;
+
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.NavigateToSearchResult);
         
         isSearchNavigation = true;
         
@@ -684,11 +719,16 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanGenerateProject))]
     private async Task GenerateProject(VisualStudioVersion visualStudioVersion)
     {
-        if (SelectedNode == null || SelectedLanguage == intermediateLanguage)
-            return;
+        _ = analyticsService.TrackEventAsync(visualStudioVersion switch
+        {
+            VisualStudioVersion.VS2019 => AnalyticsEvents.CreateProject2019,
+            VisualStudioVersion.VS2017 => AnalyticsEvents.CreateProject2017,
+            VisualStudioVersion.VS2015 => AnalyticsEvents.CreateProject2015,
+            _ => throw new NotImplementedException()
+        });
         
         var node = SelectedNode;
-        while (node.Parent != null)
+        while (node!.Parent != null)
         {
             node = node.Parent;
         }

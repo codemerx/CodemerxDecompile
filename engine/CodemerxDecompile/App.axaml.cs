@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CodemerxDecompile.Extensions;
+using CodemerxDecompile.Services;
 using CodemerxDecompile.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +25,16 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = Services.GetRequiredService<MainWindow>();
+
+            desktop.ShutdownRequested += (_, _) =>
+            {
+                var analyticsService = Services.GetRequiredService<IAnalyticsService>();
+                try
+                {
+                    analyticsService.TrackEvent(AnalyticsEvents.Shutdown);
+                }
+                catch { }
+            };
         }
 
         base.OnFrameworkInitializationCompleted();

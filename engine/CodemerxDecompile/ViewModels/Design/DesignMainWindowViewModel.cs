@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using CodemerxDecompile.Notifications;
 using CodemerxDecompile.Services;
 using JustDecompile.Tools.MSBuildProjectBuilder;
@@ -9,7 +10,7 @@ namespace CodemerxDecompile.ViewModels.Design;
 public class DesignMainWindowViewModel : MainWindowViewModel
 {
     public DesignMainWindowViewModel()
-        : base(new DesignProjectGenerationService(), new DesignNotificationService())
+        : base(new DesignProjectGenerationService(), new DesignNotificationService(), new DesignAnalyticsService())
     {
     }
 }
@@ -34,5 +35,17 @@ file class DesignNotificationService : INotificationService
 
     public void ReplaceNotification(Notification notificationToBeReplaced, Notification replacementNotification)
     {
+    }
+}
+
+file class DesignAnalyticsService : IAnalyticsService
+{
+    public void TrackEvent(AnalyticsEvent @event)
+    {
+    }
+
+    public Task TrackEventAsync(AnalyticsEvent @event)
+    {
+        return Task.CompletedTask;
     }
 }

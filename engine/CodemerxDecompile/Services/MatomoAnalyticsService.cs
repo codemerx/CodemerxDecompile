@@ -27,31 +27,40 @@ public class MatomoAnalyticsService : IAnalyticsService
         this.systemInformationProvider = systemInformationProvider;
     }
 
-    public Task TrackEventAsync(string @event) => Task.Run(async () =>
+    public void TrackEvent(AnalyticsEvent @event)
     {
-        await httpClient.GetAsync($"{options.Value.Endpoint}{CreateQueryString(@event)}");
+        httpClient.Send(new HttpRequestMessage(HttpMethod.Get, CreateRequestUri(@event)));
+    }
+
+    public Task TrackEventAsync(AnalyticsEvent @event) => Task.Run(async () =>
+    {
+        await httpClient.GetAsync(CreateRequestUri(@event));
     });
 
-    private string CreateQueryString(string @event)
+    private string CreateRequestUri(AnalyticsEvent @event) => $"{options.Value.Endpoint}{CreateQueryString(@event)}";
+
+    private string CreateQueryString(AnalyticsEvent @event)
     {
         var deviceIdentifier = deviceIdentifierProvider.GetDeviceIdentifier();
         var systemInformation = systemInformationProvider.GetSystemInformation();
 
-        var queryParams = new Dictionary<string, string>
+        var queryParams = new Dictionary<string, object>
         {
-            { "idsite", options.Value.SiteId.ToString() },
-            { "rec", 1.ToString() },
-            { "action_name", @event },
-            { "e_c", "CodemerxDecompile" },
-            { "e_a", @event },
+            { "idsite", options.Value.SiteId },
+            { "rec", 1 },
             { "cid", ConvertVisitorId(deviceIdentifier) },
             { "dimension1", systemInformation.AppVersion },
             { "dimension2", systemInformation.OsPlatform },
             { "dimension3", systemInformation.OsArchitecture },
-            { "dimension4", systemInformation.OsRelease }
+            { "dimension4", systemInformation.OsRelease },
+            { "e_c", @event.Category },
+            { "e_a", @event.Action }
         };
         
-        return $"?{string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"))}";
+        if (@event == AnalyticsEvents.Startup)
+            queryParams.Add("new_visit", 1);
+        
+        return $"?{string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value.ToString()!)}"))}";
     }
 
     private static string ConvertVisitorId(string input)

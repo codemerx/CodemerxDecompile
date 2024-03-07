@@ -36,8 +36,8 @@ public partial class MainWindow : Window
         
         viewModel = mainWindowViewModel;
         DataContext = viewModel;
-        
-        _ = analyticsService.TrackEventAsync("startup");
+
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.Startup);
         // Swallowing the exceptions on purpose to avoid problems in the auto-update taking down the entire app
         _ = autoUpdateService.CheckForNewerVersionAsync();
         
@@ -116,7 +116,9 @@ public partial class MainWindow : Window
             
             if (!args.Data.Contains(DataFormats.Files))
                 return;
-                
+
+            analyticsService.TrackEventAsync(AnalyticsEvents.OpenViaDragDrop);
+            
             var files = args.Data.GetFiles()!;
             viewModel.LoadAssemblies(files.Select(file => file.Path.LocalPath));
 

@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
@@ -12,7 +11,7 @@ using AvaloniaEdit.TextMate;
 using CodemerxDecompile.Extensions;
 using CodemerxDecompile.Services;
 using CodemerxDecompile.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using TextMateSharp.Grammars;
 
@@ -25,10 +24,16 @@ public partial class MainWindow : Window
     internal static readonly TextSegmentCollection<ReferenceTextSegment> references = new();
     private static MainWindowViewModel viewModel;
     
-    public MainWindow(MainWindowViewModel mainWindowViewModel, IAnalyticsService analyticsService,
-        IAutoUpdateService autoUpdateService)
+    public MainWindow(ILogger<MainWindow> logger, MainWindowViewModel mainWindowViewModel,
+        IAnalyticsService analyticsService, IAutoUpdateService autoUpdateService)
     {
         InitializeComponent();
+
+        Program.UnhandledException += (_, e) =>
+        {
+            logger.LogCritical(e, "Unhandled exception occured");
+        };
+        
         viewModel = mainWindowViewModel;
         DataContext = viewModel;
         

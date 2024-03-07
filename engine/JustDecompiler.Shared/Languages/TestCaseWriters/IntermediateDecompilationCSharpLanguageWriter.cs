@@ -14,11 +14,12 @@ namespace Telerik.JustDecompiler.Languages.TestCaseWriters
     class IntermediateDecompilationCSharpLanguageWriter : TestCaseCSharpWriter
     {
 		private readonly bool renameInvalidMembers = true;
-		public IntermediateDecompilationCSharpLanguageWriter(IFormatter formatter)
+		public IntermediateDecompilationCSharpLanguageWriter(IFormatter formatter, IMemberDefinition member)
 			: base(LanguageFactory.GetLanguage(CSharpVersion.None), formatter, new WriterSettings(writeExceptionsAsComments: true)) 
 		{
 			SimpleWriterContextService swcs = new SimpleWriterContextService(new DefaultDecompilationCacheService(), renameInvalidMembers);
 			this.writerContextService = swcs;
+			this.currentWritingInfo = new WritingInfo(member);
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)

@@ -14,7 +14,7 @@ namespace Telerik.JustDecompiler.Ast
         public static string ToCodeString(this Expression expression)
         {
             var writer = new StringWriter();
-            ILanguageTestCaseWriter languageWriter = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(writer));
+            ILanguageTestCaseWriter languageWriter = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(writer), expression.UnderlyingSameMethodInstructions.First().ContainingMethod);
 			languageWriter.SetContext(expression.UnderlyingSameMethodInstructions.First().ContainingMethod);
 			languageWriter.Write(expression);
 

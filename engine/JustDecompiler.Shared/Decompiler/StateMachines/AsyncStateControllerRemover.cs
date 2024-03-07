@@ -61,7 +61,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                     SkipFirstBlock();
                 }
 
-                return RemoveControllerChain();
+                return RemoveControllerChainV2();
             }
         }
 
@@ -73,7 +73,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
         protected override bool IsUnconditionalBranchBlock(InstructionBlock theBlock)
         {
-            return base.IsUnconditionalBranchBlock(theBlock) || IsDummyStateControllerBlock(theBlock) || IsNopBlock(theBlock);
+            return base.IsUnconditionalBranchBlock(theBlock) || IsDummyStateControllerBlock(theBlock); // || IsNopBlock(theBlock); // we should not skip Nops anymore. if we do, we will miss some blocks in cleanup
         }
 
         /// <summary>

@@ -29,7 +29,7 @@ public class MatomoAnalyticsService : IAnalyticsService
 
     public Task TrackEventAsync(string @event) => Task.Run(async () =>
     {
-        await httpClient.GetAsync($"{options.Value.ServerUrl}{CreateQueryString(@event)}");
+        await httpClient.GetAsync($"{options.Value.Endpoint}{CreateQueryString(@event)}");
     });
 
     private string CreateQueryString(string @event)

@@ -7,6 +7,10 @@ using CodemerxDecompile.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Polly;
+using Polly.Contrib.WaitAndRetry;
+using Polly.Extensions.Http;
 
 namespace CodemerxDecompile.Extensions;
 
@@ -53,18 +57,33 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddHttpClients(this IServiceCollection services)
     {
-        services.AddHttpClient<IAutoUpdateService, AutoUpdateService>(httpClient =>
-        {
-            httpClient.BaseAddress = new Uri("https://api.github.com");
+        var policy = HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(
+                Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 5));
+        
+        services
+            .AddHttpClient<IAutoUpdateService, AutoUpdateService>(httpClient =>
+            {
+                httpClient.BaseAddress = new Uri("https://api.github.com");
 
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
-            httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
-            // As per https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28#user-agent-required
-            httpClient.DefaultRequestHeaders.Add("User-Agent", "CodemerxDecompile");
-        });
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+                httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+                // As per https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28#user-agent-required
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "CodemerxDecompile");
+            })
+            .AddPolicyHandler(policy);
 
         if (EnvironmentProvider.Environment == Environment.Production)
-            services.AddHttpClient<IAnalyticsService, MatomoAnalyticsService>();
+            services
+                .AddHttpClient<IAnalyticsService, MatomoAnalyticsService>()
+                .ConfigureHttpClient((services, httpClient) =>
+                {
+                    var options = services.GetRequiredService<IOptions<MatomoAnalyticsOptions>>();
+
+                    httpClient.BaseAddress = new Uri(options.Value.ServerUrl);
+                })
+                .AddPolicyHandler(policy);
 
         return services;
     }

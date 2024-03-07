@@ -26,12 +26,11 @@ public class MatomoAnalyticsService : IAnalyticsService
         this.deviceIdentifierProvider = deviceIdentifierProvider;
         this.systemInformationProvider = systemInformationProvider;
     }
-    
-    public async Task TrackEventAsync(string @event)
+
+    public Task TrackEventAsync(string @event) => Task.Run(async () =>
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, $"{options.Value.ServerUrl}{CreateQueryString(@event)}");
-        using var response = await httpClient.SendAsync(request);
-    }
+        await httpClient.GetAsync($"{options.Value.ServerUrl}{CreateQueryString(@event)}");
+    });
 
     private string CreateQueryString(string @event)
     {

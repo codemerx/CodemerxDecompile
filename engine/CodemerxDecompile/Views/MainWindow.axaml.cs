@@ -25,15 +25,16 @@ public partial class MainWindow : Window
     internal static readonly TextSegmentCollection<ReferenceTextSegment> references = new();
     private static MainWindowViewModel viewModel;
     
-    public MainWindow()
+    public MainWindow(MainWindowViewModel mainWindowViewModel, IAnalyticsService analyticsService,
+        IAutoUpdateService autoUpdateService)
     {
         InitializeComponent();
-        viewModel = App.Current.Services.GetRequiredService<MainWindowViewModel>();
+        viewModel = mainWindowViewModel;
         DataContext = viewModel;
-
-        var autoUpdateService = App.Current.Services.GetRequiredService<IAutoUpdateService>();
+        
+        _ = analyticsService.TrackEventAsync("startup");
         // Swallowing the exceptions on purpose to avoid problems in the auto-update taking down the entire app
-        _ = Task.Run(() => autoUpdateService.CheckForNewerVersionAsync());
+        _ = autoUpdateService.CheckForNewerVersionAsync();
         
         TextEditor.TextArea.TextView.ElementGenerators.Add(new ReferenceElementGenerator());
         

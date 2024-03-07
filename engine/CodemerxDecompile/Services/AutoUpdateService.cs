@@ -20,7 +20,7 @@ public class AutoUpdateService : IAutoUpdateService
         this.notificationService = notificationService;
     }
 
-    public async Task CheckForNewerVersionAsync()
+    public Task CheckForNewerVersionAsync() => Task.Run(async () =>
     {
         var response = await httpClient.GetAsync("/repos/codemerx/CodemerxDecompile/releases/latest");
         if (response.StatusCode != HttpStatusCode.OK)
@@ -29,7 +29,7 @@ public class AutoUpdateService : IAutoUpdateService
         var latestRelease = await response.Content.ReadFromJsonAsync<Release>();
         if (latestRelease == null || latestRelease.Name == null || latestRelease.HtmlUrl == null)
             return;
-        
+
         var latestReleaseVersion = new Version(latestRelease.Name);
         var currentVersion = AssemblyProvider.Assembly.GetName().Version;
         if (currentVersion == null)
@@ -46,12 +46,13 @@ public class AutoUpdateService : IAutoUpdateService
                     new NotificationAction
                     {
                         Title = "Download",
-                        Action = () => Process.Start(new ProcessStartInfo(latestRelease.HtmlUrl) { UseShellExecute = true })
+                        Action = () =>
+                            Process.Start(new ProcessStartInfo(latestRelease.HtmlUrl) { UseShellExecute = true })
                     }
                 }
             });
         }
-    }
+    });
 }
 
 file class Release

@@ -1,10 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CodemerxDecompile.Extensions;
-using CodemerxDecompile.Services;
 using CodemerxDecompile.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,16 +17,13 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
-        var analyticsService = Services.GetRequiredService<IAnalyticsService>();
-        _ = Task.Run(() => analyticsService.TrackEventAsync("startup"));
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            desktop.MainWindow = Services.GetRequiredService<MainWindow>();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -38,6 +33,7 @@ public partial class App : Application
         new ServiceCollection()
             .ConfigureOptions()
             .ConfigureLogging()
+            .AddViews()
             .AddViewModels()
             .AddServices()
             .AddProviders()

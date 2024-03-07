@@ -3,6 +3,7 @@ using CodemerxDecompile.Options;
 using CodemerxDecompile.Providers;
 using CodemerxDecompile.Services;
 using CodemerxDecompile.ViewModels;
+using CodemerxDecompile.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,10 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddViews(this IServiceCollection services) =>
+        services
+            .AddTransient<MainWindow>();
+
     public static IServiceCollection AddViewModels(this IServiceCollection services) =>
         services
             .AddSingleton<MainWindowViewModel>()
@@ -38,7 +43,8 @@ public static class ServiceCollectionExtensions
             .AddSingleton<INotificationService, NotificationService>()
             .AddTransient<IProjectGenerationService, ProjectGenerationService>()
             .AddTransient<IAutoUpdateService, AutoUpdateService>()
-            .AddAnalyticsService();
+            .AddTransient<IAnalyticsService, LoggerAnalyticsService>(Environment.Development)
+            .AddTransient<IAnalyticsService, MatomoAnalyticsService>(Environment.Production);
 
     public static IServiceCollection AddProviders(this IServiceCollection services) =>
         services
@@ -62,11 +68,6 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
-    private static IServiceCollection AddAnalyticsService(this IServiceCollection services) =>
-        services
-            .AddTransient<IAnalyticsService, LoggerAnalyticsService>(Environment.Development)
-            .AddTransient<IAnalyticsService, MatomoAnalyticsService>(Environment.Production);
 
     private static IConfigurationRoot GetConfiguration() =>
         new ConfigurationBuilder()

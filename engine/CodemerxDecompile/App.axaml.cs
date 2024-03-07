@@ -1,9 +1,10 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CodemerxDecompile.Extensions;
 using CodemerxDecompile.Services;
-using CodemerxDecompile.ViewModels;
 using CodemerxDecompile.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,9 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        var analyticsService = Services.GetRequiredService<IAnalyticsService>();
+        _ = Task.Run(() => analyticsService.TrackEventAsync("startup"));
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -30,19 +34,13 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
     
-    private static IServiceProvider ConfigureServices()
-    {
-        var services = new ServiceCollection();
-
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<INotificationsViewModel, NotificationsViewModel>();
-
-        services.AddSingleton<INotificationService, NotificationService>();
-        services.AddTransient<IProjectGenerationService, ProjectGenerationService>();
-        services.AddTransient<IAutoUpdateService, AutoUpdateService>();
-
-        services.AddHttpClient<AutoUpdateService>();
-
-        return services.BuildServiceProvider();
-    }
+    private static IServiceProvider ConfigureServices() =>
+        new ServiceCollection()
+            .ConfigureOptions()
+            .ConfigureLogging()
+            .AddViewModels()
+            .AddServices()
+            .AddProviders()
+            .AddHttpClients()
+            .BuildServiceProvider();
 }

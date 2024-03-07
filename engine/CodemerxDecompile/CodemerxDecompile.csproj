@@ -25,8 +25,13 @@
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.6" />
         <PackageReference Include="AvaloniaEdit.TextMate" Version="11.0.6" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+        <PackageReference Include="DeviceId" Version="6.6.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
         <PackageReference Include="TextMateSharp.Grammars" Version="1.0.56" />
     </ItemGroup>
 
@@ -36,5 +41,11 @@
       <ProjectReference Include="..\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj" />
       <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
       <ProjectReference Include="..\Tools.MSBuildProjectBuilder.NetStandard\Tools.MSBuildProjectBuilder.NetStandard.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <EmbeddedResource Include="appsettings.json" />
+      <EmbeddedResource Include="appsettings.Production.json" />
     </ItemGroup>
 </Project>

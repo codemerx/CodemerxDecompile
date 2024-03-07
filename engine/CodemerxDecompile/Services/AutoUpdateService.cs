@@ -19,21 +19,10 @@ public class AutoUpdateService : IAutoUpdateService
         this.httpClient = httpClient;
         this.notificationService = notificationService;
     }
-    
+
     public async Task CheckForNewerVersionAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/codemerx/CodemerxDecompile/releases/latest")
-        {
-            Headers =
-            {
-                { "Accept", "application/vnd.github+json" },
-                { "X-GitHub-Api-Version", "2022-11-28" },
-                // As per https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28#user-agent-required
-                { "User-Agent", "CodemerxDecompile" }
-            }
-        };
-
-        var response = await httpClient.SendAsync(request);
+        var response = await httpClient.GetAsync("/repos/codemerx/CodemerxDecompile/releases/latest");
         if (response.StatusCode != HttpStatusCode.OK)
             return;
 

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -211,8 +210,8 @@ public partial class MainWindow : Window
                     var assemblyName = (memberReference.GetTopDeclaringTypeOrSelf().Scope as AssemblyNameReference)?.FullName;
                     var message = memberReference switch
                     {
-                        TypeReference => $"Ambiguous type reference. Generic parameters might be present. Please, locate the assembly where the type is defined.{Environment.NewLine}{Environment.NewLine}Assembly name: {assemblyName}",
-                        _ => $"Ambiguous reference. Please, locate the assembly where the member is defined.{Environment.NewLine}{Environment.NewLine}Assembly name: {assemblyName}"
+                        TypeReference => $"Ambiguous type reference. Generic parameters might be present. Please, locate the assembly where the type is defined.{System.Environment.NewLine}{System.Environment.NewLine}Assembly name: {assemblyName}",
+                        _ => $"Ambiguous reference. Please, locate the assembly where the member is defined.{System.Environment.NewLine}{System.Environment.NewLine}Assembly name: {assemblyName}"
                     };
                     
                     ToolTip.SetPlacement(control, PlacementMode.Pointer);

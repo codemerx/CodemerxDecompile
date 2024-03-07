@@ -1,8 +1,11 @@
+using System;
 using System.Reflection;
 
 namespace CodemerxDecompile;
 
 public static class AssemblyProvider
 {
-    public static Assembly Assembly => typeof(AssemblyProvider).Assembly;
+    private static readonly Lazy<Assembly> AssemblyHolder = new(() => typeof(AssemblyProvider).Assembly);
+
+    public static Assembly Assembly => AssemblyHolder.Value;
 }

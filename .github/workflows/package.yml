@@ -1,0 +1,104 @@
+name: Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: 'Windows'
+        required: false
+        default: true
+      linux:
+        description: 'Linux'
+        required: false
+        default: true
+      macos:
+        description: 'MacOS'
+        required: false
+        default: true
+
+defaults:
+  run:
+    working-directory: ./engine/CodemerxDecompile
+
+jobs:
+  package-windows:
+    if: ${{ github.event.inputs.windows }}
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+    
+    - name: Publish
+      run: dotnet publish --no-build -r win-x64 -c Release
+
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-windows-x64
+        path: ./bin/Release/net7.0/win-x64
+
+  package-linux:
+    if: ${{ github.event.inputs.linux }}
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+    
+    - name: Publish
+      run: dotnet publish --no-build -r linux-x64 -c Release
+
+    - name: Archive artifacts
+      run: tar -czpvf CodemerxDecompile-linux-x64.tar.gz ./bin/Release/net7.0/linux-x64
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-linux-x64
+        path: CodemerxDecompile-linux-x64.tar.gz
+
+  package-macos:
+    if: ${{ github.event.inputs.macos }}
+    runs-on: macos-14
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+    
+    - name: Publish
+      run: dotnet publish --no-build -r osx-arm64 -c Release
+
+    - name: Archive artifacts
+      run: tar -czpvf CodemerxDecompile-macos-arm64.tar.gz ./bin/Release/net7.0/osx-arm64
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-macos-arm64
+        path: CodemerxDecompile-macos-arm64.tar.gz

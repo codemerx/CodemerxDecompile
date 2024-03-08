@@ -1,1 +1,4 @@
+name: Package
 
+on:
+  workflow_dispatch:

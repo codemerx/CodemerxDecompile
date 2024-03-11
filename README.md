@@ -13,8 +13,8 @@ CodemerxDecompile is maintained by the original JustDecompile creators and it is
 2. Start `CodemerxDecompile.exe`
 
 ### Linux
-1. Extract the archive using `tar -xzpf ./CodemerxDecompile-linux-x64.tar.gz`
-2. Start the app using `./CodemerxDecompile-linux-x64/bin/CodemerxDecompile`
+1. Extract the archive using `mkdir CodemerxDecompile && tar -xzpf ./CodemerxDecompile-linux-x64.tar.gz -C CodemerxDecompile`
+2. Start the app using `./CodemerxDecompile/CodemerxDecompile`
 
 ### MacOS
 1. Extract the archive using `tar -xzpf ./CodemerxDecompile-darwin.tar`

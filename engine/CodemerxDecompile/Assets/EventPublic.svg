@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-yellow-10{fill: #996f00; opacity: 0.1;}.light-yellow{fill: #996f00; opacity: 1;}</style>
+  </defs>
+  <title>IconLightEventPublic</title>
+  <g id="canvas" class="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <path class="light-yellow-10" d="M12.5,6.5l-8,8H3l3.5-6H3l4-7h5.387L8,6.5Z" />
+    <path class="light-yellow" d="M12.5,6H9.1l3.659-4.17L12.387,1H7l-.434.252-4,7L3,9H5.629L2.568,14.248,3,15H4.5l.354-.146,8-8ZM4.293,14H3.871L6.932,8.752,6.5,8H3.862L7.29,2h3.993L7.624,6.17,8,7h3.293Z" />
+  </g>
+</svg>

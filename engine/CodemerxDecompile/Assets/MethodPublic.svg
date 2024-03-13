@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-purple-10{fill: #6936aa; opacity: 0.1;}.light-purple{fill: #6936aa; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightMethodPublic</title>
+  <g id="canvas" class="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-purple-10" d="M13.5,5.045v7L8,14.545l-5.5-2.5v-7l5.5-3Z" />
+      <path class="light-purple" d="M14,5.045v7l-.293.455L8.207,15H7.793l-5.5-2.5L2,12.045v-7l.261-.439.032.894L3,5.821v5.9l4.5,2.045,0-5.9.3.135h.414l.288-.131,0,5.9L13,11.723v-5.9l.707-.321.032-.894Z" />
+    </g>
+    <path class="light-purple-10" d="M13.5,5.045,8,7.545l-5.5-2.5,5.5-3Z" />
+    <path class="light-purple" d="M8.239,1.606H7.761l-5.5,3,.032.894L7.793,8h.414l5.5-2.5.032-.894ZM8,7,3.619,5,8,2.614,12.381,5Z" />
+  </g>
+</svg>

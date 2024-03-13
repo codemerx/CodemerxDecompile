@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-blue-10{fill: #005dba; opacity: 0.1;}.light-blue{fill: #005dba; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightFieldPublic</title>
+  <g id="canvas" class="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-blue-10" d="M14.5,5.5V10l-9,5-4-4V6.5l9-5Z" />
+      <path class="light-blue" d="M14.854,5.146l-4-4-.6-.083-9,5L1,6.5V11l.146.354,4,4,.6.083,9-5L15,10V5.5ZM14,9.706,6,14.15V10.5H5v3.293l-3-3v-4L10.413,2.12,14,5.707Z" />
+    </g>
+    <path class="canvas" d="M16,16H0V0H16Z" />
+    <path class="light-blue-10" d="M14.5,5.5l-9,5-4-4,9-5Z" />
+    <path class="light-blue" d="M10.854,1.146l-.6-.083-9,5-.111.791,4,4,.6.083,9-5,.111-.791ZM5.587,9.88,2.322,6.615,10.413,2.12l3.265,3.265Z" />
+  </g>
+</svg>

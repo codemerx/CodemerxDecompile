@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-defaultgrey{fill: #212121; opacity: 1;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-yellow{fill: #996f00; opacity: 1;}.white{fill: #ffffff; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightReferenceWarning</title>
+  <g id="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-defaultgrey" d="M5,6V7H9V6Z" />
+    </g>
+    <path class="light-defaultgrey-10" d="M.5,4.5v4h4v-4Z" />
+    <path class="light-defaultgrey" d="M4.5,4H.5L0,4.5v4L.5,9h4L5,8.5v-4ZM4,8H1V5H4Z" />
+    <path class="light-defaultgrey-10" d="M9.5,3.5V8.76l.5-.91L10.47,7h2.06l1.1,2,.28.5H15.5v-6Z" />
+    <path class="light-defaultgrey" d="M15.5,3h-6L9,3.5v6l.06.06.44-.8.5-.91V4h5V9H13.63l.28.5.27.5H15.5l.5-.5v-6Z" />
+    <path class="light-yellow" d="M15.5,16h-8l-.439-.739,4-7.261h.878l4,7.261Z" />
+    <path class="white" d="M12,13H11V10h1Zm.25,1.5a.75.75,0,1,1-.75-.75A.75.75,0,0,1,12.25,14.5Z" />
+  </g>
+</svg>

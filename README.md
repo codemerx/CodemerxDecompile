@@ -2,9 +2,9 @@
 
 ## Overview 
 
-CodemerxDecompile is a truly multi-platform (Windows/MAC/Linux) .NET decompiler. It is based on the [fastest .NET decompiler engine](https://github.com/telerik/JustDecompileEngine) and [VS Code](https://github.com/microsoft/vscode) UI.
+CodemerxDecompile is a truly multi-platform (Windows/MAC/Linux) .NET decompiler. It is based on the [fastest .NET decompiler engine](https://github.com/telerik/JustDecompileEngine).
 
-CodemerxDecompile is maintained by the original JustDecompile creators and it is a continuation of [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine). Sadly, the original JustDecompile seems to have gone out of support after 2018. Now it returns big time with CodemerxDecompile.
+CodemerxDecompile is maintained by the original JustDecompile creators and it is a continuation of [JustDecompile Engine](https://github.com/codemerx/JustDecompileEngine). Sadly, the original JustDecompile seems to have gone out of support after 2018. Now it returns big time with CodemerxDecompile.
 
 ## Quick Start Guide
 
@@ -23,4 +23,4 @@ CodemerxDecompile is maintained by the original JustDecompile creators and it is
 
 ## License
 
-This project is [AGPL](https://github.com/codemerx/CodemerxDecompile/blob/master/COPYING) licensed. It includes [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine) and [Mono.Cecil](https://github.com/jbevain/cecil) libraries which are Apache 2.0 and MIT licensed respectively. It also includes [VS Code](https://github.com/microsoft/vscode) which is MIT licensed.
+This project is [AGPL](https://github.com/codemerx/CodemerxDecompile/blob/master/COPYING) licensed. It includes [JustDecompile Engine](https://github.com/telerik/JustDecompileEngine) and [Mono.Cecil](https://github.com/jbevain/cecil) libraries which are Apache 2.0 and MIT licensed respectively.

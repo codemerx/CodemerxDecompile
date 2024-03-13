@@ -65,8 +65,11 @@ jobs:
       run: dotnet publish -r osx-arm64 -c Release
       working-directory: ./engine/CodemerxDecompile
 
+    - name: Build .app bundle
+      run: build/macos/build-application-bundle.sh
+
     - name: Archive artifacts
-      run: tar -czpf CodemerxDecompile-macos-arm64.tar.gz -C ./engine/CodemerxDecompile/bin/Release/net7.0/osx-arm64/publish .
+      run: tar -czpf CodemerxDecompile-macos-arm64.tar.gz CodemerxDecompile.app
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4

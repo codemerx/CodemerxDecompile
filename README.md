@@ -17,8 +17,9 @@ CodemerxDecompile is maintained by the original JustDecompile creators and it is
 2. Start the app using `./CodemerxDecompile/CodemerxDecompile`
 
 ### MacOS
-1. Extract the archive using `tar -xzpf ./CodemerxDecompile-darwin.tar`
-2. Start `CodemerxDecompile.app`
+1. Extract the archive using `tar -xzpf ./CodemerxDecompile-macos-arm64.tar`
+2. Remove the quarantine attribute using `xattr -d com.apple.quarantine CodemerxDecompile.app`. This is necessary as the app is not signed and MacOS reports it as "CodemerxDecompile is damaged and can't be opened.".
+3. Start `CodemerxDecompile.app`
 
 ## License
 

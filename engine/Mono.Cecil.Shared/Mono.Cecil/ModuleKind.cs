@@ -29,6 +29,7 @@ namespace Mono.Cecil {
 		NetBSD = 0x1993,
 		Sun = 0x1992
 	}
+
 	public enum PlatformSpecificTargetArchitecture
 	{
 		I386Windows = TargetArchitecture.I386 ^ NativeOSOverrideCode.Windows,
@@ -73,6 +74,7 @@ namespace Mono.Cecil {
 		ARMv7Sun = TargetArchitecture.ARMv7 ^ NativeOSOverrideCode.Sun,
 		ARM64Sun = TargetArchitecture.ARM64 ^ NativeOSOverrideCode.Sun
 	}
+	/* End AGPL */
 
 	public enum TargetArchitecture
 	{
@@ -85,7 +87,6 @@ namespace Mono.Cecil {
 		ARMv7 = 0x01c4,
 		ARM64 = 0xaa64
 	}
-	/* End AGPL */
 
 	[Flags]
 	public enum ModuleAttributes {

@@ -24,3 +24,7 @@ CodemerxDecompile is maintained by the original JustDecompile creators and it is
 ## License
 
 This project is [AGPL](https://github.com/codemerx/CodemerxDecompile/blob/master/COPYING) licensed. It includes [JustDecompile Engine](https://github.com/codemerx/JustDecompileEngine) and [Mono.Cecil](https://github.com/jbevain/cecil) libraries which are Apache 2.0 and MIT licensed respectively.
+
+## History
+
+Versions < 1.0 are using a trimmed down version of MS Visual Studio Code as UI. Versions > 1.0 have custom built UI based on Avalonia UI. 

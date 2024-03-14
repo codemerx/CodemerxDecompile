@@ -57,10 +57,6 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <!-- AGPL -->
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../../../common/CDKey.snk</AssemblyOriginatorKeyFile>
-    <!-- End AGPL -->
   </PropertyGroup>
   <!--Telerik Authorship-->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug JustAssembly|AnyCPU'">

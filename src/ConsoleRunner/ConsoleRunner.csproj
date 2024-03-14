@@ -40,10 +40,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <!-- AGPL -->
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../common/CDKey.snk</AssemblyOriginatorKeyFile>
-    <!-- End AGPL -->
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

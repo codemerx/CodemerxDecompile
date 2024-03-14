@@ -41,7 +41,7 @@ jobs:
 
     - name: Run Tests
       run: dotnet test -c Release
-      working-directory: ./engine/Decompiler.Tests
+      working-directory: ./src/Decompiler.Tests
   
   test-on-linux:
     runs-on: ubuntu-22.04
@@ -58,7 +58,7 @@ jobs:
 
     - name: Run Tests
       run: dotnet test -c Release
-      working-directory: ./engine/Decompiler.Tests
+      working-directory: ./src/Decompiler.Tests
 
   test-on-mac:
     runs-on: macos-14
@@ -78,4 +78,4 @@ jobs:
 
     - name: Run Tests
       run: dotnet test -c Release
-      working-directory: ./engine/Decompiler.Tests
+      working-directory: ./src/Decompiler.Tests

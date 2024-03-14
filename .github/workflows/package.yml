@@ -35,13 +35,13 @@ jobs:
 
     - name: Publish
       run: dotnet publish -r win-x64 -c Release
-      working-directory: ./engine/CodemerxDecompile
+      working-directory: ./src/CodemerxDecompile
 
     - name: Archive artifacts
       uses: actions/upload-artifact@v4
       with:
         name: CodemerxDecompile-windows-x64
-        path: engine/CodemerxDecompile/bin/Release/net7.0/win-x64/publish
+        path: src/CodemerxDecompile/bin/Release/net7.0/win-x64/publish
 
   package-linux:
     runs-on: ubuntu-22.04
@@ -58,10 +58,10 @@ jobs:
 
     - name: Publish
       run: dotnet publish -r linux-x64 -c Release
-      working-directory: ./engine/CodemerxDecompile
+      working-directory: ./src/CodemerxDecompile
 
     - name: Archive artifacts
-      run: tar -czpf CodemerxDecompile-linux-x64.tar.gz -C ./engine/CodemerxDecompile/bin/Release/net7.0/linux-x64/publish .
+      run: tar -czpf CodemerxDecompile-linux-x64.tar.gz -C ./src/CodemerxDecompile/bin/Release/net7.0/linux-x64/publish .
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
@@ -79,7 +79,7 @@ jobs:
 
     - name: Publish
       run: dotnet publish -r osx-arm64 -c Release
-      working-directory: ./engine/CodemerxDecompile
+      working-directory: ./src/CodemerxDecompile
 
     - name: Build .app bundle
       run: build/macos/build-application-bundle.sh

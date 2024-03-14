@@ -1,7 +1,9 @@
 ﻿using System;
+/* AGPL */
+using System.Linq;
+/* End AGPL */
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Ast.Expressions;
-using System.Linq;
 
 namespace Telerik.JustDecompiler.Ast
 {
@@ -18,8 +20,10 @@ namespace Telerik.JustDecompiler.Ast
         {
             using (System.IO.StringWriter statementDecompilerStrWriter = new System.IO.StringWriter())
             {
-                Telerik.JustDecompiler.Languages.ILanguageTestCaseWriter statementDecompilerLanguageWriter =
-                    new Telerik.JustDecompiler.Languages.TestCaseWriters.IntermediateDecompilationCSharpLanguageWriter(new Telerik.JustDecompiler.Languages.PlainTextFormatter(statementDecompilerStrWriter), statement.UnderlyingSameMethodInstructions.First().ContainingMethod);
+                /* AGPL */
+                Languages.ILanguageTestCaseWriter statementDecompilerLanguageWriter =
+                    new Languages.TestCaseWriters.IntermediateDecompilationCSharpLanguageWriter(new Languages.PlainTextFormatter(statementDecompilerStrWriter), statement.UnderlyingSameMethodInstructions.First().ContainingMethod);
+                /* End AGPL */
                 statementDecompilerLanguageWriter.Write(statement);
                 return statementDecompilerStrWriter.ToString();
             }

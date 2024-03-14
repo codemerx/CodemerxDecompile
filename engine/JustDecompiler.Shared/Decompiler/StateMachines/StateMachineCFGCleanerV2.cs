@@ -1,4 +1,20 @@
-﻿using System;
+﻿//    Copyright CodeMerx 2024
+//    This file is part of CodemerxDecompile.
+
+//    CodemerxDecompile is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU Affero General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+
+//    CodemerxDecompile is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+
+//    You should have received a copy of the GNU Affero General Public License
+//    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Cil;
 
@@ -12,28 +28,12 @@ namespace JustDecompiler.Shared.Decompiler.StateMachines
 
         private HashSet<InstructionBlock> toBeRemoved;
 
-        //private StateMachineCFGCleanerV2(ControlFlowGraph theCFG, SwitchData[] controllerSwitchData, InstructionBlock newEntryBlock)
-        //{
-        //    this.theCFG = theCFG;
-        //    this.controllerSwitchData = controllerSwitchData;
-        //    this.newEntryBlock = newEntryBlock;
-        //}
-
         public StateMachineCFGCleanerV2(ControlFlowGraph theCFG, SwitchData[] controllerSwitchData, InstructionBlock newEntryBlock)
         {
-            if(controllerSwitchData.Length < 1) // there should be at least one item in controllerSwitchData or finding newEntryBlock fails
+            if (controllerSwitchData.Length < 1) // there should be at least one item in controllerSwitchData or finding newEntryBlock fails
             {
-                throw new ArgumentException(); // TODO improve the log
+                throw new ArgumentException("Controller switch data cannot be empty", nameof(controllerSwitchData));
             }
-
-            //var newEntryBlockCandidate = controllerSwitchData[0].DefaultCase;
-            //foreach (SwitchData switchData in controllerSwitchData)
-            //{
-            //    if (switchData.DefaultCase.Index < newEntryBlockCandidate.Index) // TODO this is a weak condition, we should find the one that is ancestor of all
-            //    {
-            //        newEntryBlockCandidate = switchData.DefaultCase;
-            //    }
-            //}
 
             this.theCFG = theCFG;
             this.controllerSwitchData = controllerSwitchData;
@@ -44,7 +44,7 @@ namespace JustDecompiler.Shared.Decompiler.StateMachines
         {
             foreach(var switchData in this.controllerSwitchData)
             {
-                //Mark for removal all of the state entries that are left without a predecessor.
+                // Mark for removal all of the state entries that are left without a predecessor.
                 for (int i = 1; i < switchData.OrderedCasesArray.Length; i++)
                 {
                     if (switchData.OrderedCasesArray[i] != null &&

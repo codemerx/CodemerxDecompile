@@ -15,7 +15,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
         private FieldDefinition stateField;
 
         private SwitchData switchData;
+        /* AGPL */
         private List<SwitchData> switchDataList;
+        /* End AGPL */
         private InstructionBlock defaultStateEntry;
         protected VariableReference stateVariable;
 
@@ -33,6 +35,8 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 return this.switchData;
             }
         }
+
+        /* AGPL */
         public List<SwitchData> SwitchDataList
         {
             get
@@ -40,6 +44,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 return this.switchDataList;
             }
         }
+
         public InstructionBlock DefaultStateEntry
         {
             get
@@ -47,6 +52,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 return this.defaultStateEntry;
             }
         }
+        /* End AGPL */
 
         /// <summary>
         /// Gets the field that holds the number of the current state of the state machine.
@@ -246,6 +252,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             return true;
         }
 
+        /* AGPL */
         /// <summary>
         /// Removes all chains of blocks that represents the state machine controller.
         /// </summary>
@@ -420,6 +427,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             }
             return true;
         }
+        /* End AGPL */
 
         /// <summary>
         /// Initializes the queue that is used for traversing the state controller blocks.
@@ -430,70 +438,6 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             Queue<InstructionBlock> theQueue = new Queue<InstructionBlock>();
             theQueue.Enqueue(theCFG.Blocks[firstControllerBlock]);
             return theQueue;
-        }
-
-        /// <summary>
-        /// Initializes the queue that is used for traversing the state controller blocks.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual Queue<InstructionBlock> InitializeTheTraversalQueueV2()
-        {
-            Queue<InstructionBlock> theQueue = new Queue<InstructionBlock>();
-            theQueue.Enqueue(theCFG.Blocks[firstControllerBlock]);
-
-            //Queue<InstructionBlock> bfs = new Queue<InstructionBlock>();
-            //bool[] vis = new bool[1000];
-            //bfs.Enqueue(theCFG.Blocks[firstControllerBlock]);
-            //while (bfs.Count > 0)
-            //{
-            //    var cur = bfs.Dequeue();
-            //    vis[cur.Index] = true;
-            //    if (IsTHEConditionalBranch(cur))
-            //    {
-            //        theQueue.Enqueue(cur);
-            //    }
-            //    foreach (var nxt in cur.Successors)
-            //    {
-            //        if (!vis[nxt.Index])
-            //        {
-            //            bfs.Enqueue(nxt);
-            //        }
-            //    }
-            //}
-
-            foreach (var block in theCFG.Blocks)
-            {
-                if (block.Index != theCFG.Blocks[firstControllerBlock].Index) // && IsStateMachineControllerBlock(block))
-                {
-                    theQueue.Enqueue(block);
-                }
-            }
-
-            return theQueue;
-        }
-
-        private bool IsTHEConditionalBranch(InstructionBlock block)
-        {
-            //if(IsStateMachineControllerBlock())
-
-            // IL_0007: ldloc.0
-            // IL_0008: brfalse.s IL_000c
-            //
-            // IL_XXXX: ldloc.X
-            // IL_XXXX: brfalse.s IL_XXXX
-            if (block.First.OpCode.Code == Code.Ldloc_0 && block.Last.OpCode.Code == Code.Brfalse_S)
-            {
-                return true;
-            }
-
-            // IL_001d: ldloc.0
-            // IL_001e: switch (IL_0082, IL_00e2, IL_0142)
-            if (block.First.OpCode.Code == Code.Ldloc_0 && block.Last.OpCode.Code == Code.Switch)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -540,6 +484,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             this.switchData = new SwitchData(null, defaultStateEntry, finalCasesArray);
         }
 
+        /* AGPL */
         /// <summary>
         /// Creates a controller switch data using the information gathered during the traversal of the state controller blocks.
         /// </summary>
@@ -562,6 +507,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
             this.switchData = new SwitchData(null, stateEntry, finalCasesArray);
         }
+        /* End AGPL */
 
         protected virtual ControllerTraversalSearchResult TryGetStateEntry(InstructionBlock theBlock, out InstructionBlock actualSuccessor)
         {
@@ -603,7 +549,8 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             return currentBlock;
         }
 
-        protected IEnumerable<InstructionBlock> GetBranchChain(InstructionBlock initialBlock)
+        /* AGPL */
+        private IEnumerable<InstructionBlock> GetBranchChain(InstructionBlock initialBlock)
         {
             InstructionBlock currentBlock = initialBlock;
             while (IsUnconditionalBranchBlock(currentBlock))
@@ -612,6 +559,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 currentBlock = currentBlock.Successors[0];
             }
         }
+        /* End AGPL */
 
         /// <summary>
         /// Checks whether the specified block contains usage of the state field.
@@ -810,6 +758,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 currentInstruction = theBlock.Last;
                 stateNumber = 0;
             }
+            /* AGPL */
             else if (IsBleUnInstruction(theBlock.Last))
             {
                 controllerType = StateMachineControllerType.ConditionV2;
@@ -817,6 +766,7 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 currentInstruction = theBlock.First.Next; // we can also skip setting currentInstruction and just return true here
                 stateNumber = 0;
             }
+            /* End AGPL */
             else if (IsBneInstruction(theBlock.Last))
             {
                 controllerType = StateMachineControllerType.NegativeCondition;
@@ -846,7 +796,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 //In rare cases the state variable is used in a regular switch block. That's why we check whether there is an assignment of the variable
                 //in theBlock. If so then the block is not a controller block.
             {
+                /* AGPL */
                 return true; // this check may fail for ble if currentInstruction is not set properly
+                /* End AGPL */
             }
 
             stateNumber = 0;
@@ -883,10 +835,12 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             return theInstruction.OpCode.Code == Code.Brfalse || theInstruction.OpCode.Code == Code.Brfalse_S;
         }
 
+        /* AGPL */
         private bool IsBleUnInstruction(Instruction theInstruction)
         {
             return theInstruction.OpCode.Code == Code.Ble_Un || theInstruction.OpCode.Code == Code.Ble_Un_S;
         }
+        /* End AGPL */
 
         /// <summary>
         /// Checks whether the specified block is a controller block generated by the compiler in debug mode.
@@ -1030,7 +984,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             Switch,
             Condition,
             NegativeCondition,
+            /* AGPL */
             ConditionV2
+            /* End AGPL */
         }
     }
 }

@@ -61,7 +61,7 @@ jobs:
       working-directory: ./src/Decompiler.Tests
 
   test-on-mac:
-    runs-on: macos-14
+    runs-on: macos-13
 
     env:
       DOTNET_INSTALL_DIR: "/usr/local/share/dotnet"

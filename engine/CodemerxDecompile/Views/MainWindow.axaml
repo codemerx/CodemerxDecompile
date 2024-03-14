@@ -1,0 +1,457 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CodemerxDecompile.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        xmlns:nodes="clr-namespace:CodemerxDecompile.Nodes"
+        xmlns:searchResults="clr-namespace:CodemerxDecompile.SearchResults"
+        xmlns:views="clr-namespace:CodemerxDecompile.Views"
+        xmlns:msBuildProjectBuilder="clr-namespace:JustDecompile.Tools.MSBuildProjectBuilder;assembly=Tools.MSBuildProjectBuilder.NetStandard"
+        xmlns:design="clr-namespace:CodemerxDecompile.ViewModels.Design"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="CodemerxDecompile.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/codemerx-logo.ico"
+        Title="CodemerxDecompile">
+
+    <Design.DataContext>
+        <design:DesignMainWindowViewModel />
+    </Design.DataContext>
+    
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="File">
+                <NativeMenu>
+                    <NativeMenuItem Header="Open file..."
+                                    Command="{Binding OpenFileCommand}"
+                                    Gesture="Cmd+O" />
+                    <NativeMenuItemSeparator />
+                    <NativeMenuItem Header="Close all"
+                                    Command="{Binding ClearAssemblyListCommand}" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Go">
+                <NativeMenu>
+                    <NativeMenuItem Header="Back"
+                                    Command="{Binding BackCommand}"
+                                    Gesture="Cmd+-" />
+                    <NativeMenuItem Header="Forward"
+                                    Command="{Binding ForwardCommand}"
+                                    Gesture="Cmd+Shift+-" />
+                    <NativeMenuItemSeparator />
+                    <NativeMenuItem Header="Search"
+                                    Command="{Binding OpenSearchPaneCommand}"
+                                    Gesture="Cmd+Shift+F" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Tools">
+                <NativeMenu>
+                    <NativeMenuItem Header="Create project">
+                        <NativeMenu>
+                            <NativeMenuItem Header="Visual Studio 2019"
+                                            Command="{Binding GenerateProjectCommand}"
+                                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}" />
+                            <NativeMenuItem Header="Visual Studio 2017"
+                                            Command="{Binding GenerateProjectCommand}"
+                                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2017}" />
+                            <NativeMenuItem Header="Visual Studio 2015"
+                                            Command="{Binding GenerateProjectCommand}"
+                                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2015}" />
+                        </NativeMenu>
+                    </NativeMenuItem>
+                </NativeMenu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top"
+                  IsVisible="{OnPlatform Windows='true', Linux='true', macOS='false'}">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open file..."
+                              Command="{Binding OpenFileCommand}"
+                              HotKey="Ctrl+O"
+                              InputGesture="Ctrl+O" />
+                    <Separator/>
+                    <MenuItem Header="_Close all"
+                              Command="{Binding ClearAssemblyListCommand}" />
+                </MenuItem>
+                <MenuItem Header="_Go">
+                    <MenuItem Header="_Back"
+                              Command="{Binding BackCommand}"
+                              HotKey="Ctrl+-"
+                              InputGesture="Ctrl+-" />
+                    <MenuItem Header="_Forward"
+                              Command="{Binding ForwardCommand}"
+                              HotKey="Ctrl+Shift+-"
+                              InputGesture="Ctrl+Shift+-" />
+                    <Separator />
+                    <MenuItem Header="_Search"
+                              Command="{Binding OpenSearchPaneCommand}"
+                              HotKey="Ctrl+Shift+F"
+                              InputGesture="Ctrl+Shift+F" />
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem Header="_Create project">
+                        <MenuItem Header="Visual Studio 2019"
+                                  Command="{Binding GenerateProjectCommand}"
+                                  CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}" />
+                        <MenuItem Header="Visual Studio 2017"
+                                  Command="{Binding GenerateProjectCommand}"
+                                  CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2017}" />
+                        <MenuItem Header="Visual Studio 2015"
+                                  Command="{Binding GenerateProjectCommand}"
+                                  CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2015}" />
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+            
+            <Border DockPanel.Dock="Top"
+                    Classes="menu-bar">
+                <Border.Styles>
+                    <Style Selector="Border.menu-bar">
+                        <Setter Property="Padding" Value="5" />
+                        <Setter Property="Background" Value="#F6F6F6" />
+                        <Setter Property="BorderThickness" Value="0 0 0 1" />
+                        <Setter Property="BorderBrush" Value="#DFDFDF"></Setter>
+                    </Style>
+                </Border.Styles>
+                
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Margin" Value="0 0 5 0" />
+                        </Style>
+                        <Style Selector="Border.separator">
+                            <Setter Property="Margin" Value="5 5 10 5" />
+                            <Setter Property="BorderThickness" Value="0.5" />
+                            <Setter Property="BorderBrush" Value="#DFDFDF" />
+                            <Setter Property="Width" Value="1" />
+                        </Style>
+                    </StackPanel.Styles>
+                    
+                    <Button Command="{Binding BackCommand}">
+                        &lt;
+                    </Button>
+                    <Button Command="{Binding ForwardCommand}">
+                        &gt;
+                    </Button>
+                    
+                    <Border Classes="separator" />
+                
+                    <Button Command="{Binding OpenFileCommand}">
+                        Open file
+                    </Button>
+                    <Button Command="{Binding ClearAssemblyListCommand}">
+                        Close all
+                    </Button>
+
+                    <Border Classes="separator" />
+
+                    <Button Command="{Binding GenerateProjectCommand}"
+                            CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}">
+                        Create project
+                    </Button>
+
+                    <Border Classes="separator" />
+                
+                    <ComboBox ItemsSource="{Binding Languages}"
+                              SelectedItem="{Binding SelectedLanguage}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+            
+            <Grid DragDrop.AllowDrop="True">
+                <Grid ColumnDefinitions="*, Auto, 3*">
+                    <DockPanel>
+                        <ListBox DockPanel.Dock="Left"
+                                 SelectionMode="AlwaysSelected"
+                                 SelectedIndex="{Binding SelectedPaneIndex}"
+                                 Background="Transparent"
+                                 BorderBrush="#DFDFDF"
+                                 BorderThickness="0 0 1 0">
+                            <ListBox.Styles>
+                                <Style Selector="Svg">
+                                    <Setter Property="Width" Value="16" />
+                                </Style>
+                                <Style Selector="ListBoxItem">
+                                    <Setter Property="Cursor" Value="Hand" />
+                                </Style>
+                            </ListBox.Styles>
+                            <ListBoxItem>
+                                <Svg Path="/Assets/Assembly.svg" />
+                            </ListBoxItem>
+                            <ListBoxItem>
+                                <Svg Path="/Assets/Search.svg" />
+                            </ListBoxItem>
+                        </ListBox>
+                        <Grid>
+                            <TreeView Name="TreeView"
+                                      ItemsSource="{Binding AssemblyNodes}"
+                                      SelectionMode="Single"
+                                      SelectedItem="{Binding SelectedNode}" 
+                                      AutoScrollToSelectedItem="True"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <TreeView.Styles>
+                                    <Style Selector="Svg">
+                                        <Setter Property="Margin" Value="0 0 5 0" />
+                                    </Style>
+                                </TreeView.Styles>
+                                
+                                <TreeView.DataTemplates>
+                                    <TreeDataTemplate DataType="nodes:AssemblyNode" ItemsSource="{Binding Children}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/Assembly.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:ReferencesNode" ItemsSource="{Binding Items}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/ReferenceGroup.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:ResolvedReferenceNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/Reference.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:UnresolvedReferenceNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/ReferenceWarning.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:NamespaceNode" ItemsSource="{Binding Types}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/Namespace.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:EnumNode" ItemsSource="{Binding Members}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/EnumerationItemPublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:StructNode" ItemsSource="{Binding Members}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/StructurePublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:ClassNode" ItemsSource="{Binding Members}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/ClassPublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:InterfaceNode" ItemsSource="{Binding Members}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/InterfacePublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:FieldNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/FieldPublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:PropertyNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/PropertyPublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:ConstructorNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/MethodInstance.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:MethodNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/MethodPublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                    <TreeDataTemplate DataType="nodes:EventNode">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Svg Path="/Assets/EventPublic.svg" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </TreeDataTemplate>
+                                </TreeView.DataTemplates>
+                            </TreeView>
+                            <DockPanel IsVisible="{Binding SearchPaneSelected}"
+                                       Background="White">
+                                <Grid DockPanel.Dock="Top"
+                                      Height="2">
+                                    <ProgressBar IsVisible="{Binding IsSearching}"
+                                                 IsIndeterminate="True"
+                                                 Height="2"
+                                                 MinHeight="2"
+                                                 Background="Transparent"
+                                                 CornerRadius="0" />
+                                </Grid>
+                                <TextBox DockPanel.Dock="Top"
+                                         Name="SearchTextBox"
+                                         Watermark="Search..."
+                                         Text="{Binding SearchText}"
+                                         Margin="5" />
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="{Binding NumberOfResultsText}"
+                                           IsVisible="{Binding NumberOfResultsText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                           Margin="10 5 0 5"
+                                           Foreground="#919191"
+                                           FontSize="12"/>
+                                <ListBox ItemsSource="{Binding SearchResults}"
+                                         SelectedItem="{Binding SelectedSearchResult}"
+                                         Background="Transparent">
+                                    <ListBox.Styles>
+                                        <Style Selector="Svg">
+                                            <Setter Property="Margin" Value="0 0 5 0" />
+                                        </Style>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Padding" Value="5" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                        </Style>
+                                    </ListBox.Styles>
+                                    <ListBox.DataTemplates>
+                                        <DataTemplate DataType="searchResults:TypeNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/ClassPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:EventNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/EventPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:EventTypeSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/EventPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:FieldNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/FieldPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:FieldTypeSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/FieldPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:PropertyNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/PropertyPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:PropertyTypeSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/PropertyPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:MethodNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/MethodPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:MethodReturnTypeSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/MethodPublic.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:ParameterNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/Parameter.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:ParameterTypeSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/Parameter.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:VariableNameSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/LocalVariable.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:VariableTypeSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/LocalVariable.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:StringLiteralSearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Svg Path="/Assets/String.svg" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="searchResults:SearchResult">
+                                            <StackPanel Orientation="Horizontal">
+                                                <!-- Used to keep the space unoccupied and align all elements vertically -->
+                                                <Svg Path="/Assets/LocalVariable.svg" Opacity="0" />
+                                                <TextBlock Text="{Binding MatchedString}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.DataTemplates>
+                                </ListBox>
+                            </DockPanel>
+                        </Grid>
+                    </DockPanel>
+                
+                    <GridSplitter Grid.Column="1"
+                                  ResizeDirection="Columns"
+                                  Margin="0 0 5 0" />
+                    
+                    <!-- Empty grid to fill the space when the TextEditor is hidden to enable drag/drop events -->
+                    <Grid Grid.Column="2"
+                          Background="Transparent" />
+                
+                    <avaloniaEdit:TextEditor Grid.Column="2"
+                                             Name="TextEditor"
+                                             ShowLineNumbers="True"
+                                             FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                             IsReadOnly="True"
+                                             Document="{Binding Document}"
+                                             IsVisible="{Binding Document, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                </Grid>
+                
+                <Grid Name="DragDropLabel"
+                      Background="#33000000"
+                      IsVisible="False">
+                    <TextBlock VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Foreground="#666666">
+                        Drop files here
+                    </TextBlock>
+                </Grid>
+            </Grid>
+        </DockPanel>
+        <views:NotificationsView />
+    </Grid>
+</Window>

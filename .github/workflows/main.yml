@@ -1,4 +1,4 @@
-#    Copyright CodeMerx 2020
+#    Copyright CodeMerx 2020, 2024
 #    This file is part of CodemerxDecompile.
 
 #    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ jobs:
           7.x
 
     - name: Build Solution
-      run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
+      run: dotnet build engine/Decompiler.Tests/Decompiler.Tests.csproj -c Release
 
     - name: Run Tests
       run: dotnet test engine/Decompiler.Tests -c Release

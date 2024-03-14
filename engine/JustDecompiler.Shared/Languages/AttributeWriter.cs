@@ -576,7 +576,9 @@ namespace Telerik.JustDecompiler.Languages
             {
                 genericWriter.Write("    ");
                 string comment = genericWriter.Language.CommentLines(ASSEMBLYNOTRESOLVEDERROR);
+                /* AGPL */
                 genericWriter.Write(comment.Remove(comment.Length - Environment.NewLine.Length));
+                /* End AGPL */
             }
 
             genericWriter.WriteLine();
@@ -606,7 +608,9 @@ namespace Telerik.JustDecompiler.Languages
             {
                 genericWriter.Write("    ");
                 string comment = genericWriter.Language.CommentLines(ASSEMBLYNOTRESOLVEDERROR);
+                /* AGPL */
                 genericWriter.Write(comment.Remove(comment.Length - Environment.NewLine.Length));
+                /* End AGPL */
             }
 
             if (!skipNewLine)

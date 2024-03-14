@@ -1,0 +1,78 @@
+name: Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package-windows:
+    runs-on: windows-2022
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Publish
+      run: dotnet publish -r win-x64 -c Release
+      working-directory: ./engine/CodemerxDecompile
+
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-windows-x64
+        path: engine/CodemerxDecompile/bin/Release/net7.0/win-x64/publish
+
+  package-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Publish
+      run: dotnet publish -r linux-x64 -c Release
+      working-directory: ./engine/CodemerxDecompile
+
+    - name: Archive artifacts
+      run: tar -czpf CodemerxDecompile-linux-x64.tar.gz -C ./engine/CodemerxDecompile/bin/Release/net7.0/linux-x64/publish .
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-linux-x64
+        path: CodemerxDecompile-linux-x64.tar.gz
+
+  package-macos:
+    runs-on: macos-14
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Publish
+      run: dotnet publish -r osx-arm64 -c Release
+      working-directory: ./engine/CodemerxDecompile
+
+    - name: Build .app bundle
+      run: build/macos/build-application-bundle.sh
+
+    - name: Archive artifacts
+      run: tar -czpf CodemerxDecompile-macos-arm64.tar.gz CodemerxDecompile.app
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-macos-arm64
+        path: CodemerxDecompile-macos-arm64.tar.gz

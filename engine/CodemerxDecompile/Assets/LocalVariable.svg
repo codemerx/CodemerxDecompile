@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-blue-10{fill: #005dba; opacity: 0.1;}.light-blue{fill: #005dba; opacity: 1;}.light-defaultgrey{fill: #212121; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightLocalVariable</title>
+  <g id="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-blue-10" d="M10.494,3.169,13.5,6.176v3.5l-7,3.889L3.494,10.556v-3.5Z" />
+      <path class="light-blue" d="M14,6.176v3.5l-.256.437L6.744,14l-.6-.084L3.14,10.91,3,10.556v-3.5l.251-.437-.111.791.854.853v2.084L6,12.355V10.271l.147.147.6.084L7,10.359v2.354L13,9.38V7.026l.744-.413.11-.791Z" />
+    </g>
+    <path class="light-blue-10" d="M13.5,6.176l-7,3.889L3.494,7.058l7-3.889Z" />
+    <path class="light-blue" d="M6.744,10.5l-.6-.084L3.14,7.412l.111-.791,7-3.889.6.084,3.006,3.006-.11.791ZM4.316,7.173,6.587,9.444l6.091-3.383L10.407,3.789Z" />
+    <path class="light-defaultgrey" d="M4,14H1.5L1,13.5V2.5L1.5,2H4V3H2V13H4ZM15.5,2H13V3h2V13H13v1h2.5l.5-.5V2.5Z" />
+  </g>
+</svg>

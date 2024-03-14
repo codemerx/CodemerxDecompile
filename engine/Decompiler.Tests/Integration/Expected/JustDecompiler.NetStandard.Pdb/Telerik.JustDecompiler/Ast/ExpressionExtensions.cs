@@ -1,7 +1,13 @@
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast.Expressions;
+using Telerik.JustDecompiler.Languages;
+using Telerik.JustDecompiler.Languages.TestCaseWriters;
 
 namespace Telerik.JustDecompiler.Ast
 {
@@ -9,76 +15,76 @@ namespace Telerik.JustDecompiler.Ast
 	{
 		public static bool CheckInnerReferenceExpressions(this Expression first, Expression second)
 		{
-			if (first as VariableReferenceExpression != null && second as VariableReferenceExpression != null)
+			if (first is VariableReferenceExpression && second is VariableReferenceExpression)
 			{
-				return (object)((VariableReferenceExpression)first).get_Variable() == (object)((VariableReferenceExpression)second).get_Variable();
+				return (object)((VariableReferenceExpression)first).Variable == (object)((VariableReferenceExpression)second).Variable;
 			}
-			if (first as ArgumentReferenceExpression != null && second as ArgumentReferenceExpression != null)
+			if (first is ArgumentReferenceExpression && second is ArgumentReferenceExpression)
 			{
-				return (object)((ArgumentReferenceExpression)first).get_Parameter() == (object)((ArgumentReferenceExpression)second).get_Parameter();
+				return (object)((ArgumentReferenceExpression)first).Parameter == (object)((ArgumentReferenceExpression)second).Parameter;
 			}
-			if (first as FieldReferenceExpression != null && second as FieldReferenceExpression != null)
+			if (first is FieldReferenceExpression && second is FieldReferenceExpression)
 			{
-				return (object)((FieldReferenceExpression)first).get_Field() == (object)((FieldReferenceExpression)second).get_Field();
+				return (object)((FieldReferenceExpression)first).Field == (object)((FieldReferenceExpression)second).Field;
 			}
-			if (first as PropertyReferenceExpression == null || second as PropertyReferenceExpression == null)
+			if (!(first is PropertyReferenceExpression) || !(second is PropertyReferenceExpression))
 			{
 				return false;
 			}
-			return (object)((PropertyReferenceExpression)first).get_Property() == (object)((PropertyReferenceExpression)second).get_Property();
+			return (object)((PropertyReferenceExpression)first).Property == (object)((PropertyReferenceExpression)second).Property;
 		}
 
 		public static TypeReference GetTargetTypeReference(this Expression target)
 		{
-			if (target == null || !target.get_HasType())
+			if (target == null || !target.HasType)
 			{
 				return null;
 			}
-			return target.get_ExpressionType();
+			return target.ExpressionType;
 		}
 
 		public static bool IsReferenceExpression(this Expression expression)
 		{
-			if (expression as VariableReferenceExpression != null || expression as ArgumentReferenceExpression != null || expression as FieldReferenceExpression != null)
+			if (expression is VariableReferenceExpression || expression is ArgumentReferenceExpression || expression is FieldReferenceExpression)
 			{
 				return true;
 			}
-			return expression as PropertyReferenceExpression != null;
+			return expression is PropertyReferenceExpression;
 		}
 
 		public static bool IsTypeOfExpression(this MethodInvocationExpression self, out TypeReference typeReference)
 		{
 			typeReference = null;
-			V_0 = self.get_MethodExpression();
-			if (V_0 == null)
+			MethodReferenceExpression methodExpression = self.MethodExpression;
+			if (methodExpression == null)
 			{
 				return false;
 			}
-			V_1 = V_0.get_Method();
-			if (V_1.get_CallingConvention() == 2 || String.op_Inequality(V_1.get_DeclaringType().get_FullName(), "System.Type") || String.op_Inequality(V_1.get_Name(), "GetTypeFromHandle"))
+			MethodReference method = methodExpression.Method;
+			if (method.get_CallingConvention() == 2 || method.get_DeclaringType().get_FullName() != "System.Type" || method.get_Name() != "GetTypeFromHandle")
 			{
 				return false;
 			}
-			if (self.get_Arguments().get_Count() != 1)
+			if (self.Arguments.Count != 1)
 			{
 				return false;
 			}
-			V_2 = self.get_Arguments().get_Item(0) as MemberHandleExpression;
-			if (V_2 == null)
+			MemberHandleExpression item = self.Arguments[0] as MemberHandleExpression;
+			if (item == null)
 			{
 				return false;
 			}
-			typeReference = V_2.get_MemberReference() as TypeReference;
+			typeReference = item.MemberReference as TypeReference;
 			return (object)typeReference != (object)null;
 		}
 
 		public static string ToCodeString(this Expression expression)
 		{
-			stackVariable0 = new StringWriter();
-			stackVariable2 = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(stackVariable0));
-			((ILanguageTestCaseWriter)stackVariable2).SetContext(expression.get_UnderlyingSameMethodInstructions().First<Instruction>().get_ContainingMethod());
-			((ILanguageTestCaseWriter)stackVariable2).Write(expression);
-			return stackVariable0.ToString();
+			StringWriter stringWriter = new StringWriter();
+			IntermediateDecompilationCSharpLanguageWriter intermediateDecompilationCSharpLanguageWriter = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(stringWriter));
+			((ILanguageTestCaseWriter)intermediateDecompilationCSharpLanguageWriter).SetContext(expression.UnderlyingSameMethodInstructions.First<Instruction>().get_ContainingMethod());
+			((ILanguageTestCaseWriter)intermediateDecompilationCSharpLanguageWriter).Write(expression);
+			return stringWriter.ToString();
 		}
 	}
 }

@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
+using Telerik.JustDecompiler.Decompiler.DefineUseAnalysis;
 
 namespace Telerik.JustDecompiler.Decompiler.TypeInference
 {
@@ -13,64 +15,65 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 	{
 		private HashSet<ClassHierarchyNode> notPossibleBooleanNodes;
 
-		public IntegerTypesHierarchyBuilder(Dictionary<int, Expression> offsetToExpression, DecompilationContext context)
+		public IntegerTypesHierarchyBuilder(Dictionary<int, Expression> offsetToExpression, DecompilationContext context) : base(offsetToExpression, context.MethodContext.ControlFlowGraph.OffsetToInstruction, context)
 		{
-			base(offsetToExpression, context.get_MethodContext().get_ControlFlowGraph().get_OffsetToInstruction(), context);
 			this.notPossibleBooleanNodes = new HashSet<ClassHierarchyNode>();
-			return;
 		}
 
 		private void AddEdge(ClassHierarchyNode biggerTypeNode, ClassHierarchyNode smallerTypeNode)
 		{
 			smallerTypeNode.AddSupertype(biggerTypeNode);
-			dummyVar0 = this.resultingGraph.Add(smallerTypeNode);
-			dummyVar1 = this.resultingGraph.Add(biggerTypeNode);
-			return;
+			this.resultingGraph.Add(smallerTypeNode);
+			this.resultingGraph.Add(biggerTypeNode);
 		}
 
 		protected override void BuildUpHardNodesHierarchy(IEnumerable<ClassHierarchyNode> hardNodes)
 		{
-			V_0 = this.GetTypeNode(this.typeSystem.get_Boolean());
-			V_1 = this.GetTypeNode(this.typeSystem.get_Byte());
-			this.AddEdge(V_1, V_0);
-			V_0 = this.GetTypeNode(this.typeSystem.get_Byte());
-			V_1 = this.GetTypeNode(this.typeSystem.get_Char());
-			this.AddEdge(V_1, V_0);
-			V_0 = this.GetTypeNode(this.typeSystem.get_Byte());
-			V_1 = this.GetTypeNode(this.typeSystem.get_Int16());
-			this.AddEdge(V_1, V_0);
-			V_0 = this.GetTypeNode(this.typeSystem.get_Char());
-			V_1 = this.GetTypeNode(this.typeSystem.get_Int32());
-			this.AddEdge(V_1, V_0);
-			V_0 = this.GetTypeNode(this.typeSystem.get_Int16());
-			V_1 = this.GetTypeNode(this.typeSystem.get_Int32());
-			this.AddEdge(V_1, V_0);
-			return;
+			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Boolean());
+			ClassHierarchyNode classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Byte());
+			this.AddEdge(classHierarchyNode, typeNode);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Byte());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Char());
+			this.AddEdge(classHierarchyNode, typeNode);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Byte());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Int16());
+			this.AddEdge(classHierarchyNode, typeNode);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Char());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Int32());
+			this.AddEdge(classHierarchyNode, typeNode);
+			typeNode = this.GetTypeNode(this.typeSystem.get_Int16());
+			classHierarchyNode = this.GetTypeNode(this.typeSystem.get_Int32());
+			this.AddEdge(classHierarchyNode, typeNode);
 		}
 
 		protected override ClassHierarchyNode GetTypeNode(TypeReference assignedType)
 		{
-			V_0 = assignedType.get_FullName();
-			if (!this.typeNameToNode.ContainsKey(V_0))
+			string fullName = assignedType.get_FullName();
+			if (!this.typeNameToNode.ContainsKey(fullName))
 			{
-				V_1 = new ClassHierarchyNode(assignedType);
-				this.typeNameToNode.Add(V_0, V_1);
+				ClassHierarchyNode classHierarchyNode = new ClassHierarchyNode(assignedType);
+				this.typeNameToNode.Add(fullName, classHierarchyNode);
 			}
-			return this.typeNameToNode.get_Item(V_0);
+			return this.typeNameToNode[fullName];
 		}
 
 		private List<ClassHierarchyNode> GetUsedPhiVariableNodes(int offset)
 		{
-			V_0 = new List<ClassHierarchyNode>();
-			if (this.methodContext.get_StackData().get_InstructionOffsetToAssignedVariableMap().TryGetValue(offset, out V_1) && this.methodContext.get_StackData().get_VariableToDefineUseInfo().ContainsKey(V_1))
+			VariableDefinition variableDefinition;
+			List<VariableDefinition> variableDefinitions;
+			List<ClassHierarchyNode> classHierarchyNodes = new List<ClassHierarchyNode>();
+			if (this.methodContext.StackData.InstructionOffsetToAssignedVariableMap.TryGetValue(offset, out variableDefinition) && this.methodContext.StackData.VariableToDefineUseInfo.ContainsKey(variableDefinition))
 			{
-				V_0.Add(this.GetVariableNode(V_1));
+				classHierarchyNodes.Add(base.GetVariableNode(variableDefinition));
 			}
-			if (this.methodContext.get_StackData().get_InstructionOffsetToUsedStackVariablesMap().TryGetValue(offset, out V_2))
+			if (this.methodContext.StackData.InstructionOffsetToUsedStackVariablesMap.TryGetValue(offset, out variableDefinitions))
 			{
-				V_0.AddRange(V_2.Where<VariableDefinition>(new Func<VariableDefinition, bool>(this.u003cGetUsedPhiVariableNodesu003eb__8_0)).Select<VariableDefinition, ClassHierarchyNode>(new Func<VariableDefinition, ClassHierarchyNode>(this.u003cGetUsedPhiVariableNodesu003eb__8_1)));
+				classHierarchyNodes.AddRange(
+					from variable in variableDefinitions
+					where this.methodContext.StackData.VariableToDefineUseInfo.ContainsKey(variable)
+					select base.GetVariableNode(variable));
 			}
-			return V_0;
+			return classHierarchyNodes;
 		}
 
 		private bool IsArithmeticOperation(Code code)
@@ -84,7 +87,7 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private bool IsStackVariable(VariableReference varRef)
 		{
-			return this.methodContext.get_StackData().get_VariableToDefineUseInfo().ContainsKey(varRef.Resolve());
+			return this.methodContext.StackData.VariableToDefineUseInfo.ContainsKey(varRef.Resolve());
 		}
 
 		protected override ClassHierarchyNode MergeWithVariableTypeIfNeeded(VariableReference variable, ClassHierarchyNode variableNode)
@@ -94,167 +97,138 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		private bool OnlyPhiVariablesUsed(Expression expression)
 		{
-			switch (expression.get_CodeNodeType() - 22)
+			switch (expression.CodeNodeType)
 			{
-				case 0:
+				case CodeNodeType.LiteralExpression:
 				{
 					return true;
 				}
-				case 1:
-				case 3:
+				case CodeNodeType.UnaryExpression:
+				case CodeNodeType.ArgumentReferenceExpression:
 				{
-				Label0:
 					return false;
 				}
-				case 2:
+				case CodeNodeType.BinaryExpression:
 				{
-					V_1 = expression as BinaryExpression;
-					if (V_1.get_Left() as VariableReferenceExpression == null)
+					BinaryExpression binaryExpression = expression as BinaryExpression;
+					if (binaryExpression.Left is VariableReferenceExpression)
 					{
-						if (V_1.get_Left() as VariableReferenceExpression != null && this.IsStackVariable((V_1.get_Right() as VariableReferenceExpression).get_Variable()))
+						if (this.IsStackVariable((binaryExpression.Left as VariableReferenceExpression).Variable))
 						{
-							return this.OnlyPhiVariablesUsed(V_1.get_Left());
+							return this.OnlyPhiVariablesUsed(binaryExpression.Right);
 						}
 					}
-					else
+					else if (binaryExpression.Left is VariableReferenceExpression && this.IsStackVariable((binaryExpression.Right as VariableReferenceExpression).Variable))
 					{
-						if (this.IsStackVariable((V_1.get_Left() as VariableReferenceExpression).get_Variable()))
-						{
-							return this.OnlyPhiVariablesUsed(V_1.get_Right());
-						}
+						return this.OnlyPhiVariablesUsed(binaryExpression.Left);
 					}
 					return false;
 				}
-				case 4:
+				case CodeNodeType.VariableReferenceExpression:
 				{
-					return this.IsStackVariable((expression as VariableReferenceExpression).get_Variable());
+					return this.IsStackVariable((expression as VariableReferenceExpression).Variable);
 				}
-				case 5:
+				case CodeNodeType.VariableDeclarationExpression:
 				{
-					return this.IsStackVariable((expression as VariableDeclarationExpression).get_Variable());
+					return this.IsStackVariable((expression as VariableDeclarationExpression).Variable);
 				}
 				default:
 				{
-					goto Label0;
+					return false;
 				}
 			}
 		}
 
 		protected override void OnPhiVariableAssigned(int instructionOffset, ClassHierarchyNode variableNode)
 		{
-			V_0 = this.offsetToExpression.get_Item(instructionOffset);
-			V_1 = V_0.get_ExpressionType();
-			if (V_0 as LiteralExpression != null)
+			Expression item = this.offsetToExpression[instructionOffset];
+			TypeReference expressionType = item.ExpressionType;
+			if (item is LiteralExpression)
 			{
-				V_3 = (Int32)(V_0 as LiteralExpression).get_Value();
-				if (V_3 == 0 || V_3 == 1)
+				int value = (Int32)(item as LiteralExpression).Value;
+				if (value == 0 || value == 1)
 				{
-					V_1 = this.typeSystem.get_Boolean();
+					expressionType = this.typeSystem.get_Boolean();
 				}
-				else
+				else if (value <= 0xff && value >= 0)
 				{
-					if (V_3 > 0xff || V_3 < 0)
-					{
-						if (V_3 < 0xffff && V_3 >= 0)
-						{
-							V_1 = this.typeSystem.get_Char();
-						}
-					}
-					else
-					{
-						V_1 = this.typeSystem.get_Byte();
-					}
+					expressionType = this.typeSystem.get_Byte();
+				}
+				else if (value < 0xffff && value >= 0)
+				{
+					expressionType = this.typeSystem.get_Char();
 				}
 			}
-			V_2 = this.GetTypeNode(V_1);
-			V_2.AddSupertype(variableNode);
-			dummyVar0 = this.resultingGraph.Add(V_2);
-			return;
+			ClassHierarchyNode typeNode = this.GetTypeNode(expressionType);
+			typeNode.AddSupertype(variableNode);
+			this.resultingGraph.Add(typeNode);
 		}
 
 		protected override void OnPhiVariableUsed(int instructionOffset, ClassHierarchyNode variableNode)
 		{
-			V_0 = this.offsetToInstruction.get_Item(instructionOffset);
-			if (V_0.get_OpCode().get_Code() == 36 || V_0.get_OpCode().get_Code() == 37)
+			Instruction item = this.offsetToInstruction[instructionOffset];
+			if (item.get_OpCode().get_Code() == 36 || item.get_OpCode().get_Code() == 37)
 			{
 				return;
 			}
-			V_1 = this.GetUseExpressionTypeNode(V_0, variableNode.get_Variable());
-			if (V_0.get_OpCode().get_Code() == 68)
+			ClassHierarchyNode useExpressionTypeNode = base.GetUseExpressionTypeNode(item, variableNode.Variable);
+			if (item.get_OpCode().get_Code() == 68)
 			{
-				variableNode.AddSupertype(V_1);
-				dummyVar0 = this.resultingGraph.Add(V_1);
+				variableNode.AddSupertype(useExpressionTypeNode);
+				this.resultingGraph.Add(useExpressionTypeNode);
 				return;
 			}
-			if (!String.op_Equality(V_1.get_NodeType().get_FullName(), "System.Int32") || !this.OnlyPhiVariablesUsed(this.offsetToExpression.get_Item(V_0.get_Offset())))
+			if (!(useExpressionTypeNode.NodeType.get_FullName() == "System.Int32") || !this.OnlyPhiVariablesUsed(this.offsetToExpression[item.get_Offset()]))
 			{
-				variableNode.AddSupertype(V_1);
-				dummyVar2 = this.resultingGraph.Add(V_1);
+				variableNode.AddSupertype(useExpressionTypeNode);
+				this.resultingGraph.Add(useExpressionTypeNode);
 				return;
 			}
-			V_3 = this.GetUsedPhiVariableNodes(V_0.get_Offset());
-			V_4 = 0;
-			while (V_4 < V_3.get_Count())
+			List<ClassHierarchyNode> usedPhiVariableNodes = this.GetUsedPhiVariableNodes(item.get_Offset());
+			for (int i = 0; i < usedPhiVariableNodes.Count; i++)
 			{
-				V_5 = V_4 + 1;
-				while (V_5 < V_3.get_Count())
+				for (int j = i + 1; j < usedPhiVariableNodes.Count; j++)
 				{
-					V_3.get_Item(V_4).AddSupertype(V_3.get_Item(V_5));
-					V_3.get_Item(V_5).AddSupertype(V_3.get_Item(V_4));
-					V_5 = V_5 + 1;
+					usedPhiVariableNodes[i].AddSupertype(usedPhiVariableNodes[j]);
+					usedPhiVariableNodes[j].AddSupertype(usedPhiVariableNodes[i]);
 				}
-				V_4 = V_4 + 1;
 			}
-			if (this.IsArithmeticOperation(V_0.get_OpCode().get_Code()))
+			if (this.IsArithmeticOperation(item.get_OpCode().get_Code()))
 			{
-				V_6 = 0;
-				while (V_6 < V_3.get_Count())
+				for (int k = 0; k < usedPhiVariableNodes.Count; k++)
 				{
-					dummyVar1 = this.notPossibleBooleanNodes.Add(V_3.get_Item(V_6));
-					V_7 = this.GetTypeNode(this.typeSystem.get_Int32());
-					if (!V_7.get_CanAssignTo().Contains(V_3.get_Item(V_6)))
+					this.notPossibleBooleanNodes.Add(usedPhiVariableNodes[k]);
+					ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Int32());
+					if (!typeNode.CanAssignTo.Contains(usedPhiVariableNodes[k]))
 					{
-						V_7.get_CanAssignTo().Add(V_3.get_Item(V_6));
-						V_3.get_Item(V_6).get_SubTypes().Add(V_7);
+						typeNode.CanAssignTo.Add(usedPhiVariableNodes[k]);
+						usedPhiVariableNodes[k].SubTypes.Add(typeNode);
 					}
-					V_6 = V_6 + 1;
 				}
 			}
-			return;
 		}
 
 		private void RemoveBooleanAsASubtype(ClassHierarchyNode variableNode)
 		{
-			V_0 = this.GetTypeNode(this.typeSystem.get_Boolean());
-			if (variableNode.get_SubTypes().Contains(V_0))
+			ClassHierarchyNode typeNode = this.GetTypeNode(this.typeSystem.get_Boolean());
+			if (variableNode.SubTypes.Contains(typeNode))
 			{
-				dummyVar0 = variableNode.get_SubTypes().Remove(V_0);
-				dummyVar1 = V_0.get_CanAssignTo().Remove(variableNode);
+				variableNode.SubTypes.Remove(typeNode);
+				typeNode.CanAssignTo.Remove(variableNode);
 			}
-			return;
 		}
 
 		protected override void RemoveImpossibleEdges()
 		{
-			V_0 = this.notPossibleBooleanNodes.GetEnumerator();
-			try
+			foreach (ClassHierarchyNode notPossibleBooleanNode in this.notPossibleBooleanNodes)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.RemoveBooleanAsASubtype(V_1);
-				}
+				this.RemoveBooleanAsASubtype(notPossibleBooleanNode);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		protected override bool ShouldConsiderVariable(VariableReference variableReference)
 		{
-			return String.op_Equality(variableReference.get_VariableType().get_FullName(), "System.Int32");
+			return variableReference.get_VariableType().get_FullName() == "System.Int32";
 		}
 	}
 }

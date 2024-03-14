@@ -26,11 +26,9 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public DecompiledMember(string memberName, Telerik.JustDecompiler.Ast.Statements.Statement statement, MethodSpecificContext context)
 		{
-			base();
-			this.set_MemberFullName(memberName);
-			this.set_Statement(statement);
-			this.set_Context(context);
-			return;
+			this.MemberFullName = memberName;
+			this.Statement = statement;
+			this.Context = context;
 		}
 	}
 }

@@ -9,222 +9,204 @@ namespace Telerik.JustDecompiler.Languages
 		{
 			get
 			{
-				return get_RenameInvalidMembers();
+				return JustDecompileGenerated_get_RenameInvalidMembers();
 			}
 			set
 			{
-				set_RenameInvalidMembers(value);
+				JustDecompileGenerated_set_RenameInvalidMembers(value);
 			}
 		}
 
-		// <RenameInvalidMembers>k__BackingField
-		private bool u003cRenameInvalidMembersu003ek__BackingField;
+		private bool JustDecompileGenerated_RenameInvalidMembers_k__BackingField;
 
-		public bool get_RenameInvalidMembers()
+		public bool JustDecompileGenerated_get_RenameInvalidMembers()
 		{
-			return this.u003cRenameInvalidMembersu003ek__BackingField;
+			return this.JustDecompileGenerated_RenameInvalidMembers_k__BackingField;
 		}
 
-		private void set_RenameInvalidMembers(bool value)
+		private void JustDecompileGenerated_set_RenameInvalidMembers(bool value)
 		{
-			this.u003cRenameInvalidMembersu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_RenameInvalidMembers_k__BackingField = value;
 		}
 
 		public bool ShouldGenerateBlocks
 		{
 			get
 			{
-				return get_ShouldGenerateBlocks();
+				return JustDecompileGenerated_get_ShouldGenerateBlocks();
 			}
 			set
 			{
-				set_ShouldGenerateBlocks(value);
+				JustDecompileGenerated_set_ShouldGenerateBlocks(value);
 			}
 		}
 
-		// <ShouldGenerateBlocks>k__BackingField
-		private bool u003cShouldGenerateBlocksu003ek__BackingField;
+		private bool JustDecompileGenerated_ShouldGenerateBlocks_k__BackingField;
 
-		public bool get_ShouldGenerateBlocks()
+		public bool JustDecompileGenerated_get_ShouldGenerateBlocks()
 		{
-			return this.u003cShouldGenerateBlocksu003ek__BackingField;
+			return this.JustDecompileGenerated_ShouldGenerateBlocks_k__BackingField;
 		}
 
-		private void set_ShouldGenerateBlocks(bool value)
+		private void JustDecompileGenerated_set_ShouldGenerateBlocks(bool value)
 		{
-			this.u003cShouldGenerateBlocksu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_ShouldGenerateBlocks_k__BackingField = value;
 		}
 
 		public bool ShowCompilerGeneratedMembers
 		{
 			get
 			{
-				return get_ShowCompilerGeneratedMembers();
+				return JustDecompileGenerated_get_ShowCompilerGeneratedMembers();
 			}
 			set
 			{
-				set_ShowCompilerGeneratedMembers(value);
+				JustDecompileGenerated_set_ShowCompilerGeneratedMembers(value);
 			}
 		}
 
-		// <ShowCompilerGeneratedMembers>k__BackingField
-		private bool u003cShowCompilerGeneratedMembersu003ek__BackingField;
+		private bool JustDecompileGenerated_ShowCompilerGeneratedMembers_k__BackingField;
 
-		public bool get_ShowCompilerGeneratedMembers()
+		public bool JustDecompileGenerated_get_ShowCompilerGeneratedMembers()
 		{
-			return this.u003cShowCompilerGeneratedMembersu003ek__BackingField;
+			return this.JustDecompileGenerated_ShowCompilerGeneratedMembers_k__BackingField;
 		}
 
-		private void set_ShowCompilerGeneratedMembers(bool value)
+		private void JustDecompileGenerated_set_ShowCompilerGeneratedMembers(bool value)
 		{
-			this.u003cShowCompilerGeneratedMembersu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_ShowCompilerGeneratedMembers_k__BackingField = value;
 		}
 
 		public bool WriteDangerousResources
 		{
 			get
 			{
-				return get_WriteDangerousResources();
+				return JustDecompileGenerated_get_WriteDangerousResources();
 			}
 			set
 			{
-				set_WriteDangerousResources(value);
+				JustDecompileGenerated_set_WriteDangerousResources(value);
 			}
 		}
 
-		// <WriteDangerousResources>k__BackingField
-		private bool u003cWriteDangerousResourcesu003ek__BackingField;
+		private bool JustDecompileGenerated_WriteDangerousResources_k__BackingField;
 
-		public bool get_WriteDangerousResources()
+		public bool JustDecompileGenerated_get_WriteDangerousResources()
 		{
-			return this.u003cWriteDangerousResourcesu003ek__BackingField;
+			return this.JustDecompileGenerated_WriteDangerousResources_k__BackingField;
 		}
 
-		private void set_WriteDangerousResources(bool value)
+		private void JustDecompileGenerated_set_WriteDangerousResources(bool value)
 		{
-			this.u003cWriteDangerousResourcesu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_WriteDangerousResources_k__BackingField = value;
 		}
 
 		public bool WriteDocumentation
 		{
 			get
 			{
-				return get_WriteDocumentation();
+				return JustDecompileGenerated_get_WriteDocumentation();
 			}
 			set
 			{
-				set_WriteDocumentation(value);
+				JustDecompileGenerated_set_WriteDocumentation(value);
 			}
 		}
 
-		// <WriteDocumentation>k__BackingField
-		private bool u003cWriteDocumentationu003ek__BackingField;
+		private bool JustDecompileGenerated_WriteDocumentation_k__BackingField;
 
-		public bool get_WriteDocumentation()
+		public bool JustDecompileGenerated_get_WriteDocumentation()
 		{
-			return this.u003cWriteDocumentationu003ek__BackingField;
+			return this.JustDecompileGenerated_WriteDocumentation_k__BackingField;
 		}
 
-		private void set_WriteDocumentation(bool value)
+		private void JustDecompileGenerated_set_WriteDocumentation(bool value)
 		{
-			this.u003cWriteDocumentationu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_WriteDocumentation_k__BackingField = value;
 		}
 
 		public bool WriteExceptionsAsComments
 		{
 			get
 			{
-				return get_WriteExceptionsAsComments();
+				return JustDecompileGenerated_get_WriteExceptionsAsComments();
 			}
 			set
 			{
-				set_WriteExceptionsAsComments(value);
+				JustDecompileGenerated_set_WriteExceptionsAsComments(value);
 			}
 		}
 
-		// <WriteExceptionsAsComments>k__BackingField
-		private bool u003cWriteExceptionsAsCommentsu003ek__BackingField;
+		private bool JustDecompileGenerated_WriteExceptionsAsComments_k__BackingField;
 
-		public bool get_WriteExceptionsAsComments()
+		public bool JustDecompileGenerated_get_WriteExceptionsAsComments()
 		{
-			return this.u003cWriteExceptionsAsCommentsu003ek__BackingField;
+			return this.JustDecompileGenerated_WriteExceptionsAsComments_k__BackingField;
 		}
 
-		private void set_WriteExceptionsAsComments(bool value)
+		private void JustDecompileGenerated_set_WriteExceptionsAsComments(bool value)
 		{
-			this.u003cWriteExceptionsAsCommentsu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_WriteExceptionsAsComments_k__BackingField = value;
 		}
 
 		public bool WriteFullyQualifiedNames
 		{
 			get
 			{
-				return get_WriteFullyQualifiedNames();
+				return JustDecompileGenerated_get_WriteFullyQualifiedNames();
 			}
 			set
 			{
-				set_WriteFullyQualifiedNames(value);
+				JustDecompileGenerated_set_WriteFullyQualifiedNames(value);
 			}
 		}
 
-		// <WriteFullyQualifiedNames>k__BackingField
-		private bool u003cWriteFullyQualifiedNamesu003ek__BackingField;
+		private bool JustDecompileGenerated_WriteFullyQualifiedNames_k__BackingField;
 
-		public bool get_WriteFullyQualifiedNames()
+		public bool JustDecompileGenerated_get_WriteFullyQualifiedNames()
 		{
-			return this.u003cWriteFullyQualifiedNamesu003ek__BackingField;
+			return this.JustDecompileGenerated_WriteFullyQualifiedNames_k__BackingField;
 		}
 
-		private void set_WriteFullyQualifiedNames(bool value)
+		private void JustDecompileGenerated_set_WriteFullyQualifiedNames(bool value)
 		{
-			this.u003cWriteFullyQualifiedNamesu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_WriteFullyQualifiedNames_k__BackingField = value;
 		}
 
 		public bool WriteLargeNumbersInHex
 		{
 			get
 			{
-				return get_WriteLargeNumbersInHex();
+				return JustDecompileGenerated_get_WriteLargeNumbersInHex();
 			}
 			set
 			{
-				set_WriteLargeNumbersInHex(value);
+				JustDecompileGenerated_set_WriteLargeNumbersInHex(value);
 			}
 		}
 
-		// <WriteLargeNumbersInHex>k__BackingField
-		private bool u003cWriteLargeNumbersInHexu003ek__BackingField;
+		private bool JustDecompileGenerated_WriteLargeNumbersInHex_k__BackingField;
 
-		public bool get_WriteLargeNumbersInHex()
+		public bool JustDecompileGenerated_get_WriteLargeNumbersInHex()
 		{
-			return this.u003cWriteLargeNumbersInHexu003ek__BackingField;
+			return this.JustDecompileGenerated_WriteLargeNumbersInHex_k__BackingField;
 		}
 
-		private void set_WriteLargeNumbersInHex(bool value)
+		private void JustDecompileGenerated_set_WriteLargeNumbersInHex(bool value)
 		{
-			this.u003cWriteLargeNumbersInHexu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_WriteLargeNumbersInHex_k__BackingField = value;
 		}
 
 		public WriterSettings(bool writeExceptionsAsComments = false, bool shouldGenerateBlocks = false, bool renameInvalidMembers = false, bool writeFullyQualifiedNames = false, bool writeDocumentation = false, bool showCompilerGeneratedMembers = false, bool writeLargeNumbersInHex = true, bool writeDangerousResources = false)
 		{
-			base();
-			this.set_WriteExceptionsAsComments(writeExceptionsAsComments);
-			this.set_ShouldGenerateBlocks(shouldGenerateBlocks);
-			this.set_RenameInvalidMembers(renameInvalidMembers);
-			this.set_WriteFullyQualifiedNames(writeFullyQualifiedNames);
-			this.set_WriteDocumentation(writeDocumentation);
-			this.set_ShowCompilerGeneratedMembers(showCompilerGeneratedMembers);
-			this.set_WriteLargeNumbersInHex(writeLargeNumbersInHex);
-			this.set_WriteDangerousResources(writeDangerousResources);
-			return;
+			this.WriteExceptionsAsComments = writeExceptionsAsComments;
+			this.ShouldGenerateBlocks = shouldGenerateBlocks;
+			this.RenameInvalidMembers = renameInvalidMembers;
+			this.WriteFullyQualifiedNames = writeFullyQualifiedNames;
+			this.WriteDocumentation = writeDocumentation;
+			this.ShowCompilerGeneratedMembers = showCompilerGeneratedMembers;
+			this.WriteLargeNumbersInHex = writeLargeNumbersInHex;
+			this.WriteDangerousResources = writeDangerousResources;
 		}
 	}
 }

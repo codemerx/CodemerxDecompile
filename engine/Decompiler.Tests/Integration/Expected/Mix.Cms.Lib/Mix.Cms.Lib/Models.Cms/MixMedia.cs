@@ -128,9 +128,7 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixMedia()
 		{
-			base();
-			this.set_MixPostMedia(new HashSet<Mix.Cms.Lib.Models.Cms.MixPostMedia>());
-			return;
+			this.MixPostMedia = new HashSet<Mix.Cms.Lib.Models.Cms.MixPostMedia>();
 		}
 	}
 }

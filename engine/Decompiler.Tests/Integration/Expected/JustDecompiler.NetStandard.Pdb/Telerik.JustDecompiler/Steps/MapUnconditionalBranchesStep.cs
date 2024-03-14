@@ -4,76 +4,70 @@ using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
 {
 	internal class MapUnconditionalBranchesStep : BaseCodeVisitor, IDecompilationStep
 	{
-		private readonly HashSet<Instruction> mappedInstructions;
+		private readonly HashSet<Instruction> mappedInstructions = new HashSet<Instruction>();
 
 		private MethodSpecificContext methodContext;
 
 		public MapUnconditionalBranchesStep()
 		{
-			this.mappedInstructions = new HashSet<Instruction>();
-			base();
-			return;
 		}
 
 		private bool IsUnconditionalBranch(Instruction instruction)
 		{
-			V_0 = instruction.get_OpCode().get_Code();
-			if (V_0 == 55)
+			Code code = instruction.get_OpCode().get_Code();
+			if (code == 55)
 			{
 				return true;
 			}
-			return V_0 == 42;
+			return code == 42;
 		}
 
 		private void MapBranches(Expression expression)
 		{
-			V_0 = new List<Instruction>(expression.get_UnderlyingSameMethodInstructions());
-			V_1 = new List<Instruction>();
-			V_2 = V_0.get_Count();
-			V_3 = 0;
-			while (V_3 < V_2)
+			List<Instruction> instructions = new List<Instruction>(expression.UnderlyingSameMethodInstructions);
+			List<Instruction> instructions1 = new List<Instruction>();
+			int count = instructions.Count;
+			for (int i = 0; i < count; i++)
 			{
-				V_4 = V_0.get_Item(V_3);
-				V_6 = V_4.get_OpCode().get_FlowControl();
-				if (V_6 != null && V_6 != 3 && V_6 - 7 > 1)
+				Instruction item = instructions[i];
+				FlowControl flowControl = item.get_OpCode().get_FlowControl();
+				if (flowControl != null && flowControl != 3 && flowControl - 7 > 1)
 				{
-					V_5 = V_4.get_Next();
-					if (V_5 != null && !this.mappedInstructions.Contains(V_5) && V_3 == V_0.get_Count() - 1 || (object)V_5 != (object)V_0.get_Item(V_3 + 1) && this.IsUnconditionalBranch(V_5) && !this.methodContext.get_ControlFlowGraph().get_InstructionToBlockMapping().ContainsKey(V_5.get_Offset()))
+					Instruction next = item.get_Next();
+					if (next != null && !this.mappedInstructions.Contains(next) && (i == instructions.Count - 1 || (object)next != (object)instructions[i + 1]) && this.IsUnconditionalBranch(next) && !this.methodContext.ControlFlowGraph.InstructionToBlockMapping.ContainsKey(next.get_Offset()))
 					{
-						V_1.Add(V_5);
+						instructions1.Add(next);
 					}
 				}
-				V_3 = V_3 + 1;
 			}
-			this.mappedInstructions.UnionWith(V_1);
-			expression.MapBranchInstructions(V_1);
-			return;
+			this.mappedInstructions.UnionWith(instructions1);
+			expression.MapBranchInstructions(instructions1);
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.get_MethodContext();
-			this.mappedInstructions.UnionWith(body.get_UnderlyingSameMethodInstructions());
+			this.methodContext = context.MethodContext;
+			this.mappedInstructions.UnionWith(body.UnderlyingSameMethodInstructions);
 			this.Visit(body);
 			return body;
 		}
 
 		public override void Visit(ICodeNode node)
 		{
-			V_0 = node as Expression;
-			if (V_0 != null)
+			Expression expression = node as Expression;
+			if (expression != null)
 			{
-				this.MapBranches(V_0);
+				this.MapBranches(expression);
 				return;
 			}
-			this.Visit(node);
-			return;
+			base.Visit(node);
 		}
 	}
 }

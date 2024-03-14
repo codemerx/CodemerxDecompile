@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OrchardCore.Environment.Shell
@@ -8,23 +9,19 @@ namespace OrchardCore.Environment.Shell
 	{
 		public SingleShellSettingsManager()
 		{
-			base();
-			return;
 		}
 
 		public ShellSettings CreateDefaultSettings()
 		{
-			stackVariable0 = new ShellSettings();
-			stackVariable0.set_Name("Default");
-			stackVariable0.set_State(2);
-			return stackVariable0;
+			ShellSettings shellSetting = new ShellSettings();
+			shellSetting.set_Name("Default");
+			shellSetting.set_State(2);
+			return shellSetting;
 		}
 
 		public Task<IEnumerable<ShellSettings>> LoadSettingsAsync()
 		{
-			stackVariable1 = new ShellSettings[1];
-			stackVariable1[0] = this.CreateDefaultSettings();
-			return Task.FromResult<IEnumerable<ShellSettings>>(stackVariable1.AsEnumerable<ShellSettings>());
+			return Task.FromResult<IEnumerable<ShellSettings>>((new ShellSettings[] { this.CreateDefaultSettings() }).AsEnumerable<ShellSettings>());
 		}
 
 		public Task<ShellSettings> LoadSettingsAsync(string tenant)
@@ -34,7 +31,7 @@ namespace OrchardCore.Environment.Shell
 
 		public Task SaveSettingsAsync(ShellSettings shellSettings)
 		{
-			return Task.get_CompletedTask();
+			return Task.CompletedTask;
 		}
 	}
 }

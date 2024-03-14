@@ -1,14 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -138,85 +143,136 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPages
 
 		public UpdateViewModel()
 		{
-			base();
-			return;
 		}
 
-		public UpdateViewModel(MixPortalPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixPortalPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_ParentNavs(this.GetParentNavs(_context, _transaction));
-			this.set_ChildNavs(this.GetChildNavs(_context, _transaction));
-			return;
+			this.ParentNavs = this.GetParentNavs(_context, _transaction);
+			this.ChildNavs = this.GetChildNavs(_context, _transaction);
 		}
 
 		public List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> GetChildNavs(MixCmsContext context, IDbContextTransaction transaction)
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cu003ec__DisplayClass75_0();
-			V_0.u003cu003e4__this = this;
-			V_0.context = context;
-			V_0.transaction = transaction;
-			stackVariable9 = V_0.context.get_MixPortalPage();
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel::GetChildNavs(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> GetChildNavs(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> list = (
+				from PortalPage in (
+					from PortalPage in EntityFrameworkQueryableExtensions.Include<MixPortalPage, ICollection<MixPortalPageNavigation>>(context.MixPortalPage, (MixPortalPage cp) => cp.MixPortalPageNavigationParent)
+					where PortalPage.Id != this.Id
+					select PortalPage).AsEnumerable<MixPortalPage>()
+				select new Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel(new MixPortalPageNavigation()
+				{
+					Id = PortalPage.Id,
+					ParentId = this.Id,
+					Description = PortalPage.TextDefault
+				}, context, transaction)).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>();
+			list.ForEach((Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel nav) => {
+				MixPortalPageNavigation mixPortalPageNavigation = context.MixPortalPageNavigation.FirstOrDefault<MixPortalPageNavigation>((MixPortalPageNavigation m) => m.ParentId == this.Id && m.Id == nav.Id);
+				nav.Priority = (mixPortalPageNavigation != null ? mixPortalPageNavigation.Priority : 0);
+				nav.IsActived = mixPortalPageNavigation != null;
+			});
+			return (
+				from m in list
+				orderby m.Priority
+				select m).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>();
+		}
 
 		public List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> GetParentNavs(MixCmsContext context, IDbContextTransaction transaction)
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cu003ec__DisplayClass74_0();
-			V_0.u003cu003e4__this = this;
-			V_0.context = context;
-			stackVariable7 = V_0.context.get_MixPortalPage();
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel::GetParentNavs(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> GetParentNavs(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> list = (
+				from PortalPage in (
+					from PortalPage in EntityFrameworkQueryableExtensions.Include<MixPortalPage, ICollection<MixPortalPageNavigation>>(context.MixPortalPage, (MixPortalPage cp) => cp.MixPortalPageNavigationParent)
+					where PortalPage.Id != this.Id && PortalPage.Level == 0
+					select PortalPage).AsEnumerable<MixPortalPage>()
+				select new Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel()
+				{
+					Id = this.Id,
+					ParentId = PortalPage.Id,
+					Description = PortalPage.TextDefault,
+					Level = PortalPage.Level
+				}).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>();
+			list.ForEach((Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel nav) => nav.IsActived = context.MixPortalPageNavigation.Any<MixPortalPageNavigation>((MixPortalPageNavigation m) => m.ParentId == nav.ParentId && m.Id == this.Id));
+			return (
+				from m in list
+				orderby m.Priority
+				select m).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>();
+		}
 
 		public override MixPortalPage ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel updateViewModel;
+			if (this.Id == 0)
 			{
-				stackVariable33 = ViewModelBase<MixCmsContext, MixPortalPage, Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel>.Repository;
-				V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixPortalPage Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixPortalPage ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixPortalPage, Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel>.Repository.Max((MixPortalPage c) => c.Id, _context, _transaction).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> parentNavs = this.ParentNavs;
+			if (parentNavs != null)
+			{
+				updateViewModel = parentNavs.FirstOrDefault<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>((Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel p) => p.IsActived);
+			}
+			else
+			{
+				updateViewModel = null;
+			}
+			Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel updateViewModel1 = updateViewModel;
+			if (updateViewModel1 == null)
+			{
+				this.Level = 0;
+			}
+			else
+			{
+				this.Level = updateViewModel1.Level + 1;
+			}
+			if (this.ChildNavs != null)
+			{
+				(
+					from c in this.ChildNavs
+					where c.IsActived
+					select c).ToList<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>().ForEach((Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel c) => c.Page.Level = this.Level + 1);
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cRemoveRelatedModelsAsyncu003ed__73>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			DbSet<MixPortalPageNavigation> mixPortalPageNavigation = _context.MixPortalPageNavigation;
+			foreach (MixPortalPageNavigation mixPortalPageNavigation1 in 
+				from p in mixPortalPageNavigation
+				where p.Id == this.Id || p.ParentId == this.Id
+				select p)
+			{
+				_context.Entry<MixPortalPageNavigation>(mixPortalPageNavigation1).set_State(2);
+				if (mixPortalPageNavigation1.ParentId != this.Id)
+				{
+					continue;
+				}
+				MixCmsContext mixCmsContext = _context;
+				DbSet<MixPortalPage> mixPortalPage = _context.MixPortalPage;
+				((DbContext)mixCmsContext).Entry<MixPortalPage>(mixPortalPage.Single<MixPortalPage>((MixPortalPage sub) => sub.Id == mixPortalPageNavigation1.Id)).set_State(2);
+			}
+			MixCmsContext mixCmsContext1 = _context;
+			CancellationToken cancellationToken = new CancellationToken();
+			await ((DbContext)mixCmsContext1).SaveChangesAsync(cancellationToken);
+			return repositoryResponse1;
 		}
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPortalPage parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parent = parent;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72 variable = new Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72();
+			variable.u003cu003e4__this = this;
+			variable.parent = parent;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

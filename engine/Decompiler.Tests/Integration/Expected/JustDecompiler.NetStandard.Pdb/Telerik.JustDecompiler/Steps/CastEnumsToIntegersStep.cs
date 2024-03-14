@@ -1,6 +1,7 @@
 using Mono.Cecil;
 using Mono.Collections.Generic;
 using System;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -16,50 +17,39 @@ namespace Telerik.JustDecompiler.Steps
 
 		public CastEnumsToIntegersStep()
 		{
-			base();
-			return;
 		}
 
 		private void AddArrayInitializerCasts(TypeDefinition arrayType, BlockExpression blockExpression)
 		{
-			V_0 = 0;
-			while (V_0 < blockExpression.get_Expressions().get_Count())
+			for (int i = 0; i < blockExpression.Expressions.Count; i++)
 			{
-				V_1 = blockExpression.get_Expressions().get_Item(V_0);
-				if (V_1.get_CodeNodeType() != 18)
+				Expression item = blockExpression.Expressions[i];
+				if (item.CodeNodeType == CodeNodeType.BlockExpression)
 				{
-					if (this.ShouldAddCast(arrayType, V_1.get_ExpressionType()))
-					{
-						blockExpression.get_Expressions().set_Item(V_0, new ExplicitCastExpression(V_1, arrayType, null));
-					}
+					this.AddArrayInitializerCasts(arrayType, item as BlockExpression);
 				}
-				else
+				else if (this.ShouldAddCast(arrayType, item.ExpressionType))
 				{
-					this.AddArrayInitializerCasts(arrayType, V_1 as BlockExpression);
+					blockExpression.Expressions[i] = new ExplicitCastExpression(item, arrayType, null);
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
-		private void CheckArguments(Collection<ParameterDefinition> parameters, ExpressionCollection arguments)
+		private void CheckArguments(Mono.Collections.Generic.Collection<ParameterDefinition> parameters, ExpressionCollection arguments)
 		{
-			V_0 = 0;
-			while (V_0 < arguments.get_Count())
+			for (int i = 0; i < arguments.Count; i++)
 			{
-				V_1 = arguments.get_Item(V_0);
-				if (V_1.get_HasType())
+				Expression item = arguments[i];
+				if (item.HasType)
 				{
-					V_2 = V_1.get_ExpressionType().Resolve();
-					V_3 = parameters.get_Item(V_0).get_ParameterType();
-					if (this.ShouldAddCast(V_2, V_3))
+					TypeDefinition typeDefinition = item.ExpressionType.Resolve();
+					TypeReference parameterType = parameters.get_Item(i).get_ParameterType();
+					if (this.ShouldAddCast(typeDefinition, parameterType))
 					{
-						arguments.set_Item(V_0, new ExplicitCastExpression(V_1, V_3, null));
+						arguments[i] = new ExplicitCastExpression(item, parameterType, null);
 					}
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		private TypeReference GetEnumUnderlyingType(TypeDefinition enumType)
@@ -69,29 +59,29 @@ namespace Telerik.JustDecompiler.Steps
 
 		private string GetExpressionTypeName(Expression expression)
 		{
-			if (!expression.get_HasType())
+			if (!expression.HasType)
 			{
 				return "";
 			}
-			return expression.get_ExpressionType().get_FullName();
+			return expression.ExpressionType.get_FullName();
 		}
 
 		private bool IsArithmeticOperator(BinaryOperator binaryOperator)
 		{
-			if (binaryOperator == 1 || binaryOperator == 3 || binaryOperator == 7 || binaryOperator == 5)
+			if (binaryOperator == BinaryOperator.Add || binaryOperator == BinaryOperator.Subtract || binaryOperator == BinaryOperator.Divide || binaryOperator == BinaryOperator.Multiply)
 			{
 				return true;
 			}
-			return binaryOperator == 24;
+			return binaryOperator == BinaryOperator.Modulo;
 		}
 
 		private bool IsBitwiseOperator(BinaryOperator binaryOperator)
 		{
-			if (binaryOperator == 22 || binaryOperator == 21)
+			if (binaryOperator == BinaryOperator.BitwiseAnd || binaryOperator == BinaryOperator.BitwiseOr)
 			{
 				return true;
 			}
-			return binaryOperator == 23;
+			return binaryOperator == BinaryOperator.BitwiseXor;
 		}
 
 		private bool IsIntegerType(TypeReference type)
@@ -100,8 +90,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			V_0 = type.get_FullName();
-			if (!String.op_Equality(V_0, this.typeSystem.get_Byte().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_SByte().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_Int16().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_UInt16().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_Int32().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_UInt32().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_Int64().get_FullName()) && !String.op_Equality(V_0, this.typeSystem.get_UInt64().get_FullName()))
+			string fullName = type.get_FullName();
+			if (!(fullName == this.typeSystem.get_Byte().get_FullName()) && !(fullName == this.typeSystem.get_SByte().get_FullName()) && !(fullName == this.typeSystem.get_Int16().get_FullName()) && !(fullName == this.typeSystem.get_UInt16().get_FullName()) && !(fullName == this.typeSystem.get_Int32().get_FullName()) && !(fullName == this.typeSystem.get_UInt32().get_FullName()) && !(fullName == this.typeSystem.get_Int64().get_FullName()) && !(fullName == this.typeSystem.get_UInt64().get_FullName()))
 			{
 				return false;
 			}
@@ -110,17 +100,17 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool IsShiftOperator(BinaryOperator binaryOperator)
 		{
-			if (binaryOperator == 17)
+			if (binaryOperator == BinaryOperator.LeftShift)
 			{
 				return true;
 			}
-			return binaryOperator == 19;
+			return binaryOperator == BinaryOperator.RightShift;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
-			this.decompiledMethodReturnType = context.get_MethodContext().get_Method().get_ReturnType();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
+			this.decompiledMethodReturnType = context.MethodContext.Method.get_ReturnType();
 			this.Visit(body);
 			return body;
 		}
@@ -140,209 +130,181 @@ namespace Telerik.JustDecompiler.Steps
 
 		public override void VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			this.VisitArrayCreationExpression(node);
-			if (node.get_Initializer() != null)
+			base.VisitArrayCreationExpression(node);
+			if (node.Initializer != null)
 			{
-				V_0 = node.get_ExpressionType().Resolve();
-				this.AddArrayInitializerCasts(V_0, node.get_Initializer().get_Expression());
+				TypeDefinition typeDefinition = node.ExpressionType.Resolve();
+				this.AddArrayInitializerCasts(typeDefinition, node.Initializer.Expression);
 			}
-			return;
 		}
 
 		public override void VisitArrayIndexerExpression(ArrayIndexerExpression node)
 		{
-			this.VisitArrayIndexerExpression(node);
-			V_0 = 0;
-			while (V_0 < node.get_Indices().get_Count())
+			base.VisitArrayIndexerExpression(node);
+			for (int i = 0; i < node.Indices.Count; i++)
 			{
-				V_1 = node.get_Indices().get_Item(V_0);
-				if (V_1.get_HasType() && this.ShouldAddCast(V_1.get_ExpressionType().Resolve(), this.typeSystem.get_Int32()))
+				Expression item = node.Indices[i];
+				if (item.HasType && this.ShouldAddCast(item.ExpressionType.Resolve(), this.typeSystem.get_Int32()))
 				{
-					node.get_Indices().set_Item(V_0, new ExplicitCastExpression(V_1, this.typeSystem.get_Int32(), null));
+					node.Indices[i] = new ExplicitCastExpression(item, this.typeSystem.get_Int32(), null);
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			V_0 = this.GetExpressionTypeName(node.get_Left());
-			V_1 = this.GetExpressionTypeName(node.get_Right());
-			this.VisitBinaryExpression(node);
-			if (String.op_Inequality(this.GetExpressionTypeName(node.get_Left()), V_0))
+			string expressionTypeName = this.GetExpressionTypeName(node.Left);
+			string str = this.GetExpressionTypeName(node.Right);
+			base.VisitBinaryExpression(node);
+			bool flag = (this.GetExpressionTypeName(node.Left) != expressionTypeName ? true : this.GetExpressionTypeName(node.Right) != str);
+			if (node.IsAssignmentExpression || node.IsSelfAssign && !node.IsEventHandlerAddOrRemove)
 			{
-				stackVariable16 = true;
-			}
-			else
-			{
-				stackVariable16 = String.op_Inequality(this.GetExpressionTypeName(node.get_Right()), V_1);
-			}
-			V_2 = stackVariable16;
-			if (node.get_IsAssignmentExpression() || node.get_IsSelfAssign() && !node.get_IsEventHandlerAddOrRemove())
-			{
-				V_3 = node.get_Left();
-				V_4 = node.get_Right();
-				if (V_4.get_HasType() && V_3.get_HasType())
+				Expression left = node.Left;
+				Expression right = node.Right;
+				if (right.HasType && left.HasType)
 				{
-					V_5 = V_3.get_ExpressionType();
-					V_6 = V_4.get_ExpressionType().Resolve();
-					if (this.ShouldAddCast(V_6, V_5))
+					TypeReference expressionType = left.ExpressionType;
+					TypeDefinition typeDefinition = right.ExpressionType.Resolve();
+					if (this.ShouldAddCast(typeDefinition, expressionType))
 					{
-						node.set_Right(new ExplicitCastExpression(V_4, V_5, null));
-						V_2 = true;
+						node.Right = new ExplicitCastExpression(right, expressionType, null);
+						flag = true;
 					}
-					V_7 = V_5.Resolve();
-					if (V_7 != null && V_6 != null && V_7.get_IsEnum() && V_6.get_IsValueType() && String.op_Inequality(V_7.get_FullName(), V_6.get_FullName()))
+					TypeDefinition typeDefinition1 = expressionType.Resolve();
+					if (typeDefinition1 != null && typeDefinition != null && typeDefinition1.get_IsEnum() && typeDefinition.get_IsValueType() && typeDefinition1.get_FullName() != typeDefinition.get_FullName())
 					{
-						node.set_Right(new ExplicitCastExpression(V_4, V_5, null));
-						V_2 = true;
+						node.Right = new ExplicitCastExpression(right, expressionType, null);
+						flag = true;
 					}
 				}
 			}
-			else
+			else if (this.IsArithmeticOperator(node.Operator))
 			{
-				if (!this.IsArithmeticOperator(node.get_Operator()))
+				if (node.Left.HasType)
 				{
-					if (this.IsBitwiseOperator(node.get_Operator()) || node.get_IsComparisonExpression())
+					TypeDefinition typeDefinition2 = node.Left.ExpressionType.Resolve();
+					if (typeDefinition2 != null && typeDefinition2.get_IsEnum())
 					{
-						V_10 = node.get_Left();
-						V_11 = node.get_Right();
-						if (V_11.get_HasType() && V_10.get_HasType())
-						{
-							V_12 = V_10.get_ExpressionType();
-							V_13 = V_11.get_ExpressionType().Resolve();
-							if (this.ShouldAddCast(V_13, V_12))
-							{
-								node.set_Right(new ExplicitCastExpression(V_11, V_12, null));
-								V_2 = true;
-							}
-							V_14 = V_11.get_ExpressionType();
-							V_15 = V_10.get_ExpressionType().Resolve();
-							if (this.ShouldAddCast(V_15, V_14))
-							{
-								node.set_Left(new ExplicitCastExpression(V_10, V_14, null));
-								V_2 = true;
-							}
-							if (V_15 != null && V_15.get_IsEnum() && V_13 != null && V_13.get_IsEnum() && String.op_Inequality(V_15.get_FullName(), V_13.get_FullName()))
-							{
-								node.set_Left(new ExplicitCastExpression(V_10, this.GetEnumUnderlyingType(V_15), null));
-								node.set_Right(new ExplicitCastExpression(V_11, this.GetEnumUnderlyingType(V_15), null));
-								V_2 = true;
-							}
-						}
-					}
-					else
-					{
-						if (this.IsShiftOperator(node.get_Operator()))
-						{
-							if (node.get_Left().get_HasType())
-							{
-								V_16 = node.get_Left().get_ExpressionType().Resolve();
-								if (V_16 != null && V_16.get_IsEnum())
-								{
-									node.set_Left(new ExplicitCastExpression(node.get_Left(), this.GetEnumUnderlyingType(V_16), null));
-									V_2 = true;
-								}
-							}
-							if (node.get_Right().get_HasType())
-							{
-								V_17 = node.get_Right().get_ExpressionType().Resolve();
-								if (V_17 != null && V_17.get_IsEnum())
-								{
-									node.set_Right(new ExplicitCastExpression(node.get_Right(), this.GetEnumUnderlyingType(V_17), null));
-									V_2 = true;
-								}
-							}
-						}
+						node.Left = new ExplicitCastExpression(node.Left, this.GetEnumUnderlyingType(typeDefinition2), null);
+						flag = true;
 					}
 				}
-				else
+				if (node.Right.HasType)
 				{
-					if (node.get_Left().get_HasType())
+					TypeDefinition typeDefinition3 = node.Right.ExpressionType.Resolve();
+					if (typeDefinition3 != null && typeDefinition3.get_IsEnum())
 					{
-						V_8 = node.get_Left().get_ExpressionType().Resolve();
-						if (V_8 != null && V_8.get_IsEnum())
-						{
-							node.set_Left(new ExplicitCastExpression(node.get_Left(), this.GetEnumUnderlyingType(V_8), null));
-							V_2 = true;
-						}
-					}
-					if (node.get_Right().get_HasType())
-					{
-						V_9 = node.get_Right().get_ExpressionType().Resolve();
-						if (V_9 != null && V_9.get_IsEnum())
-						{
-							node.set_Right(new ExplicitCastExpression(node.get_Right(), this.GetEnumUnderlyingType(V_9), null));
-							V_2 = true;
-						}
+						node.Right = new ExplicitCastExpression(node.Right, this.GetEnumUnderlyingType(typeDefinition3), null);
+						flag = true;
 					}
 				}
 			}
-			if (V_2)
+			else if (this.IsBitwiseOperator(node.Operator) || node.IsComparisonExpression)
+			{
+				Expression expression = node.Left;
+				Expression right1 = node.Right;
+				if (right1.HasType && expression.HasType)
+				{
+					TypeReference typeReference = expression.ExpressionType;
+					TypeDefinition typeDefinition4 = right1.ExpressionType.Resolve();
+					if (this.ShouldAddCast(typeDefinition4, typeReference))
+					{
+						node.Right = new ExplicitCastExpression(right1, typeReference, null);
+						flag = true;
+					}
+					TypeReference expressionType1 = right1.ExpressionType;
+					TypeDefinition typeDefinition5 = expression.ExpressionType.Resolve();
+					if (this.ShouldAddCast(typeDefinition5, expressionType1))
+					{
+						node.Left = new ExplicitCastExpression(expression, expressionType1, null);
+						flag = true;
+					}
+					if (typeDefinition5 != null && typeDefinition5.get_IsEnum() && typeDefinition4 != null && typeDefinition4.get_IsEnum() && typeDefinition5.get_FullName() != typeDefinition4.get_FullName())
+					{
+						node.Left = new ExplicitCastExpression(expression, this.GetEnumUnderlyingType(typeDefinition5), null);
+						node.Right = new ExplicitCastExpression(right1, this.GetEnumUnderlyingType(typeDefinition5), null);
+						flag = true;
+					}
+				}
+			}
+			else if (this.IsShiftOperator(node.Operator))
+			{
+				if (node.Left.HasType)
+				{
+					TypeDefinition typeDefinition6 = node.Left.ExpressionType.Resolve();
+					if (typeDefinition6 != null && typeDefinition6.get_IsEnum())
+					{
+						node.Left = new ExplicitCastExpression(node.Left, this.GetEnumUnderlyingType(typeDefinition6), null);
+						flag = true;
+					}
+				}
+				if (node.Right.HasType)
+				{
+					TypeDefinition typeDefinition7 = node.Right.ExpressionType.Resolve();
+					if (typeDefinition7 != null && typeDefinition7.get_IsEnum())
+					{
+						node.Right = new ExplicitCastExpression(node.Right, this.GetEnumUnderlyingType(typeDefinition7), null);
+						flag = true;
+					}
+				}
+			}
+			if (flag)
 			{
 				node.UpdateType();
 			}
-			return;
 		}
 
 		public override void VisitDelegateInvokeExpression(DelegateInvokeExpression node)
 		{
-			this.VisitDelegateInvokeExpression(node);
-			this.CheckArguments(node.get_InvokeMethodReference().get_Parameters(), node.get_Arguments());
-			return;
+			base.VisitDelegateInvokeExpression(node);
+			this.CheckArguments(node.InvokeMethodReference.get_Parameters(), node.Arguments);
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			this.VisitMethodInvocationExpression(node);
-			this.CheckArguments(node.get_MethodExpression().get_Method().get_Parameters(), node.get_Arguments());
-			return;
+			base.VisitMethodInvocationExpression(node);
+			this.CheckArguments(node.MethodExpression.Method.get_Parameters(), node.Arguments);
 		}
 
 		public override void VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			this.VisitObjectCreationExpression(node);
-			if (node.get_Constructor() != null)
+			base.VisitObjectCreationExpression(node);
+			if (node.Constructor != null)
 			{
-				this.CheckArguments(node.get_Constructor().get_Parameters(), node.get_Arguments());
+				this.CheckArguments(node.Constructor.get_Parameters(), node.Arguments);
 			}
-			return;
 		}
 
 		public override void VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			this.VisitPropertyReferenceExpression(node);
-			if (node.get_IsIndexer())
+			base.VisitPropertyReferenceExpression(node);
+			if (node.IsIndexer)
 			{
-				this.CheckArguments(node.get_Property().get_Parameters(), node.get_Arguments());
+				this.CheckArguments(node.Property.get_Parameters(), node.Arguments);
 			}
-			return;
 		}
 
 		public override void VisitReturnExpression(ReturnExpression node)
 		{
-			this.VisitReturnExpression(node);
-			if (node.get_Value() != null && node.get_Value().get_HasType() && this.ShouldAddCast(node.get_Value().get_ExpressionType().Resolve(), this.decompiledMethodReturnType))
+			base.VisitReturnExpression(node);
+			if (node.Value != null && node.Value.HasType && this.ShouldAddCast(node.Value.ExpressionType.Resolve(), this.decompiledMethodReturnType))
 			{
-				node.set_Value(new ExplicitCastExpression(node.get_Value(), this.decompiledMethodReturnType, null));
+				node.Value = new ExplicitCastExpression(node.Value, this.decompiledMethodReturnType, null);
 			}
-			return;
 		}
 
 		public override void VisitUnaryExpression(UnaryExpression node)
 		{
-			this.VisitUnaryExpression(node);
-			if (node.get_Operator() == UnaryOperator.Negate || node.get_Operator() == 10 && node.get_Operand().get_HasType())
+			base.VisitUnaryExpression(node);
+			if ((node.Operator == UnaryOperator.Negate || node.Operator == UnaryOperator.UnaryPlus) && node.Operand.HasType)
 			{
-				V_0 = node.get_Operand().get_ExpressionType().Resolve();
-				if (V_0 != null && V_0.get_IsEnum())
+				TypeDefinition typeDefinition = node.Operand.ExpressionType.Resolve();
+				if (typeDefinition != null && typeDefinition.get_IsEnum())
 				{
-					node.set_Operand(new ExplicitCastExpression(node.get_Operand(), this.GetEnumUnderlyingType(V_0), null));
+					node.Operand = new ExplicitCastExpression(node.Operand, this.GetEnumUnderlyingType(typeDefinition), null);
 					node.DecideExpressionType();
 				}
 			}
-			return;
 		}
 	}
 }

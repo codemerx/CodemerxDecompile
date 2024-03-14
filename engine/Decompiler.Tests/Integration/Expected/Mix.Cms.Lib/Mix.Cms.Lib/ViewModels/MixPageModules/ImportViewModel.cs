@@ -3,6 +3,7 @@ using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixModules;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -111,27 +112,21 @@ namespace Mix.Cms.Lib.ViewModels.MixPageModules
 			set;
 		}
 
-		public ImportViewModel(MixPageModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ImportViewModel(MixPageModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public ImportViewModel()
 		{
-			base();
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPageModules.ImportViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel> singleModel = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository.GetSingleModel((MixModule p) => p.Id == this.ModuleId && p.Specificulture == this.Specificulture, _context, _transaction);
+			if (singleModel.get_IsSucceed())
+			{
+				this.Module = singleModel.get_Data();
+			}
+		}
 	}
 }

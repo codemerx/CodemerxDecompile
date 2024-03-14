@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Telerik.JustDecompiler.Pattern
@@ -20,19 +21,16 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public Constant()
 		{
-			base();
-			return;
 		}
 
-		public override bool Match(MatchContext context, object object)
+		public override bool Match(MatchContext context, object @object)
 		{
-			stackVariable1 = this.get_Comparer();
-			if (stackVariable1 == null)
+			object comparer = this.Comparer;
+			if (comparer == null)
 			{
-				dummyVar0 = stackVariable1;
-				stackVariable1 = EqualityComparer<object>.get_Default();
+				comparer = EqualityComparer<object>.Default;
 			}
-			return stackVariable1.Equals(this.get_Value(), object);
+			return comparer.Equals(this.Value, @object);
 		}
 	}
 }

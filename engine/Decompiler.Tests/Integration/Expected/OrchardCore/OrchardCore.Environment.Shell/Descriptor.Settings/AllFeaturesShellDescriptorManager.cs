@@ -4,6 +4,7 @@ using OrchardCore.Environment.Shell.Descriptor;
 using OrchardCore.Environment.Shell.Descriptor.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -17,33 +18,27 @@ namespace OrchardCore.Environment.Shell.Descriptor.Settings
 
 		public AllFeaturesShellDescriptorManager(IExtensionManager extensionManager)
 		{
-			base();
 			this._extensionManager = extensionManager;
-			return;
 		}
 
 		public Task<ShellDescriptor> GetShellDescriptorAsync()
 		{
 			if (this._shellDescriptor == null)
 			{
-				stackVariable6 = new ShellDescriptor();
-				stackVariable9 = this._extensionManager.GetFeatures();
-				stackVariable10 = AllFeaturesShellDescriptorManager.u003cu003ec.u003cu003e9__3_0;
-				if (stackVariable10 == null)
-				{
-					dummyVar0 = stackVariable10;
-					stackVariable10 = new Func<IFeatureInfo, ShellFeature>(AllFeaturesShellDescriptorManager.u003cu003ec.u003cu003e9.u003cGetShellDescriptorAsyncu003eb__3_0);
-					AllFeaturesShellDescriptorManager.u003cu003ec.u003cu003e9__3_0 = stackVariable10;
-				}
-				stackVariable6.set_Features(stackVariable9.Select<IFeatureInfo, ShellFeature>(stackVariable10).ToList<ShellFeature>());
-				this._shellDescriptor = stackVariable6;
+				ShellDescriptor shellDescriptor = new ShellDescriptor();
+				shellDescriptor.set_Features(this._extensionManager.GetFeatures().Select<IFeatureInfo, ShellFeature>((IFeatureInfo x) => {
+					ShellFeature shellFeature = new ShellFeature();
+					shellFeature.set_Id(x.get_Id());
+					return shellFeature;
+				}).ToList<ShellFeature>());
+				this._shellDescriptor = shellDescriptor;
 			}
 			return Task.FromResult<ShellDescriptor>(this._shellDescriptor);
 		}
 
 		public Task UpdateShellDescriptorAsync(int priorSerialNumber, IEnumerable<ShellFeature> enabledFeatures, IEnumerable<ShellParameter> parameters)
 		{
-			return Task.get_CompletedTask();
+			return Task.CompletedTask;
 		}
 	}
 }

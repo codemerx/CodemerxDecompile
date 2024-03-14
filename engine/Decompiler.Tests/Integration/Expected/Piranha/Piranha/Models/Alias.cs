@@ -47,17 +47,10 @@ namespace Piranha.Models
 			set;
 		}
 
-		public RedirectType Type
-		{
-			get;
-			set;
-		}
+		public RedirectType Type { get; set; } = RedirectType.Temporary;
 
 		public Alias()
 		{
-			this.u003cTypeu003ek__BackingField = 1;
-			base();
-			return;
 		}
 	}
 }

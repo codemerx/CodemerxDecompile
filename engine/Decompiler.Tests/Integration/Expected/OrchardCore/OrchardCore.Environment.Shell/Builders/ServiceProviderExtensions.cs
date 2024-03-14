@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,29 +11,73 @@ namespace OrchardCore.Environment.Shell.Builders
 	{
 		public static IServiceCollection CreateChildContainer(this IServiceProvider serviceProvider, IServiceCollection serviceCollection)
 		{
-			V_0 = new ServiceProviderExtensions.u003cu003ec__DisplayClass0_0();
-			V_0.serviceProvider = serviceProvider;
-			V_1 = new ServiceCollection();
-			stackVariable4 = serviceCollection;
-			stackVariable5 = ServiceProviderExtensions.u003cu003ec.u003cu003e9__0_0;
-			if (stackVariable5 == null)
+			IServiceCollection serviceCollection1 = new ServiceCollection();
+			foreach (IGrouping<Type, ServiceDescriptor> types in 
+				from s in serviceCollection
+				group s by s.get_ServiceType())
 			{
-				dummyVar0 = stackVariable5;
-				stackVariable5 = new Func<ServiceDescriptor, Type>(ServiceProviderExtensions.u003cu003ec.u003cu003e9.u003cCreateChildContaineru003eb__0_0);
-				ServiceProviderExtensions.u003cu003ec.u003cu003e9__0_0 = stackVariable5;
-			}
-			V_2 = stackVariable4.GroupBy<ServiceDescriptor, Type>(stackVariable5).GetEnumerator();
-			try
-			{
-				while (V_2.MoveNext())
+				if (types.Key == typeof(IStartupFilter))
 				{
-					V_3 = V_2.get_Current();
-					if (Type.op_Equality(V_3.get_Key(), Type.GetTypeFromHandle(// 
-					// Current member / type: Microsoft.Extensions.DependencyInjection.IServiceCollection OrchardCore.Environment.Shell.Builders.ServiceProviderExtensions::CreateChildContainer(System.IServiceProvider,Microsoft.Extensions.DependencyInjection.IServiceCollection)
-					// Exception in: Microsoft.Extensions.DependencyInjection.IServiceCollection CreateChildContainer(System.IServiceProvider,Microsoft.Extensions.DependencyInjection.IServiceCollection)
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
+					continue;
+				}
+				if (types.Key.IsGenericTypeDefinition)
+				{
+					foreach (ServiceDescriptor serviceDescriptor in types)
+					{
+						serviceCollection1.Add(serviceDescriptor);
+					}
+				}
+				else if (types.Count<ServiceDescriptor>() == 1)
+				{
+					ServiceDescriptor serviceDescriptor1 = types.First<ServiceDescriptor>();
+					if (serviceDescriptor1.get_Lifetime() != null)
+					{
+						serviceCollection1.Add(serviceDescriptor1);
+					}
+					else if (typeof(IDisposable).IsAssignableFrom(ServiceDescriptorExtensions.GetImplementationType(serviceDescriptor1)) || serviceDescriptor1.get_ImplementationFactory() != null)
+					{
+						serviceCollection1.CloneSingleton(serviceDescriptor1, serviceProvider.GetService(serviceDescriptor1.get_ServiceType()));
+					}
+					else
+					{
+						serviceCollection1.CloneSingleton(serviceDescriptor1, (IServiceProvider sp) => serviceProvider.GetService(serviceDescriptor1.get_ServiceType()));
+					}
+				}
+				else if (types.All<ServiceDescriptor>((ServiceDescriptor s) => s.get_Lifetime() != 0))
+				{
+					foreach (ServiceDescriptor serviceDescriptor2 in types)
+					{
+						serviceCollection1.Add(serviceDescriptor2);
+					}
+				}
+				else if (!types.All<ServiceDescriptor>((ServiceDescriptor s) => s.get_Lifetime() == 0))
+				{
+					using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(serviceProvider))
+					{
+						IEnumerable<object> services = ServiceProviderServiceExtensions.GetServices(serviceScope.get_ServiceProvider(), types.Key);
+						for (int i = 0; i < types.Count<ServiceDescriptor>(); i++)
+						{
+							if (types.ElementAt<ServiceDescriptor>(i).get_Lifetime() != null)
+							{
+								serviceCollection1.Add(types.ElementAt<ServiceDescriptor>(i));
+							}
+							else
+							{
+								serviceCollection1.CloneSingleton(types.ElementAt<ServiceDescriptor>(i), services.ElementAt<object>(i));
+							}
+						}
+					}
+				}
+				else
+				{
+					IEnumerable<object> objs = ServiceProviderServiceExtensions.GetServices(serviceProvider, types.Key);
+					for (int j = 0; j < types.Count<ServiceDescriptor>(); j++)
+					{
+						serviceCollection1.CloneSingleton(types.ElementAt<ServiceDescriptor>(j), objs.ElementAt<object>(j));
+					}
+				}
+			}
+			return serviceCollection1;
+		}
 	}
 }

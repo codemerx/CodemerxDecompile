@@ -8,34 +8,32 @@ namespace Piranha.Extend.Serializers
 	{
 		public VideoFieldSerializer()
 		{
-			base();
-			return;
 		}
 
 		public object Deserialize(string str)
 		{
-			stackVariable0 = new VideoField();
+			Guid? nullable;
+			VideoField videoField = new VideoField();
 			if (!String.IsNullOrEmpty(str))
 			{
-				stackVariable5 = new Guid?(new Guid(str));
+				nullable = new Guid?(new Guid(str));
 			}
 			else
 			{
-				V_0 = null;
-				stackVariable5 = V_0;
+				nullable = null;
 			}
-			stackVariable0.set_Id(stackVariable5);
-			return stackVariable0;
+			videoField.Id = nullable;
+			return videoField;
 		}
 
 		public string Serialize(object obj)
 		{
-			V_0 = obj as VideoField;
-			if (V_0 == null)
+			VideoField videoField = obj as VideoField;
+			if (videoField == null)
 			{
 				throw new ArgumentException("The given object doesn't match the serialization type");
 			}
-			return V_0.get_Id().ToString();
+			return videoField.Id.ToString();
 		}
 	}
 }

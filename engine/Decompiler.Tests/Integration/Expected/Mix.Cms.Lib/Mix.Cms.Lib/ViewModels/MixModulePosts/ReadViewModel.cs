@@ -1,13 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixModules;
 using Mix.Cms.Lib.ViewModels.MixPosts;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -120,74 +124,107 @@ namespace Mix.Cms.Lib.ViewModels.MixModulePosts
 			set;
 		}
 
-		public ReadViewModel(MixModulePost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixModulePost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.ReadListItemViewModel>.Repository;
-			V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPosts.ReadListItemViewModel> singleModel = ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.ReadListItemViewModel>.Repository.GetSingleModel((MixPost p) => p.Id == this.PostId && p.Specificulture == this.Specificulture, _context, _transaction);
+			if (singleModel.get_IsSucceed())
+			{
+				this.Post = singleModel.get_Data();
+			}
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel> repositoryResponse = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel>.Repository.GetSingleModel((MixModule p) => p.Id == this.ModuleId && p.Specificulture == this.Specificulture, _context, _transaction);
+			if (repositoryResponse.get_IsSucceed())
+			{
+				this.Module = repositoryResponse.get_Data();
+			}
+		}
 
 		public static RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> GetModulePostNavAsync(int postId, string specificulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel.u003cu003ec__DisplayClass64_0();
-			V_0.specificulture = specificulture;
-			V_0.postId = postId;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			stackVariable10 = V_0._context;
-			if (stackVariable10 == null)
-			{
-				dummyVar0 = stackVariable10;
-				stackVariable10 = new MixCmsContext();
-			}
-			V_1 = stackVariable10;
-			stackVariable12 = V_0._transaction;
-			if (stackVariable12 == null)
-			{
-				dummyVar1 = stackVariable12;
-				stackVariable12 = V_1.get_Database().BeginTransaction();
-			}
-			V_2 = stackVariable12;
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> repositoryResponse;
+			Func<MixModulePost, bool> func1 = null;
+			MixCmsContext mixCmsContext = _context ?? new MixCmsContext();
+			IDbContextTransaction dbContextTransaction = _transaction ?? mixCmsContext.get_Database().BeginTransaction();
 			try
 			{
 				try
 				{
-					stackVariable14 = V_1.get_MixModule();
-					V_4 = Expression.Parameter(Type.GetTypeFromHandle(// 
-					// Current member / type: Mix.Domain.Core.ViewModels.RepositoryResponse`1<System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel::GetModulePostNavAsync(System.Int32,System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Exception in: Mix.Domain.Core.ViewModels.RepositoryResponse<System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> GetModulePostNavAsync(System.Int32,System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
+					IEnumerable<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel> readViewModels = (
+						from a in EntityFrameworkQueryableExtensions.Include<MixModule, ICollection<MixModulePost>>(mixCmsContext.MixModule, (MixModule cp) => cp.MixModulePost)
+						where a.Specificulture == specificulture && (a.Type == 2 || a.Type == 6)
+						select a).AsEnumerable<MixModule>().Select<MixModule, Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>((MixModule p) => {
+						Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel readViewModel = new Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel(new MixModulePost()
+						{
+							PostId = postId,
+							ModuleId = p.Id,
+							Specificulture = specificulture
+						}, _context, _transaction);
+						ICollection<MixModulePost> mixModulePost = p.MixModulePost;
+						Func<MixModulePost, bool> u003cu003e9_3 = func1;
+						if (u003cu003e9_3 == null)
+						{
+							Func<MixModulePost, bool> func2 = (MixModulePost cp) => {
+								if (cp.PostId != postId)
+								{
+									return false;
+								}
+								return cp.Specificulture == specificulture;
+							};
+							Func<MixModulePost, bool> func = func2;
+							func1 = func2;
+							u003cu003e9_3 = func;
+						}
+						readViewModel.IsActived = mixModulePost.Any<MixModulePost>(u003cu003e9_3);
+						readViewModel.Description = p.Title;
+						return readViewModel;
+					});
+					RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> repositoryResponse1 = new RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>>();
+					repositoryResponse1.set_IsSucceed(true);
+					repositoryResponse1.set_Data(readViewModels.ToList<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>());
+					repositoryResponse = repositoryResponse1;
+				}
+				catch (Exception exception1)
+				{
+					Exception exception = exception1;
+					if (_transaction == null)
+					{
+						dbContextTransaction.Rollback();
+					}
+					RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> repositoryResponse2 = new RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>>();
+					repositoryResponse2.set_IsSucceed(true);
+					repositoryResponse2.set_Data(null);
+					repositoryResponse2.set_Exception(exception);
+					repositoryResponse = repositoryResponse2;
+				}
+			}
+			finally
+			{
+				if (_context == null)
+				{
+					dbContextTransaction.Dispose();
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
+				}
+			}
+			return repositoryResponse;
+		}
 
 		public override MixModulePost ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				stackVariable7 = ViewModelBase<MixCmsContext, MixModulePost, Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>.Repository;
-				V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixModulePost Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixModulePost ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixModulePost, Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>.Repository.Max((MixModulePost c) => c.Id, _context, _transaction).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 	}
 }

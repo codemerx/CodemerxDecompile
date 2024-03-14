@@ -13,60 +13,54 @@ namespace Telerik.JustDecompiler.External
 		{
 			get
 			{
-				return get_MetadataToken();
+				return JustDecompileGenerated_get_MetadataToken();
 			}
 			set
 			{
-				set_MetadataToken(value);
+				JustDecompileGenerated_set_MetadataToken(value);
 			}
 		}
 
-		// <MetadataToken>k__BackingField
-		private int u003cMetadataTokenu003ek__BackingField;
+		private int JustDecompileGenerated_MetadataToken_k__BackingField;
 
-		public int get_MetadataToken()
+		public int JustDecompileGenerated_get_MetadataToken()
 		{
-			return this.u003cMetadataTokenu003ek__BackingField;
+			return this.JustDecompileGenerated_MetadataToken_k__BackingField;
 		}
 
-		private void set_MetadataToken(int value)
+		private void JustDecompileGenerated_set_MetadataToken(int value)
 		{
-			this.u003cMetadataTokenu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_MetadataToken_k__BackingField = value;
 		}
 
 		public string ModuleFilePath
 		{
 			get
 			{
-				return get_ModuleFilePath();
+				return JustDecompileGenerated_get_ModuleFilePath();
 			}
 			set
 			{
-				set_ModuleFilePath(value);
+				JustDecompileGenerated_set_ModuleFilePath(value);
 			}
 		}
 
-		// <ModuleFilePath>k__BackingField
-		private string u003cModuleFilePathu003ek__BackingField;
+		private string JustDecompileGenerated_ModuleFilePath_k__BackingField;
 
-		public string get_ModuleFilePath()
+		public string JustDecompileGenerated_get_ModuleFilePath()
 		{
-			return this.u003cModuleFilePathu003ek__BackingField;
+			return this.JustDecompileGenerated_ModuleFilePath_k__BackingField;
 		}
 
-		private void set_ModuleFilePath(string value)
+		private void JustDecompileGenerated_set_ModuleFilePath(string value)
 		{
-			this.u003cModuleFilePathu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_ModuleFilePath_k__BackingField = value;
 		}
 
 		public UniqueMemberIdentifier(string moduleFilePath, int metadataToken)
 		{
-			base();
-			this.set_ModuleFilePath(moduleFilePath);
-			this.set_MetadataToken(metadataToken);
-			return;
+			this.ModuleFilePath = moduleFilePath;
+			this.MetadataToken = metadataToken;
 		}
 	}
 }

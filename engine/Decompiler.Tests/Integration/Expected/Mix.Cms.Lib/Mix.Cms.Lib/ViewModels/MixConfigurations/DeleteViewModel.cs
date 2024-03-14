@@ -98,14 +98,10 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 
 		public DeleteViewModel()
 		{
-			base();
-			return;
 		}
 
-		public DeleteViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public DeleteViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 	}
 }

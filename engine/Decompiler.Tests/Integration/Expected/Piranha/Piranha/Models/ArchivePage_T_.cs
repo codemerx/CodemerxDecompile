@@ -11,8 +11,6 @@ namespace Piranha.Models
 	{
 		public ArchivePage()
 		{
-			base();
-			return;
 		}
 	}
 }

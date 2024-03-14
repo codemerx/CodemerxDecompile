@@ -7,8 +7,6 @@ namespace Piranha.Models
 	{
 		public PageInfo()
 		{
-			base();
-			return;
 		}
 	}
 }

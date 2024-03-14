@@ -19,26 +19,24 @@ namespace Telerik.JustDecompiler.Decompiler
 		{
 			get
 			{
-				return get_FieldAssignmentData();
+				return JustDecompileGenerated_get_FieldAssignmentData();
 			}
 			set
 			{
-				set_FieldAssignmentData(value);
+				JustDecompileGenerated_set_FieldAssignmentData(value);
 			}
 		}
 
-		// <FieldAssignmentData>k__BackingField
-		private Dictionary<FieldDefinition, AssignmentType> u003cFieldAssignmentDatau003ek__BackingField;
+		private Dictionary<FieldDefinition, AssignmentType> JustDecompileGenerated_FieldAssignmentData_k__BackingField;
 
-		public Dictionary<FieldDefinition, AssignmentType> get_FieldAssignmentData()
+		public Dictionary<FieldDefinition, AssignmentType> JustDecompileGenerated_get_FieldAssignmentData()
 		{
-			return this.u003cFieldAssignmentDatau003ek__BackingField;
+			return this.JustDecompileGenerated_FieldAssignmentData_k__BackingField;
 		}
 
-		public void set_FieldAssignmentData(Dictionary<FieldDefinition, AssignmentType> value)
+		public void JustDecompileGenerated_set_FieldAssignmentData(Dictionary<FieldDefinition, AssignmentType> value)
 		{
-			this.u003cFieldAssignmentDatau003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_FieldAssignmentData_k__BackingField = value;
 		}
 
 		public FieldDefinition StateField
@@ -55,12 +53,10 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public AsyncData(FieldDefinition stateField, HashSet<VariableReference> awaiterVariables, Dictionary<VariableReference, FieldReference> variableToFieldMap)
 		{
-			base();
-			this.set_StateField(stateField);
-			this.set_AwaiterVariables(awaiterVariables);
-			this.set_VariableToFieldMap(variableToFieldMap);
-			this.set_FieldAssignmentData(new Dictionary<FieldDefinition, AssignmentType>());
-			return;
+			this.StateField = stateField;
+			this.AwaiterVariables = awaiterVariables;
+			this.VariableToFieldMap = variableToFieldMap;
+			this.FieldAssignmentData = new Dictionary<FieldDefinition, AssignmentType>();
 		}
 	}
 }

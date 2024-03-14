@@ -134,13 +134,11 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixAttributeSet()
 		{
-			base();
-			this.set_MixAttributeFieldAttributeSet(new HashSet<MixAttributeField>());
-			this.set_MixAttributeFieldReference(new HashSet<MixAttributeField>());
-			this.set_MixAttributeSetData(new HashSet<Mix.Cms.Lib.Models.Cms.MixAttributeSetData>());
-			this.set_MixAttributeSetReference(new HashSet<Mix.Cms.Lib.Models.Cms.MixAttributeSetReference>());
-			this.set_MixRelatedAttributeSet(new HashSet<Mix.Cms.Lib.Models.Cms.MixRelatedAttributeSet>());
-			return;
+			this.MixAttributeFieldAttributeSet = new HashSet<MixAttributeField>();
+			this.MixAttributeFieldReference = new HashSet<MixAttributeField>();
+			this.MixAttributeSetData = new HashSet<Mix.Cms.Lib.Models.Cms.MixAttributeSetData>();
+			this.MixAttributeSetReference = new HashSet<Mix.Cms.Lib.Models.Cms.MixAttributeSetReference>();
+			this.MixRelatedAttributeSet = new HashSet<Mix.Cms.Lib.Models.Cms.MixRelatedAttributeSet>();
 		}
 	}
 }

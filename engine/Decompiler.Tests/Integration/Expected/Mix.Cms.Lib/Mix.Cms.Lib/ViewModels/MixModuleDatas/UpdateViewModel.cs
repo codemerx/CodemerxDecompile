@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
 using Mix.Domain.Data.ViewModels;
@@ -9,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -45,11 +47,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 		}
 
 		[JsonProperty("fields")]
-		public string Fields
-		{
-			get;
-			set;
-		}
+		public string Fields { get; set; } = "[]";
 
 		[JsonProperty("id")]
 		public string Id
@@ -137,134 +135,135 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 
 		public UpdateViewModel()
 		{
-			this.u003cFieldsu003ek__BackingField = "[]";
-			base();
-			return;
 		}
 
-		public UpdateViewModel(MixModuleData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixModuleData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cFieldsu003ek__BackingField = "[]";
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable2 = this.get_Fields();
-			if (stackVariable2 == null)
+			List<ApiModuleDataValueViewModel> apiModuleDataValueViewModels;
+			object obj;
+			object fields = this.Fields;
+			if (fields == null)
 			{
-				dummyVar0 = stackVariable2;
-				stackVariable57 = _context.get_MixModule();
-				V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixModuleDatas.UpdateViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				MixModule mixModule = _context.MixModule.First<MixModule>((MixModule m) => m.Id == this.ModuleId && m.Specificulture == this.Specificulture);
+				if (mixModule != null)
+				{
+					fields = mixModule.Fields;
+				}
+				else
+				{
+					fields = null;
+				}
+			}
+			this.Fields = (string)fields;
+			if (this.Fields == null)
+			{
+				apiModuleDataValueViewModels = null;
+			}
+			else
+			{
+				apiModuleDataValueViewModels = JsonConvert.DeserializeObject<List<ApiModuleDataValueViewModel>>(this.Fields);
+			}
+			this.DataProperties = apiModuleDataValueViewModels;
+			this.JItem = (this.Value == null ? this.InitValue() : JsonConvert.DeserializeObject<JObject>(this.Value));
+			foreach (ApiModuleDataValueViewModel dataProperty in this.DataProperties)
+			{
+				this.JItem.set_Item(dataProperty.Name, Helper.ParseValue(this.JItem, dataProperty));
+				if (this.JItem.get_Item(dataProperty.Name) != null)
+				{
+					continue;
+				}
+				JObject jItem = this.JItem;
+				string name = dataProperty.Name;
+				JObject jObject = new JObject();
+				jObject.Add(new JProperty("dataType", (object)dataProperty.DataType));
+				JToken item = this.JItem.get_Item(dataProperty.Name);
+				if (item != null)
+				{
+					obj = Newtonsoft.Json.Linq.Extensions.Value<JObject>(item).Value<string>("value");
+				}
+				else
+				{
+					obj = null;
+				}
+				jObject.Add(new JProperty("value", obj));
+				jItem.set_Item(name, jObject);
+			}
+		}
 
 		public ApiModuleDataValueViewModel GetDataProperty(string name)
 		{
-			V_0 = new UpdateViewModel.u003cu003ec__DisplayClass76_0();
-			V_0.name = name;
-			return this.get_DataProperties().FirstOrDefault<ApiModuleDataValueViewModel>(new Func<ApiModuleDataValueViewModel, bool>(V_0.u003cGetDataPropertyu003eb__0));
+			return this.DataProperties.FirstOrDefault<ApiModuleDataValueViewModel>((ApiModuleDataValueViewModel p) => p.Name == name);
 		}
 
 		public string GetStringValue(string name)
 		{
-			V_0 = new UpdateViewModel.u003cu003ec__DisplayClass75_0();
-			V_0.name = name;
-			V_1 = this.get_DataProperties().FirstOrDefault<ApiModuleDataValueViewModel>(new Func<ApiModuleDataValueViewModel, bool>(V_0.u003cGetStringValueu003eb__0));
-			if (V_1 == null || V_1.get_Value() == null)
+			ApiModuleDataValueViewModel apiModuleDataValueViewModel = this.DataProperties.FirstOrDefault<ApiModuleDataValueViewModel>((ApiModuleDataValueViewModel p) => p.Name == name);
+			if (apiModuleDataValueViewModel == null || apiModuleDataValueViewModel.Value == null)
 			{
 				return string.Empty;
 			}
-			return V_1.get_Value().ToString();
+			return apiModuleDataValueViewModel.Value.ToString();
 		}
 
 		public JObject InitValue()
 		{
-			V_0 = new JObject();
-			V_1 = this.get_DataProperties().GetEnumerator();
-			try
+			JObject jObject = new JObject();
+			foreach (ApiModuleDataValueViewModel dataProperty in this.DataProperties)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_3 = new JObject();
-					V_3.Add(new JProperty("dataType", (object)V_2.get_DataType()));
-					V_3.Add(new JProperty("value", V_2.get_Value()));
-					V_0.Add(new JProperty(CommonHelper.ParseJsonPropertyName(V_2.get_Name()), V_3));
-				}
+				JObject jObject1 = new JObject();
+				jObject1.Add(new JProperty("dataType", (object)dataProperty.DataType));
+				jObject1.Add(new JProperty("value", dataProperty.Value));
+				jObject.Add(new JProperty(CommonHelper.ParseJsonPropertyName(dataProperty.Name), jObject1));
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return jObject;
 		}
 
 		public override MixModuleData ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (string.IsNullOrEmpty(this.get_Id()))
+			if (string.IsNullOrEmpty(this.Id))
 			{
-				this.set_Id(Guid.NewGuid().ToString());
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
+				this.Id = Guid.NewGuid().ToString();
+				this.CreatedDateTime = DateTime.UtcNow;
 			}
-			this.set_LastModified(new DateTime?(DateTime.get_UtcNow()));
-			this.set_Value(JsonConvert.SerializeObject(this.get_JItem()));
-			this.set_Fields(JsonConvert.SerializeObject(this.get_DataProperties()));
-			return this.ParseModel(_context, _transaction);
+			this.LastModified = new DateTime?(DateTime.UtcNow);
+			this.Value = JsonConvert.SerializeObject(this.JItem);
+			this.Fields = JsonConvert.SerializeObject(this.DataProperties);
+			return base.ParseModel(_context, _transaction);
 		}
 
 		public string ParseObjectValue()
 		{
-			V_0 = new JObject();
-			V_1 = this.get_DataProperties().GetEnumerator();
-			try
+			JObject jObject = new JObject();
+			foreach (ApiModuleDataValueViewModel dataProperty in this.DataProperties)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_3 = new JObject();
-					V_3.Add(new JProperty("dataType", (object)V_2.get_DataType()));
-					V_3.Add(new JProperty("value", V_2.get_Value()));
-					V_0.Add(new JProperty(CommonHelper.ParseJsonPropertyName(V_2.get_Name()), V_3));
-				}
+				JObject jObject1 = new JObject();
+				jObject1.Add(new JProperty("dataType", (object)dataProperty.DataType));
+				jObject1.Add(new JProperty("value", dataProperty.Value));
+				jObject.Add(new JProperty(CommonHelper.ParseJsonPropertyName(dataProperty.Name), jObject1));
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0.ToString(0, Array.Empty<JsonConverter>());
+			return jObject.ToString(0, Array.Empty<JsonConverter>());
 		}
 
 		public override void Validate(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.Validate(_context, _transaction);
-			if (this.get_IsValid())
+			base.Validate(_context, _transaction);
+			if (base.get_IsValid())
 			{
-				V_0 = this.get_DataProperties().GetEnumerator();
-				try
+				foreach (ApiModuleDataValueViewModel dataProperty in this.DataProperties)
 				{
-					while (V_0.MoveNext())
+					RepositoryResponse<bool> repositoryResponse = dataProperty.Validate<MixModuleData>(this.Id, this.Specificulture, this.JItem, _context, _transaction);
+					if (repositoryResponse.get_IsSucceed())
 					{
-						V_1 = V_0.get_Current().Validate<MixModuleData>(this.get_Id(), this.get_Specificulture(), this.get_JItem(), _context, _transaction);
-						if (V_1.get_IsSucceed())
-						{
-							continue;
-						}
-						this.set_IsValid(false);
-						this.get_Errors().AddRange(V_1.get_Errors());
+						continue;
 					}
-				}
-				finally
-				{
-					((IDisposable)V_0).Dispose();
+					base.set_IsValid(false);
+					base.get_Errors().AddRange(repositoryResponse.get_Errors());
 				}
 			}
-			return;
 		}
 	}
 }

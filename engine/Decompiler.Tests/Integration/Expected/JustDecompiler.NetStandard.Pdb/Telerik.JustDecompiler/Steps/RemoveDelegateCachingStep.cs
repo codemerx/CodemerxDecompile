@@ -1,7 +1,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
+using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -23,41 +26,39 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RemoveDelegateCachingStep()
 		{
-			base();
-			return;
 		}
 
 		private bool CheckFieldCaching(IfStatement theIf)
 		{
-			V_0 = theIf.get_Condition() as BinaryExpression;
-			if (V_0.get_Operator() != 9 || V_0.get_Right().get_CodeNodeType() != 22 || (V_0.get_Right() as LiteralExpression).get_Value() != null)
+			BinaryExpression condition = theIf.Condition as BinaryExpression;
+			if (condition.Operator != BinaryOperator.ValueEquality || condition.Right.CodeNodeType != CodeNodeType.LiteralExpression || (condition.Right as LiteralExpression).Value != null)
 			{
 				return false;
 			}
-			V_1 = (V_0.get_Left() as FieldReferenceExpression).get_Field().Resolve();
-			if (V_1 == null || !V_1.get_IsStatic() || !V_1.get_IsPrivate())
+			FieldDefinition right = (condition.Left as FieldReferenceExpression).Field.Resolve();
+			if (right == null || !right.get_IsStatic() || !right.get_IsPrivate())
 			{
 				return false;
 			}
-			V_2 = (theIf.get_Then().get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_2 == null || !V_2.get_IsAssignmentExpression() || V_2.get_Left().get_CodeNodeType() != 30 || (object)(V_2.get_Left() as FieldReferenceExpression).get_Field().Resolve() != (object)V_1)
+			BinaryExpression expression = (theIf.Then.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
+			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || (object)(expression.Left as FieldReferenceExpression).Field.Resolve() != (object)right)
 			{
 				return false;
 			}
-			if (this.fieldToReplacingExpressionMap.ContainsKey(V_1))
+			if (this.fieldToReplacingExpressionMap.ContainsKey(right))
 			{
 				throw new Exception("A caching field cannot be assigned more than once.");
 			}
-			if (!V_1.IsCompilerGenerated(true))
+			if (!right.IsCompilerGenerated(true))
 			{
 				return false;
 			}
-			V_3 = V_1.get_FieldType().Resolve();
-			if (V_3 == null || V_3.get_BaseType() == null || String.op_Inequality(V_3.get_BaseType().get_FullName(), "System.MulticastDelegate"))
+			TypeDefinition typeDefinition = right.get_FieldType().Resolve();
+			if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 			{
 				return false;
 			}
-			this.fieldToReplacingExpressionMap.set_Item(V_1, V_2.get_Right());
+			this.fieldToReplacingExpressionMap[right] = expression.Right;
 			return true;
 		}
 
@@ -67,12 +68,12 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			V_0 = theIf.get_Condition() as BinaryExpression;
-			if (V_0.get_Left().get_CodeNodeType() == 30)
+			BinaryExpression condition = theIf.Condition as BinaryExpression;
+			if (condition.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 			{
 				return this.CheckFieldCaching(theIf);
 			}
-			if (V_0.get_Left().get_CodeNodeType() != 26)
+			if (condition.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return false;
 			}
@@ -81,48 +82,48 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckIfStatementStructure(IfStatement theIf)
 		{
-			if (theIf.get_Else() == null && theIf.get_Condition().get_CodeNodeType() == 24)
+			if (theIf.Else == null && theIf.Condition.CodeNodeType == CodeNodeType.BinaryExpression)
 			{
-				if (theIf.get_Then().get_Statements().get_Count() == 1 && theIf.get_Then().get_Statements().get_Item(0).get_CodeNodeType() == 5)
+				if (theIf.Then.Statements.Count == 1 && theIf.Then.Statements[0].CodeNodeType == CodeNodeType.ExpressionStatement)
 				{
-					this.cachingVersion = 0;
+					this.cachingVersion = RemoveDelegateCachingStep.DelegateCachingVersion.V1;
 					return true;
 				}
-				if (theIf.get_Then().get_Statements().get_Count() == 3)
+				if (theIf.Then.Statements.Count == 3)
 				{
-					V_0 = theIf.get_Then().get_Statements().get_Item(0) as ExpressionStatement;
-					if (V_0 == null)
+					ExpressionStatement item = theIf.Then.Statements[0] as ExpressionStatement;
+					if (item == null)
 					{
 						return false;
 					}
-					V_1 = V_0.get_Expression() as BinaryExpression;
-					if (V_1 == null)
+					BinaryExpression expression = item.Expression as BinaryExpression;
+					if (expression == null)
 					{
 						return false;
 					}
-					if (!V_1.get_IsAssignmentExpression() || V_1.get_Left().get_CodeNodeType() != 26 || V_1.get_Right().get_CodeNodeType() != 26 || !this.initializationsToRemove.ContainsKey((V_1.get_Right() as VariableReferenceExpression).get_Variable()))
+					if (!expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || expression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || !this.initializationsToRemove.ContainsKey((expression.Right as VariableReferenceExpression).Variable))
 					{
 						return false;
 					}
-					if (theIf.get_Then().get_Statements().get_Item(1).get_CodeNodeType() != 5)
+					if (theIf.Then.Statements[1].CodeNodeType != CodeNodeType.ExpressionStatement)
 					{
 						return false;
 					}
-					V_2 = theIf.get_Then().get_Statements().get_Item(2) as ExpressionStatement;
-					if (V_2 == null)
+					ExpressionStatement expressionStatement = theIf.Then.Statements[2] as ExpressionStatement;
+					if (expressionStatement == null)
 					{
 						return false;
 					}
-					V_3 = V_2.get_Expression() as BinaryExpression;
-					if (V_3 == null)
+					BinaryExpression binaryExpression = expressionStatement.Expression as BinaryExpression;
+					if (binaryExpression == null)
 					{
 						return false;
 					}
-					if (!V_3.get_IsAssignmentExpression() || V_3.get_Left().get_CodeNodeType() != 30 || V_3.get_Right().get_CodeNodeType() != 26 || !this.initializationsToRemove.ContainsKey((V_3.get_Right() as VariableReferenceExpression).get_Variable()))
+					if (!binaryExpression.IsAssignmentExpression || binaryExpression.Left.CodeNodeType != CodeNodeType.FieldReferenceExpression || binaryExpression.Right.CodeNodeType != CodeNodeType.VariableReferenceExpression || !this.initializationsToRemove.ContainsKey((binaryExpression.Right as VariableReferenceExpression).Variable))
 					{
 						return false;
 					}
-					this.cachingVersion = 1;
+					this.cachingVersion = RemoveDelegateCachingStep.DelegateCachingVersion.V2;
 					return true;
 				}
 			}
@@ -131,40 +132,32 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool CheckVariableCaching(IfStatement theIf)
 		{
-			V_0 = theIf.get_Condition() as BinaryExpression;
-			if (V_0.get_Operator() != 9 || V_0.get_Right().get_CodeNodeType() != 22 || (V_0.get_Right() as LiteralExpression).get_Value() != null)
+			BinaryExpression condition = theIf.Condition as BinaryExpression;
+			if (condition.Operator != BinaryOperator.ValueEquality || condition.Right.CodeNodeType != CodeNodeType.LiteralExpression || (condition.Right as LiteralExpression).Value != null)
 			{
 				return false;
 			}
-			V_1 = (V_0.get_Left() as VariableReferenceExpression).get_Variable();
-			if (!this.initializationsToRemove.ContainsKey(V_1))
+			VariableReference variable = (condition.Left as VariableReferenceExpression).Variable;
+			if (!this.initializationsToRemove.ContainsKey(variable))
 			{
 				return false;
 			}
-			if (this.cachingVersion == RemoveDelegateCachingStep.DelegateCachingVersion.V1)
-			{
-				stackVariable25 = 0;
-			}
-			else
-			{
-				stackVariable25 = 1;
-			}
-			V_2 = stackVariable25;
-			V_3 = (theIf.get_Then().get_Statements().get_Item(V_2) as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (V_3 == null || !V_3.get_IsAssignmentExpression() || V_3.get_Left().get_CodeNodeType() != 26 || (object)(V_3.get_Left() as VariableReferenceExpression).get_Variable() != (object)V_1)
+			int num = (this.cachingVersion == RemoveDelegateCachingStep.DelegateCachingVersion.V1 ? 0 : 1);
+			BinaryExpression expression = (theIf.Then.Statements[num] as ExpressionStatement).Expression as BinaryExpression;
+			if (expression == null || !expression.IsAssignmentExpression || expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression || (object)(expression.Left as VariableReferenceExpression).Variable != (object)variable)
 			{
 				return false;
 			}
-			if (this.variableToReplacingExpressionMap.ContainsKey(V_1))
+			if (this.variableToReplacingExpressionMap.ContainsKey(variable))
 			{
 				throw new Exception("A caching variable cannot be assigned more than once.");
 			}
-			V_4 = V_1.get_VariableType().Resolve();
-			if (V_4 == null || V_4.get_BaseType() == null || String.op_Inequality(V_4.get_BaseType().get_FullName(), "System.MulticastDelegate"))
+			TypeDefinition typeDefinition = variable.get_VariableType().Resolve();
+			if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 			{
 				return false;
 			}
-			this.variableToReplacingExpressionMap.set_Item(V_1, V_3.get_Right());
+			this.variableToReplacingExpressionMap[variable] = expression.Right;
 			return true;
 		}
 
@@ -174,35 +167,35 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			V_0 = node.get_Expression() as BinaryExpression;
-			if (V_0.get_Left().get_CodeNodeType() != 26)
+			BinaryExpression expression = node.Expression as BinaryExpression;
+			if (expression.Left.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return false;
 			}
-			V_1 = V_0.get_Right();
-			if (V_1.get_CodeNodeType() == 31)
+			Expression right = expression.Right;
+			if (right.CodeNodeType == CodeNodeType.ExplicitCastExpression)
 			{
-				V_1 = (V_1 as ExplicitCastExpression).get_Expression();
+				right = (right as ExplicitCastExpression).Expression;
 			}
-			if (V_1.get_CodeNodeType() != 22 || (V_1 as LiteralExpression).get_Value() != null && V_1.get_CodeNodeType() != 30)
+			if ((right.CodeNodeType != CodeNodeType.LiteralExpression || (right as LiteralExpression).Value != null) && right.CodeNodeType != CodeNodeType.FieldReferenceExpression)
 			{
 				return false;
 			}
-			if (V_1.get_CodeNodeType() == 30)
+			if (right.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 			{
-				V_2 = V_1 as FieldReferenceExpression;
-				V_3 = V_2.get_ExpressionType().Resolve();
-				if (V_3 == null || V_3.get_BaseType() == null || String.op_Inequality(V_3.get_BaseType().get_FullName(), "System.MulticastDelegate"))
+				FieldReferenceExpression fieldReferenceExpression = right as FieldReferenceExpression;
+				TypeDefinition typeDefinition = fieldReferenceExpression.ExpressionType.Resolve();
+				if (typeDefinition == null || typeDefinition.get_BaseType() == null || typeDefinition.get_BaseType().get_FullName() != "System.MulticastDelegate")
 				{
 					return false;
 				}
-				V_4 = V_2.get_Field().Resolve();
-				if ((object)V_4.get_DeclaringType() != (object)this.context.get_MethodContext().get_Method().get_DeclaringType() && !V_4.get_DeclaringType().IsNestedIn(this.context.get_MethodContext().get_Method().get_DeclaringType()) || !V_4.get_DeclaringType().IsCompilerGenerated())
+				FieldDefinition fieldDefinition = fieldReferenceExpression.Field.Resolve();
+				if ((object)fieldDefinition.get_DeclaringType() != (object)this.context.MethodContext.Method.get_DeclaringType() && !fieldDefinition.get_DeclaringType().IsNestedIn(this.context.MethodContext.Method.get_DeclaringType()) || !fieldDefinition.get_DeclaringType().IsCompilerGenerated())
 				{
 					return false;
 				}
 			}
-			this.initializationsToRemove.set_Item((V_0.get_Left() as VariableReferenceExpression).get_Variable(), node);
+			this.initializationsToRemove[(expression.Left as VariableReferenceExpression).Variable] = node;
 			return true;
 		}
 
@@ -217,66 +210,52 @@ namespace Telerik.JustDecompiler.Steps
 			this.fieldToReplacingExpressionMap = new Dictionary<FieldDefinition, Expression>();
 			this.variableToReplacingExpressionMap = new Dictionary<VariableReference, Expression>();
 			this.initializationsToRemove = new Dictionary<VariableReference, Statement>();
-			stackVariable11 = (BlockStatement)this.Visit(body);
+			BlockStatement blockStatement = (BlockStatement)this.Visit(body);
 			this.ProcessInitializations();
-			return stackVariable11;
+			return blockStatement;
 		}
 
 		protected virtual void ProcessInitializations()
 		{
 			this.RemoveInitializations();
-			return;
 		}
 
 		protected void RemoveInitializations()
 		{
-			V_0 = this.initializationsToRemove.GetEnumerator();
-			try
+			foreach (KeyValuePair<VariableReference, Statement> keyValuePair in this.initializationsToRemove)
 			{
-				while (V_0.MoveNext())
+				if (!this.variableToReplacingExpressionMap.ContainsKey(keyValuePair.Key))
 				{
-					V_1 = V_0.get_Current();
-					if (!this.variableToReplacingExpressionMap.ContainsKey(V_1.get_Key()))
-					{
-						continue;
-					}
-					stackVariable15 = V_1.get_Value().get_Parent() as BlockStatement;
-					if (stackVariable15 == null)
-					{
-						throw new Exception("Invalid parent statement.");
-					}
-					dummyVar0 = this.context.get_MethodContext().get_Variables().Remove(V_1.get_Key().Resolve());
-					dummyVar1 = stackVariable15.get_Statements().Remove(V_1.get_Value());
+					continue;
 				}
+				BlockStatement parent = keyValuePair.Value.Parent as BlockStatement;
+				if (parent == null)
+				{
+					throw new Exception("Invalid parent statement.");
+				}
+				this.context.MethodContext.Variables.Remove(keyValuePair.Key.Resolve());
+				parent.Statements.Remove(keyValuePair.Value);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.get_IsAssignmentExpression())
+			if (node.IsAssignmentExpression)
 			{
-				if (node.get_Left().get_CodeNodeType() != 30)
+				if (node.Left.CodeNodeType == CodeNodeType.FieldReferenceExpression)
 				{
-					if (node.get_Left().get_CodeNodeType() == 26 && this.variableToReplacingExpressionMap.ContainsKey((node.get_Left() as VariableReferenceExpression).get_Variable()))
-					{
-						throw new Exception("A caching variable cannot be assigned more than once.");
-					}
-				}
-				else
-				{
-					V_0 = (node.get_Left() as FieldReferenceExpression).get_Field().Resolve();
-					if (V_0 != null && this.fieldToReplacingExpressionMap.ContainsKey(V_0))
+					FieldDefinition fieldDefinition = (node.Left as FieldReferenceExpression).Field.Resolve();
+					if (fieldDefinition != null && this.fieldToReplacingExpressionMap.ContainsKey(fieldDefinition))
 					{
 						throw new Exception("A caching field cannot be assigned more than once.");
 					}
 				}
+				else if (node.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression && this.variableToReplacingExpressionMap.ContainsKey((node.Left as VariableReferenceExpression).Variable))
+				{
+					throw new Exception("A caching variable cannot be assigned more than once.");
+				}
 			}
-			return this.VisitBinaryExpression(node);
+			return base.VisitBinaryExpression(node);
 		}
 
 		public override ICodeNode VisitExpressionStatement(ExpressionStatement node)
@@ -285,17 +264,18 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			return this.VisitExpressionStatement(node);
+			return base.VisitExpressionStatement(node);
 		}
 
 		public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			V_1 = node.get_Field().Resolve();
-			if (V_1 == null || !this.fieldToReplacingExpressionMap.TryGetValue(V_1, out V_0))
+			Expression expression;
+			FieldDefinition fieldDefinition = node.Field.Resolve();
+			if (fieldDefinition == null || !this.fieldToReplacingExpressionMap.TryGetValue(fieldDefinition, out expression))
 			{
-				return this.VisitFieldReferenceExpression(node);
+				return base.VisitFieldReferenceExpression(node);
 			}
-			return V_0.CloneExpressionOnlyAndAttachInstructions(node.get_UnderlyingSameMethodInstructions());
+			return expression.CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 		}
 
 		public override ICodeNode VisitIfStatement(IfStatement node)
@@ -304,16 +284,17 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return this.GetIfSubstitution(node);
 			}
-			return this.VisitIfStatement(node);
+			return base.VisitIfStatement(node);
 		}
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (!this.variableToReplacingExpressionMap.TryGetValue(node.get_Variable(), out V_0))
+			Expression expression;
+			if (!this.variableToReplacingExpressionMap.TryGetValue(node.Variable, out expression))
 			{
-				return this.VisitVariableReferenceExpression(node);
+				return base.VisitVariableReferenceExpression(node);
 			}
-			return V_0.CloneExpressionOnlyAndAttachInstructions(node.get_UnderlyingSameMethodInstructions());
+			return expression.CloneExpressionOnlyAndAttachInstructions(node.UnderlyingSameMethodInstructions);
 		}
 
 		private enum DelegateCachingVersion

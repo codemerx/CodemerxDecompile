@@ -1,9 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DFST;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DTree;
 
@@ -13,305 +16,227 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.Switches
 	{
 		private readonly Dictionary<ILogicalConstruct, List<CFGBlockLogicalConstruct>> logicalConstructToSwitchBlocksMap;
 
-		public SwitchBuilder(LogicalFlowBuilderContext logicalContext)
+		public SwitchBuilder(LogicalFlowBuilderContext logicalContext) : base(logicalContext)
 		{
-			base(logicalContext);
 			this.logicalConstructToSwitchBlocksMap = new Dictionary<ILogicalConstruct, List<CFGBlockLogicalConstruct>>();
-			return;
 		}
 
 		private void AddSwitchCFGBlockToMap(CFGBlockLogicalConstruct cfgConstruct)
 		{
-			V_0 = cfgConstruct.get_Parent() as ILogicalConstruct;
-			if (!this.logicalConstructToSwitchBlocksMap.TryGetValue(V_0, out V_1))
+			List<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs;
+			ILogicalConstruct parent = cfgConstruct.Parent as ILogicalConstruct;
+			if (!this.logicalConstructToSwitchBlocksMap.TryGetValue(parent, out cFGBlockLogicalConstructs))
 			{
-				V_1 = new List<CFGBlockLogicalConstruct>();
-				this.logicalConstructToSwitchBlocksMap.Add(V_0, V_1);
+				cFGBlockLogicalConstructs = new List<CFGBlockLogicalConstruct>();
+				this.logicalConstructToSwitchBlocksMap.Add(parent, cFGBlockLogicalConstructs);
 			}
-			V_1.Add(cfgConstruct);
-			return;
+			cFGBlockLogicalConstructs.Add(cfgConstruct);
 		}
 
 		public void BuildConstructs()
 		{
 			this.MapSwitchBlocksToParents();
-			V_0 = this.logicalConstructToSwitchBlocksMap.GetEnumerator();
-			try
+			foreach (KeyValuePair<ILogicalConstruct, List<CFGBlockLogicalConstruct>> keyValuePair in this.logicalConstructToSwitchBlocksMap)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.ProcessSwitchConstructs(V_1.get_Key(), V_1.get_Value());
-				}
+				this.ProcessSwitchConstructs(keyValuePair.Key, keyValuePair.Value);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void CreateSwitchConstruct(CFGBlockLogicalConstruct switchBlock, ILogicalConstruct parentConstruct, SwitchData switchData, DominatorTree dominatorTree)
 		{
-			stackVariable2 = this.GetOrderedCFGSuccessorToLabelsMap(switchData);
-			V_0 = this.GetValidCases(dominatorTree, switchBlock);
-			V_1 = new List<CaseLogicalConstruct>();
-			V_2 = new PairList<List<int>, CFGBlockLogicalConstruct>();
-			V_8 = stackVariable2.GetEnumerator();
-			try
+			ILogicalConstruct logicalConstruct;
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs;
+			ILogicalConstruct logicalConstruct1;
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs1;
+			PairList<CFGBlockLogicalConstruct, List<int>> orderedCFGSuccessorToLabelsMap = this.GetOrderedCFGSuccessorToLabelsMap(switchData);
+			Dictionary<ILogicalConstruct, HashSet<ISingleEntrySubGraph>> validCases = this.GetValidCases(dominatorTree, switchBlock);
+			List<CaseLogicalConstruct> caseLogicalConstructs = new List<CaseLogicalConstruct>();
+			PairList<List<int>, CFGBlockLogicalConstruct> pairList = new PairList<List<int>, CFGBlockLogicalConstruct>();
+			foreach (KeyValuePair<CFGBlockLogicalConstruct, List<int>> keyValuePair in orderedCFGSuccessorToLabelsMap)
 			{
-				while (V_8.MoveNext())
+				if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(keyValuePair.Key, parentConstruct, out logicalConstruct1) || !validCases.TryGetValue(logicalConstruct1, out singleEntrySubGraphs1))
 				{
-					V_9 = V_8.get_Current();
-					if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_9.get_Key(), parentConstruct, out V_10) || !V_0.TryGetValue(V_10, out V_11))
-					{
-						V_2.Add(V_9.get_Value(), V_9.get_Key());
-					}
-					else
-					{
-						V_12 = new CaseLogicalConstruct(V_10);
-						V_12.get_CaseNumbers().AddRange(V_9.get_Value());
-						V_12.get_Body().UnionWith(V_11.Cast<ILogicalConstruct>());
-						V_12.AttachCaseConstructToGraph();
-						V_1.Add(V_12);
-					}
+					pairList.Add(keyValuePair.Value, keyValuePair.Key);
+				}
+				else
+				{
+					CaseLogicalConstruct caseLogicalConstruct = new CaseLogicalConstruct(logicalConstruct1);
+					caseLogicalConstruct.CaseNumbers.AddRange(keyValuePair.Value);
+					caseLogicalConstruct.Body.UnionWith(singleEntrySubGraphs1.Cast<ILogicalConstruct>());
+					caseLogicalConstruct.AttachCaseConstructToGraph();
+					caseLogicalConstructs.Add(caseLogicalConstruct);
 				}
 			}
-			finally
+			CaseLogicalConstruct caseLogicalConstruct1 = null;
+			CFGBlockLogicalConstruct cFGLogicalConstructFromBlock = this.GetCFGLogicalConstructFromBlock(switchData.DefaultCase);
+			if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(cFGLogicalConstructFromBlock, parentConstruct, out logicalConstruct) && validCases.TryGetValue(logicalConstruct, out singleEntrySubGraphs))
 			{
-				((IDisposable)V_8).Dispose();
-			}
-			V_3 = null;
-			V_4 = this.GetCFGLogicalConstructFromBlock(switchData.get_DefaultCase());
-			if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_4, parentConstruct, out V_5) && V_0.TryGetValue(V_5, out V_6))
-			{
-				V_3 = new CaseLogicalConstruct(V_5);
-				if (this.HasSuccessors(V_6))
+				caseLogicalConstruct1 = new CaseLogicalConstruct(logicalConstruct);
+				if (this.HasSuccessors(singleEntrySubGraphs))
 				{
-					V_3.get_Body().UnionWith(V_6.Cast<ILogicalConstruct>());
+					caseLogicalConstruct1.Body.UnionWith(singleEntrySubGraphs.Cast<ILogicalConstruct>());
 				}
-				V_3.AttachCaseConstructToGraph();
+				caseLogicalConstruct1.AttachCaseConstructToGraph();
 			}
-			V_7 = SwitchLogicalConstruct.GroupInSwitchConstruct(switchBlock, V_1, V_2, V_3, V_4);
-			this.UpdateDominatorTree(dominatorTree, V_7);
-			return;
+			SwitchLogicalConstruct switchLogicalConstruct = SwitchLogicalConstruct.GroupInSwitchConstruct(switchBlock, caseLogicalConstructs, pairList, caseLogicalConstruct1, cFGLogicalConstructFromBlock);
+			this.UpdateDominatorTree(dominatorTree, switchLogicalConstruct);
 		}
 
 		private CFGBlockLogicalConstruct GetCFGLogicalConstructFromBlock(InstructionBlock theBlock)
 		{
-			return this.logicalContext.get_CFGBlockToLogicalConstructMap().get_Item(theBlock)[0];
+			return this.logicalContext.CFGBlockToLogicalConstructMap[theBlock][0];
 		}
 
 		private PairList<CFGBlockLogicalConstruct, List<int>> GetOrderedCFGSuccessorToLabelsMap(SwitchData switchData)
 		{
-			V_0 = new PairList<CFGBlockLogicalConstruct, List<int>>();
-			V_1 = new Dictionary<InstructionBlock, KeyValuePair<int, List<int>>>();
-			V_2 = 0;
-			while (V_2 < (int)switchData.get_OrderedCasesArray().Length)
+			KeyValuePair<int, List<int>> keyValuePair;
+			PairList<CFGBlockLogicalConstruct, List<int>> pairList = new PairList<CFGBlockLogicalConstruct, List<int>>();
+			Dictionary<InstructionBlock, KeyValuePair<int, List<int>>> instructionBlocks = new Dictionary<InstructionBlock, KeyValuePair<int, List<int>>>();
+			for (int i = 0; i < (int)switchData.OrderedCasesArray.Length; i++)
 			{
-				V_3 = switchData.get_OrderedCasesArray()[V_2];
-				if (InstructionBlock.op_Inequality(V_3, switchData.get_DefaultCase()))
+				InstructionBlock orderedCasesArray = switchData.OrderedCasesArray[i];
+				if (orderedCasesArray != switchData.DefaultCase)
 				{
-					if (!V_1.TryGetValue(V_3, out V_4))
+					if (!instructionBlocks.TryGetValue(orderedCasesArray, out keyValuePair))
 					{
-						V_4 = new KeyValuePair<int, List<int>>(V_0.get_Count(), new List<int>());
-						V_0.Add(this.GetCFGLogicalConstructFromBlock(V_3), V_4.get_Value());
-						V_1.Add(V_3, V_4);
+						keyValuePair = new KeyValuePair<int, List<int>>(pairList.Count, new List<int>());
+						pairList.Add(this.GetCFGLogicalConstructFromBlock(orderedCasesArray), keyValuePair.Value);
+						instructionBlocks.Add(orderedCasesArray, keyValuePair);
 					}
-					V_4.get_Value().Add(V_2);
+					keyValuePair.Value.Add(i);
 				}
-				V_2 = V_2 + 1;
 			}
-			return V_0;
+			return pairList;
 		}
 
 		private Dictionary<ILogicalConstruct, HashSet<ISingleEntrySubGraph>> GetValidCases(DominatorTree dominatorTree, ILogicalConstruct switchCFGBlock)
 		{
-			V_0 = new SwitchBuilder.u003cu003ec__DisplayClass9_0();
-			V_0.caseEntriesToDominatedNodesMap = new Dictionary<ILogicalConstruct, HashSet<ISingleEntrySubGraph>>();
-			V_1 = new HashSet<ISingleEntrySubGraph>();
-			dummyVar0 = V_1.Add(switchCFGBlock);
-			V_4 = switchCFGBlock.get_SameParentSuccessors().GetEnumerator();
-			try
+			bool flag;
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs;
+			Dictionary<ILogicalConstruct, HashSet<ISingleEntrySubGraph>> logicalConstructs = new Dictionary<ILogicalConstruct, HashSet<ISingleEntrySubGraph>>();
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs1 = new HashSet<ISingleEntrySubGraph>();
+			singleEntrySubGraphs1.Add(switchCFGBlock);
+			foreach (ILogicalConstruct sameParentSuccessor in switchCFGBlock.SameParentSuccessors)
 			{
-				while (V_4.MoveNext())
+				if (sameParentSuccessor == switchCFGBlock || dominatorTree.GetImmediateDominator(sameParentSuccessor) != switchCFGBlock)
 				{
-					V_5 = (ILogicalConstruct)V_4.get_Current();
-					if (V_5 == switchCFGBlock || dominatorTree.GetImmediateDominator(V_5) != switchCFGBlock)
+					continue;
+				}
+				HashSet<ISingleEntrySubGraph> dominatedNodes = dominatorTree.GetDominatedNodes(sameParentSuccessor);
+				logicalConstructs.Add(sameParentSuccessor, dominatedNodes);
+				singleEntrySubGraphs1.UnionWith(dominatedNodes);
+			}
+			List<ILogicalConstruct> logicalConstructs1 = new List<ILogicalConstruct>(
+				from node in DFSTBuilder.BuildTree(switchCFGBlock.Parent, switchCFGBlock).ReversePostOrder
+				select node.Construct as ILogicalConstruct into construct
+				where logicalConstructs.ContainsKey(construct)
+				select construct);
+			do
+			{
+				flag = false;
+				foreach (ILogicalConstruct logicalConstruct in logicalConstructs1)
+				{
+					if (!logicalConstructs.TryGetValue(logicalConstruct, out singleEntrySubGraphs) || this.IsCaseValid(logicalConstruct, singleEntrySubGraphs1))
 					{
 						continue;
 					}
-					V_6 = dominatorTree.GetDominatedNodes(V_5);
-					V_0.caseEntriesToDominatedNodesMap.Add(V_5, V_6);
-					V_1.UnionWith(V_6);
+					singleEntrySubGraphs1.ExceptWith(singleEntrySubGraphs);
+					logicalConstructs.Remove(logicalConstruct);
+					flag = true;
 				}
 			}
-			finally
-			{
-				((IDisposable)V_4).Dispose();
-			}
-			stackVariable34 = DFSTBuilder.BuildTree(switchCFGBlock.get_Parent(), switchCFGBlock).get_ReversePostOrder();
-			stackVariable35 = SwitchBuilder.u003cu003ec.u003cu003e9__9_0;
-			if (stackVariable35 == null)
-			{
-				dummyVar1 = stackVariable35;
-				stackVariable35 = new Func<DFSTNode, ILogicalConstruct>(SwitchBuilder.u003cu003ec.u003cu003e9.u003cGetValidCasesu003eb__9_0);
-				SwitchBuilder.u003cu003ec.u003cu003e9__9_0 = stackVariable35;
-			}
-			V_2 = new List<ILogicalConstruct>(stackVariable34.Select<DFSTNode, ILogicalConstruct>(stackVariable35).Where<ILogicalConstruct>(new Func<ILogicalConstruct, bool>(V_0.u003cGetValidCasesu003eb__1)));
-			do
-			{
-				V_3 = false;
-				V_7 = V_2.GetEnumerator();
-				try
-				{
-					while (V_7.MoveNext())
-					{
-						V_8 = V_7.get_Current();
-						if (!V_0.caseEntriesToDominatedNodesMap.TryGetValue(V_8, out V_9) || this.IsCaseValid(V_8, V_1))
-						{
-							continue;
-						}
-						V_1.ExceptWith(V_9);
-						dummyVar2 = V_0.caseEntriesToDominatedNodesMap.Remove(V_8);
-						V_3 = true;
-					}
-				}
-				finally
-				{
-					((IDisposable)V_7).Dispose();
-				}
-			}
-			while (V_3);
-			return V_0.caseEntriesToDominatedNodesMap;
+			while (flag);
+			return logicalConstructs;
 		}
 
 		private bool HasSuccessors(IEnumerable<ISingleEntrySubGraph> body)
 		{
-			V_0 = body.GetEnumerator();
-			try
+			bool flag;
+			using (IEnumerator<ISingleEntrySubGraph> enumerator = body.GetEnumerator())
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = ((ILogicalConstruct)V_0.get_Current()).get_SameParentSuccessors().GetEnumerator();
+					HashSet<ISingleEntrySubGraph>.Enumerator enumerator1 = ((ILogicalConstruct)enumerator.Current).SameParentSuccessors.GetEnumerator();
 					try
 					{
-						while (V_1.MoveNext())
+						while (enumerator1.MoveNext())
 						{
-							V_2 = (ILogicalConstruct)V_1.get_Current();
-							if (body.Contains<ISingleEntrySubGraph>(V_2))
+							if (body.Contains<ISingleEntrySubGraph>((ILogicalConstruct)enumerator1.Current))
 							{
 								continue;
 							}
-							V_3 = true;
-							goto Label1;
+							flag = true;
+							return flag;
 						}
 					}
 					finally
 					{
-						((IDisposable)V_1).Dispose();
+						((IDisposable)enumerator1).Dispose();
 					}
 				}
-				goto Label0;
+				return false;
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-		Label1:
-			return V_3;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		private bool IsCaseValid(ISingleEntrySubGraph caseEntry, HashSet<ISingleEntrySubGraph> legalPredecessors)
 		{
-			V_0 = caseEntry.get_SameParentPredecessors().GetEnumerator();
+			bool flag;
+			HashSet<ISingleEntrySubGraph>.Enumerator enumerator = caseEntry.SameParentPredecessors.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = (ILogicalConstruct)V_0.get_Current();
-					if (legalPredecessors.Contains(V_1))
+					if (legalPredecessors.Contains((ILogicalConstruct)enumerator.Current))
 					{
 						continue;
 					}
-					V_2 = false;
-					goto Label1;
+					flag = false;
+					return flag;
 				}
-				goto Label0;
+				return true;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			return true;
+			return flag;
 		}
 
 		private void MapSwitchBlocksToParents()
 		{
-			V_0 = this.logicalContext.get_CFG().get_SwitchBlocksInformation().get_Keys().GetEnumerator();
-			try
+			foreach (InstructionBlock key in this.logicalContext.CFG.SwitchBlocksInformation.Keys)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					stackVariable14 = this.logicalContext.get_CFGBlockToLogicalConstructMap().get_Item(V_1);
-					this.AddSwitchCFGBlockToMap(stackVariable14[(int)stackVariable14.Length - 1]);
-				}
+				CFGBlockLogicalConstruct[] item = this.logicalContext.CFGBlockToLogicalConstructMap[key];
+				this.AddSwitchCFGBlockToMap(item[(int)item.Length - 1]);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void ProcessSwitchConstructs(ILogicalConstruct parent, List<CFGBlockLogicalConstruct> switchBlocks)
 		{
-			V_0 = new SwitchBuilder.u003cu003ec__DisplayClass5_0();
-			V_1 = this.GetDominatorTreeFromContext(parent);
-			V_0.dfsTree = DFSTBuilder.BuildTree(parent);
-			switchBlocks.Sort(new Comparison<CFGBlockLogicalConstruct>(V_0.u003cProcessSwitchConstructsu003eb__0));
-			V_2 = switchBlocks.GetEnumerator();
-			try
+			DominatorTree dominatorTreeFromContext = base.GetDominatorTreeFromContext(parent);
+			DFSTree dFSTree = DFSTBuilder.BuildTree(parent);
+			switchBlocks.Sort((CFGBlockLogicalConstruct x, CFGBlockLogicalConstruct y) => dFSTree.ConstructToNodeMap[y].ReversePostOrderIndex.CompareTo(dFSTree.ConstructToNodeMap[x].ReversePostOrderIndex));
+			foreach (CFGBlockLogicalConstruct switchBlock in switchBlocks)
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = V_2.get_Current();
-					this.CreateSwitchConstruct(V_3, parent, this.logicalContext.get_CFG().get_SwitchBlocksInformation().get_Item(V_3.get_TheBlock()), V_1);
-				}
+				this.CreateSwitchConstruct(switchBlock, parent, this.logicalContext.CFG.SwitchBlocksInformation[switchBlock.TheBlock], dominatorTreeFromContext);
 			}
-			finally
-			{
-				((IDisposable)V_2).Dispose();
-			}
-			return;
 		}
 
 		private void UpdateDominatorTree(DominatorTree dominatorTree, SwitchLogicalConstruct theSwitchConstruct)
 		{
-			V_0 = new HashSet<ISingleEntrySubGraph>();
-			dummyVar0 = V_0.Add(theSwitchConstruct.get_Entry());
-			V_1 = theSwitchConstruct.get_ConditionCases();
-			V_2 = 0;
-			while (V_2 < (int)V_1.Length)
+			HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+			singleEntrySubGraphs.Add(theSwitchConstruct.Entry);
+			CaseLogicalConstruct[] conditionCases = theSwitchConstruct.ConditionCases;
+			for (int i = 0; i < (int)conditionCases.Length; i++)
 			{
-				V_0.UnionWith(V_1[V_2].get_Children());
-				V_2 = V_2 + 1;
+				singleEntrySubGraphs.UnionWith(conditionCases[i].Children);
 			}
-			if (theSwitchConstruct.get_DefaultCase() != null)
+			if (theSwitchConstruct.DefaultCase != null)
 			{
-				V_0.UnionWith(theSwitchConstruct.get_DefaultCase().get_Children());
+				singleEntrySubGraphs.UnionWith(theSwitchConstruct.DefaultCase.Children);
 			}
-			dominatorTree.MergeNodes(V_0, theSwitchConstruct.get_Entry(), theSwitchConstruct);
-			return;
+			dominatorTree.MergeNodes(singleEntrySubGraphs, theSwitchConstruct.Entry, theSwitchConstruct);
 		}
 	}
 }

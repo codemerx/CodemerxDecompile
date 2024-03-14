@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 
@@ -15,9 +16,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ParenthesesExpression.u003cget_Childrenu003ed__12(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ParenthesesExpression parenthesesExpression = null;
+				yield return parenthesesExpression.Expression;
 			}
 		}
 
@@ -25,7 +25,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 87;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ParenthesesExpression;
 			}
 		}
 
@@ -39,7 +39,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Expression().get_ExpressionType();
+				return this.Expression.ExpressionType;
 			}
 			set
 			{
@@ -47,37 +47,33 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public ParenthesesExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression)
+		public ParenthesesExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression) : this(expression, Enumerable.Empty<Instruction>())
 		{
-			this(expression, Enumerable.Empty<Instruction>());
-			return;
 		}
 
-		public ParenthesesExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions)
+		public ParenthesesExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			return;
+			this.Expression = expression;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new ParenthesesExpression(this.get_Expression().Clone(), this.instructions);
+			return new ParenthesesExpression(this.Expression.Clone(), this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new ParenthesesExpression(this.get_Expression().Clone(), null);
+			return new ParenthesesExpression(this.Expression.Clone(), null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			V_0 = other as ParenthesesExpression;
-			if (V_0 == null)
+			ParenthesesExpression parenthesesExpression = other as ParenthesesExpression;
+			if (parenthesesExpression == null)
 			{
 				return false;
 			}
-			return this.get_Expression().Equals(V_0.get_Expression());
+			return this.Expression.Equals(parenthesesExpression.Expression);
 		}
 	}
 }

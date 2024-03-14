@@ -13,11 +13,7 @@ namespace Piranha.Extend
 			set;
 		}
 
-		public string Icon
-		{
-			get;
-			set;
-		}
+		public string Icon { get; set; } = "fas fa-table";
 
 		public bool ListExpand
 		{
@@ -37,11 +33,7 @@ namespace Piranha.Extend
 			set;
 		}
 
-		public int SortOrder
-		{
-			get;
-			set;
-		}
+		public int SortOrder { get; set; } = 0x7fffffff;
 
 		public string Title
 		{
@@ -51,10 +43,6 @@ namespace Piranha.Extend
 
 		public RegionAttribute()
 		{
-			this.u003cSortOrderu003ek__BackingField = 0x7fffffff;
-			this.u003cIconu003ek__BackingField = "fas fa-table";
-			base();
-			return;
 		}
 	}
 }

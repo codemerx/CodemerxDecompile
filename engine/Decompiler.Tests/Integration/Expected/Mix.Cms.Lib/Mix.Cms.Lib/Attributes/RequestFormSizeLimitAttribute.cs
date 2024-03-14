@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Runtime.CompilerServices;
@@ -14,47 +16,42 @@ namespace Mix.Cms.Lib.Attributes
 		{
 			get
 			{
-				return get_Order();
+				return JustDecompileGenerated_get_Order();
 			}
 			set
 			{
-				set_Order(value);
+				JustDecompileGenerated_set_Order(value);
 			}
 		}
 
-		// <Order>k__BackingField
-		private int u003cOrderu003ek__BackingField;
+		private int JustDecompileGenerated_Order_k__BackingField;
 
-		public int get_Order()
+		public int JustDecompileGenerated_get_Order()
 		{
-			return this.u003cOrderu003ek__BackingField;
+			return this.JustDecompileGenerated_Order_k__BackingField;
 		}
 
-		public void set_Order(int value)
+		public void JustDecompileGenerated_set_Order(int value)
 		{
-			this.u003cOrderu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_Order_k__BackingField = value;
 		}
 
 		public RequestFormSizeLimitAttribute(int valueCountLimit)
 		{
-			base();
-			stackVariable2 = new FormOptions();
-			stackVariable2.set_ValueCountLimit(valueCountLimit);
-			stackVariable2.set_KeyLengthLimit(valueCountLimit);
-			this._formOptions = stackVariable2;
-			return;
+			FormOptions formOption = new FormOptions();
+			formOption.set_ValueCountLimit(valueCountLimit);
+			formOption.set_KeyLengthLimit(valueCountLimit);
+			this._formOptions = formOption;
 		}
 
 		public void OnAuthorization(AuthorizationFilterContext context)
 		{
-			V_0 = context.get_HttpContext().get_Features();
-			V_1 = V_0.Get<IFormFeature>();
-			if (V_1 == null || V_1.get_Form() == null)
+			IFeatureCollection features = context.get_HttpContext().get_Features();
+			IFormFeature formFeature = features.Get<IFormFeature>();
+			if (formFeature == null || formFeature.get_Form() == null)
 			{
-				V_0.Set<IFormFeature>(new FormFeature(context.get_HttpContext().get_Request(), this._formOptions));
+				features.Set<IFormFeature>(new FormFeature(context.get_HttpContext().get_Request(), this._formOptions));
 			}
-			return;
 		}
 	}
 }

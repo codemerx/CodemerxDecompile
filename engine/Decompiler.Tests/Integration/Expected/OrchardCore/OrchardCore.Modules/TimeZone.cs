@@ -32,17 +32,15 @@ namespace OrchardCore.Modules
 
 		public TimeZone(string timeZoneId, Offset standardOffset, Offset wallOffset, NodaTime.DateTimeZone dateTimeZone)
 		{
-			base();
-			this.set_TimeZoneId(timeZoneId);
-			this.set_StandardOffset(standardOffset);
-			this.set_WallOffset(wallOffset);
-			this.set_DateTimeZone(dateTimeZone);
-			return;
+			this.TimeZoneId = timeZoneId;
+			this.StandardOffset = standardOffset;
+			this.WallOffset = wallOffset;
+			this.DateTimeZone = dateTimeZone;
 		}
 
 		public override string ToString()
 		{
-			return string.Format("(GMT{0}) {1} ({2:+HH:mm})", this.get_StandardOffset(), this.get_TimeZoneId(), this.get_WallOffset());
+			return string.Format("(GMT{0}) {1} ({2:+HH:mm})", this.StandardOffset, this.TimeZoneId, this.WallOffset);
 		}
 	}
 }

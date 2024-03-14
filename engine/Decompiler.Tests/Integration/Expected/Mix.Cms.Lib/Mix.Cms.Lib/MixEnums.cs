@@ -8,31 +8,16 @@ namespace Mix.Cms.Lib
 	{
 		public MixEnums()
 		{
-			base();
-			return;
 		}
 
 		public static List<object> EnumToObject(Type enumType)
 		{
-			V_0 = new List<object>();
-			V_1 = Enum.GetValues(enumType).GetEnumerator();
-			try
+			List<object> objs = new List<object>();
+			foreach (object value in Enum.GetValues(enumType))
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.Add(new u003cu003ef__AnonymousType63<string, string>(Enum.GetName(enumType, V_2), Enum.GetName(enumType, V_2)));
-				}
+				objs.Add(new { name = Enum.GetName(enumType, value), @value = Enum.GetName(enumType, value) });
 			}
-			finally
-			{
-				V_3 = V_1 as IDisposable;
-				if (V_3 != null)
-				{
-					V_3.Dispose();
-				}
-			}
-			return V_0;
+			return objs;
 		}
 
 		public enum CatePosition

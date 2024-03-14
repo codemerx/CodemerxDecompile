@@ -37,8 +37,6 @@ namespace Mix.Cms.Messenger.Models.Data
 
 		public MixMessengerNavRoomUser()
 		{
-			base();
-			return;
 		}
 	}
 }

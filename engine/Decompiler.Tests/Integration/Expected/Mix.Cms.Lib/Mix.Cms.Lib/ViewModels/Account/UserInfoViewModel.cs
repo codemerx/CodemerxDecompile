@@ -1,6 +1,12 @@
 using Microsoft.EntityFrameworkCore.Storage;
+using Mix.Cms.Lib.Models.Account;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Repositories;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
+using Mix.Common.Helper;
+using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Mix.Identity.Models.AccountViewModels;
 using Newtonsoft.Json;
@@ -32,14 +38,11 @@ namespace Mix.Cms.Lib.ViewModels.Account
 		{
 			get
 			{
-				if (this.get_Avatar() == null || this.get_Avatar().IndexOf("http") != -1 || this.get_Avatar().get_Chars(0) == '/')
+				if (this.Avatar == null || this.Avatar.IndexOf("http") != -1 || this.Avatar[0] == '/')
 				{
-					return this.get_Avatar();
+					return this.Avatar;
 				}
-				stackVariable15 = new string[2];
-				stackVariable15[0] = this.get_Domain();
-				stackVariable15[1] = this.get_Avatar();
-				return CommonHelper.GetFullPath(stackVariable15);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Avatar });
 			}
 		}
 
@@ -116,11 +119,7 @@ namespace Mix.Cms.Lib.ViewModels.Account
 		}
 
 		[JsonProperty("mediaFile")]
-		public FileViewModel MediaFile
-		{
-			get;
-			set;
-		}
+		public FileViewModel MediaFile { get; set; } = new FileViewModel();
 
 		[JsonProperty("middleName")]
 		public string MiddleName
@@ -151,59 +150,40 @@ namespace Mix.Cms.Lib.ViewModels.Account
 		}
 
 		[JsonProperty("userRoles")]
-		public List<UserRoleViewModel> UserRoles
-		{
-			get;
-			set;
-		}
+		public List<UserRoleViewModel> UserRoles { get; set; } = new List<UserRoleViewModel>();
 
 		public UserInfoViewModel()
 		{
-			this.u003cUserRolesu003ek__BackingField = new List<UserRoleViewModel>();
-			this.u003cMediaFileu003ek__BackingField = new FileViewModel();
-			base();
-			return;
 		}
 
-		public UserInfoViewModel(MixCmsUser model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UserInfoViewModel(MixCmsUser model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cUserRolesu003ek__BackingField = new List<UserRoleViewModel>();
-			this.u003cMediaFileu003ek__BackingField = new FileViewModel();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = ViewModelBase<MixCmsAccountContext, AspNetUserRoles, UserRoleViewModel>.Repository;
-			V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.Account.UserInfoViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			this.UserRoles = ViewModelBase<MixCmsAccountContext, AspNetUserRoles, UserRoleViewModel>.Repository.GetModelListBy((AspNetUserRoles ur) => ur.UserId == this.Id, null, null).get_Data();
+			this.ResetPassword = new ResetPasswordViewModel();
+		}
 
 		public override MixCmsUser ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_MediaFile().get_FileStream() != null)
+			if (this.MediaFile.FileStream != null)
 			{
-				stackVariable8 = this.get_MediaFile();
-				stackVariable10 = new string[2];
-				stackVariable10[0] = "Content/Uploads";
-				V_0 = DateTime.get_UtcNow();
-				stackVariable10[1] = V_0.ToString("MMM-yyyy");
-				stackVariable8.set_FileFolder(CommonHelper.GetFullPath(stackVariable10));
-				if (!FileRepository.get_Instance().SaveWebFile(this.get_MediaFile()))
+				FileViewModel mediaFile = this.MediaFile;
+				string[] str = new string[] { "Content/Uploads", null };
+				str[1] = DateTime.UtcNow.ToString("MMM-yyyy");
+				mediaFile.FileFolder = CommonHelper.GetFullPath(str);
+				if (!FileRepository.Instance.SaveWebFile(this.MediaFile))
 				{
-					this.set_IsValid(false);
+					base.set_IsValid(false);
 				}
 				else
 				{
-					this.set_Avatar(this.get_MediaFile().get_FullPath());
+					this.Avatar = this.MediaFile.FullPath;
 				}
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 	}
 }

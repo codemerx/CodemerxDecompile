@@ -10,60 +10,54 @@ namespace Telerik.JustDecompiler.External
 		{
 			get
 			{
-				return get_FullPath();
+				return JustDecompileGenerated_get_FullPath();
 			}
 			set
 			{
-				set_FullPath(value);
+				JustDecompileGenerated_set_FullPath(value);
 			}
 		}
 
-		// <FullPath>k__BackingField
-		private string u003cFullPathu003ek__BackingField;
+		private string JustDecompileGenerated_FullPath_k__BackingField;
 
-		public string get_FullPath()
+		public string JustDecompileGenerated_get_FullPath()
 		{
-			return this.u003cFullPathu003ek__BackingField;
+			return this.JustDecompileGenerated_FullPath_k__BackingField;
 		}
 
-		private void set_FullPath(string value)
+		private void JustDecompileGenerated_set_FullPath(string value)
 		{
-			this.u003cFullPathu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_FullPath_k__BackingField = value;
 		}
 
 		public bool HasErrors
 		{
 			get
 			{
-				return get_HasErrors();
+				return JustDecompileGenerated_get_HasErrors();
 			}
 			set
 			{
-				set_HasErrors(value);
+				JustDecompileGenerated_set_HasErrors(value);
 			}
 		}
 
-		// <HasErrors>k__BackingField
-		private bool u003cHasErrorsu003ek__BackingField;
+		private bool JustDecompileGenerated_HasErrors_k__BackingField;
 
-		public bool get_HasErrors()
+		public bool JustDecompileGenerated_get_HasErrors()
 		{
-			return this.u003cHasErrorsu003ek__BackingField;
+			return this.JustDecompileGenerated_HasErrors_k__BackingField;
 		}
 
-		private void set_HasErrors(bool value)
+		private void JustDecompileGenerated_set_HasErrors(bool value)
 		{
-			this.u003cHasErrorsu003ek__BackingField = value;
-			return;
+			this.JustDecompileGenerated_HasErrors_k__BackingField = value;
 		}
 
 		public FileGeneratedInfo(string fullPath, bool hasErrors)
 		{
-			base();
-			this.set_FullPath(fullPath);
-			this.set_HasErrors(hasErrors);
-			return;
+			this.FullPath = fullPath;
+			this.HasErrors = hasErrors;
 		}
 	}
 }

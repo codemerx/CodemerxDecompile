@@ -1,7 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
 using Mix.Domain.Data.ViewModels;
@@ -64,7 +68,7 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 		{
 			get
 			{
-				return MixService.GetConfig<string>("Domain", this.get_Specificulture());
+				return MixService.GetConfig<string>("Domain", this.Specificulture);
 			}
 		}
 
@@ -134,45 +138,40 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 
 		public SystemConfigurationViewModel()
 		{
-			base();
-			return;
 		}
 
-		public SystemConfigurationViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public SystemConfigurationViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = new DataValueViewModel();
-			stackVariable1.set_DataType(this.get_DataType());
-			stackVariable1.set_Value(this.get_Value());
-			stackVariable1.set_Name(this.get_Keyword());
-			this.set_Property(stackVariable1);
-			return;
+			this.Property = new DataValueViewModel()
+			{
+				DataType = this.DataType,
+				Value = this.Value,
+				Name = this.Keyword
+			};
 		}
 
 		public static async Task<RepositoryResponse<bool>> ImportConfigurations(List<MixConfiguration> arrConfiguration, string destCulture)
 		{
-			V_0.arrConfiguration = arrConfiguration;
-			V_0.destCulture = destCulture;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66 variable = new SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66();
+			variable.arrConfiguration = arrConfiguration;
+			variable.destCulture = destCulture;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<SystemConfigurationViewModel.u003cImportConfigurationsu003ed__66>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		public override MixConfiguration ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = this.get_CreatedDateTime();
-			V_0 = new DateTime();
-			if (DateTime.op_Equality(stackVariable1, V_0))
+			if (this.CreatedDateTime == new DateTime())
 			{
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
+				this.CreatedDateTime = DateTime.UtcNow;
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 	}
 }

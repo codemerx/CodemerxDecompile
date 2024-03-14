@@ -19,26 +19,25 @@ namespace OrchardCore.Environment.Shell.Configuration
 
 		public ShellsSettingsSources(IOptions<ShellOptions> shellOptions)
 		{
-			base();
 			this._tenants = Path.Combine(shellOptions.get_Value().get_ShellsApplicationDataPath(), "tenants.json");
-			return;
 		}
 
 		public Task AddSourcesAsync(IConfigurationBuilder builder)
 		{
-			dummyVar0 = JsonConfigurationExtensions.AddJsonFile(builder, this._tenants, true);
-			return Task.get_CompletedTask();
+			JsonConfigurationExtensions.AddJsonFile(builder, this._tenants, true);
+			return Task.CompletedTask;
 		}
 
 		public async Task SaveAsync(string tenant, IDictionary<string, string> data)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.tenant = tenant;
-			V_0.data = data;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellsSettingsSources.u003cSaveAsyncu003ed__3>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ShellsSettingsSources.u003cSaveAsyncu003ed__3 variable = new ShellsSettingsSources.u003cSaveAsyncu003ed__3();
+			variable.u003cu003e4__this = this;
+			variable.tenant = tenant;
+			variable.data = data;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<ShellsSettingsSources.u003cSaveAsyncu003ed__3>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

@@ -31,8 +31,6 @@ namespace Piranha.Security
 
 		public PermissionItem()
 		{
-			base();
-			return;
 		}
 	}
 }

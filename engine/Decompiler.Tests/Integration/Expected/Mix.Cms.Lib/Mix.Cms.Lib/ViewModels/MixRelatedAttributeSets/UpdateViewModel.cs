@@ -3,6 +3,7 @@ using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixAttributeSets;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -96,37 +97,31 @@ namespace Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets
 			set;
 		}
 
-		public UpdateViewModel(MixRelatedAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixRelatedAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public UpdateViewModel()
 		{
-			base();
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets.UpdateViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel> singleModel = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>.Repository.GetSingleModel((MixAttributeSet p) => p.Id == this.Id, _context, _transaction);
+			if (singleModel.get_IsSucceed())
+			{
+				this.Data = singleModel.get_Data();
+			}
+		}
 
 		public override MixRelatedAttributeSet ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				this.set_Id(ViewModelBase<MixCmsContext, MixRelatedAttributeSet, Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets.UpdateViewModel>.Repository.Count(null, null).get_Data() + 1);
-				this.set_CreatedDateTime(DateTime.get_UtcNow());
+				this.Id = ViewModelBase<MixCmsContext, MixRelatedAttributeSet, Mix.Cms.Lib.ViewModels.MixRelatedAttributeSets.UpdateViewModel>.Repository.Count(null, null).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
 			}
-			return this.ParseModel(_context, _transaction);
+			return base.ParseModel(_context, _transaction);
 		}
 	}
 }

@@ -43,8 +43,6 @@ namespace Mix.Cms.Lib.Models.Account
 
 		public AspNetUserRoles()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -9,14 +9,12 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 68;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.BreakSwitchCaseStatement;
 			}
 		}
 
-		public BreakSwitchCaseStatement()
+		public BreakSwitchCaseStatement() : base(null)
 		{
-			base(null);
-			return;
 		}
 
 		public override Statement Clone()
@@ -26,9 +24,9 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new BreakSwitchCaseStatement();
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			BreakSwitchCaseStatement breakSwitchCaseStatement = new BreakSwitchCaseStatement();
+			base.CopyParentAndLabel(breakSwitchCaseStatement);
+			return breakSwitchCaseStatement;
 		}
 	}
 }

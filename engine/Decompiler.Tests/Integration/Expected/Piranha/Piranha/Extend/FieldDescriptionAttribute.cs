@@ -14,15 +14,11 @@ namespace Piranha.Extend
 
 		public FieldDescriptionAttribute()
 		{
-			base();
-			return;
 		}
 
 		public FieldDescriptionAttribute(string text)
 		{
-			base();
-			this.set_Text(text);
-			return;
+			this.Text = text;
 		}
 	}
 }

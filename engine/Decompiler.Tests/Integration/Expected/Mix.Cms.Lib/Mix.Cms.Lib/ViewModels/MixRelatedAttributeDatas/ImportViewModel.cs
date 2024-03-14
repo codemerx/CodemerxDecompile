@@ -125,19 +125,14 @@ namespace Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas
 
 		public ImportViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ImportViewModel(MixRelatedAttributeData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ImportViewModel(MixRelatedAttributeData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return;
 		}
 	}
 }

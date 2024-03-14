@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
@@ -13,8 +14,6 @@ namespace Telerik.JustDecompiler.Steps
 
 		public CaseGotoTransformerStep()
 		{
-			base();
-			return;
 		}
 
 		private GotoStatement CreateCaseGoto(GotoStatement node, SwitchCase targetedCase)
@@ -27,14 +26,13 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			while (targetedNode != null)
 			{
-				if (targetedNode as T != null)
+				if (targetedNode is T)
 				{
 					return (T)(targetedNode as T);
 				}
-				targetedNode = targetedNode.get_Parent();
+				targetedNode = targetedNode.Parent;
 			}
-			V_0 = default(T);
-			return V_0;
+			return default(T);
 		}
 
 		private bool IsFirstStatement(Statement targetedNode, BlockStatement blockStatement)
@@ -43,52 +41,41 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return false;
 			}
-			if (!blockStatement.get_Statements().Contains(targetedNode))
+			if (!blockStatement.Statements.Contains(targetedNode))
 			{
 				return false;
 			}
-			return blockStatement.get_Statements().IndexOf(targetedNode) == 0;
+			return blockStatement.Statements.IndexOf(targetedNode) == 0;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			dummyVar0 = this.Visit(body);
+			this.Visit(body);
 			return body;
 		}
 
 		private void RemoveLabelFromCacheIfNotTargetedAnymore(string gotoLabel, GotoStatement oldGotoStatement)
 		{
-			V_0 = this.context.get_MethodContext().get_GotoStatements().GetEnumerator();
-			try
+			foreach (GotoStatement gotoStatement in this.context.MethodContext.GotoStatements)
 			{
-				while (V_0.MoveNext())
+				if (gotoStatement == oldGotoStatement || !(gotoStatement.TargetLabel == gotoLabel))
 				{
-					V_1 = V_0.get_Current();
-					if (V_1 == oldGotoStatement || !String.op_Equality(V_1.get_TargetLabel(), gotoLabel))
-					{
-						continue;
-					}
-					goto Label0;
+					continue;
 				}
+				return;
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			this.context.get_MethodContext().get_GotoLabels().get_Item(gotoLabel).set_Label(String.Empty);
-			dummyVar0 = this.context.get_MethodContext().get_GotoLabels().Remove(gotoLabel);
-		Label0:
-			return;
+			this.context.MethodContext.GotoLabels[gotoLabel].Label = String.Empty;
+			this.context.MethodContext.GotoLabels.Remove(gotoLabel);
 		}
 
 		private bool TargetIsSwitchCaseEntryStatement(Statement targetedNode)
 		{
-			if (targetedNode.get_Parent() as BlockStatement != null && targetedNode.get_Parent().get_Parent() as SwitchCase != null && this.IsFirstStatement(targetedNode, targetedNode.get_Parent() as BlockStatement))
+			if (targetedNode.Parent is BlockStatement && targetedNode.Parent.Parent is SwitchCase && this.IsFirstStatement(targetedNode, targetedNode.Parent as BlockStatement))
 			{
 				return true;
 			}
-			if (targetedNode.get_Parent() as SwitchCase != null && this.IsFirstStatement(targetedNode, targetedNode.get_Parent() as BlockStatement))
+			if (targetedNode.Parent is SwitchCase && this.IsFirstStatement(targetedNode, targetedNode.Parent as BlockStatement))
 			{
 				return true;
 			}
@@ -97,33 +84,32 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void UpdateContext(GotoStatement oldGoto, GotoStatement newGoto)
 		{
-			this.RemoveLabelFromCacheIfNotTargetedAnymore(oldGoto.get_TargetLabel(), oldGoto);
-			V_1 = this.context.get_MethodContext().get_GotoStatements().IndexOf(oldGoto);
-			this.context.get_MethodContext().get_GotoStatements().set_Item(V_1, newGoto);
-			if (this.context.get_MethodContext().get_StatementToLogicalConstruct().ContainsKey(oldGoto))
+			this.RemoveLabelFromCacheIfNotTargetedAnymore(oldGoto.TargetLabel, oldGoto);
+			int num = this.context.MethodContext.GotoStatements.IndexOf(oldGoto);
+			this.context.MethodContext.GotoStatements[num] = newGoto;
+			if (this.context.MethodContext.StatementToLogicalConstruct.ContainsKey(oldGoto))
 			{
-				V_2 = this.context.get_MethodContext().get_StatementToLogicalConstruct().get_Item(oldGoto);
-				dummyVar0 = this.context.get_MethodContext().get_StatementToLogicalConstruct().Remove(oldGoto);
-				this.context.get_MethodContext().get_StatementToLogicalConstruct().Add(newGoto, V_2);
+				ILogicalConstruct item = this.context.MethodContext.StatementToLogicalConstruct[oldGoto];
+				this.context.MethodContext.StatementToLogicalConstruct.Remove(oldGoto);
+				this.context.MethodContext.StatementToLogicalConstruct.Add(newGoto, item);
 			}
-			return;
 		}
 
 		public override ICodeNode VisitGotoStatement(GotoStatement node)
 		{
-			node = (GotoStatement)this.VisitGotoStatement(node);
-			V_0 = node.get_TargetLabel();
-			V_1 = this.context.get_MethodContext().get_GotoLabels().get_Item(V_0);
-			if (this.TargetIsSwitchCaseEntryStatement(V_1))
+			node = (GotoStatement)base.VisitGotoStatement(node);
+			string targetLabel = node.TargetLabel;
+			Statement item = this.context.MethodContext.GotoLabels[targetLabel];
+			if (this.TargetIsSwitchCaseEntryStatement(item))
 			{
-				V_2 = this.GetInnerMostParentOfType<SwitchCase>(V_1);
-				V_3 = this.GetInnerMostParentOfType<SwitchStatement>(V_2);
-				V_4 = this.GetInnerMostParentOfType<SwitchStatement>(node);
-				if (V_4 != null && V_4 == V_3)
+				SwitchCase innerMostParentOfType = this.GetInnerMostParentOfType<SwitchCase>(item);
+				SwitchStatement switchStatement = this.GetInnerMostParentOfType<SwitchStatement>(innerMostParentOfType);
+				SwitchStatement innerMostParentOfType1 = this.GetInnerMostParentOfType<SwitchStatement>(node);
+				if (innerMostParentOfType1 != null && innerMostParentOfType1 == switchStatement)
 				{
-					V_5 = this.CreateCaseGoto(node, V_2);
-					this.UpdateContext(node, V_5);
-					return V_5;
+					GotoStatement gotoStatement = this.CreateCaseGoto(node, innerMostParentOfType);
+					this.UpdateContext(node, gotoStatement);
+					return gotoStatement;
 				}
 			}
 			return node;

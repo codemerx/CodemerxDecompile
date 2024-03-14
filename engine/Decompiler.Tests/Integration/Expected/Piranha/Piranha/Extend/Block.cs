@@ -1,3 +1,4 @@
+using Piranha;
 using Piranha.Runtime;
 using System;
 using System.Reflection;
@@ -21,23 +22,21 @@ namespace Piranha.Extend
 
 		protected Block()
 		{
-			base();
-			return;
 		}
 
 		public virtual string GetTitle()
 		{
-			V_0 = App.get_Blocks().GetByType(this.GetType());
-			V_1 = "[Not Implemented]";
-			if (!String.IsNullOrEmpty(V_0.get_ListTitleField()))
+			AppBlock byType = App.Blocks.GetByType(this.GetType());
+			string title = "[Not Implemented]";
+			if (!String.IsNullOrEmpty(byType.ListTitleField))
 			{
-				V_2 = this.GetType().GetProperty(V_0.get_ListTitleField(), App.get_PropertyBindings());
-				if (PropertyInfo.op_Inequality(V_2, null) && System.Type.GetTypeFromHandle(// 
-				// Current member / type: System.String Piranha.Extend.Block::GetTitle()
-				// Exception in: System.String GetTitle()
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				PropertyInfo property = this.GetType().GetProperty(byType.ListTitleField, App.PropertyBindings);
+				if (property != null && typeof(IField).IsAssignableFrom(property.PropertyType))
+				{
+					title = ((IField)property.GetValue(this)).GetTitle();
+				}
+			}
+			return title;
+		}
 	}
 }

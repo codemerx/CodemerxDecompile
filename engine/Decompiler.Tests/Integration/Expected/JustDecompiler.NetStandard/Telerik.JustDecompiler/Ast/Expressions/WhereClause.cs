@@ -14,9 +14,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new WhereClause.u003cget_Childrenu003ed__11(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				WhereClause whereClause = null;
+				yield return whereClause.Condition;
 			}
 		}
 
@@ -24,7 +23,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 75;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.WhereClause;
 			}
 		}
 
@@ -34,31 +33,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public WhereClause(Expression condition, IEnumerable<Instruction> instructions)
+		public WhereClause(Expression condition, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Condition(condition);
-			return;
+			this.Condition = condition;
 		}
 
 		public override Expression Clone()
 		{
-			return new WhereClause(this.get_Condition().Clone(), this.instructions);
+			return new WhereClause(this.Condition.Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new WhereClause(this.get_Condition().CloneExpressionOnly(), null);
+			return new WhereClause(this.Condition.CloneExpressionOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as WhereClause;
-			if (V_0 == null)
+			WhereClause whereClause = other as WhereClause;
+			if (whereClause == null)
 			{
 				return false;
 			}
-			return this.get_Condition().Equals(V_0.get_Condition());
+			return this.Condition.Equals(whereClause.Condition);
 		}
 	}
 }

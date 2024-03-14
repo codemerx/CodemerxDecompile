@@ -19,8 +19,6 @@ namespace Mix.Cms.Lib.ViewModels.Account
 
 		public ChangePasswordViewModel()
 		{
-			base();
-			return;
 		}
 	}
 }

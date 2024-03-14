@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Piranha.Models
@@ -9,91 +10,31 @@ namespace Piranha.Models
 	{
 		public SiteType()
 		{
-			base();
-			return;
 		}
 
 		public void Ensure()
 		{
-			stackVariable1 = this.get_Regions();
-			stackVariable2 = SiteType.u003cu003ec.u003cu003e9__0_0;
-			if (stackVariable2 == null)
+			if ((
+				from r in base.Regions
+				select r.Id).Distinct<string>().Count<string>() != base.Regions.Count)
 			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<RegionType, string>(SiteType.u003cu003ec.u003cu003e9.u003cEnsureu003eb__0_0);
-				SiteType.u003cu003ec.u003cu003e9__0_0 = stackVariable2;
+				throw new InvalidOperationException(String.Concat("Region Id not unique for site type ", base.Id));
 			}
-			if (stackVariable1.Select<RegionType, string>(stackVariable2).Distinct<string>().Count<string>() != this.get_Regions().get_Count())
+			foreach (RegionType region in base.Regions)
 			{
-				throw new InvalidOperationException(String.Concat("Region Id not unique for site type ", this.get_Id()));
-			}
-			V_0 = this.get_Regions().GetEnumerator();
-			try
-			{
-				while (V_0.MoveNext())
+				region.Title = region.Title ?? region.Id;
+				if ((
+					from f in region.Fields
+					select f.Id).Distinct<string>().Count<string>() != region.Fields.Count)
 				{
-					V_1 = V_0.get_Current();
-					stackVariable16 = V_1;
-					stackVariable18 = V_1.get_Title();
-					if (stackVariable18 == null)
-					{
-						dummyVar1 = stackVariable18;
-						stackVariable18 = V_1.get_Id();
-					}
-					stackVariable16.set_Title(stackVariable18);
-					stackVariable20 = V_1.get_Fields();
-					stackVariable21 = SiteType.u003cu003ec.u003cu003e9__0_1;
-					if (stackVariable21 == null)
-					{
-						dummyVar2 = stackVariable21;
-						stackVariable21 = new Func<FieldType, string>(SiteType.u003cu003ec.u003cu003e9.u003cEnsureu003eb__0_1);
-						SiteType.u003cu003ec.u003cu003e9__0_1 = stackVariable21;
-					}
-					if (stackVariable20.Select<FieldType, string>(stackVariable21).Distinct<string>().Count<string>() != V_1.get_Fields().get_Count())
-					{
-						throw new InvalidOperationException(String.Concat("Field Id not unique for site type ", this.get_Id()));
-					}
-					V_2 = V_1.get_Fields().GetEnumerator();
-					try
-					{
-						while (V_2.MoveNext())
-						{
-							V_3 = V_2.get_Current();
-							stackVariable35 = V_3;
-							stackVariable37 = V_3.get_Id();
-							if (stackVariable37 == null)
-							{
-								dummyVar3 = stackVariable37;
-								stackVariable37 = "Default";
-							}
-							stackVariable35.set_Id(stackVariable37);
-							stackVariable38 = V_3;
-							stackVariable40 = V_3.get_Title();
-							if (stackVariable40 == null)
-							{
-								dummyVar4 = stackVariable40;
-								stackVariable40 = V_3.get_Id();
-							}
-							stackVariable38.set_Title(stackVariable40);
-						}
-					}
-					finally
-					{
-						if (V_2 != null)
-						{
-							V_2.Dispose();
-						}
-					}
+					throw new InvalidOperationException(String.Concat("Field Id not unique for site type ", base.Id));
+				}
+				foreach (FieldType field in region.Fields)
+				{
+					field.Id = field.Id ?? "Default";
+					field.Title = field.Title ?? field.Id;
 				}
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 	}
 }

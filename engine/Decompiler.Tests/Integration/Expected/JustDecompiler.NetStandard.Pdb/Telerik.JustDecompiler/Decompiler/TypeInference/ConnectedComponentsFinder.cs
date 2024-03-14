@@ -21,7 +21,6 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		public ConnectedComponentsFinder(ICollection<ClassHierarchyNode> inferenceGraph)
 		{
-			base();
 			this.inferenceGraph = inferenceGraph;
 			this.used = new Dictionary<ClassHierarchyNode, int>();
 			this.s = new Stack<ClassHierarchyNode>();
@@ -29,114 +28,80 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 			this.nodeToComponent = new Dictionary<ClassHierarchyNode, int>();
 			this.componentCount = 0;
 			this.preorderNumber = 0;
-			return;
 		}
 
 		public IEnumerable<ICollection<ClassHierarchyNode>> GetConnectedComponents()
 		{
+			ClassHierarchyNode classHierarchyNode;
 			do
 			{
-				V_0 = null;
-				V_2 = this.inferenceGraph.GetEnumerator();
-				try
+				classHierarchyNode = null;
+				foreach (ClassHierarchyNode classHierarchyNode1 in this.inferenceGraph)
 				{
-					while (V_2.MoveNext())
+					if (this.used.ContainsKey(classHierarchyNode1))
 					{
-						V_3 = V_2.get_Current();
-						if (this.used.ContainsKey(V_3))
-						{
-							continue;
-						}
-						V_0 = V_3;
-						goto Label0;
+						continue;
 					}
-				}
-				finally
-				{
-					if (V_2 != null)
-					{
-						V_2.Dispose();
-					}
+					classHierarchyNode = classHierarchyNode1;
+					goto Label0;
 				}
 			Label0:
-				if (V_0 == null)
+				if (classHierarchyNode == null)
 				{
 					continue;
 				}
-				this.RecursiveDfs(V_0);
+				this.RecursiveDfs(classHierarchyNode);
 			}
-			while (V_0 != null);
-			V_1 = new ICollection<ClassHierarchyNode>[this.componentCount];
-			V_4 = this.nodeToComponent.get_Keys().GetEnumerator();
-			try
+			while (classHierarchyNode != null);
+			ICollection<ClassHierarchyNode>[] classHierarchyNodes = new ICollection<ClassHierarchyNode>[this.componentCount];
+			foreach (ClassHierarchyNode key in this.nodeToComponent.Keys)
 			{
-				while (V_4.MoveNext())
+				int item = this.nodeToComponent[key];
+				if (classHierarchyNodes[item] == null)
 				{
-					V_5 = V_4.get_Current();
-					V_6 = this.nodeToComponent.get_Item(V_5);
-					if (V_1[V_6] == null)
-					{
-						V_1[V_6] = new List<ClassHierarchyNode>();
-					}
-					((List<ClassHierarchyNode>)V_1[V_6]).Add(V_5);
+					classHierarchyNodes[item] = new List<ClassHierarchyNode>();
 				}
+				((List<ClassHierarchyNode>)classHierarchyNodes[item]).Add(key);
 			}
-			finally
-			{
-				((IDisposable)V_4).Dispose();
-			}
-			return V_1;
+			return classHierarchyNodes;
 		}
 
 		private void RecursiveDfs(ClassHierarchyNode node)
 		{
-			this.preorderNumber = this.preorderNumber + 1;
+			this.preorderNumber++;
 			this.used.Add(node, this.preorderNumber);
 			this.s.Push(node);
 			this.p.Push(node);
-			V_0 = node.get_CanAssignTo().GetEnumerator();
-			try
+			foreach (ClassHierarchyNode canAssignTo in node.CanAssignTo)
 			{
-				while (V_0.MoveNext())
+				if (this.used.ContainsKey(canAssignTo))
 				{
-					V_1 = V_0.get_Current();
-					if (this.used.ContainsKey(V_1))
+					if (this.nodeToComponent.ContainsKey(canAssignTo))
 					{
-						if (this.nodeToComponent.ContainsKey(V_1))
-						{
-							continue;
-						}
-						V_2 = this.used.get_Item(V_1);
-						while (V_2 < this.used.get_Item(this.p.Peek()))
-						{
-							dummyVar0 = this.p.Pop();
-						}
+						continue;
 					}
-					else
+					int item = this.used[canAssignTo];
+					while (item < this.used[this.p.Peek()])
 					{
-						this.RecursiveDfs(V_1);
+						this.p.Pop();
 					}
 				}
-			}
-			finally
-			{
-				if (V_0 != null)
+				else
 				{
-					V_0.Dispose();
+					this.RecursiveDfs(canAssignTo);
 				}
 			}
 			if (this.p.Peek() == node)
 			{
 				while (this.s.Peek() != node)
 				{
-					V_3 = this.s.Pop();
-					this.nodeToComponent.Add(V_3, this.componentCount);
+					ClassHierarchyNode classHierarchyNode = this.s.Pop();
+					this.nodeToComponent.Add(classHierarchyNode, this.componentCount);
 				}
 				this.nodeToComponent.Add(this.p.Pop(), this.componentCount);
-				dummyVar1 = this.s.Pop();
-				this.componentCount = this.componentCount + 1;
+				this.s.Pop();
+				this.componentCount++;
 			}
-			return;
 		}
 	}
 }

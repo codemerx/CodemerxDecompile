@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using Mono.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,9 +12,20 @@ namespace Mono.Cecil.Extensions
 	{
 		public static IEnumerable<GenericParameter> GetGenericParameters(IGenericParameterProvider self)
 		{
-			stackVariable1 = new IGenericParameterProviderExtensions.u003cGetGenericParametersu003ed__0(-2);
-			stackVariable1.u003cu003e3__self = self;
-			return stackVariable1;
+			int count = 0;
+			if (self is TypeReference)
+			{
+				TypeReference declaringType = (self as TypeReference).get_DeclaringType();
+				if (declaringType != null)
+				{
+					count = declaringType.get_GenericParameters().get_Count();
+				}
+			}
+			while (count < self.get_GenericParameters().get_Count())
+			{
+				yield return self.get_GenericParameters().get_Item(count);
+				count++;
+			}
 		}
 	}
 }

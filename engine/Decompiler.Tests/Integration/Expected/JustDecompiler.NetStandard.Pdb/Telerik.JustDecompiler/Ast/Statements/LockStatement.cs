@@ -26,9 +26,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.set_Parent(this);
+					this.body.Parent = this;
 				}
-				return;
 			}
 		}
 
@@ -36,9 +35,15 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new LockStatement.u003cget_Childrenu003ed__5(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				LockStatement lockStatement = null;
+				if (lockStatement.Expression != null)
+				{
+					yield return lockStatement.Expression;
+				}
+				if (lockStatement.body != null)
+				{
+					yield return lockStatement.body;
+				}
 			}
 		}
 
@@ -46,7 +51,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 56;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.LockStatement;
 			}
 		}
 
@@ -58,59 +63,52 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public LockStatement(Telerik.JustDecompiler.Ast.Expressions.Expression expression, BlockStatement body, IEnumerable<Instruction> finallyInstructions)
 		{
-			base();
-			this.set_Expression(expression);
+			this.Expression = expression;
 			this.body = body;
 			this.mappedFinallyInstructions = new List<Instruction>();
 			if (finallyInstructions != null)
 			{
 				this.mappedFinallyInstructions.AddRange(finallyInstructions);
-				stackVariable12 = this.mappedFinallyInstructions;
-				stackVariable13 = LockStatement.u003cu003ec.u003cu003e9__2_0;
-				if (stackVariable13 == null)
-				{
-					dummyVar0 = stackVariable13;
-					stackVariable13 = new Comparison<Instruction>(LockStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__2_0);
-					LockStatement.u003cu003ec.u003cu003e9__2_0 = stackVariable13;
-				}
-				stackVariable12.Sort(stackVariable13);
+				this.mappedFinallyInstructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
-			return;
 		}
 
 		public override Statement Clone()
 		{
-			V_0 = null;
+			BlockStatement blockStatement = null;
 			if (this.body != null)
 			{
-				V_0 = this.body.Clone() as BlockStatement;
+				blockStatement = this.body.Clone() as BlockStatement;
 			}
-			V_1 = new LockStatement(this.get_Expression().Clone(), V_0, this.mappedFinallyInstructions);
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			LockStatement lockStatement = new LockStatement(this.Expression.Clone(), blockStatement, this.mappedFinallyInstructions);
+			base.CopyParentAndLabel(lockStatement);
+			return lockStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
+			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				stackVariable5 = this.body.CloneStatementOnly() as BlockStatement;
+				blockStatement = this.body.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable5;
-			V_1 = new LockStatement(this.get_Expression().CloneExpressionOnly(), V_0, null);
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			BlockStatement blockStatement1 = blockStatement;
+			LockStatement lockStatement = new LockStatement(this.Expression.CloneExpressionOnly(), blockStatement1, null);
+			base.CopyParentAndLabel(lockStatement);
+			return lockStatement;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			stackVariable1 = new LockStatement.u003cGetOwnInstructionsu003ed__3(-2);
-			stackVariable1.u003cu003e4__this = this;
-			return stackVariable1;
+			LockStatement lockStatement = null;
+			foreach (Instruction mappedFinallyInstruction in lockStatement.mappedFinallyInstructions)
+			{
+				yield return mappedFinallyInstruction;
+			}
 		}
 	}
 }

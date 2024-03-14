@@ -1,6 +1,7 @@
 using Piranha;
 using Piranha.Extend;
 using Piranha.Models;
+using Piranha.Services;
 using System;
 
 namespace Piranha.Extend.Fields
@@ -10,42 +11,40 @@ namespace Piranha.Extend.Fields
 	{
 		public ImageField()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator ImageField(Guid guid)
 		{
-			stackVariable0 = new ImageField();
-			stackVariable0.set_Id(new Guid?(guid));
-			return stackVariable0;
+			return new ImageField()
+			{
+				Id = new Guid?(guid)
+			};
 		}
 
 		public static implicit operator ImageField(Piranha.Models.Media media)
 		{
-			stackVariable0 = new ImageField();
-			stackVariable0.set_Id(new Guid?(media.get_Id()));
-			return stackVariable0;
+			return new ImageField()
+			{
+				Id = new Guid?(media.Id)
+			};
 		}
 
 		public static implicit operator String(ImageField image)
 		{
-			if (image.get_Media() == null)
+			if (image.Media == null)
 			{
 				return "";
 			}
-			return image.get_Media().get_PublicUrl();
+			return image.Media.PublicUrl;
 		}
 
 		public string Resize(IApi api, int width, int? height = null)
 		{
-			if (!this.get_Id().get_HasValue())
+			if (!base.Id.HasValue)
 			{
 				return null;
 			}
-			stackVariable6 = api.get_Media();
-			V_0 = this.get_Id();
-			return stackVariable6.EnsureVersion(V_0.get_Value(), width, height);
+			return api.Media.EnsureVersion(base.Id.Value, width, height);
 		}
 	}
 }

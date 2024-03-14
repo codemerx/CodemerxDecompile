@@ -8,10 +8,6 @@ using System.Resources;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Linq;
-using Mono.Cecil.AssemblyResolver;
-using Telerik.JustDecompiler.External.Interfaces;
-using Telerik.JustDecompiler.External;
-using Telerik.JustDecompiler.Common;
 using JustDecompile.EngineInfrastructure;
 
 namespace JustDecompile.Tools.MSBuildProjectBuilder
@@ -20,13 +16,28 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 	{
 		public const int MaxPathLength = 259; // 259 + NULL == 260
 
+		/* AGPL */
+		// Hardcoding invalid chars to get same result in different platforms
+		private static readonly char[] InvalidChars = new char[]
+		{
+			'"', '<', '>', '|', '\0', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005',
+			'\u0006', '\a', '\b', '\t', '\n', '\v', '\f', '\r', '\u000e', '\u000f',
+			'\u0010', '\u0011', '\u0012', '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019',
+			'\u001a', '\u001b', '\u001c', '\u001d', '\u001e', '\u001f', ':', '*', '?', '\\',
+			'/'
+		};
+		/* End AGPL */
+		
 		public static string GetLegalFileName(string legalName)
 		{
 			if (legalName.Length == 0)
 			{
 				return string.Empty;
 			}
-			string regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+			
+			/* AGPL */
+			string regexSearch = new string(InvalidChars);
+			/* End AGPL */
 
 			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 
@@ -41,7 +52,10 @@ namespace JustDecompile.Tools.MSBuildProjectBuilder
 			{
 				return string.Empty;
 			}
-			string regexSearch = new string(Path.GetInvalidPathChars());
+			
+			/* AGPL */
+			string regexSearch = new string(InvalidChars);
+			/* End AGPL */
 
 			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 

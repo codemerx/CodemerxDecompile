@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
 namespace Telerik.JustDecompiler.Decompiler
@@ -29,74 +30,47 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public ExpressionDecompilerData()
 		{
-			base();
 			this.blockToExpressionStack = new Dictionary<int, IList<Expression>>();
 			this.exceptionHandlerStartToVariable = new Dictionary<int, VariableReferenceExpression>();
-			return;
 		}
 
 		private string PrintExpressions(IEnumerable<Expression> stack)
 		{
-			V_0 = new StringBuilder();
-			V_1 = stack.GetEnumerator();
-			try
+			StringBuilder stringBuilder = new StringBuilder();
+			foreach (Expression expression in stack)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					dummyVar0 = V_0.AppendLine(V_2.ToCodeString());
-				}
+				stringBuilder.AppendLine(expression.ToCodeString());
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		private string TabIn(string startingString)
 		{
-			V_0 = new StringBuilder();
-			stackVariable3 = new String[1];
-			stackVariable3[0] = Environment.get_NewLine();
-			V_1 = startingString.Split(stackVariable3, 1);
-			V_2 = 0;
-			while (V_2 < (int)V_1.Length)
+			StringBuilder stringBuilder = new StringBuilder();
+			string[] strArray = startingString.Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+			for (int i = 0; i < (int)strArray.Length; i++)
 			{
-				V_3 = V_1[V_2].Trim();
-				dummyVar0 = V_0.Append("\t");
-				dummyVar1 = V_0.AppendLine(V_3);
-				V_2 = V_2 + 1;
+				string str = strArray[i].Trim();
+				stringBuilder.Append("\t");
+				stringBuilder.AppendLine(str);
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		public override string ToString()
 		{
-			V_0 = new StringBuilder();
-			V_1 = this.blockToExpressionStack.get_Keys().GetEnumerator();
-			try
+			StringBuilder stringBuilder = new StringBuilder();
+			foreach (int key in this.blockToExpressionStack.Keys)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					dummyVar0 = V_0.AppendFormat("Block starting at {0:X4} offset:", V_2);
-					dummyVar1 = V_0.AppendLine();
-					dummyVar2 = V_0.AppendLine("{");
-					V_3 = this.TabIn(this.PrintExpressions(this.blockToExpressionStack.get_Item(V_2)));
-					dummyVar3 = V_0.Append(V_3);
-					dummyVar4 = V_0.AppendLine("}");
-					dummyVar5 = V_0.AppendLine();
-				}
+				stringBuilder.AppendFormat("Block starting at {0:X4} offset:", key);
+				stringBuilder.AppendLine();
+				stringBuilder.AppendLine("{");
+				string str = this.TabIn(this.PrintExpressions(this.blockToExpressionStack[key]));
+				stringBuilder.Append(str);
+				stringBuilder.AppendLine("}");
+				stringBuilder.AppendLine();
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 	}
 }

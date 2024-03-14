@@ -212,15 +212,13 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixPost()
 		{
-			base();
-			this.set_MixModuleData(new HashSet<Mix.Cms.Lib.Models.Cms.MixModuleData>());
-			this.set_MixModulePost(new HashSet<Mix.Cms.Lib.Models.Cms.MixModulePost>());
-			this.set_MixPagePost(new HashSet<Mix.Cms.Lib.Models.Cms.MixPagePost>());
-			this.set_MixPostMedia(new HashSet<Mix.Cms.Lib.Models.Cms.MixPostMedia>());
-			this.set_MixPostModule(new HashSet<Mix.Cms.Lib.Models.Cms.MixPostModule>());
-			this.set_MixRelatedPostMixPost(new HashSet<MixRelatedPost>());
-			this.set_MixRelatedPostS(new HashSet<MixRelatedPost>());
-			return;
+			this.MixModuleData = new HashSet<Mix.Cms.Lib.Models.Cms.MixModuleData>();
+			this.MixModulePost = new HashSet<Mix.Cms.Lib.Models.Cms.MixModulePost>();
+			this.MixPagePost = new HashSet<Mix.Cms.Lib.Models.Cms.MixPagePost>();
+			this.MixPostMedia = new HashSet<Mix.Cms.Lib.Models.Cms.MixPostMedia>();
+			this.MixPostModule = new HashSet<Mix.Cms.Lib.Models.Cms.MixPostModule>();
+			this.MixRelatedPostMixPost = new HashSet<MixRelatedPost>();
+			this.MixRelatedPostS = new HashSet<MixRelatedPost>();
 		}
 	}
 }

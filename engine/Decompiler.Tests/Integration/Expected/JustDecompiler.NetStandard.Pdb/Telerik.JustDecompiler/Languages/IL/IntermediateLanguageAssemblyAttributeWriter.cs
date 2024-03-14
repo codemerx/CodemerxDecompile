@@ -31,33 +31,28 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public IntermediateLanguageAssemblyAttributeWriter(ILanguage language, IFormatter formatter, IExceptionFormatter exceptionFormatter, IWriterSettings settings)
 		{
-			base();
-			this.set_Language(language);
+			this.Language = language;
 			this.formatter = formatter;
 			this.exceptionFormatter = exceptionFormatter;
-			this.set_Settings(settings);
-			return;
+			this.Settings = settings;
 		}
 
 		public void WriteAssemblyAttributes(AssemblyDefinition assembly, IWriterContextService writerContextService, bool writeUsings = false, ICollection<string> attributesToIgnore = null)
 		{
-			stackVariable8 = new IntermediateLanguageAttributeWriter(this.get_Language(), this.formatter, this.exceptionFormatter, this.get_Settings());
-			stackVariable8.add_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
-			stackVariable8.WriteAssemblyAttributes(assembly, attributesToIgnore);
-			stackVariable8.remove_ExceptionThrown(new EventHandler<Exception>(this.OnExceptionThrown));
-			return;
+			IntermediateLanguageAttributeWriter intermediateLanguageAttributeWriter = new IntermediateLanguageAttributeWriter(this.Language, this.formatter, this.exceptionFormatter, this.Settings);
+			intermediateLanguageAttributeWriter.ExceptionThrown += new EventHandler<Exception>(this.OnExceptionThrown);
+			intermediateLanguageAttributeWriter.WriteAssemblyAttributes(assembly, attributesToIgnore);
+			intermediateLanguageAttributeWriter.ExceptionThrown -= new EventHandler<Exception>(this.OnExceptionThrown);
 		}
 
 		public void WriteAssemblyInfo(AssemblyDefinition assembly, IWriterContextService writerContextService, bool writeUsings = false, ICollection<string> assemblyAttributesToIgnore = null, ICollection<string> moduleAttributesToIgnore = null)
 		{
 			this.WriteAssemblyAttributes(assembly, writerContextService, writeUsings, assemblyAttributesToIgnore);
 			this.WriteModuleAttributes(assembly.get_MainModule(), writerContextService, writeUsings, moduleAttributesToIgnore);
-			return;
 		}
 
 		public void WriteModuleAttributes(ModuleDefinition module, IWriterContextService writerContextService, bool writeUsings = false, ICollection<string> attributesToIgnore = null)
 		{
-			return;
 		}
 	}
 }

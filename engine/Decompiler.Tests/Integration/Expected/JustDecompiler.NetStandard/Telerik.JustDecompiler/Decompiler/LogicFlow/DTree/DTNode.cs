@@ -18,14 +18,12 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DTree
 		{
 			get
 			{
-				V_0 = new HashSet<DTNode>();
-				V_1 = this;
-				while (V_1 != null)
+				HashSet<DTNode> dTNodes = new HashSet<DTNode>();
+				for (DTNode i = this; i != null; i = i.Predecessor as DTNode)
 				{
-					dummyVar0 = V_0.Add(V_1);
-					V_1 = V_1.get_Predecessor() as DTNode;
+					dTNodes.Add(i);
 				}
-				return V_0;
+				return dTNodes;
 			}
 		}
 
@@ -33,15 +31,13 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DTree
 		{
 			get
 			{
-				return this.get_Predecessor() as DTNode;
+				return base.Predecessor as DTNode;
 			}
 		}
 
-		public DTNode(ISingleEntrySubGraph construct)
+		public DTNode(ISingleEntrySubGraph construct) : base(construct)
 		{
-			base(construct);
-			this.set_DominanceFrontier(new HashSet<DTNode>());
-			return;
+			this.DominanceFrontier = new HashSet<DTNode>();
 		}
 	}
 }

@@ -16,11 +16,13 @@
 
 using Decompiler.Tests.Helpers;
 using JustDecompile.Tools.MSBuildProjectBuilder;
+using System;
 using System.IO;
 using Telerik.JustDecompiler.External;
 using Telerik.JustDecompiler.Languages;
 using Telerik.JustDecompiler.Languages.CSharp;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Decompiler.Tests.Integration
 {
@@ -31,13 +33,23 @@ namespace Decompiler.Tests.Integration
         private const string ExpectedFolderTemplate = @"../../../Integration/Expected/{0}";
 
         [Theory]
-        [InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard")]
-        [InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard")]
-        [InlineData("OrchardCore", "OrchardCore")]
-        [InlineData("Mix.Cms.Lib", "Mix.Cms.Lib")]
-        [InlineData("Piranha", "Piranha")]
-        public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName)
+        [InlineData("JustDecompiler.NetStandard", "JustDecompiler.NetStandard", true)]
+        [InlineData("JustDecompiler.NetStandard.Pdb", "JustDecompiler.NetStandard", true)]
+        [InlineData("OrchardCore", "OrchardCore", true)]
+        [InlineData("Mix.Cms.Lib", "Mix.Cms.Lib", true)]
+        [InlineData("Piranha", "Piranha", true)]
+        [InlineData("Squidex.7.2.0.Net6", "Squidex", false)]
+        [InlineData("coolstore.ShoppingCart.Net6", "ShoppingCart", false)]
+        [InlineData("clean-architecture-manga.accounts-api.Net7", "Application", false)]
+        [InlineData("NorthwindTraders.NetStandard2.1", "Northwind.Application", false)]
+        public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName, bool windowsOnly)
         {
+            // Skip Windows Only tests
+            if (windowsOnly && !OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
             // Arrange
             string targetFolder = string.Format(TargetFolderTemplate, assemblyFolder, assemblyName);
             string outputFolder = string.Format(OutputFolderTemplate, assemblyFolder);
@@ -72,7 +84,7 @@ namespace Decompiler.Tests.Integration
             preferences.WriteLargeNumbersInHex = true;
             preferences.DecompileDangerousResources = false;
 
-            ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.None);
+            ILanguage language = LanguageFactory.GetLanguage(CSharpVersion.V7);
             string projFilePath = Path.Combine(output, Path.GetFileNameWithoutExtension(target) + language.VSProjectFileExtension);
 
             TestMSBuildProjectBuilder result = new TestMSBuildProjectBuilder(target, projFilePath, language, preferences);

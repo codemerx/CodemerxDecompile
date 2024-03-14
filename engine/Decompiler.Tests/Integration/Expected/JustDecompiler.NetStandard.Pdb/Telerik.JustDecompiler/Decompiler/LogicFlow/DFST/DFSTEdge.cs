@@ -19,10 +19,8 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DFST
 
 		public DFSTEdge(DFSTNode start, DFSTNode end)
 		{
-			base();
-			this.set_Start(start);
-			this.set_End(end);
-			return;
+			this.Start = start;
+			this.End = end;
 		}
 
 		public override bool Equals(object obj)
@@ -36,20 +34,20 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DFST
 			{
 				return false;
 			}
-			if (this.get_Start() != other.get_Start())
+			if (this.Start != other.Start)
 			{
 				return false;
 			}
-			return this.get_End() == other.get_End();
+			return this.End == other.End;
 		}
 
 		public override int GetHashCode()
 		{
-			V_0 = this.get_Start().GetHashCode();
-			V_1 = this.get_End().GetHashCode();
-			V_2 = 32;
-			V_3 = V_0 | V_1 & V_2 - 1;
-			return V_0 << V_3 & 31 | V_0 >> V_2 - V_3 & 31 ^ V_1;
+			uint hashCode = (uint)this.Start.GetHashCode();
+			uint num = (uint)this.End.GetHashCode();
+			int num1 = 32;
+			int num2 = (hashCode | num) & num1 - 1;
+			return (hashCode << (num2 & 31) | hashCode >> (num1 - num2 & 31)) ^ num;
 		}
 	}
 }

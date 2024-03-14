@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new VariableDeclarationExpression.u003cget_Childrenu003ed__6(-2);
 			}
 		}
 
@@ -23,7 +22,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 27;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.VariableDeclarationExpression;
 			}
 		}
 
@@ -31,12 +30,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Variable().get_VariableType();
+				return this.Variable.get_VariableType();
 			}
 			set
 			{
-				this.get_Variable().set_VariableType(value);
-				return;
+				this.Variable.set_VariableType(value);
 			}
 		}
 
@@ -46,31 +44,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public VariableDeclarationExpression(VariableDefinition variable, IEnumerable<Instruction> instructions)
+		public VariableDeclarationExpression(VariableDefinition variable, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Variable(variable);
-			return;
+			this.Variable = variable;
 		}
 
 		public override Expression Clone()
 		{
-			return new VariableDeclarationExpression(this.get_Variable(), this.instructions);
+			return new VariableDeclarationExpression(this.Variable, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new VariableDeclarationExpression(this.get_Variable(), null);
+			return new VariableDeclarationExpression(this.Variable, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as VariableDeclarationExpression == null)
+			if (!(other is VariableDeclarationExpression))
 			{
 				return false;
 			}
-			V_0 = other as VariableDeclarationExpression;
-			return (object)this.get_Variable().Resolve() == (object)V_0.get_Variable().Resolve();
+			VariableDeclarationExpression variableDeclarationExpression = other as VariableDeclarationExpression;
+			return (object)this.Variable.Resolve() == (object)variableDeclarationExpression.Variable.Resolve();
 		}
 	}
 }

@@ -1,6 +1,8 @@
+using Piranha;
 using Piranha.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Piranha.Runtime
@@ -10,37 +12,27 @@ namespace Piranha.Runtime
 	{
 		public ContentTypeList()
 		{
-			base();
-			return;
 		}
 
 		public T GetById(string id)
 		{
-			V_0 = new ContentTypeList<T>.u003cu003ec__DisplayClass1_0();
-			V_0.id = id;
-			return this.FirstOrDefault<T>(new Func<T, bool>(V_0.u003cGetByIdu003eb__0));
+			return this.FirstOrDefault<T>((T t) => t.Id == id);
 		}
 
 		public void Init(IEnumerable<T> types)
 		{
-			V_0 = types.GetEnumerator();
-			try
+			foreach (T type in types)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.Add(V_1);
-				}
+				base.Add(type);
 			}
-			finally
-			{
-				if (V_0 != null)
+			App.Hooks.RegisterOnAfterSave<T>((T model) => {
+				T t1 = this.FirstOrDefault<T>((T t) => t.Id == model.Id);
+				if (t1 != null)
 				{
-					V_0.Dispose();
+					base.Remove(t1);
 				}
-			}
-			App.get_Hooks().RegisterOnAfterSave<T>(new HookManager.ModelDelegate<T>(this.u003cInitu003eb__0_0));
-			return;
+				base.Add(model);
+			});
 		}
 	}
 }

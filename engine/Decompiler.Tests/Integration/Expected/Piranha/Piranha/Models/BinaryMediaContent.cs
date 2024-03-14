@@ -13,8 +13,6 @@ namespace Piranha.Models
 
 		public BinaryMediaContent()
 		{
-			base();
-			return;
 		}
 	}
 }

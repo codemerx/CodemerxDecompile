@@ -10,17 +10,15 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public DetermineNotSupportedVBCodeStep()
 		{
-			base();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			V_0 = new DetermineNotSupportedVBCodeStep.NotSupportedUnaryOperatorFinder();
-			V_0.Visit(body);
-			if (V_0.IsAddressUnaryOperatorFound)
+			DetermineNotSupportedVBCodeStep.NotSupportedUnaryOperatorFinder notSupportedUnaryOperatorFinder = new DetermineNotSupportedVBCodeStep.NotSupportedUnaryOperatorFinder();
+			notSupportedUnaryOperatorFinder.Visit(body);
+			if (notSupportedUnaryOperatorFinder.IsAddressUnaryOperatorFound)
 			{
-				throw new ArgumentException(String.Format("The unary opperator {0} is not supported in VisualBasic", V_0.FoundUnaryOperator));
+				throw new ArgumentException(String.Format("The unary opperator {0} is not supported in VisualBasic", notSupportedUnaryOperatorFinder.FoundUnaryOperator));
 			}
 			(new DetermineNotSupportedVBCodeStep.NotSupportedFeatureUsageFinder()).Visit(body);
 			return body;
@@ -30,19 +28,16 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			public NotSupportedFeatureUsageFinder()
 			{
-				base();
-				return;
 			}
 
 			public override void VisitBinaryExpression(BinaryExpression node)
 			{
-				if (node.get_Left().get_CodeNodeType() != 48 || node.get_Operator() != 2 && node.get_Operator() != 4)
+				if (node.Left.CodeNodeType != CodeNodeType.EventReferenceExpression || node.Operator != BinaryOperator.AddAssign && node.Operator != BinaryOperator.SubtractAssign)
 				{
-					this.VisitBinaryExpression(node);
+					base.VisitBinaryExpression(node);
 					return;
 				}
-				this.Visit(node.get_Right());
-				return;
+				this.Visit(node.Right);
 			}
 
 			public override void VisitEventReferenceExpression(EventReferenceExpression node)
@@ -71,11 +66,9 @@ namespace Telerik.JustDecompiler.Steps
 
 			public NotSupportedUnaryOperatorFinder()
 			{
-				base();
 				this.IsAddressUnaryOperatorFound = false;
-				this.FoundUnaryOperator = 11;
+				this.FoundUnaryOperator = UnaryOperator.None;
 				this.methodInvocationsStackCount = 0;
-				return;
 			}
 
 			public override void Visit(ICodeNode node)
@@ -84,34 +77,31 @@ namespace Telerik.JustDecompiler.Steps
 				{
 					return;
 				}
-				this.Visit(node);
-				return;
+				base.Visit(node);
 			}
 
 			public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				this.Visit(node.get_MethodExpression());
-				if (node.get_MethodExpression() != null)
+				this.Visit(node.MethodExpression);
+				if (node.MethodExpression != null)
 				{
-					this.methodInvocationsStackCount = this.methodInvocationsStackCount + 1;
+					this.methodInvocationsStackCount++;
 				}
-				this.Visit(node.get_Arguments());
-				if (node.get_MethodExpression() != null)
+				this.Visit(node.Arguments);
+				if (node.MethodExpression != null)
 				{
-					this.methodInvocationsStackCount = this.methodInvocationsStackCount - 1;
+					this.methodInvocationsStackCount--;
 				}
-				return;
 			}
 
 			public override void VisitUnaryExpression(UnaryExpression node)
 			{
-				if (this.methodInvocationsStackCount == 0 && node.get_Operand() as ArgumentReferenceExpression == null && node.get_Operator() == 8 || node.get_Operator() == 7 || node.get_Operator() == 9)
+				if (this.methodInvocationsStackCount == 0 && !(node.Operand is ArgumentReferenceExpression) && (node.Operator == UnaryOperator.AddressDereference || node.Operator == UnaryOperator.AddressReference || node.Operator == UnaryOperator.AddressOf))
 				{
 					this.IsAddressUnaryOperatorFound = true;
-					this.FoundUnaryOperator = node.get_Operator();
+					this.FoundUnaryOperator = node.Operator;
 				}
-				this.VisitUnaryExpression(node);
-				return;
+				base.VisitUnaryExpression(node);
 			}
 		}
 	}

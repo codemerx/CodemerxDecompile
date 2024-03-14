@@ -91,8 +91,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixPagePost()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mix.Cms.Lib", "Mix.Cms.Lib.csproj", "{CACB79B0-DF1C-4C85-A991-9D19FCE4FFB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mix.Cms.Lib", "Mix.Cms.Lib.csproj", "{1D155A9A-C0BC-4914-9B4A-29EA71CE0AF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,10 +8,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CACB79B0-DF1C-4C85-A991-9D19FCE4FFB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CACB79B0-DF1C-4C85-A991-9D19FCE4FFB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CACB79B0-DF1C-4C85-A991-9D19FCE4FFB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CACB79B0-DF1C-4C85-A991-9D19FCE4FFB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D155A9A-C0BC-4914-9B4A-29EA71CE0AF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D155A9A-C0BC-4914-9B4A-29EA71CE0AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D155A9A-C0BC-4914-9B4A-29EA71CE0AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D155A9A-C0BC-4914-9B4A-29EA71CE0AF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using Mono.Collections.Generic;
 using System;
 using Telerik.JustDecompiler.Ast;
 
@@ -6,185 +7,174 @@ namespace Telerik.JustDecompiler.Common
 {
 	internal static class DynamicHelper
 	{
-		public static BinaryOperator GetBinaryOperator(ExpressionType operator)
+		public static BinaryOperator GetBinaryOperator(ExpressionType @operator)
 		{
-			switch (operator)
+			switch (@operator)
 			{
-				case 0:
-				case 1:
+				case ExpressionType.Add:
+				case ExpressionType.AddChecked:
 				{
-				Label1:
-					return 1;
+					return BinaryOperator.Add;
 				}
-				case 2:
+				case ExpressionType.And:
 				{
-				Label2:
-					return 22;
+					return BinaryOperator.BitwiseAnd;
 				}
-				case 3:
+				case ExpressionType.AndAlso:
 				{
-					return 12;
+					return BinaryOperator.LogicalAnd;
 				}
-				case 4:
-				case 5:
-				case 6:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-				case 17:
-				case 18:
-				case 22:
-				case 23:
-				case 24:
+				case ExpressionType.ArrayLength:
+				case ExpressionType.ArrayIndex:
+				case ExpressionType.Call:
+				case ExpressionType.Conditional:
+				case ExpressionType.Constant:
+				case ExpressionType.Convert:
+				case ExpressionType.ConvertChecked:
+				case ExpressionType.Invoke:
+				case ExpressionType.Lambda:
+				case ExpressionType.ListInit:
+				case ExpressionType.MemberAccess:
+				case ExpressionType.MemberInit:
 				{
-				Label0:
 					throw new Exception("Operator is not supported.");
 				}
-				case 7:
+				case ExpressionType.Coalesce:
 				{
-					return 27;
+					return BinaryOperator.NullCoalesce;
 				}
-				case 12:
+				case ExpressionType.Divide:
 				{
-				Label3:
-					return 7;
+					return BinaryOperator.Divide;
 				}
-				case 13:
+				case ExpressionType.Equal:
 				{
-					return 9;
+					return BinaryOperator.ValueEquality;
 				}
-				case 14:
+				case ExpressionType.ExclusiveOr:
 				{
-				Label4:
-					return 23;
+					return BinaryOperator.BitwiseXor;
 				}
-				case 15:
+				case ExpressionType.GreaterThan:
 				{
-					return 15;
+					return BinaryOperator.GreaterThan;
 				}
-				case 16:
+				case ExpressionType.GreaterThanOrEqual:
 				{
-					return 16;
+					return BinaryOperator.GreaterThanOrEqual;
 				}
-				case 19:
+				case ExpressionType.LeftShift:
 				{
-				Label5:
-					return 17;
+					return BinaryOperator.LeftShift;
 				}
-				case 20:
+				case ExpressionType.LessThan:
 				{
-					return 13;
+					return BinaryOperator.LessThan;
 				}
-				case 21:
+				case ExpressionType.LessThanOrEqual:
 				{
-					return 14;
+					return BinaryOperator.LessThanOrEqual;
 				}
-				case 25:
+				case ExpressionType.Modulo:
 				{
-				Label6:
-					return 24;
+					return BinaryOperator.Modulo;
 				}
-				case 26:
-				case 27:
+				case ExpressionType.Multiply:
+				case ExpressionType.MultiplyChecked:
 				{
-				Label7:
-					return 5;
+					return BinaryOperator.Multiply;
 				}
 				default:
 				{
-					switch (operator - 35)
+					switch (@operator)
 					{
-						case 0:
+						case ExpressionType.NotEqual:
 						{
-							return 10;
+							return BinaryOperator.ValueInequality;
 						}
-						case 1:
+						case ExpressionType.Or:
 						{
-						Label8:
-							return 21;
+							return BinaryOperator.BitwiseOr;
 						}
-						case 2:
+						case ExpressionType.OrElse:
 						{
-							return 11;
+							return BinaryOperator.LogicalOr;
 						}
-						case 3:
-						case 4:
-						case 5:
-						case 9:
-						case 10:
+						case ExpressionType.Parameter:
+						case ExpressionType.Power:
+						case ExpressionType.Quote:
+						case ExpressionType.TypeAs:
+						case ExpressionType.TypeIs:
 						{
-							goto Label0;
+							throw new Exception("Operator is not supported.");
 						}
-						case 6:
+						case ExpressionType.RightShift:
 						{
-						Label9:
-							return 19;
+							return BinaryOperator.RightShift;
 						}
-						case 7:
-						case 8:
+						case ExpressionType.Subtract:
+						case ExpressionType.SubtractChecked:
 						{
-						Label10:
-							return 3;
+							return BinaryOperator.Subtract;
 						}
-						case 11:
+						case ExpressionType.Assign:
 						{
-							return 26;
+							return BinaryOperator.Assign;
 						}
 						default:
 						{
-							switch (operator - 63)
+							switch (@operator)
 							{
-								case 0:
-								case 11:
+								case ExpressionType.AddAssign:
+								case ExpressionType.AddAssignChecked:
 								{
-									goto Label1;
+									return BinaryOperator.Add;
 								}
-								case 1:
+								case ExpressionType.AndAssign:
 								{
-									goto Label2;
+									return BinaryOperator.BitwiseAnd;
 								}
-								case 2:
+								case ExpressionType.DivideAssign:
 								{
-									goto Label3;
+									return BinaryOperator.Divide;
 								}
-								case 3:
+								case ExpressionType.ExclusiveOrAssign:
 								{
-									goto Label4;
+									return BinaryOperator.BitwiseXor;
 								}
-								case 4:
+								case ExpressionType.LeftShiftAssign:
 								{
-									goto Label5;
+									return BinaryOperator.LeftShift;
 								}
-								case 5:
+								case ExpressionType.ModuloAssign:
 								{
-									goto Label6;
+									return BinaryOperator.Modulo;
 								}
-								case 6:
-								case 12:
+								case ExpressionType.MultiplyAssign:
+								case ExpressionType.MultiplyAssignChecked:
 								{
-									goto Label7;
+									return BinaryOperator.Multiply;
 								}
-								case 7:
+								case ExpressionType.OrAssign:
 								{
-									goto Label8;
+									return BinaryOperator.BitwiseOr;
 								}
-								case 8:
+								case ExpressionType.PowerAssign:
 								{
-									goto Label0;
+									throw new Exception("Operator is not supported.");
 								}
-								case 9:
+								case ExpressionType.RightShiftAssign:
 								{
-									goto Label9;
+									return BinaryOperator.RightShift;
 								}
-								case 10:
-								case 13:
+								case ExpressionType.SubtractAssign:
+								case ExpressionType.SubtractAssignChecked:
 								{
-									goto Label10;
+									return BinaryOperator.Subtract;
 								}
 								default:
 								{
-									goto Label0;
+									throw new Exception("Operator is not supported.");
 								}
 							}
 							break;
@@ -204,110 +194,101 @@ namespace Telerik.JustDecompiler.Common
 			}
 			if (dynamicAttribute.get_ConstructorArguments().get_Count() == 0)
 			{
-				stackVariable45 = new Boolean[1];
-				stackVariable45[0] = true;
-				return stackVariable45;
+				return new Boolean[] { true };
 			}
-			if (String.op_Inequality(dynamicAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName(), "System.Boolean[]"))
+			if (dynamicAttribute.get_ConstructorArguments().get_Item(0).get_Type().get_FullName() != "System.Boolean[]")
 			{
 				throw new Exception("Invalid argument type for DynamicAttribute");
 			}
-			V_2 = dynamicAttribute.get_ConstructorArguments().get_Item(0);
-			V_0 = (CustomAttributeArgument[])V_2.get_Value();
-			V_1 = new Boolean[(int)V_0.Length];
-			V_3 = 0;
-			while (V_3 < (int)V_0.Length)
+			CustomAttributeArgument item = dynamicAttribute.get_ConstructorArguments().get_Item(0);
+			CustomAttributeArgument[] value = (CustomAttributeArgument[])item.get_Value();
+			bool[] flagArray = new Boolean[(int)value.Length];
+			for (int i = 0; i < (int)value.Length; i++)
 			{
-				V_1[V_3] = (Boolean)V_0[V_3].get_Value();
-				V_3 = V_3 + 1;
+				flagArray[i] = (Boolean)value[i].get_Value();
 			}
-			return V_1;
+			return flagArray;
 		}
 
-		public static UnaryOperator GetUnaryOperator(ExpressionType operator)
+		public static UnaryOperator GetUnaryOperator(ExpressionType @operator)
 		{
-			if (operator > 49)
+			if (@operator > ExpressionType.Decrement)
 			{
-				if (operator != 54)
+				if (@operator != ExpressionType.Increment)
 				{
-					switch (operator - 77)
+					switch (@operator)
 					{
-						case 0:
+						case ExpressionType.PreIncrementAssign:
 						{
 							break;
 						}
-						case 1:
+						case ExpressionType.PreDecrementAssign:
 						{
-							goto Label0;
+							return UnaryOperator.PreDecrement;
 						}
-						case 2:
+						case ExpressionType.PostIncrementAssign:
 						{
-							return 4;
+							return UnaryOperator.PostIncrement;
 						}
-						case 3:
+						case ExpressionType.PostDecrementAssign:
 						{
-							return 3;
+							return UnaryOperator.PostDecrement;
 						}
-						case 4:
-						case 6:
+						case ExpressionType.TypeEqual:
+						case ExpressionType.IsTrue:
 						{
-							goto Label2;
+							throw new Exception("Operator is not supported.");
 						}
-						case 5:
+						case ExpressionType.OnesComplement:
 						{
-							return 2;
+							return UnaryOperator.BitwiseNot;
 						}
-						case 7:
+						case ExpressionType.IsFalse:
 						{
-							goto Label1;
+							return UnaryOperator.LogicalNot;
 						}
 						default:
 						{
-							goto Label2;
+							throw new Exception("Operator is not supported.");
 						}
 					}
 				}
-				return 6;
+				return UnaryOperator.PreIncrement;
 			}
 			else
 			{
-				switch (operator - 28)
+				switch (@operator)
 				{
-					case 0:
-					case 2:
+					case ExpressionType.Negate:
+					case ExpressionType.NegateChecked:
 					{
-						return 0;
+						return UnaryOperator.Negate;
 					}
-					case 1:
+					case ExpressionType.UnaryPlus:
 					{
-						return 10;
+						return UnaryOperator.UnaryPlus;
 					}
-					case 3:
-					case 4:
-					case 5:
+					case ExpressionType.New:
+					case ExpressionType.NewArrayInit:
+					case ExpressionType.NewArrayBounds:
 					{
 						break;
 					}
-					case 6:
+					case ExpressionType.Not:
 					{
-						goto Label1;
+						return UnaryOperator.LogicalNot;
 					}
 					default:
 					{
-						if (operator == 49)
+						if (@operator == ExpressionType.Decrement)
 						{
-							goto Label0;
+							return UnaryOperator.PreDecrement;
 						}
 						break;
 					}
 				}
 			}
-		Label2:
 			throw new Exception("Operator is not supported.");
-		Label0:
-			return 5;
-		Label1:
-			return 1;
 		}
 	}
 }

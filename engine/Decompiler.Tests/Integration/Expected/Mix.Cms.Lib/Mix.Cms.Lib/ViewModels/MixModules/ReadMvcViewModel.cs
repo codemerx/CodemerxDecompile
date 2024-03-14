@@ -1,20 +1,26 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
+using Mix.Cms.Lib.ViewModels.MixAttributeSetDatas;
 using Mix.Cms.Lib.ViewModels.MixAttributeSets;
 using Mix.Cms.Lib.ViewModels.MixModuleDatas;
 using Mix.Cms.Lib.ViewModels.MixModulePosts;
 using Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas;
 using Mix.Cms.Lib.ViewModels.MixTemplates;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.ViewModels.MixModules
@@ -33,16 +39,15 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				if (this.get_Fields() == null)
+				if (this.Fields == null)
 				{
 					return null;
 				}
-				return JsonConvert.DeserializeObject<List<ModuleFieldViewModel>>(this.get_Fields());
+				return JsonConvert.DeserializeObject<List<ModuleFieldViewModel>>(this.Fields);
 			}
 			set
 			{
-				this.set_Fields(JsonConvert.SerializeObject(value));
-				return;
+				this.Fields = JsonConvert.SerializeObject(value);
 			}
 		}
 
@@ -68,11 +73,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		}
 
 		[JsonProperty("data")]
-		public PaginationModel<Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel> Data
-		{
-			get;
-			set;
-		}
+		public PaginationModel<Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel> Data { get; set; } = new PaginationModel<Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel>();
 
 		[JsonProperty("description")]
 		public string Description
@@ -108,18 +109,10 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				stackVariable1 = new string[4];
-				stackVariable1[0] = "";
-				stackVariable1[1] = "Views/Shared/Templates";
-				stackVariable10 = MixService.GetConfig<string>("ThemeFolder", this.get_Specificulture());
-				if (stackVariable10 == null)
-				{
-					dummyVar0 = stackVariable10;
-					stackVariable10 = "Default";
-				}
-				stackVariable1[2] = stackVariable10;
-				stackVariable1[3] = this.get_EdmTemplate();
-				return CommonHelper.GetFullPath(stackVariable1);
+				string[] config = new string[] { "", "Views/Shared/Templates", null, null };
+				config[2] = MixService.GetConfig<string>("ThemeFolder", this.Specificulture) ?? "Default";
+				config[3] = this.EdmTemplate;
+				return CommonHelper.GetFullPath(config);
 			}
 		}
 
@@ -148,18 +141,10 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				stackVariable1 = new string[4];
-				stackVariable1[0] = "";
-				stackVariable1[1] = "Views/Shared/Templates";
-				stackVariable10 = MixService.GetConfig<string>("ThemeFolder", this.get_Specificulture());
-				if (stackVariable10 == null)
-				{
-					dummyVar0 = stackVariable10;
-					stackVariable10 = "Default";
-				}
-				stackVariable1[2] = stackVariable10;
-				stackVariable1[3] = this.get_FormTemplate();
-				return CommonHelper.GetFullPath(stackVariable1);
+				string[] config = new string[] { "", "Views/Shared/Templates", null, null };
+				config[2] = MixService.GetConfig<string>("ThemeFolder", this.Specificulture) ?? "Default";
+				config[3] = this.FormTemplate;
+				return CommonHelper.GetFullPath(config);
 			}
 		}
 
@@ -189,14 +174,11 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_Image()) || this.get_Image().IndexOf("http") != -1 || this.get_Image().get_Chars(0) == '/')
+				if (string.IsNullOrEmpty(this.Image) || this.Image.IndexOf("http") != -1 || this.Image[0] == '/')
 				{
-					return this.get_Image();
+					return this.Image;
 				}
-				stackVariable16 = new string[2];
-				stackVariable16[0] = this.get_Domain();
-				stackVariable16[1] = this.get_Image();
-				return CommonHelper.GetFullPath(stackVariable16);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Image });
 			}
 		}
 
@@ -241,11 +223,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		}
 
 		[JsonProperty("posts")]
-		public PaginationModel<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel> Posts
-		{
-			get;
-			set;
-		}
+		public PaginationModel<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel> Posts { get; set; } = new PaginationModel<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>();
 
 		[JsonProperty("priority")]
 		public int Priority
@@ -279,18 +257,10 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				stackVariable1 = new string[4];
-				stackVariable1[0] = "";
-				stackVariable1[1] = "Views/Shared/Templates";
-				stackVariable10 = MixService.GetConfig<string>("ThemeFolder", this.get_Specificulture());
-				if (stackVariable10 == null)
-				{
-					dummyVar0 = stackVariable10;
-					stackVariable10 = "Default";
-				}
-				stackVariable1[2] = stackVariable10;
-				stackVariable1[3] = this.get_Template();
-				return CommonHelper.GetFullPath(stackVariable1);
+				string[] config = new string[] { "", "Views/Shared/Templates", null, null };
+				config[2] = MixService.GetConfig<string>("ThemeFolder", this.Specificulture) ?? "Default";
+				config[3] = this.Template;
+				return CommonHelper.GetFullPath(config);
 			}
 		}
 
@@ -306,18 +276,15 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		{
 			get
 			{
-				if (this.get_Thumbnail() == null || this.get_Thumbnail().IndexOf("http") != -1 || this.get_Thumbnail().get_Chars(0) == '/')
+				if (this.Thumbnail == null || this.Thumbnail.IndexOf("http") != -1 || this.Thumbnail[0] == '/')
 				{
-					if (!string.IsNullOrEmpty(this.get_Thumbnail()))
+					if (!string.IsNullOrEmpty(this.Thumbnail))
 					{
-						return this.get_Thumbnail();
+						return this.Thumbnail;
 					}
-					return this.get_ImageUrl();
+					return this.ImageUrl;
 				}
-				stackVariable20 = new string[2];
-				stackVariable20[0] = this.get_Domain();
-				stackVariable20[1] = this.get_Thumbnail();
-				return CommonHelper.GetFullPath(stackVariable20);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Thumbnail });
 			}
 		}
 
@@ -344,121 +311,148 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 
 		public ReadMvcViewModel()
 		{
-			this.u003cDatau003ek__BackingField = new PaginationModel<Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel>();
-			this.u003cPostsu003ek__BackingField = new PaginationModel<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>();
-			base();
-			return;
 		}
 
-		public ReadMvcViewModel(MixModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cDatau003ek__BackingField = new PaginationModel<Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel>();
-			this.u003cPostsu003ek__BackingField = new PaginationModel<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_View(Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel.GetTemplateByPath(this.get_Template(), this.get_Specificulture(), _context, _transaction).get_Data());
-			this.set_FormView(Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel.GetTemplateByPath(this.get_FormTemplate(), this.get_Specificulture(), _context, _transaction).get_Data());
-			this.set_EdmView(Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel.GetTemplateByPath(this.get_EdmTemplate(), this.get_Specificulture(), _context, _transaction).get_Data());
+			this.View = Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel.GetTemplateByPath(this.Template, this.Specificulture, _context, _transaction).get_Data();
+			this.FormView = Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel.GetTemplateByPath(this.FormTemplate, this.Specificulture, _context, _transaction).get_Data();
+			this.EdmView = Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel.GetTemplateByPath(this.EdmTemplate, this.Specificulture, _context, _transaction).get_Data();
 			this.LoadAttributes(_context, _transaction);
-			return;
 		}
 
 		public static RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> GetBy(Expression<Func<MixModule, bool>> predicate, int? postId = null, int? productid = null, int pageId = 0, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>.Repository.GetSingleModel(predicate, _context, _transaction);
-			if (V_0.get_IsSucceed())
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> singleModel = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>.Repository.GetSingleModel(predicate, _context, _transaction);
+			if (singleModel.get_IsSucceed())
 			{
-				V_0.get_Data().set_PostId(postId);
-				V_0.get_Data().set_PageId(new int?(pageId));
-				V_1 = null;
-				stackVariable18 = V_1;
-				V_1 = null;
-				stackVariable20 = V_1;
-				V_1 = null;
-				stackVariable22 = V_1;
-				V_1 = null;
-				V_0.get_Data().LoadData(stackVariable18, stackVariable20, stackVariable22, V_1, new int?(0), null, null);
+				singleModel.get_Data().PostId = postId;
+				singleModel.get_Data().PageId = new int?(pageId);
+				int? nullable = null;
+				int? nullable1 = nullable;
+				nullable = null;
+				int? nullable2 = nullable;
+				nullable = null;
+				int? nullable3 = nullable;
+				nullable = null;
+				singleModel.get_Data().LoadData(nullable1, nullable2, nullable3, nullable, new int?(0), null, null);
 			}
-			return V_0;
+			return singleModel;
 		}
 
 		private void LoadAttributes(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.u003cu003ec__DisplayClass134_0();
-			V_0.u003cu003e4__this = this;
-			stackVariable4 = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>.Repository;
-			V_1 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel::LoadAttributes(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadAttributes(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.u003cu003ec__DisplayClass134_0 variable = null;
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixAttributeSet, Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>.Repository;
+			ParameterExpression parameterExpression = Expression.Parameter(typeof(MixAttributeSet), "m");
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel> singleModel = repository.GetSingleModel(Expression.Lambda<Func<MixAttributeSet, bool>>(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixAttributeSet).GetMethod("get_Name").MethodHandle)), Expression.Constant("sys_additional_field_module", typeof(string))), new ParameterExpression[] { parameterExpression }), _context, _transaction);
+			if (singleModel.get_IsSucceed())
+			{
+				DefaultRepository<!0, !1, !2> defaultRepository = ViewModelBase<MixCmsContext, MixRelatedAttributeData, Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ReadMvcViewModel>.Repository;
+				parameterExpression = Expression.Parameter(typeof(MixRelatedAttributeData), "a");
+				this.AttributeData = defaultRepository.GetFirstModel(Expression.Lambda<Func<MixRelatedAttributeData, bool>>(Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentId").MethodHandle)), Expression.Call(Expression.Property(Expression.Constant(this, typeof(Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel).GetMethod("get_Id").MethodHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(int).GetMethod("ToString").MethodHandle), Array.Empty<Expression>())), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel).GetMethod("get_Specificulture").MethodHandle)))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_AttributeSetId").MethodHandle)), Expression.Property(Expression.Property(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.u003cu003ec__DisplayClass134_0)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.u003cu003ec__DisplayClass134_0).GetField("getAttrs").FieldHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>).GetMethod("get_Data").MethodHandle, typeof(RepositoryResponse<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel>).TypeHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel).GetMethod("get_Id").MethodHandle)))), new ParameterExpression[] { parameterExpression }), _context, _transaction).get_Data();
+			}
+		}
 
 		public void LoadData(int? postId = null, int? productId = null, int? pageId = null, int? pageSize = null, int? pageIndex = 0, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.u003cu003ec__DisplayClass136_0();
-			V_0.u003cu003e4__this = this;
-			V_0.pageId = pageId;
-			V_0.postId = postId;
-			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref V_1, ref V_2, ref V_3);
+			MixCmsContext mixCmsContext = null;
+			IDbContextTransaction dbContextTransaction = null;
+			bool flag = false;
+			UnitOfWorkHelper<MixCmsContext>.InitTransaction(_context, _transaction, ref mixCmsContext, ref dbContextTransaction, ref flag);
 			try
 			{
 				try
 				{
-					V_6 = pageSize;
-					if (V_6.GetValueOrDefault() > 0 & V_6.get_HasValue())
+					int? nullable = pageSize;
+					pageSize = (nullable.GetValueOrDefault() > 0 & nullable.HasValue ? pageSize : this.PageSize);
+					nullable = pageIndex;
+					pageIndex = (nullable.GetValueOrDefault() > 0 & nullable.HasValue ? pageIndex : new int?(0));
+					Expression<Func<MixModuleData, bool>> moduleId = null;
+					Expression<Func<MixModulePost, bool>> expression = null;
+					switch (this.Type)
 					{
-						stackVariable21 = pageSize;
-					}
-					else
-					{
-						stackVariable21 = this.get_PageSize();
-					}
-					pageSize = stackVariable21;
-					V_6 = pageIndex;
-					if (V_6.GetValueOrDefault() > 0 & V_6.get_HasValue())
-					{
-						stackVariable31 = pageIndex;
-					}
-					else
-					{
-						stackVariable31 = new int?(0);
-					}
-					pageIndex = stackVariable31;
-					V_4 = null;
-					V_5 = null;
-					switch (this.get_Type())
-					{
-						case 0:
-						case 1:
+						case MixEnums.MixModuleType.Content:
+						case MixEnums.MixModuleType.Data:
 						{
-							V_9 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-							// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel::LoadData(System.Nullable`1<System.Int32>,System.Nullable`1<System.Int32>,System.Nullable`1<System.Int32>,System.Nullable`1<System.Int32>,System.Nullable`1<System.Int32>,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Exception in: System.Void LoadData(System.Nullable<System.Int32>,System.Nullable<System.Int32>,System.Nullable<System.Int32>,System.Nullable<System.Int32>,System.Nullable<System.Int32>,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Specified method is not supported.
-							// 
-							// mailto: JustDecompilePublicFeedback@telerik.com
-
+							moduleId = (MixModuleData m) => m.ModuleId == this.Id && m.Specificulture == this.Specificulture;
+							break;
+						}
+						case MixEnums.MixModuleType.ListPost:
+						{
+							expression = (MixModulePost n) => n.ModuleId == this.Id && n.Specificulture == this.Specificulture;
+							break;
+						}
+						case MixEnums.MixModuleType.SubPage:
+						{
+							moduleId = (MixModuleData m) => m.ModuleId == this.Id && m.Specificulture == this.Specificulture && m.PageId == pageId;
+							expression = (MixModulePost n) => n.ModuleId == this.Id && n.Specificulture == this.Specificulture;
+							break;
+						}
+						case MixEnums.MixModuleType.SubPost:
+						{
+							moduleId = (MixModuleData m) => m.ModuleId == this.Id && m.Specificulture == this.Specificulture && m.PostId == postId;
+							break;
+						}
+						default:
+						{
+							moduleId = (MixModuleData m) => m.ModuleId == this.Id && m.Specificulture == this.Specificulture;
+							expression = (MixModulePost n) => n.ModuleId == this.Id && n.Specificulture == this.Specificulture;
+							break;
+						}
+					}
+					if (moduleId != null)
+					{
+						RepositoryResponse<PaginationModel<Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel>> modelListBy = ViewModelBase<MixCmsContext, MixModuleData, Mix.Cms.Lib.ViewModels.MixModuleDatas.ReadViewModel>.Repository.GetModelListBy(moduleId, MixService.GetConfig<string>("OrderBy"), 0, pageSize, pageIndex, mixCmsContext, dbContextTransaction);
+						if (modelListBy.get_IsSucceed())
+						{
+							this.Data = modelListBy.get_Data();
+						}
+					}
+					if (expression != null)
+					{
+						RepositoryResponse<PaginationModel<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> repositoryResponse = ViewModelBase<MixCmsContext, MixModulePost, Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>.Repository.GetModelListBy(expression, MixService.GetConfig<string>("OrderBy"), 0, pageSize, pageIndex, mixCmsContext, dbContextTransaction);
+						if (repositoryResponse.get_IsSucceed())
+						{
+							this.Posts = repositoryResponse.get_Data();
+						}
+					}
+				}
+				catch (Exception exception)
+				{
+					UnitOfWorkHelper<MixCmsContext>.HandleException<PaginationModel<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>>(exception, flag, dbContextTransaction);
+				}
+			}
+			finally
+			{
+				if (flag)
+				{
+					RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+					dbContextTransaction.Dispose();
+					mixCmsContext.Dispose();
+				}
+			}
+		}
 
 		public T Property<T>(string fieldName)
 		{
-			if (this.get_AttributeData() == null)
+			T t;
+			if (this.AttributeData == null)
 			{
-				V_1 = default(T);
-				return V_1;
+				t = default(T);
+				return t;
 			}
-			V_0 = this.get_AttributeData().get_Data().get_Data().GetValue(fieldName);
-			if (V_0 != null)
+			JToken value = this.AttributeData.Data.Data.GetValue(fieldName);
+			if (value != null)
 			{
-				return Newtonsoft.Json.Linq.Extensions.Value<T>(V_0);
+				return Newtonsoft.Json.Linq.Extensions.Value<T>(value);
 			}
-			V_1 = default(T);
-			return V_1;
+			t = default(T);
+			return t;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Telerik.JustDecompiler.External.Interfaces;
 
 namespace Telerik.JustDecompiler.External
@@ -8,24 +9,20 @@ namespace Telerik.JustDecompiler.External
 	{
 		public ExceptionThrownNotifier()
 		{
-			base();
-			return;
 		}
 
 		protected void OnExceptionThrown(Exception ex)
 		{
 			this.OnExceptionThrown(this, ex);
-			return;
 		}
 
 		protected void OnExceptionThrown(object sender, Exception ex)
 		{
-			V_0 = this.ExceptionThrown;
-			if (V_0 != null)
+			EventHandler<Exception> eventHandler = this.ExceptionThrown;
+			if (eventHandler != null)
 			{
-				V_0.Invoke(sender, ex);
+				eventHandler(sender, ex);
 			}
-			return;
 		}
 
 		public event EventHandler<Exception> ExceptionThrown;

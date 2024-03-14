@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using Mono.Collections.Generic;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -8,71 +9,68 @@ namespace Mono.Cecil.Extensions
 	{
 		public static int CompareToSecurityAttribute(this SecurityAttribute first, SecurityAttribute second, SecurityDeclaration firstDeclaration, SecurityDeclaration secondDeclaration)
 		{
+			CustomAttributeArgument argument;
 			if ((object)first == (object)second)
 			{
 				return 0;
 			}
-			V_0 = firstDeclaration.get_Action().ToString();
-			V_1 = secondDeclaration.get_Action().ToString();
-			if (String.op_Inequality(V_0, V_1))
+			string str = firstDeclaration.get_Action().ToString();
+			string str1 = secondDeclaration.get_Action().ToString();
+			if (str != str1)
 			{
-				return V_0.CompareTo(V_1);
+				return str.CompareTo(str1);
 			}
-			V_2 = Math.Max(first.get_Properties().get_Count(), second.get_Properties().get_Count());
-			V_5 = 0;
-			while (V_5 < V_2)
+			int num = Math.Max(first.get_Properties().get_Count(), second.get_Properties().get_Count());
+			for (int i = 0; i < num; i++)
 			{
-				if (V_5 >= first.get_Properties().get_Count())
+				if (i >= first.get_Properties().get_Count())
 				{
 					return 1;
 				}
-				if (V_5 >= second.get_Properties().get_Count())
+				if (i >= second.get_Properties().get_Count())
 				{
 					return -1;
 				}
-				V_6 = first.get_Properties().get_Item(V_5);
-				V_7 = second.get_Properties().get_Item(V_5);
-				if (!String.op_Equality(V_6.get_Name(), V_7.get_Name()))
+				CustomAttributeNamedArgument item = first.get_Properties().get_Item(i);
+				CustomAttributeNamedArgument customAttributeNamedArgument = second.get_Properties().get_Item(i);
+				if (item.get_Name() != customAttributeNamedArgument.get_Name())
 				{
-					return V_6.get_Name().CompareTo(V_7.get_Name());
+					return item.get_Name().CompareTo(customAttributeNamedArgument.get_Name());
 				}
-				V_10 = V_6.get_Argument();
-				V_8 = V_10.get_Value().ToString();
-				V_10 = V_7.get_Argument();
-				V_9 = V_10.get_Value().ToString();
-				if (String.op_Inequality(V_8, V_9))
+				argument = item.get_Argument();
+				string str2 = argument.get_Value().ToString();
+				argument = customAttributeNamedArgument.get_Argument();
+				string str3 = argument.get_Value().ToString();
+				if (str2 != str3)
 				{
-					return V_8.CompareTo(V_9);
+					return str2.CompareTo(str3);
 				}
-				V_5 = V_5 + 1;
 			}
-			V_3 = Math.Max(first.get_Fields().get_Count(), second.get_Fields().get_Count());
-			V_11 = 0;
-			while (V_11 < V_3)
+			int num1 = Math.Max(first.get_Fields().get_Count(), second.get_Fields().get_Count());
+			for (int j = 0; j < num1; j++)
 			{
-				if (V_11 >= first.get_Fields().get_Count())
+				if (j >= first.get_Fields().get_Count())
 				{
 					return 1;
 				}
-				if (V_11 >= second.get_Fields().get_Count())
+				if (j >= second.get_Fields().get_Count())
 				{
 					return -1;
 				}
-				V_12 = first.get_Fields().get_Item(V_11);
-				V_13 = second.get_Fields().get_Item(V_11);
-				if (!String.op_Equality(V_12.get_Name(), V_13.get_Name()))
+				CustomAttributeNamedArgument item1 = first.get_Fields().get_Item(j);
+				CustomAttributeNamedArgument customAttributeNamedArgument1 = second.get_Fields().get_Item(j);
+				if (item1.get_Name() != customAttributeNamedArgument1.get_Name())
 				{
-					return V_12.get_Name().CompareTo(V_13.get_Name());
+					return item1.get_Name().CompareTo(customAttributeNamedArgument1.get_Name());
 				}
-				V_10 = V_12.get_Argument();
-				V_14 = V_10.get_Value().ToString();
-				V_10 = V_13.get_Argument();
-				V_15 = V_10.get_Value().ToString();
-				if (String.op_Inequality(V_14, V_15))
+				argument = item1.get_Argument();
+				string str4 = argument.get_Value().ToString();
+				argument = customAttributeNamedArgument1.get_Argument();
+				string str5 = argument.get_Value().ToString();
+				if (str4 != str5)
 				{
-					return V_14.CompareTo(V_15);
+					return str4.CompareTo(str5);
 				}
-				V_11 = V_11 + 1;
 			}
 			return 0;
 		}

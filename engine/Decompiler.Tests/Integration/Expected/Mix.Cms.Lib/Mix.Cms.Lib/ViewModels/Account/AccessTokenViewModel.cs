@@ -77,8 +77,6 @@ namespace Mix.Cms.Lib.ViewModels.Account
 
 		public AccessTokenViewModel()
 		{
-			base();
-			return;
 		}
 	}
 }

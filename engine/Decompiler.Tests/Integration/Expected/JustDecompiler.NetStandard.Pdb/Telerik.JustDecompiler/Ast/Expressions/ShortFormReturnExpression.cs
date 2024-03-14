@@ -12,7 +12,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 71;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ShortFormReturnExpression;
 			}
 		}
 
@@ -36,50 +36,50 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public ShortFormReturnExpression(Expression value, IEnumerable<Instruction> instructions)
+		public ShortFormReturnExpression(Expression value, IEnumerable<Instruction> instructions) : base(value, instructions)
 		{
-			base(value, instructions);
-			return;
 		}
 
 		public override Expression Clone()
 		{
-			if (this.get_Value() != null)
+			Expression expression;
+			if (base.Value != null)
 			{
-				stackVariable4 = this.get_Value().Clone();
+				expression = base.Value.Clone();
 			}
 			else
 			{
-				stackVariable4 = null;
+				expression = null;
 			}
-			return new ShortFormReturnExpression(stackVariable4, this.instructions);
+			return new ShortFormReturnExpression(expression, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			if (this.get_Value() != null)
+			Expression expression;
+			if (base.Value != null)
 			{
-				stackVariable4 = this.get_Value().CloneExpressionOnly();
+				expression = base.Value.CloneExpressionOnly();
 			}
 			else
 			{
-				stackVariable4 = null;
+				expression = null;
 			}
-			return new ShortFormReturnExpression(stackVariable4, null);
+			return new ShortFormReturnExpression(expression, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as ShortFormReturnExpression == null)
+			if (!(other is ShortFormReturnExpression))
 			{
 				return false;
 			}
-			V_0 = other as ShortFormReturnExpression;
-			if (this.get_Value() == null)
+			ReturnExpression returnExpression = other as ShortFormReturnExpression;
+			if (base.Value == null)
 			{
-				return V_0.get_Value() == null;
+				return returnExpression.Value == null;
 			}
-			return this.get_Value().Equals(V_0.get_Value());
+			return base.Value.Equals(returnExpression.Value);
 		}
 	}
 }

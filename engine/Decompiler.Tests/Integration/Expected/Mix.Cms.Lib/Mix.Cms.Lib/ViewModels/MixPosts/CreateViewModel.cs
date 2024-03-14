@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
 using Mix.Cms.Lib.ViewModels.MixCultures;
 using Mix.Cms.Lib.ViewModels.MixModulePosts;
@@ -11,8 +14,10 @@ using Mix.Cms.Lib.ViewModels.MixPostModules;
 using Mix.Cms.Lib.ViewModels.MixPostPosts;
 using Mix.Cms.Lib.ViewModels.MixTemplates;
 using Mix.Cms.Lib.ViewModels.MixUrlAliases;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,7 +25,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +41,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				return MixService.GetConfig<int>("ThemeId", this.get_Specificulture());
+				return MixService.GetConfig<int>("ThemeId", this.Specificulture);
 			}
 		}
 
@@ -97,19 +104,11 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		[JsonIgnore]
 		[JsonProperty("extraFields")]
-		public string ExtraFields
-		{
-			get;
-			set;
-		}
+		public string ExtraFields { get; set; } = "[]";
 
 		[JsonIgnore]
 		[JsonProperty("extraProperties")]
-		public string ExtraProperties
-		{
-			get;
-			set;
-		}
+		public string ExtraProperties { get; set; } = "[]";
 
 		[JsonProperty("icon")]
 		public string Icon
@@ -144,14 +143,11 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_Image()) || this.get_Image().IndexOf("http") != -1 || this.get_Image().get_Chars(0) == '/')
+				if (string.IsNullOrEmpty(this.Image) || this.Image.IndexOf("http") != -1 || this.Image[0] == '/')
 				{
-					return this.get_Image();
+					return this.Image;
 				}
-				stackVariable16 = new string[2];
-				stackVariable16[0] = this.get_Domain();
-				stackVariable16[1] = this.get_Image();
-				return CommonHelper.GetFullPath(stackVariable16);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Image });
 			}
 		}
 
@@ -163,11 +159,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		}
 
 		[JsonProperty("listTag")]
-		public JArray ListTag
-		{
-			get;
-			set;
-		}
+		public JArray ListTag { get; set; } = new JArray();
 
 		[JsonProperty("mediaNavs")]
 		public List<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel> MediaNavs
@@ -282,11 +274,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		}
 
 		[JsonProperty("tags")]
-		public string Tags
-		{
-			get;
-			set;
-		}
+		public string Tags { get; set; } = "[]";
 
 		[JsonProperty("template")]
 		public string Template
@@ -300,11 +288,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				stackVariable1 = new string[3];
-				stackVariable1[0] = "Views/Shared/Templates";
-				stackVariable1[1] = MixService.GetConfig<string>("ThemeName", this.get_Specificulture());
-				stackVariable1[2] = this.get_TemplateFolderType();
-				return CommonHelper.GetFullPath(stackVariable1);
+				return CommonHelper.GetFullPath(new string[] { "Views/Shared/Templates", MixService.GetConfig<string>("ThemeName", this.Specificulture), this.TemplateFolderType });
 			}
 		}
 
@@ -313,7 +297,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				return 5.ToString();
+				return MixEnums.EnumTemplateFolder.Posts.ToString();
 			}
 		}
 
@@ -343,18 +327,15 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 		{
 			get
 			{
-				if (this.get_Thumbnail() == null || this.get_Thumbnail().IndexOf("http") != -1 || this.get_Thumbnail().get_Chars(0) == '/')
+				if (this.Thumbnail == null || this.Thumbnail.IndexOf("http") != -1 || this.Thumbnail[0] == '/')
 				{
-					if (!string.IsNullOrEmpty(this.get_Thumbnail()))
+					if (!string.IsNullOrEmpty(this.Thumbnail))
 					{
-						return this.get_Thumbnail();
+						return this.Thumbnail;
 					}
-					return this.get_ImageUrl();
+					return this.ImageUrl;
 				}
-				stackVariable20 = new string[2];
-				stackVariable20[0] = this.get_Domain();
-				stackVariable20[1] = this.get_Thumbnail();
-				return CommonHelper.GetFullPath(stackVariable20);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Thumbnail });
 			}
 		}
 
@@ -396,40 +377,28 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 
 		public CreateViewModel()
 		{
-			this.u003cExtraFieldsu003ek__BackingField = "[]";
-			this.u003cExtraPropertiesu003ek__BackingField = "[]";
-			this.u003cTagsu003ek__BackingField = "[]";
-			this.u003cListTagu003ek__BackingField = new JArray();
-			base();
-			return;
 		}
 
-		public CreateViewModel(MixPost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public CreateViewModel(MixPost model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cExtraFieldsu003ek__BackingField = "[]";
-			this.u003cExtraPropertiesu003ek__BackingField = "[]";
-			this.u003cTagsu003ek__BackingField = "[]";
-			this.u003cListTagu003ek__BackingField = new JArray();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override Task<RepositoryResponse<List<CreateViewModel>>> CloneAsync(MixPost model, List<SupportedCulture> cloneCultures, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return this.CloneAsync(model, cloneCultures, _context, _transaction);
+			return base.CloneAsync(model, cloneCultures, _context, _transaction);
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				this.set_ExtraFields(MixService.GetConfig<string>("DefaultPostAttr"));
+				this.ExtraFields = MixService.GetConfig<string>("DefaultPostAttr");
 			}
-			this.set_Cultures(this.LoadCultures(this.get_Specificulture(), _context, _transaction));
-			this.set_UrlAliases(this.GetAliases(_context, _transaction));
-			if (!string.IsNullOrEmpty(this.get_Tags()))
+			this.Cultures = this.LoadCultures(this.Specificulture, _context, _transaction);
+			this.UrlAliases = this.GetAliases(_context, _transaction);
+			if (!string.IsNullOrEmpty(this.Tags))
 			{
-				this.set_ListTag(JArray.Parse(this.get_Tags()));
+				this.ListTag = JArray.Parse(this.Tags);
 			}
 			this.LoadExtraProperties();
 			this.LoadAttributeSets(_context, _transaction);
@@ -439,750 +408,854 @@ namespace Mix.Cms.Lib.ViewModels.MixPosts
 			this.LoadMedias(_context, _transaction);
 			this.LoadSubModules(_context, _transaction);
 			this.LoadRelatedPost(_context, _transaction);
-			return;
 		}
 
 		private void GenerateSEO()
 		{
-			V_0 = new CreateViewModel.u003cu003ec__DisplayClass207_0();
-			V_0.u003cu003e4__this = this;
-			if (string.IsNullOrEmpty(this.get_SeoName()))
+			if (string.IsNullOrEmpty(this.SeoName))
 			{
-				this.set_SeoName(SeoHelper.GetSEOString(this.get_Title(), '-'));
+				this.SeoName = SeoHelper.GetSEOString(this.Title, '-');
 			}
-			V_1 = 1;
-			V_0.name = this.get_SeoName();
-			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists(new Func<MixPost, bool>(V_0.u003cGenerateSEOu003eb__0), null, null))
+			int num = 1;
+			string seoName = this.SeoName;
+			while (ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.UpdateViewModel>.Repository.CheckIsExists((MixPost a) => {
+				if (!(a.SeoName == seoName) || !(a.Specificulture == this.Specificulture))
+				{
+					return false;
+				}
+				return a.Id != this.Id;
+			}, null, null))
 			{
-				V_0.name = string.Concat(this.get_SeoName(), "_", V_1.ToString());
-				V_1 = V_1 + 1;
+				seoName = string.Concat(this.SeoName, "_", num.ToString());
+				num++;
 			}
-			this.set_SeoName(V_0.name);
-			if (string.IsNullOrEmpty(this.get_SeoTitle()))
+			this.SeoName = seoName;
+			if (string.IsNullOrEmpty(this.SeoTitle))
 			{
-				this.set_SeoTitle(SeoHelper.GetSEOString(this.get_Title(), '-'));
+				this.SeoTitle = SeoHelper.GetSEOString(this.Title, '-');
 			}
-			if (string.IsNullOrEmpty(this.get_SeoDescription()))
+			if (string.IsNullOrEmpty(this.SeoDescription))
 			{
-				this.set_SeoDescription(SeoHelper.GetSEOString(this.get_Title(), '-'));
+				this.SeoDescription = SeoHelper.GetSEOString(this.Title, '-');
 			}
-			if (string.IsNullOrEmpty(this.get_SeoKeywords()))
+			if (string.IsNullOrEmpty(this.SeoKeywords))
 			{
-				this.set_SeoKeywords(SeoHelper.GetSEOString(this.get_Title(), '-'));
+				this.SeoKeywords = SeoHelper.GetSEOString(this.Title, '-');
 			}
-			return;
 		}
 
 		public List<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel> GetAliases(MixCmsContext context, IDbContextTransaction transaction)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository;
-			V_1 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel> Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::GetAliases(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel> GetAliases(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>.Repository;
+			ParameterExpression parameterExpression = Expression.Parameter(typeof(MixUrlAlias), "p");
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>> modelListBy = repository.GetModelListBy(Expression.Lambda<Func<MixUrlAlias, bool>>(Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_SourceId").MethodHandle)), Expression.Call(Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(int).GetMethod("ToString").MethodHandle), Array.Empty<Expression>()))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_Type").MethodHandle)), Expression.Constant(1, typeof(int)))), new ParameterExpression[] { parameterExpression }), context, transaction);
+			if (!modelListBy.get_IsSucceed())
+			{
+				return new List<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>();
+			}
+			return modelListBy.get_Data();
+		}
 
 		public List<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> GetRelated(MixCmsContext context, IDbContextTransaction transaction)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixRelatedPost, Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel>.Repository;
-			V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::GetRelated(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> GetRelated(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			List<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> data = ViewModelBase<MixCmsContext, MixRelatedPost, Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel>.Repository.GetModelListBy((MixRelatedPost n) => n.SourceId == this.Id && n.Specificulture == this.Specificulture, context, transaction).get_Data();
+			data.ForEach((Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel n) => n.IsActived = true);
+			return (
+				from p in data
+				orderby p.Priority
+				select p).ToList<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel>();
+		}
 
 		private void LoadAttributeSets(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			return;
 		}
 
 		private List<SupportedCulture> LoadCultures(string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
-			V_1 = new List<SupportedCulture>();
-			if (V_0.get_IsSucceed())
+			RepositoryResponse<List<SystemCultureViewModel>> modelList = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
+			List<SupportedCulture> supportedCultures = new List<SupportedCulture>();
+			if (modelList.get_IsSucceed())
 			{
-				V_2 = V_0.get_Data().GetEnumerator();
-				try
+				foreach (SystemCultureViewModel datum in modelList.get_Data())
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = new CreateViewModel.u003cu003ec__DisplayClass206_0();
-						V_3.u003cu003e4__this = this;
-						V_3.culture = V_2.get_Current();
-						stackVariable19 = V_1;
-						V_4 = new SupportedCulture();
-						V_4.set_Icon(V_3.culture.get_Icon());
-						V_4.set_Specificulture(V_3.culture.get_Specificulture());
-						V_4.set_Alias(V_3.culture.get_Alias());
-						V_4.set_FullName(V_3.culture.get_FullName());
-						V_4.set_Description(V_3.culture.get_FullName());
-						V_4.set_Id(V_3.culture.get_Id());
-						V_4.set_Lcid(V_3.culture.get_Lcid());
-						stackVariable49 = V_4;
-						if (string.op_Equality(V_3.culture.get_Specificulture(), initCulture))
-						{
-							stackVariable55 = true;
-						}
-						else
-						{
-							stackVariable58 = _context.get_MixPost();
-							V_5 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-							// Current member / type: System.Collections.Generic.List`1<Mix.Domain.Core.Models.SupportedCulture> Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Exception in: System.Collections.Generic.List<Mix.Domain.Core.Models.SupportedCulture> LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Specified method is not supported.
-							// 
-							// mailto: JustDecompilePublicFeedback@telerik.com
-
+					List<SupportedCulture> supportedCultures1 = supportedCultures;
+					SupportedCulture supportedCulture = new SupportedCulture();
+					supportedCulture.set_Icon(datum.Icon);
+					supportedCulture.set_Specificulture(datum.Specificulture);
+					supportedCulture.set_Alias(datum.Alias);
+					supportedCulture.set_FullName(datum.FullName);
+					supportedCulture.set_Description(datum.FullName);
+					supportedCulture.set_Id(datum.Id);
+					supportedCulture.set_Lcid(datum.Lcid);
+					supportedCulture.set_IsSupported((datum.Specificulture == initCulture ? true : _context.MixPost.Any<MixPost>((MixPost p) => p.Id == this.Id && p.Specificulture == datum.Specificulture)));
+					supportedCultures1.Add(supportedCulture);
+				}
+			}
+			return supportedCultures;
+		}
 
 		private void LoadExtraProperties()
 		{
-			this.set_Columns(new List<ModuleFieldViewModel>());
-			if (!string.IsNullOrEmpty(this.get_ExtraFields()))
+			string str;
+			string str1;
+			this.Columns = new List<ModuleFieldViewModel>();
+			foreach (JToken jToken in (!string.IsNullOrEmpty(this.ExtraFields) ? JArray.Parse(this.ExtraFields) : new JArray()))
 			{
-				stackVariable7 = JArray.Parse(this.get_ExtraFields());
-			}
-			else
-			{
-				stackVariable7 = new JArray();
-			}
-			V_0 = stackVariable7.GetEnumerator();
-			try
-			{
-				while (V_0.MoveNext())
+				ModuleFieldViewModel moduleFieldViewModel = new ModuleFieldViewModel()
 				{
-					V_1 = V_0.get_Current();
-					stackVariable13 = new ModuleFieldViewModel();
-					stackVariable13.set_Name(CommonHelper.ParseJsonPropertyName(V_1.get_Item("name").ToString()));
-					stackVariable21 = V_1.get_Item("title");
-					if (stackVariable21 != null)
-					{
-						stackVariable22 = stackVariable21.ToString();
-					}
-					else
-					{
-						dummyVar0 = stackVariable21;
-						stackVariable22 = null;
-					}
-					stackVariable13.set_Title(stackVariable22);
-					stackVariable25 = V_1.get_Item("defaultValue");
-					if (stackVariable25 != null)
-					{
-						stackVariable26 = stackVariable25.ToString();
-					}
-					else
-					{
-						dummyVar1 = stackVariable25;
-						stackVariable26 = null;
-					}
-					stackVariable13.set_DefaultValue(stackVariable26);
-					if (V_1.get_Item("options") != null)
-					{
-						stackVariable33 = Newtonsoft.Json.Linq.Extensions.Value<JArray>(V_1.get_Item("options"));
-					}
-					else
-					{
-						stackVariable33 = new JArray();
-					}
-					stackVariable13.set_Options(stackVariable33);
-					if (V_1.get_Item("priority") != null)
-					{
-						stackVariable40 = Newtonsoft.Json.Linq.Extensions.Value<int>(V_1.get_Item("priority"));
-					}
-					else
-					{
-						stackVariable40 = 0;
-					}
-					stackVariable13.set_Priority(stackVariable40);
-					stackVariable13.set_DataType(JToken.op_Explicit(V_1.get_Item("dataType")));
-					if (V_1.get_Item("width") != null)
-					{
-						stackVariable51 = Newtonsoft.Json.Linq.Extensions.Value<int>(V_1.get_Item("width"));
-					}
-					else
-					{
-						stackVariable51 = 3;
-					}
-					stackVariable13.set_Width(stackVariable51);
-					if (V_1.get_Item("isUnique") != null)
-					{
-						stackVariable58 = Newtonsoft.Json.Linq.Extensions.Value<bool>(V_1.get_Item("isUnique"));
-					}
-					else
-					{
-						stackVariable58 = true;
-					}
-					stackVariable13.set_IsUnique(stackVariable58);
-					if (V_1.get_Item("isRequired") != null)
-					{
-						stackVariable65 = Newtonsoft.Json.Linq.Extensions.Value<bool>(V_1.get_Item("isRequired"));
-					}
-					else
-					{
-						stackVariable65 = true;
-					}
-					stackVariable13.set_IsRequired(stackVariable65);
-					if (V_1.get_Item("isDisplay") != null)
-					{
-						stackVariable72 = Newtonsoft.Json.Linq.Extensions.Value<bool>(V_1.get_Item("isDisplay"));
-					}
-					else
-					{
-						stackVariable72 = true;
-					}
-					stackVariable13.set_IsDisplay(stackVariable72);
-					if (V_1.get_Item("isSelect") != null)
-					{
-						stackVariable79 = Newtonsoft.Json.Linq.Extensions.Value<bool>(V_1.get_Item("isSelect"));
-					}
-					else
-					{
-						stackVariable79 = false;
-					}
-					stackVariable13.set_IsSelect(stackVariable79);
-					if (V_1.get_Item("isGroupBy") != null)
-					{
-						stackVariable86 = Newtonsoft.Json.Linq.Extensions.Value<bool>(V_1.get_Item("isGroupBy"));
-					}
-					else
-					{
-						stackVariable86 = false;
-					}
-					stackVariable13.set_IsGroupBy(stackVariable86);
-					this.get_Columns().Add(stackVariable13);
+					Name = CommonHelper.ParseJsonPropertyName(jToken.get_Item("name").ToString())
+				};
+				JToken item = jToken.get_Item("title");
+				if (item != null)
+				{
+					str = item.ToString();
+				}
+				else
+				{
+					str = null;
+				}
+				moduleFieldViewModel.Title = str;
+				JToken item1 = jToken.get_Item("defaultValue");
+				if (item1 != null)
+				{
+					str1 = item1.ToString();
+				}
+				else
+				{
+					str1 = null;
+				}
+				moduleFieldViewModel.DefaultValue = str1;
+				moduleFieldViewModel.Options = (jToken.get_Item("options") != null ? Newtonsoft.Json.Linq.Extensions.Value<JArray>(jToken.get_Item("options")) : new JArray());
+				moduleFieldViewModel.Priority = (jToken.get_Item("priority") != null ? Newtonsoft.Json.Linq.Extensions.Value<int>(jToken.get_Item("priority")) : 0);
+				moduleFieldViewModel.DataType = (MixEnums.MixDataType)((int)jToken.get_Item("dataType"));
+				moduleFieldViewModel.Width = (jToken.get_Item("width") != null ? Newtonsoft.Json.Linq.Extensions.Value<int>(jToken.get_Item("width")) : 3);
+				moduleFieldViewModel.IsUnique = (jToken.get_Item("isUnique") != null ? Newtonsoft.Json.Linq.Extensions.Value<bool>(jToken.get_Item("isUnique")) : true);
+				moduleFieldViewModel.IsRequired = (jToken.get_Item("isRequired") != null ? Newtonsoft.Json.Linq.Extensions.Value<bool>(jToken.get_Item("isRequired")) : true);
+				moduleFieldViewModel.IsDisplay = (jToken.get_Item("isDisplay") != null ? Newtonsoft.Json.Linq.Extensions.Value<bool>(jToken.get_Item("isDisplay")) : true);
+				moduleFieldViewModel.IsSelect = (jToken.get_Item("isSelect") != null ? Newtonsoft.Json.Linq.Extensions.Value<bool>(jToken.get_Item("isSelect")) : false);
+				moduleFieldViewModel.IsGroupBy = (jToken.get_Item("isGroupBy") != null ? Newtonsoft.Json.Linq.Extensions.Value<bool>(jToken.get_Item("isGroupBy")) : false);
+				this.Columns.Add(moduleFieldViewModel);
+			}
+			this.Properties = new List<ExtraProperty>();
+			if (!string.IsNullOrEmpty(this.ExtraProperties))
+			{
+				foreach (JToken jToken1 in JArray.Parse(this.ExtraProperties))
+				{
+					ExtraProperty obj = jToken1.ToObject<ExtraProperty>();
+					this.Properties.Add(obj);
 				}
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			this.set_Properties(new List<ExtraProperty>());
-			if (!string.IsNullOrEmpty(this.get_ExtraProperties()))
-			{
-				V_0 = JArray.Parse(this.get_ExtraProperties()).GetEnumerator();
-				try
-				{
-					while (V_0.MoveNext())
-					{
-						V_3 = V_0.get_Current().ToObject<ExtraProperty>();
-						this.get_Properties().Add(V_3);
-					}
-				}
-				finally
-				{
-					if (V_0 != null)
-					{
-						V_0.Dispose();
-					}
-				}
-			}
-			return;
 		}
 
 		private void LoadMedias(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixPostMedia, Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>.Repository;
-			V_1 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::LoadMedias(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadMedias(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>> modelListBy = ViewModelBase<MixCmsContext, MixPostMedia, Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>.Repository.GetModelListBy((MixPostMedia n) => n.PostId == this.Id && n.Specificulture == this.Specificulture, _context, _transaction);
+			if (modelListBy.get_IsSucceed())
+			{
+				this.MediaNavs = (
+					from p in modelListBy.get_Data()
+					orderby p.Priority
+					select p).ToList<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>();
+				this.MediaNavs.ForEach((Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel n) => n.IsActived = true);
+			}
+		}
 
 		private void LoadParentModules(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0 = new CreateViewModel.u003cu003ec__DisplayClass202_0();
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_1 = Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel.GetModulePostNavAsync(this.get_Id(), this.get_Specificulture(), V_0._context, V_0._transaction);
-			if (V_1.get_IsSucceed())
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>> modulePostNavAsync = Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel.GetModulePostNavAsync(this.Id, this.Specificulture, _context, _transaction);
+			if (modulePostNavAsync.get_IsSucceed())
 			{
-				this.set_Modules(V_1.get_Data());
-				this.get_Modules().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>(V_0.u003cLoadParentModulesu003eb__0));
+				this.Modules = modulePostNavAsync.get_Data();
+				this.Modules.ForEach((Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel c) => c.IsActived = ViewModelBase<MixCmsContext, MixModulePost, Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>.Repository.CheckIsExists((MixModulePost n) => {
+					if (n.ModuleId != c.ModuleId)
+					{
+						return false;
+					}
+					return n.PostId == this.Id;
+				}, _context, _transaction));
 			}
-			stackVariable18 = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel>.Repository;
-			V_2 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::LoadParentModules(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadParentModules(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel>.Repository;
+			int? nullable = null;
+			foreach (Mix.Cms.Lib.ViewModels.MixModules.ReadListItemViewModel item in repository.GetModelListBy((MixModule m) => (m.Type == 0 || m.Type == 2) && m.Specificulture == this.Specificulture && !this.Modules.Any<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel>((Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel n) => n.ModuleId == m.Id && n.Specificulture == m.Specificulture), "CreatedDateTime", 1, nullable, new int?(0), _context, _transaction).get_Data().get_Items())
+			{
+				this.Modules.Add(new Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel()
+				{
+					ModuleId = item.Id,
+					Image = item.Image,
+					PostId = this.Id,
+					Description = this.Title
+				});
+			}
+		}
 
 		private void LoadParentPage(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0 = new CreateViewModel.u003cu003ec__DisplayClass203_0();
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_1 = Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel.GetPagePostNavAsync(this.get_Id(), this.get_Specificulture(), V_0._context, V_0._transaction);
-			if (V_1.get_IsSucceed())
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>> pagePostNavAsync = Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel.GetPagePostNavAsync(this.Id, this.Specificulture, _context, _transaction);
+			if (pagePostNavAsync.get_IsSucceed())
 			{
-				this.set_Pages(V_1.get_Data());
-				this.get_Pages().ForEach(new Action<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>(V_0.u003cLoadParentPageu003eb__0));
+				this.Pages = pagePostNavAsync.get_Data();
+				this.Pages.ForEach((Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel c) => c.IsActived = ViewModelBase<MixCmsContext, MixPagePost, Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel>.Repository.CheckIsExists((MixPagePost n) => {
+					if (n.PageId != c.PageId)
+					{
+						return false;
+					}
+					return n.PostId == this.Id;
+				}, _context, _transaction));
 			}
-			return;
 		}
 
 		private void LoadRelatedPost(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			this.set_PostNavs(this.GetRelated(_context, _transaction));
-			stackVariable5 = ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.ReadListItemViewModel>.Repository;
-			V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::LoadRelatedPost(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadRelatedPost(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			this.PostNavs = this.GetRelated(_context, _transaction);
+			foreach (Mix.Cms.Lib.ViewModels.MixPosts.ReadListItemViewModel item in ViewModelBase<MixCmsContext, MixPost, Mix.Cms.Lib.ViewModels.MixPosts.ReadListItemViewModel>.Repository.GetModelListBy((MixPost m) => m.Id != this.Id && m.Specificulture == this.Specificulture && !this.PostNavs.Any<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel>((Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel n) => n.DestinationId == m.Id), "CreatedDateTime", 1, new int?(10), new int?(0), _context, _transaction).get_Data().get_Items())
+			{
+				this.PostNavs.Add(new Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel()
+				{
+					SourceId = this.Id,
+					Image = item.ImageUrl,
+					DestinationId = item.Id,
+					Description = item.Title
+				});
+			}
+		}
 
 		private void LoadSubModules(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixPostModule, Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>.Repository;
-			V_1 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::LoadSubModules(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadSubModules(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			int? nullable;
+			RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>> modelListBy = ViewModelBase<MixCmsContext, MixPostModule, Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>.Repository.GetModelListBy((MixPostModule n) => n.PostId == this.Id && n.Specificulture == this.Specificulture, _context, _transaction);
+			if (modelListBy.get_IsSucceed())
+			{
+				this.ModuleNavs = (
+					from p in modelListBy.get_Data()
+					orderby p.Priority
+					select p).ToList<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>();
+				foreach (Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel moduleNav in this.ModuleNavs)
+				{
+					moduleNav.IsActived = true;
+					nullable = null;
+					int? nullable1 = nullable;
+					nullable = null;
+					int? nullable2 = nullable;
+					nullable = null;
+					moduleNav.Module.LoadData(new int?(this.Id), nullable1, nullable2, nullable, new int?(0), _context, _transaction);
+				}
+			}
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>.Repository;
+			nullable = null;
+			foreach (Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel item in repository.GetModelListBy((MixModule m) => m.Type == 4 && m.Specificulture == this.Specificulture && !this.ModuleNavs.Any<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>((Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel n) => n.ModuleId == m.Id), "CreatedDateTime", 1, nullable, new int?(0), _context, _transaction).get_Data().get_Items())
+			{
+				nullable = null;
+				int? nullable3 = nullable;
+				nullable = null;
+				int? nullable4 = nullable;
+				nullable = null;
+				item.LoadData(new int?(this.Id), nullable3, nullable4, nullable, new int?(0), _context, _transaction);
+				this.ModuleNavs.Add(new Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel()
+				{
+					ModuleId = item.Id,
+					Image = item.Image,
+					PostId = this.Id,
+					Description = item.Title,
+					Module = item
+				});
+			}
+		}
 
 		private void LoadTemplates(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable2 = this.get_Templates();
-			if (stackVariable2 == null)
+			string fileFolder;
+			string fileName;
+			this.Templates = this.Templates ?? ViewModelBase<MixCmsContext, MixTemplate, Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel>.Repository.GetModelListBy((MixTemplate t) => t.Theme.Id == this.ActivedTheme && t.FolderType == this.TemplateFolderType, null, null).get_Data();
+			this.View = Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel.GetTemplateByPath(this.Template, this.Specificulture, MixEnums.EnumTemplateFolder.Posts, _context, _transaction);
+			string[] strArrays = new string[2];
+			Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel view = this.View;
+			if (view != null)
 			{
-				dummyVar0 = stackVariable2;
-				stackVariable24 = ViewModelBase<MixCmsContext, MixTemplate, Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel>.Repository;
-				V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-				// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::LoadTemplates(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: System.Void LoadTemplates(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				fileFolder = view.FileFolder;
+			}
+			else
+			{
+				fileFolder = null;
+			}
+			strArrays[0] = fileFolder;
+			Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel updateViewModel = this.View;
+			if (updateViewModel != null)
+			{
+				fileName = updateViewModel.FileName;
+			}
+			else
+			{
+				fileName = null;
+			}
+			strArrays[1] = fileName;
+			this.Template = CommonHelper.GetFullPath(strArrays);
+		}
 
 		public override MixPost ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			DateTime valueOrDefault;
+			DateTime? nullable;
+			string str;
+			if (this.Id == 0)
 			{
-				stackVariable184 = ViewModelBase<MixCmsContext, MixPost, CreateViewModel>.Repository;
-				V_1 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixPost Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixPost ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixPost, CreateViewModel>.Repository.Max((MixPost c) => c.Id, _context, _transaction).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			this.LastModified = new DateTime?(DateTime.UtcNow);
+			DateTime? publishedDateTime = this.PublishedDateTime;
+			if (publishedDateTime.HasValue)
+			{
+				valueOrDefault = publishedDateTime.GetValueOrDefault();
+				nullable = new DateTime?(valueOrDefault.ToUniversalTime());
+			}
+			else
+			{
+				nullable = null;
+			}
+			this.PublishedDateTime = nullable;
+			this.ExtraFields = ((this.Columns != null ? JArray.Parse(JsonConvert.SerializeObject(
+				from c in this.Columns
+				orderby c.Priority
+				where !string.IsNullOrEmpty(c.Name)
+				select c)) : new JArray())).ToString(0, Array.Empty<JsonConverter>());
+			if (this.Properties != null && this.Properties.Count > 0)
+			{
+				JArray jArray = new JArray();
+				foreach (ExtraProperty extraProperty in this.Properties.Where<ExtraProperty>((ExtraProperty p) => {
+					if (string.IsNullOrEmpty(p.Value))
+					{
+						return false;
+					}
+					return !string.IsNullOrEmpty(p.Name);
+				}))
+				{
+					jArray.Add(JObject.FromObject(extraProperty));
+				}
+				string str1 = jArray.ToString(0, Array.Empty<JsonConverter>());
+				if (str1 != null)
+				{
+					str = str1.Trim();
+				}
+				else
+				{
+					str = null;
+				}
+				this.ExtraProperties = str;
+			}
+			this.Template = (this.View != null ? string.Format("{0}/{1}{2}", this.View.FolderType, this.View.FileName, this.View.Extension) : this.Template);
+			if (this.ThumbnailFileStream != null)
+			{
+				string[] strArrays = new string[] { "Content/Uploads", "Posts", null };
+				valueOrDefault = DateTime.UtcNow;
+				strArrays[2] = valueOrDefault.ToString("dd-MM-yyyy");
+				string fullPath = CommonHelper.GetFullPath(strArrays);
+				string randomName = CommonHelper.GetRandomName(this.ThumbnailFileStream.get_Name());
+				if (CommonHelper.SaveFileBase64(fullPath, randomName, this.ThumbnailFileStream.get_Base64()))
+				{
+					CommonHelper.RemoveFile(this.Thumbnail);
+					this.Thumbnail = CommonHelper.GetFullPath(new string[] { fullPath, randomName });
+				}
+			}
+			if (this.ImageFileStream != null)
+			{
+				string[] strArrays1 = new string[] { "Content/Uploads", "Posts", null };
+				valueOrDefault = DateTime.UtcNow;
+				strArrays1[2] = valueOrDefault.ToString("dd-MM-yyyy");
+				string fullPath1 = CommonHelper.GetFullPath(strArrays1);
+				string randomName1 = CommonHelper.GetRandomName(this.ImageFileStream.get_Name());
+				if (CommonHelper.SaveFileBase64(fullPath1, randomName1, this.ImageFileStream.get_Base64()))
+				{
+					CommonHelper.RemoveFile(this.Image);
+					this.Image = CommonHelper.GetFullPath(new string[] { fullPath1, randomName1 });
+				}
+			}
+			if (!string.IsNullOrEmpty(this.Image) && this.Image[0] == '/')
+			{
+				this.Image = this.Image.Substring(1);
+			}
+			if (!string.IsNullOrEmpty(this.Thumbnail) && this.Thumbnail[0] == '/')
+			{
+				this.Thumbnail = this.Thumbnail.Substring(1);
+			}
+			this.Tags = this.ListTag.ToString(0, Array.Empty<JsonConverter>());
+			this.GenerateSEO();
+			return base.ParseModel(_context, _transaction);
+		}
 
 		public override RepositoryResponse<bool> RemoveRelatedModels(CreateViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			if (V_0.get_IsSucceed())
+			ParameterExpression parameterExpression;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed())
 			{
-				stackVariable293 = _context.get_MixPagePost();
-				V_1 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Domain.Core.ViewModels.RepositoryResponse`1<System.Boolean> Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel::RemoveRelatedModels(Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Domain.Core.ViewModels.RepositoryResponse<System.Boolean> RemoveRelatedModels(Mix.Cms.Lib.ViewModels.MixPosts.CreateViewModel,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				DbSet<MixPagePost> mixPagePost = _context.MixPagePost;
+				parameterExpression = Expression.Parameter(typeof(MixPagePost), "n");
+				foreach (MixPagePost list in mixPagePost.Where<MixPagePost>(Expression.Lambda<Func<MixPagePost, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression })).ToList<MixPagePost>())
+				{
+					_context.Entry<MixPagePost>(list).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixModulePost> mixModulePost = _context.MixModulePost;
+				parameterExpression = Expression.Parameter(typeof(MixModulePost), "n");
+				foreach (MixModulePost list1 in mixModulePost.Where<MixModulePost>(Expression.Lambda<Func<MixModulePost, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixModulePost).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixModulePost).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression })).ToList<MixModulePost>())
+				{
+					_context.Entry<MixModulePost>(list1).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPostMedia> mixPostMedia = _context.MixPostMedia;
+				parameterExpression = Expression.Parameter(typeof(MixPostMedia), "n");
+				foreach (MixPostMedia mixPostMedium in mixPostMedia.Where<MixPostMedia>(Expression.Lambda<Func<MixPostMedia, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression })).ToList<MixPostMedia>())
+				{
+					_context.Entry<MixPostMedia>(mixPostMedium).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPostModule> mixPostModule = _context.MixPostModule;
+				parameterExpression = Expression.Parameter(typeof(MixPostModule), "n");
+				foreach (MixPostModule mixPostModule1 in mixPostModule.Where<MixPostModule>(Expression.Lambda<Func<MixPostModule, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostModule).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostModule).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression })).ToList<MixPostModule>())
+				{
+					_context.Entry<MixPostModule>(mixPostModule1).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPostMedia> dbSet = _context.MixPostMedia;
+				parameterExpression = Expression.Parameter(typeof(MixPostMedia), "n");
+				foreach (MixPostMedia mixPostMedium1 in dbSet.Where<MixPostMedia>(Expression.Lambda<Func<MixPostMedia, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression })).ToList<MixPostMedia>())
+				{
+					_context.Entry<MixPostMedia>(mixPostMedium1).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixUrlAlias> mixUrlAlias = _context.MixUrlAlias;
+				parameterExpression = Expression.Parameter(typeof(MixUrlAlias), "n");
+				foreach (MixUrlAlias mixUrlAlia in mixUrlAlias.Where<MixUrlAlias>(Expression.Lambda<Func<MixUrlAlias, bool>>(Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_SourceId").MethodHandle)), Expression.Call(Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(int).GetMethod("ToString").MethodHandle), Array.Empty<Expression>())), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_Type").MethodHandle)), Expression.Constant(1, typeof(int)))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression })).ToList<MixUrlAlias>())
+				{
+					_context.Entry<MixUrlAlias>(mixUrlAlia).set_State(2);
+				}
+			}
+			repositoryResponse1.set_IsSucceed(_context.SaveChanges() > 0);
+			return repositoryResponse1;
+		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(CreateViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cRemoveRelatedModelsAsyncu003ed__188>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ParameterExpression parameterExpression;
+			CancellationToken cancellationToken;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPagePost> mixPagePost = _context.MixPagePost;
+				parameterExpression = Expression.Parameter(typeof(MixPagePost), "n");
+				BinaryExpression binaryExpression = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPagePost).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+				IQueryable<MixPagePost> mixPagePosts = mixPagePost.Where<MixPagePost>(Expression.Lambda<Func<MixPagePost, bool>>(binaryExpression, parameterExpressionArray));
+				cancellationToken = new CancellationToken();
+				foreach (MixPagePost listAsync in await EntityFrameworkQueryableExtensions.ToListAsync<MixPagePost>(mixPagePosts, cancellationToken))
+				{
+					_context.Entry<MixPagePost>(listAsync).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixModulePost> mixModulePost = _context.MixModulePost;
+				parameterExpression = Expression.Parameter(typeof(MixModulePost), "n");
+				BinaryExpression binaryExpression1 = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixModulePost).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixModulePost).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray1 = new ParameterExpression[] { parameterExpression };
+				IQueryable<MixModulePost> mixModulePosts = mixModulePost.Where<MixModulePost>(Expression.Lambda<Func<MixModulePost, bool>>(binaryExpression1, parameterExpressionArray1));
+				cancellationToken = new CancellationToken();
+				foreach (MixModulePost listAsync1 in await EntityFrameworkQueryableExtensions.ToListAsync<MixModulePost>(mixModulePosts, cancellationToken))
+				{
+					_context.Entry<MixModulePost>(listAsync1).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPostMedia> mixPostMedia = _context.MixPostMedia;
+				parameterExpression = Expression.Parameter(typeof(MixPostMedia), "n");
+				BinaryExpression binaryExpression2 = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray2 = new ParameterExpression[] { parameterExpression };
+				IQueryable<MixPostMedia> mixPostMedias = mixPostMedia.Where<MixPostMedia>(Expression.Lambda<Func<MixPostMedia, bool>>(binaryExpression2, parameterExpressionArray2));
+				cancellationToken = new CancellationToken();
+				foreach (MixPostMedia mixPostMedium in await EntityFrameworkQueryableExtensions.ToListAsync<MixPostMedia>(mixPostMedias, cancellationToken))
+				{
+					_context.Entry<MixPostMedia>(mixPostMedium).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPostModule> mixPostModule = _context.MixPostModule;
+				parameterExpression = Expression.Parameter(typeof(MixPostModule), "n");
+				BinaryExpression binaryExpression3 = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostModule).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostModule).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray3 = new ParameterExpression[] { parameterExpression };
+				IQueryable<MixPostModule> mixPostModules = mixPostModule.Where<MixPostModule>(Expression.Lambda<Func<MixPostModule, bool>>(binaryExpression3, parameterExpressionArray3));
+				cancellationToken = new CancellationToken();
+				foreach (MixPostModule mixPostModule1 in await EntityFrameworkQueryableExtensions.ToListAsync<MixPostModule>(mixPostModules, cancellationToken))
+				{
+					_context.Entry<MixPostModule>(mixPostModule1).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixPostMedia> dbSet = _context.MixPostMedia;
+				parameterExpression = Expression.Parameter(typeof(MixPostMedia), "n");
+				BinaryExpression binaryExpression4 = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_PostId").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPostMedia).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray4 = new ParameterExpression[] { parameterExpression };
+				IQueryable<MixPostMedia> mixPostMedias1 = dbSet.Where<MixPostMedia>(Expression.Lambda<Func<MixPostMedia, bool>>(binaryExpression4, parameterExpressionArray4));
+				cancellationToken = new CancellationToken();
+				foreach (MixPostMedia mixPostMedium1 in await EntityFrameworkQueryableExtensions.ToListAsync<MixPostMedia>(mixPostMedias1, cancellationToken))
+				{
+					_context.Entry<MixPostMedia>(mixPostMedium1).set_State(2);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DbSet<MixUrlAlias> mixUrlAlias = _context.MixUrlAlias;
+				parameterExpression = Expression.Parameter(typeof(MixUrlAlias), "n");
+				BinaryExpression binaryExpression5 = Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_SourceId").MethodHandle)), Expression.Call(Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Id").MethodHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(int).GetMethod("ToString").MethodHandle), Array.Empty<Expression>())), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_Type").MethodHandle)), Expression.Constant(1, typeof(int)))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixUrlAlias).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(CreateViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(CreateViewModel).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray5 = new ParameterExpression[] { parameterExpression };
+				IQueryable<MixUrlAlias> mixUrlAliases = mixUrlAlias.Where<MixUrlAlias>(Expression.Lambda<Func<MixUrlAlias, bool>>(binaryExpression5, parameterExpressionArray5));
+				cancellationToken = new CancellationToken();
+				foreach (MixUrlAlias mixUrlAlia in await EntityFrameworkQueryableExtensions.ToListAsync<MixUrlAlias>(mixUrlAliases, cancellationToken))
+				{
+					_context.Entry<MixUrlAlias>(mixUrlAlia).set_State(2);
+				}
+			}
+			RepositoryResponse<bool> repositoryResponse2 = repositoryResponse1;
+			MixCmsContext mixCmsContext = _context;
+			cancellationToken = new CancellationToken();
+			int num = await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+			repositoryResponse2.set_IsSucceed(num > 0);
+			repositoryResponse2 = null;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveAttributeSetDataAsync(int parentId, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveAttributeSetDataAsyncu003ed__187>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			return repositoryResponse;
 		}
 
 		private RepositoryResponse<bool> SaveMedias(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			V_1 = this.get_MediaNavs().GetEnumerator();
-			try
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel mediaNav in this.MediaNavs)
 			{
-				while (V_1.MoveNext())
+				mediaNav.PostId = id;
+				mediaNav.Specificulture = this.Specificulture;
+				if (!mediaNav.IsActived)
 				{
-					V_2 = V_1.get_Current();
-					V_2.set_PostId(id);
-					V_2.set_Specificulture(this.get_Specificulture());
-					if (!V_2.get_IsActived())
-					{
-						ViewModelHelper.HandleResult<MixPostMedia>(V_2.RemoveModel(false, _context, _transaction), ref V_0);
-					}
-					else
-					{
-						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>(V_2.SaveModel(false, _context, _transaction), ref V_0);
-					}
+					ViewModelHelper.HandleResult<MixPostMedia>(mediaNav.RemoveModel(false, _context, _transaction), ref repositoryResponse1);
+				}
+				else
+				{
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixPostMedias.ReadViewModel>(mediaNav.SaveModel(false, _context, _transaction), ref repositoryResponse1);
 				}
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveMediasAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveMediasAsyncu003ed__185>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveMediasAsyncu003ed__185 variable = new CreateViewModel.u003cSaveMediasAsyncu003ed__185();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveMediasAsyncu003ed__185>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private RepositoryResponse<bool> SaveParentModules(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			V_1 = this.get_Modules().GetEnumerator();
-			try
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel module in this.Modules)
 			{
-				while (V_1.MoveNext())
+				module.PostId = id;
+				module.Description = this.Title;
+				module.Image = this.ThumbnailUrl;
+				module.Status = MixEnums.MixContentStatus.Published;
+				if (!module.IsActived)
 				{
-					V_2 = V_1.get_Current();
-					V_2.set_PostId(id);
-					V_2.set_Description(this.get_Title());
-					V_2.set_Image(this.get_ThumbnailUrl());
-					V_2.set_Status(2);
-					if (!V_2.get_IsActived())
+					RepositoryResponse<MixModulePost> repositoryResponse2 = module.RemoveModel(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
 					{
-						V_4 = V_2.RemoveModel(false, _context, _transaction);
-						V_0.set_IsSucceed(V_4.get_IsSucceed());
-						if (V_0.get_IsSucceed())
-						{
-							continue;
-						}
-						V_0.set_Exception(V_4.get_Exception());
-						this.get_Errors().AddRange(V_4.get_Errors());
+						continue;
 					}
-					else
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+				}
+				else
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel> repositoryResponse3 = module.SaveModel(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
 					{
-						V_3 = V_2.SaveModel(false, _context, _transaction);
-						V_0.set_IsSucceed(V_3.get_IsSucceed());
-						if (V_0.get_IsSucceed())
-						{
-							continue;
-						}
-						V_0.set_Exception(V_3.get_Exception());
-						this.get_Errors().AddRange(V_3.get_Errors());
+						continue;
 					}
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse3.get_Errors());
 				}
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveParentModulesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveParentModulesAsyncu003ed__181>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveParentModulesAsyncu003ed__181 variable = new CreateViewModel.u003cSaveParentModulesAsyncu003ed__181();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveParentModulesAsyncu003ed__181>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private RepositoryResponse<bool> SaveParentPages(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			V_1 = this.get_Pages().GetEnumerator();
-			try
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel page in this.Pages)
 			{
-				while (V_1.MoveNext())
+				page.PostId = id;
+				page.Description = this.Title;
+				page.Image = this.ThumbnailUrl;
+				page.Status = MixEnums.MixContentStatus.Published;
+				if (!page.IsActived)
 				{
-					V_2 = V_1.get_Current();
-					V_2.set_PostId(id);
-					V_2.set_Description(this.get_Title());
-					V_2.set_Image(this.get_ThumbnailUrl());
-					V_2.set_Status(2);
-					if (!V_2.get_IsActived())
+					RepositoryResponse<MixPagePost> repositoryResponse2 = page.RemoveModel(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
 					{
-						V_4 = V_2.RemoveModel(false, _context, _transaction);
-						V_0.set_IsSucceed(V_4.get_IsSucceed());
-						if (V_0.get_IsSucceed())
-						{
-							continue;
-						}
-						V_0.set_Exception(V_4.get_Exception());
-						this.get_Errors().AddRange(V_4.get_Errors());
+						continue;
 					}
-					else
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+				}
+				else
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPagePosts.ReadViewModel> repositoryResponse3 = page.SaveModel(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
 					{
-						V_3 = V_2.SaveModel(false, _context, _transaction);
-						V_0.set_IsSucceed(V_3.get_IsSucceed());
-						if (V_0.get_IsSucceed())
-						{
-							continue;
-						}
-						V_0.set_Exception(V_3.get_Exception());
-						this.get_Errors().AddRange(V_3.get_Errors());
+						continue;
 					}
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse3.get_Errors());
 				}
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveParentPagesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveParentPagesAsyncu003ed__182>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveParentPagesAsyncu003ed__182 variable = new CreateViewModel.u003cSaveParentPagesAsyncu003ed__182();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveParentPagesAsyncu003ed__182>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private RepositoryResponse<bool> SaveRelatedPost(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			V_1 = this.get_PostNavs().GetEnumerator();
-			try
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel postNav in this.PostNavs)
 			{
-				while (V_1.MoveNext())
+				postNav.SourceId = id;
+				postNav.Status = MixEnums.MixContentStatus.Published;
+				postNav.Specificulture = this.Specificulture;
+				if (!postNav.IsActived)
 				{
-					V_2 = V_1.get_Current();
-					V_2.set_SourceId(id);
-					V_2.set_Status(2);
-					V_2.set_Specificulture(this.get_Specificulture());
-					if (!V_2.get_IsActived())
+					RepositoryResponse<MixRelatedPost> repositoryResponse2 = postNav.RemoveModel(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
 					{
-						V_4 = V_2.RemoveModel(false, _context, _transaction);
-						V_0.set_IsSucceed(V_4.get_IsSucceed());
-						if (V_0.get_IsSucceed())
-						{
-							continue;
-						}
-						V_0.set_Exception(V_4.get_Exception());
-						this.get_Errors().AddRange(V_4.get_Errors());
+						continue;
 					}
-					else
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+				}
+				else
+				{
+					RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPostPosts.ReadViewModel> repositoryResponse3 = postNav.SaveModel(false, _context, _transaction);
+					repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+					if (repositoryResponse1.get_IsSucceed())
 					{
-						V_3 = V_2.SaveModel(false, _context, _transaction);
-						V_0.set_IsSucceed(V_3.get_IsSucceed());
-						if (V_0.get_IsSucceed())
-						{
-							continue;
-						}
-						V_0.set_Exception(V_3.get_Exception());
-						this.get_Errors().AddRange(V_3.get_Errors());
+						continue;
 					}
+					repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+					base.get_Errors().AddRange(repositoryResponse3.get_Errors());
 				}
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveRelatedPostAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveRelatedPostAsyncu003ed__183>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveRelatedPostAsyncu003ed__183 variable = new CreateViewModel.u003cSaveRelatedPostAsyncu003ed__183();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveRelatedPostAsyncu003ed__183>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		public override RepositoryResponse<bool> SaveSubModels(MixPost parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
+			RepositoryResponse<bool> repositoryResponse;
+			RepositoryResponse<bool> repositoryResponse1 = new RepositoryResponse<bool>();
+			repositoryResponse1.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse2 = repositoryResponse1;
 			try
 			{
-				V_1 = this.get_View().SaveModel(true, _context, _transaction);
-				stackVariable8 = V_0;
-				if (!V_0.get_IsSucceed())
+				RepositoryResponse<Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel> repositoryResponse3 = this.View.SaveModel(true, _context, _transaction);
+				repositoryResponse2.set_IsSucceed((!repositoryResponse2.get_IsSucceed() ? false : repositoryResponse3.get_IsSucceed()));
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel>(repositoryResponse3, ref repositoryResponse2);
+				if (repositoryResponse2.get_IsSucceed())
 				{
-					stackVariable11 = false;
+					repositoryResponse2 = this.SaveUrlAlias(parent.Id, _context, _transaction);
 				}
-				else
+				if (repositoryResponse2.get_IsSucceed())
 				{
-					stackVariable11 = V_1.get_IsSucceed();
+					repositoryResponse2 = this.SaveMedias(parent.Id, _context, _transaction);
 				}
-				stackVariable8.set_IsSucceed(stackVariable11);
-				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel>(V_1, ref V_0);
-				if (V_0.get_IsSucceed())
+				if (repositoryResponse2.get_IsSucceed())
 				{
-					V_0 = this.SaveUrlAlias(parent.get_Id(), _context, _transaction);
+					repositoryResponse2 = this.SaveSubModules(parent.Id, _context, _transaction);
 				}
-				if (V_0.get_IsSucceed())
+				if (repositoryResponse2.get_IsSucceed())
 				{
-					V_0 = this.SaveMedias(parent.get_Id(), _context, _transaction);
+					repositoryResponse2 = this.SaveRelatedPost(parent.Id, _context, _transaction);
 				}
-				if (V_0.get_IsSucceed())
+				if (repositoryResponse2.get_IsSucceed())
 				{
-					V_0 = this.SaveSubModules(parent.get_Id(), _context, _transaction);
+					repositoryResponse2 = this.SaveParentPages(parent.Id, _context, _transaction);
 				}
-				if (V_0.get_IsSucceed())
+				if (repositoryResponse2.get_IsSucceed())
 				{
-					V_0 = this.SaveRelatedPost(parent.get_Id(), _context, _transaction);
+					repositoryResponse2 = this.SaveParentModules(parent.Id, _context, _transaction);
 				}
-				if (V_0.get_IsSucceed())
-				{
-					V_0 = this.SaveParentPages(parent.get_Id(), _context, _transaction);
-				}
-				if (V_0.get_IsSucceed())
-				{
-					V_0 = this.SaveParentModules(parent.get_Id(), _context, _transaction);
-				}
-				V_2 = V_0;
+				repositoryResponse = repositoryResponse2;
 			}
-			catch (Exception exception_0)
+			catch (Exception exception1)
 			{
-				V_3 = exception_0;
-				V_0.set_IsSucceed(false);
-				V_0.set_Exception(V_3);
-				V_2 = V_0;
+				Exception exception = exception1;
+				repositoryResponse2.set_IsSucceed(false);
+				repositoryResponse2.set_Exception(exception);
+				repositoryResponse = repositoryResponse2;
 			}
-			return V_2;
+			return repositoryResponse;
 		}
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPost parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parent = parent;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveSubModelsAsyncu003ed__180>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveSubModelsAsyncu003ed__180 variable = new CreateViewModel.u003cSaveSubModelsAsyncu003ed__180();
+			variable.u003cu003e4__this = this;
+			variable.parent = parent;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveSubModelsAsyncu003ed__180>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private RepositoryResponse<bool> SaveSubModules(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			V_1 = this.get_ModuleNavs().GetEnumerator();
-			try
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel moduleNav in this.ModuleNavs)
 			{
-				while (V_1.MoveNext())
+				moduleNav.PostId = id;
+				moduleNav.Specificulture = this.Specificulture;
+				moduleNav.Status = MixEnums.MixContentStatus.Published;
+				if (!moduleNav.IsActived)
 				{
-					V_2 = V_1.get_Current();
-					V_2.set_PostId(id);
-					V_2.set_Specificulture(this.get_Specificulture());
-					V_2.set_Status(2);
-					if (!V_2.get_IsActived())
-					{
-						ViewModelHelper.HandleResult<MixPostModule>(V_2.RemoveModel(false, _context, _transaction), ref V_0);
-					}
-					else
-					{
-						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>(V_2.SaveModel(false, _context, _transaction), ref V_0);
-					}
+					ViewModelHelper.HandleResult<MixPostModule>(moduleNav.RemoveModel(false, _context, _transaction), ref repositoryResponse1);
+				}
+				else
+				{
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixPostModules.ReadViewModel>(moduleNav.SaveModel(false, _context, _transaction), ref repositoryResponse1);
 				}
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveSubModulesAsync(int id, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveSubModulesAsyncu003ed__184>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveSubModulesAsyncu003ed__184 variable = new CreateViewModel.u003cSaveSubModulesAsyncu003ed__184();
+			variable.u003cu003e4__this = this;
+			variable.id = id;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveSubModulesAsyncu003ed__184>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private RepositoryResponse<bool> SaveUrlAlias(int parentId, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			stackVariable0 = new RepositoryResponse<bool>();
-			stackVariable0.set_IsSucceed(true);
-			V_0 = stackVariable0;
-			V_1 = this.get_UrlAliases().GetEnumerator();
-			try
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			foreach (Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel urlAlias in this.UrlAliases)
 			{
-				while (V_1.MoveNext())
+				urlAlias.SourceId = parentId.ToString();
+				urlAlias.Type = MixEnums.UrlAliasType.Post;
+				urlAlias.Specificulture = this.Specificulture;
+				ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>(((ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>)urlAlias).SaveModel(false, _context, _transaction), ref repositoryResponse1);
+				if (repositoryResponse1.get_IsSucceed())
 				{
-					stackVariable8 = V_1.get_Current();
-					stackVariable8.set_SourceId(parentId.ToString());
-					stackVariable8.set_Type(1);
-					stackVariable8.set_Specificulture(this.get_Specificulture());
-					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>(((ViewModelBase<MixCmsContext, MixUrlAlias, Mix.Cms.Lib.ViewModels.MixUrlAliases.UpdateViewModel>)stackVariable8).SaveModel(false, _context, _transaction), ref V_0);
-					if (V_0.get_IsSucceed())
-					{
-						continue;
-					}
-					goto Label0;
+					continue;
 				}
+				return repositoryResponse1;
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-		Label0:
-			return V_0;
+			return repositoryResponse1;
 		}
 
 		private async Task<RepositoryResponse<bool>> SaveUrlAliasAsync(int parentId, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parentId = parentId;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<CreateViewModel.u003cSaveUrlAliasAsyncu003ed__186>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			CreateViewModel.u003cSaveUrlAliasAsyncu003ed__186 variable = new CreateViewModel.u003cSaveUrlAliasAsyncu003ed__186();
+			variable.u003cu003e4__this = this;
+			variable.parentId = parentId;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<CreateViewModel.u003cSaveUrlAliasAsyncu003ed__186>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

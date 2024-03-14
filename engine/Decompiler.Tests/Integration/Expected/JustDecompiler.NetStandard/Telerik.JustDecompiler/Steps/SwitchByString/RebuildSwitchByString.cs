@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using System;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Statements;
@@ -10,22 +11,19 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 	{
 		private DecompilationContext context;
 
-		private SwitchByStringMatcher matcher;
+		private SwitchByStringMatcher matcher = new SwitchByStringMatcher();
 
 		private SwitchByStringFixer fixer;
 
 		public RebuildSwitchByString()
 		{
-			this.matcher = new SwitchByStringMatcher();
-			base();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement block)
 		{
 			this.context = context;
-			this.fixer = new SwitchByStringFixer(context.get_MethodContext().get_Method().get_Module().get_TypeSystem());
-			dummyVar0 = this.Visit(block);
+			this.fixer = new SwitchByStringFixer(context.MethodContext.Method.get_Module().get_TypeSystem());
+			this.Visit(block);
 			return block;
 		}
 
@@ -33,10 +31,10 @@ namespace Telerik.JustDecompiler.Steps.SwitchByString
 		{
 			if (!this.matcher.TryMatch(node))
 			{
-				return this.VisitIfStatement(node);
+				return base.VisitIfStatement(node);
 			}
-			V_0 = this.fixer.FixToSwitch(node, this.matcher.get_StringVariable(), this.matcher.get_IntVariable());
-			return this.Visit(V_0);
+			Statement @switch = this.fixer.FixToSwitch(node, this.matcher.StringVariable, this.matcher.IntVariable);
+			return base.Visit(@switch);
 		}
 	}
 }

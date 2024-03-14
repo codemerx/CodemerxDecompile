@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -21,9 +22,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new DynamicConstructorInvocationExpression.u003cget_Childrenu003ed__10(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				DynamicConstructorInvocationExpression dynamicConstructorInvocationExpression = null;
+				foreach (ICodeNode argument in dynamicConstructorInvocationExpression.Arguments)
+				{
+					yield return argument;
+				}
 			}
 		}
 
@@ -31,7 +34,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 60;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.DynamicConstructorInvocationExpression;
 			}
 		}
 
@@ -45,40 +48,38 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_ConstructorType();
+				return this.ConstructorType;
 			}
 		}
 
-		public DynamicConstructorInvocationExpression(TypeReference constructorType, IEnumerable<Expression> arguments, IEnumerable<Instruction> instructions)
+		public DynamicConstructorInvocationExpression(TypeReference constructorType, IEnumerable<Expression> arguments, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_ConstructorType(constructorType);
-			this.set_Arguments(new ExpressionCollection(arguments));
-			return;
+			this.ConstructorType = constructorType;
+			this.Arguments = new ExpressionCollection(arguments);
 		}
 
 		public override Expression Clone()
 		{
-			return new DynamicConstructorInvocationExpression(this.get_ConstructorType(), this.get_Arguments().Clone(), this.instructions);
+			return new DynamicConstructorInvocationExpression(this.ConstructorType, this.Arguments.Clone(), this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new DynamicConstructorInvocationExpression(this.get_ConstructorType(), this.get_Arguments().CloneExpressionsOnly(), null);
+			return new DynamicConstructorInvocationExpression(this.ConstructorType, this.Arguments.CloneExpressionsOnly(), null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other.get_CodeNodeType() != 60)
+			if (other.CodeNodeType != Telerik.JustDecompiler.Ast.CodeNodeType.DynamicConstructorInvocationExpression)
 			{
 				return false;
 			}
-			V_0 = other as DynamicConstructorInvocationExpression;
-			if (!String.op_Equality(this.get_ConstructorType().get_FullName(), V_0.get_ConstructorType().get_FullName()))
+			DynamicConstructorInvocationExpression dynamicConstructorInvocationExpression = other as DynamicConstructorInvocationExpression;
+			if (this.ConstructorType.get_FullName() != dynamicConstructorInvocationExpression.ConstructorType.get_FullName())
 			{
 				return false;
 			}
-			return this.get_Arguments().Equals(V_0.get_Arguments());
+			return this.Arguments.Equals(dynamicConstructorInvocationExpression.Arguments);
 		}
 	}
 }

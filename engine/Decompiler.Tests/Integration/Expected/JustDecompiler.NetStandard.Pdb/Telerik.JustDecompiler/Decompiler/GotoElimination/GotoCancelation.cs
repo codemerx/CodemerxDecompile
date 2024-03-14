@@ -1,9 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Telerik.JustDecompiler;
 using Telerik.JustDecompiler.Ast;
+using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.Switches;
 using Telerik.JustDecompiler.Steps;
 
 namespace Telerik.JustDecompiler.Decompiler.GotoElimination
@@ -18,8 +24,6 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		public GotoCancelation()
 		{
-			base();
-			return;
 		}
 
 		private bool ContainsLabel(Statement statement)
@@ -51,83 +55,61 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private bool IsReturnStatement(Statement statement)
 		{
-			if (statement as ExpressionStatement == null)
+			if (!(statement is ExpressionStatement))
 			{
 				return false;
 			}
-			return (statement as ExpressionStatement).get_Expression().get_CodeNodeType() == 57;
+			return (statement as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ReturnExpression;
 		}
 
 		private bool IsThrowStatement(Statement labeledClone)
 		{
-			if (labeledClone as ExpressionStatement == null)
+			if (!(labeledClone is ExpressionStatement))
 			{
 				return false;
 			}
-			return (labeledClone as ExpressionStatement).get_Expression().get_CodeNodeType() == 6;
+			return (labeledClone as ExpressionStatement).Expression.CodeNodeType == CodeNodeType.ThrowExpression;
 		}
 
 		private void MoveStatements(GotoStatement gotoStatement, IEnumerable<Statement> toMove)
 		{
-			V_0 = gotoStatement.get_Parent() as BlockStatement;
-			if (V_0 == null)
+			BlockStatement parent = gotoStatement.Parent as BlockStatement;
+			if (parent == null)
 			{
 				throw new DecompilationException("Goto statement not inside a block.");
 			}
-			V_1 = V_0.get_Statements().IndexOf(gotoStatement);
-			V_0.get_Statements().RemoveAt(V_1);
-			dummyVar0 = this.methodContext.get_GotoStatements().Remove(gotoStatement);
-			V_2 = V_1;
-			V_3 = toMove.GetEnumerator();
-			try
+			int num = parent.Statements.IndexOf(gotoStatement);
+			parent.Statements.RemoveAt(num);
+			this.methodContext.GotoStatements.Remove(gotoStatement);
+			int num1 = num;
+			foreach (Statement statement in toMove)
 			{
-				while (V_3.MoveNext())
-				{
-					V_4 = V_3.get_Current();
-					V_0.AddStatementAt(V_2, V_4);
-					V_2 = V_2 + 1;
-				}
+				parent.AddStatementAt(num1, statement);
+				num1++;
 			}
-			finally
+			if (!String.IsNullOrEmpty(gotoStatement.Label))
 			{
-				if (V_3 != null)
-				{
-					V_3.Dispose();
-				}
+				string label = gotoStatement.Label;
+				Statement item = parent.Statements[num];
+				this.methodContext.GotoLabels[label] = item;
+				item.Label = gotoStatement.Label;
 			}
-			if (!String.IsNullOrEmpty(gotoStatement.get_Label()))
-			{
-				V_5 = gotoStatement.get_Label();
-				V_6 = V_0.get_Statements().get_Item(V_1);
-				this.methodContext.get_GotoLabels().set_Item(V_5, V_6);
-				V_6.set_Label(gotoStatement.get_Label());
-			}
-			return;
 		}
 
 		private IEnumerable<KeyValuePair<GotoStatement, Statement>> Preprocess()
 		{
-			V_0 = new List<KeyValuePair<GotoStatement, Statement>>();
-			V_1 = this.methodContext.get_GotoStatements().GetEnumerator();
-			try
+			List<KeyValuePair<GotoStatement, Statement>> keyValuePairs = new List<KeyValuePair<GotoStatement, Statement>>();
+			foreach (GotoStatement gotoStatement in this.methodContext.GotoStatements)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_3 = this.methodContext.get_GotoLabels().get_Item(V_2.get_TargetLabel());
-					V_0.Add(new KeyValuePair<GotoStatement, Statement>(V_2, V_3));
-				}
+				Statement item = this.methodContext.GotoLabels[gotoStatement.TargetLabel];
+				keyValuePairs.Add(new KeyValuePair<GotoStatement, Statement>(gotoStatement, item));
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return keyValuePairs;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.get_MethodContext();
+			this.methodContext = context.MethodContext;
 			this.body = body;
 			this.RemoveGotoStatements();
 			return body;
@@ -135,37 +117,16 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private void RemoveGotoStatements()
 		{
-			V_0 = false;
+			bool flag = false;
 			do
 			{
-				V_0 = false;
-				V_1 = this.Preprocess().GetEnumerator();
-				try
+				flag = false;
+				foreach (KeyValuePair<GotoStatement, Statement> keyValuePair in this.Preprocess())
 				{
-					while (V_1.MoveNext())
-					{
-						V_2 = V_1.get_Current();
-						if (V_0)
-						{
-							stackVariable10 = true;
-						}
-						else
-						{
-							stackVariable10 = this.EliminateGotoPair(V_2.get_Key(), V_2.get_Value());
-						}
-						V_0 = stackVariable10;
-					}
-				}
-				finally
-				{
-					if (V_1 != null)
-					{
-						V_1.Dispose();
-					}
+					flag = (flag ? true : this.EliminateGotoPair(keyValuePair.Key, keyValuePair.Value));
 				}
 			}
-			while (V_0);
-			return;
+			while (flag);
 		}
 
 		private void RemoveInnerGotoStatementsFromContext(Statement s)
@@ -174,293 +135,260 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 			{
 				return;
 			}
-			V_0 = s.get_CodeNodeType();
-			switch (V_0)
+			CodeNodeType codeNodeType = s.CodeNodeType;
+			switch (codeNodeType)
 			{
-				case 0:
-				case 1:
+				case CodeNodeType.BlockStatement:
+				case CodeNodeType.UnsafeBlock:
 				{
-					V_1 = (s as BlockStatement).get_Statements().GetEnumerator();
-					try
+					using (IEnumerator<Statement> enumerator = (s as BlockStatement).Statements.GetEnumerator())
 					{
-						while (V_1.MoveNext())
+						while (enumerator.MoveNext())
 						{
-							V_2 = V_1.get_Current();
-							this.RemoveInnerGotoStatementsFromContext(V_2);
+							this.RemoveInnerGotoStatementsFromContext(enumerator.Current);
 						}
-						goto Label0;
-					}
-					finally
-					{
-						if (V_1 != null)
-						{
-							V_1.Dispose();
-						}
+						return;
 					}
 					break;
 				}
-				case 2:
+				case CodeNodeType.GotoStatement:
 				{
-					dummyVar0 = this.methodContext.get_GotoStatements().Remove(s as GotoStatement);
+					this.methodContext.GotoStatements.Remove(s as GotoStatement);
 					return;
 				}
-				case 3:
+				case CodeNodeType.IfStatement:
 				{
-					V_3 = s as IfStatement;
-					this.RemoveInnerGotoStatementsFromContext(V_3.get_Then());
-					this.RemoveInnerGotoStatementsFromContext(V_3.get_Else());
+					IfStatement ifStatement = s as IfStatement;
+					this.RemoveInnerGotoStatementsFromContext(ifStatement.Then);
+					this.RemoveInnerGotoStatementsFromContext(ifStatement.Else);
 					return;
 				}
-				case 4:
+				case CodeNodeType.IfElseIfStatement:
 				{
-					V_4 = (s as IfElseIfStatement).get_ConditionBlocks().GetEnumerator();
-					try
+					foreach (KeyValuePair<Expression, BlockStatement> conditionBlock in (s as IfElseIfStatement).ConditionBlocks)
 					{
-						while (V_4.MoveNext())
-						{
-							V_5 = V_4.get_Current();
-							this.RemoveInnerGotoStatementsFromContext(V_5.get_Value());
-						}
+						this.RemoveInnerGotoStatementsFromContext(conditionBlock.Value);
 					}
-					finally
+					this.RemoveInnerGotoStatementsFromContext((s as IfElseIfStatement).Else);
+					return;
+				}
+				case CodeNodeType.ExpressionStatement:
+				case CodeNodeType.ThrowExpression:
+				case CodeNodeType.BreakStatement:
+				case CodeNodeType.ContinueStatement:
+				case CodeNodeType.CatchClause:
+				{
+					return;
+				}
+				case CodeNodeType.WhileStatement:
+				{
+					this.RemoveInnerGotoStatementsFromContext((s as WhileStatement).Body);
+					return;
+				}
+				case CodeNodeType.DoWhileStatement:
+				{
+					this.RemoveInnerGotoStatementsFromContext((s as DoWhileStatement).Body);
+					return;
+				}
+				case CodeNodeType.ForStatement:
+				{
+					this.RemoveInnerGotoStatementsFromContext((s as ForStatement).Body);
+					return;
+				}
+				case CodeNodeType.ForEachStatement:
+				{
+					this.RemoveInnerGotoStatementsFromContext((s as ForEachStatement).Body);
+					return;
+				}
+				case CodeNodeType.ConditionCase:
+				case CodeNodeType.DefaultCase:
+				{
+					this.RemoveInnerGotoStatementsFromContext((s as SwitchCase).Body);
+					return;
+				}
+				case CodeNodeType.SwitchStatement:
+				{
+					using (IEnumerator<SwitchCase> enumerator1 = (s as SwitchStatement).Cases.GetEnumerator())
 					{
-						((IDisposable)V_4).Dispose();
-					}
-					this.RemoveInnerGotoStatementsFromContext((s as IfElseIfStatement).get_Else());
-					return;
-				}
-				case 5:
-				case 6:
-				case 9:
-				case 10:
-				case 16:
-				{
-				Label0:
-					return;
-				}
-				case 7:
-				{
-					this.RemoveInnerGotoStatementsFromContext((s as WhileStatement).get_Body());
-					return;
-				}
-				case 8:
-				{
-					this.RemoveInnerGotoStatementsFromContext((s as DoWhileStatement).get_Body());
-					return;
-				}
-				case 11:
-				{
-					this.RemoveInnerGotoStatementsFromContext((s as ForStatement).get_Body());
-					return;
-				}
-				case 12:
-				{
-					this.RemoveInnerGotoStatementsFromContext((s as ForEachStatement).get_Body());
-					return;
-				}
-				case 13:
-				case 14:
-				{
-					this.RemoveInnerGotoStatementsFromContext((s as SwitchCase).get_Body());
-					return;
-				}
-				case 15:
-				{
-					V_6 = (s as SwitchStatement).get_Cases().GetEnumerator();
-					try
-					{
-						while (V_6.MoveNext())
+						while (enumerator1.MoveNext())
 						{
-							V_7 = V_6.get_Current();
-							this.RemoveInnerGotoStatementsFromContext(V_7);
+							this.RemoveInnerGotoStatementsFromContext(enumerator1.Current);
 						}
-						goto Label0;
-					}
-					finally
-					{
-						if (V_6 != null)
-						{
-							V_6.Dispose();
-						}
+						return;
 					}
 					break;
 				}
-				case 17:
+				case CodeNodeType.TryStatement:
 				{
-					this.RemoveInnerGotoStatementsFromContext((s as TryStatement).get_Try());
+					this.RemoveInnerGotoStatementsFromContext((s as TryStatement).Try);
 					return;
 				}
 				default:
 				{
-					if (V_0 == 37)
+					if (codeNodeType == CodeNodeType.FixedStatement)
 					{
-						this.RemoveInnerGotoStatementsFromContext((s as FixedStatement).get_Body());
+						this.RemoveInnerGotoStatementsFromContext((s as FixedStatement).Body);
 						return;
 					}
-					if (V_0 != 44)
+					if (codeNodeType != CodeNodeType.UsingStatement)
 					{
 						return;
 					}
-					this.RemoveInnerGotoStatementsFromContext((s as UsingStatement).get_Body());
-					goto Label0;
+					this.RemoveInnerGotoStatementsFromContext((s as UsingStatement).Body);
+					return;
 				}
 			}
 		}
 
 		private bool Targeted(string label)
 		{
-			V_0 = this.methodContext.get_GotoStatements().GetEnumerator();
+			bool flag;
+			List<GotoStatement>.Enumerator enumerator = this.methodContext.GotoStatements.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					if (!String.op_Equality(V_0.get_Current().get_TargetLabel(), label))
+					if (enumerator.Current.TargetLabel != label)
 					{
 						continue;
 					}
-					V_1 = true;
-					goto Label1;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				return false;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_1;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		private bool TryCopyTargetedBlock(Statement labeledStatement, GotoStatement gotoStatement)
 		{
-			V_0 = new StatementCollection();
-			V_1 = new StatementCollection();
-			V_2 = labeledStatement.get_Parent() as BlockStatement;
-			if (V_2 == null)
+			int i;
+			StatementCollection statementCollection = new StatementCollection();
+			StatementCollection statementCollection1 = new StatementCollection();
+			BlockStatement parent = labeledStatement.Parent as BlockStatement;
+			if (parent == null)
 			{
 				return false;
 			}
-			V_3 = V_2.get_Statements().IndexOf(labeledStatement);
-			V_1.Add(labeledStatement);
-			V_4 = labeledStatement.CloneStatementOnly();
-			V_4.set_Label(String.Empty);
-			V_0.Add(V_4);
-			V_5 = 15;
-			if (this.ContainsLabel(V_4))
+			int num = parent.Statements.IndexOf(labeledStatement);
+			statementCollection1.Add(labeledStatement);
+			Statement empty = labeledStatement.CloneStatementOnly();
+			empty.Label = String.Empty;
+			statementCollection.Add(empty);
+			int statementsCount = 15;
+			if (this.ContainsLabel(empty))
 			{
 				return false;
 			}
-			V_5 = V_5 - this.GetStatementsCount(V_4);
-			if (V_5 < 0)
+			statementsCount -= this.GetStatementsCount(empty);
+			if (statementsCount < 0)
 			{
 				return false;
 			}
-			if (!this.IsReturnStatement(V_4) && !this.IsThrowStatement(V_4))
+			if (!this.IsReturnStatement(empty) && !this.IsThrowStatement(empty))
 			{
-				V_6 = V_3 + 1;
-				while (V_6 < V_2.get_Statements().get_Count())
+				for (i = num + 1; i < parent.Statements.Count; i++)
 				{
-					V_7 = V_2.get_Statements().get_Item(V_6);
-					if (this.ContainsLabel(V_7))
+					Statement item = parent.Statements[i];
+					if (this.ContainsLabel(item))
 					{
 						return false;
 					}
-					V_5 = V_5 - this.GetStatementsCount(V_7);
-					if (V_5 < 0)
+					statementsCount -= this.GetStatementsCount(item);
+					if (statementsCount < 0)
 					{
 						return false;
 					}
-					V_1.Add(V_7);
-					V_0.Add(V_7.CloneStatementOnly());
-					if (this.IsReturnStatement(V_7) || this.IsThrowStatement(V_7))
+					statementCollection1.Add(item);
+					statementCollection.Add(item.CloneStatementOnly());
+					if (this.IsReturnStatement(item) || this.IsThrowStatement(item))
 					{
 						break;
 					}
-					V_6 = V_6 + 1;
 				}
-				if (V_6 == V_2.get_Statements().get_Count())
+				if (i == parent.Statements.Count)
 				{
 					return false;
 				}
 			}
-			this.MoveStatements(gotoStatement, V_0);
-			if (!this.Targeted(labeledStatement.get_Label()))
+			this.MoveStatements(gotoStatement, statementCollection);
+			if (!this.Targeted(labeledStatement.Label))
 			{
-				this.UpdateUntargetedStatement(labeledStatement, V_1);
+				this.UpdateUntargetedStatement(labeledStatement, statementCollection1);
 			}
 			return true;
 		}
 
 		private bool TryRemoveChainedGoto(Statement labeledStatement, GotoStatement gotoStatement)
 		{
-			if (labeledStatement as GotoStatement == null)
+			if (!(labeledStatement is GotoStatement))
 			{
 				return false;
 			}
-			stackVariable4 = gotoStatement.get_Parent() as BlockStatement;
-			V_0 = stackVariable4.get_Statements().IndexOf(gotoStatement);
-			V_1 = labeledStatement.CloneStatementOnly();
-			V_1.set_Label(String.Empty);
-			stackVariable4.get_Statements().RemoveAt(V_0);
-			stackVariable4.AddStatementAt(V_0, V_1);
-			dummyVar0 = this.methodContext.get_GotoStatements().Remove(gotoStatement);
-			this.methodContext.get_GotoStatements().Add(V_1 as GotoStatement);
-			if (!this.Targeted(labeledStatement.get_Label()))
+			BlockStatement parent = gotoStatement.Parent as BlockStatement;
+			int num = parent.Statements.IndexOf(gotoStatement);
+			Statement empty = labeledStatement.CloneStatementOnly();
+			empty.Label = String.Empty;
+			parent.Statements.RemoveAt(num);
+			parent.AddStatementAt(num, empty);
+			this.methodContext.GotoStatements.Remove(gotoStatement);
+			this.methodContext.GotoStatements.Add(empty as GotoStatement);
+			if (!this.Targeted(labeledStatement.Label))
 			{
-				stackVariable34 = new Statement[1];
-				stackVariable34[0] = labeledStatement;
-				this.UpdateUntargetedStatement(labeledStatement, (IEnumerable<Statement>)stackVariable34);
+				this.UpdateUntargetedStatement(labeledStatement, (IEnumerable<Statement>)(new Statement[] { labeledStatement }));
 			}
 			return true;
 		}
 
 		private bool TryRemoveGoto(Statement labeledStatement, GotoStatement gotoStatement)
 		{
-			V_0 = gotoStatement.get_Parent() as BlockStatement;
-			if (V_0 == null)
+			BlockStatement parent = gotoStatement.Parent as BlockStatement;
+			if (parent == null)
 			{
 				throw new DecompilationException("Goto statement not inside a block.");
 			}
-			V_1 = V_0.get_Statements().IndexOf(gotoStatement);
-			if (labeledStatement.get_Parent() == V_0 && V_0.get_Statements().IndexOf(labeledStatement) == V_1 + 1)
+			int num = parent.Statements.IndexOf(gotoStatement);
+			if (labeledStatement.Parent == parent && parent.Statements.IndexOf(labeledStatement) == num + 1)
 			{
-				V_0.get_Statements().RemoveAt(V_1);
-				dummyVar0 = this.methodContext.get_GotoStatements().Remove(gotoStatement);
-				if (!this.Targeted(labeledStatement.get_Label()))
+				parent.Statements.RemoveAt(num);
+				this.methodContext.GotoStatements.Remove(gotoStatement);
+				if (!this.Targeted(labeledStatement.Label))
 				{
 					this.UpdateUntargetedStatement(labeledStatement, new List<Statement>());
 				}
 				return true;
 			}
-			if (V_1 == V_0.get_Statements().get_Count() - 1)
+			if (num == parent.Statements.Count - 1)
 			{
-				V_2 = V_0.get_Parent();
-				if (V_2 == null)
+				Statement statement = parent.Parent;
+				if (statement == null)
 				{
 					return false;
 				}
-				if (V_2.get_CodeNodeType() == 13 || V_2.get_CodeNodeType() == 14)
+				if (statement.CodeNodeType == CodeNodeType.ConditionCase || statement.CodeNodeType == CodeNodeType.DefaultCase)
 				{
-					V_2 = V_2.get_Parent();
+					statement = statement.Parent;
 				}
-				if (V_2.get_CodeNodeType() == 15 || V_2.get_CodeNodeType() == 12 || V_2.get_CodeNodeType() == 7 || V_2.get_CodeNodeType() == 11 || V_2.get_CodeNodeType() == 8 || V_2.get_CodeNodeType() == 3 || V_2.get_CodeNodeType() == 4)
+				if (statement.CodeNodeType == CodeNodeType.SwitchStatement || statement.CodeNodeType == CodeNodeType.ForEachStatement || statement.CodeNodeType == CodeNodeType.WhileStatement || statement.CodeNodeType == CodeNodeType.ForStatement || statement.CodeNodeType == CodeNodeType.DoWhileStatement || statement.CodeNodeType == CodeNodeType.IfStatement || statement.CodeNodeType == CodeNodeType.IfElseIfStatement)
 				{
-					V_3 = V_2.get_Parent() as BlockStatement;
-					if (labeledStatement.get_Parent() != V_3)
+					BlockStatement blockStatement = statement.Parent as BlockStatement;
+					if (labeledStatement.Parent != blockStatement)
 					{
 						return false;
 					}
-					if (V_3.get_Statements().IndexOf(V_2) == V_3.get_Statements().IndexOf(labeledStatement) - 1)
+					if (blockStatement.Statements.IndexOf(statement) == blockStatement.Statements.IndexOf(labeledStatement) - 1)
 					{
-						V_0.get_Statements().RemoveAt(V_1);
-						dummyVar1 = this.methodContext.get_GotoStatements().Remove(gotoStatement);
-						if (V_2.get_CodeNodeType() != 3 && V_2.get_CodeNodeType() != 4)
+						parent.Statements.RemoveAt(num);
+						this.methodContext.GotoStatements.Remove(gotoStatement);
+						if (statement.CodeNodeType != CodeNodeType.IfStatement && statement.CodeNodeType != CodeNodeType.IfElseIfStatement)
 						{
-							V_0.AddStatementAt(V_1, new BreakStatement(gotoStatement.get_UnderlyingSameMethodInstructions()));
+							parent.AddStatementAt(num, new BreakStatement(gotoStatement.UnderlyingSameMethodInstructions));
 						}
-						if (!this.Targeted(labeledStatement.get_Label()))
+						if (!this.Targeted(labeledStatement.Label))
 						{
 							this.UpdateUntargetedStatement(labeledStatement, new List<Statement>());
 						}
@@ -473,52 +401,30 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private void UpdateUntargetedStatement(Statement labeledStatement, IEnumerable<Statement> originalStatements)
 		{
-			dummyVar0 = this.methodContext.get_GotoLabels().Remove(labeledStatement.get_Label());
-			labeledStatement.set_Label(String.Empty);
-			if (!this.methodContext.get_StatementToLogicalConstruct().ContainsKey(labeledStatement))
+			this.methodContext.GotoLabels.Remove(labeledStatement.Label);
+			labeledStatement.Label = String.Empty;
+			if (!this.methodContext.StatementToLogicalConstruct.ContainsKey(labeledStatement))
 			{
 				return;
 			}
-			V_0 = this.methodContext.get_StatementToLogicalConstruct().get_Item(labeledStatement);
-			if (V_0.get_Parent() as CaseLogicalConstruct != null)
+			ILogicalConstruct item = this.methodContext.StatementToLogicalConstruct[labeledStatement];
+			if (item.Parent is CaseLogicalConstruct)
 			{
 				return;
 			}
-			V_1 = V_0.get_AllPredecessors().GetEnumerator();
-			try
+			foreach (ISingleEntrySubGraph allPredecessor in item.AllPredecessors)
 			{
-				while (V_1.MoveNext())
+				if (((ILogicalConstruct)allPredecessor).FollowNode != item)
 				{
-					if (((ILogicalConstruct)V_1.get_Current()).get_FollowNode() != V_0)
-					{
-						continue;
-					}
-					goto Label0;
+					continue;
 				}
+				return;
 			}
-			finally
+			foreach (Statement originalStatement in originalStatements)
 			{
-				((IDisposable)V_1).Dispose();
+				(originalStatement.Parent as BlockStatement).Statements.Remove(originalStatement);
+				this.RemoveInnerGotoStatementsFromContext(originalStatement);
 			}
-			V_2 = originalStatements.GetEnumerator();
-			try
-			{
-				while (V_2.MoveNext())
-				{
-					V_3 = V_2.get_Current();
-					dummyVar1 = (V_3.get_Parent() as BlockStatement).get_Statements().Remove(V_3);
-					this.RemoveInnerGotoStatementsFromContext(V_3);
-				}
-			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
-			}
-		Label0:
-			return;
 		}
 
 		private class LableAndGotoFinder : BaseCodeVisitor
@@ -527,8 +433,6 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 			public LableAndGotoFinder()
 			{
-				base();
-				return;
 			}
 
 			public bool CheckForLableOrGoto(Statement statement)
@@ -540,27 +444,20 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 			public override void Visit(ICodeNode node)
 			{
-				if (this.hasLableOrGoto || node as GotoStatement != null)
+				bool flag;
+				if (this.hasLableOrGoto || node is GotoStatement)
 				{
-					stackVariable3 = true;
+					flag = true;
 				}
 				else
 				{
-					if (node as Statement == null)
-					{
-						stackVariable3 = false;
-					}
-					else
-					{
-						stackVariable3 = !String.IsNullOrEmpty((node as Statement).get_Label());
-					}
+					flag = (!(node is Statement) ? false : !String.IsNullOrEmpty((node as Statement).Label));
 				}
-				this.hasLableOrGoto = stackVariable3;
+				this.hasLableOrGoto = flag;
 				if (!this.hasLableOrGoto)
 				{
-					this.Visit(node);
+					base.Visit(node);
 				}
-				return;
 			}
 		}
 
@@ -570,8 +467,6 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 			public StatementsCounter()
 			{
-				base();
-				return;
 			}
 
 			public int GetStatementsCount(Statement statement)
@@ -583,9 +478,8 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 			public override void VisitBlockStatement(BlockStatement node)
 			{
-				this.statementsVisited = this.statementsVisited + node.get_Statements().get_Count();
-				this.VisitBlockStatement(node);
-				return;
+				this.statementsVisited += node.Statements.Count;
+				base.VisitBlockStatement(node);
 			}
 		}
 	}

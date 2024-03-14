@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new LinqQueryExpression.u003cget_Childrenu003ed__11(-2);
 			}
 		}
 
@@ -29,59 +28,43 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 81;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.LinqQueryExpression;
 			}
 		}
 
-		public LinqQueryExpression(List<QueryClause> clauses, TypeReference linqQueryType, IEnumerable<Instruction> instructions)
+		public LinqQueryExpression(List<QueryClause> clauses, TypeReference linqQueryType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Clauses(clauses);
-			this.set_ExpressionType(linqQueryType);
-			return;
+			this.Clauses = clauses;
+			this.ExpressionType = linqQueryType;
 		}
 
 		public override Expression Clone()
 		{
-			stackVariable1 = this.get_Clauses();
-			stackVariable2 = LinqQueryExpression.u003cu003ec.u003cu003e9__6_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<QueryClause, QueryClause>(LinqQueryExpression.u003cu003ec.u003cu003e9.u003cCloneu003eb__6_0);
-				LinqQueryExpression.u003cu003ec.u003cu003e9__6_0 = stackVariable2;
-			}
-			return new LinqQueryExpression(new List<QueryClause>(stackVariable1.Select<QueryClause, QueryClause>(stackVariable2)), this.get_ExpressionType(), this.instructions);
+			return new LinqQueryExpression(new List<QueryClause>(
+				from clause in this.Clauses
+				select (QueryClause)clause.Clone()), this.ExpressionType, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			stackVariable1 = this.get_Clauses();
-			stackVariable2 = LinqQueryExpression.u003cu003ec.u003cu003e9__7_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<QueryClause, QueryClause>(LinqQueryExpression.u003cu003ec.u003cu003e9.u003cCloneExpressionOnlyu003eb__7_0);
-				LinqQueryExpression.u003cu003ec.u003cu003e9__7_0 = stackVariable2;
-			}
-			return new LinqQueryExpression(new List<QueryClause>(stackVariable1.Select<QueryClause, QueryClause>(stackVariable2)), this.get_ExpressionType(), null);
+			return new LinqQueryExpression(new List<QueryClause>(
+				from clause in this.Clauses
+				select (QueryClause)clause.CloneExpressionOnly()), this.ExpressionType, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as LinqQueryExpression;
-			if (V_0 == null || this.get_Clauses().get_Count() != V_0.get_Clauses().get_Count())
+			LinqQueryExpression linqQueryExpression = other as LinqQueryExpression;
+			if (linqQueryExpression == null || this.Clauses.Count != linqQueryExpression.Clauses.Count)
 			{
 				return false;
 			}
-			V_1 = 0;
-			while (V_1 < this.get_Clauses().get_Count())
+			for (int i = 0; i < this.Clauses.Count; i++)
 			{
-				if (!this.get_Clauses().get_Item(V_1).Equals(V_0.get_Clauses().get_Item(V_1)))
+				if (!this.Clauses[i].Equals(linqQueryExpression.Clauses[i]))
 				{
 					return false;
 				}
-				V_1 = V_1 + 1;
 			}
 			return true;
 		}

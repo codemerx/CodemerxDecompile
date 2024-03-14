@@ -6,17 +6,17 @@ namespace Telerik.JustDecompiler.Pattern
 	{
 		protected CodePattern()
 		{
-			base();
-			return;
 		}
 
-		public static MatchContext Match(ICodePattern pattern, object object)
+		public static MatchContext Match(ICodePattern pattern, object @object)
 		{
-			V_0 = new MatchContext();
-			V_0.set_Success(pattern.Match(V_0, object));
-			return V_0;
+			MatchContext matchContext = new MatchContext()
+			{
+				Success = pattern.Match(matchContext, @object)
+			};
+			return matchContext;
 		}
 
-		public abstract bool Match(MatchContext context, object object);
+		public abstract bool Match(MatchContext context, object @object);
 	}
 }

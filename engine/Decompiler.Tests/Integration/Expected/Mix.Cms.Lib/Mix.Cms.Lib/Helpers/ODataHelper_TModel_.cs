@@ -1,6 +1,9 @@
+using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -10,53 +13,191 @@ namespace Mix.Cms.Lib.Helpers
 	{
 		public ODataHelper()
 		{
-			base();
-			return;
 		}
 
 		public static Expression<Func<T, bool>> CombineExpression<T>(Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2, BinaryOperatorKind kind, string name = "model")
 		{
-			V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Linq.Expressions.Expression`1<System.Func`2<T,System.Boolean>> Mix.Cms.Lib.Helpers.ODataHelper`1::CombineExpression(System.Linq.Expressions.Expression`1<System.Func`2<T,System.Boolean>>,System.Linq.Expressions.Expression`1<System.Func`2<T,System.Boolean>>,Microsoft.OData.UriParser.BinaryOperatorKind,System.String)
-			// Exception in: System.Linq.Expressions.Expression<System.Func<T,System.Boolean>> CombineExpression(System.Linq.Expressions.Expression<System.Func<T,System.Boolean>>,System.Linq.Expressions.Expression<System.Func<T,System.Boolean>>,Microsoft.OData.UriParser.BinaryOperatorKind,System.String)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			ParameterExpression parameterExpression = Expression.Parameter(typeof(T), name);
+			Expression expression = (new ODataHelper<TModel>.ReplaceExpressionVisitor(expr1.Parameters[0], parameterExpression)).Visit(expr1.Body);
+			Expression expression1 = (new ODataHelper<TModel>.ReplaceExpressionVisitor(expr2.Parameters[0], parameterExpression)).Visit(expr2.Body);
+			switch (kind)
+			{
+				case 0:
+				{
+					return Expression.Lambda<Func<T, bool>>(Expression.Or(expression, expression1), new ParameterExpression[] { parameterExpression });
+				}
+				case 1:
+				{
+					return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expression, expression1), new ParameterExpression[] { parameterExpression });
+				}
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:
+				case 11:
+				case 12:
+				case 13:
+				{
+					return null;
+				}
+				default:
+				{
+					return null;
+				}
+			}
+		}
 
 		public static Expression<Func<TModel, bool>> FilterObjectSet(SingleValuePropertyAccessNode rule, ConstantNode constant, BinaryOperatorKind kind, string name = "model")
 		{
-			V_0 = Type.GetTypeFromHandle(// 
-			// Current member / type: System.Linq.Expressions.Expression`1<System.Func`2<TModel,System.Boolean>> Mix.Cms.Lib.Helpers.ODataHelper`1::FilterObjectSet(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.OData.UriParser.ConstantNode,Microsoft.OData.UriParser.BinaryOperatorKind,System.String)
-			// Exception in: System.Linq.Expressions.Expression<System.Func<TModel,System.Boolean>> FilterObjectSet(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.OData.UriParser.ConstantNode,Microsoft.OData.UriParser.BinaryOperatorKind,System.String)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			Type fieldType;
+			Expression expression;
+			ParameterExpression[] parameterExpressionArray;
+			Type type = typeof(TModel);
+			ParameterExpression parameterExpression = Expression.Parameter(type, name);
+			FieldInfo field = type.GetField(rule.get_Property().get_Name());
+			if (field != null)
+			{
+				fieldType = field.FieldType;
+				expression = Expression.Field(parameterExpression, field);
+			}
+			else
+			{
+				PropertyInfo property = type.GetProperty(rule.get_Property().get_Name());
+				if (property == null)
+				{
+					throw new Exception();
+				}
+				fieldType = property.PropertyType;
+				expression = Expression.Property(parameterExpression, property);
+			}
+			object obj = null;
+			obj = (!fieldType.IsGenericType || !(fieldType.GetGenericTypeDefinition() == typeof(Nullable<>)) ? Convert.ChangeType(constant.get_LiteralText(), fieldType) : TypeDescriptor.GetConverter(fieldType).ConvertFrom(constant.get_LiteralText()));
+			if (fieldType == typeof(string))
+			{
+				obj = obj.ToString().Replace("'", "");
+			}
+			BinaryExpression binaryExpression = null;
+			switch (kind)
+			{
+				case 0:
+				{
+					binaryExpression = Expression.Or(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 1:
+				{
+					binaryExpression = Expression.And(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 2:
+				{
+					binaryExpression = Expression.Equal(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 3:
+				{
+					binaryExpression = Expression.NotEqual(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 4:
+				{
+					binaryExpression = Expression.GreaterThan(expression, Expression.Constant(obj));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 5:
+				{
+					binaryExpression = Expression.GreaterThanOrEqual(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 6:
+				{
+					binaryExpression = Expression.LessThan(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 7:
+				{
+					binaryExpression = Expression.LessThanOrEqual(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 8:
+				{
+					binaryExpression = Expression.Add(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 9:
+				{
+					binaryExpression = Expression.Subtract(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 10:
+				{
+					binaryExpression = Expression.Multiply(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 11:
+				{
+					binaryExpression = Expression.Divide(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 12:
+				{
+					binaryExpression = Expression.Modulo(expression, Expression.Constant(obj, fieldType));
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				case 13:
+				{
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+				default:
+				{
+					parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+					return Expression.Lambda<Func<TModel, bool>>(binaryExpression, parameterExpressionArray);
+				}
+			}
+		}
 
 		private static Expression GetPropertyExpression(Type type, string name)
 		{
-			stackVariable2 = Expression.Parameter(type, "model");
-			return Expression.Property(stackVariable2, type.GetProperty(name));
+			return Expression.Property(Expression.Parameter(type, "model"), type.GetProperty(name));
 		}
 
 		private static Type GetPropertyType(Type type, string name)
 		{
-			V_1 = type.GetField(name);
-			if (!FieldInfo.op_Equality(V_1, null))
+			Type fieldType;
+			FieldInfo field = type.GetField(name);
+			if (field != null)
 			{
-				V_0 = V_1.get_FieldType();
+				fieldType = field.FieldType;
 			}
 			else
 			{
-				stackVariable11 = type.GetProperty(name);
-				if (PropertyInfo.op_Equality(stackVariable11, null))
+				PropertyInfo property = type.GetProperty(name);
+				if (property == null)
 				{
 					throw new Exception();
 				}
-				V_0 = stackVariable11.get_PropertyType();
+				fieldType = property.PropertyType;
 			}
-			return V_0;
+			return fieldType;
 		}
 
 		public static object GetPropValue(object src, string propName)
@@ -66,76 +207,80 @@ namespace Mix.Cms.Lib.Helpers
 
 		public static void ParseFilter(SingleValueNode node, ref Expression<Func<TModel, bool>> result, int kind = -1)
 		{
-			if (node as BinaryOperatorNode != null)
+			if (node is BinaryOperatorNode)
 			{
-				V_0 = node as BinaryOperatorNode;
-				V_1 = V_0.get_Left();
-				V_2 = V_0.get_Right();
-				if (V_1 as ConvertNode != null)
+				BinaryOperatorNode binaryOperatorNode = node as BinaryOperatorNode;
+				SingleValueNode left = binaryOperatorNode.get_Left();
+				SingleValueNode right = binaryOperatorNode.get_Right();
+				if (left is ConvertNode)
 				{
-					ODataHelper<TModel>.ParseFilter(((ConvertNode)V_1).get_Source(), ref result, -1);
+					ODataHelper<TModel>.ParseFilter(((ConvertNode)left).get_Source(), ref result, -1);
 				}
-				if (V_1 as BinaryOperatorNode != null)
+				if (left is BinaryOperatorNode)
 				{
-					ODataHelper<TModel>.ParseFilter(V_1, ref result, -1);
+					ODataHelper<TModel>.ParseFilter(left, ref result, -1);
 				}
-				if (V_2 as ConvertNode != null)
+				if (right is ConvertNode)
 				{
-					ODataHelper<TModel>.ParseFilter(((ConvertNode)V_2).get_Source(), ref result, V_0.get_OperatorKind());
+					ODataHelper<TModel>.ParseFilter(((ConvertNode)right).get_Source(), ref result, binaryOperatorNode.get_OperatorKind());
 				}
-				if (V_2 as BinaryOperatorNode != null)
+				if (right is BinaryOperatorNode)
 				{
-					ODataHelper<TModel>.ParseFilter(V_2, ref result, V_0.get_OperatorKind());
+					ODataHelper<TModel>.ParseFilter(right, ref result, binaryOperatorNode.get_OperatorKind());
 				}
-				if (V_1 as SingleValuePropertyAccessNode != null && V_2 as ConstantNode != null)
+				if (left is SingleValuePropertyAccessNode && right is ConstantNode)
 				{
-					V_3 = V_1 as SingleValuePropertyAccessNode;
-					V_4 = V_2 as ConstantNode;
-					if (V_3 != null && V_3.get_Property() != null && V_4 != null && V_4.get_Value() != null)
+					SingleValuePropertyAccessNode singleValuePropertyAccessNode = left as SingleValuePropertyAccessNode;
+					ConstantNode constantNode = right as ConstantNode;
+					if (singleValuePropertyAccessNode != null && singleValuePropertyAccessNode.get_Property() != null && constantNode != null && constantNode.get_Value() != null)
 					{
-						V_5 = ODataHelper<TModel>.FilterObjectSet(V_3, V_4, V_0.get_OperatorKind(), "model");
-						dummyVar0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-						// Current member / type: System.Void Mix.Cms.Lib.Helpers.ODataHelper`1::ParseFilter(Microsoft.OData.UriParser.SingleValueNode,System.Linq.Expressions.Expression`1<System.Func`2<TModel,System.Boolean>>&,System.Int32)
-						// Exception in: System.Void ParseFilter(Microsoft.OData.UriParser.SingleValueNode,System.Linq.Expressions.Expression<System.Func<TModel,System.Boolean>>&,System.Int32)
-						// Specified method is not supported.
-						// 
-						// mailto: JustDecompilePublicFeedback@telerik.com
-
-
-		public static void TryNodeValue(SingleValueNode node, IDictionary<string, object> values)
-		{
-			if (node as BinaryOperatorNode != null)
-			{
-				V_0 = (BinaryOperatorNode)node;
-				V_1 = V_0.get_Left();
-				V_2 = V_0.get_Right();
-				if (V_1 as ConvertNode != null)
-				{
-					ODataHelper<TModel>.TryNodeValue(((ConvertNode)V_1).get_Source(), values);
-				}
-				if (V_1 as BinaryOperatorNode != null)
-				{
-					ODataHelper<TModel>.TryNodeValue(V_1, values);
-				}
-				if (V_2 as ConvertNode != null)
-				{
-					ODataHelper<TModel>.TryNodeValue(((ConvertNode)V_2).get_Source(), values);
-				}
-				if (V_2 as BinaryOperatorNode != null)
-				{
-					ODataHelper<TModel>.TryNodeValue(V_2, values);
-				}
-				if (V_1 as SingleValuePropertyAccessNode != null && V_2 as ConstantNode != null)
-				{
-					V_3 = (SingleValuePropertyAccessNode)V_1;
-					if (V_0.get_OperatorKind() == 2)
-					{
-						V_4 = ((ConstantNode)V_2).get_Value();
-						values.Add(V_3.get_Property().get_Name(), V_4);
+						Expression<Func<TModel, bool>> expression = ODataHelper<TModel>.FilterObjectSet(singleValuePropertyAccessNode, constantNode, binaryOperatorNode.get_OperatorKind(), "model");
+						Expression.Parameter(typeof(TModel), "model");
+						if (kind >= 0 && result != null)
+						{
+							BinaryOperatorKind binaryOperatorKind = kind;
+							result = ODataHelper<TModel>.CombineExpression<TModel>(result, expression, binaryOperatorKind, "model");
+							return;
+						}
+						result = expression;
 					}
 				}
 			}
-			return;
+		}
+
+		public static void TryNodeValue(SingleValueNode node, IDictionary<string, object> values)
+		{
+			if (node is BinaryOperatorNode)
+			{
+				BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)node;
+				SingleValueNode left = binaryOperatorNode.get_Left();
+				SingleValueNode right = binaryOperatorNode.get_Right();
+				if (left is ConvertNode)
+				{
+					ODataHelper<TModel>.TryNodeValue(((ConvertNode)left).get_Source(), values);
+				}
+				if (left is BinaryOperatorNode)
+				{
+					ODataHelper<TModel>.TryNodeValue(left, values);
+				}
+				if (right is ConvertNode)
+				{
+					ODataHelper<TModel>.TryNodeValue(((ConvertNode)right).get_Source(), values);
+				}
+				if (right is BinaryOperatorNode)
+				{
+					ODataHelper<TModel>.TryNodeValue(right, values);
+				}
+				if (left is SingleValuePropertyAccessNode && right is ConstantNode)
+				{
+					SingleValuePropertyAccessNode singleValuePropertyAccessNode = (SingleValuePropertyAccessNode)left;
+					if (binaryOperatorNode.get_OperatorKind() == 2)
+					{
+						object value = ((ConstantNode)right).get_Value();
+						values.Add(singleValuePropertyAccessNode.get_Property().get_Name(), value);
+					}
+				}
+			}
 		}
 
 		private class ReplaceExpressionVisitor : ExpressionVisitor
@@ -146,10 +291,8 @@ namespace Mix.Cms.Lib.Helpers
 
 			public ReplaceExpressionVisitor(Expression oldValue, Expression newValue)
 			{
-				base();
 				this._oldValue = oldValue;
 				this._newValue = newValue;
-				return;
 			}
 
 			public override Expression Visit(Expression node)
@@ -158,7 +301,7 @@ namespace Mix.Cms.Lib.Helpers
 				{
 					return this._newValue;
 				}
-				return this.Visit(node);
+				return base.Visit(node);
 			}
 		}
 	}

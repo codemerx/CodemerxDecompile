@@ -27,8 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 					throw new ArgumentNullException("value");
 				}
 				this.body = value;
-				this.body.set_Parent(this);
-				return;
+				this.body.Parent = this;
 			}
 		}
 
@@ -36,9 +35,11 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new FinallyClause.u003cget_Childrenu003ed__10(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				FinallyClause finallyClause = null;
+				if (!finallyClause.IsSpecialYieldFinally)
+				{
+					yield return finallyClause.body;
+				}
 			}
 		}
 
@@ -46,7 +47,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 70;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.FinallyClause;
 			}
 		}
 
@@ -60,27 +61,17 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		public FinallyClause(BlockStatement body, IEnumerable<Instruction> mappedInstructions = null)
 		{
-			base();
 			if (body == null)
 			{
 				throw new ArgumentNullException("body");
 			}
 			this.body = body;
-			body.set_Parent(this);
+			body.Parent = this;
 			if (mappedInstructions != null)
 			{
 				this.mappedInstructions = new List<Instruction>(mappedInstructions);
-				stackVariable11 = this.mappedInstructions;
-				stackVariable12 = FinallyClause.u003cu003ec.u003cu003e9__2_0;
-				if (stackVariable12 == null)
-				{
-					dummyVar0 = stackVariable12;
-					stackVariable12 = new Comparison<Instruction>(FinallyClause.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__2_0);
-					FinallyClause.u003cu003ec.u003cu003e9__2_0 = stackVariable12;
-				}
-				stackVariable11.Sort(stackVariable12);
+				this.mappedInstructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
-			return;
 		}
 
 		public override Statement Clone()
@@ -95,9 +86,14 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			stackVariable1 = new FinallyClause.u003cGetOwnInstructionsu003ed__8(-2);
-			stackVariable1.u003cu003e4__this = this;
-			return stackVariable1;
+			FinallyClause finallyClause = null;
+			if (finallyClause.IsSpecialYieldFinally)
+			{
+				foreach (Instruction mappedInstruction in finallyClause.mappedInstructions)
+				{
+					yield return mappedInstruction;
+				}
+			}
 		}
 	}
 }

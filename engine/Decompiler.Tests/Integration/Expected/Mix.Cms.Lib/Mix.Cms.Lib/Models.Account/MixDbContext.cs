@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Mix.Cms.Lib;
+using Mix.Cms.Lib.Services;
 using Mix.Identity.Entities;
 using Mix.Identity.Models;
+using MySql.Data.MySqlClient;
+using Npgsql;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -22,62 +27,57 @@ namespace Mix.Cms.Lib.Models.Account
 			set;
 		}
 
-		public MixDbContext(DbContextOptions<MixDbContext> options)
+		public MixDbContext(DbContextOptions<MixDbContext> options) : base(options)
 		{
-			base(options);
-			return;
 		}
 
 		public MixDbContext()
 		{
-			base();
-			return;
 		}
 
 		public override void Dispose()
 		{
 			switch (Enum.Parse<MixEnums.DatabaseProvider>(MixService.GetConfig<string>("DatabaseProvider")))
 			{
-				case 0:
+				case MixEnums.DatabaseProvider.MSSQL:
 				{
 					SqlConnection.ClearPool((SqlConnection)RelationalDatabaseFacadeExtensions.GetDbConnection(this.get_Database()));
 					break;
 				}
-				case 1:
+				case MixEnums.DatabaseProvider.MySQL:
 				{
 					MySqlConnection.ClearPool((MySqlConnection)RelationalDatabaseFacadeExtensions.GetDbConnection(this.get_Database()));
 					break;
 				}
-				case 2:
+				case MixEnums.DatabaseProvider.PostgreSQL:
 				{
 					NpgsqlConnection.ClearPool((NpgsqlConnection)RelationalDatabaseFacadeExtensions.GetDbConnection(this.get_Database()));
 					break;
 				}
 			}
-			this.Dispose();
-			return;
+			base.Dispose();
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			V_0 = MixService.GetConnectionString("MixCmsConnection");
-			if (!string.IsNullOrEmpty(V_0))
+			string connectionString = MixService.GetConnectionString("MixCmsConnection");
+			if (!string.IsNullOrEmpty(connectionString))
 			{
 				switch (Enum.Parse<MixEnums.DatabaseProvider>(MixService.GetConfig<string>("DatabaseProvider")))
 				{
-					case 0:
+					case MixEnums.DatabaseProvider.MSSQL:
 					{
-						dummyVar0 = SqlServerDbContextOptionsExtensions.UseSqlServer(optionsBuilder, V_0, null);
+						SqlServerDbContextOptionsExtensions.UseSqlServer(optionsBuilder, connectionString, null);
 						return;
 					}
-					case 1:
+					case MixEnums.DatabaseProvider.MySQL:
 					{
-						dummyVar1 = MySqlDbContextOptionsExtensions.UseMySql(optionsBuilder, V_0, null);
+						MySqlDbContextOptionsExtensions.UseMySql(optionsBuilder, connectionString, null);
 						return;
 					}
-					case 2:
+					case MixEnums.DatabaseProvider.PostgreSQL:
 					{
-						dummyVar2 = NpgsqlDbContextOptionsExtensions.UseNpgsql(optionsBuilder, V_0, null);
+						NpgsqlDbContextOptionsExtensions.UseNpgsql(optionsBuilder, connectionString, null);
 						break;
 					}
 					default:
@@ -86,13 +86,11 @@ namespace Mix.Cms.Lib.Models.Account
 					}
 				}
 			}
-			return;
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
-			this.OnModelCreating(builder);
-			return;
+			base.OnModelCreating(builder);
 		}
 	}
 }

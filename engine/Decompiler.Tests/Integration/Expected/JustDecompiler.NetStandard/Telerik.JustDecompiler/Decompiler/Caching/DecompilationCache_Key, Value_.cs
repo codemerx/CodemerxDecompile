@@ -15,34 +15,30 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 		{
 			get
 			{
-				return this.cacheStore.get_Count();
+				return this.cacheStore.Count;
 			}
 		}
 
 		public DecompilationCache(int maxSize)
 		{
-			base();
 			this.maxSize = maxSize;
 			this.cacheStore = new Dictionary<Key, Value>();
 			this.keysQueue = new Queue<Key>();
-			return;
 		}
 
 		public void Add(Key key, Value value)
 		{
-			while (this.get_Count() > this.maxSize)
+			while (this.Count > this.maxSize)
 			{
 				this.Delete(this.keysQueue.Dequeue());
 			}
 			this.cacheStore.Add(key, value);
 			this.keysQueue.Enqueue(key);
-			return;
 		}
 
 		public void Clear()
 		{
 			this.cacheStore.Clear();
-			return;
 		}
 
 		public bool ContainsKey(Key key)
@@ -52,42 +48,32 @@ namespace Telerik.JustDecompiler.Decompiler.Caching
 
 		private void Delete(Key key)
 		{
-			dummyVar0 = this.cacheStore.Remove(key);
-			return;
+			this.cacheStore.Remove(key);
 		}
 
 		public Value Get(Key key)
 		{
-			if (!this.cacheStore.TryGetValue(key, out V_0))
+			Value value;
+			if (!this.cacheStore.TryGetValue(key, out value))
 			{
 				throw new KeyNotFoundException("Key not found in cache.");
 			}
-			return V_0;
+			return value;
 		}
 
 		public void Remove(Key key)
 		{
 			this.Delete(key);
-			V_0 = new Queue<Key>();
-			V_1 = this.keysQueue.GetEnumerator();
-			try
+			Queue<Key> keys = new Queue<Key>();
+			foreach (Key key1 in this.keysQueue)
 			{
-				while (V_1.MoveNext())
+				if (key1.Equals(key))
 				{
-					V_2 = V_1.get_Current();
-					if (V_2.Equals(key))
-					{
-						continue;
-					}
-					V_0.Enqueue(V_2);
+					continue;
 				}
+				keys.Enqueue(key1);
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			this.keysQueue = V_0;
-			return;
+			this.keysQueue = keys;
 		}
 	}
 }

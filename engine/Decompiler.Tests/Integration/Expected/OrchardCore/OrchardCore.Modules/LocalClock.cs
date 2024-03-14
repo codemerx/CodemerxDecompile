@@ -1,6 +1,7 @@
 using NodaTime;
 using OrchardCore.Localization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -28,58 +29,51 @@ namespace OrchardCore.Modules
 
 		public LocalClock(IEnumerable<ITimeZoneSelector> timeZoneSelectors, IClock clock, ICalendarManager calendarManager)
 		{
-			base();
 			this._timeZoneSelectors = timeZoneSelectors;
 			this._clock = clock;
 			this._calendarManager = calendarManager;
-			return;
 		}
 
 		public async Task<DateTimeOffset> ConvertToLocalAsync(DateTimeOffset dateTimeOffSet)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.dateTimeOffSet = dateTimeOffSet;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<DateTimeOffset>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<LocalClock.u003cConvertToLocalAsyncu003ed__9>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			DateTimeZone dateTimeZone = ((OrchardCore.Modules.TimeZone)await this.GetLocalTimeZoneAsync()).DateTimeZone;
+			OffsetDateTime offsetDateTime = OffsetDateTime.FromDateTimeOffset(dateTimeOffSet);
+			CalendarSystem calendarByName = BclCalendars.GetCalendarByName(await this._calendarManager.GetCurrentCalendar());
+			ZonedDateTime zonedDateTime = offsetDateTime.InZone(dateTimeZone);
+			zonedDateTime = zonedDateTime.WithCalendar(calendarByName);
+			return zonedDateTime.ToDateTimeOffset();
 		}
 
 		public async Task<DateTime> ConvertToUtcAsync(DateTime dateTime)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.dateTime = dateTime;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<DateTime>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<LocalClock.u003cConvertToUtcAsyncu003ed__10>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			DateTimeZone dateTimeZone = ((OrchardCore.Modules.TimeZone)await this.GetLocalTimeZoneAsync()).DateTimeZone;
+			LocalDateTime localDateTime = LocalDateTime.FromDateTime(dateTime);
+			return dateTimeZone.AtStrictly(localDateTime).ToDateTimeUtc();
 		}
 
 		private async Task<DateTimeOffset> GetLocalNowAsync()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<DateTimeOffset>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<LocalClock.u003cGetLocalNowAsyncu003ed__7>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			IClock clock = this._clock;
+			return clock.ConvertToTimeZone(this._clock.get_UtcNow(), await this.GetLocalTimeZoneAsync());
 		}
 
 		public async Task<ITimeZone> GetLocalTimeZoneAsync()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<ITimeZone>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<LocalClock.u003cGetLocalTimeZoneAsyncu003ed__8>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			if (this._timeZone == null)
+			{
+				this._timeZone = await this.LoadLocalTimeZoneAsync();
+			}
+			return this._timeZone;
 		}
 
 		private async Task<ITimeZone> LoadLocalTimeZoneAsync()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<ITimeZone>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11 variable = new LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11();
+			variable.u003cu003e4__this = this;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<ITimeZone>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<LocalClock.u003cLoadLocalTimeZoneAsyncu003ed__11>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

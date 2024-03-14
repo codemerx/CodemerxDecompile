@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using OrchardCore.Environment.Extensions.Features;
 using System;
 using System.Collections;
@@ -11,7 +12,7 @@ namespace OrchardCore.Environment.Shell.Builders
 	{
 		private readonly IServiceCollection _innerServiceCollection;
 
-		private readonly Dictionary<IFeatureInfo, ServiceCollection> _featureServiceCollections;
+		private readonly Dictionary<IFeatureInfo, ServiceCollection> _featureServiceCollections = new Dictionary<IFeatureInfo, ServiceCollection>();
 
 		private ServiceCollection _currentFeatureServiceCollection;
 
@@ -19,7 +20,7 @@ namespace OrchardCore.Environment.Shell.Builders
 		{
 			get
 			{
-				return this._innerServiceCollection.get_Count();
+				return this._innerServiceCollection.Count;
 			}
 		}
 
@@ -35,7 +36,7 @@ namespace OrchardCore.Environment.Shell.Builders
 		{
 			get
 			{
-				return this._innerServiceCollection.get_IsReadOnly();
+				return this._innerServiceCollection.IsReadOnly;
 			}
 		}
 
@@ -43,28 +44,23 @@ namespace OrchardCore.Environment.Shell.Builders
 		{
 			get
 			{
-				return this._innerServiceCollection.get_Item(index);
+				return this._innerServiceCollection[index];
 			}
 			set
 			{
-				this._innerServiceCollection.set_Item(index, value);
-				return;
+				this._innerServiceCollection[index] = value;
 			}
 		}
 
 		public FeatureAwareServiceCollection(IServiceCollection innerServiceCollection)
 		{
-			this._featureServiceCollections = new Dictionary<IFeatureInfo, ServiceCollection>();
-			base();
 			this._innerServiceCollection = innerServiceCollection;
-			return;
 		}
 
 		public void Clear()
 		{
 			this._innerServiceCollection.Clear();
 			this._featureServiceCollections.Clear();
-			return;
 		}
 
 		public bool Contains(ServiceDescriptor item)
@@ -75,7 +71,6 @@ namespace OrchardCore.Environment.Shell.Builders
 		public void CopyTo(ServiceDescriptor[] array, int arrayIndex)
 		{
 			this._innerServiceCollection.CopyTo(array, arrayIndex);
-			return;
 		}
 
 		public IEnumerator<ServiceDescriptor> GetEnumerator()
@@ -91,14 +86,12 @@ namespace OrchardCore.Environment.Shell.Builders
 		public void Insert(int index, ServiceDescriptor item)
 		{
 			this._innerServiceCollection.Insert(index, item);
-			stackVariable5 = this._currentFeatureServiceCollection;
-			if (stackVariable5 == null)
+			ServiceCollection serviceCollection = this._currentFeatureServiceCollection;
+			if (serviceCollection == null)
 			{
-				dummyVar0 = stackVariable5;
 				return;
 			}
-			dummyVar1 = ServiceCollectionDescriptorExtensions.Add(stackVariable5, item);
-			return;
+			ServiceCollectionDescriptorExtensions.Add(serviceCollection, item);
 		}
 
 		public bool Remove(ServiceDescriptor item)
@@ -109,33 +102,29 @@ namespace OrchardCore.Environment.Shell.Builders
 		public void RemoveAt(int index)
 		{
 			this._innerServiceCollection.RemoveAt(index);
-			return;
 		}
 
 		public void SetCurrentFeature(IFeatureInfo feature)
 		{
 			if (!this._featureServiceCollections.TryGetValue(feature, out this._currentFeatureServiceCollection))
 			{
-				stackVariable7 = this._featureServiceCollections;
-				stackVariable10 = new ServiceCollection();
-				V_0 = stackVariable10;
-				this._currentFeatureServiceCollection = stackVariable10;
-				stackVariable7.Add(feature, V_0);
+				Dictionary<IFeatureInfo, ServiceCollection> featureInfos = this._featureServiceCollections;
+				ServiceCollection serviceCollection = new ServiceCollection();
+				ServiceCollection serviceCollection1 = serviceCollection;
+				this._currentFeatureServiceCollection = serviceCollection;
+				featureInfos.Add(feature, serviceCollection1);
 			}
-			return;
 		}
 
 		void System.Collections.Generic.ICollection<Microsoft.Extensions.DependencyInjection.ServiceDescriptor>.Add(ServiceDescriptor item)
 		{
 			this._innerServiceCollection.Add(item);
-			stackVariable4 = this._currentFeatureServiceCollection;
-			if (stackVariable4 == null)
+			ServiceCollection serviceCollection = this._currentFeatureServiceCollection;
+			if (serviceCollection == null)
 			{
-				dummyVar0 = stackVariable4;
 				return;
 			}
-			dummyVar1 = ServiceCollectionDescriptorExtensions.Add(stackVariable4, item);
-			return;
+			ServiceCollectionDescriptorExtensions.Add(serviceCollection, item);
 		}
 
 		IEnumerator System.Collections.IEnumerable.GetEnumerator()

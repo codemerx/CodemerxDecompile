@@ -27,106 +27,85 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.FollowNodes
 
 		private MaxWeightDisjointPathsFinder(int[,] bipartiteGraph)
 		{
-			base();
 			this.graph = bipartiteGraph;
 			this.size = this.graph.GetLength(0);
 			this.u = new Int32[this.size];
 			this.v = new Int32[this.size];
 			this.excessMatrix = new int[this.size, this.size];
 			this.equalityGraph = new List<int>[this.size * 2];
-			V_0 = 0;
-			while (V_0 < this.size * 2)
+			for (int i = 0; i < this.size * 2; i++)
 			{
-				this.equalityGraph[V_0] = new List<int>();
-				V_0 = V_0 + 1;
+				this.equalityGraph[i] = new List<int>();
 			}
 			this.pair = new Int32[this.size * 2 + 1];
 			this.dist = new Int32[this.size * 2 + 1];
 			this.nilVertex = this.size * 2;
-			return;
 		}
 
 		private List<KeyValuePair<int, int>> FindMaximumCardianlityMatching()
 		{
-			V_1 = 0;
-			while (V_1 < (int)this.pair.Length)
+			for (int i = 0; i < (int)this.pair.Length; i++)
 			{
-				this.pair[V_1] = this.nilVertex;
-				V_1 = V_1 + 1;
+				this.pair[i] = this.nilVertex;
 			}
 			while (this.HopcroftKarpBFS())
 			{
-				V_2 = 0;
-				while (V_2 < this.size)
+				for (int j = 0; j < this.size; j++)
 				{
-					if (this.pair[V_2] == this.nilVertex)
+					if (this.pair[j] == this.nilVertex)
 					{
-						dummyVar0 = this.HopcroftKarpDFS(V_2);
+						this.HopcroftKarpDFS(j);
 					}
-					V_2 = V_2 + 1;
 				}
 			}
-			V_0 = new List<KeyValuePair<int, int>>();
-			V_3 = 0;
-			while (V_3 < this.size)
+			List<KeyValuePair<int, int>> keyValuePairs = new List<KeyValuePair<int, int>>();
+			for (int k = 0; k < this.size; k++)
 			{
-				if (this.pair[V_3] != this.nilVertex)
+				if (this.pair[k] != this.nilVertex)
 				{
-					V_0.Add(new KeyValuePair<int, int>(V_3, this.pair[V_3]));
+					keyValuePairs.Add(new KeyValuePair<int, int>(k, this.pair[k]));
 				}
-				V_3 = V_3 + 1;
 			}
-			return V_0;
+			return keyValuePairs;
 		}
 
 		private void GenerateExcessMatrixAndEqualitySubgraph()
 		{
-			V_0 = 0;
-			while (V_0 < this.size * 2)
+			for (int i = 0; i < this.size * 2; i++)
 			{
-				this.equalityGraph[V_0].Clear();
-				V_0 = V_0 + 1;
+				this.equalityGraph[i].Clear();
 			}
-			V_1 = 0;
-			while (V_1 < this.size)
+			for (int j = 0; j < this.size; j++)
 			{
-				V_2 = 0;
-				while (V_2 < this.size)
+				for (int k = 0; k < this.size; k++)
 				{
-					this.excessMatrix[V_1, V_2] = this.u[V_1] + this.v[V_2] - this.graph[V_1, V_2];
-					if (this.excessMatrix[V_1, V_2] == 0)
+					this.excessMatrix[j, k] = this.u[j] + this.v[k] - this.graph[j, k];
+					if (this.excessMatrix[j, k] == 0)
 					{
-						this.equalityGraph[V_1].Add(V_2 + this.size);
-						this.equalityGraph[V_2 + this.size].Add(V_1);
+						this.equalityGraph[j].Add(k + this.size);
+						this.equalityGraph[k + this.size].Add(j);
 					}
-					V_2 = V_2 + 1;
 				}
-				V_1 = V_1 + 1;
 			}
-			return;
 		}
 
 		private int GetMinElement(bool[] restriction)
 		{
-			V_0 = 0x3b9aca00;
-			V_1 = 0;
-			while (V_1 < this.size)
+			int num = 0x3b9aca00;
+			for (int i = 0; i < this.size; i++)
 			{
-				if (!restriction[V_1])
+				if (!restriction[i])
 				{
-					V_2 = 0;
-					while (V_2 < this.size)
+					for (int j = 0; j < this.size; j++)
 					{
-						if (!restriction[V_2 + this.size] && this.excessMatrix[V_1, V_2] < V_0)
+						if (!restriction[j + this.size] && this.excessMatrix[i, j] < num)
 						{
-							V_0 = this.excessMatrix[V_1, V_2];
+							num = this.excessMatrix[i, j];
 						}
-						V_2 = V_2 + 1;
 					}
 				}
-				V_1 = V_1 + 1;
 			}
-			return V_0;
+			return num;
 		}
 
 		public static List<KeyValuePair<int, int>> GetOptimalEdgesInDAG(int[,] adjacencyMatrix)
@@ -136,46 +115,35 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.FollowNodes
 
 		private bool HopcroftKarpBFS()
 		{
-			V_0 = new Queue<int>();
-			V_1 = 0;
-			while (V_1 < this.size)
+			Queue<int> nums = new Queue<int>();
+			for (int i = 0; i < this.size; i++)
 			{
-				if (this.pair[V_1] != this.nilVertex)
+				if (this.pair[i] != this.nilVertex)
 				{
-					this.dist[V_1] = 0x3b9aca00;
+					this.dist[i] = 0x3b9aca00;
 				}
 				else
 				{
-					this.dist[V_1] = 0;
-					V_0.Enqueue(V_1);
+					this.dist[i] = 0;
+					nums.Enqueue(i);
 				}
-				V_1 = V_1 + 1;
 			}
 			this.dist[this.nilVertex] = 0x3b9aca00;
-			while (V_0.get_Count() > 0)
+			while (nums.Count > 0)
 			{
-				V_2 = V_0.Dequeue();
-				if (V_2 == this.nilVertex)
+				int num = nums.Dequeue();
+				if (num == this.nilVertex)
 				{
 					continue;
 				}
-				V_3 = this.equalityGraph[V_2].GetEnumerator();
-				try
+				foreach (int num1 in this.equalityGraph[num])
 				{
-					while (V_3.MoveNext())
+					if (this.dist[this.pair[num1]] != 0x3b9aca00)
 					{
-						V_4 = V_3.get_Current();
-						if (this.dist[this.pair[V_4]] != 0x3b9aca00)
-						{
-							continue;
-						}
-						this.dist[this.pair[V_4]] = this.dist[V_2] + 1;
-						V_0.Enqueue(this.pair[V_4]);
+						continue;
 					}
-				}
-				finally
-				{
-					((IDisposable)V_3).Dispose();
+					this.dist[this.pair[num1]] = this.dist[num] + 1;
+					nums.Enqueue(this.pair[num1]);
 				}
 			}
 			return this.dist[this.nilVertex] != 0x3b9aca00;
@@ -183,169 +151,132 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.FollowNodes
 
 		private bool HopcroftKarpDFS(int vertex)
 		{
+			bool flag;
 			if (vertex == this.nilVertex)
 			{
 				return true;
 			}
-			V_0 = this.equalityGraph[vertex].GetEnumerator();
+			List<int>.Enumerator enumerator = this.equalityGraph[vertex].GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (this.dist[this.pair[V_1]] != this.dist[vertex] + 1 || !this.HopcroftKarpDFS(this.pair[V_1]))
+					int current = enumerator.Current;
+					if (this.dist[this.pair[current]] != this.dist[vertex] + 1 || !this.HopcroftKarpDFS(this.pair[current]))
 					{
 						continue;
 					}
-					this.pair[V_1] = vertex;
-					this.pair[vertex] = V_1;
-					V_2 = true;
-					goto Label1;
+					this.pair[current] = vertex;
+					this.pair[vertex] = current;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				this.dist[vertex] = 0x3b9aca00;
+				return false;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			this.dist[vertex] = 0x3b9aca00;
-			return false;
+			return flag;
 		}
 
 		private void Initialization()
 		{
-			V_0 = 0;
-			while (V_0 < this.size)
+			for (int i = 0; i < this.size; i++)
 			{
-				V_1 = -1;
-				V_2 = 0;
-				while (V_2 < this.size)
+				int num = -1;
+				for (int j = 0; j < this.size; j++)
 				{
-					if (this.graph[V_0, V_2] > V_1)
+					if (this.graph[i, j] > num)
 					{
-						V_1 = this.graph[V_0, V_2];
+						num = this.graph[i, j];
 					}
-					V_2 = V_2 + 1;
 				}
-				this.u[V_0] = V_1;
-				V_0 = V_0 + 1;
+				this.u[i] = num;
 			}
-			return;
 		}
 
 		private void KonigDFS(int vertex, bool[] traversed)
 		{
 			traversed[vertex] = true;
-			V_0 = 0;
-			while (V_0 < this.equalityGraph[vertex].get_Count())
+			for (int i = 0; i < this.equalityGraph[vertex].Count; i++)
 			{
-				if (!traversed[this.equalityGraph[vertex].get_Item(V_0)])
+				if (!traversed[this.equalityGraph[vertex][i]])
 				{
-					this.KonigDFS(this.equalityGraph[vertex].get_Item(V_0), traversed);
+					this.KonigDFS(this.equalityGraph[vertex][i], traversed);
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		private List<KeyValuePair<int, int>> MaximumWeightBipartiteGraphMatching()
 		{
+			List<KeyValuePair<int, int>> keyValuePairs;
 			this.Initialization();
 			while (true)
 			{
 				this.GenerateExcessMatrixAndEqualitySubgraph();
-				V_0 = this.FindMaximumCardianlityMatching();
-				if (V_0.get_Count() == this.size)
+				keyValuePairs = this.FindMaximumCardianlityMatching();
+				if (keyValuePairs.Count == this.size)
 				{
 					break;
 				}
-				V_1 = this.MinimumVertexCover(V_0);
-				V_2 = this.GetMinElement(V_1);
-				V_6 = 0;
-				while (V_6 < this.size)
+				bool[] flagArray = this.MinimumVertexCover(keyValuePairs);
+				int minElement = this.GetMinElement(flagArray);
+				for (int i = 0; i < this.size; i++)
 				{
-					if (!V_1[V_6])
+					if (!flagArray[i])
 					{
-						stackVariable40 = &this.u[V_6];
-						stackVariable40 = stackVariable40 - V_2;
+						this.u[i] -= minElement;
 					}
-					if (V_1[V_6 + this.size])
+					if (flagArray[i + this.size])
 					{
-						stackVariable33 = &this.v[V_6];
-						stackVariable33 = stackVariable33 + V_2;
+						this.v[i] += minElement;
 					}
-					V_6 = V_6 + 1;
 				}
 			}
-			V_3 = new List<KeyValuePair<int, int>>();
-			V_4 = V_0.GetEnumerator();
-			try
+			List<KeyValuePair<int, int>> keyValuePairs1 = new List<KeyValuePair<int, int>>();
+			foreach (KeyValuePair<int, int> keyValuePair in keyValuePairs)
 			{
-				while (V_4.MoveNext())
+				if (this.graph[keyValuePair.Key, keyValuePair.Value - this.size] == 0)
 				{
-					V_5 = V_4.get_Current();
-					if (this.graph[V_5.get_Key(), V_5.get_Value() - this.size] == 0)
-					{
-						continue;
-					}
-					V_3.Add(new KeyValuePair<int, int>(V_5.get_Key(), V_5.get_Value() - this.size));
+					continue;
 				}
+				keyValuePairs1.Add(new KeyValuePair<int, int>(keyValuePair.Key, keyValuePair.Value - this.size));
 			}
-			finally
-			{
-				((IDisposable)V_4).Dispose();
-			}
-			return V_3;
+			return keyValuePairs1;
 		}
 
 		private bool[] MinimumVertexCover(List<KeyValuePair<int, int>> maxCardinalMatching)
 		{
-			V_0 = new Boolean[this.size];
-			V_1 = new Boolean[this.size * 2];
-			V_3 = maxCardinalMatching.GetEnumerator();
-			try
+			bool[] flagArray = new Boolean[this.size];
+			bool[] flagArray1 = new Boolean[this.size * 2];
+			foreach (KeyValuePair<int, int> keyValuePair in maxCardinalMatching)
 			{
-				while (V_3.MoveNext())
+				int key = keyValuePair.Key;
+				int value = keyValuePair.Value;
+				flagArray[key] = true;
+				this.equalityGraph[key].Remove(value);
+				this.equalityGraph[value] = new List<int>();
+				this.equalityGraph[value].Add(key);
+			}
+			for (int i = 0; i < this.size; i++)
+			{
+				if (!flagArray[i])
 				{
-					V_4 = V_3.get_Current();
-					V_5 = V_4.get_Key();
-					V_6 = V_4.get_Value();
-					V_0[V_5] = true;
-					dummyVar0 = this.equalityGraph[V_5].Remove(V_6);
-					this.equalityGraph[V_6] = new List<int>();
-					this.equalityGraph[V_6].Add(V_5);
+					this.KonigDFS(i, flagArray1);
 				}
 			}
-			finally
+			bool[] flagArray2 = new Boolean[this.size * 2];
+			for (int j = 0; j < this.size; j++)
 			{
-				((IDisposable)V_3).Dispose();
+				flagArray2[j] = !flagArray1[j];
 			}
-			V_7 = 0;
-			while (V_7 < this.size)
+			for (int k = 0; k < this.size; k++)
 			{
-				if (!V_0[V_7])
-				{
-					this.KonigDFS(V_7, V_1);
-				}
-				V_7 = V_7 + 1;
+				flagArray2[k + this.size] = flagArray1[k + this.size];
 			}
-			V_2 = new Boolean[this.size * 2];
-			V_8 = 0;
-			while (V_8 < this.size)
-			{
-				V_2[V_8] = !V_1[V_8];
-				V_8 = V_8 + 1;
-			}
-			V_9 = 0;
-			while (V_9 < this.size)
-			{
-				V_2[V_9 + this.size] = V_1[V_9 + this.size];
-				V_9 = V_9 + 1;
-			}
-			return V_2;
+			return flagArray2;
 		}
 	}
 }

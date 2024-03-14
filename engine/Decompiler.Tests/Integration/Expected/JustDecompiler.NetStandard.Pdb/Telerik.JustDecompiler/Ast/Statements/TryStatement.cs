@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -9,13 +10,13 @@ namespace Telerik.JustDecompiler.Ast.Statements
 {
 	public class TryStatement : Statement
 	{
-		private BlockStatement try;
+		private BlockStatement @try;
 
-		private CatchClauseCollection catchClauses;
+		private CatchClauseCollection catchClauses = new CatchClauseCollection();
 
 		private BlockStatement fault;
 
-		private FinallyClause finally;
+		private FinallyClause @finally;
 
 		public CatchClauseCollection CatchClauses
 		{
@@ -26,23 +27,10 @@ namespace Telerik.JustDecompiler.Ast.Statements
 			set
 			{
 				this.catchClauses = value;
-				V_0 = this.catchClauses.GetEnumerator();
-				try
+				foreach (CatchClause catchClause in this.catchClauses)
 				{
-					while (V_0.MoveNext())
-					{
-						V_1 = V_0.get_Current();
-						this.SetParentToThis(V_1);
-					}
+					this.SetParentToThis(catchClause);
 				}
-				finally
-				{
-					if (V_0 != null)
-					{
-						V_0.Dispose();
-					}
-				}
-				return;
 			}
 		}
 
@@ -50,9 +38,23 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new TryStatement.u003cget_Childrenu003ed__7(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				TryStatement tryStatement = null;
+				if (tryStatement.@try != null)
+				{
+					yield return tryStatement.@try;
+				}
+				if (tryStatement.@finally != null)
+				{
+					yield return tryStatement.@finally;
+				}
+				if (tryStatement.fault != null)
+				{
+					yield return tryStatement.fault;
+				}
+				foreach (CatchClause catchClause in tryStatement.CatchClauses)
+				{
+					yield return catchClause;
+				}
 			}
 		}
 
@@ -60,7 +62,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 17;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.TryStatement;
 			}
 		}
 
@@ -75,9 +77,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.fault = value;
 				if (this.fault != null)
 				{
-					this.fault.set_Parent(this);
+					this.fault.Parent = this;
 				}
-				return;
 			}
 		}
 
@@ -85,16 +86,15 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return this.finally;
+				return this.@finally;
 			}
 			set
 			{
-				this.finally = value;
-				if (this.finally != null)
+				this.@finally = value;
+				if (this.@finally != null)
 				{
-					this.finally.set_Parent(this);
+					this.@finally.Parent = this;
 				}
-				return;
 			}
 		}
 
@@ -102,150 +102,123 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return this.try;
+				return this.@try;
 			}
 			set
 			{
-				this.try = value;
-				if (this.try != null)
+				this.@try = value;
+				if (this.@try != null)
 				{
-					this.try.set_Parent(this);
+					this.@try.Parent = this;
 				}
-				return;
 			}
 		}
 
 		public TryStatement()
 		{
-			this.catchClauses = new CatchClauseCollection();
-			base();
-			return;
 		}
 
-		public TryStatement(BlockStatement try, BlockStatement fault, FinallyClause finally)
+		public TryStatement(BlockStatement @try, BlockStatement fault, FinallyClause @finally)
 		{
-			this.catchClauses = new CatchClauseCollection();
-			base();
-			this.set_Try(try);
-			this.set_Fault(fault);
-			this.set_Finally(finally);
-			return;
+			this.Try = @try;
+			this.Fault = fault;
+			this.Finally = @finally;
 		}
 
 		public void AddToCatchClauses(CatchClause catchClause)
 		{
 			this.SetParentToThis(catchClause);
-			this.get_CatchClauses().Add(catchClause);
-			return;
+			this.CatchClauses.Add(catchClause);
 		}
 
 		public override Statement Clone()
 		{
-			if (this.try != null)
+			BlockStatement blockStatement;
+			FinallyClause finallyClause;
+			BlockStatement blockStatement1;
+			if (this.@try != null)
 			{
-				stackVariable5 = this.try.Clone() as BlockStatement;
+				blockStatement1 = this.@try.Clone() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement1 = null;
 			}
 			if (this.fault != null)
 			{
-				stackVariable11 = this.fault.Clone() as BlockStatement;
+				blockStatement = this.fault.Clone() as BlockStatement;
 			}
 			else
 			{
-				stackVariable11 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable11;
-			if (this.finally != null)
+			BlockStatement blockStatement2 = blockStatement;
+			if (this.@finally != null)
 			{
-				stackVariable17 = this.finally.Clone() as FinallyClause;
+				finallyClause = this.@finally.Clone() as FinallyClause;
 			}
 			else
 			{
-				stackVariable17 = null;
+				finallyClause = null;
 			}
-			V_2 = new TryStatement(stackVariable5, V_0, stackVariable17);
-			V_3 = this.catchClauses.GetEnumerator();
-			try
+			TryStatement tryStatement = new TryStatement(blockStatement1, blockStatement2, finallyClause);
+			foreach (CatchClause catchClause in this.catchClauses)
 			{
-				while (V_3.MoveNext())
-				{
-					V_4 = V_3.get_Current();
-					V_2.AddToCatchClauses((CatchClause)V_4.Clone());
-				}
+				tryStatement.AddToCatchClauses((CatchClause)catchClause.Clone());
 			}
-			finally
-			{
-				if (V_3 != null)
-				{
-					V_3.Dispose();
-				}
-			}
-			this.CopyParentAndLabel(V_2);
-			return V_2;
+			base.CopyParentAndLabel(tryStatement);
+			return tryStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			if (this.try != null)
+			BlockStatement blockStatement;
+			FinallyClause finallyClause;
+			BlockStatement blockStatement1;
+			if (this.@try != null)
 			{
-				stackVariable5 = this.try.CloneStatementOnly() as BlockStatement;
+				blockStatement1 = this.@try.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement1 = null;
 			}
 			if (this.fault != null)
 			{
-				stackVariable11 = this.fault.CloneStatementOnly() as BlockStatement;
+				blockStatement = this.fault.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				stackVariable11 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable11;
-			if (this.finally != null)
+			BlockStatement blockStatement2 = blockStatement;
+			if (this.@finally != null)
 			{
-				stackVariable17 = this.finally.CloneStatementOnly() as FinallyClause;
+				finallyClause = this.@finally.CloneStatementOnly() as FinallyClause;
 			}
 			else
 			{
-				stackVariable17 = null;
+				finallyClause = null;
 			}
-			V_2 = new TryStatement(stackVariable5, V_0, stackVariable17);
-			V_3 = this.catchClauses.GetEnumerator();
-			try
+			TryStatement tryStatement = new TryStatement(blockStatement1, blockStatement2, finallyClause);
+			foreach (CatchClause catchClause in this.catchClauses)
 			{
-				while (V_3.MoveNext())
-				{
-					V_4 = V_3.get_Current();
-					V_2.AddToCatchClauses((CatchClause)V_4.CloneStatementOnly());
-				}
+				tryStatement.AddToCatchClauses((CatchClause)catchClause.CloneStatementOnly());
 			}
-			finally
-			{
-				if (V_3 != null)
-				{
-					V_3.Dispose();
-				}
-			}
-			this.CopyParentAndLabel(V_2);
-			return V_2;
+			base.CopyParentAndLabel(tryStatement);
+			return tryStatement;
 		}
 
 		private void SetParentToThis(CatchClause catchClause)
 		{
-			if (catchClause.get_Body() != null)
+			if (catchClause.Body != null)
 			{
-				catchClause.get_Body().set_Parent(this);
+				catchClause.Body.Parent = this;
 			}
-			if (catchClause.get_Filter() != null)
+			if (catchClause.Filter != null)
 			{
-				catchClause.get_Filter().set_Parent(this);
+				catchClause.Filter.Parent = this;
 			}
-			return;
 		}
 	}
 }

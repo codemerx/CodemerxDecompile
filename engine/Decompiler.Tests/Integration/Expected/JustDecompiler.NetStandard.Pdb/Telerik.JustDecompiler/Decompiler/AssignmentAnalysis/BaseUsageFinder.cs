@@ -1,5 +1,8 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
+using Mono.Collections.Generic;
 using System;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 
@@ -11,15 +14,13 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		protected BaseUsageFinder()
 		{
-			base();
-			return;
 		}
 
 		public abstract bool CheckExpression(Expression node);
 
 		public UsageFinderSearchResult SearchForUsage(Expression expression)
 		{
-			this.searchResult = 0;
+			this.searchResult = UsageFinderSearchResult.NotFound;
 			this.Visit(expression);
 			return this.searchResult;
 		}
@@ -28,58 +29,53 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 		{
 			if (this.searchResult == UsageFinderSearchResult.NotFound)
 			{
-				this.Visit(node);
+				base.Visit(node);
 			}
-			return;
 		}
 
 		public override void VisitBinaryExpression(BinaryExpression node)
 		{
-			if (!node.get_IsAssignmentExpression())
+			if (!node.IsAssignmentExpression)
 			{
-				this.VisitBinaryExpression(node);
+				base.VisitBinaryExpression(node);
 				return;
 			}
-			this.Visit(node.get_Right());
+			this.Visit(node.Right);
 			if (this.searchResult != UsageFinderSearchResult.NotFound)
 			{
 				return;
 			}
-			if (this.CheckExpression(node.get_Left()))
+			if (this.CheckExpression(node.Left))
 			{
-				this.searchResult = 1;
+				this.searchResult = UsageFinderSearchResult.Assigned;
 				return;
 			}
-			this.Visit(node.get_Left());
-			return;
+			base.Visit(node.Left);
 		}
 
 		public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			V_0 = node.get_MethodExpression().get_MethodDefinition();
-			if (V_0 == null)
+			MethodDefinition methodDefinition = node.MethodExpression.MethodDefinition;
+			if (methodDefinition == null)
 			{
-				this.VisitMethodInvocationExpression(node);
+				base.VisitMethodInvocationExpression(node);
 				return;
 			}
-			this.Visit(node.get_MethodExpression());
-			V_1 = 0;
-			while (V_1 < node.get_Arguments().get_Count())
+			this.Visit(node.MethodExpression);
+			for (int i = 0; i < node.Arguments.Count; i++)
 			{
-				V_2 = node.get_Arguments().get_Item(V_1) as UnaryExpression;
-				if (V_0.get_Parameters().get_Item(V_1).IsOutParameter() && V_2 != null && V_2.get_Operator() == 7 && this.CheckExpression(V_2.get_Operand()) || this.CheckExpression(node.get_Arguments().get_Item(V_1)))
+				UnaryExpression item = node.Arguments[i] as UnaryExpression;
+				if (methodDefinition.get_Parameters().get_Item(i).IsOutParameter() && (item != null && item.Operator == UnaryOperator.AddressReference && this.CheckExpression(item.Operand) || this.CheckExpression(node.Arguments[i])))
 				{
-					this.searchResult = 1;
+					this.searchResult = UsageFinderSearchResult.Assigned;
 					return;
 				}
-				this.Visit(node.get_Arguments().get_Item(V_1));
+				this.Visit(node.Arguments[i]);
 				if (this.searchResult != UsageFinderSearchResult.NotFound)
 				{
 					return;
 				}
-				V_1 = V_1 + 1;
 			}
-			return;
 		}
 	}
 }

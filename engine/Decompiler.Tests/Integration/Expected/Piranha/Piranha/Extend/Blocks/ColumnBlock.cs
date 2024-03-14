@@ -11,39 +11,26 @@ namespace Piranha.Extend.Blocks
 	{
 		public ColumnBlock()
 		{
-			base();
-			return;
 		}
 
 		public string GetIndexedContent()
 		{
-			V_0 = new StringBuilder();
-			V_1 = this.get_Items().GetEnumerator();
-			try
+			StringBuilder stringBuilder = new StringBuilder();
+			foreach (Block item in base.Items)
 			{
-				while (V_1.MoveNext())
+				ISearchable searchable = item as ISearchable;
+				if (searchable == null)
 				{
-					V_2 = V_1.get_Current() as ISearchable;
-					if (V_2 == null)
-					{
-						continue;
-					}
-					V_3 = V_2.GetIndexedContent();
-					if (String.IsNullOrEmpty(V_3))
-					{
-						continue;
-					}
-					dummyVar0 = V_0.AppendLine(V_3);
+					continue;
 				}
-			}
-			finally
-			{
-				if (V_1 != null)
+				string indexedContent = searchable.GetIndexedContent();
+				if (String.IsNullOrEmpty(indexedContent))
 				{
-					V_1.Dispose();
+					continue;
 				}
+				stringBuilder.AppendLine(indexedContent);
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 	}
 }

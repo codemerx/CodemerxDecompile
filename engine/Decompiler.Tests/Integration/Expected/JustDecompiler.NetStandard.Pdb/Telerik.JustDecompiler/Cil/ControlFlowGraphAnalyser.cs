@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Telerik.JustDecompiler.Cil
 {
@@ -13,94 +14,78 @@ namespace Telerik.JustDecompiler.Cil
 
 		internal ControlFlowGraphAnalyser(ControlFlowGraph TheGraph)
 		{
-			base();
 			this.cfg = TheGraph;
 			this.verticesThatPartitionGraph = new List<InstructionBlock>();
 			this.mostDistantInstructionBlockIndexReached = 0;
 			this.MarkPartitioningVertices(0);
-			return;
 		}
 
 		private InstructionBlock FindMostDistantSuccessor(InstructionBlock currentBlock)
 		{
-			V_0 = null;
-			V_1 = currentBlock.get_Successors();
-			V_2 = 0;
-			while (V_2 < (int)V_1.Length)
+			InstructionBlock instructionBlocks = null;
+			InstructionBlock[] successors = currentBlock.Successors;
+			for (int i = 0; i < (int)successors.Length; i++)
 			{
-				V_3 = V_1[V_2];
-				if (!InstructionBlock.op_Equality(V_0, null))
+				InstructionBlock instructionBlocks1 = successors[i];
+				if (instructionBlocks == null)
 				{
-					if (V_3.get_Index() > V_0.get_Index())
+					if (instructionBlocks1.Index > currentBlock.Index)
 					{
-						V_0 = V_3;
+						instructionBlocks = instructionBlocks1;
 					}
 				}
-				else
+				else if (instructionBlocks1.Index > instructionBlocks.Index)
 				{
-					if (V_3.get_Index() > currentBlock.get_Index())
-					{
-						V_0 = V_3;
-					}
+					instructionBlocks = instructionBlocks1;
 				}
-				V_2 = V_2 + 1;
 			}
-			return V_0;
+			return instructionBlocks;
 		}
 
 		private void MarkPartitioningVertices(int startInstructionBlockIndex)
 		{
-			V_0 = this.cfg.get_Blocks()[startInstructionBlockIndex];
-			V_1 = this.FindMostDistantSuccessor(V_0);
-			if (InstructionBlock.op_Equality(V_1, null))
+			InstructionBlock blocks = this.cfg.Blocks[startInstructionBlockIndex];
+			InstructionBlock instructionBlocks = this.FindMostDistantSuccessor(blocks);
+			if (instructionBlocks == null)
 			{
 				return;
 			}
-			if (V_1.get_Index() == this.cfg.get_Blocks().Count<InstructionBlock>() - 1)
+			if (instructionBlocks.Index == this.cfg.Blocks.Count<InstructionBlock>() - 1)
 			{
 				return;
 			}
-			V_2 = null;
-			V_3 = V_0.get_Index() + 1;
-			while (V_3 <= V_1.get_Index())
+			InstructionBlock instructionBlocks1 = null;
+			for (int i = blocks.Index + 1; i <= instructionBlocks.Index; i++)
 			{
-				if (!InstructionBlock.op_Equality(V_2, null))
+				if (instructionBlocks1 != null)
 				{
-					V_4 = this.FindMostDistantSuccessor(this.cfg.get_Blocks()[V_3]);
-					if (V_4.get_Index() > V_2.get_Index())
+					InstructionBlock instructionBlocks2 = this.FindMostDistantSuccessor(this.cfg.Blocks[i]);
+					if (instructionBlocks2.Index > instructionBlocks1.Index)
 					{
-						V_2 = V_4;
+						instructionBlocks1 = instructionBlocks2;
 					}
 				}
 				else
 				{
-					V_2 = this.FindMostDistantSuccessor(this.cfg.get_Blocks()[V_3]);
+					instructionBlocks1 = this.FindMostDistantSuccessor(this.cfg.Blocks[i]);
 				}
-				V_3 = V_3 + 1;
 			}
-			if ((long)V_1.get_Index() < (ulong)this.mostDistantInstructionBlockIndexReached)
+			if ((long)instructionBlocks.Index < (ulong)this.mostDistantInstructionBlockIndexReached)
 			{
-				if (InstructionBlock.op_Inequality(V_2, null) && (long)V_2.get_Index() > (ulong)this.mostDistantInstructionBlockIndexReached)
+				if (instructionBlocks1 != null && (long)instructionBlocks1.Index > (ulong)this.mostDistantInstructionBlockIndexReached)
 				{
-					this.mostDistantInstructionBlockIndexReached = V_2.get_Index();
+					this.mostDistantInstructionBlockIndexReached = (uint)instructionBlocks1.Index;
 				}
 			}
-			else
+			else if (instructionBlocks1 == null)
 			{
-				if (!InstructionBlock.op_Inequality(V_2, null))
-				{
-					this.verticesThatPartitionGraph.Add(V_1);
-				}
-				else
-				{
-					if (V_2.get_Index() <= V_1.get_Index())
-					{
-						this.verticesThatPartitionGraph.Add(V_1);
-					}
-				}
+				this.verticesThatPartitionGraph.Add(instructionBlocks);
 			}
-			this.MarkPartitioningVertices(V_1.get_Index());
-			return;
+			else if (instructionBlocks1.Index <= instructionBlocks.Index)
+			{
+				this.verticesThatPartitionGraph.Add(instructionBlocks);
+			}
+			this.MarkPartitioningVertices(instructionBlocks.Index);
 		}
 	}
 }

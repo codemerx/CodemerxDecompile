@@ -153,16 +153,12 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetValues
 
 		public DeleteViewModel()
 		{
-			base();
-			this.set_IsCache(false);
-			return;
+			base.set_IsCache(false);
 		}
 
-		public DeleteViewModel(MixAttributeSetValue model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public DeleteViewModel(MixAttributeSetValue model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			this.set_IsCache(false);
-			return;
+			base.set_IsCache(false);
 		}
 	}
 }

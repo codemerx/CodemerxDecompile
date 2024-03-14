@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
@@ -10,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -134,53 +137,70 @@ namespace Mix.Cms.Lib.ViewModels.MixLanguages
 
 		public ReadMvcViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadMvcViewModel(MixLanguage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixLanguage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable1 = new DataValueViewModel();
-			stackVariable1.set_DataType(this.get_DataType());
-			stackVariable1.set_Value(this.get_Value());
-			stackVariable1.set_Name(this.get_Keyword());
-			this.set_Property(stackVariable1);
-			return;
+			this.Property = new DataValueViewModel()
+			{
+				DataType = this.DataType,
+				Value = this.Value,
+				Name = this.Keyword
+			};
 		}
 
 		public override RepositoryResponse<bool> RemoveRelatedModels(ReadMvcViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = this.get_Cultures().Where<SupportedCulture>(new Func<SupportedCulture, bool>(this.u003cRemoveRelatedModelsu003eb__67_0)).GetEnumerator();
-			try
+			ReadMvcViewModel.u003cu003ec__DisplayClass67_0 variable = null;
+			foreach (SupportedCulture supportedCulture in 
+				from c in this.Cultures
+				where c.get_Specificulture() != this.Specificulture
+				select c)
 			{
-				while (V_0.MoveNext())
+				DbSet<MixLanguage> mixLanguage = _context.MixLanguage;
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(MixLanguage), "c");
+				MixLanguage mixLanguage1 = mixLanguage.First<MixLanguage>(Expression.Lambda<Func<MixLanguage, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixLanguage).GetMethod("get_Keyword").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(ReadMvcViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(ReadMvcViewModel).GetMethod("get_Keyword").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixLanguage).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Field(Expression.Constant(variable, typeof(ReadMvcViewModel.u003cu003ec__DisplayClass67_0)), FieldInfo.GetFieldFromHandle(typeof(ReadMvcViewModel.u003cu003ec__DisplayClass67_0).GetField("culture").FieldHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(SupportedCulture).GetMethod("get_Specificulture").MethodHandle)))), new ParameterExpression[] { parameterExpression }));
+				if (mixLanguage1 == null)
 				{
-					V_1 = new ReadMvcViewModel.u003cu003ec__DisplayClass67_0();
-					V_1.u003cu003e4__this = this;
-					V_1.culture = V_0.get_Current();
-					stackVariable16 = _context.get_MixLanguage();
-					V_3 = Expression.Parameter(Type.GetTypeFromHandle(// 
-					// Current member / type: Mix.Domain.Core.ViewModels.RepositoryResponse`1<System.Boolean> Mix.Cms.Lib.ViewModels.MixLanguages.ReadMvcViewModel::RemoveRelatedModels(Mix.Cms.Lib.ViewModels.MixLanguages.ReadMvcViewModel,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Exception in: Mix.Domain.Core.ViewModels.RepositoryResponse<System.Boolean> RemoveRelatedModels(Mix.Cms.Lib.ViewModels.MixLanguages.ReadMvcViewModel,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
+					continue;
+				}
+				_context.MixLanguage.Remove(mixLanguage1);
+			}
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(_context.SaveChanges() > 0);
+			return repositoryResponse;
+		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(ReadMvcViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ReadMvcViewModel.u003cRemoveRelatedModelsAsyncu003ed__68>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ReadMvcViewModel.u003cu003ec__DisplayClass68_0 variable = null;
+			foreach (SupportedCulture supportedCulture in 
+				from c in this.Cultures
+				where c.get_Specificulture() != this.Specificulture
+				select c)
+			{
+				DbSet<MixLanguage> mixLanguage = _context.MixLanguage;
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(MixLanguage), "c");
+				BinaryExpression binaryExpression = Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixLanguage).GetMethod("get_Keyword").MethodHandle)), Expression.Property(Expression.Constant(this, typeof(ReadMvcViewModel)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(ReadMvcViewModel).GetMethod("get_Keyword").MethodHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixLanguage).GetMethod("get_Specificulture").MethodHandle)), Expression.Property(Expression.Field(Expression.Constant(variable, typeof(ReadMvcViewModel.u003cu003ec__DisplayClass68_0)), FieldInfo.GetFieldFromHandle(typeof(ReadMvcViewModel.u003cu003ec__DisplayClass68_0).GetField("culture").FieldHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(SupportedCulture).GetMethod("get_Specificulture").MethodHandle))));
+				ParameterExpression[] parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+				MixLanguage mixLanguage1 = mixLanguage.First<MixLanguage>(Expression.Lambda<Func<MixLanguage, bool>>(binaryExpression, parameterExpressionArray));
+				if (mixLanguage1 == null)
+				{
+					continue;
+				}
+				_context.MixLanguage.Remove(mixLanguage1);
+			}
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			MixCmsContext mixCmsContext = _context;
+			CancellationToken cancellationToken = new CancellationToken();
+			int num = await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+			repositoryResponse1.set_IsSucceed(num > 0);
+			return repositoryResponse;
 		}
 	}
 }

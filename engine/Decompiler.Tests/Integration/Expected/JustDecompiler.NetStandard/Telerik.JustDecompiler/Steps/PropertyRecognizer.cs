@@ -1,6 +1,8 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Decompiler;
@@ -18,22 +20,20 @@ namespace Telerik.JustDecompiler.Steps
 
 		public PropertyRecognizer(TypeSystem typeSystem, TypeSpecificContext typeContext, ILanguage language)
 		{
-			base();
 			this.typeSystem = typeSystem;
 			this.typeContext = typeContext;
 			this.language = language;
-			return;
 		}
 
 		private bool IsAutoPropertyConstructorInitializerExpression(FieldReference fieldReference, out PropertyDefinition property)
 		{
-			V_0 = fieldReference.Resolve();
-			if (V_0 != null)
+			FieldDefinition fieldDefinition = fieldReference.Resolve();
+			if (fieldDefinition != null)
 			{
-				V_1 = this.typeContext.GetFieldToPropertyMap(this.language);
-				if (V_1.ContainsKey(V_0) && V_1.get_Item(V_0) != null && !V_1.get_Item(V_0).ShouldStaySplit())
+				Dictionary<FieldDefinition, PropertyDefinition> fieldToPropertyMap = this.typeContext.GetFieldToPropertyMap(this.language);
+				if (fieldToPropertyMap.ContainsKey(fieldDefinition) && fieldToPropertyMap[fieldDefinition] != null && !fieldToPropertyMap[fieldDefinition].ShouldStaySplit())
 				{
-					property = V_1.get_Item(V_0);
+					property = fieldToPropertyMap[fieldDefinition];
 					return true;
 				}
 			}
@@ -43,45 +43,46 @@ namespace Telerik.JustDecompiler.Steps
 
 		public ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			if (!this.IsAutoPropertyConstructorInitializerExpression(node.get_Field(), out V_0))
+			PropertyDefinition propertyDefinition;
+			if (!this.IsAutoPropertyConstructorInitializerExpression(node.Field, out propertyDefinition))
 			{
 				return node;
 			}
-			return new AutoPropertyConstructorInitializerExpression(V_0, node.get_Target(), node.get_MappedInstructions());
+			return new AutoPropertyConstructorInitializerExpression(propertyDefinition, node.Target, node.MappedInstructions);
 		}
 
 		public ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			V_0 = node.get_MethodExpression();
-			if (V_0 == null)
+			MethodReferenceExpression methodExpression = node.MethodExpression;
+			if (methodExpression == null)
 			{
 				return null;
 			}
-			V_1 = V_0.get_Method() as MethodDefinition;
-			if (V_1 == null)
+			MethodDefinition method = methodExpression.Method as MethodDefinition;
+			if (method == null)
 			{
-				V_2 = V_0.get_Method();
-				if (V_2 != null && !String.IsNullOrEmpty(V_2.get_Name()) && V_2.get_Name().StartsWith("set_") || V_2.get_Name().StartsWith("get_") || V_2.get_Name().StartsWith("put_"))
+				MethodReference methodReference = methodExpression.Method;
+				if (methodReference != null && !String.IsNullOrEmpty(methodReference.get_Name()) && (methodReference.get_Name().StartsWith("set_") || methodReference.get_Name().StartsWith("get_") || methodReference.get_Name().StartsWith("put_")))
 				{
-					V_1 = V_2.Resolve();
+					method = methodReference.Resolve();
 				}
 			}
-			if (V_1 == null || !V_1.get_IsGetter() && !V_1.get_IsSetter())
+			if (method == null || !method.get_IsGetter() && !method.get_IsSetter())
 			{
 				return null;
 			}
-			V_3 = new PropertyReferenceExpression(node, null);
-			if (V_3.get_Property() == null)
+			PropertyReferenceExpression propertyReferenceExpression = new PropertyReferenceExpression(node, null);
+			if (propertyReferenceExpression.Property == null)
 			{
 				return node;
 			}
-			V_4 = V_3;
-			if (V_1.get_IsSetter())
+			Expression binaryExpression = propertyReferenceExpression;
+			if (method.get_IsSetter())
 			{
-				V_5 = node.get_Arguments().get_Count() - 1;
-				V_4 = new BinaryExpression(26, V_3, node.get_Arguments().get_Item(V_5), this.typeSystem, null, false);
+				int count = node.Arguments.Count - 1;
+				binaryExpression = new BinaryExpression(BinaryOperator.Assign, propertyReferenceExpression, node.Arguments[count], this.typeSystem, null, false);
 			}
-			return V_4;
+			return binaryExpression;
 		}
 	}
 }

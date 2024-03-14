@@ -1,5 +1,6 @@
 using Piranha.Extend;
 using Piranha.Extend.Fields;
+using Piranha.Models;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -16,17 +17,15 @@ namespace Piranha.Extend.Blocks
 
 		public VideoBlock()
 		{
-			base();
-			return;
 		}
 
 		public override string GetTitle()
 		{
-			if (!MediaFieldBase<VideoField>.op_Inequality(this.get_Body(), null) || this.get_Body().get_Media() == null)
+			if (!(this.Body != null) || this.Body.Media == null)
 			{
 				return "No video selected";
 			}
-			return this.get_Body().get_Media().get_Filename();
+			return this.Body.Media.Filename;
 		}
 	}
 }

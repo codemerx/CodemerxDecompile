@@ -49,8 +49,6 @@ namespace Mix.Cms.Lib.Models.Account
 
 		public AspNetUserLogins()
 		{
-			base();
-			return;
 		}
 	}
 }

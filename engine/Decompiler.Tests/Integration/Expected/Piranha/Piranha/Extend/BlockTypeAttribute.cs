@@ -8,9 +8,9 @@ namespace Piranha.Extend
 	{
 		private bool _isGenericManuallySet;
 
-		private bool _isGeneric;
+		private bool _isGeneric = true;
 
-		private string _component;
+		private string _component = "generic-block";
 
 		public string Category
 		{
@@ -29,9 +29,8 @@ namespace Piranha.Extend
 				this._component = value;
 				if (!this._isGenericManuallySet)
 				{
-					this._isGeneric = String.op_Equality(value, "generic-block");
+					this._isGeneric = value == "generic-block";
 				}
-				return;
 			}
 		}
 
@@ -51,7 +50,6 @@ namespace Piranha.Extend
 			{
 				this._isGeneric = value;
 				this._isGenericManuallySet = true;
-				return;
 			}
 		}
 
@@ -75,10 +73,6 @@ namespace Piranha.Extend
 
 		public BlockTypeAttribute()
 		{
-			this._isGeneric = true;
-			this._component = "generic-block";
-			base();
-			return;
 		}
 	}
 }

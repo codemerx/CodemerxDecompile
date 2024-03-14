@@ -122,14 +122,12 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixCulture()
 		{
-			base();
-			this.set_MixConfiguration(new HashSet<Mix.Cms.Lib.Models.Cms.MixConfiguration>());
-			this.set_MixLanguage(new HashSet<Mix.Cms.Lib.Models.Cms.MixLanguage>());
-			this.set_MixModule(new HashSet<Mix.Cms.Lib.Models.Cms.MixModule>());
-			this.set_MixPage(new HashSet<Mix.Cms.Lib.Models.Cms.MixPage>());
-			this.set_MixPost(new HashSet<Mix.Cms.Lib.Models.Cms.MixPost>());
-			this.set_MixUrlAlias(new HashSet<Mix.Cms.Lib.Models.Cms.MixUrlAlias>());
-			return;
+			this.MixConfiguration = new HashSet<Mix.Cms.Lib.Models.Cms.MixConfiguration>();
+			this.MixLanguage = new HashSet<Mix.Cms.Lib.Models.Cms.MixLanguage>();
+			this.MixModule = new HashSet<Mix.Cms.Lib.Models.Cms.MixModule>();
+			this.MixPage = new HashSet<Mix.Cms.Lib.Models.Cms.MixPage>();
+			this.MixPost = new HashSet<Mix.Cms.Lib.Models.Cms.MixPost>();
+			this.MixUrlAlias = new HashSet<Mix.Cms.Lib.Models.Cms.MixUrlAlias>();
 		}
 	}
 }

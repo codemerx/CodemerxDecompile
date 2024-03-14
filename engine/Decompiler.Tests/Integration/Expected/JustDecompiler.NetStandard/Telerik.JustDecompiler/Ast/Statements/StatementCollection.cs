@@ -7,8 +7,6 @@ namespace Telerik.JustDecompiler.Ast.Statements
 	{
 		public StatementCollection()
 		{
-			base();
-			return;
 		}
 	}
 }

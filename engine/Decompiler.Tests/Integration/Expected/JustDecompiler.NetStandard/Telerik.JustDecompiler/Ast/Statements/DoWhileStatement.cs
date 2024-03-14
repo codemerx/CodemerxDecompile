@@ -23,9 +23,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.set_Parent(this);
+					this.body.Parent = this;
 				}
-				return;
 			}
 		}
 
@@ -33,9 +32,12 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new DoWhileStatement.u003cget_Childrenu003ed__3(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				DoWhileStatement doWhileStatement = null;
+				yield return doWhileStatement.Condition;
+				if (doWhileStatement.body != null)
+				{
+					yield return doWhileStatement.body;
+				}
 			}
 		}
 
@@ -43,47 +45,51 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 8;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.DoWhileStatement;
 			}
 		}
 
-		public DoWhileStatement(Expression condition, BlockStatement body)
+		public DoWhileStatement(Expression condition, BlockStatement body) : base(condition)
 		{
-			base(condition);
-			this.set_Body(body);
-			return;
+			this.Body = body;
 		}
 
 		public override Statement Clone()
 		{
+			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				stackVariable5 = this.body.Clone() as BlockStatement;
+				blockStatement = this.body.Clone() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_1 = new DoWhileStatement(this.get_Condition().Clone(), stackVariable5);
-			V_1.set_ConditionBlock(this.get_ConditionBlock());
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			DoWhileStatement doWhileStatement = new DoWhileStatement(base.Condition.Clone(), blockStatement)
+			{
+				ConditionBlock = base.ConditionBlock
+			};
+			base.CopyParentAndLabel(doWhileStatement);
+			return doWhileStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
+			BlockStatement blockStatement;
 			if (this.body != null)
 			{
-				stackVariable5 = this.body.CloneStatementOnly() as BlockStatement;
+				blockStatement = this.body.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_1 = new DoWhileStatement(this.get_Condition().CloneExpressionOnly(), stackVariable5);
-			V_1.set_ConditionBlock(null);
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			DoWhileStatement doWhileStatement = new DoWhileStatement(base.Condition.CloneExpressionOnly(), blockStatement)
+			{
+				ConditionBlock = null
+			};
+			base.CopyParentAndLabel(doWhileStatement);
+			return doWhileStatement;
 		}
 	}
 }

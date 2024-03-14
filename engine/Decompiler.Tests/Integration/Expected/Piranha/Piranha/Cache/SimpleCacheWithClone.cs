@@ -4,10 +4,8 @@ namespace Piranha.Cache
 {
 	public class SimpleCacheWithClone : SimpleCache
 	{
-		public SimpleCacheWithClone()
+		public SimpleCacheWithClone() : base(true)
 		{
-			base(true);
-			return;
 		}
 	}
 }

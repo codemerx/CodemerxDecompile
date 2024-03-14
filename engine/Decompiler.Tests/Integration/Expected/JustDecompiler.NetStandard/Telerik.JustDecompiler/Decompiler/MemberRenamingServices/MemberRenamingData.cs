@@ -20,18 +20,14 @@ namespace Telerik.JustDecompiler.Decompiler.MemberRenamingServices
 
 		public MemberRenamingData()
 		{
-			base();
-			this.set_RenamedMembers(new HashSet<uint>());
-			this.set_RenamedMembersMap(new Dictionary<uint, string>());
-			return;
+			this.RenamedMembers = new HashSet<uint>();
+			this.RenamedMembersMap = new Dictionary<uint, string>();
 		}
 
 		public MemberRenamingData(HashSet<uint> renamedMembers, Dictionary<uint, string> renamedMembersMap)
 		{
-			base();
-			this.set_RenamedMembers(renamedMembers);
-			this.set_RenamedMembersMap(renamedMembersMap);
-			return;
+			this.RenamedMembers = renamedMembers;
+			this.RenamedMembersMap = renamedMembersMap;
 		}
 	}
 }

@@ -1,5 +1,7 @@
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Telerik.JustDecompiler.Cil;
@@ -22,28 +24,17 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				V_0 = new HashSet<ISingleEntrySubGraph>();
-				V_1 = this.predecessors.GetEnumerator();
-				try
+				ILogicalConstruct logicalConstruct;
+				HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+				foreach (CFGBlockLogicalConstruct predecessor in this.predecessors)
 				{
-					while (V_1.MoveNext())
+					if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(predecessor, LogicalFlowUtilities.FindFirstCommonParent((IEnumerable<ISingleEntrySubGraph>)(new ISingleEntrySubGraph[] { this.parent, predecessor })) as ILogicalConstruct, out logicalConstruct))
 					{
-						V_2 = V_1.get_Current();
-						stackVariable9 = new ISingleEntrySubGraph[2];
-						stackVariable9[0] = this.parent;
-						stackVariable9[1] = V_2;
-						if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_2, LogicalFlowUtilities.FindFirstCommonParent((IEnumerable<ISingleEntrySubGraph>)stackVariable9) as ILogicalConstruct, out V_4))
-						{
-							continue;
-						}
-						dummyVar0 = V_0.Add(V_4);
+						continue;
 					}
+					singleEntrySubGraphs.Add(logicalConstruct);
 				}
-				finally
-				{
-					((IDisposable)V_1).Dispose();
-				}
-				return V_0;
+				return singleEntrySubGraphs;
 			}
 		}
 
@@ -51,28 +42,17 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				V_0 = new HashSet<ISingleEntrySubGraph>();
-				V_1 = this.successors.GetEnumerator();
-				try
+				ILogicalConstruct logicalConstruct;
+				HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+				foreach (CFGBlockLogicalConstruct successor in this.successors)
 				{
-					while (V_1.MoveNext())
+					if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(successor, LogicalFlowUtilities.FindFirstCommonParent((IEnumerable<ISingleEntrySubGraph>)(new ISingleEntrySubGraph[] { this.parent, successor })) as ILogicalConstruct, out logicalConstruct))
 					{
-						V_2 = V_1.get_Current();
-						stackVariable9 = new ISingleEntrySubGraph[2];
-						stackVariable9[0] = this.parent;
-						stackVariable9[1] = V_2;
-						if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_2, LogicalFlowUtilities.FindFirstCommonParent((IEnumerable<ISingleEntrySubGraph>)stackVariable9) as ILogicalConstruct, out V_4))
-						{
-							continue;
-						}
-						dummyVar0 = V_0.Add(V_4);
+						continue;
 					}
+					singleEntrySubGraphs.Add(logicalConstruct);
 				}
-				finally
-				{
-					((IDisposable)V_1).Dispose();
-				}
-				return V_0;
+				return singleEntrySubGraphs;
 			}
 		}
 
@@ -80,21 +60,12 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				V_0 = new HashSet<CFGBlockLogicalConstruct>();
-				V_1 = this.get_Children().GetEnumerator();
-				try
+				HashSet<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs = new HashSet<CFGBlockLogicalConstruct>();
+				foreach (LogicalConstructBase child in this.Children)
 				{
-					while (V_1.MoveNext())
-					{
-						V_2 = (LogicalConstructBase)V_1.get_Current();
-						V_0.UnionWith(V_2.get_CFGBlocks());
-					}
+					cFGBlockLogicalConstructs.UnionWith(child.CFGBlocks);
 				}
-				finally
-				{
-					((IDisposable)V_1).Dispose();
-				}
-				return V_0;
+				return cFGBlockLogicalConstructs;
 			}
 		}
 
@@ -138,7 +109,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				return (this.get_Entry() as ILogicalConstruct).get_FirstBlock();
+				return (this.Entry as ILogicalConstruct).FirstBlock;
 			}
 		}
 
@@ -146,15 +117,16 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				if (this.get_CFGFollowNode() == null)
+				ILogicalConstruct logicalConstruct;
+				if (this.CFGFollowNode == null)
 				{
 					return null;
 				}
-				if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this.get_CFGFollowNode(), this.parent as ILogicalConstruct, out V_0))
+				if (LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this.CFGFollowNode, this.parent as ILogicalConstruct, out logicalConstruct))
 				{
-					return V_0;
+					return logicalConstruct;
 				}
-				this.set_CFGFollowNode(null);
+				this.CFGFollowNode = null;
 				return null;
 			}
 		}
@@ -163,7 +135,7 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				return this.get_FirstBlock().get_Index();
+				return this.FirstBlock.Index;
 			}
 		}
 
@@ -176,7 +148,6 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 			set
 			{
 				this.parent = value;
-				return;
 			}
 		}
 
@@ -184,24 +155,17 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				V_0 = new HashSet<ISingleEntrySubGraph>();
-				V_1 = this.predecessors.GetEnumerator();
-				try
+				ILogicalConstruct logicalConstruct;
+				HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+				foreach (CFGBlockLogicalConstruct predecessor in this.predecessors)
 				{
-					while (V_1.MoveNext())
+					if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(predecessor, this.Parent as ILogicalConstruct, out logicalConstruct))
 					{
-						if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_1.get_Current(), this.get_Parent() as ILogicalConstruct, out V_2))
-						{
-							continue;
-						}
-						dummyVar0 = V_0.Add(V_2);
+						continue;
 					}
+					singleEntrySubGraphs.Add(logicalConstruct);
 				}
-				finally
-				{
-					((IDisposable)V_1).Dispose();
-				}
-				return V_0;
+				return singleEntrySubGraphs;
 			}
 		}
 
@@ -209,176 +173,123 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 		{
 			get
 			{
-				V_0 = new HashSet<ISingleEntrySubGraph>();
-				V_1 = this.successors.GetEnumerator();
-				try
+				ILogicalConstruct logicalConstruct;
+				HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+				foreach (CFGBlockLogicalConstruct successor in this.successors)
 				{
-					while (V_1.MoveNext())
+					if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(successor, this.Parent as LogicalConstructBase, out logicalConstruct))
 					{
-						if (!LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_1.get_Current(), this.get_Parent() as LogicalConstructBase, out V_2))
-						{
-							continue;
-						}
-						dummyVar0 = V_0.Add(V_2);
+						continue;
 					}
+					singleEntrySubGraphs.Add(logicalConstruct);
 				}
-				finally
-				{
-					((IDisposable)V_1).Dispose();
-				}
-				return V_0;
+				return singleEntrySubGraphs;
 			}
 		}
 
 		static LogicalConstructBase()
 		{
 			LogicalConstructBase.EmptyISingleEntrySubGraphSet = new HashSet<ISingleEntrySubGraph>();
-			return;
 		}
 
 		protected LogicalConstructBase()
 		{
-			base();
 			this.predecessors = new HashSet<CFGBlockLogicalConstruct>();
 			this.successors = new HashSet<CFGBlockLogicalConstruct>();
 			this.children = new HashSet<ISingleEntrySubGraph>();
-			return;
 		}
 
 		public void AddToPredecessors(CFGBlockLogicalConstruct predecessor)
 		{
-			dummyVar0 = this.predecessors.Add(predecessor);
-			return;
+			this.predecessors.Add(predecessor);
 		}
 
 		public void AddToSuccessors(ILogicalConstruct successor)
 		{
-			dummyVar0 = this.successors.Add(successor.get_FirstBlock());
-			return;
+			this.successors.Add(successor.FirstBlock);
 		}
 
 		private void CleanUpPredecessors()
 		{
-			V_0 = this.get_CFGBlocks().GetEnumerator();
-			try
+			foreach (CFGBlockLogicalConstruct cFGBlock in this.CFGBlocks)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					dummyVar0 = this.RemoveFromPredecessors(V_1);
-				}
+				this.RemoveFromPredecessors(cFGBlock);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		public virtual int CompareTo(ISingleEntrySubGraph other)
 		{
-			return this.get_FirstBlock().CompareTo((other as ILogicalConstruct).get_FirstBlock());
+			return this.FirstBlock.CompareTo((other as ILogicalConstruct).FirstBlock);
 		}
 
 		private void CopyPredecessors()
 		{
-			V_0 = (this.get_Entry() as LogicalConstructBase).predecessors.GetEnumerator();
-			try
+			foreach (CFGBlockLogicalConstruct predecessor in (this.Entry as LogicalConstructBase).predecessors)
 			{
-				while (V_0.MoveNext())
+				if (predecessor.HasForParent(this))
 				{
-					V_1 = V_0.get_Current();
-					if (V_1.HasForParent(this))
-					{
-						continue;
-					}
-					dummyVar0 = this.predecessors.Add(V_1);
+					continue;
 				}
+				this.predecessors.Add(predecessor);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		protected ILogicalConstruct[] GetSortedArrayFromCollection<T>(ICollection<T> collection)
 		where T : ISingleEntrySubGraph
 		{
-			V_0 = new ILogicalConstruct[collection.get_Count()];
-			V_1 = 0;
-			V_2 = collection.GetEnumerator();
-			try
+			ILogicalConstruct[] logicalConstructArray = new ILogicalConstruct[collection.Count];
+			int num = 0;
+			foreach (T t in collection)
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = (ILogicalConstruct)(object)V_2.get_Current();
-					stackVariable13 = V_1;
-					V_1 = stackVariable13 + 1;
-					V_0[stackVariable13] = V_3;
-				}
+				ILogicalConstruct logicalConstruct = (ILogicalConstruct)(object)t;
+				int num1 = num;
+				num = num1 + 1;
+				logicalConstructArray[num1] = logicalConstruct;
 			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
-			}
-			Array.Sort<ISingleEntrySubGraph>(V_0);
-			return V_0;
+			Array.Sort<ISingleEntrySubGraph>(logicalConstructArray);
+			return logicalConstructArray;
 		}
 
 		private bool HasForParent(ILogicalConstruct supposedParent)
 		{
-			return LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this, supposedParent, out V_0);
+			ILogicalConstruct logicalConstruct;
+			return LogicalFlowUtilities.TryGetParentConstructWithGivenParent(this, supposedParent, out logicalConstruct);
 		}
 
 		protected string NodeILOffset(LogicalFlowBuilderContext context, CFGBlockLogicalConstruct node)
 		{
+			int offset;
 			if (node == null)
 			{
 				return "null";
 			}
-			V_0 = node as PartialCFGBlockLogicalConstruct;
-			if (V_0 == null)
+			PartialCFGBlockLogicalConstruct partialCFGBlockLogicalConstruct = node as PartialCFGBlockLogicalConstruct;
+			if (partialCFGBlockLogicalConstruct == null)
 			{
-				V_2 = node.get_TheBlock().get_First().get_Offset();
-				return String.Format("IL_{0}", V_2.ToString("x4"));
+				offset = node.TheBlock.First.get_Offset();
+				return String.Format("IL_{0}", offset.ToString("x4"));
 			}
-			V_1 = Array.IndexOf<CFGBlockLogicalConstruct>(context.get_CFGBlockToLogicalConstructMap().get_Item(V_0.get_TheBlock()), V_0);
-			if (V_1 == -1)
+			int num = Array.IndexOf<CFGBlockLogicalConstruct>(context.CFGBlockToLogicalConstructMap[partialCFGBlockLogicalConstruct.TheBlock], partialCFGBlockLogicalConstruct);
+			if (num == -1)
 			{
 				throw new Exception("Invalid partial block data.");
 			}
-			V_2 = V_0.get_TheBlock().get_First().get_Offset();
-			return String.Format("IL_{0}_{1}", V_2.ToString("x4"), V_1);
+			offset = partialCFGBlockLogicalConstruct.TheBlock.First.get_Offset();
+			return String.Format("IL_{0}_{1}", (object)offset.ToString("x4"), num);
 		}
 
 		protected void RedirectChildrenToNewParent(IEnumerable<ILogicalConstruct> body)
 		{
-			V_0 = this.get_Children().get_Count() == 0;
-			if (this.successors.get_Count() != 0)
+			bool count = this.Children.Count == 0;
+			if (this.successors.Count != 0)
 			{
-				V_1 = body.GetEnumerator();
-				try
+				foreach (LogicalConstructBase logicalConstructBase in body)
 				{
-					while (V_1.MoveNext())
-					{
-						V_2 = (LogicalConstructBase)V_1.get_Current();
-						dummyVar0 = this.RemoveFromSuccessors(V_2);
-					}
-				}
-				finally
-				{
-					if (V_1 != null)
-					{
-						V_1.Dispose();
-					}
+					this.RemoveFromSuccessors(logicalConstructBase);
 				}
 			}
 			this.RedirectParents(body);
-			if (!V_0)
+			if (!count)
 			{
 				this.CleanUpPredecessors();
 			}
@@ -390,109 +301,71 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 				}
 				this.CopyPredecessors();
 			}
-			V_1 = body.GetEnumerator();
-			try
+			foreach (ILogicalConstruct logicalConstruct in body)
 			{
-				while (V_1.MoveNext())
+				foreach (CFGBlockLogicalConstruct successor in ((LogicalConstructBase)logicalConstruct).successors)
 				{
-					V_3 = ((LogicalConstructBase)V_1.get_Current()).successors.GetEnumerator();
-					try
+					if (successor.HasForParent(this))
 					{
-						while (V_3.MoveNext())
-						{
-							V_4 = V_3.get_Current();
-							if (V_4.HasForParent(this))
-							{
-								continue;
-							}
-							dummyVar1 = this.successors.Add(V_4);
-						}
+						continue;
 					}
-					finally
-					{
-						((IDisposable)V_3).Dispose();
-					}
+					this.successors.Add(successor);
 				}
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			return;
 		}
 
 		private void RedirectParentEntry()
 		{
-			if (this.parent.get_Entry().get_Parent() != this.parent)
+			if (this.parent.Entry.Parent != this.parent)
 			{
-				if (this.parent.get_Entry().get_Parent() != this)
+				if (this.parent.Entry.Parent != this)
 				{
 					throw new InvalidOperationException("Invalid entry of parent");
 				}
-				if (this.parent.get_Entry() != this.get_Entry())
+				if (this.parent.Entry != this.Entry)
 				{
 					throw new InvalidOperationException("Invalid entry of new construct");
 				}
-				this.parent.set_Entry(this);
+				this.parent.Entry = this;
 			}
-			return;
 		}
 
 		private void RedirectParents(IEnumerable<ILogicalConstruct> childrenCollection)
 		{
-			V_0 = null;
-			V_1 = childrenCollection.GetEnumerator();
-			try
+			ISingleEntrySubGraph parent = null;
+			foreach (ILogicalConstruct logicalConstruct in childrenCollection)
 			{
-				while (V_1.MoveNext())
+				if (logicalConstruct.Parent == this)
 				{
-					V_2 = V_1.get_Current();
-					if (V_2.get_Parent() == this)
-					{
-						continue;
-					}
-					if (V_0 != null)
-					{
-						if (V_0 != V_2.get_Parent())
-						{
-							throw new InvalidOperationException("The nodes in the child collection does not have the same parent");
-						}
-					}
-					else
-					{
-						V_0 = V_2.get_Parent();
-					}
-					if (V_0 != null)
-					{
-						dummyVar0 = V_0.get_Children().Remove(V_2);
-					}
-					V_2.set_Parent(this);
-					dummyVar1 = this.get_Children().Add(V_2);
+					continue;
 				}
-			}
-			finally
-			{
-				if (V_1 != null)
+				if (parent == null)
 				{
-					V_1.Dispose();
+					parent = logicalConstruct.Parent;
 				}
+				else if (parent != logicalConstruct.Parent)
+				{
+					throw new InvalidOperationException("The nodes in the child collection does not have the same parent");
+				}
+				if (parent != null)
+				{
+					parent.Children.Remove(logicalConstruct);
+				}
+				logicalConstruct.Parent = this;
+				this.Children.Add(logicalConstruct);
 			}
-			if (V_0 != null)
+			if (parent != null)
 			{
-				dummyVar2 = V_0.get_Children().Add(this);
-				if (this.parent != null && this.parent != V_0)
+				parent.Children.Add(this);
+				if (this.parent != null && this.parent != parent)
 				{
 					throw new InvalidOperationException("The nodes you are trying to add are not from the same logical construct");
 				}
 				if (this.parent == null)
 				{
-					this.parent = V_0;
+					this.parent = parent;
 				}
 			}
-			return;
 		}
 
 		public bool RemoveFromPredecessors(CFGBlockLogicalConstruct predecessor)
@@ -502,64 +375,56 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow
 
 		public bool RemoveFromSuccessors(ILogicalConstruct successor)
 		{
-			return this.successors.Remove(successor.get_FirstBlock());
+			return this.successors.Remove(successor.FirstBlock);
 		}
 
 		public virtual string ToString(LogicalFlowBuilderContext context)
 		{
-			return this.ToString(this.GetType().get_Name(), new HashSet<CFGBlockLogicalConstruct>(), context);
+			return this.ToString(this.GetType().Name, new HashSet<CFGBlockLogicalConstruct>(), context);
 		}
 
 		protected virtual string ToString(string constructName, HashSet<CFGBlockLogicalConstruct> printedCFGBlocks, LogicalFlowBuilderContext context)
 		{
-			V_0 = new StringBuilder();
-			dummyVar0 = V_0.AppendLine(constructName);
-			dummyVar1 = V_0.AppendLine("{");
-			V_1 = this.GetSortedArrayFromCollection<CFGBlockLogicalConstruct>(this.get_CFGBlocks());
-			V_2 = new Stack<CFGBlockLogicalConstruct>();
-			V_4 = 0;
-			while (V_4 < (int)V_1.Length)
+			ILogicalConstruct logicalConstruct;
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.AppendLine(constructName);
+			stringBuilder.AppendLine("{");
+			ILogicalConstruct[] sortedArrayFromCollection = this.GetSortedArrayFromCollection<CFGBlockLogicalConstruct>(this.CFGBlocks);
+			Stack<CFGBlockLogicalConstruct> cFGBlockLogicalConstructs = new Stack<CFGBlockLogicalConstruct>();
+			for (int i = 0; i < (int)sortedArrayFromCollection.Length; i++)
 			{
-				V_5 = V_1[V_4] as CFGBlockLogicalConstruct;
-				if (!printedCFGBlocks.Contains(V_5))
+				CFGBlockLogicalConstruct cFGBlockLogicalConstruct = sortedArrayFromCollection[i] as CFGBlockLogicalConstruct;
+				if (!printedCFGBlocks.Contains(cFGBlockLogicalConstruct))
 				{
-					V_2.Push(V_5);
-					while (V_2.get_Count() > 0)
+					cFGBlockLogicalConstructs.Push(cFGBlockLogicalConstruct);
+					while (cFGBlockLogicalConstructs.Count > 0)
 					{
-						V_6 = V_2.Pop();
-						if (printedCFGBlocks.Contains(V_6) || !LogicalFlowUtilities.TryGetParentConstructWithGivenParent(V_6, this, out V_7))
+						CFGBlockLogicalConstruct cFGBlockLogicalConstruct1 = cFGBlockLogicalConstructs.Pop();
+						if (printedCFGBlocks.Contains(cFGBlockLogicalConstruct1) || !LogicalFlowUtilities.TryGetParentConstructWithGivenParent(cFGBlockLogicalConstruct1, this, out logicalConstruct))
 						{
 							continue;
 						}
-						stackVariable48 = ((LogicalConstructBase)V_7).ToString(V_7.GetType().get_Name(), printedCFGBlocks, context);
-						stackVariable50 = new String[1];
-						stackVariable50[0] = Environment.get_NewLine();
-						V_9 = stackVariable48.Split(stackVariable50, 1);
-						V_10 = 0;
-						while (V_10 < (int)V_9.Length)
+						string[] strArray = ((LogicalConstructBase)logicalConstruct).ToString(logicalConstruct.GetType().Name, printedCFGBlocks, context).Split(new String[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+						for (int j = 0; j < (int)strArray.Length; j++)
 						{
-							V_11 = V_9[V_10];
-							dummyVar2 = V_0.AppendLine(String.Format("\t{0}", V_11));
-							V_10 = V_10 + 1;
+							string str = strArray[j];
+							stringBuilder.AppendLine(String.Format("\t{0}", str));
 						}
-						V_8 = this.GetSortedArrayFromCollection<ISingleEntrySubGraph>(V_7.get_SameParentSuccessors());
-						V_12 = (int)V_8.Length - 1;
-						while (V_12 >= 0)
+						ILogicalConstruct[] logicalConstructArray = this.GetSortedArrayFromCollection<ISingleEntrySubGraph>(logicalConstruct.SameParentSuccessors);
+						for (int k = (int)logicalConstructArray.Length - 1; k >= 0; k--)
 						{
-							if (!printedCFGBlocks.Contains(V_8[V_12].get_FirstBlock()))
+							if (!printedCFGBlocks.Contains(logicalConstructArray[k].FirstBlock))
 							{
-								V_2.Push(V_8[V_12].get_FirstBlock());
+								cFGBlockLogicalConstructs.Push(logicalConstructArray[k].FirstBlock);
 							}
-							V_12 = V_12 - 1;
 						}
 					}
 				}
-				V_4 = V_4 + 1;
 			}
-			V_3 = String.Format("\tFollowNode: {0}", this.NodeILOffset(context, this.get_CFGFollowNode()));
-			dummyVar3 = V_0.AppendLine(V_3);
-			dummyVar4 = V_0.AppendLine("}");
-			return V_0.ToString();
+			string str1 = String.Format("\tFollowNode: {0}", this.NodeILOffset(context, this.CFGFollowNode));
+			stringBuilder.AppendLine(str1);
+			stringBuilder.AppendLine("}");
+			return stringBuilder.ToString();
 		}
 	}
 }

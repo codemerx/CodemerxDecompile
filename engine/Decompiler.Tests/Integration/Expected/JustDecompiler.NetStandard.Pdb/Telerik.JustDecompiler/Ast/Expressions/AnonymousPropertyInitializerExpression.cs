@@ -12,7 +12,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 63;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.AnonymousPropertyInitializerExpression;
 			}
 		}
 
@@ -20,30 +20,26 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Property().get_SetMethod() == null;
+				return base.Property.get_SetMethod() == null;
 			}
 		}
 
-		public AnonymousPropertyInitializerExpression(PropertyDefinition property, TypeReference type)
+		public AnonymousPropertyInitializerExpression(PropertyDefinition property, TypeReference type) : this(property, type, null)
 		{
-			this(property, type, null);
-			return;
 		}
 
-		public AnonymousPropertyInitializerExpression(PropertyDefinition property, TypeReference type, IEnumerable<Instruction> instructions)
+		public AnonymousPropertyInitializerExpression(PropertyDefinition property, TypeReference type, IEnumerable<Instruction> instructions) : base(property, type, instructions)
 		{
-			base(property, type, instructions);
-			return;
 		}
 
 		public override Expression Clone()
 		{
-			return new AnonymousPropertyInitializerExpression(this.get_Property(), this.expressionType, this.instructions);
+			return new AnonymousPropertyInitializerExpression(base.Property, this.expressionType, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new AnonymousPropertyInitializerExpression(this.get_Property(), this.expressionType, null);
+			return new AnonymousPropertyInitializerExpression(base.Property, this.expressionType, null);
 		}
 	}
 }

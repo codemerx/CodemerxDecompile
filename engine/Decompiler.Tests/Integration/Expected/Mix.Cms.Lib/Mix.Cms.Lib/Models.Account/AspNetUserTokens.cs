@@ -37,8 +37,6 @@ namespace Mix.Cms.Lib.Models.Account
 
 		public AspNetUserTokens()
 		{
-			base();
-			return;
 		}
 	}
 }

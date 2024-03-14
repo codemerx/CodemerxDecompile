@@ -4,6 +4,7 @@ using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixModuleDatas;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -40,11 +41,7 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 		}
 
 		[JsonProperty("data")]
-		public PaginationModel<ReadViewModel> Data
-		{
-			get;
-			set;
-		}
+		public PaginationModel<ReadViewModel> Data { get; set; } = new PaginationModel<ReadViewModel>();
 
 		[JsonProperty("description")]
 		public string Description
@@ -190,77 +187,72 @@ namespace Mix.Cms.Lib.ViewModels.MixModules
 
 		public ImportViewModel()
 		{
-			this.u003cDatau003ek__BackingField = new PaginationModel<ReadViewModel>();
-			base();
-			return;
 		}
 
-		public ImportViewModel(MixModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ImportViewModel(MixModule model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cDatau003ek__BackingField = new PaginationModel<ReadViewModel>();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return;
 		}
 
 		public void LoadData(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			dummyVar0 = new RepositoryResponse<PaginationModel<ReadViewModel>>();
-			stackVariable1 = ViewModelBase<MixCmsContext, MixModuleData, ReadViewModel>.Repository;
-			V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel::LoadData(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadData(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<PaginationModel<ReadViewModel>> repositoryResponse = new RepositoryResponse<PaginationModel<ReadViewModel>>();
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixModuleData, ReadViewModel>.Repository;
+			int? nullable = null;
+			int? nullable1 = nullable;
+			nullable = null;
+			repository.GetModelListBy((MixModuleData m) => m.ModuleId == this.Id && m.Specificulture == this.Specificulture, "Priority", 0, nullable1, nullable, _context, _transaction);
+		}
 
 		public override MixModule ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				stackVariable7 = ViewModelBase<MixCmsContext, MixModule, ReadListItemViewModel>.Repository;
-				V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixModule Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixModule ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixModule, ReadListItemViewModel>.Repository.Max((MixModule m) => m.Id, _context, _transaction).get_Data() + 1;
+				this.LastModified = new DateTime?(DateTime.UtcNow);
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 
 		public override Task<RepositoryResponse<MixModule>> RemoveModelAsync(bool isRemoveRelatedModels = false, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			return this.RemoveModelAsync(isRemoveRelatedModels, _context, _transaction);
+			return base.RemoveModelAsync(isRemoveRelatedModels, _context, _transaction);
 		}
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixModule parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parent = parent;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101 variable = new Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101();
+			variable.u003cu003e4__this = this;
+			variable.parent = parent;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel.u003cSaveSubModelsAsyncu003ed__101>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			this.Validate(_context, _transaction);
-			if (this.get_IsValid() && this.get_Id() == 0)
+			base.Validate(_context, _transaction);
+			if (base.get_IsValid() && this.Id == 0)
 			{
-				this.set_IsValid(!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository.CheckIsExists(new Func<MixModule, bool>(this.u003cValidateu003eb__98_0), _context, _transaction));
-				if (!this.get_IsValid())
+				base.set_IsValid(!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository.CheckIsExists((MixModule m) => {
+					if (m.Name != this.Name)
+					{
+						return false;
+					}
+					return m.Specificulture == this.Specificulture;
+				}, _context, _transaction));
+				if (!base.get_IsValid())
 				{
-					this.get_Errors().Add("Module Name Existed");
+					base.get_Errors().Add("Module Name Existed");
 				}
 			}
-			return;
 		}
 	}
 }

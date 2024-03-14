@@ -122,7 +122,7 @@ namespace Telerik.JustDecompiler.Languages
 
 		bool IsLanguageKeyword(string word);
 
-		bool IsOperatorKeyword(string operator);
+		bool IsOperatorKeyword(string @operator);
 
 		bool IsValidIdentifier(string identifier);
 

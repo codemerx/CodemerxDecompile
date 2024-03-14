@@ -1,7 +1,11 @@
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Languages;
+using Telerik.JustDecompiler.Languages.TestCaseWriters;
 
 namespace Telerik.JustDecompiler.Ast
 {
@@ -9,44 +13,37 @@ namespace Telerik.JustDecompiler.Ast
 	{
 		public static Statement GetNextStatement(this Statement self)
 		{
-			V_0 = self.get_Parent() as BlockStatement;
-			if (V_0 == null)
+			BlockStatement parent = self.Parent as BlockStatement;
+			if (parent == null)
 			{
 				throw new Exception("Unable to get next statement.");
 			}
-			V_1 = V_0.get_Statements().IndexOf(self);
-			if (V_1 < 0 || V_1 >= V_0.get_Statements().get_Count() - 1)
+			int num = parent.Statements.IndexOf(self);
+			if (num < 0 || num >= parent.Statements.Count - 1)
 			{
 				return null;
 			}
-			return V_0.get_Statements().get_Item(V_1 + 1);
+			return parent.Statements[num + 1];
 		}
 
 		public static bool IsAssignmentStatement(this Statement statement)
 		{
-			if (statement.get_CodeNodeType() != 5 || (statement as ExpressionStatement).get_Expression().get_CodeNodeType() != 24)
+			if (statement.CodeNodeType != CodeNodeType.ExpressionStatement || (statement as ExpressionStatement).Expression.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
 				return false;
 			}
-			return ((statement as ExpressionStatement).get_Expression() as BinaryExpression).get_IsAssignmentExpression();
+			return ((statement as ExpressionStatement).Expression as BinaryExpression).IsAssignmentExpression;
 		}
 
 		public static string ToCodeString(this Statement statement)
 		{
-			V_0 = new StringWriter();
-			try
+			string str;
+			using (StringWriter stringWriter = new StringWriter())
 			{
-				((ILanguageTestCaseWriter)(new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(V_0)))).Write(statement);
-				V_1 = V_0.ToString();
+				((ILanguageTestCaseWriter)(new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(stringWriter)))).Write(statement);
+				str = stringWriter.ToString();
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					((IDisposable)V_0).Dispose();
-				}
-			}
-			return V_1;
+			return str;
 		}
 	}
 }

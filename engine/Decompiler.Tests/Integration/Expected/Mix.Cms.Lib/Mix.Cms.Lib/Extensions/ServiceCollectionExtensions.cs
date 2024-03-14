@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using Mix.Cms.Lib.Controllers;
+using Mix.Heart.NetCore;
 using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.Extensions
@@ -8,17 +11,14 @@ namespace Mix.Cms.Lib.Extensions
 	{
 		public static IServiceCollection AddGenerateApis(this IServiceCollection services)
 		{
-			dummyVar0 = ServiceCollectionExtensions.AddGeneratedRestApi(services, Assembly.GetExecutingAssembly(), Type.GetTypeFromHandle(// 
-			// Current member / type: Microsoft.Extensions.DependencyInjection.IServiceCollection Mix.Cms.Lib.Extensions.ServiceCollectionExtensions::AddGenerateApis(Microsoft.Extensions.DependencyInjection.IServiceCollection)
-			// Exception in: Microsoft.Extensions.DependencyInjection.IServiceCollection AddGenerateApis(Microsoft.Extensions.DependencyInjection.IServiceCollection)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			Mix.Heart.NetCore.ServiceCollectionExtensions.AddGeneratedRestApi(services, Assembly.GetExecutingAssembly(), typeof(BaseRestApiController<,,>));
+			SignalRDependencyInjectionExtensions.AddSignalR(services);
+			return services;
+		}
 
 		public static IServiceCollection AddMyGraphQL(this IServiceCollection services)
 		{
-			dummyVar0 = SignalRDependencyInjectionExtensions.AddSignalR(services);
+			SignalRDependencyInjectionExtensions.AddSignalR(services);
 			return services;
 		}
 	}

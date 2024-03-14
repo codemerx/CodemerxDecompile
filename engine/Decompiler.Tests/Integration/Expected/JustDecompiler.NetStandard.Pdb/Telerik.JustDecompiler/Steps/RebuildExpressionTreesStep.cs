@@ -1,7 +1,11 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Extensions;
+using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -16,13 +20,13 @@ namespace Telerik.JustDecompiler.Steps
 
 		private TypeSystem typeSystem;
 
-		private readonly Dictionary<VariableReference, Expression> variableToValueMap;
+		private readonly Dictionary<VariableReference, Expression> variableToValueMap = new Dictionary<VariableReference, Expression>();
 
-		private readonly Dictionary<VariableReference, HashSet<ExpressionStatement>> variableToAssigingStatementsMap;
+		private readonly Dictionary<VariableReference, HashSet<ExpressionStatement>> variableToAssigingStatementsMap = new Dictionary<VariableReference, HashSet<ExpressionStatement>>();
 
-		private readonly HashSet<VariableReference> usedVariables;
+		private readonly HashSet<VariableReference> usedVariables = new HashSet<VariableReference>();
 
-		private readonly Dictionary<VariableReference, int> variableToLastUninitializedIndex;
+		private readonly Dictionary<VariableReference, int> variableToLastUninitializedIndex = new Dictionary<VariableReference, int>();
 
 		private int conversionDepth;
 
@@ -32,55 +36,50 @@ namespace Telerik.JustDecompiler.Steps
 
 		public RebuildExpressionTreesStep()
 		{
-			this.variableToValueMap = new Dictionary<VariableReference, Expression>();
-			this.variableToAssigingStatementsMap = new Dictionary<VariableReference, HashSet<ExpressionStatement>>();
-			this.usedVariables = new HashSet<VariableReference>();
-			this.variableToLastUninitializedIndex = new Dictionary<VariableReference, int>();
-			base();
-			return;
 		}
 
 		private ICodeNode ConvertArrayIndex(MethodInvocationExpression node)
 		{
-			if (node.get_Arguments().get_Count() != 2)
+			if (node.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.Visit(node.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_0 == null || V_0.get_Dimensions().get_Count() != 1 || V_0.get_Initializer() == null || V_0.get_Initializer().get_Expressions().get_Count() == 0)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(node.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions.Count == 0)
 			{
 				return null;
 			}
-			stackVariable31 = new ArrayIndexerExpression((Expression)this.Visit(node.get_Arguments().get_Item(0)), null);
-			stackVariable31.set_Indices(V_0.get_Initializer().get_Expressions());
-			return stackVariable31;
+			return new ArrayIndexerExpression((Expression)this.Visit(node.Arguments[0]), null)
+			{
+				Indices = arrayCreationExpression.Initializer.Expressions
+			};
 		}
 
 		private ICodeNode ConvertArrayLength(MethodInvocationExpression node)
 		{
-			if (node.get_Arguments().get_Count() != 1)
+			if (node.Arguments.Count != 1)
 			{
 				return null;
 			}
-			return new ArrayLengthExpression((Expression)this.Visit(node.get_Arguments().get_Item(0)), this.typeSystem, null);
+			return new ArrayLengthExpression((Expression)this.Visit(node.Arguments[0]), this.typeSystem, null);
 		}
 
 		private BinaryExpression ConvertBinaryOperator(MethodInvocationExpression node, BinaryOperator binaryOperator, bool isChecked)
 		{
-			if (node.get_Arguments().get_Count() < 2)
+			BinaryExpression binaryExpression;
+			if (node.Arguments.Count < 2)
 			{
 				return null;
 			}
 			try
 			{
-				V_0 = new BinaryExpression(binaryOperator, (Expression)this.Visit(node.get_Arguments().get_Item(0)), (Expression)this.Visit(node.get_Arguments().get_Item(1)), this.typeSystem, isChecked, null, node.get_Arguments().get_Count() > 2);
+				binaryExpression = new BinaryExpression(binaryOperator, (Expression)this.Visit(node.Arguments[0]), (Expression)this.Visit(node.Arguments[1]), this.typeSystem, isChecked, null, node.Arguments.Count > 2);
 			}
 			catch
 			{
-				dummyVar0 = exception_0;
-				V_0 = null;
+				binaryExpression = null;
 			}
-			return V_0;
+			return binaryExpression;
 		}
 
 		private BinaryExpression ConvertBinaryOperator(MethodInvocationExpression node, BinaryOperator binaryOperator)
@@ -90,574 +89,444 @@ namespace Telerik.JustDecompiler.Steps
 
 		private ICodeNode ConvertBind(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2 || !this.TryGetMethodReference((Expression)this.Visit(invocation.get_Arguments().get_Item(0)), "System.Reflection.MethodInfo", out V_0))
+			MethodReference methodReference;
+			if (invocation.Arguments.Count != 2 || !this.TryGetMethodReference((Expression)this.Visit(invocation.Arguments[0]), "System.Reflection.MethodInfo", out methodReference))
 			{
 				return null;
 			}
-			V_1 = this.ResolveProperty(V_0);
-			if (V_1 == null)
+			PropertyDefinition propertyDefinition = this.ResolveProperty(methodReference);
+			if (propertyDefinition == null)
 			{
 				return null;
 			}
-			return new BinaryExpression(26, new PropertyInitializerExpression(V_1, V_1.get_PropertyType()), (Expression)this.Visit(invocation.get_Arguments().get_Item(1)), this.typeSystem, null, false);
+			return new BinaryExpression(BinaryOperator.Assign, new PropertyInitializerExpression(propertyDefinition, propertyDefinition.get_PropertyType()), (Expression)this.Visit(invocation.Arguments[1]), this.typeSystem, null, false);
 		}
 
 		private ICodeNode ConvertCall(MethodInvocationExpression node)
 		{
-			if (node.get_Arguments().get_Count() < 2 || !this.TryGetMethodReference((Expression)this.Visit(node.get_Arguments().get_Item(1)), "System.Reflection.MethodInfo", out V_0))
+			MethodReference methodReference;
+			if (node.Arguments.Count < 2 || !this.TryGetMethodReference((Expression)this.Visit(node.Arguments[1]), "System.Reflection.MethodInfo", out methodReference))
 			{
 				return null;
 			}
-			V_1 = new MethodInvocationExpression(new MethodReferenceExpression(this.GetTarget(node.get_Arguments().get_Item(0)), V_0, null), null);
-			if (node.get_Arguments().get_Count() == 3)
+			MethodInvocationExpression methodInvocationExpression = new MethodInvocationExpression(new MethodReferenceExpression(this.GetTarget(node.Arguments[0]), methodReference, null), null);
+			if (node.Arguments.Count == 3)
 			{
-				V_2 = this.Visit(node.get_Arguments().get_Item(2)) as ArrayCreationExpression;
-				if (V_2 == null || V_2.get_Dimensions().get_Count() != 1 || V_2.get_Initializer() == null || V_2.get_Initializer().get_Expressions() == null || V_2.get_Initializer().get_Expressions().get_Count() != V_0.get_Parameters().get_Count())
+				ArrayCreationExpression arrayCreationExpression = this.Visit(node.Arguments[2]) as ArrayCreationExpression;
+				if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count != methodReference.get_Parameters().get_Count())
 				{
 					return null;
 				}
-				V_3 = V_2.get_Initializer().get_Expressions().GetEnumerator();
-				try
+				foreach (Expression expression in arrayCreationExpression.Initializer.Expressions)
 				{
-					while (V_3.MoveNext())
-					{
-						V_4 = V_3.get_Current();
-						V_1.get_Arguments().Add(V_4);
-					}
-				}
-				finally
-				{
-					if (V_3 != null)
-					{
-						V_3.Dispose();
-					}
+					methodInvocationExpression.Arguments.Add(expression);
 				}
 			}
-			return V_1;
+			return methodInvocationExpression;
 		}
 
 		private ICodeNode ConvertCast(MethodInvocationExpression invocation, Func<Expression, TypeReference, Expression> createInstance)
 		{
-			if (invocation.get_Arguments().get_Count() < 2 || invocation.get_Arguments().get_Item(1).get_CodeNodeType() != 35)
+			if (invocation.Arguments.Count < 2 || invocation.Arguments[1].CodeNodeType != CodeNodeType.TypeOfExpression)
 			{
 				return null;
 			}
-			V_0 = (Expression)this.Visit(invocation.get_Arguments().get_Item(0));
-			V_1 = (invocation.get_Arguments().get_Item(1) as TypeOfExpression).get_Type();
-			return createInstance.Invoke(V_0, V_1);
+			Expression expression = (Expression)this.Visit(invocation.Arguments[0]);
+			TypeReference type = (invocation.Arguments[1] as TypeOfExpression).Type;
+			return createInstance(expression, type);
 		}
 
 		private ICodeNode ConvertCast(MethodInvocationExpression node)
 		{
-			stackVariable1 = node;
-			stackVariable2 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__45_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<Expression, TypeReference, Expression>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertCastu003eb__45_0);
-				RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__45_0 = stackVariable2;
-			}
-			return this.ConvertCast(stackVariable1, stackVariable2);
+			return this.ConvertCast(node, (Expression expression, TypeReference type) => new ExplicitCastExpression(expression, type, null));
 		}
 
 		private ICodeNode ConvertCastChecked(MethodInvocationExpression node)
 		{
-			V_0 = this.ConvertCast(node) as ExplicitCastExpression;
-			if (V_0 == null)
+			ExplicitCastExpression explicitCastExpression = this.ConvertCast(node) as ExplicitCastExpression;
+			if (explicitCastExpression == null)
 			{
 				return null;
 			}
-			return new CheckedExpression(V_0, null);
+			return new CheckedExpression(explicitCastExpression, null);
 		}
 
 		private ICodeNode ConvertCondition(MethodInvocationExpression node)
 		{
-			if (node.get_Arguments().get_Count() < 3)
+			if (node.Arguments.Count < 3)
 			{
 				return null;
 			}
-			stackVariable10 = (Expression)this.Visit(node.get_Arguments().get_Item(0));
-			V_0 = (Expression)this.Visit(node.get_Arguments().get_Item(1));
-			V_1 = (Expression)this.Visit(node.get_Arguments().get_Item(2));
-			return new ConditionExpression(stackVariable10, V_0, V_1, null);
+			Expression expression = (Expression)this.Visit(node.Arguments[0]);
+			Expression expression1 = (Expression)this.Visit(node.Arguments[1]);
+			Expression expression2 = (Expression)this.Visit(node.Arguments[2]);
+			return new ConditionExpression(expression, expression1, expression2, null);
 		}
 
 		private ICodeNode ConvertConstant(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() < 1 || invocation.get_Arguments().get_Count() > 2)
+			if (invocation.Arguments.Count < 1 || invocation.Arguments.Count > 2)
 			{
 				return null;
 			}
-			V_0 = (Expression)this.Visit(invocation.get_Arguments().get_Item(0));
-			if (invocation.get_Arguments().get_Count() == 2)
+			Expression expression = (Expression)this.Visit(invocation.Arguments[0]);
+			if (invocation.Arguments.Count == 2)
 			{
-				dummyVar0 = this.Visit(invocation.get_Arguments().get_Item(1));
+				this.Visit(invocation.Arguments[1]);
 			}
-			V_1 = V_0 as BoxExpression;
-			if (V_1 == null || !V_1.get_IsAutoBox())
+			BoxExpression boxExpression = expression as BoxExpression;
+			if (boxExpression == null || !boxExpression.IsAutoBox)
 			{
-				return V_0;
+				return expression;
 			}
-			return V_1.get_BoxedExpression();
+			return boxExpression.BoxedExpression;
 		}
 
 		private ICodeNode ConvertElementInit(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_0 == null || V_0.get_Dimensions() == null || V_0.get_Dimensions().get_Count() != 1 || V_0.get_Initializer() == null || V_0.get_Initializer().get_Expressions() == null || V_0.get_Initializer().get_Expressions().get_Count() == 0)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count == 0)
 			{
 				return null;
 			}
-			dummyVar0 = this.Visit(invocation.get_Arguments().get_Item(0));
-			if (V_0.get_Initializer().get_Expressions().get_Count() != 1)
+			this.Visit(invocation.Arguments[0]);
+			if (arrayCreationExpression.Initializer.Expressions.Count != 1)
 			{
-				return V_0.get_Initializer().get_Expression();
+				return arrayCreationExpression.Initializer.Expression;
 			}
-			return V_0.get_Initializer().get_Expressions().get_Item(0);
+			return arrayCreationExpression.Initializer.Expressions[0];
 		}
 
 		private ICodeNode ConvertField(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2 || !this.TryGetFieldReference((Expression)this.Visit(invocation.get_Arguments().get_Item(1)), out V_0))
+			FieldReference fieldReference;
+			if (invocation.Arguments.Count != 2 || !this.TryGetFieldReference((Expression)this.Visit(invocation.Arguments[1]), out fieldReference))
 			{
 				return null;
 			}
-			return new FieldReferenceExpression(this.GetTarget(invocation.get_Arguments().get_Item(0)), V_0, null);
+			return new FieldReferenceExpression(this.GetTarget(invocation.Arguments[0]), fieldReference, null);
 		}
 
 		private ICodeNode ConvertInvocation(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_MethodExpression() == null || invocation.get_MethodExpression().get_Method() == null || invocation.get_MethodExpression().get_Method().get_HasThis() || invocation.get_MethodExpression().get_Method().get_DeclaringType() == null || String.op_Inequality(invocation.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Linq.Expressions.Expression"))
+			if (invocation.MethodExpression == null || invocation.MethodExpression.Method == null || invocation.MethodExpression.Method.get_HasThis() || invocation.MethodExpression.Method.get_DeclaringType() == null || invocation.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Linq.Expressions.Expression")
 			{
 				return null;
 			}
-			if (this.conversionDepth == 0 && String.op_Inequality(invocation.get_MethodExpression().get_Method().get_Name(), "Lambda"))
+			if (this.conversionDepth == 0 && invocation.MethodExpression.Method.get_Name() != "Lambda")
 			{
 				return null;
 			}
-			V_0 = null;
-			V_1 = invocation.get_MethodExpression().get_Method().get_Name();
-			if (V_1 != null)
+			ICodeNode codeNode = null;
+			string name = invocation.MethodExpression.Method.get_Name();
+			if (name != null)
 			{
-				if (String.op_Equality(V_1, "Add"))
+				switch (name)
 				{
-					V_0 = this.ConvertBinaryOperator(invocation, 1, false);
-				}
-				else
-				{
-					if (String.op_Equality(V_1, "AddChecked"))
+					case "Add":
 					{
-						V_0 = this.ConvertBinaryOperator(invocation, 1, true);
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Add, false);
+						break;
 					}
-					else
+					case "AddChecked":
 					{
-						if (String.op_Equality(V_1, "And"))
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Add, true);
+						break;
+					}
+					case "And":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.BitwiseAnd);
+						break;
+					}
+					case "AndAlso":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.LogicalAnd);
+						break;
+					}
+					case "ArrayAccess":
+					case "ArrayIndex":
+					{
+						codeNode = this.ConvertArrayIndex(invocation);
+						break;
+					}
+					case "ArrayLength":
+					{
+						codeNode = this.ConvertArrayLength(invocation);
+						break;
+					}
+					case "Bind":
+					{
+						codeNode = this.ConvertBind(invocation);
+						break;
+					}
+					case "Call":
+					{
+						codeNode = this.ConvertCall(invocation);
+						break;
+					}
+					case "Coalesce":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.NullCoalesce);
+						break;
+					}
+					case "Condition":
+					{
+						codeNode = this.ConvertCondition(invocation);
+						break;
+					}
+					case "Constant":
+					{
+						codeNode = this.ConvertConstant(invocation);
+						break;
+					}
+					case "Convert":
+					{
+						codeNode = this.ConvertCast(invocation);
+						break;
+					}
+					case "ConvertChecked":
+					{
+						codeNode = this.ConvertCastChecked(invocation);
+						break;
+					}
+					case "Divide":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Divide);
+						break;
+					}
+					case "ElementInit":
+					{
+						codeNode = this.ConvertElementInit(invocation);
+						break;
+					}
+					case "Equal":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.ValueEquality);
+						break;
+					}
+					case "ExclusiveOr":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.BitwiseXor);
+						break;
+					}
+					case "Field":
+					{
+						codeNode = this.ConvertField(invocation);
+						break;
+					}
+					case "GreaterThan":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.GreaterThan);
+						break;
+					}
+					case "GreaterThanOrEqual":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.GreaterThanOrEqual);
+						break;
+					}
+					case "Invoke":
+					{
+						codeNode = this.ConvertInvoke(invocation);
+						break;
+					}
+					case "Lambda":
+					{
+						codeNode = this.ConvertLambda(invocation);
+						break;
+					}
+					case "LeftShift":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.LeftShift);
+						break;
+					}
+					case "LessThan":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.LessThan);
+						break;
+					}
+					case "LessThanOrEqual":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.LessThanOrEqual);
+						break;
+					}
+					case "ListBind":
+					{
+						codeNode = this.ConvertListBind(invocation);
+						break;
+					}
+					case "ListInit":
+					{
+						codeNode = this.ConvertListInit(invocation);
+						break;
+					}
+					case "MemberInit":
+					{
+						codeNode = this.ConvertMemberInit(invocation);
+						break;
+					}
+					case "Modulo":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Modulo);
+						break;
+					}
+					case "Multiply":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Multiply, false);
+						break;
+					}
+					case "MultiplyChecked":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Multiply, true);
+						break;
+					}
+					case "Negate":
+					{
+						codeNode = this.ConvertUnaryOperator(invocation, UnaryOperator.Negate);
+						break;
+					}
+					case "NegateChecked":
+					{
+						codeNode = this.ConvertUnaryOperatorChecked(invocation, UnaryOperator.Negate);
+						break;
+					}
+					case "New":
+					{
+						codeNode = this.ConvertNewObject(invocation);
+						break;
+					}
+					case "NewArrayBounds":
+					{
+						codeNode = this.ConvertNewArrayBounds(invocation);
+						break;
+					}
+					case "NewArrayInit":
+					{
+						codeNode = this.ConvertNewArrayInit(invocation);
+						break;
+					}
+					case "Not":
+					{
+						codeNode = this.ConvertUnaryOperator(invocation, UnaryOperator.LogicalNot);
+						break;
+					}
+					case "NotEqual":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.ValueInequality);
+						break;
+					}
+					case "OnesComplement":
+					{
+						codeNode = this.ConvertUnaryOperator(invocation, UnaryOperator.BitwiseNot);
+						break;
+					}
+					case "Or":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.BitwiseOr);
+						break;
+					}
+					case "OrElse":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.LogicalOr);
+						break;
+					}
+					case "Parameter":
+					{
+						codeNode = this.ConvertParameter(invocation);
+						break;
+					}
+					case "Property":
+					{
+						codeNode = this.ConvertProperty(invocation);
+						break;
+					}
+					case "Quote":
+					{
+						if (invocation.Arguments.Count == 1)
 						{
-							V_0 = this.ConvertBinaryOperator(invocation, 22);
+							codeNode = this.Visit(invocation.Arguments[0]);
 						}
-						else
+						break;
+					}
+					case "RightShift":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.RightShift);
+						break;
+					}
+					case "Subtract":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Subtract, false);
+						break;
+					}
+					case "SubtractChecked":
+					{
+						codeNode = this.ConvertBinaryOperator(invocation, BinaryOperator.Subtract, true);
+						break;
+					}
+					case "TypeAs":
+					{
+						codeNode = this.ConvertTypeAs(invocation);
+						break;
+					}
+					default:
+					{
+						if (name != "TypeIs")
 						{
-							if (String.op_Equality(V_1, "AndAlso"))
-							{
-								V_0 = this.ConvertBinaryOperator(invocation, 12);
-							}
-							else
-							{
-								if (String.op_Equality(V_1, "ArrayAccess") || String.op_Equality(V_1, "ArrayIndex"))
-								{
-									V_0 = this.ConvertArrayIndex(invocation);
-								}
-								else
-								{
-									if (String.op_Equality(V_1, "ArrayLength"))
-									{
-										V_0 = this.ConvertArrayLength(invocation);
-									}
-									else
-									{
-										if (String.op_Equality(V_1, "Bind"))
-										{
-											V_0 = this.ConvertBind(invocation);
-										}
-										else
-										{
-											if (String.op_Equality(V_1, "Call"))
-											{
-												V_0 = this.ConvertCall(invocation);
-											}
-											else
-											{
-												if (String.op_Equality(V_1, "Coalesce"))
-												{
-													V_0 = this.ConvertBinaryOperator(invocation, 27);
-												}
-												else
-												{
-													if (String.op_Equality(V_1, "Condition"))
-													{
-														V_0 = this.ConvertCondition(invocation);
-													}
-													else
-													{
-														if (String.op_Equality(V_1, "Constant"))
-														{
-															V_0 = this.ConvertConstant(invocation);
-														}
-														else
-														{
-															if (String.op_Equality(V_1, "Convert"))
-															{
-																V_0 = this.ConvertCast(invocation);
-															}
-															else
-															{
-																if (String.op_Equality(V_1, "ConvertChecked"))
-																{
-																	V_0 = this.ConvertCastChecked(invocation);
-																}
-																else
-																{
-																	if (String.op_Equality(V_1, "Divide"))
-																	{
-																		V_0 = this.ConvertBinaryOperator(invocation, 7);
-																	}
-																	else
-																	{
-																		if (String.op_Equality(V_1, "ElementInit"))
-																		{
-																			V_0 = this.ConvertElementInit(invocation);
-																		}
-																		else
-																		{
-																			if (String.op_Equality(V_1, "Equal"))
-																			{
-																				V_0 = this.ConvertBinaryOperator(invocation, 9);
-																			}
-																			else
-																			{
-																				if (String.op_Equality(V_1, "ExclusiveOr"))
-																				{
-																					V_0 = this.ConvertBinaryOperator(invocation, 23);
-																				}
-																				else
-																				{
-																					if (String.op_Equality(V_1, "Field"))
-																					{
-																						V_0 = this.ConvertField(invocation);
-																					}
-																					else
-																					{
-																						if (String.op_Equality(V_1, "GreaterThan"))
-																						{
-																							V_0 = this.ConvertBinaryOperator(invocation, 15);
-																						}
-																						else
-																						{
-																							if (String.op_Equality(V_1, "GreaterThanOrEqual"))
-																							{
-																								V_0 = this.ConvertBinaryOperator(invocation, 16);
-																							}
-																							else
-																							{
-																								if (String.op_Equality(V_1, "Invoke"))
-																								{
-																									V_0 = this.ConvertInvoke(invocation);
-																								}
-																								else
-																								{
-																									if (String.op_Equality(V_1, "Lambda"))
-																									{
-																										V_0 = this.ConvertLambda(invocation);
-																									}
-																									else
-																									{
-																										if (String.op_Equality(V_1, "LeftShift"))
-																										{
-																											V_0 = this.ConvertBinaryOperator(invocation, 17);
-																										}
-																										else
-																										{
-																											if (String.op_Equality(V_1, "LessThan"))
-																											{
-																												V_0 = this.ConvertBinaryOperator(invocation, 13);
-																											}
-																											else
-																											{
-																												if (String.op_Equality(V_1, "LessThanOrEqual"))
-																												{
-																													V_0 = this.ConvertBinaryOperator(invocation, 14);
-																												}
-																												else
-																												{
-																													if (String.op_Equality(V_1, "ListBind"))
-																													{
-																														V_0 = this.ConvertListBind(invocation);
-																													}
-																													else
-																													{
-																														if (String.op_Equality(V_1, "ListInit"))
-																														{
-																															V_0 = this.ConvertListInit(invocation);
-																														}
-																														else
-																														{
-																															if (String.op_Equality(V_1, "MemberInit"))
-																															{
-																																V_0 = this.ConvertMemberInit(invocation);
-																															}
-																															else
-																															{
-																																if (String.op_Equality(V_1, "Modulo"))
-																																{
-																																	V_0 = this.ConvertBinaryOperator(invocation, 24);
-																																}
-																																else
-																																{
-																																	if (String.op_Equality(V_1, "Multiply"))
-																																	{
-																																		V_0 = this.ConvertBinaryOperator(invocation, 5, false);
-																																	}
-																																	else
-																																	{
-																																		if (String.op_Equality(V_1, "MultiplyChecked"))
-																																		{
-																																			V_0 = this.ConvertBinaryOperator(invocation, 5, true);
-																																		}
-																																		else
-																																		{
-																																			if (String.op_Equality(V_1, "Negate"))
-																																			{
-																																				V_0 = this.ConvertUnaryOperator(invocation, 0);
-																																			}
-																																			else
-																																			{
-																																				if (String.op_Equality(V_1, "NegateChecked"))
-																																				{
-																																					V_0 = this.ConvertUnaryOperatorChecked(invocation, 0);
-																																				}
-																																				else
-																																				{
-																																					if (String.op_Equality(V_1, "New"))
-																																					{
-																																						V_0 = this.ConvertNewObject(invocation);
-																																					}
-																																					else
-																																					{
-																																						if (String.op_Equality(V_1, "NewArrayBounds"))
-																																						{
-																																							V_0 = this.ConvertNewArrayBounds(invocation);
-																																						}
-																																						else
-																																						{
-																																							if (String.op_Equality(V_1, "NewArrayInit"))
-																																							{
-																																								V_0 = this.ConvertNewArrayInit(invocation);
-																																							}
-																																							else
-																																							{
-																																								if (String.op_Equality(V_1, "Not"))
-																																								{
-																																									V_0 = this.ConvertUnaryOperator(invocation, 1);
-																																								}
-																																								else
-																																								{
-																																									if (String.op_Equality(V_1, "NotEqual"))
-																																									{
-																																										V_0 = this.ConvertBinaryOperator(invocation, 10);
-																																									}
-																																									else
-																																									{
-																																										if (String.op_Equality(V_1, "OnesComplement"))
-																																										{
-																																											V_0 = this.ConvertUnaryOperator(invocation, 2);
-																																										}
-																																										else
-																																										{
-																																											if (String.op_Equality(V_1, "Or"))
-																																											{
-																																												V_0 = this.ConvertBinaryOperator(invocation, 21);
-																																											}
-																																											else
-																																											{
-																																												if (String.op_Equality(V_1, "OrElse"))
-																																												{
-																																													V_0 = this.ConvertBinaryOperator(invocation, 11);
-																																												}
-																																												else
-																																												{
-																																													if (String.op_Equality(V_1, "Parameter"))
-																																													{
-																																														V_0 = this.ConvertParameter(invocation);
-																																													}
-																																													else
-																																													{
-																																														if (String.op_Equality(V_1, "Property"))
-																																														{
-																																															V_0 = this.ConvertProperty(invocation);
-																																														}
-																																														else
-																																														{
-																																															if (String.op_Equality(V_1, "Quote"))
-																																															{
-																																																if (invocation.get_Arguments().get_Count() == 1)
-																																																{
-																																																	V_0 = this.Visit(invocation.get_Arguments().get_Item(0));
-																																																}
-																																															}
-																																															else
-																																															{
-																																																if (String.op_Equality(V_1, "RightShift"))
-																																																{
-																																																	V_0 = this.ConvertBinaryOperator(invocation, 19);
-																																																}
-																																																else
-																																																{
-																																																	if (String.op_Equality(V_1, "Subtract"))
-																																																	{
-																																																		V_0 = this.ConvertBinaryOperator(invocation, 3, false);
-																																																	}
-																																																	else
-																																																	{
-																																																		if (String.op_Equality(V_1, "SubtractChecked"))
-																																																		{
-																																																			V_0 = this.ConvertBinaryOperator(invocation, 3, true);
-																																																		}
-																																																		else
-																																																		{
-																																																			if (String.op_Equality(V_1, "TypeAs"))
-																																																			{
-																																																				V_0 = this.ConvertTypeAs(invocation);
-																																																			}
-																																																			else
-																																																			{
-																																																				if (!String.op_Equality(V_1, "TypeIs"))
-																																																				{
-																																																					goto Label0;
-																																																				}
-																																																				V_0 = this.ConvertTypeIs(invocation);
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
+							return null;
 						}
+						codeNode = this.ConvertTypeIs(invocation);
+						break;
 					}
 				}
-				this.failure = this.failure | V_0 == null;
-				return V_0;
+				this.failure = this.failure | codeNode == null;
+				return codeNode;
 			}
-		Label0:
 			return null;
 		}
 
 		private ICodeNode ConvertInvoke(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_0 == null || V_0.get_Dimensions().get_Count() != 1 || V_0.get_Initializer() == null || V_0.get_Initializer().get_Expressions() == null)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null)
 			{
 				return null;
 			}
-			V_1 = (Expression)this.Visit(invocation.get_Arguments().get_Item(0));
-			V_2 = this.GetInvokeMethodReference(V_1);
-			if (V_2 == null)
+			Expression expression = (Expression)this.Visit(invocation.Arguments[0]);
+			MethodReference invokeMethodReference = this.GetInvokeMethodReference(expression);
+			if (invokeMethodReference == null)
 			{
 				return null;
 			}
-			return new DelegateInvokeExpression(V_1, V_0.get_Initializer().get_Expressions(), V_2, null);
+			return new DelegateInvokeExpression(expression, arrayCreationExpression.Initializer.Expressions, invokeMethodReference, null);
 		}
 
 		private ICodeNode ConvertLambda(MethodInvocationExpression invocation)
 		{
-			V_0 = new RebuildExpressionTreesStep.u003cu003ec__DisplayClass29_0();
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_1 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_1 != null && V_1.get_Initializer() != null && V_1.get_Initializer().get_Expressions() != null)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression != null && arrayCreationExpression.Initializer != null && arrayCreationExpression.Initializer.Expressions != null)
 			{
-				stackVariable21 = V_1.get_Initializer().get_Expressions();
-				stackVariable22 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__29_0;
-				if (stackVariable22 == null)
+				if (!arrayCreationExpression.Initializer.Expressions.Any<Expression>((Expression element) => element.CodeNodeType != CodeNodeType.ArgumentReferenceExpression))
 				{
-					dummyVar0 = stackVariable22;
-					stackVariable22 = new Func<Expression, bool>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertLambdau003eb__29_0);
-					RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__29_0 = stackVariable22;
-				}
-				if (!stackVariable21.Any<Expression>(stackVariable22))
-				{
-					V_2 = V_1.get_Initializer().get_Expressions().Cast<ArgumentReferenceExpression>().ToList<ArgumentReferenceExpression>();
-					stackVariable29 = V_0;
-					stackVariable30 = V_2;
-					stackVariable31 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__29_1;
-					if (stackVariable31 == null)
-					{
-						dummyVar1 = stackVariable31;
-						stackVariable31 = new Func<ArgumentReferenceExpression, bool>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertLambdau003eb__29_1);
-						RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__29_1 = stackVariable31;
-					}
-					stackVariable29.hasAnonymousParameter = stackVariable30.Any<ArgumentReferenceExpression>(stackVariable31);
-					V_3 = new BlockStatement();
-					V_3.AddStatement(new ExpressionStatement(new ShortFormReturnExpression((Expression)this.Visit(invocation.get_Arguments().get_Item(0)), null)));
-					stackVariable50 = new ExpressionCollection(V_2.Select<ArgumentReferenceExpression, LambdaParameterExpression>(new Func<ArgumentReferenceExpression, LambdaParameterExpression>(V_0.u003cConvertLambdau003eb__2)));
-					stackVariable51 = V_3;
-					stackVariable54 = V_2;
-					stackVariable55 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__29_3;
-					if (stackVariable55 == null)
-					{
-						dummyVar2 = stackVariable55;
-						stackVariable55 = new Func<ArgumentReferenceExpression, ParameterReference>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertLambdau003eb__29_3);
-						RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__29_3 = stackVariable55;
-					}
-					return new LambdaExpression(stackVariable50, stackVariable51, false, false, stackVariable54.Select<ArgumentReferenceExpression, ParameterReference>(stackVariable55), true, null);
+					List<ArgumentReferenceExpression> list = arrayCreationExpression.Initializer.Expressions.Cast<ArgumentReferenceExpression>().ToList<ArgumentReferenceExpression>();
+					bool flag = list.Any<ArgumentReferenceExpression>((ArgumentReferenceExpression param) => param.Parameter.get_ParameterType().Resolve().IsAnonymous());
+					BlockStatement blockStatement = new BlockStatement();
+					blockStatement.AddStatement(new ExpressionStatement(new ShortFormReturnExpression((Expression)this.Visit(invocation.Arguments[0]), null)));
+					return new LambdaExpression(new ExpressionCollection(
+						from param in list
+						select new LambdaParameterExpression(param.Parameter, !flag, null)), blockStatement, false, false, 
+						from argRef in list
+						select argRef.Parameter, true, null);
 				}
 			}
 			return null;
@@ -665,76 +534,79 @@ namespace Telerik.JustDecompiler.Steps
 
 		private ICodeNode ConvertListBind(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2 || !this.TryGetMethodReference((Expression)this.Visit(invocation.get_Arguments().get_Item(0)), "System.Reflection.MethodInfo", out V_0))
+			MethodReference methodReference;
+			if (invocation.Arguments.Count != 2 || !this.TryGetMethodReference((Expression)this.Visit(invocation.Arguments[0]), "System.Reflection.MethodInfo", out methodReference))
 			{
 				return null;
 			}
-			V_1 = this.ResolveProperty(V_0);
-			if (V_1 == null)
+			PropertyDefinition propertyDefinition = this.ResolveProperty(methodReference);
+			if (propertyDefinition == null)
 			{
 				return null;
 			}
-			V_2 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_2 == null || V_2.get_Dimensions() == null || V_2.get_Dimensions().get_Count() != 1 || V_2.get_Initializer() == null || V_2.get_Initializer().get_Expressions() == null)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null)
 			{
 				return null;
 			}
-			V_2.get_Initializer().set_InitializerType(0);
-			V_2.get_Initializer().set_IsMultiLine(true);
-			return new BinaryExpression(26, new PropertyInitializerExpression(V_1, V_1.get_PropertyType()), V_2.get_Initializer(), this.typeSystem, null, false);
+			arrayCreationExpression.Initializer.InitializerType = InitializerType.CollectionInitializer;
+			arrayCreationExpression.Initializer.IsMultiLine = true;
+			return new BinaryExpression(BinaryOperator.Assign, new PropertyInitializerExpression(propertyDefinition, propertyDefinition.get_PropertyType()), arrayCreationExpression.Initializer, this.typeSystem, null, false);
 		}
 
 		private ICodeNode ConvertListInit(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.Visit(invocation.get_Arguments().get_Item(0)) as ObjectCreationExpression;
-			if (V_0 == null || V_0.get_Initializer() != null)
+			ObjectCreationExpression initializerExpression = this.Visit(invocation.Arguments[0]) as ObjectCreationExpression;
+			if (initializerExpression == null || initializerExpression.Initializer != null)
 			{
 				return null;
 			}
-			V_1 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_1 == null || V_1.get_Dimensions() == null || V_1.get_Dimensions().get_Count() != 1 || V_1.get_Initializer() == null || V_1.get_Initializer().get_Expressions() == null)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null)
 			{
 				return null;
 			}
-			V_0.set_Initializer(new InitializerExpression(V_1.get_Initializer().get_Expression(), 0));
-			V_0.get_Initializer().set_IsMultiLine(true);
-			return V_0;
+			initializerExpression.Initializer = new InitializerExpression(arrayCreationExpression.Initializer.Expression, InitializerType.CollectionInitializer)
+			{
+				IsMultiLine = true
+			};
+			return initializerExpression;
 		}
 
 		private ICodeNode ConvertMemberInit(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.Visit(invocation.get_Arguments().get_Item(0)) as ObjectCreationExpression;
-			if (V_0 == null || V_0.get_Initializer() != null)
+			ObjectCreationExpression initializerExpression = this.Visit(invocation.Arguments[0]) as ObjectCreationExpression;
+			if (initializerExpression == null || initializerExpression.Initializer != null)
 			{
 				return null;
 			}
-			V_1 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_1 != null && V_1.get_Dimensions() != null && V_1.get_Dimensions().get_Count() == 1 && V_1.get_Initializer() != null && V_1.get_Initializer().get_Expressions() != null)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression != null && arrayCreationExpression.Dimensions != null && arrayCreationExpression.Dimensions.Count == 1 && arrayCreationExpression.Initializer != null && arrayCreationExpression.Initializer.Expressions != null)
 			{
-				stackVariable37 = V_1.get_Initializer().get_Expressions();
-				stackVariable38 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__27_0;
-				if (stackVariable38 == null)
-				{
-					dummyVar0 = stackVariable38;
-					stackVariable38 = new Func<Expression, bool>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertMemberInitu003eb__27_0);
-					RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__27_0 = stackVariable38;
-				}
-				if (!stackVariable37.Any<Expression>(stackVariable38))
-				{
-					if (V_1.get_Initializer().get_Expressions().get_Count() > 0)
+				if (!arrayCreationExpression.Initializer.Expressions.Any<Expression>((Expression expr) => {
+					if (expr.CodeNodeType != CodeNodeType.BinaryExpression)
 					{
-						V_0.set_Initializer(new InitializerExpression(V_1.get_Initializer().get_Expression(), 1));
-						V_0.get_Initializer().set_IsMultiLine(true);
+						return true;
 					}
-					return V_0;
+					return !(expr as BinaryExpression).IsAssignmentExpression;
+				}))
+				{
+					if (arrayCreationExpression.Initializer.Expressions.Count > 0)
+					{
+						initializerExpression.Initializer = new InitializerExpression(arrayCreationExpression.Initializer.Expression, InitializerType.ObjectInitializer)
+						{
+							IsMultiLine = true
+						};
+					}
+					return initializerExpression;
 				}
 			}
 			return null;
@@ -742,251 +614,215 @@ namespace Telerik.JustDecompiler.Steps
 
 		private ICodeNode ConvertNewArrayBounds(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.GenerateArrayCreationExpression(invocation.get_Arguments().get_Item(0));
-			if (V_0 == null)
+			ArrayCreationExpression expressions = this.GenerateArrayCreationExpression(invocation.Arguments[0]);
+			if (expressions == null)
 			{
 				return null;
 			}
-			V_1 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_1 == null || V_1.get_Dimensions().get_Count() != 1 || V_1.get_Initializer() == null || V_1.get_Initializer().get_Expressions() == null || V_1.get_Initializer().get_Expressions().get_Count() == 0)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count == 0)
 			{
 				return null;
 			}
-			V_0.set_Dimensions(V_1.get_Initializer().get_Expressions());
-			return V_0;
+			expressions.Dimensions = arrayCreationExpression.Initializer.Expressions;
+			return expressions;
 		}
 
 		private ICodeNode ConvertNewArrayInit(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			V_0 = this.GenerateArrayCreationExpression(invocation.get_Arguments().get_Item(0));
-			if (V_0 == null)
+			ArrayCreationExpression dimensions = this.GenerateArrayCreationExpression(invocation.Arguments[0]);
+			if (dimensions == null)
 			{
 				return null;
 			}
-			V_1 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_1 == null || V_1.get_Dimensions() == null || V_1.get_Initializer() == null || V_1.get_Initializer().get_Expressions() == null || V_1.get_Initializer().get_Expressions().get_Count() == 0)
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions == null || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count == 0)
 			{
 				return null;
 			}
-			V_0.set_Dimensions(V_1.get_Dimensions());
-			V_0.set_Initializer(V_1.get_Initializer());
-			return V_0;
+			dimensions.Dimensions = arrayCreationExpression.Dimensions;
+			dimensions.Initializer = arrayCreationExpression.Initializer;
+			return dimensions;
 		}
 
 		private ICodeNode ConvertNewObject(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() < 1 || invocation.get_Arguments().get_Count() > 3)
+			MethodReference methodReference;
+			if (invocation.Arguments.Count < 1 || invocation.Arguments.Count > 3)
 			{
 				return null;
 			}
-			V_0 = (Expression)this.Visit(invocation.get_Arguments().get_Item(0));
-			if (!this.TryGetMethodReference(V_0, "System.Reflection.ConstructorInfo", out V_1))
+			Expression expression = (Expression)this.Visit(invocation.Arguments[0]);
+			if (!this.TryGetMethodReference(expression, "System.Reflection.ConstructorInfo", out methodReference))
 			{
-				if (invocation.get_Arguments().get_Count() != 1 || V_0.get_CodeNodeType() != 35)
+				if (invocation.Arguments.Count != 1 || expression.CodeNodeType != CodeNodeType.TypeOfExpression)
 				{
 					return null;
 				}
-				return new ObjectCreationExpression(null, (V_0 as TypeOfExpression).get_Type(), null, null);
+				return new ObjectCreationExpression(null, (expression as TypeOfExpression).Type, null, null);
 			}
-			V_2 = new ObjectCreationExpression(V_1, V_1.get_DeclaringType(), null, null);
-			if (invocation.get_Arguments().get_Count() == 1)
+			ObjectCreationExpression objectCreationExpression = new ObjectCreationExpression(methodReference, methodReference.get_DeclaringType(), null, null);
+			if (invocation.Arguments.Count == 1)
 			{
-				return V_2;
+				return objectCreationExpression;
 			}
-			V_3 = this.Visit(invocation.get_Arguments().get_Item(1)) as ArrayCreationExpression;
-			if (V_3 == null || V_3.get_Dimensions().get_Count() != 1 || V_3.get_Initializer() == null || V_3.get_Initializer().get_Expressions() == null || V_3.get_Initializer().get_Expressions().get_Count() != V_1.get_Parameters().get_Count())
+			ArrayCreationExpression arrayCreationExpression = this.Visit(invocation.Arguments[1]) as ArrayCreationExpression;
+			if (arrayCreationExpression == null || arrayCreationExpression.Dimensions.Count != 1 || arrayCreationExpression.Initializer == null || arrayCreationExpression.Initializer.Expressions == null || arrayCreationExpression.Initializer.Expressions.Count != methodReference.get_Parameters().get_Count())
 			{
 				return null;
 			}
-			V_4 = V_3.get_Initializer().get_Expressions().GetEnumerator();
-			try
+			foreach (Expression expression1 in arrayCreationExpression.Initializer.Expressions)
 			{
-				while (V_4.MoveNext())
-				{
-					V_5 = V_4.get_Current();
-					V_2.get_Arguments().Add(V_5);
-				}
+				objectCreationExpression.Arguments.Add(expression1);
 			}
-			finally
+			if (invocation.Arguments.Count == 2)
 			{
-				if (V_4 != null)
-				{
-					V_4.Dispose();
-				}
+				return objectCreationExpression;
 			}
-			if (invocation.get_Arguments().get_Count() == 2)
-			{
-				return V_2;
-			}
-			dummyVar0 = this.Visit(invocation.get_Arguments().get_Item(2));
-			return V_2;
+			this.Visit(invocation.Arguments[2]);
+			return objectCreationExpression;
 		}
 
 		private ArgumentReferenceExpression ConvertParameter(MethodInvocationExpression node)
 		{
-			if (node.get_Arguments().get_Count() < 1 || node.get_Arguments().get_Count() > 2 || node.get_Arguments().get_Item(0).get_CodeNodeType() != 35)
+			if (node.Arguments.Count < 1 || node.Arguments.Count > 2 || node.Arguments[0].CodeNodeType != CodeNodeType.TypeOfExpression)
 			{
 				return null;
 			}
-			V_0 = (node.get_Arguments().get_Item(0) as TypeOfExpression).get_Type();
-			V_1 = null;
-			if (node.get_Arguments().get_Count() == 2 && node.get_Arguments().get_Item(1).get_CodeNodeType() == 22)
+			TypeReference type = (node.Arguments[0] as TypeOfExpression).Type;
+			string value = null;
+			if (node.Arguments.Count == 2 && node.Arguments[1].CodeNodeType == CodeNodeType.LiteralExpression)
 			{
-				V_1 = (node.get_Arguments().get_Item(1) as LiteralExpression).get_Value() as String;
+				value = (node.Arguments[1] as LiteralExpression).Value as String;
 			}
-			stackVariable26 = V_1;
-			if (stackVariable26 == null)
+			string str = value;
+			if (str == null)
 			{
-				dummyVar0 = stackVariable26;
-				V_2 = this.paramterNameIndex;
-				this.paramterNameIndex = V_2 + 1;
-				stackVariable26 = String.Concat("expressionParameter", V_2.ToString());
+				int num = this.paramterNameIndex;
+				this.paramterNameIndex = num + 1;
+				str = String.Concat("expressionParameter", num.ToString());
 			}
-			return new ArgumentReferenceExpression(new ParameterDefinition(stackVariable26, 0, V_0), null);
+			return new ArgumentReferenceExpression(new ParameterDefinition(str, 0, type), null);
 		}
 
 		private ICodeNode ConvertProperty(MethodInvocationExpression invocation)
 		{
-			V_0 = this.ConvertCall(invocation) as MethodInvocationExpression;
-			if (V_0 == null)
+			MethodInvocationExpression methodInvocationExpression = this.ConvertCall(invocation) as MethodInvocationExpression;
+			if (methodInvocationExpression == null)
 			{
 				return null;
 			}
-			V_1 = new PropertyReferenceExpression(V_0, null);
-			if (V_1.get_Property() == null)
+			PropertyReferenceExpression propertyReferenceExpression = new PropertyReferenceExpression(methodInvocationExpression, null);
+			if (propertyReferenceExpression.Property == null)
 			{
 				return null;
 			}
-			return V_1;
+			return propertyReferenceExpression;
 		}
 
 		private ICodeNode ConvertTypeAs(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			stackVariable5 = invocation;
-			stackVariable6 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__37_0;
-			if (stackVariable6 == null)
-			{
-				dummyVar0 = stackVariable6;
-				stackVariable6 = new Func<Expression, TypeReference, Expression>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertTypeAsu003eb__37_0);
-				RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__37_0 = stackVariable6;
-			}
-			return this.ConvertCast(stackVariable5, stackVariable6);
+			return this.ConvertCast(invocation, (Expression expression, TypeReference type) => new SafeCastExpression(expression, type, null));
 		}
 
 		private ICodeNode ConvertTypeIs(MethodInvocationExpression invocation)
 		{
-			if (invocation.get_Arguments().get_Count() != 2)
+			if (invocation.Arguments.Count != 2)
 			{
 				return null;
 			}
-			stackVariable5 = invocation;
-			stackVariable6 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__36_0;
-			if (stackVariable6 == null)
-			{
-				dummyVar0 = stackVariable6;
-				stackVariable6 = new Func<Expression, TypeReference, Expression>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cConvertTypeIsu003eb__36_0);
-				RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__36_0 = stackVariable6;
-			}
-			return this.ConvertCast(stackVariable5, stackVariable6);
+			return this.ConvertCast(invocation, (Expression expression, TypeReference type) => new CanCastExpression(expression, type, null));
 		}
 
 		private UnaryExpression ConvertUnaryOperator(MethodInvocationExpression node, UnaryOperator unaryOperator)
 		{
-			if (node.get_Arguments().get_Count() < 1)
+			if (node.Arguments.Count < 1)
 			{
 				return null;
 			}
-			return new UnaryExpression(unaryOperator, (Expression)this.Visit(node.get_Arguments().get_Item(0)), null);
+			return new UnaryExpression(unaryOperator, (Expression)this.Visit(node.Arguments[0]), null);
 		}
 
 		private ICodeNode ConvertUnaryOperatorChecked(MethodInvocationExpression node, UnaryOperator unaryOperator)
 		{
-			V_0 = this.ConvertUnaryOperator(node, unaryOperator);
-			if (V_0 == null)
+			UnaryExpression unaryExpression = this.ConvertUnaryOperator(node, unaryOperator);
+			if (unaryExpression == null)
 			{
 				return null;
 			}
-			return new CheckedExpression(V_0, null);
+			return new CheckedExpression(unaryExpression, null);
 		}
 
 		private ArrayCreationExpression GenerateArrayCreationExpression(Expression unprocessedExpression)
 		{
-			V_0 = this.Visit(unprocessedExpression) as TypeOfExpression;
-			if (V_0 == null)
+			TypeOfExpression typeOfExpression = this.Visit(unprocessedExpression) as TypeOfExpression;
+			if (typeOfExpression == null)
 			{
 				return null;
 			}
-			return new ArrayCreationExpression(V_0.get_Type(), null, null);
+			return new ArrayCreationExpression(typeOfExpression.Type, null, null);
 		}
 
 		private int GetIntegerValue(LiteralExpression size)
 		{
+			int num;
 			if (size == null)
 			{
 				return -1;
 			}
 			try
 			{
-				V_0 = Convert.ToInt32(size.get_Value());
+				num = Convert.ToInt32(size.Value);
 			}
-			catch (InvalidCastException exception_0)
+			catch (InvalidCastException invalidCastException)
 			{
-				dummyVar0 = exception_0;
-				V_0 = -1;
+				num = -1;
 			}
-			return V_0;
+			return num;
 		}
 
 		private MethodReference GetInvokeMethodReference(Expression target)
 		{
-			if (!target.get_HasType() || target.get_ExpressionType() == null)
+			if (!target.HasType || target.ExpressionType == null)
 			{
 				return null;
 			}
-			V_0 = target.get_ExpressionType();
-			V_1 = V_0.Resolve();
-			if (V_1 == null || !V_1.IsDelegate())
+			TypeReference expressionType = target.ExpressionType;
+			TypeDefinition typeDefinition = expressionType.Resolve();
+			if (typeDefinition == null || !typeDefinition.IsDelegate())
 			{
 				return null;
 			}
-			stackVariable14 = V_1.get_Methods();
-			stackVariable15 = RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__31_0;
-			if (stackVariable15 == null)
-			{
-				dummyVar0 = stackVariable15;
-				stackVariable15 = new Func<MethodDefinition, bool>(RebuildExpressionTreesStep.u003cu003ec.u003cu003e9.u003cGetInvokeMethodReferenceu003eb__31_0);
-				RebuildExpressionTreesStep.u003cu003ec.u003cu003e9__31_0 = stackVariable15;
-			}
-			V_2 = stackVariable14.FirstOrDefault<MethodDefinition>(stackVariable15);
-			if (V_2 == null)
+			MethodDefinition methodDefinition = typeDefinition.get_Methods().FirstOrDefault<MethodDefinition>((MethodDefinition method) => method.get_Name() == "Invoke");
+			if (methodDefinition == null)
 			{
 				return null;
 			}
-			stackVariable23 = new MethodReference(V_2.get_Name(), V_2.get_ReturnType(), V_0);
-			stackVariable23.get_Parameters().AddRange(V_2.get_Parameters());
-			return stackVariable23;
+			MethodReference methodReference = new MethodReference(methodDefinition.get_Name(), methodDefinition.get_ReturnType(), expressionType);
+			methodReference.get_Parameters().AddRange(methodDefinition.get_Parameters());
+			return methodReference;
 		}
 
 		private Expression GetTarget(Expression unprocessedTarget)
 		{
-			V_0 = (Expression)this.Visit(unprocessedTarget);
-			if (V_0.get_CodeNodeType() == 22 && (V_0 as LiteralExpression).get_Value() == null)
+			Expression expression = (Expression)this.Visit(unprocessedTarget);
+			if (expression.CodeNodeType == CodeNodeType.LiteralExpression && (expression as LiteralExpression).Value == null)
 			{
 				return null;
 			}
-			return V_0;
+			return expression;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
@@ -996,176 +832,182 @@ namespace Telerik.JustDecompiler.Steps
 				return body;
 			}
 			this.context = context;
-			this.typeSystem = context.get_TypeContext().get_CurrentType().get_Module().get_TypeSystem();
+			this.typeSystem = context.TypeContext.CurrentType.get_Module().get_TypeSystem();
 			this.failure = false;
-			V_0 = (BlockStatement)this.Visit(body.Clone());
-			if (this.failure || this.usedVariables.get_Count() == 0 || !this.TryRemoveUnusedVariableAssignments(V_0))
+			BlockStatement blockStatement = (BlockStatement)this.Visit(body.Clone());
+			if (this.failure || this.usedVariables.Count == 0 || !this.TryRemoveUnusedVariableAssignments(blockStatement))
 			{
 				return body;
 			}
-			V_0 = (BlockStatement)(new RebuildExpressionTreesStep.ClosureVariablesRemover(context.get_MethodContext())).Visit(V_0);
-			V_0 = (new CombinedTransformerStep()).Process(context, V_0);
-			return V_0;
+			blockStatement = (BlockStatement)(new RebuildExpressionTreesStep.ClosureVariablesRemover(context.MethodContext)).Visit(blockStatement);
+			blockStatement = (new CombinedTransformerStep()).Process(context, blockStatement);
+			return blockStatement;
 		}
 
 		private void RecordVariableAssignment(ExpressionStatement node)
 		{
-			V_0 = node.get_Expression() as BinaryExpression;
-			V_1 = (V_0.get_Left() as VariableReferenceExpression).get_Variable();
-			V_0.set_Right((Expression)this.Visit(V_0.get_Right()));
-			V_2 = V_0.get_Right().CloneExpressionOnly();
-			this.variableToValueMap.set_Item(V_1, V_2);
-			if (!this.variableToAssigingStatementsMap.TryGetValue(V_1, out V_3))
+			HashSet<ExpressionStatement> expressionStatements;
+			BinaryExpression expression = node.Expression as BinaryExpression;
+			VariableReference variable = (expression.Left as VariableReferenceExpression).Variable;
+			expression.Right = (Expression)this.Visit(expression.Right);
+			Expression expression1 = expression.Right.CloneExpressionOnly();
+			this.variableToValueMap[variable] = expression1;
+			if (!this.variableToAssigingStatementsMap.TryGetValue(variable, out expressionStatements))
 			{
-				V_3 = new HashSet<ExpressionStatement>();
-				this.variableToAssigingStatementsMap.set_Item(V_1, V_3);
+				expressionStatements = new HashSet<ExpressionStatement>();
+				this.variableToAssigingStatementsMap[variable] = expressionStatements;
 			}
-			dummyVar0 = V_3.Add(node);
-			V_4 = V_2 as ArrayCreationExpression;
-			if (V_4 == null || V_4.get_Dimensions() == null || V_4.get_Dimensions().get_Count() != 1 || V_4.get_Initializer() != null && V_4.get_Initializer().get_Expressions() != null && V_4.get_Initializer().get_Expressions().get_Count() > 0)
+			expressionStatements.Add(node);
+			ArrayCreationExpression initializerExpression = expression1 as ArrayCreationExpression;
+			if (initializerExpression == null || initializerExpression.Dimensions == null || initializerExpression.Dimensions.Count != 1 || initializerExpression.Initializer != null && initializerExpression.Initializer.Expressions != null && initializerExpression.Initializer.Expressions.Count > 0)
 			{
 				return;
 			}
-			V_4.set_Initializer(new InitializerExpression(new BlockExpression(null), 2));
-			this.variableToLastUninitializedIndex.set_Item(V_1, 0);
-			return;
+			initializerExpression.Initializer = new InitializerExpression(new BlockExpression(null), InitializerType.ArrayInitializer);
+			this.variableToLastUninitializedIndex[variable] = 0;
 		}
 
 		private PropertyDefinition ResolveProperty(MethodReference methodRef)
 		{
-			V_0 = new RebuildExpressionTreesStep.u003cu003ec__DisplayClass25_0();
-			V_0.methodDef = methodRef.Resolve();
-			if (V_0.methodDef == null || V_0.methodDef.get_DeclaringType() == null)
+			MethodDefinition methodDefinition = methodRef.Resolve();
+			if (methodDefinition == null || methodDefinition.get_DeclaringType() == null)
 			{
 				return null;
 			}
-			return V_0.methodDef.get_DeclaringType().get_Properties().FirstOrDefault<PropertyDefinition>(new Func<PropertyDefinition, bool>(V_0.u003cResolvePropertyu003eb__0));
+			return methodDefinition.get_DeclaringType().get_Properties().FirstOrDefault<PropertyDefinition>((PropertyDefinition prop) => {
+				if ((object)prop.get_GetMethod() == (object)methodDefinition)
+				{
+					return true;
+				}
+				return (object)prop.get_SetMethod() == (object)methodDefinition;
+			});
 		}
 
 		private bool TryGetFieldReference(Expression expression, out FieldReference fieldRef)
 		{
 			fieldRef = null;
-			V_0 = expression as MethodInvocationExpression;
-			if (V_0 == null || V_0.get_Arguments().get_Count() > 2 || V_0.get_Arguments().get_Count() < 1 || V_0.get_Arguments().get_Item(0).get_CodeNodeType() != 90 || V_0.get_Arguments().get_Count() == 2 && V_0.get_Arguments().get_Item(1).get_CodeNodeType() != 90 || V_0.get_MethodExpression().get_Method() == null || String.op_Inequality(V_0.get_MethodExpression().get_Method().get_Name(), "GetFieldFromHandle") || V_0.get_MethodExpression().get_Method().get_DeclaringType() == null || String.op_Inequality(V_0.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Reflection.FieldInfo"))
+			MethodInvocationExpression methodInvocationExpression = expression as MethodInvocationExpression;
+			if (methodInvocationExpression == null || methodInvocationExpression.Arguments.Count > 2 || methodInvocationExpression.Arguments.Count < 1 || methodInvocationExpression.Arguments[0].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.Arguments.Count == 2 && methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.MethodExpression.Method == null || methodInvocationExpression.MethodExpression.Method.get_Name() != "GetFieldFromHandle" || methodInvocationExpression.MethodExpression.Method.get_DeclaringType() == null || methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Reflection.FieldInfo")
 			{
 				return false;
 			}
-			fieldRef = (V_0.get_Arguments().get_Item(0) as MemberHandleExpression).get_MemberReference() as FieldReference;
+			fieldRef = (methodInvocationExpression.Arguments[0] as MemberHandleExpression).MemberReference as FieldReference;
 			return (object)fieldRef != (object)null;
 		}
 
 		private bool TryGetMethodReference(Expression expression, string castTargetTypeName, out MethodReference methodRef)
 		{
 			methodRef = null;
-			V_0 = expression as ExplicitCastExpression;
-			if (V_0 == null || V_0.get_Expression().get_CodeNodeType() != 19 || V_0.get_TargetType() == null || String.op_Inequality(V_0.get_TargetType().get_FullName(), castTargetTypeName))
+			ExplicitCastExpression explicitCastExpression = expression as ExplicitCastExpression;
+			if (explicitCastExpression == null || explicitCastExpression.Expression.CodeNodeType != CodeNodeType.MethodInvocationExpression || explicitCastExpression.TargetType == null || explicitCastExpression.TargetType.get_FullName() != castTargetTypeName)
 			{
 				return false;
 			}
-			V_1 = V_0.get_Expression() as MethodInvocationExpression;
-			if (V_1 == null || V_1.get_Arguments().get_Count() > 2 || V_1.get_Arguments().get_Count() < 1 || V_1.get_Arguments().get_Item(0).get_CodeNodeType() != 90 || V_1.get_Arguments().get_Count() == 2 && V_1.get_Arguments().get_Item(1).get_CodeNodeType() != 90 || V_1.get_MethodExpression().get_Method() == null || String.op_Inequality(V_1.get_MethodExpression().get_Method().get_Name(), "GetMethodFromHandle") || V_1.get_MethodExpression().get_Method().get_DeclaringType() == null || String.op_Inequality(V_1.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Reflection.MethodBase"))
+			MethodInvocationExpression methodInvocationExpression = explicitCastExpression.Expression as MethodInvocationExpression;
+			if (methodInvocationExpression == null || methodInvocationExpression.Arguments.Count > 2 || methodInvocationExpression.Arguments.Count < 1 || methodInvocationExpression.Arguments[0].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.Arguments.Count == 2 && methodInvocationExpression.Arguments[1].CodeNodeType != CodeNodeType.MemberHandleExpression || methodInvocationExpression.MethodExpression.Method == null || methodInvocationExpression.MethodExpression.Method.get_Name() != "GetMethodFromHandle" || methodInvocationExpression.MethodExpression.Method.get_DeclaringType() == null || methodInvocationExpression.MethodExpression.Method.get_DeclaringType().get_FullName() != "System.Reflection.MethodBase")
 			{
 				return false;
 			}
-			methodRef = (V_1.get_Arguments().get_Item(0) as MemberHandleExpression).get_MemberReference() as MethodReference;
+			methodRef = (methodInvocationExpression.Arguments[0] as MemberHandleExpression).MemberReference as MethodReference;
 			return (object)methodRef != (object)null;
 		}
 
 		private bool TryRemoveExpressionStatment(ExpressionStatement statement)
 		{
-			V_0 = statement.get_Parent() as BlockStatement;
-			if (V_0 == null)
+			BlockStatement parent = statement.Parent as BlockStatement;
+			if (parent == null)
 			{
 				return false;
 			}
-			dummyVar0 = V_0.get_Statements().Remove(statement);
+			parent.Statements.Remove(statement);
 			return true;
 		}
 
 		private bool TryRemoveUnusedVariableAssignments(BlockStatement body)
 		{
-			V_0 = new HashSet<VariableReference>();
+			bool flag;
+			bool flag1;
+			HashSet<VariableReference> variableReferences = new HashSet<VariableReference>();
 			do
 			{
-				V_1 = false;
-				V_2 = this.usedVariables.GetEnumerator();
+				flag = false;
+				HashSet<VariableReference>.Enumerator enumerator = this.usedVariables.GetEnumerator();
 				try
 				{
-					while (V_2.MoveNext())
+					while (enumerator.MoveNext())
 					{
-						V_3 = V_2.get_Current();
-						if (V_0.Contains(V_3))
+						VariableReference current = enumerator.Current;
+						if (variableReferences.Contains(current))
 						{
 							continue;
 						}
-						V_4 = this.variableToAssigingStatementsMap.get_Item(V_3);
-						if ((new RebuildExpressionTreesStep.VariableUsageFinder(V_3, V_4)).IsUsed(body))
+						HashSet<ExpressionStatement> item = this.variableToAssigingStatementsMap[current];
+						if ((new RebuildExpressionTreesStep.VariableUsageFinder(current, item)).IsUsed(body))
 						{
 							continue;
 						}
-						V_5 = V_4.GetEnumerator();
+						HashSet<ExpressionStatement>.Enumerator enumerator1 = item.GetEnumerator();
 						try
 						{
-							while (V_5.MoveNext())
+							while (enumerator1.MoveNext())
 							{
-								V_6 = V_5.get_Current();
-								if (this.TryRemoveExpressionStatment(V_6))
+								if (this.TryRemoveExpressionStatment(enumerator1.Current))
 								{
 									continue;
 								}
-								V_7 = false;
-								goto Label0;
+								flag1 = false;
+								return flag1;
 							}
 						}
 						finally
 						{
-							((IDisposable)V_5).Dispose();
+							((IDisposable)enumerator1).Dispose();
 						}
-						V_1 = true;
-						dummyVar0 = V_0.Add(V_3);
+						flag = true;
+						variableReferences.Add(current);
 					}
 					continue;
 				}
 				finally
 				{
-					((IDisposable)V_2).Dispose();
+					((IDisposable)enumerator).Dispose();
 				}
-			Label0:
-				return V_7;
+				return flag1;
 			}
-			while (V_1);
-			return this.usedVariables.get_Count() == V_0.get_Count();
+			while (flag);
+			return this.usedVariables.Count == variableReferences.Count;
 		}
 
 		private bool TryUpdateInitializer(ExpressionStatement node)
 		{
-			V_0 = node.get_Expression() as BinaryExpression;
-			V_1 = V_0.get_Left() as ArrayIndexerExpression;
-			if (V_1.get_Target() == null || V_1.get_Target().get_CodeNodeType() != 26)
+			int num;
+			BinaryExpression expression = node.Expression as BinaryExpression;
+			ArrayIndexerExpression left = expression.Left as ArrayIndexerExpression;
+			if (left.Target == null || left.Target.CodeNodeType != CodeNodeType.VariableReferenceExpression)
 			{
 				return false;
 			}
-			V_2 = (V_1.get_Target() as VariableReferenceExpression).get_Variable();
-			if (!this.variableToLastUninitializedIndex.TryGetValue(V_2, out V_3))
+			VariableReference variable = (left.Target as VariableReferenceExpression).Variable;
+			if (!this.variableToLastUninitializedIndex.TryGetValue(variable, out num))
 			{
 				return false;
 			}
-			if (V_1.get_Indices() == null || V_1.get_Indices().get_Count() != 1)
+			if (left.Indices == null || left.Indices.Count != 1)
 			{
 				return false;
 			}
-			V_4 = this.GetIntegerValue(V_1.get_Indices().get_Item(0) as LiteralExpression);
-			if (V_4 == V_3)
+			int integerValue = this.GetIntegerValue(left.Indices[0] as LiteralExpression);
+			if (integerValue == num)
 			{
-				(this.variableToValueMap.get_Item(V_2) as ArrayCreationExpression).get_Initializer().get_Expressions().Add((Expression)this.Visit(V_0.get_Right().CloneExpressionOnly()));
-				dummyVar3 = this.variableToAssigingStatementsMap.get_Item(V_2).Add(node);
-				this.variableToLastUninitializedIndex.set_Item(V_2, V_4 + 1);
+				(this.variableToValueMap[variable] as ArrayCreationExpression).Initializer.Expressions.Add((Expression)this.Visit(expression.Right.CloneExpressionOnly()));
+				this.variableToAssigingStatementsMap[variable].Add(node);
+				this.variableToLastUninitializedIndex[variable] = integerValue + 1;
 				return true;
 			}
-			dummyVar0 = this.variableToLastUninitializedIndex.Remove(V_2);
-			dummyVar1 = this.variableToValueMap.Remove(V_2);
-			dummyVar2 = this.variableToAssigingStatementsMap.Remove(V_2);
-			if (this.usedVariables.Contains(V_2))
+			this.variableToLastUninitializedIndex.Remove(variable);
+			this.variableToValueMap.Remove(variable);
+			this.variableToAssigingStatementsMap.Remove(variable);
+			if (this.usedVariables.Contains(variable))
 			{
 				this.failure = true;
 			}
@@ -1178,71 +1020,66 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				return node;
 			}
-			return this.Visit(node);
+			return base.Visit(node);
 		}
 
 		public override ICodeNode VisitBlockStatement(BlockStatement node)
 		{
 			this.variableToLastUninitializedIndex.Clear();
 			this.variableToValueMap.Clear();
-			return this.VisitBlockStatement(node);
+			return base.VisitBlockStatement(node);
 		}
 
 		public override ICodeNode VisitExpressionStatement(ExpressionStatement node)
 		{
-			if (node.get_Expression().get_CodeNodeType() == 24)
+			if (node.Expression.CodeNodeType == CodeNodeType.BinaryExpression)
 			{
-				V_0 = node.get_Expression() as BinaryExpression;
-				if (V_0.get_IsAssignmentExpression())
+				BinaryExpression expression = node.Expression as BinaryExpression;
+				if (expression.IsAssignmentExpression)
 				{
-					if (V_0.get_Left().get_CodeNodeType() == 26)
+					if (expression.Left.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 					{
 						this.RecordVariableAssignment(node);
 						return node;
 					}
-					if (V_0.get_Left().get_CodeNodeType() == 39 && this.TryUpdateInitializer(node))
+					if (expression.Left.CodeNodeType == CodeNodeType.ArrayIndexerExpression && this.TryUpdateInitializer(node))
 					{
 						return node;
 					}
 				}
 			}
-			return this.VisitExpressionStatement(node);
+			return base.VisitExpressionStatement(node);
 		}
 
 		public override ICodeNode VisitLambdaExpression(LambdaExpression node)
 		{
-			if (!node.get_IsExpressionTreeLambda())
+			if (!node.IsExpressionTreeLambda)
 			{
-				return this.VisitLambdaExpression(node);
+				return base.VisitLambdaExpression(node);
 			}
 			return node;
 		}
 
 		public override ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			this.conversionDepth = this.conversionDepth + 1;
-			this.conversionDepth = this.conversionDepth - 1;
-			stackVariable13 = this.ConvertInvocation(node);
-			if (stackVariable13 == null)
-			{
-				dummyVar0 = stackVariable13;
-				stackVariable13 = this.VisitMethodInvocationExpression(node);
-			}
-			return stackVariable13;
+			this.conversionDepth++;
+			this.conversionDepth--;
+			return this.ConvertInvocation(node) ?? base.VisitMethodInvocationExpression(node);
 		}
 
 		public override ICodeNode VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
+			Expression expression;
 			if (this.conversionDepth > 0)
 			{
-				if (this.variableToValueMap.TryGetValue(node.get_Variable(), out V_0))
+				if (this.variableToValueMap.TryGetValue(node.Variable, out expression))
 				{
-					dummyVar0 = this.usedVariables.Add(node.get_Variable());
-					return this.Visit(V_0.CloneExpressionOnly());
+					this.usedVariables.Add(node.Variable);
+					return this.Visit(expression.CloneExpressionOnly());
 				}
-				this.failure = !this.context.get_MethodContext().get_ClosureVariableToFieldValue().ContainsKey(node.get_Variable());
+				this.failure = !this.context.MethodContext.ClosureVariableToFieldValue.ContainsKey(node.Variable);
 			}
-			return this.VisitVariableReferenceExpression(node);
+			return base.VisitVariableReferenceExpression(node);
 		}
 
 		private class ClosureVariablesRemover : BaseCodeTransformer
@@ -1251,26 +1088,26 @@ namespace Telerik.JustDecompiler.Steps
 
 			public ClosureVariablesRemover(MethodSpecificContext methodContext)
 			{
-				base();
 				this.methodContext = methodContext;
-				return;
 			}
 
 			public override ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 			{
-				if (node.get_Target() != null && node.get_Target().get_CodeNodeType() == 26)
+				Dictionary<FieldDefinition, Expression> fieldDefinitions;
+				Expression expression;
+				if (node.Target != null && node.Target.CodeNodeType == CodeNodeType.VariableReferenceExpression)
 				{
-					V_0 = (node.get_Target() as VariableReferenceExpression).get_Variable();
-					if (this.methodContext.get_ClosureVariableToFieldValue().TryGetValue(V_0, out V_1))
+					VariableReference variable = (node.Target as VariableReferenceExpression).Variable;
+					if (this.methodContext.ClosureVariableToFieldValue.TryGetValue(variable, out fieldDefinitions))
 					{
-						V_2 = node.get_Field().Resolve();
-						if (V_2 != null && V_1.TryGetValue(V_2, out V_3))
+						FieldDefinition fieldDefinition = node.Field.Resolve();
+						if (fieldDefinition != null && fieldDefinitions.TryGetValue(fieldDefinition, out expression))
 						{
-							return V_3.CloneExpressionOnly();
+							return expression.CloneExpressionOnly();
 						}
 					}
 				}
-				return this.VisitFieldReferenceExpression(node);
+				return base.VisitFieldReferenceExpression(node);
 			}
 		}
 
@@ -1280,8 +1117,6 @@ namespace Telerik.JustDecompiler.Steps
 
 			public ExpressionTreesFinder()
 			{
-				base();
-				return;
 			}
 
 			public bool ContainsExpressionTree(BlockStatement body)
@@ -1295,20 +1130,18 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (!this.containsExpressionTree)
 				{
-					this.Visit(node);
+					base.Visit(node);
 				}
-				return;
 			}
 
 			public override void VisitMethodInvocationExpression(MethodInvocationExpression node)
 			{
-				if (node.get_MethodExpression() != null && node.get_MethodExpression().get_Method() != null && !node.get_MethodExpression().get_Method().get_HasThis() && String.op_Equality(node.get_MethodExpression().get_Method().get_Name(), "Lambda") && node.get_MethodExpression().get_Method().get_DeclaringType() != null && String.op_Equality(node.get_MethodExpression().get_Method().get_DeclaringType().get_FullName(), "System.Linq.Expressions.Expression"))
+				if (node.MethodExpression != null && node.MethodExpression.Method != null && !node.MethodExpression.Method.get_HasThis() && node.MethodExpression.Method.get_Name() == "Lambda" && node.MethodExpression.Method.get_DeclaringType() != null && node.MethodExpression.Method.get_DeclaringType().get_FullName() == "System.Linq.Expressions.Expression")
 				{
 					this.containsExpressionTree = true;
 					return;
 				}
-				this.VisitMethodInvocationExpression(node);
-				return;
+				base.VisitMethodInvocationExpression(node);
 			}
 		}
 
@@ -1322,10 +1155,8 @@ namespace Telerik.JustDecompiler.Steps
 
 			public VariableUsageFinder(VariableReference variable, HashSet<ExpressionStatement> assignments)
 			{
-				base();
 				this.variable = variable;
 				this.assignments = assignments;
-				return;
 			}
 
 			public bool IsUsed(BlockStatement body)
@@ -1339,27 +1170,24 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				if (!this.isUsed)
 				{
-					this.Visit(node);
+					base.Visit(node);
 				}
-				return;
 			}
 
 			public override void VisitExpressionStatement(ExpressionStatement node)
 			{
 				if (!this.assignments.Contains(node))
 				{
-					this.VisitExpressionStatement(node);
+					base.VisitExpressionStatement(node);
 				}
-				return;
 			}
 
 			public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 			{
-				if ((object)node.get_Variable() == (object)this.variable)
+				if ((object)node.Variable == (object)this.variable)
 				{
 					this.isUsed = true;
 				}
-				return;
 			}
 		}
 	}

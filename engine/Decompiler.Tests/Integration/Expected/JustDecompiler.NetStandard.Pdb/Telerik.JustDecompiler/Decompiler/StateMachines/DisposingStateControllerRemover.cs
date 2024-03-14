@@ -1,6 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
+using System.Collections.Generic;
 using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 
@@ -12,88 +13,84 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private VariableReference returnFlagVariable;
 
-		public DisposingStateControllerRemover(MethodSpecificContext methodContext, FieldDefinition stateField, FieldDefinition disposingField)
+		public DisposingStateControllerRemover(MethodSpecificContext methodContext, FieldDefinition stateField, FieldDefinition disposingField) : base(methodContext, stateField)
 		{
-			base(methodContext, stateField);
 			this.disposingField = disposingField;
-			return;
 		}
 
 		private bool CheckAndSaveReturnFlagVariable(VariableReference foundFlagVariable)
 		{
-			if (this.returnFlagVariable != null)
-			{
-				if ((object)this.returnFlagVariable != (object)foundFlagVariable)
-				{
-					return false;
-				}
-			}
-			else
+			if (this.returnFlagVariable == null)
 			{
 				this.returnFlagVariable = foundFlagVariable;
+			}
+			else if ((object)this.returnFlagVariable != (object)foundFlagVariable)
+			{
+				return false;
 			}
 			return true;
 		}
 
 		private bool IsDisposingBlock(InstructionBlock theBlock)
 		{
-			V_0 = theBlock.get_First();
-			if (V_0.get_OpCode().get_Code() != 2 || (object)V_0 == (object)theBlock.get_Last())
+			Instruction first = theBlock.First;
+			if (first.get_OpCode().get_Code() != 2 || (object)first == (object)theBlock.Last)
 			{
 				return false;
 			}
-			V_0 = V_0.get_Next();
-			if (V_0.get_OpCode().get_Code() != 120 || (object)((FieldReference)V_0.get_Operand()).Resolve() != (object)this.disposingField || (object)V_0 == (object)theBlock.get_Last())
+			first = first.get_Next();
+			if (first.get_OpCode().get_Code() != 120 || (object)((FieldReference)first.get_Operand()).Resolve() != (object)this.disposingField || (object)first == (object)theBlock.Last)
 			{
 				return false;
 			}
-			V_1 = theBlock.get_Last();
-			if (V_1.get_OpCode().get_Code() == 56 || V_1.get_OpCode().get_Code() == 43 || V_1.get_OpCode().get_Code() == 57)
+			Instruction last = theBlock.Last;
+			if (last.get_OpCode().get_Code() == 56 || last.get_OpCode().get_Code() == 43 || last.get_OpCode().get_Code() == 57)
 			{
 				return true;
 			}
-			return V_1.get_OpCode().get_Code() == 44;
+			return last.get_OpCode().get_Code() == 44;
 		}
 
 		private bool IsFalseReturnBlock(InstructionBlock theBlock)
 		{
-			V_0 = theBlock.get_First();
-			if (V_0.get_OpCode().get_Code() != 22 || (object)V_0 == (object)theBlock.get_Last())
+			VariableReference variableReference;
+			Instruction first = theBlock.First;
+			if (first.get_OpCode().get_Code() != 22 || (object)first == (object)theBlock.Last)
 			{
 				return false;
 			}
-			V_0 = V_0.get_Next();
-			if (!this.TryGetVariableFromInstruction(V_0, out V_1) || (object)V_0 == (object)theBlock.get_Last() || !this.CheckAndSaveReturnFlagVariable(V_1))
+			first = first.get_Next();
+			if (!base.TryGetVariableFromInstruction(first, out variableReference) || (object)first == (object)theBlock.Last || !this.CheckAndSaveReturnFlagVariable(variableReference))
 			{
 				return false;
 			}
-			V_0 = V_0.get_Next();
-			return StateMachineUtilities.IsUnconditionalBranch(V_0);
+			first = first.get_Next();
+			return StateMachineUtilities.IsUnconditionalBranch(first);
 		}
 
 		protected override StateControllerRemover.ControllerTraversalSearchResult TryGetStateEntry(InstructionBlock theBlock, out InstructionBlock actualSuccessor)
 		{
-			actualSuccessor = this.SkipBranchChain(theBlock);
+			actualSuccessor = base.SkipBranchChain(theBlock);
 			if (!this.IsDisposingBlock(actualSuccessor))
 			{
-				return 2;
+				return StateControllerRemover.ControllerTraversalSearchResult.FoundControllerCandidate;
 			}
-			dummyVar0 = this.toBeRemoved.Add(actualSuccessor);
-			if (!this.IsFalseReturnBlock(actualSuccessor.get_Successors()[1]))
+			this.toBeRemoved.Add(actualSuccessor);
+			if (!this.IsFalseReturnBlock(actualSuccessor.Successors[1]))
 			{
-				if (!this.IsFalseReturnBlock(actualSuccessor.get_Successors()[0]))
+				if (!this.IsFalseReturnBlock(actualSuccessor.Successors[0]))
 				{
-					return 0;
+					return StateControllerRemover.ControllerTraversalSearchResult.PatternFailed;
 				}
-				dummyVar2 = this.toBeRemoved.Add(actualSuccessor.get_Successors()[0]);
-				actualSuccessor = actualSuccessor.get_Successors()[1];
+				this.toBeRemoved.Add(actualSuccessor.Successors[0]);
+				actualSuccessor = actualSuccessor.Successors[1];
 			}
 			else
 			{
-				dummyVar1 = this.toBeRemoved.Add(actualSuccessor.get_Successors()[1]);
-				actualSuccessor = actualSuccessor.get_Successors()[0];
+				this.toBeRemoved.Add(actualSuccessor.Successors[1]);
+				actualSuccessor = actualSuccessor.Successors[0];
 			}
-			return 1;
+			return StateControllerRemover.ControllerTraversalSearchResult.FoundStateEntry;
 		}
 	}
 }

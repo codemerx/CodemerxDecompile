@@ -1,7 +1,9 @@
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler.LogicFlow;
+using Telerik.JustDecompiler.Decompiler.LogicFlow.Common;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.Conditions;
 using Telerik.JustDecompiler.Decompiler.LogicFlow.DFST;
 
@@ -17,152 +19,106 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.FollowNodes
 
 		public FollowNodeDeterminator(TypeSystem typeSystem)
 		{
-			base();
 			this.typeSystem = typeSystem;
-			return;
 		}
 
 		private void BuildAdjacencyMatrix(DFSTree dfsTree)
 		{
-			stackVariable2 = this.GetForwardFlowEdges(dfsTree);
+			DFSTEdge[] forwardFlowEdges = this.GetForwardFlowEdges(dfsTree);
 			this.adjacencyMatrix = new int[(int)this.orderedVertexArray.Length, (int)this.orderedVertexArray.Length];
-			V_0 = stackVariable2;
-			V_1 = 0;
-			while (V_1 < (int)V_0.Length)
+			DFSTEdge[] dFSTEdgeArray = forwardFlowEdges;
+			for (int i = 0; i < (int)dFSTEdgeArray.Length; i++)
 			{
-				V_2 = V_0[V_1];
-				V_3 = V_2.get_Start().get_ReversePostOrderIndex();
-				V_4 = V_2.get_End().get_ReversePostOrderIndex();
-				if (V_3 != V_4)
+				DFSTEdge dFSTEdge = dFSTEdgeArray[i];
+				int reversePostOrderIndex = dFSTEdge.Start.ReversePostOrderIndex;
+				int num = dFSTEdge.End.ReversePostOrderIndex;
+				if (reversePostOrderIndex != num)
 				{
-					V_5 = this.GetWeight(V_2.get_Start().get_Construct() as ILogicalConstruct, V_2.get_End().get_Construct() as ILogicalConstruct);
-					this.adjacencyMatrix[V_3, V_4] = V_5;
+					int weight = this.GetWeight(dFSTEdge.Start.Construct as ILogicalConstruct, dFSTEdge.End.Construct as ILogicalConstruct);
+					this.adjacencyMatrix[reversePostOrderIndex, num] = weight;
 				}
-				V_1 = V_1 + 1;
 			}
-			return;
 		}
 
 		private void DetermineFollowNodesInSubGraph(ILogicalConstruct theGraph)
 		{
 			this.GetVerticesAndAdjacencyMatrix(theGraph);
-			V_0 = MaxWeightDisjointPathsFinder.GetOptimalEdgesInDAG(this.adjacencyMatrix).GetEnumerator();
-			try
+			foreach (KeyValuePair<int, int> optimalEdgesInDAG in MaxWeightDisjointPathsFinder.GetOptimalEdgesInDAG(this.adjacencyMatrix))
 			{
-				while (V_0.MoveNext())
+				this.orderedVertexArray[optimalEdgesInDAG.Key].CFGFollowNode = this.orderedVertexArray[optimalEdgesInDAG.Value].FirstBlock;
+				if (!(this.orderedVertexArray[optimalEdgesInDAG.Key] is ConditionLogicalConstruct))
 				{
-					V_1 = V_0.get_Current();
-					this.orderedVertexArray[V_1.get_Key()].set_CFGFollowNode(this.orderedVertexArray[V_1.get_Value()].get_FirstBlock());
-					if (this.orderedVertexArray[V_1.get_Key()] as ConditionLogicalConstruct == null)
-					{
-						continue;
-					}
-					V_2 = this.orderedVertexArray[V_1.get_Key()] as ConditionLogicalConstruct;
-					if (V_2.get_CFGFollowNode() != V_2.get_TrueCFGSuccessor())
-					{
-						continue;
-					}
-					V_2.Negate(this.typeSystem);
+					continue;
 				}
+				ConditionLogicalConstruct conditionLogicalConstruct = this.orderedVertexArray[optimalEdgesInDAG.Key] as ConditionLogicalConstruct;
+				if (conditionLogicalConstruct.CFGFollowNode != conditionLogicalConstruct.TrueCFGSuccessor)
+				{
+					continue;
+				}
+				conditionLogicalConstruct.Negate(this.typeSystem);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void FillEdgesArray(DFSTEdge[] edgeArray, HashSet<DFSTEdge> edgeSet, ref int index)
 		{
-			V_0 = edgeSet.GetEnumerator();
-			try
+			foreach (DFSTEdge dFSTEdge in edgeSet)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					V_2 = index;
-					index = V_2 + 1;
-					edgeArray[V_2] = V_1;
-				}
+				int num = index;
+				index = num + 1;
+				edgeArray[num] = dFSTEdge;
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private DFSTEdge[] GetForwardFlowEdges(DFSTree dfsTree)
 		{
-			V_0 = new DFSTEdge[dfsTree.get_TreeEdges().get_Count() + dfsTree.get_ForwardEdges().get_Count() + dfsTree.get_CrossEdges().get_Count()];
-			V_1 = 0;
-			this.FillEdgesArray(V_0, dfsTree.get_TreeEdges(), ref V_1);
-			this.FillEdgesArray(V_0, dfsTree.get_ForwardEdges(), ref V_1);
-			this.FillEdgesArray(V_0, dfsTree.get_CrossEdges(), ref V_1);
-			return V_0;
+			DFSTEdge[] dFSTEdgeArray = new DFSTEdge[dfsTree.TreeEdges.Count + dfsTree.ForwardEdges.Count + dfsTree.CrossEdges.Count];
+			int num = 0;
+			this.FillEdgesArray(dFSTEdgeArray, dfsTree.TreeEdges, ref num);
+			this.FillEdgesArray(dFSTEdgeArray, dfsTree.ForwardEdges, ref num);
+			this.FillEdgesArray(dFSTEdgeArray, dfsTree.CrossEdges, ref num);
+			return dFSTEdgeArray;
 		}
 
 		private void GetVerticesAndAdjacencyMatrix(ILogicalConstruct graph)
 		{
-			V_0 = DFSTBuilder.BuildTree(graph);
-			this.orderedVertexArray = new ILogicalConstruct[V_0.get_ReversePostOrder().get_Count()];
-			V_1 = 0;
-			while (V_1 < (int)this.orderedVertexArray.Length)
+			DFSTree dFSTree = DFSTBuilder.BuildTree(graph);
+			this.orderedVertexArray = new ILogicalConstruct[dFSTree.ReversePostOrder.Count];
+			for (int i = 0; i < (int)this.orderedVertexArray.Length; i++)
 			{
-				this.orderedVertexArray[V_1] = V_0.get_ReversePostOrder().get_Item(V_1).get_Construct() as ILogicalConstruct;
-				V_1 = V_1 + 1;
+				this.orderedVertexArray[i] = dFSTree.ReversePostOrder[i].Construct as ILogicalConstruct;
 			}
-			this.BuildAdjacencyMatrix(V_0);
-			return;
+			this.BuildAdjacencyMatrix(dFSTree);
 		}
 
 		private int GetWeight(ILogicalConstruct start, ILogicalConstruct end)
 		{
-			V_0 = 0;
-			V_1 = end.get_FirstBlock();
-			V_2 = start.get_CFGBlocks().GetEnumerator();
-			try
+			int num = 0;
+			CFGBlockLogicalConstruct firstBlock = end.FirstBlock;
+			foreach (CFGBlockLogicalConstruct cFGBlock in start.CFGBlocks)
 			{
-				while (V_2.MoveNext())
+				if (!cFGBlock.CFGSuccessors.Contains(firstBlock))
 				{
-					if (!V_2.get_Current().get_CFGSuccessors().Contains(V_1))
-					{
-						continue;
-					}
-					V_0 = V_0 + 1;
+					continue;
 				}
+				num++;
 			}
-			finally
-			{
-				((IDisposable)V_2).Dispose();
-			}
-			return V_0;
+			return num;
 		}
 
 		public void ProcessConstruct(ILogicalConstruct theConstruct)
 		{
-			if (theConstruct as CFGBlockLogicalConstruct != null || theConstruct as ConditionLogicalConstruct != null)
+			if (theConstruct is CFGBlockLogicalConstruct || theConstruct is ConditionLogicalConstruct)
 			{
 				return;
 			}
-			if (theConstruct as BlockLogicalConstruct != null)
+			if (theConstruct is BlockLogicalConstruct)
 			{
 				this.DetermineFollowNodesInSubGraph(theConstruct);
 			}
-			V_0 = theConstruct.get_Children().GetEnumerator();
-			try
+			foreach (ILogicalConstruct child in theConstruct.Children)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = (ILogicalConstruct)V_0.get_Current();
-					this.ProcessConstruct(V_1);
-				}
+				this.ProcessConstruct(child);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 	}
 }

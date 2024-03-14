@@ -152,14 +152,10 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeFields
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(MixAttributeField model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixAttributeField model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 	}
 }

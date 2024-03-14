@@ -1,6 +1,9 @@
+using Mono.Cecil.Cil;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Telerik.JustDecompiler.Ast.Expressions;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
@@ -13,122 +16,95 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		public AssignmentAnalyzer(BaseUsageFinder visitor, ExpressionDecompilerData expressionsData)
 		{
-			base();
 			this.visitor = visitor;
 			this.expressionsData = expressionsData;
-			return;
 		}
 
 		public AssignmentType CheckAssignmentType(AssignmentFlowNode entryNode)
 		{
-			V_0 = 0;
-			V_1 = new Queue<AssignmentFlowNode>();
+			AssignmentType assignmentType;
+			int num = 0;
+			Queue<AssignmentFlowNode> assignmentFlowNodes = new Queue<AssignmentFlowNode>();
 			this.CheckForAssignment(entryNode);
-			if (entryNode.get_NodeState() == 2)
+			if (entryNode.NodeState == AssignmentNodeState.ContainsAssignment)
 			{
-				return 2;
+				return AssignmentType.SingleAssignment;
 			}
-			if (entryNode.get_NodeState() == 3)
+			if (entryNode.NodeState == AssignmentNodeState.ContainsUsage)
 			{
-				return 1;
+				return AssignmentType.NotAssigned;
 			}
-			V_1.Enqueue(entryNode);
-			while (V_1.get_Count() > 0)
+			assignmentFlowNodes.Enqueue(entryNode);
+			while (assignmentFlowNodes.Count > 0)
 			{
-				V_2 = V_1.Dequeue().get_Successors().GetEnumerator();
-				try
+				using (IEnumerator<AssignmentFlowNode> enumerator = assignmentFlowNodes.Dequeue().Successors.GetEnumerator())
 				{
-					while (V_2.MoveNext())
+					while (enumerator.MoveNext())
 					{
-						V_3 = V_2.get_Current();
-						if (V_3.get_NodeState() != AssignmentNodeState.Unknown)
+						AssignmentFlowNode current = enumerator.Current;
+						if (current.NodeState != AssignmentNodeState.Unknown)
 						{
 							continue;
 						}
-						this.CheckForAssignment(V_3);
-						if (V_3.get_NodeState() != 1)
+						this.CheckForAssignment(current);
+						if (current.NodeState == AssignmentNodeState.NotAssigned)
 						{
-							if (V_3.get_NodeState() != 2)
+							assignmentFlowNodes.Enqueue(current);
+						}
+						else if (current.NodeState != AssignmentNodeState.ContainsAssignment)
+						{
+							if (current.NodeState != AssignmentNodeState.ContainsUsage)
 							{
-								if (V_3.get_NodeState() != 3)
-								{
-									continue;
-								}
-								V_4 = 1;
-								goto Label0;
+								continue;
 							}
-							else
-							{
-								V_0 = V_0 + 1;
-							}
+							assignmentType = AssignmentType.NotAssigned;
+							return assignmentType;
 						}
 						else
 						{
-							V_1.Enqueue(V_3);
+							num++;
 						}
 					}
 					continue;
 				}
-				finally
-				{
-					if (V_2 != null)
-					{
-						V_2.Dispose();
-					}
-				}
-			Label0:
-				return V_4;
+				return assignmentType;
 			}
-			if (V_0 == 0)
+			if (num == 0)
 			{
-				return 0;
+				return AssignmentType.NotUsed;
 			}
-			if (V_0 != 1)
+			if (num != 1)
 			{
-				return 3;
+				return AssignmentType.MultipleAssignments;
 			}
-			return 2;
+			return AssignmentType.SingleAssignment;
 		}
 
 		private void CheckForAssignment(AssignmentFlowNode node)
 		{
-			if (node.get_NodeState() != AssignmentNodeState.Unknown)
+			if (node.NodeState != AssignmentNodeState.Unknown)
 			{
 				return;
 			}
-			V_0 = this.expressionsData.get_BlockExpressions().get_Item(node.get_CFGBlock().get_First().get_Offset()).GetEnumerator();
-			try
+			foreach (Expression item in this.expressionsData.BlockExpressions[node.CFGBlock.First.get_Offset()])
 			{
-				while (V_0.MoveNext())
+				UsageFinderSearchResult usageFinderSearchResult = this.visitor.SearchForUsage(item);
+				if (usageFinderSearchResult != UsageFinderSearchResult.Assigned)
 				{
-					V_1 = V_0.get_Current();
-					V_2 = this.visitor.SearchForUsage(V_1);
-					if (V_2 != 1)
+					if (usageFinderSearchResult != UsageFinderSearchResult.Used)
 					{
-						if (V_2 != 2)
-						{
-							continue;
-						}
-						node.set_NodeState(3);
-						goto Label0;
+						continue;
 					}
-					else
-					{
-						node.set_NodeState(2);
-						goto Label0;
-					}
+					node.NodeState = AssignmentNodeState.ContainsUsage;
+					return;
+				}
+				else
+				{
+					node.NodeState = AssignmentNodeState.ContainsAssignment;
+					return;
 				}
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			node.set_NodeState(1);
-		Label0:
-			return;
+			node.NodeState = AssignmentNodeState.NotAssigned;
 		}
 	}
 }

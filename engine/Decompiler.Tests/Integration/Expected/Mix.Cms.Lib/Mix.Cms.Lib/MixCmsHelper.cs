@@ -1,16 +1,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Repositories;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
 using Mix.Cms.Lib.ViewModels.MixAttributeSetDatas;
 using Mix.Cms.Lib.ViewModels.MixModulePosts;
 using Mix.Cms.Lib.ViewModels.MixModules;
 using Mix.Cms.Lib.ViewModels.MixPages;
+using Mix.Cms.Lib.ViewModels.MixPosts;
 using Mix.Cms.Lib.ViewModels.MixTemplates;
+using Mix.Common.Helper;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Mix.Heart.Enums;
+using Mix.Heart.Helpers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -29,57 +36,105 @@ namespace Mix.Cms.Lib
 	{
 		public MixCmsHelper()
 		{
-			base();
-			return;
 		}
 
 		public static bool CheckIsPrice(string number)
 		{
+			double num;
 			if (number == null)
 			{
 				return false;
 			}
 			number = number.Replace(",", "");
-			return double.TryParse(number, out V_0);
+			return double.TryParse(number, out num);
 		}
 
 		public static Expression<Func<TModel, bool>> FilterObjectSet<TModel, T>(string propName, T data2, MixEnums.CompareType filterType)
 		{
-			V_0 = Type.GetTypeFromHandle(// 
-			// Current member / type: System.Linq.Expressions.Expression`1<System.Func`2<TModel,System.Boolean>> Mix.Cms.Lib.MixCmsHelper::FilterObjectSet(System.String,T,Mix.Cms.Lib.MixEnums/CompareType)
-			// Exception in: System.Linq.Expressions.Expression<System.Func<TModel,System.Boolean>> FilterObjectSet(System.String,T,Mix.Cms.Lib.MixEnums/CompareType)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
-
-		public static string FormatPrice(double? price, string oldPrice = "0")
-		{
-			if (price.get_HasValue())
+			Type fieldType;
+			Expression expression;
+			Type type = typeof(TModel);
+			ParameterExpression parameterExpression = Expression.Parameter(type, "model");
+			FieldInfo field = type.GetField(propName);
+			if (field != null)
 			{
-				V_2 = price.GetValueOrDefault();
-				stackVariable5 = V_2.ToString();
+				fieldType = field.FieldType;
+				expression = Expression.Field(parameterExpression, field);
 			}
 			else
 			{
-				stackVariable5 = null;
+				PropertyInfo property = type.GetProperty(propName);
+				if (property == null)
+				{
+					throw new Exception();
+				}
+				fieldType = property.PropertyType;
+				expression = Expression.Property(parameterExpression, property);
 			}
-			V_0 = stackVariable5;
-			if (string.IsNullOrEmpty(V_0))
+			BinaryExpression binaryExpression = null;
+			switch (filterType)
+			{
+				case MixEnums.CompareType.Eq:
+				{
+					binaryExpression = Expression.Equal(expression, Expression.Constant(data2, fieldType));
+					break;
+				}
+				case MixEnums.CompareType.Lt:
+				{
+					binaryExpression = Expression.LessThan(expression, Expression.Constant(data2, fieldType));
+					break;
+				}
+				case MixEnums.CompareType.Gt:
+				{
+					binaryExpression = Expression.GreaterThan(expression, Expression.Constant(data2, fieldType));
+					break;
+				}
+				case MixEnums.CompareType.Lte:
+				{
+					binaryExpression = Expression.LessThanOrEqual(expression, Expression.Constant(data2, fieldType));
+					break;
+				}
+				case MixEnums.CompareType.Gte:
+				{
+					binaryExpression = Expression.GreaterThanOrEqual(expression, Expression.Constant(data2, fieldType));
+					break;
+				}
+				case MixEnums.CompareType.In:
+				{
+					MethodInfo method = typeof(string).GetMethod("Contains");
+					return Expression.Lambda<Func<TModel, bool>>(Expression.Call(parameterExpression, method, new Expression[] { Expression.Constant(data2, typeof(string)) }), new ParameterExpression[] { parameterExpression });
+				}
+			}
+			return Expression.Lambda<Func<TModel, bool>>(binaryExpression, new ParameterExpression[] { parameterExpression });
+		}
+
+		public static string FormatPrice(double? price, string oldPrice = "0")
+		{
+			string str;
+			if (price.HasValue)
+			{
+				str = price.GetValueOrDefault().ToString();
+			}
+			else
+			{
+				str = null;
+			}
+			string str1 = str;
+			if (string.IsNullOrEmpty(str1))
 			{
 				return "0";
 			}
-			V_1 = V_0.Replace(",", string.Empty);
-			if (!MixCmsHelper.CheckIsPrice(V_1))
+			string str2 = str1.Replace(",", string.Empty);
+			if (!MixCmsHelper.CheckIsPrice(str2))
 			{
 				return oldPrice;
 			}
-			V_3 = new Regex("(\\d+)(\\d{3})");
-			while (V_3.IsMatch(V_1))
+			Regex regex = new Regex("(\\d+)(\\d{3})");
+			while (regex.IsMatch(str2))
 			{
-				V_1 = V_3.Replace(V_1, "$1,$2");
+				str2 = regex.Replace(str2, "$1,$2");
 			}
-			return V_1;
+			return str2;
 		}
 
 		public static string GetAssetFolder(string culture)
@@ -89,134 +144,153 @@ namespace Mix.Cms.Lib
 
 		public static List<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> GetCategory(IUrlHelper Url, string culture, MixEnums.MixPageType cateType, string activePath = "")
 		{
-			V_0 = new MixCmsHelper.u003cu003ec__DisplayClass3_0();
-			V_0.culture = culture;
-			V_0.cateType = cateType;
-			stackVariable5 = ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel>.Repository;
-			V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Collections.Generic.List`1<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> Mix.Cms.Lib.MixCmsHelper::GetCategory(Microsoft.AspNetCore.Mvc.IUrlHelper,System.String,Mix.Cms.Lib.MixEnums/MixPageType,System.String)
-			// Exception in: System.Collections.Generic.List<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> GetCategory(Microsoft.AspNetCore.Mvc.IUrlHelper,System.String,Mix.Cms.Lib.MixEnums/MixPageType,System.String)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			MixCmsHelper.u003cu003ec__DisplayClass3_0 variable = null;
+			bool flag;
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel>.Repository;
+			ParameterExpression parameterExpression = Expression.Parameter(typeof(MixPage), "c");
+			List<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel> data = repository.GetModelListBy(Expression.Lambda<Func<MixPage, bool>>(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPage).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass3_0)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass3_0).GetField("culture").FieldHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixPage).GetMethod("get_Type").MethodHandle)), Expression.Call(Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass3_0)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass3_0).GetField("cateType").FieldHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(object).GetMethod("ToString").MethodHandle), Array.Empty<Expression>()))), new ParameterExpression[] { parameterExpression }), null, null).get_Data() ?? new List<Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel>();
+			activePath = activePath.ToLower();
+			foreach (Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel datum in data)
+			{
+				MixEnums.MixPageType type = datum.Type;
+				datum.DetailsUrl = UrlHelperExtensions.RouteUrl(Url, "Alias", new { culture = culture, seoName = datum.SeoName });
+				Mix.Cms.Lib.ViewModels.MixPages.ReadListItemViewModel readListItemViewModel = datum;
+				if (datum.DetailsUrl == activePath)
+				{
+					flag = true;
+				}
+				else
+				{
+					flag = (datum.Type != MixEnums.MixPageType.Home ? false : activePath == string.Format("/{0}/home", culture));
+				}
+				readListItemViewModel.IsActived = flag;
+			}
+			return data;
+		}
 
 		public static async Task<RepositoryResponse<PaginationModel<TView>>> GetListPostByAddictionalField<TView>(string fieldName, object fieldValue, string culture, MixEnums.MixDataType dataType, MixEnums.CompareType filterType = 1, string orderByPropertyName = null, MixHeartEnums.DisplayDirection direction = 0, int? pageSize = null, int? pageIndex = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		where TView : ViewModelBase<MixCmsContext, MixPost, TView>
 		{
-			V_0.fieldName = fieldName;
-			V_0.fieldValue = fieldValue;
-			V_0.culture = culture;
-			V_0.dataType = dataType;
-			V_0.filterType = filterType;
-			V_0.orderByPropertyName = orderByPropertyName;
-			V_0.direction = direction;
-			V_0.pageSize = pageSize;
-			V_0.pageIndex = pageIndex;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<PaginationModel<TView>>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView>>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView> variable = new MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView>();
+			variable.fieldName = fieldName;
+			variable.fieldValue = fieldValue;
+			variable.culture = culture;
+			variable.dataType = dataType;
+			variable.filterType = filterType;
+			variable.orderByPropertyName = orderByPropertyName;
+			variable.direction = direction;
+			variable.pageSize = pageSize;
+			variable.pageIndex = pageIndex;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<PaginationModel<TView>>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<MixCmsHelper.u003cGetListPostByAddictionalFieldu003ed__15<TView>>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		public static Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel GetModule(string name, string culture)
 		{
-			V_0 = new MixCmsHelper.u003cu003ec__DisplayClass11_0();
-			V_0.name = name;
-			V_0.culture = culture;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel Mix.Cms.Lib.MixCmsHelper::GetModule(System.String,System.String)
-			// Exception in: Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel GetModule(System.String,System.String)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			int? nullable = null;
+			int? nullable1 = nullable;
+			nullable = null;
+			return Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.GetBy((MixModule m) => m.Name == name && m.Specificulture == culture, nullable1, nullable, 0, null, null).get_Data();
+		}
 
 		public static Task<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> GetModuleAsync(string name, string culture, IUrlHelper url = null)
 		{
-			V_0 = new MixCmsHelper.u003cu003ec__DisplayClass9_0();
-			V_0.name = name;
-			V_0.culture = culture;
-			V_0.url = url;
-			stackVariable8 = new string[5];
-			stackVariable8[0] = "vm_";
-			stackVariable8[1] = V_0.culture;
-			stackVariable8[2] = "_module_";
-			stackVariable8[3] = V_0.name;
-			stackVariable8[4] = "_mvc";
-			dummyVar0 = string.Concat(stackVariable8);
-			V_1 = new RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>();
-			if (V_1 == null || !V_1.get_IsSucceed())
+			string.Concat(new string[] { "vm_", culture, "_module_", name, "_mvc" });
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> repositoryResponse = new RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>();
+			if (repositoryResponse == null || !repositoryResponse.get_IsSucceed())
 			{
-				V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: System.Threading.Tasks.Task`1<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> Mix.Cms.Lib.MixCmsHelper::GetModuleAsync(System.String,System.String,Microsoft.AspNetCore.Mvc.IUrlHelper)
-				// Exception in: System.Threading.Tasks.Task<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel> GetModuleAsync(System.String,System.String,Microsoft.AspNetCore.Mvc.IUrlHelper)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				int? nullable = null;
+				int? nullable1 = nullable;
+				nullable = null;
+				repositoryResponse = Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel.GetBy((MixModule m) => m.Name == name && m.Specificulture == culture, nullable1, nullable, 0, null, null);
+			}
+			if (repositoryResponse.get_IsSucceed() && url != null && repositoryResponse.get_Data().Posts != null)
+			{
+				repositoryResponse.get_Data().Posts.get_Items().ForEach((Mix.Cms.Lib.ViewModels.MixModulePosts.ReadViewModel a) => a.Post.DetailsUrl = UrlHelperExtensions.RouteUrl(url, "Post", new { id = a.PostId, seoName = a.Post.SeoName }));
+			}
+			return Task.FromResult<Mix.Cms.Lib.ViewModels.MixModules.ReadMvcViewModel>(repositoryResponse.get_Data());
+		}
 
 		public static async Task<Navigation> GetNavigation(string name, string culture, IUrlHelper Url)
 		{
-			V_0.name = name;
-			V_0.culture = culture;
-			V_0.Url = Url;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<Navigation>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<MixCmsHelper.u003cGetNavigationu003ed__14>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Navigation nav;
+			bool flag;
+			NavigationViewModel navigationViewModel = await Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.Helper.FilterByKeywordAsync<NavigationViewModel>(culture, "sys_navigation", "equal", "name", name, null, null).get_Data().FirstOrDefault<NavigationViewModel>();
+			if (navigationViewModel != null)
+			{
+				nav = navigationViewModel.Nav;
+			}
+			else
+			{
+				nav = null;
+			}
+			Navigation navigation = nav;
+			string path = Url.get_ActionContext().get_HttpContext().get_Request().get_Path();
+			if (navigation != null && !string.IsNullOrEmpty(path))
+			{
+				foreach (MenuItem menuItem in navigation.MenuItems)
+				{
+					menuItem.IsActive = menuItem.Uri == path;
+					foreach (MenuItem uri in menuItem.MenuItems)
+					{
+						uri.IsActive = uri.Uri == path;
+						MenuItem menuItem1 = menuItem;
+						flag = (menuItem.IsActive ? true : uri.IsActive);
+						menuItem1.IsActive = flag;
+					}
+				}
+			}
+			return navigation;
 		}
 
 		public static Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel GetPage(int id, string culture)
 		{
-			V_0 = new MixCmsHelper.u003cu003ec__DisplayClass12_0();
-			V_0.id = id;
-			V_0.culture = culture;
-			stackVariable5 = ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel Mix.Cms.Lib.MixCmsHelper::GetPage(System.Int32,System.String)
-			// Exception in: Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel GetPage(System.Int32,System.String)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			return ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel>.Repository.GetSingleModel((MixPage m) => m.Id == id && m.Specificulture == culture, null, null).get_Data();
+		}
 
 		public static async Task<Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel> GetPageAsync(int id, string culture)
 		{
-			V_0.id = id;
-			V_0.culture = culture;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<MixCmsHelper.u003cGetPageAsyncu003ed__10>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel> singleModelAsync = null;
+			if (singleModelAsync == null)
+			{
+				DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixPage, Mix.Cms.Lib.ViewModels.MixPages.ReadMvcViewModel>.Repository;
+				singleModelAsync = await repository.GetSingleModelAsync((MixPage m) => m.Id == id && m.Specificulture == culture, null, null);
+			}
+			return singleModelAsync.get_Data();
 		}
 
 		public static string GetRouterUrl(object routeValues, HttpRequest request, IUrlHelper Url)
 		{
-			V_0 = "";
-			V_1 = routeValues.GetType().GetProperties();
-			V_2 = 0;
-			while (V_2 < (int)V_1.Length)
+			string str = "";
+			PropertyInfo[] properties = routeValues.GetType().GetProperties();
+			for (int i = 0; i < (int)properties.Length; i++)
 			{
-				stackVariable11 = V_1[V_2];
-				dummyVar0 = stackVariable11.get_Name();
-				V_3 = stackVariable11.GetValue(routeValues, null).ToString();
-				V_0 = string.Concat(V_0, "/", V_3);
-				V_2 = V_2 + 1;
+				PropertyInfo propertyInfo = properties[i];
+				string name = propertyInfo.Name;
+				string str1 = propertyInfo.GetValue(routeValues, null).ToString();
+				str = string.Concat(str, "/", str1);
 			}
-			return string.Format("{0}://{1}{2}", request.get_Scheme(), request.get_Host(), V_0);
+			return string.Format("{0}://{1}{2}", request.get_Scheme(), request.get_Host(), str);
 		}
 
 		public static async Task<Mix.Cms.Lib.ViewModels.MixTemplates.ReadViewModel> GetTemplateByPath(string themeName, string templatePath)
 		{
-			V_0.themeName = themeName;
-			V_0.templatePath = templatePath;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<Mix.Cms.Lib.ViewModels.MixTemplates.ReadViewModel>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<MixCmsHelper.u003cGetTemplateByPathu003ed__13>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			MixCmsHelper.u003cu003ec__DisplayClass13_0 variable = null;
+			string[] strArrays = templatePath.Split('/', StringSplitOptions.None);
+			if (strArrays[1].IndexOf('.') > 0)
+			{
+				strArrays[1] = strArrays[1].Substring(0, strArrays[1].IndexOf('.'));
+			}
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixTemplate, Mix.Cms.Lib.ViewModels.MixTemplates.ReadViewModel>.Repository;
+			ParameterExpression parameterExpression = Expression.Parameter(typeof(MixTemplate), "m");
+			BinaryExpression binaryExpression = Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixTemplate).GetMethod("get_ThemeName").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass13_0)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass13_0).GetField("themeName").FieldHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixTemplate).GetMethod("get_FolderType").MethodHandle)), Expression.ArrayIndex(Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass13_0)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass13_0).GetField("tmp").FieldHandle)), Expression.Constant(0, typeof(int))))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixTemplate).GetMethod("get_FileName").MethodHandle)), Expression.ArrayIndex(Expression.Field(Expression.Constant(variable, typeof(MixCmsHelper.u003cu003ec__DisplayClass13_0)), FieldInfo.GetFieldFromHandle(typeof(MixCmsHelper.u003cu003ec__DisplayClass13_0).GetField("tmp").FieldHandle)), Expression.Constant(1, typeof(int)))));
+			ParameterExpression[] parameterExpressionArray = new ParameterExpression[] { parameterExpression };
+			Mix.Cms.Lib.ViewModels.MixTemplates.ReadViewModel data = await repository.GetFirstModelAsync(Expression.Lambda<Func<MixTemplate, bool>>(binaryExpression, parameterExpressionArray), null, null).get_Data();
+			return data;
 		}
 
 		public static string GetTemplateFolder(string culture)
@@ -226,161 +300,139 @@ namespace Mix.Cms.Lib
 
 		private static Expression<Func<MixAttributeSetValue, bool>> GetValuePredicate(string fieldValue, MixEnums.CompareType filterType, MixEnums.MixDataType dataType)
 		{
-			V_0 = null;
+			DateTime dateTime;
+			double num;
+			bool flag;
+			int num1;
+			Expression<Func<MixAttributeSetValue, bool>> expression = null;
 			switch (dataType)
 			{
-				case 0:
-				case 1:
-				case 4:
-				case 5:
-				case 7:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-				case 12:
-				case 13:
-				case 14:
-				case 15:
-				case 16:
-				case 17:
-				case 19:
-				case 20:
-				case 21:
-				case 24:
+				case MixEnums.MixDataType.Custom:
+				case MixEnums.MixDataType.DateTime:
+				case MixEnums.MixDataType.Duration:
+				case MixEnums.MixDataType.PhoneNumber:
+				case MixEnums.MixDataType.Text:
+				case MixEnums.MixDataType.Html:
+				case MixEnums.MixDataType.MultilineText:
+				case MixEnums.MixDataType.EmailAddress:
+				case MixEnums.MixDataType.Password:
+				case MixEnums.MixDataType.Url:
+				case MixEnums.MixDataType.ImageUrl:
+				case MixEnums.MixDataType.CreditCard:
+				case MixEnums.MixDataType.PostalCode:
+				case MixEnums.MixDataType.Upload:
+				case MixEnums.MixDataType.Color:
+				case MixEnums.MixDataType.Icon:
+				case MixEnums.MixDataType.VideoYoutube:
+				case MixEnums.MixDataType.TuiEditor:
+				case MixEnums.MixDataType.QRCode:
 				{
-				Label1:
-					V_0 = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, string>("StringValue", fieldValue, filterType);
-					goto Label0;
+					expression = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, string>("StringValue", fieldValue, filterType);
+					return expression;
 				}
-				case 2:
-				case 3:
+				case MixEnums.MixDataType.Date:
+				case MixEnums.MixDataType.Time:
 				{
-					if (!DateTime.TryParse(fieldValue, out V_1))
+					if (!DateTime.TryParse(fieldValue, out dateTime))
 					{
-						goto Label0;
+						return expression;
 					}
-					V_0 = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, DateTime>("DateTimeValue", V_1, filterType);
-					goto Label0;
+					expression = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, DateTime>("DateTimeValue", dateTime, filterType);
+					return expression;
 				}
-				case 6:
+				case MixEnums.MixDataType.Double:
 				{
-					if (!double.TryParse(fieldValue, out V_2))
+					if (!double.TryParse(fieldValue, out num))
 					{
-						goto Label0;
+						return expression;
 					}
-					V_0 = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, double>("DoubleValue", V_2, filterType);
-					goto Label0;
+					expression = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, double>("DoubleValue", num, filterType);
+					return expression;
 				}
-				case 18:
+				case MixEnums.MixDataType.Boolean:
 				{
-					if (!bool.TryParse(fieldValue, out V_3))
+					if (!bool.TryParse(fieldValue, out flag))
 					{
-						goto Label0;
+						return expression;
 					}
-					V_0 = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, bool>("BooleanValue", V_3, filterType);
-					goto Label0;
+					expression = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, bool>("BooleanValue", flag, filterType);
+					return expression;
 				}
-				case 22:
+				case MixEnums.MixDataType.Integer:
 				{
-					if (!int.TryParse(fieldValue, out V_4))
+					if (!int.TryParse(fieldValue, out num1))
 					{
-						goto Label0;
+						return expression;
 					}
-					V_0 = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, int>("IntegerValue", V_4, filterType);
-					goto Label0;
+					expression = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, int>("IntegerValue", num1, filterType);
+					return expression;
 				}
-				case 23:
+				case MixEnums.MixDataType.Reference:
 				{
-				Label0:
-					return V_0;
+					return expression;
 				}
 				default:
 				{
-					goto Label1;
+					expression = MixCmsHelper.FilterObjectSet<MixAttributeSetValue, string>("StringValue", fieldValue, filterType);
+					return expression;
 				}
 			}
 		}
 
 		public static FileViewModel LoadDataFile(string folder, string name)
 		{
-			return FileRepository.get_Instance().GetFile(name, folder, true, "[]");
+			return FileRepository.Instance.GetFile(name, folder, true, "[]");
 		}
 
 		public static void LogException(Exception ex)
 		{
-			V_0 = string.Format(string.Concat(Environment.get_CurrentDirectory(), "/logs"), Array.Empty<object>());
-			if (!string.IsNullOrEmpty(V_0) && !Directory.Exists(V_0))
+			string str = string.Format(string.Concat(Environment.CurrentDirectory, "/logs"), Array.Empty<object>());
+			if (!string.IsNullOrEmpty(str) && !Directory.Exists(str))
 			{
-				dummyVar0 = Directory.CreateDirectory(V_0);
+				Directory.CreateDirectory(str);
 			}
-			V_2 = DateTime.get_Now();
-			V_1 = string.Concat(V_0, "/", V_2.ToString("YYYYMMDD"), "/log_exceptions.json");
+			DateTime now = DateTime.Now;
+			string str1 = string.Concat(str, "/", now.ToString("YYYYMMDD"), "/log_exceptions.json");
 			try
 			{
-				V_3 = new FileInfo(V_1);
-				V_4 = "[]";
-				if (V_3.get_Exists())
+				FileInfo fileInfo = new FileInfo(str1);
+				string end = "[]";
+				if (fileInfo.Exists)
 				{
-					V_6 = V_3.OpenText();
-					try
+					using (StreamReader streamReader = fileInfo.OpenText())
 					{
-						V_4 = V_6.ReadToEnd();
+						end = streamReader.ReadToEnd();
 					}
-					finally
-					{
-						if (V_6 != null)
-						{
-							((IDisposable)V_6).Dispose();
-						}
-					}
-					File.Delete(V_1);
+					File.Delete(str1);
 				}
-				stackVariable21 = JArray.Parse(V_4);
-				stackVariable22 = new JObject();
-				stackVariable22.Add(new JProperty("CreatedDateTime", (object)DateTime.get_UtcNow()));
-				stackVariable22.Add(new JProperty("Details", JObject.FromObject(ex)));
-				stackVariable21.Add(stackVariable22);
-				V_4 = stackVariable21.ToString();
-				V_7 = File.CreateText(V_1);
-				try
+				JArray jArray = JArray.Parse(end);
+				JObject jObject = new JObject();
+				jObject.Add(new JProperty("CreatedDateTime", (object)DateTime.UtcNow));
+				jObject.Add(new JProperty("Details", JObject.FromObject(ex)));
+				jArray.Add(jObject);
+				end = jArray.ToString();
+				using (StreamWriter streamWriter = File.CreateText(str1))
 				{
-					V_7.WriteLine(V_4);
-				}
-				finally
-				{
-					if (V_7 != null)
-					{
-						((IDisposable)V_7).Dispose();
-					}
+					streamWriter.WriteLine(end);
 				}
 			}
 			catch
 			{
-				dummyVar1 = exception_0;
 			}
-			return;
 		}
 
 		public static double ReversePrice(string formatedPrice)
 		{
+			double num;
 			try
 			{
-				if (!string.IsNullOrEmpty(formatedPrice))
-				{
-					V_0 = double.Parse(formatedPrice.Replace(",", string.Empty));
-				}
-				else
-				{
-					V_0 = 0;
-				}
+				num = (!string.IsNullOrEmpty(formatedPrice) ? double.Parse(formatedPrice.Replace(",", string.Empty)) : 0);
 			}
 			catch
 			{
-				dummyVar0 = exception_0;
-				V_0 = 0;
+				num = 0;
 			}
-			return V_0;
+			return num;
 		}
 	}
 }

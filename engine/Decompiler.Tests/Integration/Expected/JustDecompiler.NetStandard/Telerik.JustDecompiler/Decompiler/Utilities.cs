@@ -1,9 +1,14 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using Mono.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using Telerik.JustDecompiler;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Languages;
@@ -14,28 +19,24 @@ namespace Telerik.JustDecompiler.Decompiler
 	{
 		public Utilities()
 		{
-			base();
-			return;
 		}
 
-		private static bool ArgumentsMatch(Collection<ParameterDefinition> parameters, IList<Type> arguments)
+		private static bool ArgumentsMatch(Mono.Collections.Generic.Collection<ParameterDefinition> parameters, IList<Type> arguments)
 		{
-			if (parameters == null && arguments.get_Count() != 0)
+			if (parameters == null && arguments.Count != 0)
 			{
 				return false;
 			}
-			if (parameters.get_Count() != arguments.get_Count())
+			if (parameters.get_Count() != arguments.Count)
 			{
 				return false;
 			}
-			V_0 = 0;
-			while (V_0 < parameters.get_Count())
+			for (int i = 0; i < parameters.get_Count(); i++)
 			{
-				if (String.op_Inequality(parameters.get_Item(V_0).get_ParameterType().get_FullName(), arguments.get_Item(V_0).get_FullName()))
+				if (parameters.get_Item(i).get_ParameterType().get_FullName() != arguments[i].FullName)
 				{
 					return false;
 				}
-				V_0 = V_0 + 1;
 			}
 			return true;
 		}
@@ -47,236 +48,166 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static string EscapeNameIfNeeded(string name, ILanguage language)
 		{
-			V_0 = name;
-			if (language.IsLanguageKeyword(V_0))
+			string str = name;
+			if (language.IsLanguageKeyword(str))
 			{
-				V_0 = Utilities.Escape(name, language);
+				str = Utilities.Escape(name, language);
 			}
-			return V_0;
+			return str;
 		}
 
-		public static string EscapeNamespaceIfNeeded(string namespace, ILanguage language)
+		public static string EscapeNamespaceIfNeeded(string @namespace, ILanguage language)
 		{
-			V_0 = new StringBuilder();
-			V_1 = false;
-			stackVariable4 = new Char[1];
-			stackVariable4[0] = '.';
-			V_2 = namespace.Split(stackVariable4);
-			V_3 = 0;
-			while (V_3 < (int)V_2.Length)
+			StringBuilder stringBuilder = new StringBuilder();
+			bool flag = false;
+			string[] strArray = @namespace.Split(new Char[] { '.' });
+			for (int i = 0; i < (int)strArray.Length; i++)
 			{
-				V_4 = V_2[V_3];
-				if (!language.IsValidIdentifier(V_4))
+				string str = strArray[i];
+				if (!language.IsValidIdentifier(str))
 				{
-					V_4 = language.ReplaceInvalidCharactersInIdentifier(V_4);
-					V_1 = true;
+					str = language.ReplaceInvalidCharactersInIdentifier(str);
+					flag = true;
 				}
-				if (language.IsGlobalKeyword(V_4))
+				if (language.IsGlobalKeyword(str))
 				{
-					V_4 = language.EscapeWord(V_4);
-					V_1 = true;
+					str = language.EscapeWord(str);
+					flag = true;
 				}
-				if (V_0.get_Length() > 0)
+				if (stringBuilder.Length > 0)
 				{
-					dummyVar0 = V_0.Append(".");
+					stringBuilder.Append(".");
 				}
-				dummyVar1 = V_0.Append(V_4);
-				V_3 = V_3 + 1;
+				stringBuilder.Append(str);
 			}
-			if (!V_1)
+			if (!flag)
 			{
-				return namespace;
+				return @namespace;
 			}
-			return V_0.ToString();
+			return stringBuilder.ToString();
 		}
 
 		public static string EscapeTypeNameIfNeeded(string typeName, ILanguage language)
 		{
-			V_0 = typeName;
-			if (language.IsGlobalKeyword(V_0))
+			string str = typeName;
+			if (language.IsGlobalKeyword(str))
 			{
-				V_0 = Utilities.Escape(typeName, language);
+				str = Utilities.Escape(typeName, language);
 			}
-			return V_0;
+			return str;
 		}
 
-		public static MemberReference FindMemberArgumentRefersTo(IList fieldsAndProperties, CustomAttributeNamedArgument argument)
+		public static MemberReference FindMemberArgumentRefersTo(IList fieldsAndProperties, Mono.Cecil.CustomAttributeNamedArgument argument)
 		{
-			V_0 = null;
-			V_1 = fieldsAndProperties.GetEnumerator();
-			try
+			MemberReference memberReference = null;
+			foreach (object fieldsAndProperty in fieldsAndProperties)
 			{
-				while (V_1.MoveNext())
+				if ((fieldsAndProperty as MemberReference).get_Name() != argument.get_Name())
 				{
-					V_2 = V_1.get_Current();
-					if (!String.op_Equality((V_2 as MemberReference).get_Name(), argument.get_Name()))
-					{
-						continue;
-					}
-					V_0 = V_2 as MemberReference;
+					continue;
 				}
+				memberReference = fieldsAndProperty as MemberReference;
 			}
-			finally
-			{
-				V_3 = V_1 as IDisposable;
-				if (V_3 != null)
-				{
-					V_3.Dispose();
-				}
-			}
-			return V_0;
+			return memberReference;
 		}
 
 		public static ICollection<AssemblyNameReference> GetAssembliesDependingOn(ModuleDefinition module, ICollection<TypeReference> typesDependingOn)
 		{
-			return new HashSet<AssemblyNameReference>(Utilities.GetAssembliesDependingOnToUsedTypesMap(module, typesDependingOn).get_Keys());
+			return new HashSet<AssemblyNameReference>(Utilities.GetAssembliesDependingOnToUsedTypesMap(module, typesDependingOn).Keys);
 		}
 
 		public static Dictionary<AssemblyNameReference, List<TypeReference>> GetAssembliesDependingOnToUsedTypesMap(ModuleDefinition module, ICollection<TypeReference> typesDependingOn)
 		{
-			V_0 = new Dictionary<AssemblyNameReference, List<TypeReference>>(new Utilities.AssemblyNameReferenceEqualityComparer());
-			V_1 = typesDependingOn.GetEnumerator();
-			try
+			Dictionary<AssemblyNameReference, List<TypeReference>> assemblyNameReferences = new Dictionary<AssemblyNameReference, List<TypeReference>>(new Utilities.AssemblyNameReferenceEqualityComparer());
+			foreach (TypeReference typeReference in typesDependingOn)
 			{
-				while (V_1.MoveNext())
+				AssemblyNameReference name = null;
+				ModuleDefinition scope = typeReference.get_Scope() as ModuleDefinition;
+				if (scope != null && scope.get_Kind() != 3)
 				{
-					V_2 = V_1.get_Current();
-					V_3 = null;
-					V_4 = V_2.get_Scope() as ModuleDefinition;
-					if (V_4 == null || V_4.get_Kind() == 3)
-					{
-						if (V_2.get_Scope() as AssemblyNameReference != null)
-						{
-							V_3 = V_2.get_Scope() as AssemblyNameReference;
-						}
-					}
-					else
-					{
-						V_3 = V_4.get_Assembly().get_Name();
-					}
-					if (V_3 == null || (object)module != (object)module.get_Assembly().get_MainModule() || V_3 == module.get_Assembly().get_Name())
-					{
-						continue;
-					}
-					if (!V_0.ContainsKey(V_3))
-					{
-						V_0.Add(V_3, new List<TypeReference>());
-					}
-					V_0.get_Item(V_3).Add(V_2);
+					name = scope.get_Assembly().get_Name();
 				}
-			}
-			finally
-			{
-				if (V_1 != null)
+				else if (typeReference.get_Scope() is AssemblyNameReference)
 				{
-					V_1.Dispose();
+					name = typeReference.get_Scope() as AssemblyNameReference;
 				}
+				if (name == null || (object)module != (object)module.get_Assembly().get_MainModule() || name == module.get_Assembly().get_Name())
+				{
+					continue;
+				}
+				if (!assemblyNameReferences.ContainsKey(name))
+				{
+					assemblyNameReferences.Add(name, new List<TypeReference>());
+				}
+				assemblyNameReferences[name].Add(typeReference);
 			}
-			return V_0;
+			return assemblyNameReferences;
 		}
 
 		public static AssemblyDefinition GetAssembly(string assemblyPath)
 		{
-			stackVariable1 = new WeakAssemblyResolver(GlobalAssemblyResolver.CurrentAssemblyPathCache);
-			V_0 = new ReaderParameters(stackVariable1);
-			return ((BaseAssemblyResolver)stackVariable1).LoadAssemblyDefinition(assemblyPath, V_0, true);
+			WeakAssemblyResolver weakAssemblyResolver = new WeakAssemblyResolver(GlobalAssemblyResolver.CurrentAssemblyPathCache);
+			ReaderParameters readerParameter = new ReaderParameters(weakAssemblyResolver);
+			return ((BaseAssemblyResolver)weakAssemblyResolver).LoadAssemblyDefinition(assemblyPath, readerParameter, true);
 		}
 
 		public static ICollection<string> GetAssemblyAndModuleNamespaceUsings(AssemblySpecificContext assemblyContext, ModuleSpecificContext moduleContext)
 		{
-			V_0 = new HashSet<string>();
-			V_1 = assemblyContext.get_AssemblyNamespaceUsings().GetEnumerator();
-			try
+			ICollection<string> strs = new HashSet<string>();
+			foreach (string assemblyNamespaceUsing in assemblyContext.AssemblyNamespaceUsings)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.Add(V_2);
-				}
+				strs.Add(assemblyNamespaceUsing);
 			}
-			finally
+			foreach (string moduleNamespaceUsing in moduleContext.ModuleNamespaceUsings)
 			{
-				if (V_1 != null)
+				if (strs.Contains(moduleNamespaceUsing))
 				{
-					V_1.Dispose();
+					continue;
 				}
+				strs.Add(moduleNamespaceUsing);
 			}
-			V_1 = moduleContext.get_ModuleNamespaceUsings().GetEnumerator();
-			try
-			{
-				while (V_1.MoveNext())
-				{
-					V_3 = V_1.get_Current();
-					if (V_0.Contains(V_3))
-					{
-						continue;
-					}
-					V_0.Add(V_3);
-				}
-			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			return V_0;
+			return strs;
 		}
 
 		public static FieldDefinition GetCompileGeneratedBackingField(PropertyDefinition property)
 		{
-			V_0 = property.get_DeclaringType();
-			if (!V_0.get_HasFields())
+			FieldDefinition fieldDefinition;
+			TypeDefinition declaringType = property.get_DeclaringType();
+			if (!declaringType.get_HasFields())
 			{
 				return null;
 			}
-			V_1 = V_0.get_Fields().GetEnumerator();
+			Mono.Collections.Generic.Collection<FieldDefinition>.Enumerator enumerator = declaringType.get_Fields().GetEnumerator();
 			try
 			{
-				while (V_1.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_2 = V_1.get_Current();
-					if (!V_2.get_Name().Equals(String.Concat("<", property.get_Name(), ">k__BackingField"), 4) || !V_2.HasCompilerGeneratedAttribute())
+					FieldDefinition current = enumerator.get_Current();
+					if (!current.get_Name().Equals(String.Concat("<", property.get_Name(), ">k__BackingField"), StringComparison.Ordinal) || !current.HasCompilerGeneratedAttribute())
 					{
 						continue;
 					}
-					V_3 = V_2;
-					goto Label1;
+					fieldDefinition = current;
+					return fieldDefinition;
 				}
-				goto Label0;
+				return null;
 			}
 			finally
 			{
-				V_1.Dispose();
+				enumerator.Dispose();
 			}
-		Label1:
-			return V_3;
-		Label0:
-			return null;
+			return fieldDefinition;
 		}
 
 		public static TypeReference GetCorlibTypeReference(Type type, ModuleDefinition currentModule)
 		{
-			V_0 = currentModule.ReferencedMscorlibRef();
-			if (V_0 == null)
-			{
-				V_0 = currentModule.GetReferencedCoreLibraryRef("System.Runtime");
-				if (V_0 == null)
-				{
-					V_0 = currentModule.GetReferencedCoreLibraryRef("System.Private.CoreLib");
-					if (V_0 == null)
-					{
-						V_0 = currentModule.GetReferencedCoreLibraryRef("netstandard");
-					}
-				}
-			}
-			return new TypeReference(type.get_Namespace(), type.get_Name(), currentModule, V_0);
+			AssemblyNameReference assemblyNameReference = currentModule.ReferencedMscorlibRef() ?? (currentModule.GetReferencedCoreLibraryRef("System.Runtime") ?? (currentModule.GetReferencedCoreLibraryRef("System.Private.CoreLib") ?? currentModule.GetReferencedCoreLibraryRef("netstandard")));
+			return new TypeReference(type.Namespace, type.Name, currentModule, assemblyNameReference);
 		}
 
 		public static TypeDefinition GetDeclaringTypeOrSelf(IMemberDefinition member)
 		{
-			if (member as TypeDefinition == null)
+			if (!(member is TypeDefinition))
 			{
 				return member.get_DeclaringType();
 			}
@@ -285,275 +216,222 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static MethodReference GetEmptyConstructor(Type type, ModuleDefinition currentModule, IList<Type> mscorlibArgumentTypes = null)
 		{
+			MethodReference methodReference;
 			if (mscorlibArgumentTypes == null)
 			{
 				mscorlibArgumentTypes = new List<Type>();
 			}
-			V_0 = Utilities.GetCorlibTypeReference(type, currentModule);
-			V_1 = V_0.Resolve();
-			if (V_1 == null)
+			TypeReference corlibTypeReference = Utilities.GetCorlibTypeReference(type, currentModule);
+			TypeDefinition typeDefinition = corlibTypeReference.Resolve();
+			if (typeDefinition == null)
 			{
-				stackVariable13 = new MethodReference(".ctor", Utilities.GetCorlibTypeReference(Type.GetTypeFromHandle(// 
-				// Current member / type: Mono.Cecil.MethodReference Telerik.JustDecompiler.Decompiler.Utilities::GetEmptyConstructor(System.Type,Mono.Cecil.ModuleDefinition,System.Collections.Generic.IList`1<System.Type>)
-				// Exception in: Mono.Cecil.MethodReference GetEmptyConstructor(System.Type,Mono.Cecil.ModuleDefinition,System.Collections.Generic.IList<System.Type>)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
-
-		public static ICollection<TypeReference> GetExpandedTypeDependanceList(HashSet<TypeReference> firstLevelDependanceTypes)
-		{
-			V_0 = new HashSet<TypeReference>();
-			V_1 = new Queue<TypeReference>();
-			V_2 = firstLevelDependanceTypes.GetEnumerator();
+				MethodReference methodReference1 = new MethodReference(".ctor", Utilities.GetCorlibTypeReference(typeof(Void), currentModule), corlibTypeReference);
+				methodReference1.get_Parameters().AddRange(Utilities.GetMatchingArguments(mscorlibArgumentTypes, currentModule));
+				return methodReference1;
+			}
+			Mono.Collections.Generic.Collection<MethodDefinition>.Enumerator enumerator = typeDefinition.get_Methods().GetEnumerator();
 			try
 			{
-				while (V_2.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_3 = V_2.get_Current();
-					V_1.Enqueue(V_3);
+					MethodDefinition current = enumerator.get_Current();
+					if (!current.get_IsConstructor() || !Utilities.ArgumentsMatch(current.get_Parameters(), mscorlibArgumentTypes))
+					{
+						continue;
+					}
+					methodReference = current;
+					return methodReference;
 				}
+				throw new ArgumentOutOfRangeException(String.Format("Type {0} doesnt provide matching constructor.", type.FullName));
 			}
 			finally
 			{
-				((IDisposable)V_2).Dispose();
+				enumerator.Dispose();
 			}
-			while (V_1.get_Count() > 0)
+			return methodReference;
+		}
+
+		public static ICollection<TypeReference> GetExpandedTypeDependanceList(HashSet<TypeReference> firstLevelDependanceTypes)
+		{
+			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
+			Queue<TypeReference> typeReferences1 = new Queue<TypeReference>();
+			foreach (TypeReference firstLevelDependanceType in firstLevelDependanceTypes)
 			{
-				V_4 = V_1.Dequeue();
-				if (String.op_Equality(V_4.get_Scope().get_Name(), "mscorlib") || V_0.Contains(V_4))
+				typeReferences1.Enqueue(firstLevelDependanceType);
+			}
+			while (typeReferences1.Count > 0)
+			{
+				TypeReference typeReference = typeReferences1.Dequeue();
+				if (typeReference.get_Scope().get_Name() == "mscorlib" || typeReferences.Contains(typeReference))
 				{
 					continue;
 				}
-				dummyVar0 = V_0.Add(V_4);
-				if (V_4.get_DeclaringType() != null)
+				typeReferences.Add(typeReference);
+				if (typeReference.get_DeclaringType() != null)
 				{
-					V_1.Enqueue(V_4.get_DeclaringType());
+					typeReferences1.Enqueue(typeReference.get_DeclaringType());
 				}
-				V_5 = V_4.Resolve();
-				if (V_5 == null)
+				TypeDefinition typeDefinition = typeReference.Resolve();
+				if (typeDefinition == null)
 				{
 					continue;
 				}
-				if (V_5.get_BaseType() != null && String.op_Inequality(V_5.get_BaseType().get_Scope().get_Name(), "mscorlib") && !V_0.Contains(V_5.get_BaseType()))
+				if (typeDefinition.get_BaseType() != null && typeDefinition.get_BaseType().get_Scope().get_Name() != "mscorlib" && !typeReferences.Contains(typeDefinition.get_BaseType()))
 				{
-					V_1.Enqueue(V_5.get_BaseType());
+					typeReferences1.Enqueue(typeDefinition.get_BaseType());
 				}
-				if (!V_5.get_HasInterfaces())
+				if (!typeDefinition.get_HasInterfaces())
 				{
 					continue;
 				}
-				V_6 = V_5.get_Interfaces().GetEnumerator();
-				try
+				foreach (TypeReference @interface in typeDefinition.get_Interfaces())
 				{
-					while (V_6.MoveNext())
+					if (@interface.get_Scope().get_Name() == "mscorlib" || typeReferences.Contains(@interface))
 					{
-						V_7 = V_6.get_Current();
-						if (String.op_Equality(V_7.get_Scope().get_Name(), "mscorlib") || V_0.Contains(V_7))
-						{
-							continue;
-						}
-						V_1.Enqueue(V_7);
+						continue;
 					}
-				}
-				finally
-				{
-					V_6.Dispose();
+					typeReferences1.Enqueue(@interface);
 				}
 			}
-			return V_0;
+			return typeReferences;
 		}
 
 		private static IEnumerable<ParameterDefinition> GetMatchingArguments(IList<Type> mscorlibArgumentTypes, ModuleDefinition currentModule)
 		{
-			V_0 = new List<ParameterDefinition>(mscorlibArgumentTypes.get_Count());
-			V_1 = mscorlibArgumentTypes.GetEnumerator();
-			try
+			List<ParameterDefinition> parameterDefinitions = new List<ParameterDefinition>(mscorlibArgumentTypes.Count);
+			foreach (Type mscorlibArgumentType in mscorlibArgumentTypes)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.Add(new ParameterDefinition(Utilities.GetCorlibTypeReference(V_2, currentModule)));
-				}
+				parameterDefinitions.Add(new ParameterDefinition(Utilities.GetCorlibTypeReference(mscorlibArgumentType, currentModule)));
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			return V_0;
+			return parameterDefinitions;
 		}
 
 		public static string GetMemberUniqueName(IMemberDefinition member)
 		{
-			if (member as MethodDefinition == null)
+			if (!(member is MethodDefinition))
 			{
 				return member.get_FullName();
 			}
-			V_0 = member as MethodDefinition;
-			V_1 = V_0.get_FullName();
-			if (V_0.get_HasGenericParameters())
+			MethodDefinition methodDefinition = member as MethodDefinition;
+			string fullName = methodDefinition.get_FullName();
+			if (methodDefinition.get_HasGenericParameters())
 			{
-				V_2 = V_0.get_GenericParameters().GetEnumerator();
-				try
+				foreach (GenericParameter genericParameter in methodDefinition.get_GenericParameters())
 				{
-					while (V_2.MoveNext())
+					fullName = String.Concat(fullName, genericParameter.get_Name());
+					if (!genericParameter.get_HasConstraints() && !genericParameter.get_HasDefaultConstructorConstraint() && !genericParameter.get_HasReferenceTypeConstraint() && !genericParameter.get_HasNotNullableValueTypeConstraint())
 					{
-						V_3 = V_2.get_Current();
-						V_1 = String.Concat(V_1, V_3.get_Name());
-						if (!V_3.get_HasConstraints() && !V_3.get_HasDefaultConstructorConstraint() && !V_3.get_HasReferenceTypeConstraint() && !V_3.get_HasNotNullableValueTypeConstraint())
-						{
-							continue;
-						}
-						V_4 = false;
-						if (V_3.get_HasNotNullableValueTypeConstraint())
-						{
-							if (V_4)
-							{
-								V_1 = String.Concat(V_1, ", ");
-							}
-							V_4 = true;
-							V_1 = String.Concat(V_1, "struct");
-						}
-						V_5 = V_3.get_Constraints().GetEnumerator();
-						try
-						{
-							while (V_5.MoveNext())
-							{
-								V_6 = V_5.get_Current();
-								if (V_3.get_HasNotNullableValueTypeConstraint() && String.op_Equality(V_6.get_FullName(), "System.ValueType"))
-								{
-									continue;
-								}
-								if (V_4)
-								{
-									V_1 = String.Concat(V_1, ", ");
-								}
-								V_1 = String.Concat(V_1, V_6.get_FullName());
-								V_4 = true;
-							}
-						}
-						finally
-						{
-							V_5.Dispose();
-						}
-						if (V_3.get_HasReferenceTypeConstraint())
-						{
-							if (V_4)
-							{
-								V_1 = String.Concat(V_1, ", ");
-							}
-							V_4 = true;
-							V_1 = String.Concat(V_1, "class");
-						}
-						if (!V_3.get_HasDefaultConstructorConstraint() || V_3.get_HasNotNullableValueTypeConstraint())
-						{
-							continue;
-						}
-						if (V_4)
-						{
-							V_1 = String.Concat(V_1, ", ");
-						}
-						V_4 = true;
-						V_1 = String.Concat(V_1, "new()");
+						continue;
 					}
-				}
-				finally
-				{
-					V_2.Dispose();
+					bool flag = false;
+					if (genericParameter.get_HasNotNullableValueTypeConstraint())
+					{
+						if (flag)
+						{
+							fullName = String.Concat(fullName, ", ");
+						}
+						flag = true;
+						fullName = String.Concat(fullName, "struct");
+					}
+					foreach (TypeReference constraint in genericParameter.get_Constraints())
+					{
+						if (genericParameter.get_HasNotNullableValueTypeConstraint() && constraint.get_FullName() == "System.ValueType")
+						{
+							continue;
+						}
+						if (flag)
+						{
+							fullName = String.Concat(fullName, ", ");
+						}
+						fullName = String.Concat(fullName, constraint.get_FullName());
+						flag = true;
+					}
+					if (genericParameter.get_HasReferenceTypeConstraint())
+					{
+						if (flag)
+						{
+							fullName = String.Concat(fullName, ", ");
+						}
+						flag = true;
+						fullName = String.Concat(fullName, "class");
+					}
+					if (!genericParameter.get_HasDefaultConstructorConstraint() || genericParameter.get_HasNotNullableValueTypeConstraint())
+					{
+						continue;
+					}
+					if (flag)
+					{
+						fullName = String.Concat(fullName, ", ");
+					}
+					flag = true;
+					fullName = String.Concat(fullName, "new()");
 				}
 			}
-			return V_1;
+			return fullName;
 		}
 
 		public static ICollection<ModuleReference> GetModulesDependingOn(ICollection<TypeReference> typesDependingOn)
 		{
-			V_0 = new HashSet<ModuleReference>();
-			V_1 = typesDependingOn.GetEnumerator();
-			try
+			HashSet<ModuleReference> moduleReferences = new HashSet<ModuleReference>();
+			foreach (TypeReference typeReference in typesDependingOn)
 			{
-				while (V_1.MoveNext())
+				if (!(typeReference.get_Scope() is ModuleReference) || typeReference.get_Scope() is AssemblyNameReference || typeReference.get_Scope() is ModuleDefinition)
 				{
-					V_2 = V_1.get_Current();
-					if (V_2.get_Scope() as ModuleReference == null || V_2.get_Scope() as AssemblyNameReference != null || V_2.get_Scope() as ModuleDefinition != null)
-					{
-						continue;
-					}
-					V_3 = V_2.get_Scope() as ModuleReference;
-					if (V_0.Contains(V_3))
-					{
-						continue;
-					}
-					dummyVar0 = V_0.Add(V_3);
+					continue;
 				}
-			}
-			finally
-			{
-				if (V_1 != null)
+				ModuleReference scope = typeReference.get_Scope() as ModuleReference;
+				if (moduleReferences.Contains(scope))
 				{
-					V_1.Dispose();
+					continue;
 				}
+				moduleReferences.Add(scope);
 			}
-			return V_0;
+			return moduleReferences;
 		}
 
-		public static string GetNamesapceParentNamesapce(string namespace)
+		public static string GetNamesapceParentNamesapce(string @namespace)
 		{
-			if (!Utilities.HasNamespaceParentNamespace(namespace))
+			if (!Utilities.HasNamespaceParentNamespace(@namespace))
 			{
 				throw new Exception("Namespace does not have a parent namesapce.");
 			}
-			stackVariable4 = new Char[1];
-			stackVariable4[0] = '.';
-			V_0 = namespace.Split(stackVariable4);
-			V_1 = new StringBuilder();
-			V_2 = 0;
-			while (V_2 < (int)V_0.Length - 1)
+			string[] strArray = @namespace.Split(new Char[] { '.' });
+			StringBuilder stringBuilder = new StringBuilder();
+			for (int i = 0; i < (int)strArray.Length - 1; i++)
 			{
-				if (V_2 > 0)
+				if (i > 0)
 				{
-					dummyVar0 = V_1.Append(".");
+					stringBuilder.Append(".");
 				}
-				dummyVar1 = V_1.Append(V_0[V_2]);
-				V_2 = V_2 + 1;
+				stringBuilder.Append(strArray[i]);
 			}
-			return V_1.ToString();
+			return stringBuilder.ToString();
 		}
 
-		public static string GetNamespaceChildNamesapce(string namespace)
+		public static string GetNamespaceChildNamesapce(string @namespace)
 		{
-			if (!Utilities.HasNamespaceParentNamespace(namespace))
+			if (!Utilities.HasNamespaceParentNamespace(@namespace))
 			{
 				throw new Exception("Namespace does not have a parent namesapce.");
 			}
-			stackVariable4 = new Char[1];
-			stackVariable4[0] = '.';
-			stackVariable7 = namespace.Split(stackVariable4);
-			return stackVariable7[(int)stackVariable7.Length - 1];
+			string[] strArray = @namespace.Split(new Char[] { '.' });
+			return strArray[(int)strArray.Length - 1];
 		}
 
 		public static TypeDefinition GetOuterMostDeclaringType(IMemberDefinition member)
 		{
-			if (member as TypeDefinition == null)
+			TypeDefinition declaringType;
+			declaringType = (!(member is TypeDefinition) ? member.get_DeclaringType() : member as TypeDefinition);
+			while (declaringType.get_DeclaringType() != null)
 			{
-				V_0 = member.get_DeclaringType();
+				declaringType = declaringType.get_DeclaringType();
 			}
-			else
-			{
-				V_0 = member as TypeDefinition;
-			}
-			while (V_0.get_DeclaringType() != null)
-			{
-				V_0 = V_0.get_DeclaringType();
-			}
-			return V_0;
+			return declaringType;
 		}
 
 		public static List<IMemberDefinition> GetTypeMembers(TypeDefinition type, ILanguage language, bool showCompilerGeneratedMembers = true, IEnumerable<string> attributesToSkip = null, ICollection<string> fieldsToSkip = null, IEnumerable<MethodDefinition> generatedFilterMethods = null, IEnumerable<FieldReference> propertyFields = null)
 		{
-			return TypeDefinitionExtensions.GetMembersSorted(type, showCompilerGeneratedMembers, language, attributesToSkip, fieldsToSkip, new HashSet<FieldReference>(type.GetFieldToEventMap(language).get_Keys()), generatedFilterMethods, propertyFields).ToList<IMemberDefinition>();
+			return TypeDefinitionExtensions.GetMembersSorted(type, showCompilerGeneratedMembers, language, attributesToSkip, fieldsToSkip, new HashSet<FieldReference>(type.GetFieldToEventMap(language).Keys), generatedFilterMethods, propertyFields).ToList<IMemberDefinition>();
 		}
 
 		public static List<IMemberDefinition> GetTypeMembersToDecompile(TypeDefinition type)
@@ -563,47 +441,36 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static ICollection<TypeReference> GetTypeReferenceTypesDepedningOn(TypeReference reference)
 		{
-			V_0 = new HashSet<TypeReference>();
-			V_1 = reference;
-			while (V_1 != null)
+			HashSet<TypeReference> typeReferences = new HashSet<TypeReference>();
+			for (TypeReference i = reference; i != null; i = i.get_DeclaringType())
 			{
-				if (!V_0.Contains(V_1))
+				if (!typeReferences.Contains(i))
 				{
-					dummyVar0 = V_0.Add(V_1);
+					typeReferences.Add(i);
 				}
-				if (V_1.get_IsGenericInstance())
+				if (i.get_IsGenericInstance())
 				{
-					V_2 = (V_1 as GenericInstanceType).get_GenericArguments().GetEnumerator();
-					try
+					foreach (TypeReference genericArgument in (i as GenericInstanceType).get_GenericArguments())
 					{
-						while (V_2.MoveNext())
-						{
-							V_3 = V_2.get_Current();
-							V_0.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(V_3));
-						}
-					}
-					finally
-					{
-						V_2.Dispose();
+						typeReferences.UnionWith(Utilities.GetTypeReferenceTypesDepedningOn(genericArgument));
 					}
 				}
-				V_1 = V_1.get_DeclaringType();
 			}
-			return V_0;
+			return typeReferences;
 		}
 
-		public static bool HasNamespaceParentNamespace(string namespace)
+		public static bool HasNamespaceParentNamespace(string @namespace)
 		{
-			return namespace.Contains(".");
+			return @namespace.Contains(".");
 		}
 
 		public static bool IsComputeStringHashMethod(MethodReference method)
 		{
-			if (String.op_Equality(method.get_FullName(), "System.UInt32 <PrivateImplementationDetails>::ComputeStringHash(System.String)"))
+			if (method.get_FullName() == "System.UInt32 <PrivateImplementationDetails>::ComputeStringHash(System.String)")
 			{
 				return true;
 			}
-			if (String.op_Equality(method.get_FullName(), "System.UInt32 <PrivateImplementationDetails>::$$method0x6000001-ComputeStringHash(System.String)"))
+			if (method.get_FullName() == "System.UInt32 <PrivateImplementationDetails>::$$method0x6000001-ComputeStringHash(System.String)")
 			{
 				return true;
 			}
@@ -612,15 +479,15 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static bool IsExplicitInterfaceImplementataion(IMemberDefinition theDefinition)
 		{
-			if (theDefinition as MethodDefinition != null)
+			if (theDefinition is MethodDefinition)
 			{
 				return ((MethodDefinition)theDefinition).get_HasOverrides();
 			}
-			if (theDefinition as PropertyDefinition != null)
+			if (theDefinition is PropertyDefinition)
 			{
 				return ((PropertyDefinition)theDefinition).IsExplicitImplementation();
 			}
-			if (theDefinition as EventDefinition == null)
+			if (!(theDefinition is EventDefinition))
 			{
 				return false;
 			}
@@ -629,34 +496,23 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public static bool IsInitializerPresent(InitializerExpression initializer)
 		{
-			if (initializer == null || initializer.get_Expression() == null)
+			if (initializer == null || initializer.Expression == null)
 			{
 				return false;
 			}
-			return initializer.get_Expression().get_Expressions().get_Count() > 0;
+			return initializer.Expression.Expressions.Count > 0;
 		}
 
 		public static bool IsTypeNameInCollisionOnAssemblyLevel(string typeName, AssemblySpecificContext assemblyContext, ModuleSpecificContext mainModuleContext)
 		{
-			V_0 = new HashSet<string>();
-			V_2 = assemblyContext.get_AssemblyNamespaceUsings().GetEnumerator();
-			try
+			List<string> strs;
+			HashSet<string> strs1 = new HashSet<string>();
+			foreach (string assemblyNamespaceUsing in assemblyContext.AssemblyNamespaceUsings)
 			{
-				while (V_2.MoveNext())
-				{
-					V_3 = V_2.get_Current();
-					dummyVar0 = V_0.Add(V_3);
-				}
+				strs1.Add(assemblyNamespaceUsing);
 			}
-			finally
-			{
-				if (V_2 != null)
-				{
-					V_2.Dispose();
-				}
-			}
-			V_0.UnionWith(mainModuleContext.get_ModuleNamespaceUsings());
-			if (mainModuleContext.get_CollisionTypesData().TryGetValue(typeName, out V_1) && V_1.Intersect<string>(V_0).Count<string>() > 1)
+			strs1.UnionWith(mainModuleContext.ModuleNamespaceUsings);
+			if (mainModuleContext.CollisionTypesData.TryGetValue(typeName, out strs) && strs.Intersect<string>(strs1).Count<string>() > 1)
 			{
 				return true;
 			}
@@ -669,17 +525,15 @@ namespace Telerik.JustDecompiler.Decompiler
 			{
 				return new DecompiledMember(Utilities.GetMemberUniqueName(method), null, null);
 			}
-			V_0 = null;
-			V_1 = method.get_Body().Decompile(language, out V_0, typeContext);
-			return new DecompiledMember(Utilities.GetMemberUniqueName(method), V_1, V_0.get_MethodContext());
+			DecompilationContext decompilationContext = null;
+			BlockStatement blockStatement = method.get_Body().Decompile(language, out decompilationContext, typeContext);
+			return new DecompiledMember(Utilities.GetMemberUniqueName(method), blockStatement, decompilationContext.MethodContext);
 		}
 
 		private class AssemblyNameReferenceEqualityComparer : IEqualityComparer<AssemblyNameReference>
 		{
 			public AssemblyNameReferenceEqualityComparer()
 			{
-				base();
-				return;
 			}
 
 			public bool Equals(AssemblyNameReference x, AssemblyNameReference y)
@@ -692,7 +546,7 @@ namespace Telerik.JustDecompiler.Decompiler
 				{
 					return false;
 				}
-				return String.op_Equality(x.get_FullName(), y.get_FullName());
+				return x.get_FullName() == y.get_FullName();
 			}
 
 			public int GetHashCode(AssemblyNameReference obj)

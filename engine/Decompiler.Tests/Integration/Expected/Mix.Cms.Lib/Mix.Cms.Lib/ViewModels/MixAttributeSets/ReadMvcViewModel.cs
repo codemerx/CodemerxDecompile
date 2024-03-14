@@ -1,14 +1,18 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels.MixAttributeFields;
 using Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.ViewModels.MixAttributeSets
@@ -149,44 +153,40 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSets
 
 		public ReadMvcViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadMvcViewModel(MixAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixAttributeSet model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable2 = this.get_Fields();
-			if (stackVariable2 == null)
+			object fields = this.Fields;
+			if (fields == null)
 			{
-				dummyVar0 = stackVariable2;
-				stackVariable3 = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository;
-				V_0 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-				// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				List<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel> data = ViewModelBase<MixCmsContext, MixAttributeField, Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>.Repository.GetModelListBy((MixAttributeField a) => a.AttributeSetId == this.Id, _context, _transaction).get_Data();
+				if (data != null)
+				{
+					fields = (
+						from a in data
+						orderby a.Priority
+						select a).ToList<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>();
+				}
+				else
+				{
+					fields = null;
+				}
+			}
+			this.Fields = (List<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>)fields;
+		}
 
 		public void LoadData(string parentId, MixEnums.MixAttributeSetDataType parentType, string specificulture, int? pageSize = null, int? pageIndex = 0, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = new Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0();
-			V_0.parentId = parentId;
-			V_0.parentType = parentType;
-			V_0.specificulture = specificulture;
-			stackVariable7 = ViewModelBase<MixCmsContext, MixRelatedAttributeData, Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ReadMvcViewModel>.Repository;
-			V_2 = Expression.Parameter(System.Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel::LoadData(System.String,Mix.Cms.Lib.MixEnums/MixAttributeSetDataType,System.String,System.Nullable`1<System.Int32>,System.Nullable`1<System.Int32>,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void LoadData(System.String,Mix.Cms.Lib.MixEnums/MixAttributeSetDataType,System.String,System.Nullable<System.Int32>,System.Nullable<System.Int32>,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0 variable = null;
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixRelatedAttributeData, Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ReadMvcViewModel>.Repository;
+			ParameterExpression parameterExpression = Expression.Parameter(typeof(MixRelatedAttributeData), "m");
+			RepositoryResponse<PaginationModel<Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ReadMvcViewModel>> modelListBy = repository.GetModelListBy(Expression.Lambda<Func<MixRelatedAttributeData, bool>>(Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentId").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0).GetField("parentId").FieldHandle))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_ParentType").MethodHandle)), Expression.Call(Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0).GetField("parentType").FieldHandle)), (MethodInfo)MethodBase.GetMethodFromHandle(typeof(object).GetMethod("ToString").MethodHandle), Array.Empty<Expression>()))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixRelatedAttributeData).GetMethod("get_Specificulture").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0)), FieldInfo.GetFieldFromHandle(typeof(Mix.Cms.Lib.ViewModels.MixAttributeSets.ReadMvcViewModel.u003cu003ec__DisplayClass79_0).GetField("specificulture").FieldHandle)))), new ParameterExpression[] { parameterExpression }), MixService.GetConfig<string>("OrderBy"), 0, pageSize, pageIndex, _context, _transaction);
+			this.Data = modelListBy.get_Data();
+		}
 	}
 }

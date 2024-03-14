@@ -123,8 +123,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public IntermediateLanguage()
 		{
-			base();
-			return;
 		}
 
 		public override BlockDecompilationPipeline CreateFilterMethodPipeline(DecompilationContext context)
@@ -187,7 +185,7 @@ namespace Telerik.JustDecompiler.Languages.IL
 			return false;
 		}
 
-		public override bool IsOperatorKeyword(string operator)
+		public override bool IsOperatorKeyword(string @operator)
 		{
 			return false;
 		}

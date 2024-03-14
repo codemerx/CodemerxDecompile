@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -81,7 +83,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeFields
 		{
 			get
 			{
-				return !string.IsNullOrEmpty(this.get_Regex());
+				return !string.IsNullOrEmpty(this.Regex);
 			}
 		}
 
@@ -135,11 +137,7 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeFields
 		}
 
 		[JsonProperty("strOptions")]
-		public string Options
-		{
-			get;
-			set;
-		}
+		public string Options { get; set; } = "[]";
 
 		[JsonProperty("priority")]
 		public int Priority
@@ -185,54 +183,71 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeFields
 
 		public UpdateViewModel()
 		{
-			this.u003cOptionsu003ek__BackingField = "[]";
-			base();
-			return;
 		}
 
-		public UpdateViewModel(MixAttributeField model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixAttributeField model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cOptionsu003ek__BackingField = "[]";
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (!string.IsNullOrEmpty(this.get_Options()))
+			if (!string.IsNullOrEmpty(this.Options))
 			{
-				this.set_JOptions(JArray.Parse(this.get_Options()));
+				this.JOptions = JArray.Parse(this.Options);
 			}
-			return;
 		}
 
 		public override MixAttributeField ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			string str;
+			if (this.Id == 0)
 			{
-				stackVariable11 = ViewModelBase<MixCmsContext, MixAttributeField, UpdateViewModel>.Repository;
-				V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixAttributeField Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixAttributeField ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixAttributeField, UpdateViewModel>.Repository.Max((MixAttributeField s) => s.Id, _context, _transaction).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			JArray jOptions = this.JOptions;
+			if (jOptions != null)
+			{
+				str = jOptions.ToString();
+			}
+			else
+			{
+				str = null;
+			}
+			this.Options = str;
+			return base.ParseModel(_context, _transaction);
+		}
 
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			this.Validate(_context, _transaction);
-			if (this.get_IsValid())
+			base.Validate(_context, _transaction);
+			if (base.get_IsValid())
 			{
-				if (!string.op_Inequality(this.get_AttributeSetName(), "sys_additional_field"))
+				if (this.AttributeSetName == "sys_additional_field")
 				{
-					stackVariable9 = ViewModelBase<MixCmsContext, MixAttributeField, UpdateViewModel>.Repository;
-					V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-					// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel::Validate(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Exception in: System.Void Validate(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
+					RepositoryResponse<UpdateViewModel> singleModel = ViewModelBase<MixCmsContext, MixAttributeField, UpdateViewModel>.Repository.GetSingleModel((MixAttributeField m) => m.Name == this.Name && m.DataType == (int)this.DataType, _context, _transaction);
+					if (singleModel.get_IsSucceed())
+					{
+						this.Id = singleModel.get_Data().Id;
+						this.CreatedDateTime = singleModel.get_Data().CreatedDateTime;
+					}
+				}
+				else
+				{
+					base.set_IsValid(!ViewModelBase<MixCmsContext, MixAttributeField, UpdateViewModel>.Repository.CheckIsExists((MixAttributeField f) => {
+						if (f.Id == this.Id || !(f.Name == this.Name))
+						{
+							return false;
+						}
+						return f.AttributeSetId == this.AttributeSetId;
+					}, null, null));
+					if (!base.get_IsValid())
+					{
+						base.get_Errors().Add(string.Concat("Field ", this.Name, " Existed"));
+						return;
+					}
+				}
+			}
+		}
 	}
 }

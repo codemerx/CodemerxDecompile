@@ -13,8 +13,8 @@ namespace OrchardCore.Modules
 			{
 				throw new ArgumentNullException("httpContext");
 			}
-			V_0 = httpContext.get_Request();
-			return table.Match(V_0.get_Host(), V_0.get_Path(), true);
+			HttpRequest request = httpContext.get_Request();
+			return table.Match(request.get_Host(), request.get_Path(), true);
 		}
 	}
 }

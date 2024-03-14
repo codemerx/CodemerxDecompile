@@ -1,6 +1,7 @@
 using Piranha;
 using Piranha.Extend;
 using Piranha.Models;
+using Piranha.Services;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -15,7 +16,7 @@ namespace Piranha.Extend.Fields
 		{
 			get
 			{
-				return this.get_Media() != null;
+				return this.Media != null;
 			}
 		}
 
@@ -33,69 +34,74 @@ namespace Piranha.Extend.Fields
 
 		public MediaFieldBase()
 		{
-			base();
-			return;
 		}
 
 		public override bool Equals(object obj)
 		{
-			V_0 = (T)(obj as T);
-			if (V_0 == null)
+			T t = (T)(obj as T);
+			if (t == null)
 			{
 				return false;
 			}
-			return this.Equals(V_0);
+			return this.Equals(t);
 		}
 
 		public virtual bool Equals(T obj)
 		{
-			if (MediaFieldBase<T>.op_Equality(obj, null))
+			if (obj == null)
 			{
 				return false;
 			}
-			V_0 = this.get_Id();
-			V_1 = obj.get_Id();
-			if (V_0.get_HasValue() != V_1.get_HasValue())
+			Guid? id = this.Id;
+			Guid? nullable = obj.Id;
+			if (id.HasValue != nullable.HasValue)
 			{
 				return false;
 			}
-			if (!V_0.get_HasValue())
+			if (!id.HasValue)
 			{
 				return true;
 			}
-			return Guid.op_Equality(V_0.GetValueOrDefault(), V_1.GetValueOrDefault());
+			return id.GetValueOrDefault() == nullable.GetValueOrDefault();
 		}
 
 		public override int GetHashCode()
 		{
-			if (!this.get_Id().get_HasValue())
+			if (!this.Id.HasValue)
 			{
 				return 0;
 			}
-			return this.get_Id().GetHashCode();
+			return this.Id.GetHashCode();
 		}
 
 		public virtual string GetTitle()
 		{
-			if (this.get_Media() == null)
+			if (this.Media == null)
 			{
 				return null;
 			}
-			if (String.IsNullOrWhiteSpace(this.get_Media().get_Title()))
+			if (String.IsNullOrWhiteSpace(this.Media.Title))
 			{
-				return this.get_Media().get_Filename();
+				return this.Media.Filename;
 			}
-			return String.Format("{0} ({1})", this.get_Media().get_Title(), this.get_Media().get_Filename());
+			return String.Format("{0} ({1})", (object)this.Media.Title, this.Media.Filename);
 		}
 
 		public virtual async Task Init(IApi api)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.api = api;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<MediaFieldBase<T>.u003cInitu003ed__11>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Guid? id = this.Id;
+			if (id.HasValue)
+			{
+				IMediaService media = api.Media;
+				id = this.Id;
+				ConfiguredTaskAwaitable<Piranha.Models.Media> configuredTaskAwaitable = media.GetByIdAsync(id.Value).ConfigureAwait(false);
+				this.Media = await configuredTaskAwaitable;
+				if (this.Media == null)
+				{
+					id = null;
+					this.Id = id;
+				}
+			}
 		}
 
 		public static bool operator ==(MediaFieldBase<T> field1, MediaFieldBase<T> field2)
@@ -113,7 +119,7 @@ namespace Piranha.Extend.Fields
 
 		public static bool operator !=(MediaFieldBase<T> field1, MediaFieldBase<T> field2)
 		{
-			return !MediaFieldBase<T>.op_Equality(field1, field2);
+			return !(field1 == field2);
 		}
 	}
 }

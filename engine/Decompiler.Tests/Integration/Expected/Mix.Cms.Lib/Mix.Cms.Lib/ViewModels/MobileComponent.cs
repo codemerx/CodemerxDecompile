@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
@@ -52,108 +53,93 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public MobileComponent(XElement element)
 		{
-			base();
+			string value;
+			string str;
+			string str1;
 			if (element != null)
 			{
-				stackVariable6 = element.Attribute(XName.op_Implicit("class"));
-				if (stackVariable6 != null)
+				XAttribute xAttribute = element.Attribute("class");
+				if (xAttribute != null)
 				{
-					stackVariable7 = stackVariable6.get_Value();
+					value = xAttribute.Value;
 				}
 				else
 				{
-					dummyVar0 = stackVariable6;
-					stackVariable7 = null;
+					value = null;
 				}
-				this.set_StyleName(stackVariable7);
-				this.set_DataSource(new List<MobileComponent>());
-				V_0 = element.Elements();
-				if (!V_0.Any<XElement>())
+				this.StyleName = value;
+				this.DataSource = new List<MobileComponent>();
+				IEnumerable<XElement> xElements = element.Elements();
+				if (!xElements.Any<XElement>())
 				{
-					V_4 = element.get_Name().get_LocalName();
-					if (V_4 != null)
+					string localName = element.Name.LocalName;
+					if (localName != null)
 					{
-						if (string.op_Equality(V_4, "img"))
+						if (localName == "img")
 						{
-							this.set_ComponentType("Image");
-							this.set_DataType("image_url");
-							stackVariable57 = element.Attribute(XName.op_Implicit("src"));
-							if (stackVariable57 != null)
+							this.ComponentType = "Image";
+							this.DataType = "image_url";
+							XAttribute xAttribute1 = element.Attribute("src");
+							if (xAttribute1 != null)
 							{
-								stackVariable67 = stackVariable57.get_Value().Replace("Model.", "@Model.").Replace("{{", "").Replace("}}", "");
+								str = xAttribute1.Value.Replace("Model.", "@Model.").Replace("{{", "").Replace("}}", "");
 							}
 							else
 							{
-								dummyVar2 = stackVariable57;
-								stackVariable67 = null;
+								str = null;
 							}
-							this.set_DataValue(stackVariable67);
+							this.DataValue = str;
 							return;
 						}
-						if (string.op_Equality(V_4, "br"))
+						if (localName == "br")
 						{
-							goto Label0;
+							return;
 						}
 					}
-					this.set_ComponentType("Text");
-					V_3 = element.get_Value().Trim();
-					if (!V_3.Contains("{{") || !V_3.Contains("}}"))
+					this.ComponentType = "Text";
+					string str2 = element.Value.Trim();
+					if (!str2.Contains("{{") || !str2.Contains("}}"))
 					{
-						this.set_DataType("string");
+						this.DataType = "string";
 					}
 					else
 					{
-						this.set_DataType("object");
+						this.DataType = "object";
 					}
-					this.set_DataValue(element.get_Value().Trim().Replace("Model.", "@Model.").Replace("{{", "").Replace("}}", ""));
+					this.DataValue = element.Value.Trim().Replace("Model.", "@Model.").Replace("{{", "").Replace("}}", "");
 				}
 				else
 				{
-					if (element.Attribute(XName.op_Implicit("data")) == null)
+					if (element.Attribute("data") == null)
 					{
-						this.set_ComponentType("View");
-						this.set_DataType("component");
+						this.ComponentType = "View";
+						this.DataType = "component";
 					}
 					else
 					{
-						this.set_ComponentType("View");
-						stackVariable100 = element.Attribute(XName.op_Implicit("data"));
-						if (stackVariable100 != null)
+						this.ComponentType = "View";
+						XAttribute xAttribute2 = element.Attribute("data");
+						if (xAttribute2 != null)
 						{
-							stackVariable110 = stackVariable100.get_Value().Replace("Model.", "@Model.").Replace("{{", "").Replace("}}", "");
+							str1 = xAttribute2.Value.Replace("Model.", "@Model.").Replace("{{", "").Replace("}}", "");
 						}
 						else
 						{
-							dummyVar1 = stackVariable100;
-							stackVariable110 = null;
+							str1 = null;
 						}
-						this.set_DataValue(stackVariable110);
-						this.set_DataType("object_array");
+						this.DataValue = str1;
+						this.DataType = "object_array";
 					}
-					V_1 = V_0.GetEnumerator();
-					try
+					foreach (XElement xElement in xElements)
 					{
-						while (V_1.MoveNext())
+						if (xElement.Name == "br")
 						{
-							V_2 = V_1.get_Current();
-							if (!XName.op_Inequality(V_2.get_Name(), XName.op_Implicit("br")))
-							{
-								continue;
-							}
-							this.get_DataSource().Add(new MobileComponent(V_2));
+							continue;
 						}
-					}
-					finally
-					{
-						if (V_1 != null)
-						{
-							V_1.Dispose();
-						}
+						this.DataSource.Add(new MobileComponent(xElement));
 					}
 				}
 			}
-		Label0:
-			return;
 		}
 	}
 }

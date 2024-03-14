@@ -3,6 +3,7 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace OrchardCore.Environment.Shell
@@ -11,7 +12,7 @@ namespace OrchardCore.Environment.Shell
 	{
 		private readonly static char[] HostSeparators;
 
-		private ImmutableDictionary<string, ShellSettings> _shellsByHostAndPrefix;
+		private ImmutableDictionary<string, ShellSettings> _shellsByHostAndPrefix = ImmutableDictionary<string, ShellSettings>.Empty.WithComparers(StringComparer.OrdinalIgnoreCase);
 
 		private ShellSettings _default;
 
@@ -19,60 +20,32 @@ namespace OrchardCore.Environment.Shell
 
 		static RunningShellTable()
 		{
-			stackVariable1 = new char[2];
-			stackVariable1[0] = ',';
-			stackVariable1[1] = ' ';
-			RunningShellTable.HostSeparators = stackVariable1;
-			return;
+			RunningShellTable.HostSeparators = new char[] { ',', ' ' };
 		}
 
 		public RunningShellTable()
 		{
-			this._shellsByHostAndPrefix = ImmutableDictionary<string, ShellSettings>.Empty.WithComparers(StringComparer.get_OrdinalIgnoreCase());
-			base();
-			return;
 		}
 
 		public void Add(ShellSettings settings)
 		{
-			if (string.op_Equality("Default", settings.get_Name()))
+			if ("Default" == settings.get_Name())
 			{
 				this._default = settings;
 			}
-			stackVariable6 = this.GetAllHostsAndPrefix(settings);
-			V_0 = new Dictionary<string, ShellSettings>();
-			V_1 = stackVariable6;
-			V_2 = 0;
-			while (V_2 < (int)V_1.Length)
+			string[] allHostsAndPrefix = this.GetAllHostsAndPrefix(settings);
+			Dictionary<string, ShellSettings> strs = new Dictionary<string, ShellSettings>();
+			string[] strArrays = allHostsAndPrefix;
+			for (int i = 0; i < (int)strArrays.Length; i++)
 			{
-				V_3 = V_1[V_2];
-				if (this._hasStarMapping)
-				{
-					stackVariable19 = true;
-				}
-				else
-				{
-					stackVariable19 = V_3.StartsWith('*');
-				}
-				this._hasStarMapping = stackVariable19;
-				dummyVar0 = V_0.TryAdd(V_3, settings);
-				V_2 = V_2 + 1;
+				string str = strArrays[i];
+				this._hasStarMapping = (this._hasStarMapping ? true : str.StartsWith('*'));
+				strs.TryAdd(str, settings);
 			}
-			V_4 = this;
-			V_5 = false;
-			try
+			lock (this)
 			{
-				Monitor.Enter(V_4, ref V_5);
-				this._shellsByHostAndPrefix = this._shellsByHostAndPrefix.SetItems(V_0);
+				this._shellsByHostAndPrefix = this._shellsByHostAndPrefix.SetItems(strs);
 			}
-			finally
-			{
-				if (V_5)
-				{
-					Monitor.Exit(V_4);
-				}
-			}
-			return;
 		}
 
 		private bool DefaultIsCatchAll()
@@ -86,96 +59,69 @@ namespace OrchardCore.Environment.Shell
 
 		private string[] GetAllHostsAndPrefix(ShellSettings shellSettings)
 		{
-			V_0 = new RunningShellTable.u003cu003ec__DisplayClass10_0();
-			V_0.shellSettings = shellSettings;
-			if (string.IsNullOrWhiteSpace(V_0.shellSettings.get_RequestUrlHost()))
+			if (string.IsNullOrWhiteSpace(shellSettings.get_RequestUrlHost()))
 			{
-				stackVariable19 = new string[1];
-				stackVariable19[0] = string.Concat("/", V_0.shellSettings.get_RequestUrlPrefix());
-				return stackVariable19;
+				return new string[] { string.Concat("/", shellSettings.get_RequestUrlPrefix()) };
 			}
-			return V_0.shellSettings.get_RequestUrlHost().Split(RunningShellTable.HostSeparators, 1).Select<string, string>(new Func<string, string>(V_0.u003cGetAllHostsAndPrefixu003eb__0)).ToArray<string>();
+			return (
+				from ruh in shellSettings.get_RequestUrlHost().Split(RunningShellTable.HostSeparators, StringSplitOptions.RemoveEmptyEntries)
+				select string.Concat(ruh, "/", shellSettings.get_RequestUrlPrefix())).ToArray<string>();
 		}
 
 		private string GetHostAndPrefix(StringSegment host, StringSegment path)
 		{
-			if (path.get_Length() > 0)
-			{
-				stackVariable6 = path.IndexOf('/', 1);
-			}
-			else
-			{
-				stackVariable6 = -1;
-			}
-			V_0 = stackVariable6;
-			if (V_0 <= -1)
+			int num = (path.get_Length() > 0 ? path.IndexOf('/', 1) : -1);
+			if (num <= -1)
 			{
 				return string.Concat(host.ToString(), path.get_Value());
 			}
-			stackVariable15 = host.ToString();
-			V_1 = path.Subsegment(0, V_0);
-			return string.Concat(stackVariable15, V_1.get_Value());
+			string str = host.ToString();
+			StringSegment stringSegment = path.Subsegment(0, num);
+			return string.Concat(str, stringSegment.get_Value());
 		}
 
 		public ShellSettings Match(HostString host, PathString path, bool fallbackToDefault = true)
 		{
-			V_0 = host.get_Host();
-			if (this.TryMatchInternal(StringSegment.op_Implicit(host.get_Value()), StringSegment.op_Implicit(V_0), StringSegment.op_Implicit(path.get_Value()), out V_1))
+			ShellSettings shellSetting;
+			string str = host.get_Host();
+			if (this.TryMatchInternal(host.get_Value(), str, path.get_Value(), out shellSetting))
 			{
-				return V_1;
+				return shellSetting;
 			}
-			if (this._hasStarMapping && this.TryMatchStarMapping(StringSegment.op_Implicit(host.get_Value()), StringSegment.op_Implicit(V_0), StringSegment.op_Implicit(path.get_Value()), out V_1))
+			if (this._hasStarMapping && this.TryMatchStarMapping(host.get_Value(), str, path.get_Value(), out shellSetting))
 			{
-				return V_1;
+				return shellSetting;
 			}
 			if (fallbackToDefault && this.DefaultIsCatchAll())
 			{
 				return this._default;
 			}
-			if (fallbackToDefault && this.TryMatchInternal(StringSegment.op_Implicit(""), StringSegment.op_Implicit(""), StringSegment.op_Implicit("/"), out V_1))
+			if (fallbackToDefault && this.TryMatchInternal("", "", "/", out shellSetting))
 			{
-				return V_1;
+				return shellSetting;
 			}
 			return null;
 		}
 
 		public void Remove(ShellSettings settings)
 		{
-			V_0 = new RunningShellTable.u003cu003ec__DisplayClass5_0();
-			V_0.settings = settings;
-			stackVariable8 = this._shellsByHostAndPrefix.Where<KeyValuePair<string, ShellSettings>>(new Func<KeyValuePair<string, ShellSettings>, bool>(V_0.u003cRemoveu003eb__0));
-			stackVariable9 = RunningShellTable.u003cu003ec.u003cu003e9__5_1;
-			if (stackVariable9 == null)
+			string[] array = (
+				from kv in this._shellsByHostAndPrefix
+				where kv.Value.get_Name() == settings.get_Name()
+				select kv.Key).ToArray<string>();
+			lock (this)
 			{
-				dummyVar0 = stackVariable9;
-				stackVariable9 = new Func<KeyValuePair<string, ShellSettings>, string>(RunningShellTable.u003cu003ec.u003cu003e9.u003cRemoveu003eb__5_1);
-				RunningShellTable.u003cu003ec.u003cu003e9__5_1 = stackVariable9;
+				this._shellsByHostAndPrefix = this._shellsByHostAndPrefix.RemoveRange(array);
 			}
-			V_1 = stackVariable8.Select<KeyValuePair<string, ShellSettings>, string>(stackVariable9).ToArray<string>();
-			V_2 = this;
-			V_3 = false;
-			try
-			{
-				Monitor.Enter(V_2, ref V_3);
-				this._shellsByHostAndPrefix = this._shellsByHostAndPrefix.RemoveRange(V_1);
-			}
-			finally
-			{
-				if (V_3)
-				{
-					Monitor.Exit(V_2);
-				}
-			}
-			if ((object)this._default == (object)V_0.settings)
+			if ((object)this._default == (object)settings)
 			{
 				this._default = null;
 			}
-			return;
 		}
 
 		private bool TryMatchInternal(StringSegment host, StringSegment hostOnly, StringSegment path, out ShellSettings result)
 		{
-			if (host.get_Length() != 0 && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(host, path), out result) || host.get_Length() != hostOnly.get_Length() && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(hostOnly, path), out result) || host.get_Length() != 0 && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(host, StringSegment.op_Implicit("/")), out result) || host.get_Length() != hostOnly.get_Length() && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(hostOnly, StringSegment.op_Implicit("/")), out result) || this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(StringSegment.op_Implicit(""), path), out result))
+			if (host.get_Length() != 0 && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(host, path), out result) || host.get_Length() != hostOnly.get_Length() && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(hostOnly, path), out result) || host.get_Length() != 0 && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(host, "/"), out result) || host.get_Length() != hostOnly.get_Length() && this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix(hostOnly, "/"), out result) || this._shellsByHostAndPrefix.TryGetValue(this.GetHostAndPrefix("", path), out result))
 			{
 				return true;
 			}
@@ -185,23 +131,23 @@ namespace OrchardCore.Environment.Shell
 
 		private bool TryMatchStarMapping(StringSegment host, StringSegment hostOnly, StringSegment path, out ShellSettings result)
 		{
-			if (this.TryMatchInternal(StringSegment.op_Implicit(string.Concat("*.", host.ToString())), StringSegment.op_Implicit(string.Concat("*.", hostOnly.ToString())), path, out result))
+			if (this.TryMatchInternal(string.Concat("*.", host.ToString()), string.Concat("*.", hostOnly.ToString()), path, out result))
 			{
 				return true;
 			}
-			V_0 = -1;
+			int num = -1;
 			do
 			{
-				stackVariable21 = host.IndexOf('.', V_0 + 1);
-				V_0 = stackVariable21;
-				if (-1 != stackVariable21)
+				int num1 = host.IndexOf('.', num + 1);
+				num = num1;
+				if (-1 != num1)
 				{
 					continue;
 				}
 				result = null;
 				return false;
 			}
-			while (!this.TryMatchInternal(StringSegment.op_Implicit(string.Concat("*", host.Subsegment(V_0).ToString())), StringSegment.op_Implicit(string.Concat("*", hostOnly.Subsegment(V_0).ToString())), path, out result));
+			while (!this.TryMatchInternal(string.Concat("*", host.Subsegment(num).ToString()), string.Concat("*", hostOnly.Subsegment(num).ToString()), path, out result));
 			return true;
 		}
 	}

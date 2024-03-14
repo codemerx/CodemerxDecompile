@@ -27,11 +27,9 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public GeneratedMethod(MethodDefinition method, Statement body, MethodSpecificContext context)
 		{
-			base();
-			this.set_Method(method);
-			this.set_Body(body);
-			this.set_Context(context);
-			return;
+			this.Method = method;
+			this.Body = body;
+			this.Context = context;
 		}
 	}
 }

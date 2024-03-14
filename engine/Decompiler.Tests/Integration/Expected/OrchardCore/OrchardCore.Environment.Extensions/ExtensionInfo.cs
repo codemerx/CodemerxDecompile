@@ -1,4 +1,5 @@
 using OrchardCore.Environment.Extensions.Features;
+using OrchardCore.Modules.Manifest;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -11,49 +12,38 @@ namespace OrchardCore.Environment.Extensions
 		{
 			get
 			{
-				return this.get_Manifest().get_Exists();
+				return this.Manifest.get_Exists();
 			}
 		}
 
 		public IEnumerable<IFeatureInfo> Features
 		{
-			get
-			{
-				return this.u003cFeaturesu003ek__BackingField;
-			}
+			get;
 		}
 
 		public string Id
 		{
 			get
 			{
-				return this.get_Manifest().get_ModuleInfo().get_Id();
+				return this.Manifest.get_ModuleInfo().get_Id();
 			}
 		}
 
 		public IManifestInfo Manifest
 		{
-			get
-			{
-				return this.u003cManifestu003ek__BackingField;
-			}
+			get;
 		}
 
 		public string SubPath
 		{
-			get
-			{
-				return this.u003cSubPathu003ek__BackingField;
-			}
+			get;
 		}
 
 		public ExtensionInfo(string subPath, IManifestInfo manifestInfo, Func<IManifestInfo, IExtensionInfo, IEnumerable<IFeatureInfo>> features)
 		{
-			base();
-			this.u003cSubPathu003ek__BackingField = subPath;
-			this.u003cManifestu003ek__BackingField = manifestInfo;
-			this.u003cFeaturesu003ek__BackingField = features.Invoke(manifestInfo, this);
-			return;
+			this.SubPath = subPath;
+			this.Manifest = manifestInfo;
+			this.Features = features(manifestInfo, this);
 		}
 	}
 }

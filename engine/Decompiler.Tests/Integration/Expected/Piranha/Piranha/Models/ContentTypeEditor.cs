@@ -26,8 +26,6 @@ namespace Piranha.Models
 
 		public ContentTypeEditor()
 		{
-			base();
-			return;
 		}
 	}
 }

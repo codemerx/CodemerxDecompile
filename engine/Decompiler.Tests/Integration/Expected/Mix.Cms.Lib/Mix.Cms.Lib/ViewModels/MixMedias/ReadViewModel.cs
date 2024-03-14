@@ -1,15 +1,18 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
 using Mix.Cms.Lib.ViewModels.MixCultures;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -74,21 +77,15 @@ namespace Mix.Cms.Lib.ViewModels.MixMedias
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_FileName()) || !string.IsNullOrEmpty(this.get_TargetUrl()))
+				if (string.IsNullOrEmpty(this.FileName) || !string.IsNullOrEmpty(this.TargetUrl))
 				{
-					return this.get_TargetUrl();
+					return this.TargetUrl;
 				}
-				if (this.get_FileFolder().IndexOf("http") > 0)
+				if (this.FileFolder.IndexOf("http") > 0)
 				{
-					return string.Concat(this.get_FileFolder(), "/", this.get_FileName(), this.get_Extension());
+					return string.Concat(this.FileFolder, "/", this.FileName, this.Extension);
 				}
-				stackVariable22 = new string[5];
-				stackVariable22[0] = "/";
-				stackVariable22[1] = this.get_FileFolder();
-				stackVariable22[2] = "/";
-				stackVariable22[3] = this.get_FileName();
-				stackVariable22[4] = this.get_Extension();
-				return string.Concat(stackVariable22);
+				return string.Concat(new string[] { "/", this.FileFolder, "/", this.FileName, this.Extension });
 			}
 		}
 
@@ -111,22 +108,15 @@ namespace Mix.Cms.Lib.ViewModels.MixMedias
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_FileName()) || !string.IsNullOrEmpty(this.get_TargetUrl()))
+				if (string.IsNullOrEmpty(this.FileName) || !string.IsNullOrEmpty(this.TargetUrl))
 				{
-					return this.get_TargetUrl();
+					return this.TargetUrl;
 				}
-				if (this.get_FileFolder().IndexOf("http") > 0)
+				if (this.FileFolder.IndexOf("http") > 0)
 				{
-					return string.Concat(this.get_FileFolder(), "/", this.get_FileName(), this.get_Extension());
+					return string.Concat(this.FileFolder, "/", this.FileName, this.Extension);
 				}
-				stackVariable22 = new string[6];
-				stackVariable22[0] = this.get_Domain();
-				stackVariable22[1] = "/";
-				stackVariable22[2] = this.get_FileFolder();
-				stackVariable22[3] = "/";
-				stackVariable22[4] = this.get_FileName();
-				stackVariable22[5] = this.get_Extension();
-				return string.Concat(stackVariable22);
+				return string.Concat(new string[] { this.Domain, "/", this.FileFolder, "/", this.FileName, this.Extension });
 			}
 		}
 
@@ -202,53 +192,34 @@ namespace Mix.Cms.Lib.ViewModels.MixMedias
 
 		public ReadViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadViewModel(MixMedia model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadViewModel(MixMedia model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		private List<SupportedCulture> LoadCultures(string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
-			V_1 = new List<SupportedCulture>();
-			if (V_0.get_IsSucceed())
+			RepositoryResponse<List<SystemCultureViewModel>> modelList = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
+			List<SupportedCulture> supportedCultures = new List<SupportedCulture>();
+			if (modelList.get_IsSucceed())
 			{
-				V_2 = V_0.get_Data().GetEnumerator();
-				try
+				foreach (SystemCultureViewModel datum in modelList.get_Data())
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = new Mix.Cms.Lib.ViewModels.MixMedias.ReadViewModel.u003cu003ec__DisplayClass80_0();
-						V_3.u003cu003e4__this = this;
-						V_3.culture = V_2.get_Current();
-						stackVariable19 = V_1;
-						V_4 = new SupportedCulture();
-						V_4.set_Icon(V_3.culture.get_Icon());
-						V_4.set_Specificulture(V_3.culture.get_Specificulture());
-						V_4.set_Alias(V_3.culture.get_Alias());
-						V_4.set_FullName(V_3.culture.get_FullName());
-						V_4.set_Description(V_3.culture.get_FullName());
-						V_4.set_Id(V_3.culture.get_Id());
-						V_4.set_Lcid(V_3.culture.get_Lcid());
-						stackVariable49 = V_4;
-						if (string.op_Equality(V_3.culture.get_Specificulture(), initCulture))
-						{
-							stackVariable55 = true;
-						}
-						else
-						{
-							stackVariable58 = _context.get_MixMedia();
-							V_5 = Expression.Parameter(Type.GetTypeFromHandle(// 
-							// Current member / type: System.Collections.Generic.List`1<Mix.Domain.Core.Models.SupportedCulture> Mix.Cms.Lib.ViewModels.MixMedias.ReadViewModel::LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Exception in: System.Collections.Generic.List<Mix.Domain.Core.Models.SupportedCulture> LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Specified method is not supported.
-							// 
-							// mailto: JustDecompilePublicFeedback@telerik.com
-
+					List<SupportedCulture> supportedCultures1 = supportedCultures;
+					SupportedCulture supportedCulture = new SupportedCulture();
+					supportedCulture.set_Icon(datum.Icon);
+					supportedCulture.set_Specificulture(datum.Specificulture);
+					supportedCulture.set_Alias(datum.Alias);
+					supportedCulture.set_FullName(datum.FullName);
+					supportedCulture.set_Description(datum.FullName);
+					supportedCulture.set_Id(datum.Id);
+					supportedCulture.set_Lcid(datum.Lcid);
+					supportedCulture.set_IsSupported((datum.Specificulture == initCulture ? true : _context.MixMedia.Any<MixMedia>((MixMedia p) => p.Id == this.Id && p.Specificulture == datum.Specificulture)));
+					supportedCultures1.Add(supportedCulture);
+				}
+			}
+			return supportedCultures;
+		}
 	}
 }

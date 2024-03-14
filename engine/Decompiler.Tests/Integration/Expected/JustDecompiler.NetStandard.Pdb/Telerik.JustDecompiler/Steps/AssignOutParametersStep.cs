@@ -1,5 +1,8 @@
 using Mono.Cecil;
+using Mono.Cecil.Extensions;
 using System;
+using System.Collections.Generic;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
@@ -14,37 +17,24 @@ namespace Telerik.JustDecompiler.Steps
 
 		public AssignOutParametersStep()
 		{
-			base();
-			return;
 		}
 
 		private void InsertTopLevelParameterAssignments(BlockStatement block)
 		{
-			V_0 = 0;
-			while (V_0 < this.context.get_MethodContext().get_OutParametersToAssign().get_Count())
+			for (int i = 0; i < this.context.MethodContext.OutParametersToAssign.Count; i++)
 			{
-				V_1 = this.context.get_MethodContext().get_OutParametersToAssign().get_Item(V_0);
-				if (V_1.get_ParameterType().get_IsByReference())
-				{
-					stackVariable18 = V_1.get_ParameterType().GetElementType();
-				}
-				else
-				{
-					stackVariable18 = V_1.get_ParameterType();
-				}
-				V_2 = stackVariable18;
-				V_3 = new UnaryExpression(8, new ArgumentReferenceExpression(V_1, null), null);
-				V_4 = new BinaryExpression(26, V_3, V_2.GetDefaultValueExpression(this.typeSystem), V_2, this.typeSystem, null, false);
-				block.AddStatementAt(V_0, new ExpressionStatement(V_4));
-				V_0 = V_0 + 1;
+				ParameterDefinition item = this.context.MethodContext.OutParametersToAssign[i];
+				TypeReference typeReference = (item.get_ParameterType().get_IsByReference() ? item.get_ParameterType().GetElementType() : item.get_ParameterType());
+				UnaryExpression unaryExpression = new UnaryExpression(UnaryOperator.AddressDereference, new ArgumentReferenceExpression(item, null), null);
+				BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, unaryExpression, typeReference.GetDefaultValueExpression(this.typeSystem), typeReference, this.typeSystem, null, false);
+				block.AddStatementAt(i, new ExpressionStatement(binaryExpression));
 			}
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
 			this.context = context;
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			this.InsertTopLevelParameterAssignments(body);
 			return body;
 		}

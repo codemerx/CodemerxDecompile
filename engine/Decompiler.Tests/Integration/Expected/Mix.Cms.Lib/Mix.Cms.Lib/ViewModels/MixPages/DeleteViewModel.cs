@@ -1,11 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels.MixAttributeSets;
 using Mix.Cms.Lib.ViewModels.MixPageModules;
 using Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas;
 using Mix.Cms.Lib.ViewModels.MixTemplates;
 using Mix.Cms.Lib.ViewModels.MixUrlAliases;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
 using Mix.Domain.Data.ViewModels;
@@ -15,7 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +35,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		{
 			get
 			{
-				return MixService.GetConfig<int>("ThemeId", this.get_Specificulture());
+				return MixService.GetConfig<int>("ThemeId", this.Specificulture);
 			}
 		}
 
@@ -138,14 +144,11 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_Image()) || this.get_Image().IndexOf("http") != -1 || this.get_Image().get_Chars(0) == '/')
+				if (string.IsNullOrEmpty(this.Image) || this.Image.IndexOf("http") != -1 || this.Image[0] == '/')
 				{
-					return this.get_Image();
+					return this.Image;
 				}
-				stackVariable16 = new string[2];
-				stackVariable16[0] = this.get_Domain();
-				stackVariable16[1] = this.get_Image();
-				return CommonHelper.GetFullPath(stackVariable16);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Image });
 			}
 		}
 
@@ -171,11 +174,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		}
 
 		[JsonProperty("listTag")]
-		public JArray ListTag
-		{
-			get;
-			set;
-		}
+		public JArray ListTag { get; set; } = new JArray();
 
 		[JsonProperty("master")]
 		public Mix.Cms.Lib.ViewModels.MixTemplates.UpdateViewModel Master
@@ -308,11 +307,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		{
 			get
 			{
-				stackVariable1 = new string[3];
-				stackVariable1[0] = "Views/Shared/Templates";
-				stackVariable1[1] = MixService.GetConfig<string>("ThemeName", this.get_Specificulture());
-				stackVariable1[2] = this.get_TemplateFolderType();
-				return CommonHelper.GetFullPath(stackVariable1);
+				return CommonHelper.GetFullPath(new string[] { "Views/Shared/Templates", MixService.GetConfig<string>("ThemeName", this.Specificulture), this.TemplateFolderType });
 			}
 		}
 
@@ -321,7 +316,7 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		{
 			get
 			{
-				return 1.ToString();
+				return MixEnums.EnumTemplateFolder.Pages.ToString();
 			}
 		}
 
@@ -344,18 +339,15 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 		{
 			get
 			{
-				if (this.get_Thumbnail() == null || this.get_Thumbnail().IndexOf("http") != -1 || this.get_Thumbnail().get_Chars(0) == '/')
+				if (this.Thumbnail == null || this.Thumbnail.IndexOf("http") != -1 || this.Thumbnail[0] == '/')
 				{
-					if (!string.IsNullOrEmpty(this.get_Thumbnail()))
+					if (!string.IsNullOrEmpty(this.Thumbnail))
 					{
-						return this.get_Thumbnail();
+						return this.Thumbnail;
 					}
-					return this.get_ImageUrl();
+					return this.ImageUrl;
 				}
-				stackVariable20 = new string[2];
-				stackVariable20[0] = this.get_Domain();
-				stackVariable20[1] = this.get_Thumbnail();
-				return CommonHelper.GetFullPath(stackVariable20);
+				return CommonHelper.GetFullPath(new string[] { this.Domain, this.Thumbnail });
 			}
 		}
 
@@ -404,26 +396,36 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 
 		public DeleteViewModel()
 		{
-			this.u003cListTagu003ek__BackingField = new JArray();
-			base();
-			return;
 		}
 
-		public DeleteViewModel(MixPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public DeleteViewModel(MixPage model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cListTagu003ek__BackingField = new JArray();
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(Mix.Cms.Lib.ViewModels.MixPages.DeleteViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0._context = _context;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPages.DeleteViewModel.u003cRemoveRelatedModelsAsyncu003ed__186>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			DbSet<MixPagePost> mixPagePost = _context.MixPagePost;
+			IQueryable<MixPagePost> pageId = 
+				from m in mixPagePost
+				where m.PageId == this.Id && m.Specificulture == this.Specificulture
+				select m;
+			Action<MixPagePost> action = (MixPagePost m) => _context.Entry<MixPagePost>(m).set_State(2);
+			CancellationToken cancellationToken = new CancellationToken();
+			await EntityFrameworkQueryableExtensions.ForEachAsync<MixPagePost>(pageId, action, cancellationToken);
+			DbSet<MixPageModule> mixPageModule = _context.MixPageModule;
+			IQueryable<MixPageModule> mixPageModules = 
+				from m in mixPageModule
+				where m.PageId == this.Id && m.Specificulture == this.Specificulture
+				select m;
+			Action<MixPageModule> action1 = (MixPageModule m) => _context.Entry<MixPageModule>(m).set_State(2);
+			cancellationToken = new CancellationToken();
+			await EntityFrameworkQueryableExtensions.ForEachAsync<MixPageModule>(mixPageModules, action1, cancellationToken);
+			MixCmsContext mixCmsContext = _context;
+			cancellationToken = new CancellationToken();
+			await ((DbContext)mixCmsContext).SaveChangesAsync(cancellationToken);
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			return repositoryResponse;
 		}
 	}
 }

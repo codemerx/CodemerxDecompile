@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
+using Mix.Common.Helper;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.ViewModels.MixTemplates
@@ -17,11 +22,7 @@ namespace Mix.Cms.Lib.ViewModels.MixTemplates
 		{
 			get
 			{
-				stackVariable1 = new string[3];
-				stackVariable1[0] = "content";
-				stackVariable1[1] = "templates";
-				stackVariable1[2] = this.get_ThemeName();
-				return CommonHelper.GetFullPath(stackVariable1);
+				return CommonHelper.GetFullPath(new string[] { "content", "templates", this.ThemeName });
 			}
 		}
 
@@ -89,11 +90,7 @@ namespace Mix.Cms.Lib.ViewModels.MixTemplates
 		}
 
 		[JsonProperty("mobileContent")]
-		public string MobileContent
-		{
-			get;
-			set;
-		}
+		public string MobileContent { get; set; } = "{}";
 
 		[JsonProperty("modifiedBy")]
 		public string ModifiedBy
@@ -117,11 +114,7 @@ namespace Mix.Cms.Lib.ViewModels.MixTemplates
 		}
 
 		[JsonProperty("spaContent")]
-		public string SpaContent
-		{
-			get;
-			set;
-		}
+		public string SpaContent { get; set; } = "";
 
 		[JsonProperty("status")]
 		public MixEnums.MixContentStatus Status
@@ -142,10 +135,7 @@ namespace Mix.Cms.Lib.ViewModels.MixTemplates
 		{
 			get
 			{
-				stackVariable1 = new string[2];
-				stackVariable1[0] = "Views/Shared/Templates";
-				stackVariable1[1] = this.get_ThemeName();
-				return CommonHelper.GetFullPath(stackVariable1);
+				return CommonHelper.GetFullPath(new string[] { "Views/Shared/Templates", this.ThemeName });
 			}
 		}
 
@@ -154,13 +144,7 @@ namespace Mix.Cms.Lib.ViewModels.MixTemplates
 		{
 			get
 			{
-				stackVariable1 = new string[5];
-				stackVariable1[0] = "/";
-				stackVariable1[1] = this.get_FileFolder();
-				stackVariable1[2] = "/";
-				stackVariable1[3] = this.get_FileName();
-				stackVariable1[4] = this.get_Extension();
-				return string.Concat(stackVariable1);
+				return string.Concat(new string[] { "/", this.FileFolder, "/", this.FileName, this.Extension });
 			}
 		}
 
@@ -180,73 +164,60 @@ namespace Mix.Cms.Lib.ViewModels.MixTemplates
 
 		public ReadListItemViewModel()
 		{
-			this.u003cMobileContentu003ek__BackingField = "{}";
-			this.u003cSpaContentu003ek__BackingField = "";
-			base();
-			return;
 		}
 
-		public ReadListItemViewModel(MixTemplate model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadListItemViewModel(MixTemplate model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			this.u003cMobileContentu003ek__BackingField = "{}";
-			this.u003cSpaContentu003ek__BackingField = "";
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public static ReadListItemViewModel GetDefault(string activedTemplate, string folderType, string folder, string specificulture)
 		{
-			stackVariable0 = new MixTemplate();
-			stackVariable0.set_Extension(MixService.GetConfig<string>("TemplateExtension"));
-			stackVariable0.set_ThemeId(MixService.GetConfig<int>("ThemeId", specificulture));
-			stackVariable0.set_ThemeName(activedTemplate);
-			stackVariable0.set_FolderType(folderType);
-			stackVariable0.set_FileFolder(folder);
-			stackVariable0.set_FileName(MixService.GetConfig<string>("DefaultTemplate"));
-			stackVariable0.set_Content("<div></div>");
-			return new ReadListItemViewModel(stackVariable0, null, null);
+			return new ReadListItemViewModel(new MixTemplate()
+			{
+				Extension = MixService.GetConfig<string>("TemplateExtension"),
+				ThemeId = MixService.GetConfig<int>("ThemeId", specificulture),
+				ThemeName = activedTemplate,
+				FolderType = folderType,
+				FileFolder = folder,
+				FileName = MixService.GetConfig<string>("DefaultTemplate"),
+				Content = "<div></div>"
+			}, null, null);
 		}
 
 		public static RepositoryResponse<ReadListItemViewModel> GetTemplateByPath(string path, string culture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = new ReadListItemViewModel.u003cu003ec__DisplayClass80_0();
-			V_1 = new RepositoryResponse<ReadListItemViewModel>();
-			V_0.temp = path.Split('/', 0);
-			if ((int)V_0.temp.Length >= 2)
+			ReadListItemViewModel.u003cu003ec__DisplayClass80_0 variable = null;
+			RepositoryResponse<ReadListItemViewModel> repositoryResponse = new RepositoryResponse<ReadListItemViewModel>();
+			string[] strArrays = path.Split('/', StringSplitOptions.None);
+			if ((int)strArrays.Length >= 2)
 			{
-				V_0.activeThemeId = MixService.GetConfig<int>("ThemeId", culture);
-				V_0.name = V_0.temp[1].Split('.', 0)[0];
-				stackVariable26 = ViewModelBase<MixCmsContext, MixTemplate, ReadListItemViewModel>.Repository;
-				V_2 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Domain.Core.ViewModels.RepositoryResponse`1<Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel> Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel::GetTemplateByPath(System.String,System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Domain.Core.ViewModels.RepositoryResponse<Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel> GetTemplateByPath(System.String,System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
-
-		public static ReadListItemViewModel GetTemplateByPath(int themeId, string path, string type, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
-		{
-			V_0 = new ReadListItemViewModel.u003cu003ec__DisplayClass81_0();
-			V_0.themeId = themeId;
-			V_0.type = type;
-			stackVariable5 = V_0;
-			if (path != null)
-			{
-				stackVariable12 = path.Split('/', 0)[1];
+				MixService.GetConfig<int>("ThemeId", culture);
+				string str = strArrays[1].Split('.', StringSplitOptions.None)[0];
+				DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixTemplate, ReadListItemViewModel>.Repository;
+				ParameterExpression parameterExpression = Expression.Parameter(typeof(MixTemplate), "t");
+				repositoryResponse = repository.GetSingleModel(Expression.Lambda<Func<MixTemplate, bool>>(Expression.AndAlso(Expression.AndAlso(Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixTemplate).GetMethod("get_FolderType").MethodHandle)), Expression.ArrayIndex(Expression.Field(Expression.Constant(variable, typeof(ReadListItemViewModel.u003cu003ec__DisplayClass80_0)), FieldInfo.GetFieldFromHandle(typeof(ReadListItemViewModel.u003cu003ec__DisplayClass80_0).GetField("temp").FieldHandle)), Expression.Constant(0, typeof(int)))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixTemplate).GetMethod("get_FileName").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(ReadListItemViewModel.u003cu003ec__DisplayClass80_0)), FieldInfo.GetFieldFromHandle(typeof(ReadListItemViewModel.u003cu003ec__DisplayClass80_0).GetField("name").FieldHandle)))), Expression.Equal(Expression.Property(parameterExpression, (MethodInfo)MethodBase.GetMethodFromHandle(typeof(MixTemplate).GetMethod("get_ThemeId").MethodHandle)), Expression.Field(Expression.Constant(variable, typeof(ReadListItemViewModel.u003cu003ec__DisplayClass80_0)), FieldInfo.GetFieldFromHandle(typeof(ReadListItemViewModel.u003cu003ec__DisplayClass80_0).GetField("activeThemeId").FieldHandle)))), new ParameterExpression[] { parameterExpression }), _context, _transaction);
 			}
 			else
 			{
-				stackVariable12 = null;
+				repositoryResponse.set_IsSucceed(false);
+				repositoryResponse.get_Errors().Add("Template Not Found");
 			}
-			stackVariable5.templateName = stackVariable12;
-			stackVariable13 = ViewModelBase<MixCmsContext, MixTemplate, ReadListItemViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel::GetTemplateByPath(System.Int32,System.String,System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: Mix.Cms.Lib.ViewModels.MixTemplates.ReadListItemViewModel GetTemplateByPath(System.Int32,System.String,System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
+			return repositoryResponse;
+		}
 
+		public static ReadListItemViewModel GetTemplateByPath(int themeId, string path, string type, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		{
+			string str;
+			if (path != null)
+			{
+				str = path.Split('/', StringSplitOptions.None)[1];
+			}
+			else
+			{
+				str = null;
+			}
+			string str1 = str;
+			return ViewModelBase<MixCmsContext, MixTemplate, ReadListItemViewModel>.Repository.GetSingleModel((MixTemplate t) => t.ThemeId == themeId && t.FolderType == type && !string.IsNullOrEmpty(str1) && str1.Equals(string.Format("{0}{1}", t.FileName, t.Extension)), _context, _transaction).get_Data();
+		}
 	}
 }

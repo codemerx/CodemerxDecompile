@@ -1,5 +1,6 @@
 using OrchardCore.Environment.Extensions.Features;
 using System;
+using System.Linq;
 
 namespace OrchardCore.Environment.Extensions
 {
@@ -7,8 +8,6 @@ namespace OrchardCore.Environment.Extensions
 	{
 		public ExtensionDependencyStrategy()
 		{
-			base();
-			return;
 		}
 
 		public bool HasDependency(IFeatureInfo observer, IFeatureInfo subject)

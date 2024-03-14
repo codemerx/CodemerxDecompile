@@ -2,6 +2,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
@@ -12,41 +13,25 @@ namespace Telerik.JustDecompiler.Steps
 {
 	internal class RebuildForeachArrayStatements : BaseCodeVisitor, IDecompilationStep
 	{
-		private readonly Stack<VariableDefinition> currentForIndeces;
+		private readonly Stack<VariableDefinition> currentForIndeces = new Stack<VariableDefinition>();
 
-		private readonly Stack<bool> currentForIndecesUsed;
+		private readonly Stack<bool> currentForIndecesUsed = new Stack<bool>();
 
 		private DecompilationContext context;
 
 		public RebuildForeachArrayStatements()
 		{
-			this.currentForIndeces = new Stack<VariableDefinition>();
-			this.currentForIndecesUsed = new Stack<bool>();
-			base();
-			return;
 		}
 
 		private bool CheckForIndexUsages(RebuildForeachArrayStatements.ForeachArrayMatcher matcher)
 		{
-			this.currentForIndeces.Push(matcher.get_Incrementor());
+			this.currentForIndeces.Push(matcher.Incrementor);
 			this.currentForIndecesUsed.Push(false);
-			V_0 = matcher.get_Foreach().get_Body().get_Statements().GetEnumerator();
-			try
+			foreach (Statement statement in matcher.Foreach.Body.Statements)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.Visit(V_1);
-				}
+				this.Visit(statement);
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			dummyVar0 = this.currentForIndeces.Pop();
+			this.currentForIndeces.Pop();
 			return this.currentForIndecesUsed.Pop();
 		}
 
@@ -60,58 +45,41 @@ namespace Telerik.JustDecompiler.Steps
 
 		private void ProcessBlock(BlockStatement node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_Statements().get_Count() - 1)
+			for (int i = 0; i < node.Statements.Count - 1; i++)
 			{
-				V_1 = new RebuildForeachArrayStatements.ForeachArrayMatcher(node.get_Statements().get_Item(V_0), node.get_Statements().get_Item(V_0 + 1), this.context.get_MethodContext());
-				if (V_1.Match() && !this.CheckForIndexUsages(V_1))
+				RebuildForeachArrayStatements.ForeachArrayMatcher foreachArrayMatcher = new RebuildForeachArrayStatements.ForeachArrayMatcher(node.Statements[i], node.Statements[i + 1], this.context.MethodContext);
+				if (foreachArrayMatcher.Match() && !this.CheckForIndexUsages(foreachArrayMatcher))
 				{
-					this.context.get_MethodContext().RemoveVariable(V_1.get_Incrementor());
-					if (V_1.get_CurrentVariable() != null)
+					this.context.MethodContext.RemoveVariable(foreachArrayMatcher.Incrementor);
+					if (foreachArrayMatcher.CurrentVariable != null)
 					{
-						this.context.get_MethodContext().RemoveVariable(V_1.get_CurrentVariable());
+						this.context.MethodContext.RemoveVariable(foreachArrayMatcher.CurrentVariable);
 					}
-					node.get_Statements().RemoveAt(V_0);
-					node.get_Statements().RemoveAt(V_0);
-					node.AddStatementAt(V_0, V_1.get_Foreach());
-					this.ProcessBlock(V_1.get_Foreach().get_Body());
+					node.Statements.RemoveAt(i);
+					node.Statements.RemoveAt(i);
+					node.AddStatementAt(i, foreachArrayMatcher.Foreach);
+					this.ProcessBlock(foreachArrayMatcher.Foreach.Body);
 				}
-				V_0 = V_0 + 1;
 			}
-			return;
 		}
 
 		public override void VisitBlockStatement(BlockStatement node)
 		{
 			this.ProcessBlock(node);
-			V_0 = node.get_Statements().GetEnumerator();
-			try
+			foreach (Statement statement in node.Statements)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.Visit(V_1);
-				}
+				this.Visit(statement);
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if (this.currentForIndeces.get_Count() > 0 && this.currentForIndeces.Peek() == node.get_Variable() && !this.currentForIndecesUsed.Peek())
+			if (this.currentForIndeces.Count > 0 && this.currentForIndeces.Peek() == node.Variable && !this.currentForIndecesUsed.Peek())
 			{
-				dummyVar0 = this.currentForIndecesUsed.Pop();
+				this.currentForIndecesUsed.Pop();
 				this.currentForIndecesUsed.Push(true);
 			}
-			this.VisitVariableReferenceExpression(node);
-			return;
+			base.VisitVariableReferenceExpression(node);
 		}
 
 		private class ForeachArrayMatcher
@@ -122,7 +90,7 @@ namespace Telerik.JustDecompiler.Steps
 
 			private readonly MethodSpecificContext methodContext;
 
-			private ForEachStatement foreach;
+			private ForEachStatement @foreach;
 
 			private Expression source;
 
@@ -140,14 +108,8 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				get
 				{
-					stackVariable2 = this.foreach;
-					if (stackVariable2 == null)
-					{
-						dummyVar0 = stackVariable2;
-						stackVariable2 = new ForEachStatement(new VariableDeclarationExpression(this.get_CurrentVariable().Resolve(), null), this.source, this.statementBody, this.foreachConditionInstructions, null);
-					}
-					this.foreach = stackVariable2;
-					return this.foreach;
+					this.@foreach = this.@foreach ?? new ForEachStatement(new VariableDeclarationExpression(this.CurrentVariable.Resolve(), null), this.source, this.statementBody, this.foreachConditionInstructions, null);
+					return this.@foreach;
 				}
 			}
 
@@ -159,33 +121,31 @@ namespace Telerik.JustDecompiler.Steps
 
 			public ForeachArrayMatcher(Statement statement, Statement nextStatement, MethodSpecificContext methodContext)
 			{
-				base();
 				this.statement = statement;
 				this.nextStatement = nextStatement;
 				this.methodContext = methodContext;
-				return;
 			}
 
 			private bool CheckArrayIndexer(Expression expression, VariableReference variableReference, Expression arrayExpression)
 			{
-				if (expression as ArrayIndexerExpression == null)
+				if (!(expression is ArrayIndexerExpression))
 				{
 					return false;
 				}
-				V_0 = (ArrayIndexerExpression)expression;
-				if (V_0.get_Indices().get_Count() != 1)
+				ArrayIndexerExpression arrayIndexerExpression = (ArrayIndexerExpression)expression;
+				if (arrayIndexerExpression.Indices.Count != 1)
 				{
 					return false;
 				}
-				if (V_0.get_Indices().get_Item(0) as VariableReferenceExpression == null)
+				if (!(arrayIndexerExpression.Indices[0] is VariableReferenceExpression))
 				{
 					return false;
 				}
-				if ((object)((VariableReferenceExpression)V_0.get_Indices().get_Item(0)).get_Variable() != (object)variableReference)
+				if ((object)((VariableReferenceExpression)arrayIndexerExpression.Indices[0]).Variable != (object)variableReference)
 				{
 					return false;
 				}
-				if (!V_0.get_Target().CheckInnerReferenceExpressions(arrayExpression))
+				if (!arrayIndexerExpression.Target.CheckInnerReferenceExpressions(arrayExpression))
 				{
 					return false;
 				}
@@ -194,45 +154,45 @@ namespace Telerik.JustDecompiler.Steps
 
 			private VariableReference CheckAssingExpression(Statement statement, VariableReference variableReference, Expression arrayExpression)
 			{
-				if (statement as ExpressionStatement == null)
+				if (!(statement is ExpressionStatement))
 				{
 					return null;
 				}
-				V_0 = (ExpressionStatement)statement;
-				if (this.CheckArrayIndexer(V_0.get_Expression(), variableReference, arrayExpression))
+				ExpressionStatement expressionStatement = (ExpressionStatement)statement;
+				if (this.CheckArrayIndexer(expressionStatement.Expression, variableReference, arrayExpression))
 				{
-					V_2 = this.GetArrayElementType(arrayExpression);
-					if (V_2 != null)
+					TypeReference arrayElementType = this.GetArrayElementType(arrayExpression);
+					if (arrayElementType != null)
 					{
-						V_3 = new VariableDefinition(V_2, this.methodContext.get_Method());
-						dummyVar0 = this.methodContext.get_VariablesToRename().Add(V_3);
-						return V_3;
+						VariableDefinition variableDefinition = new VariableDefinition(arrayElementType, this.methodContext.Method);
+						this.methodContext.VariablesToRename.Add(variableDefinition);
+						return variableDefinition;
 					}
 				}
-				if (V_0.get_Expression().get_CodeNodeType() != 24 || !(V_0.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
+				if (expressionStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expressionStatement.Expression as BinaryExpression).IsAssignmentExpression)
 				{
 					return null;
 				}
-				V_1 = (BinaryExpression)V_0.get_Expression();
-				if (V_1.get_Left() as VariableReferenceExpression == null)
+				BinaryExpression expression = (BinaryExpression)expressionStatement.Expression;
+				if (!(expression.Left is VariableReferenceExpression))
 				{
 					return null;
 				}
-				if (!this.CheckArrayIndexer(V_1.get_Right(), variableReference, arrayExpression))
+				if (!this.CheckArrayIndexer(expression.Right, variableReference, arrayExpression))
 				{
 					return null;
 				}
-				return (V_1.get_Left() as VariableReferenceExpression).get_Variable();
+				return (expression.Left as VariableReferenceExpression).Variable;
 			}
 
 			private bool CheckLiteralExpressionValue(Expression expression, int value)
 			{
-				if (expression as LiteralExpression == null)
+				if (!(expression is LiteralExpression))
 				{
 					return false;
 				}
-				V_0 = (LiteralExpression)expression;
-				if (V_0.get_Value() as Int32 != 0 && (Int32)V_0.get_Value() == value)
+				LiteralExpression literalExpression = (LiteralExpression)expression;
+				if (literalExpression.Value is Int32 && (Int32)literalExpression.Value == value)
 				{
 					return true;
 				}
@@ -242,115 +202,112 @@ namespace Telerik.JustDecompiler.Steps
 			private void CopyWhileBodyStatements(WhileStatement whileStatement)
 			{
 				this.statementBody = new BlockStatement();
-				V_0 = 1;
-				while (V_0 < whileStatement.get_Body().get_Statements().get_Count() - 1)
+				for (int i = 1; i < whileStatement.Body.Statements.Count - 1; i++)
 				{
-					this.statementBody.AddStatement(whileStatement.get_Body().get_Statements().get_Item(V_0));
-					V_0 = V_0 + 1;
+					this.statementBody.AddStatement(whileStatement.Body.Statements[i]);
 				}
-				return;
 			}
 
 			private TypeReference GetArrayElementType(Expression arrayExpression)
 			{
-				V_0 = arrayExpression.GetTargetTypeReference();
-				if (!V_0.get_IsArray())
+				TypeReference targetTypeReference = arrayExpression.GetTargetTypeReference();
+				if (!targetTypeReference.get_IsArray())
 				{
 					return null;
 				}
-				return V_0.GetElementType();
+				return targetTypeReference.GetElementType();
 			}
 
 			private PropertyReferenceExpression GetPropertyReferenceFromCast(Expression expression)
 			{
-				if (expression as ExplicitCastExpression == null)
+				if (!(expression is ExplicitCastExpression))
 				{
 					return null;
 				}
-				V_0 = (ExplicitCastExpression)expression;
-				if (String.op_Inequality(V_0.get_TargetType().get_FullName(), "System.Int32"))
+				ExplicitCastExpression explicitCastExpression = (ExplicitCastExpression)expression;
+				if (explicitCastExpression.TargetType.get_FullName() != "System.Int32")
 				{
 					return null;
 				}
-				if (V_0.get_Expression() as PropertyReferenceExpression == null)
+				if (!(explicitCastExpression.Expression is PropertyReferenceExpression))
 				{
 					return null;
 				}
-				V_1 = (PropertyReferenceExpression)V_0.get_Expression();
-				if (String.op_Inequality(V_1.get_Property().get_FullName(), "Int32.System Length()"))
+				PropertyReferenceExpression propertyReferenceExpression = (PropertyReferenceExpression)explicitCastExpression.Expression;
+				if (propertyReferenceExpression.Property.get_FullName() != "Int32.System Length()")
 				{
 					return null;
 				}
-				return V_1;
+				return propertyReferenceExpression;
 			}
 
 			private VariableReference GetVariableReference()
 			{
-				V_0 = (ExpressionStatement)this.statement;
-				if (V_0.get_Expression().get_CodeNodeType() != 24 || !(V_0.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
+				ExpressionStatement expressionStatement = (ExpressionStatement)this.statement;
+				if (expressionStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expressionStatement.Expression as BinaryExpression).IsAssignmentExpression)
 				{
 					return null;
 				}
-				V_1 = (BinaryExpression)V_0.get_Expression();
-				if (V_1.get_Left() as VariableReferenceExpression == null)
+				BinaryExpression expression = (BinaryExpression)expressionStatement.Expression;
+				if (!(expression.Left is VariableReferenceExpression))
 				{
 					return null;
 				}
-				if (!this.CheckLiteralExpressionValue(V_1.get_Right(), 0))
+				if (!this.CheckLiteralExpressionValue(expression.Right, 0))
 				{
 					return null;
 				}
-				return ((VariableReferenceExpression)V_1.get_Left()).get_Variable();
+				return ((VariableReferenceExpression)expression.Left).Variable;
 			}
 
 			private static bool IsArrayExpression(Expression expression)
 			{
-				V_0 = expression.GetTargetTypeReference();
-				if (V_0 == null)
+				TypeReference targetTypeReference = expression.GetTargetTypeReference();
+				if (targetTypeReference == null)
 				{
 					return false;
 				}
-				return V_0.get_IsArray();
+				return targetTypeReference.get_IsArray();
 			}
 
 			private bool IsIncrementExpression(Statement statement, VariableReference variableReference)
 			{
-				if (statement as ExpressionStatement == null)
+				if (!(statement is ExpressionStatement))
 				{
 					return false;
 				}
-				V_0 = (ExpressionStatement)statement;
-				if (V_0.get_Expression().get_CodeNodeType() != 24 || !(V_0.get_Expression() as BinaryExpression).get_IsAssignmentExpression())
+				ExpressionStatement expressionStatement = (ExpressionStatement)statement;
+				if (expressionStatement.Expression.CodeNodeType != CodeNodeType.BinaryExpression || !(expressionStatement.Expression as BinaryExpression).IsAssignmentExpression)
 				{
 					return false;
 				}
-				V_1 = (BinaryExpression)V_0.get_Expression();
-				if (V_1.get_Left() as VariableReferenceExpression == null)
+				BinaryExpression expression = (BinaryExpression)expressionStatement.Expression;
+				if (!(expression.Left is VariableReferenceExpression))
 				{
 					return false;
 				}
-				if ((object)(V_1.get_Left() as VariableReferenceExpression).get_Variable() != (object)variableReference)
+				if ((object)(expression.Left as VariableReferenceExpression).Variable != (object)variableReference)
 				{
 					return false;
 				}
-				if (V_1.get_Right() as BinaryExpression == null)
+				if (!(expression.Right is BinaryExpression))
 				{
 					return false;
 				}
-				V_2 = (BinaryExpression)V_1.get_Right();
-				if (V_2.get_Operator() != 1)
+				BinaryExpression right = (BinaryExpression)expression.Right;
+				if (right.Operator != BinaryOperator.Add)
 				{
 					return false;
 				}
-				if (!this.CheckLiteralExpressionValue(V_2.get_Right(), 1))
+				if (!this.CheckLiteralExpressionValue(right.Right, 1))
 				{
 					return false;
 				}
-				if (V_2.get_Left() as VariableReferenceExpression == null)
+				if (!(right.Left is VariableReferenceExpression))
 				{
 					return false;
 				}
-				if ((object)(V_2.get_Left() as VariableReferenceExpression).get_Variable() != (object)variableReference)
+				if ((object)(right.Left as VariableReferenceExpression).Variable != (object)variableReference)
 				{
 					return false;
 				}
@@ -359,63 +316,63 @@ namespace Telerik.JustDecompiler.Steps
 
 			internal bool Match()
 			{
-				if (this.nextStatement as WhileStatement == null)
+				if (!(this.nextStatement is WhileStatement))
 				{
 					return false;
 				}
-				V_0 = (WhileStatement)this.nextStatement;
-				if (V_0.get_Body().get_Statements().get_Count() < 2)
+				WhileStatement whileStatement = (WhileStatement)this.nextStatement;
+				if (whileStatement.Body.Statements.Count < 2)
 				{
 					return false;
 				}
-				if (this.statement as ExpressionStatement == null)
+				if (!(this.statement is ExpressionStatement))
 				{
 					return false;
 				}
-				V_1 = this.GetVariableReference();
-				if (V_0.get_Condition() as BinaryExpression == null)
+				VariableReference variableReference = this.GetVariableReference();
+				if (!(whileStatement.Condition is BinaryExpression))
 				{
 					return false;
 				}
-				V_2 = (BinaryExpression)V_0.get_Condition();
-				if (V_2.get_Operator() != 13)
+				BinaryExpression condition = (BinaryExpression)whileStatement.Condition;
+				if (condition.Operator != BinaryOperator.LessThan)
 				{
 					return false;
 				}
-				if (V_2.get_Left() as VariableReferenceExpression == null)
+				if (!(condition.Left is VariableReferenceExpression))
 				{
 					return false;
 				}
-				if ((object)((VariableReferenceExpression)V_2.get_Left()).get_Variable() != (object)V_1)
+				if ((object)((VariableReferenceExpression)condition.Left).Variable != (object)variableReference)
 				{
 					return false;
 				}
-				V_3 = this.GetPropertyReferenceFromCast(V_2.get_Right());
-				if (V_3 == null)
+				PropertyReferenceExpression propertyReferenceFromCast = this.GetPropertyReferenceFromCast(condition.Right);
+				if (propertyReferenceFromCast == null)
 				{
 					return false;
 				}
-				if (!RebuildForeachArrayStatements.ForeachArrayMatcher.IsArrayExpression(V_3.get_Target()))
+				if (!RebuildForeachArrayStatements.ForeachArrayMatcher.IsArrayExpression(propertyReferenceFromCast.Target))
 				{
 					return false;
 				}
-				this.set_CurrentVariable(this.CheckAssingExpression(V_0.get_Body().get_Statements().get_Item(0), V_1, V_3.get_Target()));
-				if (this.get_CurrentVariable() == null)
+				this.CurrentVariable = this.CheckAssingExpression(whileStatement.Body.Statements[0], variableReference, propertyReferenceFromCast.Target);
+				if (this.CurrentVariable == null)
 				{
 					return false;
 				}
-				if (!this.IsIncrementExpression(V_0.get_Body().get_Statements().get_Item(V_0.get_Body().get_Statements().get_Count() - 1), V_1))
+				if (!this.IsIncrementExpression(whileStatement.Body.Statements[whileStatement.Body.Statements.Count - 1], variableReference))
 				{
 					return false;
 				}
-				this.set_Incrementor(V_1.Resolve());
-				this.source = V_3.get_Target();
-				if (this.get_Incrementor() == null)
+				this.Incrementor = variableReference.Resolve();
+				this.source = propertyReferenceFromCast.Target;
+				if (this.Incrementor == null)
 				{
 					return false;
 				}
-				this.CopyWhileBodyStatements(V_0);
-				this.foreachConditionInstructions = V_0.get_Condition().get_UnderlyingSameMethodInstructions();
+				this.CopyWhileBodyStatements(whileStatement);
+				this.foreachConditionInstructions = whileStatement.Condition.UnderlyingSameMethodInstructions;
 				return true;
 			}
 		}

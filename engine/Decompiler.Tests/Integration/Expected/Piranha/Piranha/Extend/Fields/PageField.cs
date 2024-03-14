@@ -1,6 +1,7 @@
 using Piranha;
 using Piranha.Extend;
 using Piranha.Models;
+using Piranha.Services;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -15,7 +16,7 @@ namespace Piranha.Extend.Fields
 		{
 			get
 			{
-				return this.get_Page() != null;
+				return this.Page != null;
 			}
 		}
 
@@ -33,79 +34,81 @@ namespace Piranha.Extend.Fields
 
 		public PageField()
 		{
-			base();
-			return;
 		}
 
 		public override bool Equals(object obj)
 		{
-			V_0 = obj as PageField;
-			if (V_0 == null)
+			PageField pageField = obj as PageField;
+			if (pageField == null)
 			{
 				return false;
 			}
-			return this.Equals(V_0);
+			return this.Equals(pageField);
 		}
 
 		public virtual bool Equals(PageField obj)
 		{
-			if (PageField.op_Equality(obj, null))
+			if (obj == null)
 			{
 				return false;
 			}
-			V_0 = this.get_Id();
-			V_1 = obj.get_Id();
-			if (V_0.get_HasValue() != V_1.get_HasValue())
+			Guid? id = this.Id;
+			Guid? nullable = obj.Id;
+			if (id.HasValue != nullable.HasValue)
 			{
 				return false;
 			}
-			if (!V_0.get_HasValue())
+			if (!id.HasValue)
 			{
 				return true;
 			}
-			return Guid.op_Equality(V_0.GetValueOrDefault(), V_1.GetValueOrDefault());
+			return id.GetValueOrDefault() == nullable.GetValueOrDefault();
 		}
 
 		public override int GetHashCode()
 		{
-			if (!this.get_Id().get_HasValue())
+			if (!this.Id.HasValue)
 			{
 				return 0;
 			}
-			return this.get_Id().GetHashCode();
+			return this.Id.GetHashCode();
 		}
 
 		public virtual Task<T> GetPageAsync<T>(IApi api)
 		where T : GenericPage<T>
 		{
-			if (!this.get_Id().get_HasValue())
+			if (!this.Id.HasValue)
 			{
 				return null;
 			}
-			stackVariable6 = api.get_Pages();
-			V_0 = this.get_Id();
-			return stackVariable6.GetByIdAsync<T>(V_0.get_Value());
+			return api.Pages.GetByIdAsync<T>(this.Id.Value);
 		}
 
 		public virtual string GetTitle()
 		{
-			stackVariable1 = this.get_Page();
-			if (stackVariable1 != null)
+			PageInfo page = this.Page;
+			if (page != null)
 			{
-				return stackVariable1.get_Title();
+				return page.Title;
 			}
-			dummyVar0 = stackVariable1;
 			return null;
 		}
 
 		public virtual async Task Init(IApi api)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.api = api;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PageField.u003cInitu003ed__11>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Guid? id = this.Id;
+			if (id.HasValue)
+			{
+				IPageService pages = api.Pages;
+				id = this.Id;
+				ConfiguredTaskAwaitable<PageInfo> configuredTaskAwaitable = pages.GetByIdAsync<PageInfo>(id.Value).ConfigureAwait(false);
+				this.Page = await configuredTaskAwaitable;
+				if (this.Page == null)
+				{
+					id = null;
+					this.Id = id;
+				}
+			}
 		}
 
 		public static bool operator ==(PageField field1, PageField field2)
@@ -123,21 +126,23 @@ namespace Piranha.Extend.Fields
 
 		public static implicit operator PageField(Guid guid)
 		{
-			stackVariable0 = new PageField();
-			stackVariable0.set_Id(new Guid?(guid));
-			return stackVariable0;
+			return new PageField()
+			{
+				Id = new Guid?(guid)
+			};
 		}
 
 		public static implicit operator PageField(PageBase page)
 		{
-			stackVariable0 = new PageField();
-			stackVariable0.set_Id(new Guid?(page.get_Id()));
-			return stackVariable0;
+			return new PageField()
+			{
+				Id = new Guid?(page.Id)
+			};
 		}
 
 		public static bool operator !=(PageField field1, PageField field2)
 		{
-			return !PageField.op_Equality(field1, field2);
+			return !(field1 == field2);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -30,121 +31,130 @@ namespace Telerik.JustDecompiler.Steps
 
 		static SelfAssignment()
 		{
-			stackVariable0 = new Assignment();
-			stackVariable1 = new SelfAssignment.SelfIncrementExpression();
-			stackVariable1.set_Bind(new Func<Expression, MatchData>(SelfAssignment.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__17_0));
-			stackVariable0.set_Target(stackVariable1);
-			stackVariable5 = new Binary();
-			stackVariable5.set_Bind(new Func<BinaryExpression, MatchData>(SelfAssignment.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__17_1));
-			stackVariable9 = new ContextData();
-			stackVariable9.set_Name("Target");
-			stackVariable9.set_Comparer(new ExpressionComparer());
-			stackVariable5.set_Left(stackVariable9);
-			stackVariable12 = new Literal();
-			stackVariable12.set_Value(1);
-			stackVariable5.set_Right(stackVariable12);
-			stackVariable5.set_IsChecked(new bool?(false));
-			stackVariable0.set_Expression(stackVariable5);
-			SelfAssignment.IncrementPattern = stackVariable0;
-			stackVariable17 = new Assignment();
-			stackVariable18 = new SelfAssignment.SelfAssignmentExpression();
-			stackVariable18.set_Bind(new Func<Expression, MatchData>(SelfAssignment.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__17_2));
-			stackVariable17.set_Target(stackVariable18);
-			stackVariable22 = new Binary();
-			stackVariable22.set_Bind(new Func<BinaryExpression, MatchData>(SelfAssignment.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__17_3));
-			stackVariable26 = new ContextData();
-			stackVariable26.set_Name("Target");
-			stackVariable26.set_Comparer(new ExpressionComparer());
-			stackVariable22.set_Left(stackVariable26);
-			stackVariable29 = new SelfAssignment.SelfAssignmentValue();
-			stackVariable29.set_Bind(new Func<Expression, MatchData>(SelfAssignment.u003cu003ec.u003cu003e9.u003cu002ecctoru003eb__17_4));
-			stackVariable22.set_Right(stackVariable29);
-			stackVariable22.set_IsChecked(new bool?(false));
-			stackVariable17.set_Expression(stackVariable22);
-			SelfAssignment.AssignmentOperatorPattern = stackVariable17;
-			return;
+			SelfAssignment.IncrementPattern = new Assignment()
+			{
+				Target = new SelfAssignment.SelfIncrementExpression()
+				{
+					Bind = (Expression target) => new MatchData("Target", target)
+				},
+				Expression = new Binary()
+				{
+					Bind = (BinaryExpression binary) => new MatchData("Operator", (object)binary.Operator),
+					Left = new ContextData()
+					{
+						Name = "Target",
+						Comparer = new ExpressionComparer()
+					},
+					Right = new Literal()
+					{
+						Value = 1
+					},
+					IsChecked = new bool?(false)
+				}
+			};
+			SelfAssignment.AssignmentOperatorPattern = new Assignment()
+			{
+				Target = new SelfAssignment.SelfAssignmentExpression()
+				{
+					Bind = (Expression target) => new MatchData("Target", target)
+				},
+				Expression = new Binary()
+				{
+					Bind = (BinaryExpression binary) => new MatchData("RightSide", binary),
+					Left = new ContextData()
+					{
+						Name = "Target",
+						Comparer = new ExpressionComparer()
+					},
+					Right = new SelfAssignment.SelfAssignmentValue()
+					{
+						Bind = (Expression value) => new MatchData("Value", value)
+					},
+					IsChecked = new bool?(false)
+				}
+			};
 		}
 
 		public SelfAssignment()
 		{
-			base();
 			this.normalToAssignOperatorMap = this.InitializeNormalToAssignOperatorMap();
-			return;
 		}
 
-		private static UnaryOperator GetCorrespondingOperator(BinaryOperator operator)
+		private static UnaryOperator GetCorrespondingOperator(BinaryOperator @operator)
 		{
-			if (operator == 1)
+			if (@operator == BinaryOperator.Add)
 			{
-				return 4;
+				return UnaryOperator.PostIncrement;
 			}
-			if (operator != 3)
+			if (@operator != BinaryOperator.Subtract)
 			{
 				throw new ArgumentException();
 			}
-			return 3;
+			return UnaryOperator.PostDecrement;
 		}
 
 		protected virtual Dictionary<BinaryOperator, BinaryOperator> InitializeNormalToAssignOperatorMap()
 		{
-			stackVariable0 = new Dictionary<BinaryOperator, BinaryOperator>();
-			stackVariable0.Add(1, 2);
-			stackVariable0.Add(3, 4);
-			stackVariable0.Add(5, 6);
-			stackVariable0.Add(7, 8);
-			stackVariable0.Add(17, 18);
-			stackVariable0.Add(19, 20);
-			stackVariable0.Add(21, 29);
-			stackVariable0.Add(22, 28);
-			stackVariable0.Add(23, 30);
-			stackVariable0.Add(24, 25);
-			return stackVariable0;
+			return new Dictionary<BinaryOperator, BinaryOperator>()
+			{
+				{ BinaryOperator.Add, BinaryOperator.AddAssign },
+				{ BinaryOperator.Subtract, BinaryOperator.SubtractAssign },
+				{ BinaryOperator.Multiply, BinaryOperator.MultiplyAssign },
+				{ BinaryOperator.Divide, BinaryOperator.DivideAssign },
+				{ BinaryOperator.LeftShift, BinaryOperator.LeftShiftAssign },
+				{ BinaryOperator.RightShift, BinaryOperator.RightShiftAssign },
+				{ BinaryOperator.BitwiseOr, BinaryOperator.OrAssign },
+				{ BinaryOperator.BitwiseAnd, BinaryOperator.AndAssign },
+				{ BinaryOperator.BitwiseXor, BinaryOperator.XorAssign },
+				{ BinaryOperator.Modulo, BinaryOperator.ModuloAssign }
+			};
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.typeSystem = context.get_MethodContext().get_Method().get_Module().get_TypeSystem();
+			this.typeSystem = context.MethodContext.Method.get_Module().get_TypeSystem();
 			return (BlockStatement)this.VisitBlockStatement(body);
 		}
 
 		private ICodeNode VisitAssignExpression(BinaryExpression node)
 		{
-			V_0 = CodePattern.Match(SelfAssignment.IncrementPattern, node);
-			if (V_0.get_Success())
+			Expression item;
+			MatchContext matchContext = CodePattern.Match(SelfAssignment.IncrementPattern, node);
+			if (matchContext.Success)
 			{
-				V_1 = (Expression)V_0.get_Item("Target");
-				V_2 = (BinaryOperator)V_0.get_Item("Operator");
-				if (V_2 == 1 || V_2 == 3)
+				item = (Expression)matchContext["Target"];
+				BinaryOperator binaryOperator = (BinaryOperator)matchContext["Operator"];
+				if (binaryOperator == BinaryOperator.Add || binaryOperator == BinaryOperator.Subtract)
 				{
-					return new UnaryExpression(SelfAssignment.GetCorrespondingOperator(V_2), V_1.CloneExpressionOnly(), node.get_UnderlyingSameMethodInstructions());
+					return new UnaryExpression(SelfAssignment.GetCorrespondingOperator(binaryOperator), item.CloneExpressionOnly(), node.UnderlyingSameMethodInstructions);
 				}
 			}
-			V_0 = CodePattern.Match(SelfAssignment.AssignmentOperatorPattern, node);
-			if (V_0.get_Success())
+			matchContext = CodePattern.Match(SelfAssignment.AssignmentOperatorPattern, node);
+			if (matchContext.Success)
 			{
-				V_1 = (Expression)V_0.get_Item("Target");
-				V_3 = (BinaryExpression)V_0.get_Item("RightSide");
-				V_4 = (Expression)V_0.get_Item("Value");
-				if (this.normalToAssignOperatorMap.ContainsKey(V_3.get_Operator()))
+				item = (Expression)matchContext["Target"];
+				BinaryExpression binaryExpression = (BinaryExpression)matchContext["RightSide"];
+				Expression expression = (Expression)matchContext["Value"];
+				if (this.normalToAssignOperatorMap.ContainsKey(binaryExpression.Operator))
 				{
-					V_5 = new List<Instruction>();
-					V_5.AddRange(V_3.get_MappedInstructions());
-					V_5.AddRange(V_1.get_MappedInstructions());
-					stackVariable41 = this.normalToAssignOperatorMap.get_Item(V_3.get_Operator());
-					V_6 = V_1.CloneExpressionOnlyAndAttachInstructions(V_3.get_Left().get_MappedInstructions());
-					return new BinaryExpression(stackVariable41, V_6, V_4, this.typeSystem, V_5, false);
+					List<Instruction> instructions = new List<Instruction>();
+					instructions.AddRange(binaryExpression.MappedInstructions);
+					instructions.AddRange(item.MappedInstructions);
+					BinaryOperator item1 = this.normalToAssignOperatorMap[binaryExpression.Operator];
+					Expression expression1 = item.CloneExpressionOnlyAndAttachInstructions(binaryExpression.Left.MappedInstructions);
+					return new BinaryExpression(item1, expression1, expression, this.typeSystem, instructions, false);
 				}
 			}
-			return this.VisitBinaryExpression(node);
+			return base.VisitBinaryExpression(node);
 		}
 
 		public override ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			if (node.get_IsAssignmentExpression())
+			if (node.IsAssignmentExpression)
 			{
 				return this.VisitAssignExpression(node);
 			}
-			return this.VisitBinaryExpression(node);
+			return base.VisitBinaryExpression(node);
 		}
 
 		private class SelfAssignmentExpression : CodePattern<Expression>
@@ -159,13 +169,11 @@ namespace Telerik.JustDecompiler.Steps
 
 			public SelfAssignmentExpression()
 			{
-				base();
-				return;
 			}
 
 			protected override bool OnMatch(MatchContext context, Expression node)
 			{
-				return (new SelfAssignment.SelfAssignmentExpression.SelfAssignmentSafetyChecker(this.get_ShouldSelfAssignPointers())).IsSafeToSelfAssign(node);
+				return (new SelfAssignment.SelfAssignmentExpression.SelfAssignmentSafetyChecker(this.ShouldSelfAssignPointers)).IsSafeToSelfAssign(node);
 			}
 
 			private class SelfAssignmentSafetyChecker : BaseCodeVisitor
@@ -176,10 +184,8 @@ namespace Telerik.JustDecompiler.Steps
 
 				public SelfAssignmentSafetyChecker(bool includePointers)
 				{
-					base();
 					this.isSafe = true;
 					this.includePointers = includePointers;
-					return;
 				}
 
 				public bool IsSafeToSelfAssign(Expression expression)
@@ -195,58 +201,54 @@ namespace Telerik.JustDecompiler.Steps
 					{
 						return;
 					}
-					if (node.get_CodeNodeType() == 23)
+					if (node.CodeNodeType == CodeNodeType.UnaryExpression)
 					{
-						V_0 = node as UnaryExpression;
-						if (V_0.get_Operator() == 8 && this.includePointers || V_0.get_Operand().get_HasType() && !V_0.get_Operand().get_ExpressionType().get_IsPointer())
+						UnaryExpression unaryExpression = node as UnaryExpression;
+						if (unaryExpression.Operator == UnaryOperator.AddressDereference && (this.includePointers || unaryExpression.Operand.HasType && !unaryExpression.Operand.ExpressionType.get_IsPointer()))
 						{
-							this.Visit(node);
+							base.Visit(node);
 							return;
 						}
 					}
-					V_1 = node.get_CodeNodeType();
-					if (V_1 > 49)
+					CodeNodeType codeNodeType = node.CodeNodeType;
+					if (codeNodeType <= CodeNodeType.EnumExpression)
 					{
-						if (V_1 != 66 && V_1 - 83 > 1 && V_1 != 87)
+						switch (codeNodeType)
 						{
-							goto Label0;
-						}
-					}
-					else
-					{
-						switch (V_1 - 22)
-						{
-							case 0:
-							case 3:
-							case 4:
-							case 6:
-							case 7:
-							case 8:
-							case 9:
+							case CodeNodeType.LiteralExpression:
+							case CodeNodeType.ArgumentReferenceExpression:
+							case CodeNodeType.VariableReferenceExpression:
+							case CodeNodeType.ThisReferenceExpression:
+							case CodeNodeType.BaseReferenceExpression:
+							case CodeNodeType.FieldReferenceExpression:
+							case CodeNodeType.ExplicitCastExpression:
 							{
 								break;
 							}
-							case 1:
-							case 2:
-							case 5:
+							case CodeNodeType.UnaryExpression:
+							case CodeNodeType.BinaryExpression:
+							case CodeNodeType.VariableDeclarationExpression:
 							{
-								goto Label0;
+								this.isSafe = false;
+								return;
 							}
 							default:
 							{
-								if (V_1 == 39 || V_1 == 49)
+								if (codeNodeType == CodeNodeType.ArrayIndexerExpression || codeNodeType == CodeNodeType.EnumExpression)
 								{
 									break;
 								}
-								goto Label0;
+								this.isSafe = false;
+								return;
 							}
 						}
 					}
-					this.Visit(node);
-					return;
-				Label0:
-					this.isSafe = false;
-					return;
+					else if (codeNodeType != CodeNodeType.ArrayLengthExpression && (int)codeNodeType - (int)CodeNodeType.ArrayAssignmentVariableReferenceExpression > (int)CodeNodeType.UnsafeBlock && codeNodeType != CodeNodeType.ParenthesesExpression)
+					{
+						this.isSafe = false;
+						return;
+					}
+					base.Visit(node);
 				}
 			}
 		}
@@ -255,13 +257,11 @@ namespace Telerik.JustDecompiler.Steps
 		{
 			public SelfAssignmentValue()
 			{
-				base();
-				return;
 			}
 
 			protected override bool OnMatch(MatchContext context, Expression node)
 			{
-				return node.get_CodeNodeType() != 24;
+				return node.CodeNodeType != CodeNodeType.BinaryExpression;
 			}
 		}
 
@@ -277,8 +277,6 @@ namespace Telerik.JustDecompiler.Steps
 
 			public SelfIncrementExpression()
 			{
-				base();
-				return;
 			}
 		}
 	}

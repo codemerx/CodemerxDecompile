@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 
@@ -9,81 +11,76 @@ namespace Telerik.JustDecompiler.Common
 	{
 		public static bool BlockHasFallThroughSemantics(BlockStatement caseBody)
 		{
+			bool flag;
 			if (caseBody == null)
 			{
 				return false;
 			}
-			if (caseBody.get_Statements().get_Count() == 0)
+			if (caseBody.Statements.Count == 0)
 			{
 				return true;
 			}
-			V_0 = caseBody.get_Statements().get_Item(caseBody.get_Statements().get_Count() - 1);
-			if (V_0.get_CodeNodeType() != 5)
+			Statement item = caseBody.Statements[caseBody.Statements.Count - 1];
+			if (item.CodeNodeType != CodeNodeType.ExpressionStatement)
 			{
-				if (V_0.get_CodeNodeType() == 9 || V_0.get_CodeNodeType() == 10 || V_0.get_CodeNodeType() == 2)
+				if (item.CodeNodeType == CodeNodeType.BreakStatement || item.CodeNodeType == CodeNodeType.ContinueStatement || item.CodeNodeType == CodeNodeType.GotoStatement)
 				{
 					return false;
 				}
-				if (V_0.get_CodeNodeType() != 3)
+				if (item.CodeNodeType == CodeNodeType.IfStatement)
 				{
-					if (V_0.get_CodeNodeType() == 4)
+					IfStatement ifStatement = item as IfStatement;
+					if (ifStatement.Else != null)
 					{
-						V_3 = V_0 as IfElseIfStatement;
-						if (V_3.get_Else() == null)
+						if (SwitchHelpers.BlockHasFallThroughSemantics(ifStatement.Else))
 						{
 							return true;
 						}
-						V_4 = SwitchHelpers.BlockHasFallThroughSemantics(V_3.get_Else());
-						if (!V_4)
-						{
-							return false;
-						}
-						V_5 = V_3.get_ConditionBlocks().GetEnumerator();
-						try
-						{
-							while (V_5.MoveNext())
-							{
-								V_6 = V_5.get_Current();
-								V_4 = V_4 | SwitchHelpers.BlockHasFallThroughSemantics(V_6.get_Value());
-								if (V_4)
-								{
-									continue;
-								}
-								V_7 = false;
-								goto Label1;
-							}
-							goto Label0;
-						}
-						finally
-						{
-							((IDisposable)V_5).Dispose();
-						}
-					Label1:
-						return V_7;
+						return SwitchHelpers.BlockHasFallThroughSemantics(ifStatement.Then);
 					}
 				}
-				else
+				else if (item.CodeNodeType == CodeNodeType.IfElseIfStatement)
 				{
-					V_2 = V_0 as IfStatement;
-					if (V_2.get_Else() != null)
+					IfElseIfStatement ifElseIfStatement = item as IfElseIfStatement;
+					if (ifElseIfStatement.Else == null)
 					{
-						if (SwitchHelpers.BlockHasFallThroughSemantics(V_2.get_Else()))
-						{
-							return true;
-						}
-						return SwitchHelpers.BlockHasFallThroughSemantics(V_2.get_Then());
+						return true;
 					}
+					bool flag1 = SwitchHelpers.BlockHasFallThroughSemantics(ifElseIfStatement.Else);
+					if (!flag1)
+					{
+						return false;
+					}
+					List<KeyValuePair<Expression, BlockStatement>>.Enumerator enumerator = ifElseIfStatement.ConditionBlocks.GetEnumerator();
+					try
+					{
+						while (enumerator.MoveNext())
+						{
+							flag1 |= SwitchHelpers.BlockHasFallThroughSemantics(enumerator.Current.Value);
+							if (flag1)
+							{
+								continue;
+							}
+							flag = false;
+							return flag;
+						}
+						return true;
+					}
+					finally
+					{
+						((IDisposable)enumerator).Dispose();
+					}
+					return flag;
 				}
 			}
 			else
 			{
-				V_1 = (V_0 as ExpressionStatement).get_Expression();
-				if (V_1 != null && V_1.get_CodeNodeType() == 57 || V_1.get_CodeNodeType() == 6)
+				Expression expression = (item as ExpressionStatement).Expression;
+				if (expression != null && expression.CodeNodeType == CodeNodeType.ReturnExpression || expression.CodeNodeType == CodeNodeType.ThrowExpression)
 				{
 					return false;
 				}
 			}
-		Label0:
 			return true;
 		}
 	}

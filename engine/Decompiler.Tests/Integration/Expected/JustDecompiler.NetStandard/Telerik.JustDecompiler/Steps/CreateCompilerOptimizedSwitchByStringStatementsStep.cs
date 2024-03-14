@@ -1,9 +1,13 @@
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Common;
 using Telerik.JustDecompiler.Decompiler;
 
 namespace Telerik.JustDecompiler.Steps
@@ -14,84 +18,70 @@ namespace Telerik.JustDecompiler.Steps
 
 		public CreateCompilerOptimizedSwitchByStringStatementsStep()
 		{
-			base();
-			return;
 		}
 
 		private CompilerOptimizedSwitchByStringStatement ComposeSwitch(CreateCompilerOptimizedSwitchByStringStatementsStep.SwitchData data)
 		{
-			V_0 = new CompilerOptimizedSwitchByStringStatement(data.get_SwitchExpression(), data.get_SwitchExpressionLoadInstructions());
-			V_1 = data.get_CaseConditionToBlockMap().GetEnumerator();
-			try
+			CompilerOptimizedSwitchByStringStatement compilerOptimizedSwitchByStringStatement = new CompilerOptimizedSwitchByStringStatement(data.SwitchExpression, data.SwitchExpressionLoadInstructions);
+			foreach (KeyValuePair<Expression, BlockStatement> caseConditionToBlockMap in data.CaseConditionToBlockMap)
 			{
-				while (V_1.MoveNext())
+				if (caseConditionToBlockMap.Value != null && SwitchHelpers.BlockHasFallThroughSemantics(caseConditionToBlockMap.Value))
 				{
-					V_2 = V_1.get_Current();
-					if (V_2.get_Value() != null && SwitchHelpers.BlockHasFallThroughSemantics(V_2.get_Value()))
-					{
-						V_2.get_Value().AddStatement(new BreakSwitchCaseStatement());
-					}
-					V_0.AddCase(new ConditionCase(V_2.get_Key(), V_2.get_Value()));
+					caseConditionToBlockMap.Value.AddStatement(new BreakSwitchCaseStatement());
 				}
+				compilerOptimizedSwitchByStringStatement.AddCase(new ConditionCase(caseConditionToBlockMap.Key, caseConditionToBlockMap.Value));
 			}
-			finally
+			if (data.HaveDefaultCase)
 			{
-				((IDisposable)V_1).Dispose();
-			}
-			if (data.get_HaveDefaultCase())
-			{
-				if (SwitchHelpers.BlockHasFallThroughSemantics(data.get_DefaultCase()))
+				if (SwitchHelpers.BlockHasFallThroughSemantics(data.DefaultCase))
 				{
-					data.get_DefaultCase().AddStatement(new BreakSwitchCaseStatement());
+					data.DefaultCase.AddStatement(new BreakSwitchCaseStatement());
 				}
-				V_0.AddCase(new DefaultCase(data.get_DefaultCase()));
+				compilerOptimizedSwitchByStringStatement.AddCase(new DefaultCase(data.DefaultCase));
 			}
-			return V_0;
+			return compilerOptimizedSwitchByStringStatement;
 		}
 
 		private bool IsSwitchByString(IfElseIfStatement node)
 		{
-			V_0 = this.switchByStringData.get_SwitchBlocksToCasesMap().GetEnumerator();
+			bool flag;
+			Dictionary<int, List<int>>.Enumerator enumerator = this.switchByStringData.SwitchBlocksToCasesMap.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					V_2 = V_1.get_Value().GetEnumerator();
+					List<int>.Enumerator enumerator1 = enumerator.Current.Value.GetEnumerator();
 					try
 					{
-						while (V_2.MoveNext())
+						while (enumerator1.MoveNext())
 						{
-							V_3 = V_2.get_Current();
-							if (!node.get_SearchableUnderlyingSameMethodInstructionOffsets().Contains(V_3))
+							int current = enumerator1.Current;
+							if (!node.SearchableUnderlyingSameMethodInstructionOffsets.Contains(current))
 							{
 								continue;
 							}
-							V_4 = true;
-							goto Label1;
+							flag = true;
+							return flag;
 						}
 					}
 					finally
 					{
-						((IDisposable)V_2).Dispose();
+						((IDisposable)enumerator1).Dispose();
 					}
 				}
-				goto Label0;
+				return false;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_4;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.switchByStringData = context.get_MethodContext().get_SwitchByStringData();
-			if (this.switchByStringData.get_SwitchBlocksStartInstructions().get_Count() == 0)
+			this.switchByStringData = context.MethodContext.SwitchByStringData;
+			if (this.switchByStringData.SwitchBlocksStartInstructions.Count == 0)
 			{
 				return body;
 			}
@@ -100,106 +90,105 @@ namespace Telerik.JustDecompiler.Steps
 
 		private bool TryGetSwitchData(IfElseIfStatement node, out CreateCompilerOptimizedSwitchByStringStatementsStep.SwitchData data)
 		{
+			bool flag;
 			data = new CreateCompilerOptimizedSwitchByStringStatementsStep.SwitchData();
-			V_0 = node.get_ConditionBlocks().GetEnumerator();
+			List<KeyValuePair<Expression, BlockStatement>>.Enumerator enumerator = node.ConditionBlocks.GetEnumerator();
 			try
 			{
-				while (V_0.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					V_1 = V_0.get_Current();
-					if (this.TryMatchCondition(V_1.get_Key(), V_1.get_Value(), data))
+					KeyValuePair<Expression, BlockStatement> current = enumerator.Current;
+					if (this.TryMatchCondition(current.Key, current.Value, data))
 					{
 						continue;
 					}
-					V_2 = false;
-					goto Label1;
+					flag = false;
+					return flag;
 				}
-				goto Label0;
+				if (node.Else != null)
+				{
+					data.DefaultCase = node.Else;
+				}
+				return true;
 			}
 			finally
 			{
-				((IDisposable)V_0).Dispose();
+				((IDisposable)enumerator).Dispose();
 			}
-		Label1:
-			return V_2;
-		Label0:
-			if (node.get_Else() != null)
-			{
-				data.set_DefaultCase(node.get_Else());
-			}
-			return true;
+			return flag;
 		}
 
 		private bool TryMatchCondition(Expression condition, BlockStatement block, CreateCompilerOptimizedSwitchByStringStatementsStep.SwitchData data)
 		{
-			if (condition.get_CodeNodeType() != 23 && condition.get_CodeNodeType() != 24)
+			BinaryExpression operand;
+			if (condition.CodeNodeType != CodeNodeType.UnaryExpression && condition.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
 				return false;
 			}
-			if (condition.get_CodeNodeType() != 24)
+			if (condition.CodeNodeType != CodeNodeType.BinaryExpression)
 			{
-				V_5 = condition as UnaryExpression;
-				if (V_5.get_Operator() != 11 || V_5.get_Operand().get_CodeNodeType() != 24)
+				UnaryExpression unaryExpression = condition as UnaryExpression;
+				if (unaryExpression.Operator != UnaryOperator.None || unaryExpression.Operand.CodeNodeType != CodeNodeType.BinaryExpression)
 				{
 					return false;
 				}
-				V_0 = V_5.get_Operand() as BinaryExpression;
+				operand = unaryExpression.Operand as BinaryExpression;
 			}
 			else
 			{
-				V_0 = condition as BinaryExpression;
-				if (V_0.get_Operator() == 11)
+				operand = condition as BinaryExpression;
+				if (operand.Operator == BinaryOperator.LogicalOr)
 				{
-					if (!this.TryMatchCondition(V_0.get_Left(), null, data) || !this.TryMatchCondition(V_0.get_Right(), null, data))
+					if (!this.TryMatchCondition(operand.Left, null, data) || !this.TryMatchCondition(operand.Right, null, data))
 					{
 						return false;
 					}
 					if (block != null)
 					{
-						V_2 = data.get_CaseConditionToBlockMap().get_Count() - 1;
-						V_4 = data.get_CaseConditionToBlockMap().get_Item(V_2);
-						V_3 = V_4.get_Key();
-						data.get_CaseConditionToBlockMap().set_Item(V_2, new KeyValuePair<Expression, BlockStatement>(V_3, block));
+						int count = data.CaseConditionToBlockMap.Count - 1;
+						Expression key = data.CaseConditionToBlockMap[count].Key;
+						data.CaseConditionToBlockMap[count] = new KeyValuePair<Expression, BlockStatement>(key, block);
 					}
 					return true;
 				}
 			}
-			if (V_0.get_Right().get_CodeNodeType() != 22 || V_0.get_Operator() != 9)
+			if (operand.Right.CodeNodeType != CodeNodeType.LiteralExpression || operand.Operator != BinaryOperator.ValueEquality)
 			{
 				return false;
 			}
-			V_1 = V_0.get_Right() as LiteralExpression;
-			if (condition.get_CodeNodeType() == 23 && String.op_Inequality(V_1.get_ExpressionType().get_FullName(), "System.String"))
+			LiteralExpression right = operand.Right as LiteralExpression;
+			if (condition.CodeNodeType == CodeNodeType.UnaryExpression && right.ExpressionType.get_FullName() != "System.String")
 			{
 				return false;
 			}
-			if (condition.get_CodeNodeType() == 24 && String.op_Inequality(V_1.get_ExpressionType().get_FullName(), "System.Object") || V_1.get_Value() != null)
+			if (condition.CodeNodeType == CodeNodeType.BinaryExpression && (right.ExpressionType.get_FullName() != "System.Object" || right.Value != null))
 			{
 				return false;
 			}
-			if (data.get_SwitchExpression() != null)
+			if (data.SwitchExpression != null)
 			{
-				if (!data.get_SwitchExpression().Equals(V_0.get_Left()))
+				if (!data.SwitchExpression.Equals(operand.Left))
 				{
 					return false;
 				}
-				data.get_SwitchExpressionLoadInstructions().Add(V_0.get_Left().get_UnderlyingSameMethodInstructions().First<Instruction>().get_Offset());
+				data.SwitchExpressionLoadInstructions.Add(operand.Left.UnderlyingSameMethodInstructions.First<Instruction>().get_Offset());
 			}
 			else
 			{
-				data.set_SwitchExpression(V_0.get_Left());
+				data.SwitchExpression = operand.Left;
 			}
-			data.get_CaseConditionToBlockMap().Add(new KeyValuePair<Expression, BlockStatement>(V_1, block));
+			data.CaseConditionToBlockMap.Add(new KeyValuePair<Expression, BlockStatement>(right, block));
 			return true;
 		}
 
 		public override ICodeNode VisitIfElseIfStatement(IfElseIfStatement node)
 		{
-			if (!this.IsSwitchByString(node) || !this.TryGetSwitchData(node, out V_0))
+			CreateCompilerOptimizedSwitchByStringStatementsStep.SwitchData switchDatum;
+			if (!this.IsSwitchByString(node) || !this.TryGetSwitchData(node, out switchDatum))
 			{
-				return this.VisitIfElseIfStatement(node);
+				return base.VisitIfElseIfStatement(node);
 			}
-			return this.Visit(this.ComposeSwitch(V_0));
+			return this.Visit(this.ComposeSwitch(switchDatum));
 		}
 
 		private class SwitchData
@@ -220,7 +209,7 @@ namespace Telerik.JustDecompiler.Steps
 			{
 				get
 				{
-					return this.get_DefaultCase() != null;
+					return this.DefaultCase != null;
 				}
 			}
 
@@ -238,12 +227,10 @@ namespace Telerik.JustDecompiler.Steps
 
 			public SwitchData()
 			{
-				base();
-				this.set_SwitchExpression(null);
-				this.set_SwitchExpressionLoadInstructions(new List<int>());
-				this.set_CaseConditionToBlockMap(new List<KeyValuePair<Expression, BlockStatement>>());
-				this.set_DefaultCase(null);
-				return;
+				this.SwitchExpression = null;
+				this.SwitchExpressionLoadInstructions = new List<int>();
+				this.CaseConditionToBlockMap = new List<KeyValuePair<Expression, BlockStatement>>();
+				this.DefaultCase = null;
 			}
 		}
 	}

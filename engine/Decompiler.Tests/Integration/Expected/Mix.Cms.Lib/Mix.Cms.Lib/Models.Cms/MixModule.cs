@@ -152,12 +152,10 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixModule()
 		{
-			base();
-			this.set_MixModuleData(new HashSet<Mix.Cms.Lib.Models.Cms.MixModuleData>());
-			this.set_MixModulePost(new HashSet<Mix.Cms.Lib.Models.Cms.MixModulePost>());
-			this.set_MixPageModule(new HashSet<Mix.Cms.Lib.Models.Cms.MixPageModule>());
-			this.set_MixPostModule(new HashSet<Mix.Cms.Lib.Models.Cms.MixPostModule>());
-			return;
+			this.MixModuleData = new HashSet<Mix.Cms.Lib.Models.Cms.MixModuleData>();
+			this.MixModulePost = new HashSet<Mix.Cms.Lib.Models.Cms.MixModulePost>();
+			this.MixPageModule = new HashSet<Mix.Cms.Lib.Models.Cms.MixPageModule>();
+			this.MixPostModule = new HashSet<Mix.Cms.Lib.Models.Cms.MixPostModule>();
 		}
 	}
 }

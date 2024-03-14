@@ -88,24 +88,23 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public MenuItem()
 		{
-			base();
-			return;
 		}
 
 		public T Property<T>(string fieldName)
 		{
-			if (this.get_Data() == null)
+			T t;
+			if (this.Data == null)
 			{
-				V_1 = default(T);
-				return V_1;
+				t = default(T);
+				return t;
 			}
-			V_0 = this.get_Data().GetValue(fieldName);
-			if (V_0 != null)
+			JToken value = this.Data.GetValue(fieldName);
+			if (value != null)
 			{
-				return Newtonsoft.Json.Linq.Extensions.Value<T>(V_0);
+				return Newtonsoft.Json.Linq.Extensions.Value<T>(value);
 			}
-			V_1 = default(T);
-			return V_1;
+			t = default(T);
+			return t;
 		}
 	}
 }

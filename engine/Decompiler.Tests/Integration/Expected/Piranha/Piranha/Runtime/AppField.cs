@@ -25,8 +25,6 @@ namespace Piranha.Runtime
 
 		public AppField()
 		{
-			base();
-			return;
 		}
 	}
 }

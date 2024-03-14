@@ -10,33 +10,32 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public ExplicitlyImplementedMembersCollection()
 		{
-			base();
 			this.collection = new Dictionary<TypeReference, ICollection<string>>();
-			return;
 		}
 
-		public void Add(TypeReference interface, string memberFullName)
+		public void Add(TypeReference @interface, string memberFullName)
 		{
-			if (!this.collection.ContainsKey(interface))
+			ICollection<string> strs;
+			if (!this.collection.ContainsKey(@interface))
 			{
-				V_0 = new HashSet<string>();
-				this.collection.Add(interface, V_0);
+				strs = new HashSet<string>();
+				this.collection.Add(@interface, strs);
 			}
 			else
 			{
-				V_0 = this.collection.get_Item(interface);
+				strs = this.collection[@interface];
 			}
-			V_0.Add(memberFullName);
-			return;
+			strs.Add(memberFullName);
 		}
 
-		public bool Contains(TypeReference interface, string memberFullName)
+		public bool Contains(TypeReference @interface, string memberFullName)
 		{
-			if (!this.collection.TryGetValue(interface, out V_0))
+			ICollection<string> strs;
+			if (!this.collection.TryGetValue(@interface, out strs))
 			{
 				return false;
 			}
-			return V_0.Contains(memberFullName);
+			return strs.Contains(memberFullName);
 		}
 	}
 }

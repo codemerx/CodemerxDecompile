@@ -25,8 +25,6 @@ namespace Piranha.Models
 
 		protected MediaContent()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -86,8 +86,6 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixAttributeSetReference()
 		{
-			base();
-			return;
 		}
 	}
 }

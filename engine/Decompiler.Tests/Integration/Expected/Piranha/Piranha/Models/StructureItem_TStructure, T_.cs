@@ -28,8 +28,6 @@ namespace Piranha.Models
 
 		protected StructureItem()
 		{
-			base();
-			return;
 		}
 	}
 }

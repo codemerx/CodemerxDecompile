@@ -16,7 +16,6 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return new ContinueStatement.u003cget_Childrenu003ed__3(-2);
 			}
 		}
 
@@ -24,49 +23,44 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 10;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ContinueStatement;
 			}
 		}
 
 		public ContinueStatement(ICollection<Instruction> jumps)
 		{
-			base();
 			this.continueJumps = new List<Instruction>();
 			if (jumps != null)
 			{
 				this.continueJumps.AddRange(jumps);
-				stackVariable8 = this.continueJumps;
-				stackVariable9 = ContinueStatement.u003cu003ec.u003cu003e9__1_0;
-				if (stackVariable9 == null)
-				{
-					dummyVar0 = stackVariable9;
-					stackVariable9 = new Comparison<Instruction>(ContinueStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__1_0);
-					ContinueStatement.u003cu003ec.u003cu003e9__1_0 = stackVariable9;
-				}
-				stackVariable8.Sort(stackVariable9);
+				this.continueJumps.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
-			return;
 		}
 
 		public override Statement Clone()
 		{
-			V_0 = new ContinueStatement(this.continueJumps);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			ContinueStatement continueStatement = new ContinueStatement(this.continueJumps);
+			base.CopyParentAndLabel(continueStatement);
+			return continueStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			V_0 = new ContinueStatement(null);
-			this.CopyParentAndLabel(V_0);
-			return V_0;
+			ContinueStatement continueStatement = new ContinueStatement(null);
+			base.CopyParentAndLabel(continueStatement);
+			return continueStatement;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			stackVariable1 = new ContinueStatement.u003cGetOwnInstructionsu003ed__4(-2);
-			stackVariable1.u003cu003e4__this = this;
-			return stackVariable1;
+			ContinueStatement continueStatement = null;
+			if (continueStatement.continueJumps != null)
+			{
+				foreach (Instruction continueJump in continueStatement.continueJumps)
+				{
+					yield return continueJump;
+				}
+			}
 		}
 	}
 }

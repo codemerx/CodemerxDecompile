@@ -61,8 +61,6 @@ namespace Mix.Cms.Messenger.Models.Data
 
 		public MixMessengerMessage()
 		{
-			base();
-			return;
 		}
 	}
 }

@@ -2,6 +2,8 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 
@@ -9,38 +11,28 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 {
 	internal class TernaryConditionPattern : CommonPatterns, ICodePattern
 	{
-		public TernaryConditionPattern(CodePatternsContext patternsContext, TypeSystem typeSystem)
+		public TernaryConditionPattern(CodePatternsContext patternsContext, TypeSystem typeSystem) : base(patternsContext, typeSystem)
 		{
-			base(patternsContext, typeSystem);
-			return;
 		}
 
 		private Expression GetRightExpressionMapped(BinaryExpression assignExpression)
 		{
-			V_0 = new List<Instruction>(assignExpression.get_Left().get_UnderlyingSameMethodInstructions());
-			V_0.AddRange(assignExpression.get_MappedInstructions());
-			return assignExpression.get_Right().CloneAndAttachInstructions(V_0);
+			List<Instruction> instructions = new List<Instruction>(assignExpression.Left.UnderlyingSameMethodInstructions);
+			instructions.AddRange(assignExpression.MappedInstructions);
+			return assignExpression.Right.CloneAndAttachInstructions(instructions);
 		}
 
 		protected virtual bool ShouldInlineExpressions(BinaryExpression thenAssignExpression, BinaryExpression elseAssignExpression)
 		{
-			if (thenAssignExpression.get_Right().get_CodeNodeType() == 36)
-			{
-				stackVariable4 = false;
-			}
-			else
-			{
-				stackVariable4 = elseAssignExpression.get_Right().get_CodeNodeType() != 36;
-			}
-			if (!stackVariable4)
+			if ((thenAssignExpression.Right.CodeNodeType == CodeNodeType.ConditionExpression ? true : elseAssignExpression.Right.CodeNodeType == CodeNodeType.ConditionExpression))
 			{
 				return false;
 			}
-			if (!thenAssignExpression.get_Right().get_HasType() || !elseAssignExpression.get_Right().get_HasType())
+			if (!thenAssignExpression.Right.HasType || !elseAssignExpression.Right.HasType)
 			{
 				return false;
 			}
-			return String.op_Equality(thenAssignExpression.get_Right().get_ExpressionType().get_FullName(), elseAssignExpression.get_Right().get_ExpressionType().get_FullName());
+			return thenAssignExpression.Right.ExpressionType.get_FullName() == elseAssignExpression.Right.ExpressionType.get_FullName();
 		}
 
 		public bool TryMatch(StatementCollection statements, out int startIndex, out Statement result, out int replacedStatementsCount)
@@ -48,13 +40,13 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			result = null;
 			replacedStatementsCount = 1;
 			startIndex = 0;
-			while (startIndex < statements.get_Count())
+			while (startIndex < statements.Count)
 			{
-				if (statements.get_Item(startIndex).get_CodeNodeType() == 3 && this.TryMatchInternal(statements.get_Item(startIndex) as IfStatement, out result))
+				if (statements[startIndex].CodeNodeType == CodeNodeType.IfStatement && this.TryMatchInternal(statements[startIndex] as IfStatement, out result))
 				{
 					return true;
 				}
-				startIndex = startIndex + 1;
+				startIndex++;
 			}
 			return false;
 		}
@@ -66,34 +58,35 @@ namespace Telerik.JustDecompiler.Steps.CodePatterns
 			{
 				return false;
 			}
-			V_0 = null;
-			V_1 = null;
-			if (theIfStatement.get_Else() == null || theIfStatement.get_Then().get_Statements().get_Count() != 1 || theIfStatement.get_Else().get_Statements().get_Count() != 1 || theIfStatement.get_Then().get_Statements().get_Item(0).get_CodeNodeType() != 5 || theIfStatement.get_Else().get_Statements().get_Item(0).get_CodeNodeType() != 5)
+			VariableReference variableReference = null;
+			VariableReference variableReference1 = null;
+			if (theIfStatement.Else == null || theIfStatement.Then.Statements.Count != 1 || theIfStatement.Else.Statements.Count != 1 || theIfStatement.Then.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement || theIfStatement.Else.Statements[0].CodeNodeType != CodeNodeType.ExpressionStatement)
 			{
 				return false;
 			}
-			V_4 = (theIfStatement.get_Then().get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
-			V_5 = (theIfStatement.get_Else().get_Statements().get_Item(0) as ExpressionStatement).get_Expression() as BinaryExpression;
-			if (!this.IsAssignToVariableExpression(V_4, out V_1) || !this.IsAssignToVariableExpression(V_5, out V_0))
+			BinaryExpression expression = (theIfStatement.Then.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
+			BinaryExpression binaryExpression = (theIfStatement.Else.Statements[0] as ExpressionStatement).Expression as BinaryExpression;
+			if (!base.IsAssignToVariableExpression(expression, out variableReference1) || !base.IsAssignToVariableExpression(binaryExpression, out variableReference))
 			{
 				return false;
 			}
-			if ((object)V_0 != (object)V_1)
+			if ((object)variableReference != (object)variableReference1)
 			{
 				return false;
 			}
-			if (!this.ShouldInlineExpressions(V_4, V_5))
+			if (!this.ShouldInlineExpressions(expression, binaryExpression))
 			{
 				return false;
 			}
-			V_2 = this.GetRightExpressionMapped(V_4);
-			V_3 = this.GetRightExpressionMapped(V_5);
-			V_6 = new ConditionExpression(theIfStatement.get_Condition(), V_2, V_3, null);
-			V_7 = new BinaryExpression(26, new VariableReferenceExpression(V_0, null), V_6, this.typeSystem, null, false);
-			stackVariable87 = new ExpressionStatement(V_7);
-			stackVariable87.set_Parent(theIfStatement.get_Parent());
-			result = stackVariable87;
-			this.FixContext(V_0.Resolve(), 1, 0, result as ExpressionStatement);
+			Expression rightExpressionMapped = this.GetRightExpressionMapped(expression);
+			Expression rightExpressionMapped1 = this.GetRightExpressionMapped(binaryExpression);
+			ConditionExpression conditionExpression = new ConditionExpression(theIfStatement.Condition, rightExpressionMapped, rightExpressionMapped1, null);
+			BinaryExpression binaryExpression1 = new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(variableReference, null), conditionExpression, this.typeSystem, null, false);
+			result = new ExpressionStatement(binaryExpression1)
+			{
+				Parent = theIfStatement.Parent
+			};
+			base.FixContext(variableReference.Resolve(), 1, 0, result as ExpressionStatement);
 			return true;
 		}
 	}

@@ -92,10 +92,8 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixTheme()
 		{
-			base();
-			this.set_MixFile(new HashSet<Mix.Cms.Lib.Models.Cms.MixFile>());
-			this.set_MixTemplate(new HashSet<Mix.Cms.Lib.Models.Cms.MixTemplate>());
-			return;
+			this.MixFile = new HashSet<Mix.Cms.Lib.Models.Cms.MixFile>();
+			this.MixTemplate = new HashSet<Mix.Cms.Lib.Models.Cms.MixTemplate>();
 		}
 	}
 }

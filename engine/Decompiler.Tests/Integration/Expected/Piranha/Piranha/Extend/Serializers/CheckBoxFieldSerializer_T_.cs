@@ -9,25 +9,23 @@ namespace Piranha.Extend.Serializers
 	{
 		public CheckBoxFieldSerializer()
 		{
-			base();
-			return;
 		}
 
 		public object Deserialize(string str)
 		{
-			stackVariable0 = Activator.CreateInstance<T>();
-			stackVariable0.set_Value(Boolean.Parse(str));
-			return stackVariable0;
+			T t = Activator.CreateInstance<T>();
+			t.Value = Boolean.Parse(str);
+			return t;
 		}
 
 		public string Serialize(object obj)
 		{
-			V_0 = (T)(obj as T);
-			if (V_0 == null)
+			T t = (T)(obj as T);
+			if (t == null)
 			{
 				throw new ArgumentException("The given object doesn't match the serialization type");
 			}
-			return V_0.get_Value().ToString();
+			return t.Value.ToString();
 		}
 	}
 }

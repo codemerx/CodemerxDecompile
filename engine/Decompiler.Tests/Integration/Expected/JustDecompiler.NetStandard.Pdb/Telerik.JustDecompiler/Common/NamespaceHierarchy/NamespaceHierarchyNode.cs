@@ -26,10 +26,8 @@ namespace Telerik.JustDecompiler.Common.NamespaceHierarchy
 
 		public NamespaceHierarchyNode(string name)
 		{
-			base();
-			this.set_Name(name);
-			this.set_Children(new Dictionary<string, NamespaceHierarchyNode>());
-			return;
+			this.Name = name;
+			this.Children = new Dictionary<string, NamespaceHierarchyNode>();
 		}
 	}
 }

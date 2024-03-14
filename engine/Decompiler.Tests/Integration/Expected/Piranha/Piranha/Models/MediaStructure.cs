@@ -20,8 +20,6 @@ namespace Piranha.Models
 
 		public MediaStructure()
 		{
-			base();
-			return;
 		}
 	}
 }

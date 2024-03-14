@@ -15,7 +15,6 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return new TypeReferenceExpression.u003cget_Childrenu003ed__6(-2);
 			}
 		}
 
@@ -23,7 +22,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 43;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.TypeReferenceExpression;
 			}
 		}
 
@@ -31,12 +30,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Type();
+				return this.Type;
 			}
 			set
 			{
-				this.set_Type(value);
-				return;
+				this.Type = value;
 			}
 		}
 
@@ -44,7 +42,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.get_Type() != (object)null;
+				return (object)this.Type != (object)null;
 			}
 		}
 
@@ -54,31 +52,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public TypeReferenceExpression(TypeReference type, IEnumerable<Instruction> instructions)
+		public TypeReferenceExpression(TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Type(type);
-			return;
+			this.Type = type;
 		}
 
 		public override Expression Clone()
 		{
-			return new TypeReferenceExpression(this.get_Type(), this.instructions);
+			return new TypeReferenceExpression(this.Type, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new TypeReferenceExpression(this.get_Type(), null);
+			return new TypeReferenceExpression(this.Type, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as TypeReferenceExpression == null)
+			if (!(other is TypeReferenceExpression))
 			{
 				return false;
 			}
-			V_0 = other as TypeReferenceExpression;
-			return String.op_Equality(this.get_Type().get_FullName(), V_0.get_Type().get_FullName());
+			TypeReferenceExpression typeReferenceExpression = other as TypeReferenceExpression;
+			return this.Type.get_FullName() == typeReferenceExpression.Type.get_FullName();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-#    Copyright CodeMerx 2020
+#    Copyright CodeMerx 2020, 2024
 #    This file is part of CodemerxDecompile.
 
 #    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ on:
       - master
 
 jobs:
-  build:
+  test-on-windows:
 
     runs-on: windows-latest
 
@@ -37,12 +37,83 @@ jobs:
         encodedString: ${{ secrets.CD_SNK }}
 
     - name: Setup DotNet
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '3.1.4'
+        dotnet-version: |
+          2.x
+          3.x
+          5.x
+          6.x
+          7.x
 
     - name: Build Solution
       run: dotnet build engine/CodemerxDecompileEngine.sln -c Release
 
     - name: Run Tests
       run: dotnet test engine/Decompiler.Tests -c Release
+  
+  test-on-linux:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Restore SNK
+      uses: RollyPeres/base64-to-path@v1
+      with:
+        filePath: ${{ github.workspace }}/common/CDKey.snk
+        encodedString: ${{ secrets.CD_SNK }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.x
+          7.x
+
+    - name: Build Tests Project
+      run: dotnet build engine/Decompiler.Tests/Decompiler.Tests.csproj -c Release
+
+    - name: Run Tests
+      run: dotnet test engine/Decompiler.Tests -c Release
+
+  test-on-mac:
+
+    runs-on: macos-latest
+
+    env:
+      DOTNET_INSTALL_DIR: "/usr/local/share/dotnet"
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Restore SNK
+      uses: RollyPeres/base64-to-path@v1
+      with:
+        filePath: ${{ github.workspace }}/common/CDKey.snk
+        encodedString: ${{ secrets.CD_SNK }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          6.x
+          7.x
+
+    - name: Build Tests Project
+      run: dotnet build engine/Decompiler.Tests/Decompiler.Tests.csproj -c Release
+
+    - name: Run Tests
+      run: dotnet test engine/Decompiler.Tests -c Release
+
+    # - name: Compress Decompiler.Tests/bin
+    #   if: always()
+    #   run: zip -r Decompiler.Tests.Bin.zip engine/Decompiler.Tests/bin
+
+    # - name: Upload Decompiler.Tests.Bin artifact
+    #   if: always()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: Decompiler.Tests.Bin
+    #     path: Decompiler.Tests.Bin.zip

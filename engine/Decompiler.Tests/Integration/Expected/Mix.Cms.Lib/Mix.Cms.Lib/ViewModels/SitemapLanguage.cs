@@ -19,8 +19,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public SitemapLanguage()
 		{
-			base();
-			return;
 		}
 	}
 }

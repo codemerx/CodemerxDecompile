@@ -8,20 +8,16 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DTree
 	{
 		protected readonly ISingleEntrySubGraph originalGraph;
 
-		protected readonly Dictionary<ISingleEntrySubGraph, DTNode> constructToNodeMap;
+		protected readonly Dictionary<ISingleEntrySubGraph, DTNode> constructToNodeMap = new Dictionary<ISingleEntrySubGraph, DTNode>();
 
 		protected readonly ISingleEntrySubGraph rootConstruct;
 
-		protected readonly Dictionary<DTNode, HashSet<DTNode>> predecessorMap;
+		protected readonly Dictionary<DTNode, HashSet<DTNode>> predecessorMap = new Dictionary<DTNode, HashSet<DTNode>>();
 
 		protected BaseDominatorTreeBuilder(ISingleEntrySubGraph graph)
 		{
-			this.constructToNodeMap = new Dictionary<ISingleEntrySubGraph, DTNode>();
-			this.predecessorMap = new Dictionary<DTNode, HashSet<DTNode>>();
-			base();
 			this.originalGraph = graph;
-			this.rootConstruct = graph.get_Entry();
-			return;
+			this.rootConstruct = graph.Entry;
 		}
 
 		protected static DominatorTree BuildTreeInternal(BaseDominatorTreeBuilder theBuilder)
@@ -35,105 +31,58 @@ namespace Telerik.JustDecompiler.Decompiler.LogicFlow.DTree
 
 		private void ComputeDominanceFrontiers()
 		{
-			V_0 = this.constructToNodeMap.get_Values().GetEnumerator();
-			try
+			foreach (DTNode value in this.constructToNodeMap.Values)
 			{
-				while (V_0.MoveNext())
+				foreach (DTNode item in this.predecessorMap[value])
 				{
-					V_1 = V_0.get_Current();
-					V_2 = this.predecessorMap.get_Item(V_1).GetEnumerator();
-					try
+					while (item != value.ImmediateDominator)
 					{
-						while (V_2.MoveNext())
-						{
-							V_3 = V_2.get_Current();
-							while (V_3 != V_1.get_ImmediateDominator())
-							{
-								dummyVar0 = V_3.get_DominanceFrontier().Add(V_1);
-								V_3 = V_3.get_ImmediateDominator();
-							}
-						}
-					}
-					finally
-					{
-						((IDisposable)V_2).Dispose();
+						item.DominanceFrontier.Add(value);
+						item = item.ImmediateDominator;
 					}
 				}
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		protected abstract void FindImmediateDominators();
 
 		private void MapNodes()
 		{
-			V_0 = this.originalGraph.get_Children().GetEnumerator();
-			try
+			foreach (ISingleEntrySubGraph child in this.originalGraph.Children)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.constructToNodeMap.Add(V_1, new DTNode(V_1));
-				}
-			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
+				this.constructToNodeMap.Add(child, new DTNode(child));
 			}
 			if (!this.constructToNodeMap.ContainsKey(this.rootConstruct))
 			{
 				throw new ArgumentException("The Graph does not contain the given start node");
 			}
-			return;
 		}
 
 		private void MapPredecessors()
 		{
-			V_0 = this.originalGraph.get_Children().GetEnumerator();
-			try
+			DTNode dTNode;
+			foreach (ISingleEntrySubGraph child in this.originalGraph.Children)
 			{
-				while (V_0.MoveNext())
+				if (child != this.rootConstruct)
 				{
-					V_1 = V_0.get_Current();
-					if (V_1 != this.rootConstruct)
+					HashSet<ISingleEntrySubGraph> singleEntrySubGraphs = new HashSet<ISingleEntrySubGraph>();
+					singleEntrySubGraphs.UnionWith(child.SameParentPredecessors);
+					HashSet<DTNode> dTNodes = new HashSet<DTNode>();
+					foreach (ISingleEntrySubGraph singleEntrySubGraph in singleEntrySubGraphs)
 					{
-						stackVariable11 = new HashSet<ISingleEntrySubGraph>();
-						stackVariable11.UnionWith(V_1.get_SameParentPredecessors());
-						V_2 = new HashSet<DTNode>();
-						V_3 = stackVariable11.GetEnumerator();
-						try
+						if (!this.constructToNodeMap.TryGetValue(singleEntrySubGraph, out dTNode))
 						{
-							while (V_3.MoveNext())
-							{
-								V_4 = V_3.get_Current();
-								if (!this.constructToNodeMap.TryGetValue(V_4, out V_5))
-								{
-									throw new ArgumentException("The desired predecessor is not child of the same subgraph");
-								}
-								dummyVar0 = V_2.Add(V_5);
-							}
+							throw new ArgumentException("The desired predecessor is not child of the same subgraph");
 						}
-						finally
-						{
-							((IDisposable)V_3).Dispose();
-						}
-						this.predecessorMap.set_Item(this.constructToNodeMap.get_Item(V_1), V_2);
+						dTNodes.Add(dTNode);
 					}
-					else
-					{
-						this.predecessorMap.set_Item(this.constructToNodeMap.get_Item(V_1), new HashSet<DTNode>());
-					}
+					this.predecessorMap[this.constructToNodeMap[child]] = dTNodes;
+				}
+				else
+				{
+					this.predecessorMap[this.constructToNodeMap[child]] = new HashSet<DTNode>();
 				}
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 	}
 }

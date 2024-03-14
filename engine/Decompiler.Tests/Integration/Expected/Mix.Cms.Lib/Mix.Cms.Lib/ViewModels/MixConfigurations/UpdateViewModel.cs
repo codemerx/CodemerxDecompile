@@ -1,16 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
+using Mix.Cms.Lib.Services;
 using Mix.Cms.Lib.ViewModels;
 using Mix.Cms.Lib.ViewModels.MixCultures;
+using Mix.Common.Helper;
 using Mix.Domain.Core.Models;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -66,7 +71,7 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 		{
 			get
 			{
-				return MixService.GetConfig<string>("Domain", this.get_Specificulture());
+				return MixService.GetConfig<string>("Domain", this.Specificulture);
 			}
 		}
 
@@ -136,98 +141,75 @@ namespace Mix.Cms.Lib.ViewModels.MixConfigurations
 
 		public UpdateViewModel()
 		{
-			base();
-			return;
 		}
 
-		public UpdateViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixConfiguration model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_Cultures(this.LoadCultures(this.get_Specificulture(), _context, _transaction));
-			stackVariable8 = this.get_Cultures();
-			stackVariable9 = Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cu003e9__65_0;
-			if (stackVariable9 == null)
+			this.Cultures = this.LoadCultures(this.Specificulture, _context, _transaction);
+			this.Cultures.ForEach((SupportedCulture c) => c.set_IsSupported(true));
+			this.Property = new DataValueViewModel()
 			{
-				dummyVar0 = stackVariable9;
-				stackVariable9 = new Action<SupportedCulture>(Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cu003e9.u003cExpandViewu003eb__65_0);
-				Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec.u003cu003e9__65_0 = stackVariable9;
-			}
-			stackVariable8.ForEach(stackVariable9);
-			stackVariable11 = new DataValueViewModel();
-			stackVariable11.set_DataType(this.get_DataType());
-			stackVariable11.set_Value(this.get_Value());
-			stackVariable11.set_Name(this.get_Keyword());
-			this.set_Property(stackVariable11);
-			return;
+				DataType = this.DataType,
+				Value = this.Value,
+				Name = this.Keyword
+			};
 		}
 
 		public static async Task<RepositoryResponse<bool>> ImportConfigurations(List<MixConfiguration> arrConfiguration, string destCulture, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.arrConfiguration = arrConfiguration;
-			V_0.destCulture = destCulture;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cImportConfigurationsu003ed__66>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cImportConfigurationsu003ed__66 variable = new Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cImportConfigurationsu003ed__66();
+			variable.arrConfiguration = arrConfiguration;
+			variable.destCulture = destCulture;
+			variable._context = _context;
+			variable._transaction = _transaction;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cImportConfigurationsu003ed__66>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 
 		private List<SupportedCulture> LoadCultures(string initCulture = null, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0 = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
-			V_1 = new List<SupportedCulture>();
-			if (V_0.get_IsSucceed())
+			RepositoryResponse<List<SystemCultureViewModel>> modelList = ViewModelBase<MixCmsContext, MixCulture, SystemCultureViewModel>.Repository.GetModelList(_context, _transaction);
+			List<SupportedCulture> supportedCultures = new List<SupportedCulture>();
+			if (modelList.get_IsSucceed())
 			{
-				V_2 = V_0.get_Data().GetEnumerator();
-				try
+				foreach (SystemCultureViewModel datum in modelList.get_Data())
 				{
-					while (V_2.MoveNext())
-					{
-						V_3 = new Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel.u003cu003ec__DisplayClass67_0();
-						V_3.u003cu003e4__this = this;
-						V_3.culture = V_2.get_Current();
-						stackVariable19 = V_1;
-						V_4 = new SupportedCulture();
-						V_4.set_Icon(V_3.culture.get_Icon());
-						V_4.set_Specificulture(V_3.culture.get_Specificulture());
-						V_4.set_Alias(V_3.culture.get_Alias());
-						V_4.set_FullName(V_3.culture.get_FullName());
-						V_4.set_Description(V_3.culture.get_FullName());
-						V_4.set_Id(V_3.culture.get_Id());
-						V_4.set_Lcid(V_3.culture.get_Lcid());
-						stackVariable49 = V_4;
-						if (string.op_Equality(V_3.culture.get_Specificulture(), initCulture))
-						{
-							stackVariable55 = true;
-						}
-						else
-						{
-							stackVariable58 = _context.get_MixConfiguration();
-							V_5 = Expression.Parameter(Type.GetTypeFromHandle(// 
-							// Current member / type: System.Collections.Generic.List`1<Mix.Domain.Core.Models.SupportedCulture> Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel::LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Exception in: System.Collections.Generic.List<Mix.Domain.Core.Models.SupportedCulture> LoadCultures(System.String,Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-							// Specified method is not supported.
-							// 
-							// mailto: JustDecompilePublicFeedback@telerik.com
-
+					List<SupportedCulture> supportedCultures1 = supportedCultures;
+					SupportedCulture supportedCulture = new SupportedCulture();
+					supportedCulture.set_Icon(datum.Icon);
+					supportedCulture.set_Specificulture(datum.Specificulture);
+					supportedCulture.set_Alias(datum.Alias);
+					supportedCulture.set_FullName(datum.FullName);
+					supportedCulture.set_Description(datum.FullName);
+					supportedCulture.set_Id(datum.Id);
+					supportedCulture.set_Lcid(datum.Lcid);
+					supportedCulture.set_IsSupported((datum.Specificulture == initCulture ? true : _context.MixConfiguration.Any<MixConfiguration>((MixConfiguration p) => p.Keyword == this.Keyword && p.Specificulture == datum.Specificulture)));
+					supportedCultures1.Add(supportedCulture);
+				}
+			}
+			return supportedCultures;
+		}
 
 		public override MixConfiguration ParseModel(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			if (this.get_Id() == 0)
+			if (this.Id == 0)
 			{
-				stackVariable22 = ViewModelBase<MixCmsContext, MixConfiguration, Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel>.Repository;
-				V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-				// Current member / type: Mix.Cms.Lib.Models.Cms.MixConfiguration Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel::ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Exception in: Mix.Cms.Lib.Models.Cms.MixConfiguration ParseModel(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Id = ViewModelBase<MixCmsContext, MixConfiguration, Mix.Cms.Lib.ViewModels.MixConfigurations.UpdateViewModel>.Repository.Max((MixConfiguration s) => s.Id, _context, _transaction).get_Data() + 1;
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			this.Value = this.Property.Value;
+			this.DataType = this.Property.DataType;
+			if (this.CreatedDateTime == new DateTime())
+			{
+				this.CreatedDateTime = DateTime.UtcNow;
+			}
+			return base.ParseModel(_context, _transaction);
+		}
 	}
 }

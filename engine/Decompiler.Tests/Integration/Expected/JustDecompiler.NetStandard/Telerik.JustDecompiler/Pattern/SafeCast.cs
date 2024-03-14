@@ -20,17 +20,15 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public SafeCast()
 		{
-			base();
-			return;
 		}
 
 		protected override bool OnMatch(MatchContext context, SafeCastExpression node)
 		{
-			if (!this.get_TargetType().TryMatch(context, node.get_TargetType()))
+			if (!this.TargetType.TryMatch(context, node.TargetType))
 			{
 				return false;
 			}
-			return this.get_Expression().TryMatch(context, node.get_Expression());
+			return this.Expression.TryMatch(context, node.Expression);
 		}
 	}
 }

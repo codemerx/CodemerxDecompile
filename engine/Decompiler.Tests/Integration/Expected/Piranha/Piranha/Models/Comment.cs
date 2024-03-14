@@ -56,11 +56,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public bool IsApproved
-		{
-			get;
-			set;
-		}
+		public bool IsApproved { get; set; } = true;
 
 		[StringLength(0x100)]
 		public string Url
@@ -84,9 +80,6 @@ namespace Piranha.Models
 
 		public Comment()
 		{
-			this.u003cIsApprovedu003ek__BackingField = true;
-			base();
-			return;
 		}
 	}
 }

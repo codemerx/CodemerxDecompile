@@ -29,59 +29,50 @@ namespace Telerik.JustDecompiler.Decompiler.TypeInference
 
 		internal static int GetTypeIndex(TypeReference type)
 		{
-			V_0 = type.Resolve();
-			if (V_0 != null && V_0.get_IsEnum() && V_0 != null)
+			TypeDefinition typeDefinition = type.Resolve();
+			if (typeDefinition != null && typeDefinition.get_IsEnum() && typeDefinition != null)
 			{
-				V_1 = null;
-				V_2 = V_0.get_Fields().GetEnumerator();
-				try
+				FieldDefinition fieldDefinition = null;
+				foreach (FieldDefinition field in typeDefinition.get_Fields())
 				{
-					while (V_2.MoveNext())
+					if (field.get_Name() != "value__")
 					{
-						V_3 = V_2.get_Current();
-						if (!String.op_Equality(V_3.get_Name(), "value__"))
-						{
-							continue;
-						}
-						V_1 = V_3;
-						goto Label0;
+						continue;
 					}
-				}
-				finally
-				{
-					V_2.Dispose();
+					fieldDefinition = field;
+					goto Label0;
 				}
 			Label0:
-				type = V_1.get_FieldType();
+				type = fieldDefinition.get_FieldType();
 			}
-			V_4 = type.get_FullName();
-			if (V_4 != null)
+			string fullName = type.get_FullName();
+			if (fullName != null)
 			{
-				if (String.op_Equality(V_4, "System.Boolean"))
+				if (fullName == "System.Boolean")
 				{
 					return 0;
 				}
-				if (String.op_Equality(V_4, "System.SByte") || String.op_Equality(V_4, "System.Byte"))
+				if (fullName == "System.SByte" || fullName == "System.Byte")
 				{
 					return 1;
 				}
-				if (String.op_Equality(V_4, "System.Char") || String.op_Equality(V_4, "System.Int16") || String.op_Equality(V_4, "System.UInt16"))
+				if (fullName == "System.Char" || fullName == "System.Int16" || fullName == "System.UInt16")
 				{
 					return 2;
 				}
-				if (String.op_Equality(V_4, "System.Int32") || String.op_Equality(V_4, "System.UInt32"))
+				if (fullName == "System.Int32" || fullName == "System.UInt32")
 				{
 					return 3;
 				}
-				if (String.op_Equality(V_4, "System.IntPtr") || String.op_Equality(V_4, "System.Int64") || String.op_Equality(V_4, "System.UInt64"))
+				if (fullName == "System.IntPtr" || fullName == "System.Int64" || fullName == "System.UInt64")
 				{
 					return 4;
 				}
-				if (String.op_Equality(V_4, "System.Single"))
+				if (fullName == "System.Single")
 				{
 					return 5;
 				}
-				if (String.op_Equality(V_4, "System.Double"))
+				if (fullName == "System.Double")
 				{
 					return 6;
 				}

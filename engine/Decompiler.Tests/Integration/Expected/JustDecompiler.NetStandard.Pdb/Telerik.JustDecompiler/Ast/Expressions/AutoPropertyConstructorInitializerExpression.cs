@@ -15,9 +15,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new AutoPropertyConstructorInitializerExpression.u003cget_Childrenu003ed__15(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				AutoPropertyConstructorInitializerExpression autoPropertyConstructorInitializerExpression = null;
+				if (autoPropertyConstructorInitializerExpression.Target != null)
+				{
+					yield return autoPropertyConstructorInitializerExpression.Target;
+				}
 			}
 		}
 
@@ -25,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 91;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.AutoPropertyConstructorInitializerExpression;
 			}
 		}
 
@@ -33,7 +35,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Property().get_PropertyType();
+				return this.Property.get_PropertyType();
 			}
 			set
 			{
@@ -45,7 +47,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return (object)this.get_Property().get_PropertyType() != (object)null;
+				return (object)this.Property.get_PropertyType() != (object)null;
 			}
 		}
 
@@ -61,64 +63,61 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			private set;
 		}
 
-		public AutoPropertyConstructorInitializerExpression(PropertyDefinition property, Expression target, IEnumerable<Instruction> instructions)
+		public AutoPropertyConstructorInitializerExpression(PropertyDefinition property, Expression target, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Property(property);
-			this.set_Target(target);
-			return;
+			this.Property = property;
+			this.Target = target;
 		}
 
 		public override Expression Clone()
 		{
-			stackVariable1 = this.get_Property();
-			if (this.get_Target() != null)
+			Expression expression;
+			PropertyDefinition property = this.Property;
+			if (this.Target != null)
 			{
-				stackVariable6 = this.get_Target().Clone();
+				expression = this.Target.Clone();
 			}
 			else
 			{
-				stackVariable6 = null;
+				expression = null;
 			}
-			return new AutoPropertyConstructorInitializerExpression(stackVariable1, stackVariable6, this.get_MappedInstructions());
+			return new AutoPropertyConstructorInitializerExpression(property, expression, base.MappedInstructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			stackVariable1 = this.get_Property();
-			if (this.get_Target() != null)
+			Expression expression;
+			PropertyDefinition property = this.Property;
+			if (this.Target != null)
 			{
-				stackVariable6 = this.get_Target().CloneExpressionOnly();
+				expression = this.Target.CloneExpressionOnly();
 			}
 			else
 			{
-				stackVariable6 = null;
+				expression = null;
 			}
-			return new AutoPropertyConstructorInitializerExpression(stackVariable1, stackVariable6, null);
+			return new AutoPropertyConstructorInitializerExpression(property, expression, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			V_0 = other as AutoPropertyConstructorInitializerExpression;
-			if (V_0 == null)
+			AutoPropertyConstructorInitializerExpression autoPropertyConstructorInitializerExpression = other as AutoPropertyConstructorInitializerExpression;
+			if (autoPropertyConstructorInitializerExpression == null)
 			{
 				return false;
 			}
-			if (this.get_Target() != null)
+			if (this.Target == null)
 			{
-				if (!this.get_Target().Equals(V_0.get_Target()))
+				if (autoPropertyConstructorInitializerExpression.Target != null)
 				{
 					return false;
 				}
 			}
-			else
+			else if (!this.Target.Equals(autoPropertyConstructorInitializerExpression.Target))
 			{
-				if (V_0.get_Target() != null)
-				{
-					return false;
-				}
+				return false;
 			}
-			return String.op_Equality(this.get_Property().get_FullName(), V_0.get_Property().get_FullName());
+			return this.Property.get_FullName() == autoPropertyConstructorInitializerExpression.Property.get_FullName();
 		}
 	}
 }

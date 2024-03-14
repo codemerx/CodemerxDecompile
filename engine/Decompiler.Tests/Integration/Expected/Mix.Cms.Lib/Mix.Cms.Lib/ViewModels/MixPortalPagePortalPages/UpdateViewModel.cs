@@ -1,8 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Mix.Cms.Lib;
 using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixPortalPages;
+using Mix.Common.Helper;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -121,48 +125,51 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages
 			set;
 		}
 
-		public UpdateViewModel(MixPortalPageNavigation model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public UpdateViewModel(MixPortalPageNavigation model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public UpdateViewModel()
 		{
-			base();
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			stackVariable0 = ViewModelBase<MixCmsContext, MixPortalPage, UpdateRolePermissionViewModel>.Repository;
-			V_1 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			RepositoryResponse<UpdateRolePermissionViewModel> singleModel = ViewModelBase<MixCmsContext, MixPortalPage, UpdateRolePermissionViewModel>.Repository.GetSingleModel((MixPortalPage p) => p.Id == this.Id, null, null);
+			if (singleModel.get_IsSucceed())
+			{
+				this.Page = singleModel.get_Data();
+			}
+		}
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPortalPageNavigation parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.parent = parent;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__62>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			RepositoryResponse<bool> repositoryResponse;
+			if (this.Page == null)
+			{
+				repositoryResponse = await this.u003cu003en__0(parent, _context, _transaction);
+			}
+			else
+			{
+				RepositoryResponse<UpdateRolePermissionViewModel> repositoryResponse1 = await this.Page.SaveModelAsync(false, _context, _transaction);
+				RepositoryResponse<bool> repositoryResponse2 = new RepositoryResponse<bool>();
+				repositoryResponse2.set_IsSucceed(repositoryResponse1.get_IsSucceed());
+				repositoryResponse2.set_Data(repositoryResponse1.get_IsSucceed());
+				repositoryResponse2.set_Errors(repositoryResponse1.get_Errors());
+				repositoryResponse2.set_Exception(repositoryResponse1.get_Exception());
+				repositoryResponse = repositoryResponse2;
+			}
+			return repositoryResponse;
 		}
 
 		public static async Task<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>> UpdateInfosAsync(List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> cates)
 		{
-			V_0.cates = cates;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64 variable = new Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64();
+			variable.cates = cates;
+			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<List<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel>>>.Create();
+			variable.u003cu003e1__state = -1;
+			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel.u003cUpdateInfosAsyncu003ed__64>(ref variable);
+			return variable.u003cu003et__builder.Task;
 		}
 	}
 }

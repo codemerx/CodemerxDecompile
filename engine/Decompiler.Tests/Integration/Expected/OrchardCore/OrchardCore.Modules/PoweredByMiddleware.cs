@@ -12,17 +12,15 @@ namespace OrchardCore.Modules
 
 		public PoweredByMiddleware(RequestDelegate next, IPoweredByMiddlewareOptions options)
 		{
-			base();
 			this._next = next;
 			this._options = options;
-			return;
 		}
 
 		public Task Invoke(HttpContext httpContext)
 		{
-			if (this._options.get_Enabled())
+			if (this._options.Enabled)
 			{
-				httpContext.get_Response().get_Headers().set_Item(this._options.get_HeaderName(), StringValues.op_Implicit(this._options.get_HeaderValue()));
+				httpContext.get_Response().get_Headers().set_Item(this._options.HeaderName, this._options.HeaderValue);
 			}
 			return this._next.Invoke(httpContext);
 		}

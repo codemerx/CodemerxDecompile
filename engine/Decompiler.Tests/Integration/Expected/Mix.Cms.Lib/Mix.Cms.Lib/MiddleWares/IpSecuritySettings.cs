@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Mix.Cms.Lib.MiddleWares
@@ -16,11 +17,11 @@ namespace Mix.Cms.Lib.MiddleWares
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(this.get_AllowedIps()))
+				if (string.IsNullOrEmpty(this.AllowedIps))
 				{
 					return new List<string>();
 				}
-				return this.get_AllowedIps().Split(',', 0).ToList<string>();
+				return this.AllowedIps.Split(',', StringSplitOptions.None).ToList<string>();
 			}
 		}
 
@@ -44,8 +45,6 @@ namespace Mix.Cms.Lib.MiddleWares
 
 		public IpSecuritySettings()
 		{
-			base();
-			return;
 		}
 	}
 }

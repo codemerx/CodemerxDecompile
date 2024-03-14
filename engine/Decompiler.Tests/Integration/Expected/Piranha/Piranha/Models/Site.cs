@@ -66,11 +66,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public ImageField Logo
-		{
-			get;
-			set;
-		}
+		public ImageField Logo { get; set; } = new ImageField();
 
 		[StringLength(64)]
 		public string SiteTypeId
@@ -89,9 +85,6 @@ namespace Piranha.Models
 
 		public Site()
 		{
-			this.u003cLogou003ek__BackingField = new ImageField();
-			base();
-			return;
 		}
 	}
 }

@@ -16,73 +16,58 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		public StateMachineCFGCleaner(ControlFlowGraph theCFG, SwitchData controllerSwitchData, InstructionBlock newEntryBlock)
 		{
-			base();
 			this.theCFG = theCFG;
 			this.controllerSwitchData = controllerSwitchData;
 			this.newEntryBlock = newEntryBlock;
-			return;
 		}
 
 		private bool BFSRemoveBlocks()
 		{
-			V_0 = new Queue<InstructionBlock>();
-			V_1 = this.toBeRemoved.GetEnumerator();
-			try
+			Queue<InstructionBlock> instructionBlocks = new Queue<InstructionBlock>();
+			foreach (InstructionBlock instructionBlocks1 in this.toBeRemoved)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					if (V_2.get_Predecessors().get_Count() != 0)
-					{
-						continue;
-					}
-					V_0.Enqueue(V_2);
-				}
-			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			while (V_0.get_Count() > 0)
-			{
-				V_3 = V_0.Dequeue();
-				if (V_3.get_Index() == -1)
+				if (instructionBlocks1.Predecessors.Count != 0)
 				{
 					continue;
 				}
-				stackVariable22 = V_3.get_Successors();
-				this.theCFG.RemoveBlockAt(V_3.get_Index());
-				V_4 = stackVariable22;
-				V_5 = 0;
-				while (V_5 < (int)V_4.Length)
-				{
-					V_6 = V_4[V_5];
-					if (V_6.get_Predecessors().get_Count() == 0 && InstructionBlock.op_Inequality(V_6, this.newEntryBlock))
-					{
-						V_0.Enqueue(V_6);
-					}
-					V_5 = V_5 + 1;
-				}
-				dummyVar0 = this.toBeRemoved.Remove(V_3);
+				instructionBlocks.Enqueue(instructionBlocks1);
 			}
-			return this.toBeRemoved.get_Count() == 0;
+			while (instructionBlocks.Count > 0)
+			{
+				InstructionBlock instructionBlocks2 = instructionBlocks.Dequeue();
+				if (instructionBlocks2.Index == -1)
+				{
+					continue;
+				}
+				InstructionBlock[] successors = instructionBlocks2.Successors;
+				this.theCFG.RemoveBlockAt(instructionBlocks2.Index);
+				InstructionBlock[] instructionBlockArrays = successors;
+				for (int i = 0; i < (int)instructionBlockArrays.Length; i++)
+				{
+					InstructionBlock instructionBlocks3 = instructionBlockArrays[i];
+					if (instructionBlocks3.Predecessors.Count == 0 && instructionBlocks3 != this.newEntryBlock)
+					{
+						instructionBlocks.Enqueue(instructionBlocks3);
+					}
+				}
+				this.toBeRemoved.Remove(instructionBlocks2);
+			}
+			return this.toBeRemoved.Count == 0;
 		}
 
 		public bool CleanUpTheCFG(HashSet<InstructionBlock> blocksToRemove)
 		{
 			this.toBeRemoved = blocksToRemove;
-			V_0 = 1;
-			while (V_0 < (int)this.controllerSwitchData.get_OrderedCasesArray().Length)
+			for (int i = 1; i < (int)this.controllerSwitchData.OrderedCasesArray.Length; i++)
 			{
-				if (InstructionBlock.op_Inequality(this.controllerSwitchData.get_OrderedCasesArray()[V_0], null) && InstructionBlock.op_Inequality(this.controllerSwitchData.get_OrderedCasesArray()[V_0], this.newEntryBlock) && this.controllerSwitchData.get_OrderedCasesArray()[V_0].get_Predecessors().get_Count() == 0)
+				if (this.controllerSwitchData.OrderedCasesArray[i] != null && this.controllerSwitchData.OrderedCasesArray[i] != this.newEntryBlock && this.controllerSwitchData.OrderedCasesArray[i].Predecessors.Count == 0)
 				{
-					dummyVar0 = this.toBeRemoved.Add(this.controllerSwitchData.get_OrderedCasesArray()[V_0]);
+					this.toBeRemoved.Add(this.controllerSwitchData.OrderedCasesArray[i]);
 				}
-				V_0 = V_0 + 1;
 			}
-			if (InstructionBlock.op_Inequality(this.controllerSwitchData.get_DefaultCase(), null) && this.controllerSwitchData.get_DefaultCase().get_Predecessors().get_Count() == 0 && InstructionBlock.op_Inequality(this.controllerSwitchData.get_DefaultCase(), this.newEntryBlock))
+			if (this.controllerSwitchData.DefaultCase != null && this.controllerSwitchData.DefaultCase.Predecessors.Count == 0 && this.controllerSwitchData.DefaultCase != this.newEntryBlock)
 			{
-				dummyVar1 = this.toBeRemoved.Add(this.controllerSwitchData.get_DefaultCase());
+				this.toBeRemoved.Add(this.controllerSwitchData.DefaultCase);
 			}
 			if (!this.BFSRemoveBlocks())
 			{
@@ -94,17 +79,14 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
 		private void FixTheNewFirstBlock()
 		{
-			V_0 = this.newEntryBlock;
-			V_1 = V_0.get_Index();
-			while (V_1 > 0)
+			InstructionBlock instructionBlocks = this.newEntryBlock;
+			for (int i = instructionBlocks.Index; i > 0; i--)
 			{
-				this.theCFG.get_Blocks()[V_1] = this.theCFG.get_Blocks()[V_1 - 1];
-				this.theCFG.get_Blocks()[V_1].set_Index(V_1);
-				V_1 = V_1 - 1;
+				this.theCFG.Blocks[i] = this.theCFG.Blocks[i - 1];
+				this.theCFG.Blocks[i].Index = i;
 			}
-			this.theCFG.get_Blocks()[0] = V_0;
-			this.theCFG.get_Blocks()[0].set_Index(0);
-			return;
+			this.theCFG.Blocks[0] = instructionBlocks;
+			this.theCFG.Blocks[0].Index = 0;
 		}
 	}
 }

@@ -67,7 +67,10 @@ namespace Mono.Cecil.PE {
 			// - PEFileHeader
 
 			// Machine				2
-			image.Architecture = ReadArchitecture ();
+			/* AGPL */
+			image.ExtendedArchitecture = ReadExtendedArchitecture ();
+			image.Architecture = GetTargetArchitecture(image.ExtendedArchitecture);
+			/* End AGPL */
 
 			// NumberOfSections		2
 			ushort sections = ReadUInt16 ();
@@ -93,11 +96,65 @@ namespace Mono.Cecil.PE {
 			image.Characteristics = (ModuleCharacteristics) dll_characteristics;
 		}
 
-		TargetArchitecture ReadArchitecture ()
+		/* AGPL */
+		TargetArchitecture GetTargetArchitecture(PlatformSpecificTargetArchitecture p)
+		{
+			switch (p)
+			{
+				case PlatformSpecificTargetArchitecture.I386Windows:
+				case PlatformSpecificTargetArchitecture.I386Linux:
+				case PlatformSpecificTargetArchitecture.I386Apple:
+				case PlatformSpecificTargetArchitecture.I386FreeBSD:
+				case PlatformSpecificTargetArchitecture.I386NetBSD:
+				case PlatformSpecificTargetArchitecture.I386Sun:
+					return TargetArchitecture.I386;
+				case PlatformSpecificTargetArchitecture.AMD64Windows:
+				case PlatformSpecificTargetArchitecture.AMD64Linux:
+				case PlatformSpecificTargetArchitecture.AMD64Apple:
+				case PlatformSpecificTargetArchitecture.AMD64FreeBSD:
+				case PlatformSpecificTargetArchitecture.AMD64NetBSD:
+				case PlatformSpecificTargetArchitecture.AMD64Sun:
+					return TargetArchitecture.AMD64;
+				case PlatformSpecificTargetArchitecture.IA64Windows:
+				case PlatformSpecificTargetArchitecture.IA64Linux:
+				case PlatformSpecificTargetArchitecture.IA64Apple:
+				case PlatformSpecificTargetArchitecture.IA64FreeBSD:
+				case PlatformSpecificTargetArchitecture.IA64NetBSD:
+				case PlatformSpecificTargetArchitecture.IA64Sun:
+					return TargetArchitecture.IA64;
+				case PlatformSpecificTargetArchitecture.ARMWindows:
+				case PlatformSpecificTargetArchitecture.ARMLinux:
+				case PlatformSpecificTargetArchitecture.ARMApple:
+				case PlatformSpecificTargetArchitecture.ARMFreeBSD:
+				case PlatformSpecificTargetArchitecture.ARMNetBSD:
+				case PlatformSpecificTargetArchitecture.ARMSun:
+					return TargetArchitecture.ARM;
+				case PlatformSpecificTargetArchitecture.ARMv7Windows:
+				case PlatformSpecificTargetArchitecture.ARMv7Linux:
+				case PlatformSpecificTargetArchitecture.ARMv7Apple:
+				case PlatformSpecificTargetArchitecture.ARMv7FreeBSD:
+				case PlatformSpecificTargetArchitecture.ARMv7NetBSD:
+				case PlatformSpecificTargetArchitecture.ARMv7Sun:
+					return TargetArchitecture.ARMv7;
+				case PlatformSpecificTargetArchitecture.ARM64Windows:
+				case PlatformSpecificTargetArchitecture.ARM64Linux:
+				case PlatformSpecificTargetArchitecture.ARM64Apple:
+				case PlatformSpecificTargetArchitecture.ARM64FreeBSD:
+				case PlatformSpecificTargetArchitecture.ARM64NetBSD:
+				case PlatformSpecificTargetArchitecture.ARM64Sun:
+					return TargetArchitecture.ARM64;
+				default:
+					throw new Exception($"Unexpected PlatformSpecificTargetArchitecture {p}");
+			}
+		}
+
+		PlatformSpecificTargetArchitecture ReadExtendedArchitecture ()
 		{
 			// Applying bb40c2108ecf303691d0536c4f9d3b9035790c5c from jbevain/cecil
-			return (TargetArchitecture)ReadUInt16 ();
+			ushort data = ReadUInt16();
+			return (PlatformSpecificTargetArchitecture)data;
 		}
+		/* End AGPL */
 
 		static ModuleKind GetModuleKind (ushort characteristics, ushort subsystem)
 		{

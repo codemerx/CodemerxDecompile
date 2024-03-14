@@ -9,11 +9,7 @@ namespace OrchardCore.Modules
 
 		private const string PoweredByHeaderValue = "OrchardCore";
 
-		public bool Enabled
-		{
-			get;
-			set;
-		}
+		public bool Enabled { get; set; } = true;
 
 		public string HeaderName
 		{
@@ -23,18 +19,10 @@ namespace OrchardCore.Modules
 			}
 		}
 
-		public string HeaderValue
-		{
-			get;
-			set;
-		}
+		public string HeaderValue { get; set; } = "OrchardCore";
 
 		public PoweredByMiddlewareOptions()
 		{
-			this.u003cHeaderValueu003ek__BackingField = "OrchardCore";
-			this.u003cEnabledu003ek__BackingField = true;
-			base();
-			return;
 		}
 	}
 }

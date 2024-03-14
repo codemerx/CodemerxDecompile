@@ -4,11 +4,14 @@ using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixAttributeSetValues;
 using Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas;
 using Mix.Domain.Core.Models;
+using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -101,98 +104,89 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public ReadMvcViewModel()
 		{
-			base();
-			return;
 		}
 
-		public ReadMvcViewModel(MixAttributeSetData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public ReadMvcViewModel(MixAttributeSetData model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override void ExpandView(MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			this.set_Data(new JObject());
-			stackVariable2 = ViewModelBase<MixCmsContext, MixAttributeSetValue, Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ReadMvcViewModel>.Repository;
-			V_0 = Expression.Parameter(Type.GetTypeFromHandle(// 
-			// Current member / type: System.Void Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.ReadMvcViewModel::ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Exception in: System.Void ExpandView(Mix.Cms.Lib.Models.Cms.MixCmsContext,Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			this.Data = new JObject();
+			List<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ReadMvcViewModel> list = (
+				from a in ViewModelBase<MixCmsContext, MixAttributeSetValue, Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ReadMvcViewModel>.Repository.GetModelListBy((MixAttributeSetValue a) => a.DataId == this.Id && a.Specificulture == this.Specificulture, _context, _transaction).get_Data()
+				orderby a.Priority
+				select a).ToList<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ReadMvcViewModel>();
+			this.Data.Add(new JProperty("id", this.Id));
+			foreach (Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ReadMvcViewModel readMvcViewModel in 
+				from v in list
+				orderby v.Priority
+				select v)
+			{
+				this.Data.Add(this.ParseValue(readMvcViewModel));
+			}
+		}
 
 		private JProperty ParseValue(Mix.Cms.Lib.ViewModels.MixAttributeSetValues.ReadMvcViewModel item)
 		{
-			switch (item.get_DataType())
+			switch (item.DataType)
 			{
-				case 0:
-				case 4:
-				case 5:
-				case 7:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-				case 12:
-				case 13:
-				case 14:
-				case 15:
-				case 16:
-				case 17:
-				case 19:
-				case 20:
-				case 21:
+				case MixEnums.MixDataType.Custom:
+				case MixEnums.MixDataType.Duration:
+				case MixEnums.MixDataType.PhoneNumber:
+				case MixEnums.MixDataType.Text:
+				case MixEnums.MixDataType.Html:
+				case MixEnums.MixDataType.MultilineText:
+				case MixEnums.MixDataType.EmailAddress:
+				case MixEnums.MixDataType.Password:
+				case MixEnums.MixDataType.Url:
+				case MixEnums.MixDataType.ImageUrl:
+				case MixEnums.MixDataType.CreditCard:
+				case MixEnums.MixDataType.PostalCode:
+				case MixEnums.MixDataType.Upload:
+				case MixEnums.MixDataType.Color:
+				case MixEnums.MixDataType.Icon:
+				case MixEnums.MixDataType.VideoYoutube:
+				case MixEnums.MixDataType.TuiEditor:
 				{
-				Label0:
-					return new JProperty(item.get_AttributeFieldName(), item.get_StringValue());
+					return new JProperty(item.AttributeFieldName, item.StringValue);
 				}
-				case 1:
+				case MixEnums.MixDataType.DateTime:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DateTimeValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DateTimeValue);
 				}
-				case 2:
+				case MixEnums.MixDataType.Date:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DateTimeValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DateTimeValue);
 				}
-				case 3:
+				case MixEnums.MixDataType.Time:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DateTimeValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DateTimeValue);
 				}
-				case 6:
+				case MixEnums.MixDataType.Double:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_DoubleValue());
+					return new JProperty(item.AttributeFieldName, (object)item.DoubleValue);
 				}
-				case 18:
+				case MixEnums.MixDataType.Boolean:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_BooleanValue());
+					return new JProperty(item.AttributeFieldName, (object)item.BooleanValue);
 				}
-				case 22:
+				case MixEnums.MixDataType.Integer:
 				{
-					return new JProperty(item.get_AttributeFieldName(), (object)item.get_IntegerValue());
+					return new JProperty(item.AttributeFieldName, (object)item.IntegerValue);
 				}
-				case 23:
+				case MixEnums.MixDataType.Reference:
 				{
-					V_0 = new JArray();
-					V_2 = item.get_DataNavs().GetEnumerator();
-					try
+					JArray jArray = new JArray();
+					foreach (Mix.Cms.Lib.ViewModels.MixRelatedAttributeDatas.ReadMvcViewModel dataNav in item.DataNavs)
 					{
-						while (V_2.MoveNext())
-						{
-							V_3 = V_2.get_Current();
-							V_0.Add(V_3.get_Data().get_Data());
-						}
+						jArray.Add(dataNav.Data.Data);
 					}
-					finally
-					{
-						((IDisposable)V_2).Dispose();
-					}
-					return new JProperty(item.get_AttributeFieldName(), V_0);
+					return new JProperty(item.AttributeFieldName, jArray);
 				}
 				default:
 				{
-					goto Label0;
+					return new JProperty(item.AttributeFieldName, item.StringValue);
 				}
 			}
 		}

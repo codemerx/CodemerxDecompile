@@ -65,11 +65,7 @@ namespace Mix.Cms.Lib.ViewModels
 		}
 
 		[JsonProperty("options")]
-		public JArray Options
-		{
-			get;
-			set;
-		}
+		public JArray Options { get; set; } = new JArray();
 
 		[JsonProperty("priority")]
 		public int Priority
@@ -94,9 +90,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public ModuleFieldViewModel()
 		{
-			this.u003cOptionsu003ek__BackingField = new JArray();
-			base();
-			return;
 		}
 	}
 }

@@ -15,9 +15,11 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ThrowExpression.u003cget_Childrenu003ed__6(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ThrowExpression throwExpression = null;
+				if (throwExpression.Expression != null)
+				{
+					yield return throwExpression.Expression;
+				}
 			}
 		}
 
@@ -25,7 +27,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 6;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ThrowExpression;
 			}
 		}
 
@@ -55,46 +57,46 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public ThrowExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions)
+		public ThrowExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			return;
+			this.Expression = expression;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			if (this.get_Expression() != null)
+			Telerik.JustDecompiler.Ast.Expressions.Expression expression;
+			if (this.Expression != null)
 			{
-				stackVariable4 = this.get_Expression().Clone();
+				expression = this.Expression.Clone();
 			}
 			else
 			{
-				stackVariable4 = null;
+				expression = null;
 			}
-			return new ThrowExpression(stackVariable4, this.instructions);
+			return new ThrowExpression(expression, this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			if (this.get_Expression() != null)
+			Telerik.JustDecompiler.Ast.Expressions.Expression expression;
+			if (this.Expression != null)
 			{
-				stackVariable4 = this.get_Expression().CloneExpressionOnly();
+				expression = this.Expression.CloneExpressionOnly();
 			}
 			else
 			{
-				stackVariable4 = null;
+				expression = null;
 			}
-			return new ThrowExpression(stackVariable4, null);
+			return new ThrowExpression(expression, null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (other as ThrowExpression == null)
+			if (!(other is ThrowExpression))
 			{
 				return false;
 			}
-			return this.get_Expression().Equals((other as ThrowExpression).get_Expression());
+			return this.Expression.Equals((other as ThrowExpression).Expression);
 		}
 	}
 }

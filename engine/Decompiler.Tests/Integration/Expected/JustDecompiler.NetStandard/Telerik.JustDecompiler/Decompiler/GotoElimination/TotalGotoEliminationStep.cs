@@ -1,10 +1,16 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
+using Telerik.JustDecompiler.Cil;
 using Telerik.JustDecompiler.Decompiler;
 using Telerik.JustDecompiler.Steps;
 
@@ -37,83 +43,62 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		public TotalGotoEliminationStep()
 		{
-			base();
 			this.labelToVariable = new Dictionary<string, VariableDefinition>();
 			this.switchVariables = new List<VariableDefinition>();
 			this.variableToAssignment = new Dictionary<VariableDefinition, Statement>();
 			this.assignedOnly = new Dictionary<VariableDefinition, bool>();
-			return;
 		}
 
 		private void AddBreakContinueConditional(int index, BlockStatement containingBlock, Statement statement, VariableReference conditionVariable)
 		{
-			V_0 = new BlockStatement();
-			V_0.AddStatement(statement);
-			V_1 = new IfStatement(new VariableReferenceExpression(conditionVariable, null), V_0, null);
-			containingBlock.AddStatementAt(index, V_1);
-			return;
+			BlockStatement blockStatement = new BlockStatement();
+			blockStatement.AddStatement(statement);
+			IfStatement ifStatement = new IfStatement(new VariableReferenceExpression(conditionVariable, null), blockStatement, null);
+			containingBlock.AddStatementAt(index, ifStatement);
 		}
 
 		private void AddDefaultAssignmentsToNewConditionalVariables(BlockStatement body)
 		{
-			V_0 = this.labelToVariable.get_Values().GetEnumerator();
-			try
+			foreach (VariableDefinition value in this.labelToVariable.Values)
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					V_2 = new BinaryExpression(26, new VariableReferenceExpression(V_1, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
-					body.AddStatementAt(0, new ExpressionStatement(V_2));
-				}
-			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
+				BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(value, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
+				body.AddStatementAt(0, new ExpressionStatement(binaryExpression));
 			}
 			if (this.usedBreakVariable)
 			{
-				V_3 = new BinaryExpression(26, new VariableReferenceExpression(this.breakVariable, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
-				body.AddStatementAt(0, new ExpressionStatement(V_3));
+				BinaryExpression binaryExpression1 = new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(this.breakVariable, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
+				body.AddStatementAt(0, new ExpressionStatement(binaryExpression1));
 			}
 			if (this.usedContinueVariable)
 			{
-				V_4 = new BinaryExpression(26, new VariableReferenceExpression(this.continueVariable, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
-				body.AddStatementAt(0, new ExpressionStatement(V_4));
+				BinaryExpression binaryExpression2 = new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(this.continueVariable, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
+				body.AddStatementAt(0, new ExpressionStatement(binaryExpression2));
 			}
-			return;
 		}
 
 		private void AddLabelVariables()
 		{
-			V_0 = (new List<Statement>(this.methodContext.get_GotoLabels().get_Values())).GetEnumerator();
-			try
+			foreach (Statement empty in new List<Statement>(this.methodContext.GotoLabels.Values))
 			{
-				while (V_0.MoveNext())
+				string label = empty.Label;
+				empty.Label = String.Empty;
+				VariableDefinition labelVariable = this.GetLabelVariable(label);
+				BlockStatement parent = empty.Parent as BlockStatement;
+				if (parent == null)
 				{
-					V_1 = V_0.get_Current();
-					V_2 = V_1.get_Label();
-					V_1.set_Label(String.Empty);
-					V_3 = this.GetLabelVariable(V_2);
-					stackVariable19 = V_1.get_Parent() as BlockStatement;
-					if (stackVariable19 == null)
-					{
-						throw new ArgumentOutOfRangeException("Label target is not within a block.");
-					}
-					V_4 = stackVariable19.get_Statements().IndexOf(V_1);
-					stackVariable35 = new BinaryExpression(26, new VariableReferenceExpression(V_3, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
-					stackVariable35.get_Right().set_ExpressionType(this.methodContext.get_Method().get_Module().get_TypeSystem().get_Boolean());
-					V_5 = new ExpressionStatement(stackVariable35);
-					V_5.set_Label(V_2);
-					this.methodContext.get_GotoLabels().set_Item(V_2, V_5);
-					this.variableToAssignment.Add(V_3, V_5);
-					stackVariable19.AddStatementAt(V_4, V_5);
+					throw new ArgumentOutOfRangeException("Label target is not within a block.");
 				}
+				int num = parent.Statements.IndexOf(empty);
+				BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(labelVariable, null), this.GetLiteralExpression(false), this.typeSystem, null, false);
+				binaryExpression.Right.ExpressionType = this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean();
+				ExpressionStatement expressionStatement = new ExpressionStatement(binaryExpression)
+				{
+					Label = label
+				};
+				this.methodContext.GotoLabels[label] = expressionStatement;
+				this.variableToAssignment.Add(labelVariable, expressionStatement);
+				parent.AddStatementAt(num, expressionStatement);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private bool AreEqual(Expression first, Expression second)
@@ -123,310 +108,238 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private int CalculateLevel(Statement statement)
 		{
-			V_0 = 0;
+			int num = 0;
 			while (statement != null)
 			{
-				statement = statement.get_Parent();
-				V_0 = V_0 + 1;
+				statement = statement.Parent;
+				num++;
 			}
-			return V_0;
+			return num;
 		}
 
 		private void CleanupUnneededVariables()
 		{
-			V_0 = this.assignedOnly.get_Keys().GetEnumerator();
-			try
+			foreach (VariableDefinition key in this.assignedOnly.Keys)
 			{
-				while (V_0.MoveNext())
+				if (!this.assignedOnly[key])
 				{
-					V_1 = V_0.get_Current();
-					if (!this.assignedOnly.get_Item(V_1))
-					{
-						continue;
-					}
-					V_2 = this.variableToAssignment.get_Item(V_1);
-					dummyVar0 = (V_2.get_Parent() as BlockStatement).get_Statements().Remove(V_2);
-					dummyVar1 = this.labelToVariable.Remove(V_1.get_Name().Remove(V_1.get_Name().get_Length() - 5));
+					continue;
 				}
+				Statement item = this.variableToAssignment[key];
+				(item.Parent as BlockStatement).Statements.Remove(item);
+				this.labelToVariable.Remove(key.get_Name().Remove(key.get_Name().Length - 5));
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private void ClearLabelStatements()
 		{
-			V_0 = this.methodContext.get_GotoLabels().get_Values().GetEnumerator();
-			try
+			foreach (Statement value in this.methodContext.GotoLabels.Values)
 			{
-				while (V_0.MoveNext())
-				{
-					V_0.get_Current().set_Label(String.Empty);
-				}
+				value.Label = String.Empty;
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private BlockStatement CollectStatements(int startingIndex, int endingIndex, BlockStatement containingBlock)
 		{
-			V_0 = new BlockStatement();
-			V_1 = startingIndex;
-			while (V_1 < endingIndex)
+			BlockStatement blockStatement = new BlockStatement();
+			int num = startingIndex;
+			while (num < endingIndex)
 			{
-				V_0.AddStatement(containingBlock.get_Statements().get_Item(V_1));
-				containingBlock.get_Statements().RemoveAt(V_1);
-				endingIndex = endingIndex - 1;
+				blockStatement.AddStatement(containingBlock.Statements[num]);
+				containingBlock.Statements.RemoveAt(num);
+				endingIndex--;
 			}
-			return V_0;
+			return blockStatement;
 		}
 
 		private void EliminateGotoPair(IfStatement gotoStatement, Statement labeledStatement)
 		{
-			V_0 = this.CalculateLevel(gotoStatement);
-			V_1 = this.CalculateLevel(labeledStatement);
-			V_2 = this.Precedes(gotoStatement, labeledStatement);
-			V_3 = this.ResolveRelation(gotoStatement, labeledStatement);
-			while (V_3 != TotalGotoEliminationStep.GotoToLabelRelation.Siblings)
+			int num = this.CalculateLevel(gotoStatement);
+			int num1 = this.CalculateLevel(labeledStatement);
+			bool flag = this.Precedes(gotoStatement, labeledStatement);
+			TotalGotoEliminationStep.GotoToLabelRelation gotoToLabelRelation = this.ResolveRelation(gotoStatement, labeledStatement);
+			while (gotoToLabelRelation != TotalGotoEliminationStep.GotoToLabelRelation.Siblings)
 			{
-				if (V_3 == 2)
+				if (gotoToLabelRelation == TotalGotoEliminationStep.GotoToLabelRelation.IndirectlyRelated)
 				{
-					this.MoveOut(gotoStatement, labeledStatement.get_Label());
+					this.MoveOut(gotoStatement, labeledStatement.Label);
 				}
-				if (V_3 == 1)
+				if (gotoToLabelRelation == TotalGotoEliminationStep.GotoToLabelRelation.DirectlyRelated)
 				{
-					if (V_0 <= V_1)
+					if (num <= num1)
 					{
-						if (!V_2)
+						if (!flag)
 						{
-							V_5 = this.GetSameLevelParent(labeledStatement, gotoStatement);
-							this.LiftGoto(gotoStatement, V_5, labeledStatement.get_Label());
+							Statement sameLevelParent = this.GetSameLevelParent(labeledStatement, gotoStatement);
+							this.LiftGoto(gotoStatement, sameLevelParent, labeledStatement.Label);
 						}
-						V_4 = this.GetSameLevelParent(labeledStatement, gotoStatement);
-						this.MoveIn(gotoStatement, V_4, labeledStatement.get_Label());
+						Statement statement = this.GetSameLevelParent(labeledStatement, gotoStatement);
+						this.MoveIn(gotoStatement, statement, labeledStatement.Label);
 					}
 					else
 					{
-						this.MoveOut(gotoStatement, labeledStatement.get_Label());
+						this.MoveOut(gotoStatement, labeledStatement.Label);
 					}
 				}
-				V_0 = this.CalculateLevel(gotoStatement);
-				V_1 = this.CalculateLevel(labeledStatement);
-				V_3 = this.ResolveRelation(gotoStatement, labeledStatement);
-				V_2 = this.Precedes(gotoStatement, labeledStatement);
+				num = this.CalculateLevel(gotoStatement);
+				num1 = this.CalculateLevel(labeledStatement);
+				gotoToLabelRelation = this.ResolveRelation(gotoStatement, labeledStatement);
+				flag = this.Precedes(gotoStatement, labeledStatement);
 			}
-			if (V_2)
+			if (flag)
 			{
 				this.EliminateViaIf(gotoStatement, labeledStatement);
 				return;
 			}
 			this.EliminateViaDoWhile(gotoStatement, labeledStatement);
-			return;
 		}
 
 		private void EliminateViaDoWhile(IfStatement gotoStatement, Statement labeledStatement)
 		{
-			V_0 = new List<BreakStatement>();
-			V_1 = new List<ContinueStatement>();
-			V_2 = this.GetOuterBlock(labeledStatement);
-			V_3 = V_2.get_Statements().IndexOf(labeledStatement);
-			V_4 = V_2.get_Statements().IndexOf(gotoStatement);
-			V_5 = this.CollectStatements(V_3, V_4, V_2);
+			ICollection<BreakStatement> breakStatements = new List<BreakStatement>();
+			ICollection<ContinueStatement> continueStatements = new List<ContinueStatement>();
+			BlockStatement outerBlock = this.GetOuterBlock(labeledStatement);
+			int num = outerBlock.Statements.IndexOf(labeledStatement);
+			int num1 = outerBlock.Statements.IndexOf(gotoStatement);
+			BlockStatement blockStatement = this.CollectStatements(num, num1, outerBlock);
 			if (this.ShouldCheck(gotoStatement))
 			{
-				stackVariable127 = new ContinueAndBreakFinder();
-				stackVariable127.Visit(V_5);
-				V_0 = stackVariable127.get_Breaks();
-				V_1 = stackVariable127.get_Continues();
+				ContinueAndBreakFinder continueAndBreakFinder = new ContinueAndBreakFinder();
+				continueAndBreakFinder.Visit(blockStatement);
+				breakStatements = continueAndBreakFinder.Breaks;
+				continueStatements = continueAndBreakFinder.Continues;
 			}
-			V_7 = V_0.GetEnumerator();
-			try
+			foreach (BreakStatement breakStatement in breakStatements)
 			{
-				while (V_7.MoveNext())
-				{
-					V_8 = V_7.get_Current();
-					stackVariable29 = this.GetOuterBlock(V_8);
-					V_9 = stackVariable29.get_Statements().IndexOf(V_8);
-					this.usedBreakVariable = true;
-					V_10 = new ExpressionStatement(new BinaryExpression(26, new VariableReferenceExpression(this.breakVariable, null), this.GetLiteralExpression(true), this.typeSystem, null, false));
-					stackVariable29.AddStatementAt(V_9, V_10);
-				}
+				BlockStatement outerBlock1 = this.GetOuterBlock(breakStatement);
+				int num2 = outerBlock1.Statements.IndexOf(breakStatement);
+				this.usedBreakVariable = true;
+				ExpressionStatement expressionStatement = new ExpressionStatement(new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(this.breakVariable, null), this.GetLiteralExpression(true), this.typeSystem, null, false));
+				outerBlock1.AddStatementAt(num2, expressionStatement);
 			}
-			finally
+			foreach (ContinueStatement continueStatement in continueStatements)
 			{
-				if (V_7 != null)
-				{
-					V_7.Dispose();
-				}
+				BlockStatement blockStatement1 = this.GetOuterBlock(continueStatement);
+				int num3 = blockStatement1.Statements.IndexOf(continueStatement);
+				this.usedContinueVariable = true;
+				ExpressionStatement expressionStatement1 = new ExpressionStatement(new BinaryExpression(BinaryOperator.Assign, new VariableReferenceExpression(this.continueVariable, null), this.GetLiteralExpression(true), this.typeSystem, null, false));
+				blockStatement1.Statements.RemoveAt(num3);
+				blockStatement1.AddStatementAt(num3, new BreakStatement(null));
+				blockStatement1.AddStatementAt(num3, expressionStatement1);
 			}
-			V_11 = V_1.GetEnumerator();
-			try
+			DoWhileStatement doWhileStatement = new DoWhileStatement(gotoStatement.Condition, blockStatement);
+			num1 = outerBlock.Statements.IndexOf(gotoStatement);
+			outerBlock.AddStatementAt(num1, doWhileStatement);
+			outerBlock.Statements.Remove(gotoStatement);
+			if (breakStatements.Count > 0)
 			{
-				while (V_11.MoveNext())
-				{
-					V_12 = V_11.get_Current();
-					stackVariable60 = this.GetOuterBlock(V_12);
-					V_13 = stackVariable60.get_Statements().IndexOf(V_12);
-					this.usedContinueVariable = true;
-					V_14 = new ExpressionStatement(new BinaryExpression(26, new VariableReferenceExpression(this.continueVariable, null), this.GetLiteralExpression(true), this.typeSystem, null, false));
-					stackVariable60.get_Statements().RemoveAt(V_13);
-					stackVariable60.AddStatementAt(V_13, new BreakStatement(null));
-					stackVariable60.AddStatementAt(V_13, V_14);
-				}
+				this.AddBreakContinueConditional(num1 + 1, outerBlock, new BreakStatement(null), this.breakVariable);
 			}
-			finally
+			if (continueStatements.Count > 0)
 			{
-				if (V_11 != null)
-				{
-					V_11.Dispose();
-				}
+				this.AddBreakContinueConditional(num1 + 1, outerBlock, new ContinueStatement(null), this.continueVariable);
 			}
-			V_6 = new DoWhileStatement(gotoStatement.get_Condition(), V_5);
-			V_4 = V_2.get_Statements().IndexOf(gotoStatement);
-			V_2.AddStatementAt(V_4, V_6);
-			dummyVar0 = V_2.get_Statements().Remove(gotoStatement);
-			if (V_0.get_Count() > 0)
-			{
-				this.AddBreakContinueConditional(V_4 + 1, V_2, new BreakStatement(null), this.breakVariable);
-			}
-			if (V_1.get_Count() > 0)
-			{
-				this.AddBreakContinueConditional(V_4 + 1, V_2, new ContinueStatement(null), this.continueVariable);
-			}
-			return;
 		}
 
 		private void EliminateViaIf(IfStatement gotoStatement, Statement labeledStatement)
 		{
-			V_0 = labeledStatement.get_Parent() as BlockStatement;
-			V_1 = V_0.get_Statements().IndexOf(gotoStatement);
-			V_2 = V_0.get_Statements().IndexOf(labeledStatement);
-			if (V_1 == V_2 - 1)
+			BlockStatement parent = labeledStatement.Parent as BlockStatement;
+			int num = parent.Statements.IndexOf(gotoStatement);
+			int num1 = parent.Statements.IndexOf(labeledStatement);
+			if (num == num1 - 1)
 			{
-				V_0.get_Statements().RemoveAt(V_1);
+				parent.Statements.RemoveAt(num);
 				return;
 			}
-			V_3 = this.CollectStatements(V_1 + 1, V_2, V_0);
-			V_4 = Negator.Negate(gotoStatement.get_Condition(), this.typeSystem);
-			while (V_3.get_Statements().get_Item(0) as IfStatement != null)
+			BlockStatement blockStatement = this.CollectStatements(num + 1, num1, parent);
+			Expression expression = Negator.Negate(gotoStatement.Condition, this.typeSystem);
+			while (blockStatement.Statements[0] is IfStatement)
 			{
-				V_5 = V_3.get_Statements().get_Item(0) as IfStatement;
-				if (!this.AreEqual(V_5.get_Condition(), V_4) || V_5.get_Else() != null)
+				IfStatement item = blockStatement.Statements[0] as IfStatement;
+				if (!this.AreEqual(item.Condition, expression) || item.Else != null)
 				{
 					break;
 				}
-				V_3.get_Statements().RemoveAt(0);
-				V_6 = 0;
-				while (V_6 < V_5.get_Then().get_Statements().get_Count())
+				blockStatement.Statements.RemoveAt(0);
+				for (int i = 0; i < item.Then.Statements.Count; i++)
 				{
-					V_3.AddStatement(V_5.get_Then().get_Statements().get_Item(V_6));
-					V_6 = V_6 + 1;
+					blockStatement.AddStatement(item.Then.Statements[i]);
 				}
 			}
-			gotoStatement.set_Then(V_3);
-			gotoStatement.set_Condition(V_4);
-			return;
+			gotoStatement.Then = blockStatement;
+			gotoStatement.Condition = expression;
 		}
 
 		private void EmbedIntoDefaultIf(GotoStatement jump)
 		{
-			V_0 = jump.get_Parent() as BlockStatement;
-			V_1 = new BlockStatement();
-			V_1.AddStatement(jump);
-			V_2 = new IfStatement(this.GetLiteralExpression(true), V_1, null);
-			V_1.set_Parent(V_2);
-			V_3 = V_0.get_Statements().IndexOf(jump);
-			V_0.get_Statements().RemoveAt(V_3);
-			V_0.AddStatementAt(V_3, V_2);
-			if (V_0.get_Parent() as ConditionCase != null && V_0.get_Statements().IndexOf(V_2) == V_0.get_Statements().get_Count())
+			BlockStatement parent = jump.Parent as BlockStatement;
+			BlockStatement blockStatement = new BlockStatement();
+			blockStatement.AddStatement(jump);
+			IfStatement ifStatement = new IfStatement(this.GetLiteralExpression(true), blockStatement, null);
+			blockStatement.Parent = ifStatement;
+			int num = parent.Statements.IndexOf(jump);
+			parent.Statements.RemoveAt(num);
+			parent.AddStatementAt(num, ifStatement);
+			if (parent.Parent is ConditionCase && parent.Statements.IndexOf(ifStatement) == parent.Statements.Count)
 			{
-				V_0.AddStatement(new BreakStatement(null));
+				parent.AddStatement(new BreakStatement(null));
 			}
-			return;
 		}
 
 		private void ExtractConditionIntoVariable(VariableReferenceExpression conditionVar, ConditionStatement statement, BlockStatement containingBlock)
 		{
-			V_0 = new ExpressionStatement(new BinaryExpression(26, conditionVar, statement.get_Condition(), this.typeSystem, null, false));
-			containingBlock.AddStatementAt(containingBlock.get_Statements().IndexOf(statement), V_0);
-			statement.set_Condition(conditionVar.CloneExpressionOnly());
-			return;
+			ExpressionStatement expressionStatement = new ExpressionStatement(new BinaryExpression(BinaryOperator.Assign, conditionVar, statement.Condition, this.typeSystem, null, false));
+			containingBlock.AddStatementAt(containingBlock.Statements.IndexOf(statement), expressionStatement);
+			statement.Condition = conditionVar.CloneExpressionOnly();
 		}
 
 		private Expression GetCaseConditionExpression(SwitchCase switchCase)
 		{
-			if (switchCase as ConditionCase != null)
+			if (switchCase is ConditionCase)
 			{
-				return (switchCase as ConditionCase).get_Condition();
+				return (switchCase as ConditionCase).Condition;
 			}
-			V_0 = 1;
-			V_1 = (switchCase.get_Parent() as SwitchStatement).get_Cases().GetEnumerator();
-			try
+			int value = 1;
+			foreach (SwitchCase @case in (switchCase.Parent as SwitchStatement).Cases)
 			{
-				while (V_1.MoveNext())
+				if (@case is DefaultCase)
 				{
-					V_2 = V_1.get_Current();
-					if (V_2 as DefaultCase != null)
-					{
-						continue;
-					}
-					V_0 = V_0 + (Int32)((V_2 as ConditionCase).get_Condition() as LiteralExpression).get_Value();
+					continue;
 				}
+				value += (Int32)((@case as ConditionCase).Condition as LiteralExpression).Value;
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			return this.GetLiteralExpression(V_0);
+			return this.GetLiteralExpression(value);
 		}
 
 		private List<KeyValuePair<IfStatement, Statement>> GetGotoPairs()
 		{
-			V_0 = new List<KeyValuePair<IfStatement, Statement>>();
-			V_1 = this.methodContext.get_GotoStatements().GetEnumerator();
-			try
+			List<KeyValuePair<IfStatement, Statement>> keyValuePairs = new List<KeyValuePair<IfStatement, Statement>>();
+			foreach (GotoStatement gotoStatement in this.methodContext.GotoStatements)
 			{
-				while (V_1.MoveNext())
+				Statement item = this.methodContext.GotoLabels[gotoStatement.TargetLabel];
+				IfStatement parent = gotoStatement.Parent.Parent as IfStatement;
+				if (parent == null)
 				{
-					V_2 = V_1.get_Current();
-					V_3 = this.methodContext.get_GotoLabels().get_Item(V_2.get_TargetLabel());
-					V_4 = V_2.get_Parent().get_Parent() as IfStatement;
-					if (V_4 == null)
-					{
-						throw new ArgumentOutOfRangeException("Goto not embeded in condition.");
-					}
-					V_5 = new KeyValuePair<IfStatement, Statement>(V_4, V_3);
-					V_0.Add(V_5);
+					throw new ArgumentOutOfRangeException("Goto not embeded in condition.");
 				}
+				keyValuePairs.Add(new KeyValuePair<IfStatement, Statement>(parent, item));
 			}
-			finally
-			{
-				((IDisposable)V_1).Dispose();
-			}
-			return V_0;
+			return keyValuePairs;
 		}
 
 		private VariableDefinition GetLabelVariable(string label)
 		{
 			if (this.labelToVariable.ContainsKey(label))
 			{
-				V_0 = this.labelToVariable.get_Item(label);
-				this.assignedOnly.set_Item(V_0, false);
-				return V_0;
+				VariableDefinition item = this.labelToVariable[label];
+				this.assignedOnly[item] = false;
+				return item;
 			}
-			V_1 = this.methodContext.get_Method().get_Module().get_TypeSystem().get_Boolean();
-			V_2 = new VariableDefinition(String.Concat(label, "_cond"), V_1, this.methodContext.get_Method());
-			this.labelToVariable.Add(label, V_2);
-			this.assignedOnly.Add(V_2, true);
-			return V_2;
+			TypeReference flag = this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean();
+			VariableDefinition variableDefinition = new VariableDefinition(String.Concat(label, "_cond"), flag, this.methodContext.Method);
+			this.labelToVariable.Add(label, variableDefinition);
+			this.assignedOnly.Add(variableDefinition, true);
+			return variableDefinition;
 		}
 
 		private LiteralExpression GetLiteralExpression(object value)
@@ -436,99 +349,92 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private Statement GetLowestCommonParent(Statement first, Statement second)
 		{
-			V_0 = this.GetParentsChain(first);
-			V_1 = this.GetParentsChain(second);
-			V_2 = null;
-			while (V_0.Peek() == V_1.Peek())
+			Stack<Statement> parentsChain = this.GetParentsChain(first);
+			Stack<Statement> statements = this.GetParentsChain(second);
+			Statement statement = null;
+			while (parentsChain.Peek() == statements.Peek())
 			{
-				V_2 = V_0.Pop();
-				dummyVar0 = V_1.Pop();
+				statement = parentsChain.Pop();
+				statements.Pop();
 			}
-			return V_2;
+			return statement;
 		}
 
 		private BlockStatement GetOuterBlock(Statement statement)
 		{
-			V_0 = statement.get_Parent();
-			while (V_0 as BlockStatement == null)
+			Statement parent = statement.Parent;
+			while (!(parent is BlockStatement))
 			{
-				V_0 = V_0.get_Parent();
+				parent = parent.Parent;
 			}
-			return V_0 as BlockStatement;
+			return parent as BlockStatement;
 		}
 
 		private Stack<Statement> GetParentsChain(Statement statement)
 		{
-			V_0 = new Stack<Statement>();
+			Stack<Statement> statements = new Stack<Statement>();
 			while (statement != null)
 			{
-				V_0.Push(statement);
-				statement = statement.get_Parent();
+				statements.Push(statement);
+				statement = statement.Parent;
 			}
-			return V_0;
+			return statements;
 		}
 
 		private Statement GetSameLevelParent(Statement labeledStatement, IfStatement gotoStatement)
 		{
-			V_0 = this.GetParentsChain(labeledStatement);
-			V_1 = gotoStatement.get_Parent() as BlockStatement;
-			while (!V_1.get_Statements().Contains(V_0.Peek()))
+			Stack<Statement> parentsChain = this.GetParentsChain(labeledStatement);
+			BlockStatement parent = gotoStatement.Parent as BlockStatement;
+			while (!parent.Statements.Contains(parentsChain.Peek()))
 			{
-				dummyVar0 = V_0.Pop();
+				parentsChain.Pop();
 			}
-			return V_0.Peek();
+			return parentsChain.Peek();
 		}
 
 		private TypeReference GetSwitchType(SwitchStatement switchStatement)
 		{
-			V_0 = null;
-			V_1 = switchStatement.get_Cases().GetEnumerator();
-			try
+			LiteralExpression condition;
+			ConditionCase conditionCase = null;
+			foreach (SwitchCase @case in switchStatement.Cases)
 			{
-				while (V_1.MoveNext())
+				if (!(@case is ConditionCase))
 				{
-					V_2 = V_1.get_Current();
-					if (V_2 as ConditionCase == null)
-					{
-						continue;
-					}
-					V_0 = V_2 as ConditionCase;
-					goto Label0;
+					continue;
 				}
-			}
-			finally
-			{
-				if (V_1 != null)
+				conditionCase = @case as ConditionCase;
+				condition = conditionCase.Condition as LiteralExpression;
+				if (condition == null)
 				{
-					V_1.Dispose();
+					throw new NotSupportedException("Case should have literal condition.");
 				}
+				return condition.ExpressionType;
 			}
-		Label0:
-			stackVariable14 = V_0.get_Condition() as LiteralExpression;
-			if (stackVariable14 == null)
+			condition = conditionCase.Condition as LiteralExpression;
+			if (condition == null)
 			{
 				throw new NotSupportedException("Case should have literal condition.");
 			}
-			return stackVariable14.get_ExpressionType();
+			return condition.ExpressionType;
 		}
 
 		private bool IsUnconditionalJump(GotoStatement jump)
 		{
-			V_0 = jump.get_Parent() as BlockStatement;
-			if (V_0 == null)
+			BlockStatement parent = jump.Parent as BlockStatement;
+			if (parent == null)
 			{
 				throw new ArgumentOutOfRangeException("Goto statement outside of block.");
 			}
-			if (V_0.get_Parent() == null)
+			if (parent.Parent == null)
 			{
 				return true;
 			}
-			if (V_0.get_Parent() as IfStatement == null)
+			if (!(parent.Parent is IfStatement))
 			{
 				return true;
 			}
-			V_1 = V_0.get_Parent() as IfStatement;
-			if (V_1.get_Then() == V_0 && V_0.get_Statements().get_Count() == 1 && V_1.get_Else() == null)
+			IfStatement ifStatement = parent.Parent as IfStatement;
+			if (ifStatement.Then == parent && parent.Statements.Count == 1 && ifStatement.Else == null)
 			{
 				return false;
 			}
@@ -537,210 +443,191 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private void LiftGoto(IfStatement gotoStatement, Statement labelContainingStatement, string label)
 		{
-			V_0 = this.GetOuterBlock(gotoStatement);
-			V_1 = new VariableReferenceExpression(this.GetLabelVariable(label), null);
-			this.ExtractConditionIntoVariable(V_1, gotoStatement, V_0);
-			V_2 = V_0.get_Statements().IndexOf(gotoStatement);
-			V_3 = V_0.get_Statements().IndexOf(labelContainingStatement);
-			V_4 = this.CollectStatements(V_3, V_2, V_0);
-			V_4.AddStatementAt(0, gotoStatement);
-			V_2 = V_0.get_Statements().IndexOf(gotoStatement);
-			dummyVar0 = V_0.get_Statements().Remove(gotoStatement);
-			V_5 = new DoWhileStatement(gotoStatement.get_Condition().CloneExpressionOnly(), V_4);
-			V_0.AddStatementAt(V_2, V_5);
-			return;
+			BlockStatement outerBlock = this.GetOuterBlock(gotoStatement);
+			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(this.GetLabelVariable(label), null);
+			this.ExtractConditionIntoVariable(variableReferenceExpression, gotoStatement, outerBlock);
+			int num = outerBlock.Statements.IndexOf(gotoStatement);
+			int num1 = outerBlock.Statements.IndexOf(labelContainingStatement);
+			BlockStatement blockStatement = this.CollectStatements(num1, num, outerBlock);
+			blockStatement.AddStatementAt(0, gotoStatement);
+			num = outerBlock.Statements.IndexOf(gotoStatement);
+			outerBlock.Statements.Remove(gotoStatement);
+			DoWhileStatement doWhileStatement = new DoWhileStatement(gotoStatement.Condition.CloneExpressionOnly(), blockStatement);
+			outerBlock.AddStatementAt(num, doWhileStatement);
 		}
 
 		private void MoveIn(IfStatement gotoStatement, Statement targetStatement, string label)
 		{
-			V_0 = gotoStatement.get_Parent() as BlockStatement;
-			V_1 = new VariableReferenceExpression(this.GetLabelVariable(label), null);
-			this.ExtractConditionIntoVariable(V_1.CloneExpressionOnly() as VariableReferenceExpression, gotoStatement, V_0);
-			V_2 = V_0.get_Statements().IndexOf(gotoStatement);
-			V_3 = V_0.get_Statements().IndexOf(targetStatement);
-			V_4 = this.CollectStatements(V_2 + 1, V_3, V_0);
-			V_5 = new IfStatement(new UnaryExpression(1, V_1.CloneExpressionOnly(), null), V_4, null);
-			if (V_5.get_Then().get_Statements().get_Count() > 0)
+			BlockStatement parent = gotoStatement.Parent as BlockStatement;
+			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(this.GetLabelVariable(label), null);
+			this.ExtractConditionIntoVariable(variableReferenceExpression.CloneExpressionOnly() as VariableReferenceExpression, gotoStatement, parent);
+			int num = parent.Statements.IndexOf(gotoStatement);
+			int num1 = parent.Statements.IndexOf(targetStatement);
+			BlockStatement blockStatement = this.CollectStatements(num + 1, num1, parent);
+			IfStatement ifStatement = new IfStatement(new UnaryExpression(UnaryOperator.LogicalNot, variableReferenceExpression.CloneExpressionOnly(), null), blockStatement, null);
+			if (ifStatement.Then.Statements.Count > 0)
 			{
-				V_0.AddStatementAt(V_2, V_5);
+				parent.AddStatementAt(num, ifStatement);
 			}
-			dummyVar0 = V_0.get_Statements().Remove(gotoStatement);
-			if (targetStatement as DoWhileStatement != null)
+			parent.Statements.Remove(gotoStatement);
+			if (targetStatement is DoWhileStatement)
 			{
-				(targetStatement as DoWhileStatement).get_Body().AddStatementAt(0, gotoStatement);
+				(targetStatement as DoWhileStatement).Body.AddStatementAt(0, gotoStatement);
 				return;
 			}
-			if (targetStatement as IfStatement != null)
+			if (targetStatement is IfStatement)
 			{
-				V_6 = targetStatement as IfStatement;
-				V_6.set_Condition(this.UpdateCondition(V_6.get_Condition(), V_1.CloneExpressionOnly() as VariableReferenceExpression));
-				V_6.get_Then().AddStatementAt(0, gotoStatement);
+				IfStatement ifStatement1 = targetStatement as IfStatement;
+				ifStatement1.Condition = this.UpdateCondition(ifStatement1.Condition, variableReferenceExpression.CloneExpressionOnly() as VariableReferenceExpression);
+				ifStatement1.Then.AddStatementAt(0, gotoStatement);
 				return;
 			}
-			if (targetStatement as SwitchCase != null)
+			if (targetStatement is SwitchCase)
 			{
 				this.MoveInCase(gotoStatement, targetStatement as SwitchCase, label);
 				return;
 			}
-			if (targetStatement as WhileStatement == null)
+			if (!(targetStatement is WhileStatement))
 			{
 				throw new NotSupportedException("Unsupported target statement for goto jump.");
 			}
-			V_7 = targetStatement as WhileStatement;
-			V_7.get_Body().AddStatementAt(0, gotoStatement);
-			V_7.set_Condition(this.UpdateCondition(V_7.get_Condition(), V_1.CloneExpressionOnly() as VariableReferenceExpression));
-			return;
+			WhileStatement whileStatement = targetStatement as WhileStatement;
+			whileStatement.Body.AddStatementAt(0, gotoStatement);
+			whileStatement.Condition = this.UpdateCondition(whileStatement.Condition, variableReferenceExpression.CloneExpressionOnly() as VariableReferenceExpression);
 		}
 
 		private void MoveInCase(IfStatement gotoStatement, SwitchCase switchCase, string label)
 		{
-			V_0 = new VariableReferenceExpression(this.GetLabelVariable(label), null);
-			V_1 = this.GetOuterBlock(gotoStatement);
-			V_2 = switchCase.get_Parent() as SwitchStatement;
-			V_3 = V_1.get_Statements().IndexOf(gotoStatement);
-			V_4 = V_1.get_Statements().IndexOf(V_2);
-			V_12 = V_2.get_ConditionBlock().get_First().get_Offset();
-			stackVariable26 = String.Concat("switch", V_12.ToString());
-			V_5 = this.GetSwitchType(V_2);
-			V_6 = new VariableDefinition(stackVariable26, V_5, this.methodContext.get_Method());
-			this.switchVariables.Add(V_6);
-			V_7 = new VariableReferenceExpression(V_6, null);
-			this.ExtractConditionIntoVariable(V_7, V_2, V_1);
-			V_8 = this.CollectStatements(V_3 + 1, V_4 + 1, V_1);
-			V_9 = new BlockStatement();
-			V_10 = new BinaryExpression(26, V_7.CloneExpressionOnly(), this.GetCaseConditionExpression(switchCase), this.typeSystem, null, false);
-			V_9.AddStatement(new ExpressionStatement(V_10));
-			V_11 = new IfStatement(new UnaryExpression(1, V_0, null), V_8, V_9);
-			if (V_11.get_Then().get_Statements().get_Count() != 0)
+			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(this.GetLabelVariable(label), null);
+			BlockStatement outerBlock = this.GetOuterBlock(gotoStatement);
+			SwitchStatement parent = switchCase.Parent as SwitchStatement;
+			int num = outerBlock.Statements.IndexOf(gotoStatement);
+			int num1 = outerBlock.Statements.IndexOf(parent);
+			int offset = parent.ConditionBlock.First.get_Offset();
+			string str = String.Concat("switch", offset.ToString());
+			TypeReference switchType = this.GetSwitchType(parent);
+			VariableDefinition variableDefinition = new VariableDefinition(str, switchType, this.methodContext.Method);
+			this.switchVariables.Add(variableDefinition);
+			VariableReferenceExpression variableReferenceExpression1 = new VariableReferenceExpression(variableDefinition, null);
+			this.ExtractConditionIntoVariable(variableReferenceExpression1, parent, outerBlock);
+			BlockStatement blockStatement = this.CollectStatements(num + 1, num1 + 1, outerBlock);
+			BlockStatement blockStatement1 = new BlockStatement();
+			BinaryExpression binaryExpression = new BinaryExpression(BinaryOperator.Assign, variableReferenceExpression1.CloneExpressionOnly(), this.GetCaseConditionExpression(switchCase), this.typeSystem, null, false);
+			blockStatement1.AddStatement(new ExpressionStatement(binaryExpression));
+			IfStatement ifStatement = new IfStatement(new UnaryExpression(UnaryOperator.LogicalNot, variableReferenceExpression, null), blockStatement, blockStatement1);
+			if (ifStatement.Then.Statements.Count != 0)
 			{
-				V_1.AddStatementAt(V_3, V_11);
+				outerBlock.AddStatementAt(num, ifStatement);
 			}
-			dummyVar0 = V_1.get_Statements().Remove(gotoStatement);
-			switchCase.get_Body().AddStatementAt(0, gotoStatement);
-			return;
+			outerBlock.Statements.Remove(gotoStatement);
+			switchCase.Body.AddStatementAt(0, gotoStatement);
 		}
 
 		private void MoveOut(IfStatement gotoStatement, string label)
 		{
-			V_0 = gotoStatement.get_Parent() as BlockStatement;
-			V_1 = this.GetOuterBlock(V_0);
-			V_2 = new VariableReferenceExpression(this.GetLabelVariable(label), null);
-			this.ExtractConditionIntoVariable(V_2.CloneExpressionOnly() as VariableReferenceExpression, gotoStatement, V_0);
-			V_3 = V_0.get_Parent();
-			if (V_3 as SwitchCase != null)
+			BlockStatement parent = gotoStatement.Parent as BlockStatement;
+			BlockStatement outerBlock = this.GetOuterBlock(parent);
+			VariableReferenceExpression variableReferenceExpression = new VariableReferenceExpression(this.GetLabelVariable(label), null);
+			this.ExtractConditionIntoVariable(variableReferenceExpression.CloneExpressionOnly() as VariableReferenceExpression, gotoStatement, parent);
+			Statement statement = parent.Parent;
+			if (statement is SwitchCase)
 			{
-				V_3 = V_3.get_Parent();
+				statement = statement.Parent;
 			}
-			if (V_0.get_Parent() as SwitchCase != null || V_0.get_Parent() as WhileStatement != null || V_0.get_Parent() as DoWhileStatement != null || V_0.get_Parent() as ForStatement != null || V_0.get_Parent() as ForEachStatement != null)
+			if (parent.Parent is SwitchCase || parent.Parent is WhileStatement || parent.Parent is DoWhileStatement || parent.Parent is ForStatement || parent.Parent is ForEachStatement)
 			{
-				V_4 = new BlockStatement();
-				V_4.AddStatement(new BreakStatement(null));
-				V_5 = new IfStatement(V_2.CloneExpressionOnly(), V_4, null);
-				V_6 = V_0.get_Statements().IndexOf(gotoStatement);
-				dummyVar0 = V_0.get_Statements().Remove(gotoStatement);
-				V_0.AddStatementAt(V_6, V_5);
+				BlockStatement blockStatement = new BlockStatement();
+				blockStatement.AddStatement(new BreakStatement(null));
+				IfStatement ifStatement = new IfStatement(variableReferenceExpression.CloneExpressionOnly(), blockStatement, null);
+				int num = parent.Statements.IndexOf(gotoStatement);
+				parent.Statements.Remove(gotoStatement);
+				parent.AddStatementAt(num, ifStatement);
 			}
 			else
 			{
-				if (V_0.get_Parent() as IfStatement == null && V_0.get_Parent() as TryStatement == null && V_0.get_Parent() as IfElseIfStatement == null)
+				if (!(parent.Parent is IfStatement) && !(parent.Parent is TryStatement) && !(parent.Parent is IfElseIfStatement))
 				{
 					throw new ArgumentOutOfRangeException("Goto statement can not leave this parent construct.");
 				}
-				V_7 = V_0.get_Statements().IndexOf(gotoStatement) + 1;
-				V_8 = new BlockStatement();
-				while (V_7 < V_0.get_Statements().get_Count())
+				int num1 = parent.Statements.IndexOf(gotoStatement) + 1;
+				BlockStatement blockStatement1 = new BlockStatement();
+				while (num1 < parent.Statements.Count)
 				{
-					V_8.AddStatement(V_0.get_Statements().get_Item(V_7));
-					V_0.get_Statements().RemoveAt(V_7);
+					blockStatement1.AddStatement(parent.Statements[num1]);
+					parent.Statements.RemoveAt(num1);
 				}
-				V_9 = new IfStatement(new UnaryExpression(1, V_2.CloneExpressionOnly(), null), V_8, null);
-				dummyVar1 = V_0.get_Statements().Remove(gotoStatement);
-				if (V_9.get_Then().get_Statements().get_Count() != 0)
+				IfStatement ifStatement1 = new IfStatement(new UnaryExpression(UnaryOperator.LogicalNot, variableReferenceExpression.CloneExpressionOnly(), null), blockStatement1, null);
+				parent.Statements.Remove(gotoStatement);
+				if (ifStatement1.Then.Statements.Count != 0)
 				{
-					V_0.AddStatement(V_9);
+					parent.AddStatement(ifStatement1);
 				}
 			}
-			V_1.AddStatementAt(V_1.get_Statements().IndexOf(V_3) + 1, gotoStatement);
-			return;
+			outerBlock.AddStatementAt(outerBlock.Statements.IndexOf(statement) + 1, gotoStatement);
 		}
 
 		private bool Precedes(Statement first, Statement second)
 		{
-			V_0 = this.GetParentsChain(first);
-			V_1 = this.GetParentsChain(second);
-			V_2 = null;
-			while (V_0.Peek() == V_1.Peek())
+			bool flag;
+			Stack<Statement> parentsChain = this.GetParentsChain(first);
+			Stack<Statement> statements = this.GetParentsChain(second);
+			Statement statement = null;
+			while (parentsChain.Peek() == statements.Peek())
 			{
-				V_2 = V_0.Pop();
-				dummyVar0 = V_1.Pop();
+				statement = parentsChain.Pop();
+				statements.Pop();
 			}
-			if (V_2 as SwitchStatement == null)
+			if (!(statement is SwitchStatement))
 			{
-				if (V_2 as BlockStatement == null)
+				if (!(statement is BlockStatement))
 				{
 					throw new ArgumentException("No common block found.");
 				}
-				V_3 = (V_2 as BlockStatement).get_Statements().IndexOf(V_0.Peek());
-				V_4 = (V_2 as BlockStatement).get_Statements().IndexOf(V_1.Peek());
-				return V_3 < V_4;
+				int num = (statement as BlockStatement).Statements.IndexOf(parentsChain.Peek());
+				int num1 = (statement as BlockStatement).Statements.IndexOf(statements.Peek());
+				return num < num1;
 			}
-			V_5 = (V_2 as SwitchStatement).get_Cases().GetEnumerator();
-			try
+			using (IEnumerator<SwitchCase> enumerator = (statement as SwitchStatement).Cases.GetEnumerator())
 			{
-				while (V_5.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					if (V_5.get_Current() != V_0.Peek())
+					if (enumerator.Current != parentsChain.Peek())
 					{
 						continue;
 					}
-					V_6 = true;
-					goto Label1;
+					flag = true;
+					return flag;
 				}
-				goto Label0;
+				return false;
 			}
-			finally
-			{
-				if (V_5 != null)
-				{
-					V_5.Dispose();
-				}
-			}
-		Label1:
-			return V_6;
-		Label0:
-			return false;
+			return flag;
 		}
 
 		internal IEnumerable<KeyValuePair<IfStatement, Statement>> Preprocess()
 		{
 			this.ReplaceUnconditionalGoto();
 			this.AddLabelVariables();
-			stackVariable3 = this.GetGotoPairs();
-			stackVariable4 = TotalGotoEliminationStep.u003cu003ec.u003cu003e9__17_0;
-			if (stackVariable4 == null)
-			{
-				dummyVar0 = stackVariable4;
-				stackVariable4 = new Func<KeyValuePair<IfStatement, Statement>, string>(TotalGotoEliminationStep.u003cu003ec.u003cu003e9.u003cPreprocessu003eb__17_0);
-				TotalGotoEliminationStep.u003cu003ec.u003cu003e9__17_0 = stackVariable4;
-			}
-			stackVariable5 = stackVariable3.OrderBy<KeyValuePair<IfStatement, Statement>, string>(stackVariable4);
-			this.breakVariable = new VariableDefinition("breakCondition", this.methodContext.get_Method().get_Module().get_TypeSystem().get_Boolean(), this.methodContext.get_Method());
-			dummyVar1 = this.methodContext.get_VariablesToRename().Add(this.breakVariable.Resolve());
-			this.continueVariable = new VariableDefinition("continueCondition", this.methodContext.get_Method().get_Module().get_TypeSystem().get_Boolean(), this.methodContext.get_Method());
-			dummyVar2 = this.methodContext.get_VariablesToRename().Add(this.continueVariable.Resolve());
-			return stackVariable5;
+			IOrderedEnumerable<KeyValuePair<IfStatement, Statement>> gotoPairs = 
+				from x in this.GetGotoPairs()
+				orderby x.Value.Label
+				select x;
+			this.breakVariable = new VariableDefinition("breakCondition", this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean(), this.methodContext.Method);
+			this.methodContext.VariablesToRename.Add(this.breakVariable.Resolve());
+			this.continueVariable = new VariableDefinition("continueCondition", this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean(), this.methodContext.Method);
+			this.methodContext.VariablesToRename.Add(this.continueVariable.Resolve());
+			return gotoPairs;
 		}
 
 		public virtual BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			this.methodContext = context.get_MethodContext();
-			this.typeSystem = this.methodContext.get_Method().get_Module().get_TypeSystem();
+			this.methodContext = context.MethodContext;
+			this.typeSystem = this.methodContext.Method.get_Module().get_TypeSystem();
 			this.body = body;
 			this.RemoveGotoStatements();
-			this.methodContext.get_Variables().AddRange(this.switchVariables);
-			this.methodContext.get_VariablesToRename().UnionWith(this.switchVariables);
-			this.methodContext.get_Variables().AddRange(this.labelToVariable.get_Values());
-			this.methodContext.get_VariablesToRename().UnionWith(this.labelToVariable.get_Values());
+			this.methodContext.Variables.AddRange(this.switchVariables);
+			this.methodContext.VariablesToRename.UnionWith(this.switchVariables);
+			this.methodContext.Variables.AddRange(this.labelToVariable.Values);
+			this.methodContext.VariablesToRename.UnionWith(this.labelToVariable.Values);
 			this.CleanupUnneededVariables();
 			this.AddDefaultAssignmentsToNewConditionalVariables(body);
 			return body;
@@ -748,93 +635,69 @@ namespace Telerik.JustDecompiler.Decompiler.GotoElimination
 
 		private void RemoveGotoStatements()
 		{
-			V_0 = this.Preprocess().GetEnumerator();
-			try
+			foreach (KeyValuePair<IfStatement, Statement> keyValuePair in this.Preprocess())
 			{
-				while (V_0.MoveNext())
-				{
-					V_1 = V_0.get_Current();
-					this.EliminateGotoPair(V_1.get_Key(), V_1.get_Value());
-				}
-			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
+				this.EliminateGotoPair(keyValuePair.Key, keyValuePair.Value);
 			}
 			this.ClearLabelStatements();
-			return;
 		}
 
 		private void ReplaceUnconditionalGoto()
 		{
-			V_0 = this.methodContext.get_GotoStatements().GetEnumerator();
-			try
+			foreach (GotoStatement gotoStatement in this.methodContext.GotoStatements)
 			{
-				while (V_0.MoveNext())
+				if (!this.IsUnconditionalJump(gotoStatement))
 				{
-					V_1 = V_0.get_Current();
-					if (!this.IsUnconditionalJump(V_1))
-					{
-						continue;
-					}
-					this.EmbedIntoDefaultIf(V_1);
+					continue;
 				}
+				this.EmbedIntoDefaultIf(gotoStatement);
 			}
-			finally
-			{
-				((IDisposable)V_0).Dispose();
-			}
-			return;
 		}
 
 		private TotalGotoEliminationStep.GotoToLabelRelation ResolveRelation(IfStatement gotoStatement, Statement labeledStatement)
 		{
-			V_0 = this.GetLowestCommonParent(gotoStatement, labeledStatement) as BlockStatement;
-			if (V_0 == null)
+			BlockStatement lowestCommonParent = this.GetLowestCommonParent(gotoStatement, labeledStatement) as BlockStatement;
+			if (lowestCommonParent == null)
 			{
-				return 2;
+				return TotalGotoEliminationStep.GotoToLabelRelation.IndirectlyRelated;
 			}
-			if (V_0.get_Statements().Contains(gotoStatement) && V_0.get_Statements().Contains(labeledStatement))
+			if (lowestCommonParent.Statements.Contains(gotoStatement) && lowestCommonParent.Statements.Contains(labeledStatement))
 			{
-				return 0;
+				return TotalGotoEliminationStep.GotoToLabelRelation.Siblings;
 			}
-			if (!V_0.get_Statements().Contains(gotoStatement) && !V_0.get_Statements().Contains(labeledStatement))
+			if (!lowestCommonParent.Statements.Contains(gotoStatement) && !lowestCommonParent.Statements.Contains(labeledStatement))
 			{
-				return 2;
+				return TotalGotoEliminationStep.GotoToLabelRelation.IndirectlyRelated;
 			}
-			return 1;
+			return TotalGotoEliminationStep.GotoToLabelRelation.DirectlyRelated;
 		}
 
 		private bool ShouldCheck(IfStatement gotoStatement)
 		{
-			V_0 = gotoStatement.get_Parent();
-			while (V_0 != null)
+			for (Statement i = gotoStatement.Parent; i != null; i = i.Parent)
 			{
-				if (V_0 as SwitchStatement != null || V_0 as ForStatement != null || V_0 as ForEachStatement != null || V_0 as WhileStatement != null || V_0 as DoWhileStatement != null)
+				if (i is SwitchStatement || i is ForStatement || i is ForEachStatement || i is WhileStatement || i is DoWhileStatement)
 				{
 					return true;
 				}
-				V_0 = V_0.get_Parent();
 			}
 			return false;
 		}
 
 		private BinaryExpression UpdateCondition(Expression oldCondition, VariableReferenceExpression conditionVar)
 		{
-			if (oldCondition as BinaryExpression != null)
+			if (oldCondition is BinaryExpression)
 			{
-				V_0 = oldCondition as BinaryExpression;
-				if (V_0.get_Left() as VariableReferenceExpression != null && (object)(V_0.get_Left() as VariableReferenceExpression).get_Variable() == (object)conditionVar.get_Variable())
+				BinaryExpression binaryExpression = oldCondition as BinaryExpression;
+				if (binaryExpression.Left is VariableReferenceExpression && (object)(binaryExpression.Left as VariableReferenceExpression).Variable == (object)conditionVar.Variable)
 				{
-					return V_0;
+					return binaryExpression;
 				}
 			}
-			stackVariable9 = new BinaryExpression(11, conditionVar, oldCondition, this.typeSystem, null, false);
-			stackVariable9.set_ExpressionType(this.methodContext.get_Method().get_Module().get_TypeSystem().get_Boolean());
-			return stackVariable9;
+			return new BinaryExpression(BinaryOperator.LogicalOr, conditionVar, oldCondition, this.typeSystem, null, false)
+			{
+				ExpressionType = this.methodContext.Method.get_Module().get_TypeSystem().get_Boolean()
+			};
 		}
 
 		private enum GotoToLabelRelation

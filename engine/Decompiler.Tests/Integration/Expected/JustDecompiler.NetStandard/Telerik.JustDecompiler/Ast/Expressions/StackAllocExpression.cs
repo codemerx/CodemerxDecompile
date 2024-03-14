@@ -15,9 +15,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new StackAllocExpression.u003cget_Childrenu003ed__2(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				StackAllocExpression stackAllocExpression = null;
+				yield return stackAllocExpression.Expression;
 			}
 		}
 
@@ -25,7 +24,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 45;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.StackAllocExpression;
 			}
 		}
 
@@ -49,31 +48,29 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			}
 		}
 
-		public StackAllocExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference expressionType, IEnumerable<Instruction> instructions)
+		public StackAllocExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference expressionType, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Expression(expression);
-			this.set_ExpressionType(expressionType);
-			return;
+			this.Expression = expression;
+			this.ExpressionType = expressionType;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new StackAllocExpression(this.get_Expression().Clone(), this.get_ExpressionType(), this.instructions);
+			return new StackAllocExpression(this.Expression.Clone(), this.ExpressionType, this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new StackAllocExpression(this.get_Expression().CloneExpressionOnly(), this.get_ExpressionType(), null);
+			return new StackAllocExpression(this.Expression.CloneExpressionOnly(), this.ExpressionType, null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (other as StackAllocExpression == null)
+			if (!(other is StackAllocExpression))
 			{
 				return false;
 			}
-			return this.get_Expression().Equals((other as StackAllocExpression).get_Expression());
+			return this.Expression.Equals((other as StackAllocExpression).Expression);
 		}
 	}
 }

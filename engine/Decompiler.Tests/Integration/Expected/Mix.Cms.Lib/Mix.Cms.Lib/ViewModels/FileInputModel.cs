@@ -14,8 +14,6 @@ namespace Mix.Cms.Lib.ViewModels
 
 		public FileInputModel()
 		{
-			base();
-			return;
 		}
 	}
 }

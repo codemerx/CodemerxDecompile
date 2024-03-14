@@ -51,28 +51,24 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public ModuleSpecificContext()
 		{
-			base();
-			this.set_Module(null);
-			this.set_ModuleNamespaceUsings(new HashSet<string>());
-			this.set_CollisionTypesData(new Dictionary<string, List<string>>());
-			this.set_NamespaceHieararchy(new Dictionary<string, HashSet<string>>());
-			this.set_RenamedNamespacesMap(new Dictionary<string, string>());
-			this.set_RenamedMembers(new HashSet<uint>());
-			this.set_RenamedMembersMap(new Dictionary<uint, string>());
-			return;
+			this.Module = null;
+			this.ModuleNamespaceUsings = new HashSet<string>();
+			this.CollisionTypesData = new Dictionary<string, List<string>>();
+			this.NamespaceHieararchy = new Dictionary<string, HashSet<string>>();
+			this.RenamedNamespacesMap = new Dictionary<string, string>();
+			this.RenamedMembers = new HashSet<uint>();
+			this.RenamedMembersMap = new Dictionary<uint, string>();
 		}
 
 		public ModuleSpecificContext(ModuleDefinition module, ICollection<string> moduleNamespaceUsings, Dictionary<string, List<string>> collisionTypeData, Dictionary<string, HashSet<string>> namespaceHierarchy, Dictionary<string, string> renamedNamespacesMap, ICollection<uint> renamedMembers, Dictionary<uint, string> renamedMembersMap)
 		{
-			base();
-			this.set_Module(module);
-			this.set_ModuleNamespaceUsings(moduleNamespaceUsings);
-			this.set_CollisionTypesData(collisionTypeData);
-			this.set_NamespaceHieararchy(namespaceHierarchy);
-			this.set_RenamedNamespacesMap(renamedNamespacesMap);
-			this.set_RenamedMembers(renamedMembers);
-			this.set_RenamedMembersMap(renamedMembersMap);
-			return;
+			this.Module = module;
+			this.ModuleNamespaceUsings = moduleNamespaceUsings;
+			this.CollisionTypesData = collisionTypeData;
+			this.NamespaceHieararchy = namespaceHierarchy;
+			this.RenamedNamespacesMap = renamedNamespacesMap;
+			this.RenamedMembers = renamedMembers;
+			this.RenamedMembersMap = renamedMembersMap;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using OrchardCore;
 using OrchardCore.Environment.Extensions;
 using OrchardCore.Environment.Extensions.Features;
 using OrchardCore.Environment.Shell.Builders;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,24 +32,19 @@ namespace OrchardCore.Environment.Shell
 
 		private bool _initialized;
 
-		private ConcurrentDictionary<string, ShellContext> _shellContexts;
+		private ConcurrentDictionary<string, ShellContext> _shellContexts = new ConcurrentDictionary<string, ShellContext>();
 
-		private readonly ConcurrentDictionary<string, SemaphoreSlim> _shellSemaphores;
+		private readonly ConcurrentDictionary<string, SemaphoreSlim> _shellSemaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
 
-		private SemaphoreSlim _initializingSemaphore;
+		private SemaphoreSlim _initializingSemaphore = new SemaphoreSlim(1);
 
 		public ShellHost(IShellSettingsManager shellSettingsManager, IShellContextFactory shellContextFactory, IRunningShellTable runningShellTable, IExtensionManager extensionManager, ILogger<ShellHost> logger)
 		{
-			this._shellContexts = new ConcurrentDictionary<string, ShellContext>();
-			this._shellSemaphores = new ConcurrentDictionary<string, SemaphoreSlim>();
-			this._initializingSemaphore = new SemaphoreSlim(1);
-			base();
 			this._shellSettingsManager = shellSettingsManager;
 			this._shellContextFactory = shellContextFactory;
 			this._runningShellTable = runningShellTable;
 			this._extensionManager = extensionManager;
 			this._logger = logger;
-			return;
 		}
 
 		private void AddAndRegisterShell(ShellContext context)
@@ -56,7 +53,6 @@ namespace OrchardCore.Environment.Shell
 			{
 				this.RegisterShellSettings(context.get_Settings());
 			}
-			return;
 		}
 
 		private bool CanCreateShell(ShellSettings shellSettings)
@@ -76,10 +72,7 @@ namespace OrchardCore.Environment.Shell
 			}
 			if (this._logger.IsEnabled(1))
 			{
-				stackVariable11 = this._logger;
-				stackVariable14 = new object[1];
-				stackVariable14[0] = context.get_Settings().get_Name();
-				LoggerExtensions.LogDebug(stackVariable11, "Skipping shell context registration for tenant '{TenantName}'", stackVariable14);
+				LoggerExtensions.LogDebug(this._logger, "Skipping shell context registration for tenant '{TenantName}'", new object[] { context.get_Settings().get_Name() });
 			}
 			return false;
 		}
@@ -95,15 +88,16 @@ namespace OrchardCore.Environment.Shell
 
 		private bool CanReleaseShell(ShellSettings settings)
 		{
+			ShellContext shellContext;
 			if (settings.get_State() != 3)
 			{
 				return true;
 			}
-			if (!this._shellContexts.TryGetValue(settings.get_Name(), out V_0))
+			if (!this._shellContexts.TryGetValue(settings.get_Name(), out shellContext))
 			{
 				return false;
 			}
-			return V_0.get_ActiveScopes() == 0;
+			return shellContext.get_ActiveScopes() == 0;
 		}
 
 		public Task ChangedAsync(ShellDescriptor descriptor, ShellSettings settings)
@@ -119,10 +113,10 @@ namespace OrchardCore.Environment.Shell
 			}
 			if (defaultSettings == null)
 			{
-				stackVariable11 = this._shellSettingsManager.CreateDefaultSettings();
-				stackVariable11.set_Name("Default");
-				stackVariable11.set_State(0);
-				defaultSettings = stackVariable11;
+				ShellSettings shellSetting = this._shellSettingsManager.CreateDefaultSettings();
+				shellSetting.set_Name("Default");
+				shellSetting.set_State(0);
+				defaultSettings = shellSetting;
 			}
 			return this._shellContextFactory.CreateSetupContextAsync(defaultSettings);
 		}
@@ -133,10 +127,7 @@ namespace OrchardCore.Environment.Shell
 			{
 				if (this._logger.IsEnabled(1))
 				{
-					stackVariable56 = this._logger;
-					stackVariable59 = new object[1];
-					stackVariable59[0] = settings.get_Name();
-					LoggerExtensions.LogDebug(stackVariable56, "Creating shell context for tenant '{TenantName}' setup", stackVariable59);
+					LoggerExtensions.LogDebug(this._logger, "Creating shell context for tenant '{TenantName}' setup", new object[] { settings.get_Name() });
 				}
 				return this._shellContextFactory.CreateSetupContextAsync(settings);
 			}
@@ -144,14 +135,11 @@ namespace OrchardCore.Environment.Shell
 			{
 				if (this._logger.IsEnabled(1))
 				{
-					stackVariable40 = this._logger;
-					stackVariable43 = new object[1];
-					stackVariable43[0] = settings.get_Name();
-					LoggerExtensions.LogDebug(stackVariable40, "Creating disabled shell context for tenant '{TenantName}'", stackVariable43);
+					LoggerExtensions.LogDebug(this._logger, "Creating disabled shell context for tenant '{TenantName}'", new object[] { settings.get_Name() });
 				}
-				stackVariable36 = new ShellContext();
-				stackVariable36.set_Settings(settings);
-				return Task.FromResult<ShellContext>(stackVariable36);
+				ShellContext shellContext = new ShellContext();
+				shellContext.set_Settings(settings);
+				return Task.FromResult<ShellContext>(shellContext);
 			}
 			if (settings.get_State() != 2 && settings.get_State() != 1)
 			{
@@ -159,150 +147,257 @@ namespace OrchardCore.Environment.Shell
 			}
 			if (this._logger.IsEnabled(1))
 			{
-				stackVariable17 = this._logger;
-				stackVariable20 = new object[1];
-				stackVariable20[0] = settings.get_Name();
-				LoggerExtensions.LogDebug(stackVariable17, "Creating shell context for tenant '{TenantName}'", stackVariable20);
+				LoggerExtensions.LogDebug(this._logger, "Creating shell context for tenant '{TenantName}'", new object[] { settings.get_Name() });
 			}
 			return this._shellContextFactory.CreateShellContextAsync(settings);
 		}
 
 		public void Dispose()
 		{
-			V_0 = this.ListShellContexts().GetEnumerator();
-			try
+			foreach (ShellContext shellContext in this.ListShellContexts())
 			{
-				while (V_0.MoveNext())
-				{
-					V_0.get_Current().Dispose();
-				}
+				shellContext.Dispose();
 			}
-			finally
-			{
-				if (V_0 != null)
-				{
-					V_0.Dispose();
-				}
-			}
-			return;
 		}
 
 		public IEnumerable<ShellSettings> GetAllSettings()
 		{
-			stackVariable1 = this.ListShellContexts();
-			stackVariable2 = ShellHost.u003cu003ec.u003cu003e9__20_0;
-			if (stackVariable2 == null)
-			{
-				dummyVar0 = stackVariable2;
-				stackVariable2 = new Func<ShellContext, ShellSettings>(ShellHost.u003cu003ec.u003cu003e9.u003cGetAllSettingsu003eb__20_0);
-				ShellHost.u003cu003ec.u003cu003e9__20_0 = stackVariable2;
-			}
-			return stackVariable1.Select<ShellContext, ShellSettings>(stackVariable2);
+			return 
+				from s in this.ListShellContexts()
+				select s.get_Settings();
 		}
 
 		public async Task<ShellContext> GetOrCreateShellContextAsync(ShellSettings settings)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.settings = settings;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<ShellContext>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellHost.u003cGetOrCreateShellContextAsyncu003ed__12>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ShellContext shellContext;
+			ShellContext shellContext1 = null;
+			while (shellContext1 == null)
+			{
+				if (!this._shellContexts.TryGetValue(settings.get_Name(), out shellContext1))
+				{
+					ConcurrentDictionary<string, SemaphoreSlim> strs = this._shellSemaphores;
+					string str = settings.get_Name();
+					SemaphoreSlim orAdd = strs.GetOrAdd(str, (string name) => new SemaphoreSlim(1));
+					await orAdd.WaitAsync();
+					try
+					{
+						if (!this._shellContexts.TryGetValue(settings.get_Name(), out shellContext1))
+						{
+							shellContext1 = await this.CreateShellContextAsync(settings);
+							this.AddAndRegisterShell(shellContext1);
+						}
+					}
+					finally
+					{
+						orAdd.Release();
+						this._shellSemaphores.TryRemove(settings.get_Name(), out orAdd);
+					}
+					orAdd = null;
+				}
+				if (!shellContext1.get_Released())
+				{
+					continue;
+				}
+				this._shellContexts.TryRemove(settings.get_Name(), out shellContext);
+				shellContext1 = null;
+			}
+			return shellContext1;
 		}
 
 		public async Task<ShellScope> GetScopeAsync(ShellSettings settings)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.settings = settings;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<ShellScope>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellHost.u003cGetScopeAsyncu003ed__13>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ShellContext orCreateShellContextAsync;
+			ShellContext shellContext;
+			ShellScope shellScope = null;
+			while (shellScope == null)
+			{
+				if (!this._shellContexts.TryGetValue(settings.get_Name(), out orCreateShellContextAsync))
+				{
+					orCreateShellContextAsync = await this.GetOrCreateShellContextAsync(settings);
+				}
+				shellScope = orCreateShellContextAsync.CreateScope();
+				if (shellScope != null)
+				{
+					continue;
+				}
+				this._shellContexts.TryRemove(settings.get_Name(), out shellContext);
+			}
+			return shellScope;
 		}
 
 		public async Task InitializeAsync()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellHost.u003cInitializeAsyncu003ed__11>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			if (!this._initialized)
+			{
+				await this._initializingSemaphore.WaitAsync();
+				try
+				{
+					if (!this._initialized)
+					{
+						await this.PreCreateAndRegisterShellsAsync();
+					}
+				}
+				finally
+				{
+					this._initialized = true;
+					this._initializingSemaphore.Release();
+				}
+			}
 		}
 
 		public IEnumerable<ShellContext> ListShellContexts()
 		{
-			return this._shellContexts.get_Values().ToArray<ShellContext>();
+			return this._shellContexts.Values.ToArray<ShellContext>();
 		}
 
 		private async Task PreCreateAndRegisterShellsAsync()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellHost.u003cPreCreateAndRegisterShellsAsyncu003ed__21>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			bool state;
+			if (this._logger.IsEnabled(2))
+			{
+				LoggerExtensions.LogInformation(this._logger, "Start creation of shells", Array.Empty<object>());
+			}
+			Task<IEnumerable<FeatureEntry>> task = this._extensionManager.LoadFeaturesAsync();
+			IEnumerable<ShellSettings> shellSettings = await this._shellSettingsManager.LoadSettingsAsync();
+			ShellSettings[] array = shellSettings.Where<ShellSettings>(new Func<ShellSettings, bool>(this.CanCreateShell)).ToArray<ShellSettings>();
+			ShellSettings[] shellSettingsArray = array;
+			ShellSettings shellSetting = shellSettingsArray.FirstOrDefault<ShellSettings>((ShellSettings s) => s.get_Name() == "Default");
+			ShellSettings[] shellSettingsArray1 = array;
+			ShellSettings[] shellSettingsArray2 = new ShellSettings[] { shellSetting };
+			ShellSettings[] array1 = shellSettingsArray1.Except<ShellSettings>(shellSettingsArray2).ToArray<ShellSettings>();
+			await task;
+			ShellSettings shellSetting1 = shellSetting;
+			if (shellSetting1 != null)
+			{
+				state = shellSetting1.get_State() != 2;
+			}
+			else
+			{
+				state = true;
+			}
+			if (state)
+			{
+				this.AddAndRegisterShell(await this.CreateSetupContextAsync(shellSetting));
+				array = array1;
+			}
+			if (array.Length != 0)
+			{
+				ShellSettings[] shellSettingsArray3 = array;
+				for (int i = 0; i < (int)shellSettingsArray3.Length; i++)
+				{
+					ShellSettings shellSetting2 = shellSettingsArray3[i];
+					ShellContext.PlaceHolder placeHolder = new ShellContext.PlaceHolder();
+					placeHolder.set_Settings(shellSetting2);
+					this.AddAndRegisterShell(placeHolder);
+				}
+			}
+			if (this._logger.IsEnabled(2))
+			{
+				LoggerExtensions.LogInformation(this._logger, "Done pre-creating and registering shells", Array.Empty<object>());
+			}
 		}
 
 		private void RegisterShellSettings(ShellSettings settings)
 		{
 			if (this._logger.IsEnabled(1))
 			{
-				stackVariable8 = this._logger;
-				stackVariable11 = new object[1];
-				stackVariable11[0] = settings.get_Name();
-				LoggerExtensions.LogDebug(stackVariable8, "Registering shell context for tenant '{TenantName}'", stackVariable11);
+				LoggerExtensions.LogDebug(this._logger, "Registering shell context for tenant '{TenantName}'", new object[] { settings.get_Name() });
 			}
 			this._runningShellTable.Add(settings);
-			return;
 		}
 
 		public Task ReleaseShellContextAsync(ShellSettings settings)
 		{
+			ShellContext shellContext;
 			if (!this.CanReleaseShell(settings))
 			{
-				return Task.get_CompletedTask();
+				return Task.CompletedTask;
 			}
-			if (this._shellContexts.TryRemove(settings.get_Name(), out V_0))
+			if (this._shellContexts.TryRemove(settings.get_Name(), out shellContext))
 			{
-				V_0.Release();
+				shellContext.Release();
 			}
-			stackVariable10 = this._shellContexts;
-			stackVariable13 = V_0.get_Settings().get_Name();
-			stackVariable14 = new ShellContext.PlaceHolder();
-			stackVariable14.set_Settings(settings);
-			dummyVar0 = stackVariable10.TryAdd(stackVariable13, stackVariable14);
-			return Task.get_CompletedTask();
+			ConcurrentDictionary<string, ShellContext> strs = this._shellContexts;
+			string name = shellContext.get_Settings().get_Name();
+			ShellContext.PlaceHolder placeHolder = new ShellContext.PlaceHolder();
+			placeHolder.set_Settings(settings);
+			strs.TryAdd(name, placeHolder);
+			return Task.CompletedTask;
 		}
 
 		public async Task ReloadShellContextAsync(ShellSettings settings)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.settings = settings;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellHost.u003cReloadShellContextAsyncu003ed__16>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ShellContext shellContext;
+			if (this.CanReleaseShell(settings))
+			{
+				if (settings.get_State() != 1)
+				{
+					settings = await this._shellSettingsManager.LoadSettingsAsync(settings.get_Name());
+				}
+				int num = 0;
+				while (num < 9)
+				{
+					num++;
+					if (this._shellContexts.TryRemove(settings.get_Name(), out shellContext))
+					{
+						this._runningShellTable.Remove(settings);
+						shellContext.Release();
+					}
+					ConcurrentDictionary<string, ShellContext> strs = this._shellContexts;
+					string name = settings.get_Name();
+					ShellContext.PlaceHolder placeHolder = new ShellContext.PlaceHolder();
+					placeHolder.set_Settings(settings);
+					if (!strs.TryAdd(name, placeHolder))
+					{
+						continue;
+					}
+					if (this.CanRegisterShell(settings))
+					{
+						this._runningShellTable.Add(settings);
+					}
+					if (settings.get_State() != 1)
+					{
+						string identifier = settings.get_Identifier();
+						settings = await this._shellSettingsManager.LoadSettingsAsync(settings.get_Name());
+						if (settings.get_Identifier() != identifier)
+						{
+							identifier = null;
+						}
+						else
+						{
+							return;
+						}
+					}
+					else
+					{
+						return;
+					}
+				}
+				throw new ShellHostReloadException(string.Concat("Unable to reload the tenant '", settings.get_Name(), "' as too many concurrent processes are trying to do so."));
+			}
+			else
+			{
+				this._runningShellTable.Remove(settings);
+			}
 		}
 
 		public bool TryGetSettings(string name, out ShellSettings settings)
 		{
-			if (!this._shellContexts.TryGetValue(name, out V_0))
+			ShellContext shellContext;
+			if (!this._shellContexts.TryGetValue(name, out shellContext))
 			{
 				settings = null;
 				return false;
 			}
-			settings = V_0.get_Settings();
+			settings = shellContext.get_Settings();
 			return true;
 		}
 
 		public async Task UpdateShellSettingsAsync(ShellSettings settings)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.settings = settings;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ShellHost.u003cUpdateShellSettingsAsyncu003ed__14>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			settings.set_Identifier(IdGenerator.GenerateId());
+			await this._shellSettingsManager.SaveSettingsAsync(settings);
+			await this.ReloadShellContextAsync(settings);
 		}
 	}
 }

@@ -194,11 +194,9 @@ namespace Mix.Cms.Lib.Models.Cms
 
 		public MixPage()
 		{
-			base();
-			this.set_MixModuleData(new HashSet<Mix.Cms.Lib.Models.Cms.MixModuleData>());
-			this.set_MixPageModule(new HashSet<Mix.Cms.Lib.Models.Cms.MixPageModule>());
-			this.set_MixPagePost(new HashSet<Mix.Cms.Lib.Models.Cms.MixPagePost>());
-			return;
+			this.MixModuleData = new HashSet<Mix.Cms.Lib.Models.Cms.MixModuleData>();
+			this.MixPageModule = new HashSet<Mix.Cms.Lib.Models.Cms.MixPageModule>();
+			this.MixPagePost = new HashSet<Mix.Cms.Lib.Models.Cms.MixPagePost>();
 		}
 	}
 }

@@ -27,11 +27,9 @@ namespace Telerik.JustDecompiler.Decompiler.AssignmentAnalysis
 
 		public AssignmentFlowNode(InstructionBlock theBlock)
 		{
-			base();
-			this.set_CFGBlock(theBlock);
-			this.set_NodeState(0);
-			this.set_Successors(new AssignmentFlowNode[(int)theBlock.get_Successors().Length]);
-			return;
+			this.CFGBlock = theBlock;
+			this.NodeState = AssignmentNodeState.Unknown;
+			this.Successors = new AssignmentFlowNode[(int)theBlock.Successors.Length];
 		}
 	}
 }

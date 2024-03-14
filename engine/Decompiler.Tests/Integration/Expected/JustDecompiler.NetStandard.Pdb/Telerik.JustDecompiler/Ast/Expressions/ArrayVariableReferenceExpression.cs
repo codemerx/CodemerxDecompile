@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Telerik.JustDecompiler.Ast;
@@ -21,9 +22,18 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new ArrayVariableReferenceExpression.u003cget_Childrenu003ed__18(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ArrayVariableReferenceExpression arrayVariableReferenceExpression = null;
+				if (arrayVariableReferenceExpression.Variable != null)
+				{
+					yield return arrayVariableReferenceExpression.Variable;
+				}
+				if (arrayVariableReferenceExpression.Dimensions != null)
+				{
+					foreach (ICodeNode dimension in arrayVariableReferenceExpression.Dimensions)
+					{
+						yield return dimension;
+					}
+				}
 			}
 		}
 
@@ -31,7 +41,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 83;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ArrayAssignmentVariableReferenceExpression;
 			}
 		}
 
@@ -45,7 +55,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return this.get_Variable().get_ExpressionType();
+				return this.Variable.ExpressionType;
 			}
 			set
 			{
@@ -73,46 +83,44 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 			set;
 		}
 
-		public ArrayVariableReferenceExpression(VariableReferenceExpression variable, TypeReference arrayType, ExpressionCollection dimensions, bool hasInitializer, IEnumerable<Instruction> instructions)
+		public ArrayVariableReferenceExpression(VariableReferenceExpression variable, TypeReference arrayType, ExpressionCollection dimensions, bool hasInitializer, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
-			this.set_Variable(variable);
-			this.set_ArrayType(arrayType);
-			this.set_Dimensions(dimensions);
-			this.set_HasInitializer(hasInitializer);
-			return;
+			this.Variable = variable;
+			this.ArrayType = arrayType;
+			this.Dimensions = dimensions;
+			this.HasInitializer = hasInitializer;
 		}
 
 		public override Expression Clone()
 		{
-			return new ArrayVariableReferenceExpression(this.get_Variable(), this.get_ArrayType(), this.get_Dimensions().CloneExpressionsOnly(), this.get_HasInitializer(), this.instructions);
+			return new ArrayVariableReferenceExpression(this.Variable, this.ArrayType, this.Dimensions.CloneExpressionsOnly(), this.HasInitializer, this.instructions);
 		}
 
 		public override Expression CloneExpressionOnly()
 		{
-			return new ArrayVariableReferenceExpression(this.get_Variable(), this.get_ArrayType(), this.get_Dimensions().CloneExpressionsOnly(), this.get_HasInitializer(), null);
+			return new ArrayVariableReferenceExpression(this.Variable, this.ArrayType, this.Dimensions.CloneExpressionsOnly(), this.HasInitializer, null);
 		}
 
 		public override bool Equals(Expression other)
 		{
-			if (other as ArrayVariableReferenceExpression == null)
+			if (!(other is ArrayVariableReferenceExpression))
 			{
 				return false;
 			}
-			V_0 = other as ArrayVariableReferenceExpression;
-			if (!this.get_Variable().Equals(V_0.get_Variable()))
+			ArrayVariableReferenceExpression arrayVariableReferenceExpression = other as ArrayVariableReferenceExpression;
+			if (!this.Variable.Equals(arrayVariableReferenceExpression.Variable))
 			{
 				return false;
 			}
-			if (String.op_Inequality(this.get_ArrayType().get_FullName(), V_0.get_ArrayType().get_FullName()))
+			if (this.ArrayType.get_FullName() != arrayVariableReferenceExpression.ArrayType.get_FullName())
 			{
 				return false;
 			}
-			if (!this.get_Dimensions().Equals(V_0.get_Dimensions()))
+			if (!this.Dimensions.Equals(arrayVariableReferenceExpression.Dimensions))
 			{
 				return false;
 			}
-			if (this.get_HasInitializer() != V_0.get_HasInitializer())
+			if (this.HasInitializer != arrayVariableReferenceExpression.HasInitializer)
 			{
 				return false;
 			}

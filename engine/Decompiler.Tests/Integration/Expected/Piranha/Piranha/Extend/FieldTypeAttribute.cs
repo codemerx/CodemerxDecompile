@@ -26,8 +26,6 @@ namespace Piranha.Extend
 
 		public FieldTypeAttribute()
 		{
-			base();
-			return;
 		}
 	}
 }

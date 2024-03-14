@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using OrchardCore.Environment.Shell;
 using OrchardCore.Environment.Shell.Builders;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace OrchardCore.Modules
@@ -10,45 +13,38 @@ namespace OrchardCore.Modules
 	{
 		public static HttpContext CreateHttpContext(this ShellContext shell)
 		{
-			stackVariable2 = shell.get_Settings().CreateHttpContext();
-			stackVariable3 = stackVariable2.get_Features();
-			stackVariable4 = new ShellContextFeature();
-			stackVariable4.set_ShellContext(shell);
-			stackVariable4.set_OriginalPathBase(PathString.op_Implicit(string.Empty));
-			stackVariable4.set_OriginalPath(PathString.op_Implicit("/"));
-			stackVariable3.Set<ShellContextFeature>(stackVariable4);
-			return stackVariable2;
+			HttpContext httpContext = shell.get_Settings().CreateHttpContext();
+			IFeatureCollection features = httpContext.get_Features();
+			ShellContextFeature shellContextFeature = new ShellContextFeature();
+			shellContextFeature.set_ShellContext(shell);
+			shellContextFeature.set_OriginalPathBase(string.Empty);
+			shellContextFeature.set_OriginalPath("/");
+			features.Set<ShellContextFeature>(shellContextFeature);
+			return httpContext;
 		}
 
 		public static HttpContext CreateHttpContext(this ShellSettings settings)
 		{
-			V_0 = HttpContextExtensions.UseShellScopeServices(new DefaultHttpContext());
-			stackVariable3 = settings.get_RequestUrlHost();
-			if (stackVariable3 != null)
+			string str;
+			HttpContext httpContext = HttpContextExtensions.UseShellScopeServices(new DefaultHttpContext());
+			string requestUrlHost = settings.get_RequestUrlHost();
+			if (requestUrlHost != null)
 			{
-				stackVariable7 = stackVariable3.Split('/', 1).FirstOrDefault<string>();
+				str = requestUrlHost.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault<string>();
 			}
 			else
 			{
-				dummyVar0 = stackVariable3;
-				stackVariable7 = null;
+				str = null;
 			}
-			V_1 = stackVariable7;
-			stackVariable9 = V_0.get_Request();
-			stackVariable10 = V_1;
-			if (stackVariable10 == null)
-			{
-				dummyVar1 = stackVariable10;
-				stackVariable10 = "localhost";
-			}
-			stackVariable9.set_Host(new HostString(stackVariable10));
+			string str1 = str;
+			httpContext.get_Request().set_Host(new HostString(str1 ?? "localhost"));
 			if (!string.IsNullOrWhiteSpace(settings.get_RequestUrlPrefix()))
 			{
-				V_0.get_Request().set_PathBase(PathString.op_Implicit(string.Concat("/", settings.get_RequestUrlPrefix())));
+				httpContext.get_Request().set_PathBase(string.Concat("/", settings.get_RequestUrlPrefix()));
 			}
-			V_0.get_Request().set_Path(PathString.op_Implicit("/"));
-			V_0.get_Items().set_Item("IsBackground", true);
-			return V_0;
+			httpContext.get_Request().set_Path("/");
+			httpContext.get_Items()["IsBackground"] = true;
+			return httpContext;
 		}
 	}
 }

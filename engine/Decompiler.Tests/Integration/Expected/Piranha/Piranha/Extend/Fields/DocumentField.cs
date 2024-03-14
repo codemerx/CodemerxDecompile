@@ -9,31 +9,31 @@ namespace Piranha.Extend.Fields
 	{
 		public DocumentField()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator DocumentField(Guid guid)
 		{
-			stackVariable0 = new DocumentField();
-			stackVariable0.set_Id(new Guid?(guid));
-			return stackVariable0;
+			return new DocumentField()
+			{
+				Id = new Guid?(guid)
+			};
 		}
 
 		public static implicit operator DocumentField(Piranha.Models.Media media)
 		{
-			stackVariable0 = new DocumentField();
-			stackVariable0.set_Id(new Guid?(media.get_Id()));
-			return stackVariable0;
+			return new DocumentField()
+			{
+				Id = new Guid?(media.Id)
+			};
 		}
 
 		public static implicit operator String(DocumentField image)
 		{
-			if (image.get_Media() == null)
+			if (image.Media == null)
 			{
 				return "";
 			}
-			return image.get_Media().get_PublicUrl();
+			return image.Media.PublicUrl;
 		}
 	}
 }

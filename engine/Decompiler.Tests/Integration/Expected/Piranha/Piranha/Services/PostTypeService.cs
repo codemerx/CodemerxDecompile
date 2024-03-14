@@ -1,10 +1,13 @@
 using Piranha;
+using Piranha.Cache;
 using Piranha.Models;
 using Piranha.Repositories;
+using Piranha.Runtime;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -18,33 +21,37 @@ namespace Piranha.Services
 
 		public PostTypeService(IPostTypeRepository repo, ICache cache)
 		{
-			base();
 			this._repo = repo;
-			if (App.get_CacheLevel() > 1)
+			if (App.CacheLevel > CacheLevel.Minimal)
 			{
 				this._cache = cache;
 			}
-			return;
 		}
 
 		public async Task DeleteAsync(string id)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PostTypeService.u003cDeleteAsyncu003ed__6>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ConfiguredTaskAwaitable<PostType> configuredTaskAwaitable = this._repo.GetById(id).ConfigureAwait(false);
+			PostType postType = await configuredTaskAwaitable;
+			if (postType != null)
+			{
+				await this.DeleteAsync(postType).ConfigureAwait(false);
+			}
 		}
 
 		public async Task DeleteAsync(PostType model)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.model = model;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PostTypeService.u003cDeleteAsyncu003ed__7>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			App.Hooks.OnBeforeDelete<PostType>(model);
+			ConfiguredTaskAwaitable configuredTaskAwaitable = this._repo.Delete(model.Id).ConfigureAwait(false);
+			await configuredTaskAwaitable;
+			App.Hooks.OnAfterDelete<PostType>(model);
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				cache.Remove("Piranha_PostTypes");
+			}
+			else
+			{
+			}
 		}
 
 		public Task<IEnumerable<PostType>> GetAllAsync()
@@ -54,31 +61,54 @@ namespace Piranha.Services
 
 		public async Task<PostType> GetByIdAsync(string id)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.id = id;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<PostType>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PostTypeService.u003cGetByIdAsyncu003ed__4>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			ConfiguredTaskAwaitable<IEnumerable<PostType>> configuredTaskAwaitable = this.GetTypes().ConfigureAwait(false);
+			PostType postType = await configuredTaskAwaitable.FirstOrDefault<PostType>((PostType t) => t.Id == id);
+			return postType;
 		}
 
 		private async Task<IEnumerable<PostType>> GetTypes()
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<IEnumerable<PostType>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PostTypeService.u003cGetTypesu003ed__8>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			IEnumerable<PostType> postTypes;
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				postTypes = cache.Get<IEnumerable<PostType>>("Piranha_PostTypes");
+			}
+			else
+			{
+				postTypes = null;
+			}
+			IEnumerable<PostType> postTypes1 = postTypes;
+			if (postTypes1 == null)
+			{
+				ConfiguredTaskAwaitable<IEnumerable<PostType>> configuredTaskAwaitable = this._repo.GetAll().ConfigureAwait(false);
+				postTypes1 = await configuredTaskAwaitable;
+				ICache cache1 = this._cache;
+				if (cache1 != null)
+				{
+					cache1.Set<IEnumerable<PostType>>("Piranha_PostTypes", postTypes1);
+				}
+				else
+				{
+				}
+			}
+			return postTypes1;
 		}
 
 		public async Task SaveAsync(PostType model)
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.model = model;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<PostTypeService.u003cSaveAsyncu003ed__5>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Validator.ValidateObject(model, new ValidationContext(model), true);
+			App.Hooks.OnBeforeSave<PostType>(model);
+			await this._repo.Save(model).ConfigureAwait(false);
+			App.Hooks.OnAfterSave<PostType>(model);
+			ICache cache = this._cache;
+			if (cache != null)
+			{
+				cache.Remove("Piranha_PostTypes");
+			}
+			else
+			{
+			}
 		}
 	}
 }

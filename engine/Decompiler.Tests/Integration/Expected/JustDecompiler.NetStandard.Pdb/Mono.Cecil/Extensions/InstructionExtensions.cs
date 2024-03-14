@@ -8,90 +8,86 @@ namespace Mono.Cecil.Extensions
 	{
 		internal static bool IsLoadRegister(this Instruction instruction, out int register)
 		{
-			V_0 = instruction.get_OpCode().get_Code();
-			switch (V_0 - 6)
+			Code code = instruction.get_OpCode().get_Code();
+			switch (code)
 			{
-				case 0:
+				case 6:
 				{
 					register = 0;
 					return true;
 				}
-				case 1:
+				case 7:
 				{
 					register = 1;
 					return true;
 				}
-				case 2:
+				case 8:
 				{
 					register = 2;
 					return true;
 				}
-				case 3:
+				case 9:
 				{
 					register = 3;
 					return true;
 				}
 				default:
 				{
-					if (V_0 - 17 <= 1 || V_0 - 202 <= 1)
+					if (code - 17 <= 1 || code - 202 <= 1)
 					{
 						break;
 					}
 					else
 					{
-						goto Label0;
+						register = -1;
+						return false;
 					}
 				}
 			}
 			register = ((VariableReference)instruction.get_Operand()).get_Index();
 			return true;
-		Label0:
-			register = -1;
-			return false;
 		}
 
 		internal static bool IsStoreRegister(this Instruction instruction, out int register)
 		{
-			V_0 = instruction.get_OpCode().get_Code();
-			switch (V_0 - 10)
+			Code code = instruction.get_OpCode().get_Code();
+			switch (code)
 			{
-				case 0:
+				case 10:
 				{
 					register = 0;
 					return true;
 				}
-				case 1:
+				case 11:
 				{
 					register = 1;
 					return true;
 				}
-				case 2:
+				case 12:
 				{
 					register = 2;
 					return true;
 				}
-				case 3:
+				case 13:
 				{
 					register = 3;
 					return true;
 				}
 				default:
 				{
-					if (V_0 == 19 || V_0 == 204)
+					if (code == 19 || code == 204)
 					{
 						break;
 					}
 					else
 					{
-						goto Label0;
+						register = -1;
+						return false;
 					}
 				}
 			}
 			register = ((VariableReference)instruction.get_Operand()).get_Index();
 			return true;
-		Label0:
-			register = -1;
-			return false;
 		}
 	}
 }

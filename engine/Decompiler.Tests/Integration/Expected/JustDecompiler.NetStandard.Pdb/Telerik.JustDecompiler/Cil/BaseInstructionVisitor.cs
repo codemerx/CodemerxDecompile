@@ -7,8 +7,6 @@ namespace Telerik.JustDecompiler.Cil
 	{
 		public BaseInstructionVisitor()
 		{
-			base();
-			return;
 		}
 
 		public virtual void OnAdd(Instruction instruction)
@@ -683,7 +681,6 @@ namespace Telerik.JustDecompiler.Cil
 
 		public virtual void OnLdtoken(Instruction instruction)
 		{
-			return;
 		}
 
 		public virtual void OnLdvirtftn(Instruction instruction)
@@ -994,7 +991,6 @@ namespace Telerik.JustDecompiler.Cil
 		public void Visit(Instruction instruction)
 		{
 			InstructionDispatcher.Dispatch(instruction, this);
-			return;
 		}
 	}
 }

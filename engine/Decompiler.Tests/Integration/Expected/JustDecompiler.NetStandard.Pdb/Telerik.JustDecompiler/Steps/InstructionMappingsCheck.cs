@@ -1,8 +1,10 @@
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Telerik.JustDecompiler.Ast;
 using Telerik.JustDecompiler.Ast.Statements;
 using Telerik.JustDecompiler.Decompiler;
 
@@ -12,53 +14,33 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public InstructionMappingsCheck()
 		{
-			base();
-			return;
 		}
 
 		public BlockStatement Process(DecompilationContext context, BlockStatement body)
 		{
-			V_0 = new HashSet<Instruction>(body.get_UnderlyingSameMethodInstructions());
-			if (context.get_MethodContext().get_IsMethodBodyChanged())
+			HashSet<Instruction> instructions = new HashSet<Instruction>(body.UnderlyingSameMethodInstructions);
+			if (context.MethodContext.IsMethodBodyChanged)
 			{
-				context.get_MethodContext().get_Method().RefreshBody();
-				context.get_MethodContext().set_IsMethodBodyChanged(false);
+				context.MethodContext.Method.RefreshBody();
+				context.MethodContext.IsMethodBodyChanged = false;
 			}
-			V_1 = new List<Instruction>();
-			V_2 = context.get_MethodContext().get_Method().get_Body().get_Instructions().GetEnumerator();
-			try
+			List<Instruction> instructions1 = new List<Instruction>();
+			foreach (Instruction instruction in context.MethodContext.Method.get_Body().get_Instructions())
 			{
-				while (V_2.MoveNext())
+				if (instructions.Contains(instruction))
 				{
-					V_3 = V_2.get_Current();
-					if (V_0.Contains(V_3))
-					{
-						continue;
-					}
-					V_1.Add(V_3);
+					continue;
 				}
+				instructions1.Add(instruction);
 			}
-			finally
+			if (instructions1.Count > 0)
 			{
-				V_2.Dispose();
-			}
-			if (V_1.get_Count() > 0)
-			{
-				V_4 = new StringBuilder("Found unmapped instructions.\n");
-				V_5 = V_1.GetEnumerator();
-				try
+				StringBuilder stringBuilder = new StringBuilder("Found unmapped instructions.\n");
+				foreach (Instruction instruction1 in instructions1)
 				{
-					while (V_5.MoveNext())
-					{
-						V_6 = V_5.get_Current();
-						dummyVar0 = V_4.AppendLine(V_6.ToString());
-					}
+					stringBuilder.AppendLine(instruction1.ToString());
 				}
-				finally
-				{
-					((IDisposable)V_5).Dispose();
-				}
-				throw new Exception(V_4.ToString());
+				throw new Exception(stringBuilder.ToString());
 			}
 			return body;
 		}

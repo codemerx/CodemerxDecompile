@@ -17,7 +17,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 
 		private readonly List<Instruction> mappedConditionInstructions;
 
-		private VariableDeclarationExpression var;
+		private VariableDeclarationExpression @var;
 
 		public BlockStatement Body
 		{
@@ -30,9 +30,8 @@ namespace Telerik.JustDecompiler.Ast.Statements
 				this.body = value;
 				if (this.body != null)
 				{
-					this.body.set_Parent(this);
+					this.body.Parent = this;
 				}
-				return;
 			}
 		}
 
@@ -40,9 +39,13 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new ForEachStatement.u003cget_Childrenu003ed__9(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ForEachStatement forEachStatement = null;
+				yield return forEachStatement.Collection;
+				yield return forEachStatement.Variable;
+				if (forEachStatement.body != null)
+				{
+					yield return forEachStatement.body;
+				}
 			}
 		}
 
@@ -50,7 +53,7 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return 12;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.ForEachStatement;
 			}
 		}
 
@@ -64,9 +67,11 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new ForEachStatement.u003cget_ConditionInstructionsu003ed__6(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ForEachStatement forEachStatement = null;
+				foreach (Instruction mappedConditionInstruction in forEachStatement.mappedConditionInstructions)
+				{
+					yield return mappedConditionInstruction;
+				}
 			}
 		}
 
@@ -74,9 +79,11 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				stackVariable1 = new ForEachStatement.u003cget_FinallyInstructionsu003ed__3(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				ForEachStatement forEachStatement = null;
+				foreach (Instruction mappedFinallyInstruction in forEachStatement.mappedFinallyInstructions)
+				{
+					yield return mappedFinallyInstruction;
+				}
 			}
 		}
 
@@ -84,90 +91,70 @@ namespace Telerik.JustDecompiler.Ast.Statements
 		{
 			get
 			{
-				return this.var;
+				return this.@var;
 			}
 			set
 			{
-				this.var = value;
-				return;
+				this.@var = value;
 			}
 		}
 
 		public ForEachStatement(VariableDeclarationExpression variable, Expression expression, BlockStatement body, IEnumerable<Instruction> conditionInstructions, IEnumerable<Instruction> finallyInstructions)
 		{
-			base();
-			this.set_Variable(variable);
-			this.set_Collection(expression);
-			this.set_Body(body);
+			this.Variable = variable;
+			this.Collection = expression;
+			this.Body = body;
 			this.mappedConditionInstructions = new List<Instruction>();
 			if (conditionInstructions != null)
 			{
 				this.mappedConditionInstructions.AddRange(conditionInstructions);
-				stackVariable25 = this.mappedConditionInstructions;
-				stackVariable26 = ForEachStatement.u003cu003ec.u003cu003e9__7_0;
-				if (stackVariable26 == null)
-				{
-					dummyVar0 = stackVariable26;
-					stackVariable26 = new Comparison<Instruction>(ForEachStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__7_0);
-					ForEachStatement.u003cu003ec.u003cu003e9__7_0 = stackVariable26;
-				}
-				stackVariable25.Sort(stackVariable26);
+				this.mappedConditionInstructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
 			this.mappedFinallyInstructions = new List<Instruction>();
 			if (finallyInstructions != null)
 			{
 				this.mappedFinallyInstructions.AddRange(finallyInstructions);
-				stackVariable17 = this.mappedFinallyInstructions;
-				stackVariable18 = ForEachStatement.u003cu003ec.u003cu003e9__7_1;
-				if (stackVariable18 == null)
-				{
-					dummyVar1 = stackVariable18;
-					stackVariable18 = new Comparison<Instruction>(ForEachStatement.u003cu003ec.u003cu003e9.u003cu002ectoru003eb__7_1);
-					ForEachStatement.u003cu003ec.u003cu003e9__7_1 = stackVariable18;
-				}
-				stackVariable17.Sort(stackVariable18);
+				this.mappedFinallyInstructions.Sort((Instruction x, Instruction y) => x.get_Offset().CompareTo(y.get_Offset()));
 			}
-			return;
 		}
 
 		public override Statement Clone()
 		{
-			if (this.get_Body() != null)
+			BlockStatement blockStatement;
+			if (this.Body != null)
 			{
-				stackVariable5 = this.body.Clone() as BlockStatement;
+				blockStatement = this.body.Clone() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable5;
-			V_1 = new ForEachStatement(this.get_Variable().Clone() as VariableDeclarationExpression, this.get_Collection().Clone(), V_0, this.mappedConditionInstructions, this.mappedFinallyInstructions);
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			BlockStatement blockStatement1 = blockStatement;
+			ForEachStatement forEachStatement = new ForEachStatement(this.Variable.Clone() as VariableDeclarationExpression, this.Collection.Clone(), blockStatement1, this.mappedConditionInstructions, this.mappedFinallyInstructions);
+			base.CopyParentAndLabel(forEachStatement);
+			return forEachStatement;
 		}
 
 		public override Statement CloneStatementOnly()
 		{
-			if (this.get_Body() != null)
+			BlockStatement blockStatement;
+			if (this.Body != null)
 			{
-				stackVariable5 = this.body.CloneStatementOnly() as BlockStatement;
+				blockStatement = this.body.CloneStatementOnly() as BlockStatement;
 			}
 			else
 			{
-				stackVariable5 = null;
+				blockStatement = null;
 			}
-			V_0 = stackVariable5;
-			V_1 = new ForEachStatement(this.get_Variable().CloneExpressionOnly() as VariableDeclarationExpression, this.get_Collection().CloneExpressionOnly(), V_0, null, null);
-			this.CopyParentAndLabel(V_1);
-			return V_1;
+			BlockStatement blockStatement1 = blockStatement;
+			ForEachStatement forEachStatement = new ForEachStatement(this.Variable.CloneExpressionOnly() as VariableDeclarationExpression, this.Collection.CloneExpressionOnly(), blockStatement1, null, null);
+			base.CopyParentAndLabel(forEachStatement);
+			return forEachStatement;
 		}
 
 		protected override IEnumerable<Instruction> GetOwnInstructions()
 		{
-			stackVariable2 = new IEnumerable<Instruction>[2];
-			stackVariable2[0] = this.mappedConditionInstructions;
-			stackVariable2[1] = this.mappedFinallyInstructions;
-			return this.MergeSortedEnumerables(stackVariable2);
+			return base.MergeSortedEnumerables(new IEnumerable<Instruction>[] { this.mappedConditionInstructions, this.mappedFinallyInstructions });
 		}
 	}
 }

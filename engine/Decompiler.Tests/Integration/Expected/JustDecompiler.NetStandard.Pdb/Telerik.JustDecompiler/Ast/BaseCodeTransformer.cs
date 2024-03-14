@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Telerik.JustDecompiler.Ast.Expressions;
 using Telerik.JustDecompiler.Ast.Statements;
 
@@ -11,8 +12,6 @@ namespace Telerik.JustDecompiler.Ast
 
 		public BaseCodeTransformer()
 		{
-			base();
-			return;
 		}
 
 		private ICodeNode DoVisit(ICodeNode node)
@@ -21,451 +20,442 @@ namespace Telerik.JustDecompiler.Ast
 			{
 				return null;
 			}
-			switch (node.get_CodeNodeType())
+			switch (node.CodeNodeType)
 			{
-				case 0:
+				case CodeNodeType.BlockStatement:
 				{
 					return this.VisitBlockStatement((BlockStatement)node);
 				}
-				case 1:
+				case CodeNodeType.UnsafeBlock:
 				{
-				Label0:
 					throw new ArgumentException();
 				}
-				case 2:
+				case CodeNodeType.GotoStatement:
 				{
 					return this.VisitGotoStatement((GotoStatement)node);
 				}
-				case 3:
+				case CodeNodeType.IfStatement:
 				{
 					return this.VisitIfStatement((IfStatement)node);
 				}
-				case 4:
+				case CodeNodeType.IfElseIfStatement:
 				{
 					return this.VisitIfElseIfStatement((IfElseIfStatement)node);
 				}
-				case 5:
+				case CodeNodeType.ExpressionStatement:
 				{
 					return this.VisitExpressionStatement((ExpressionStatement)node);
 				}
-				case 6:
+				case CodeNodeType.ThrowExpression:
 				{
 					return this.VisitThrowExpression((ThrowExpression)node);
 				}
-				case 7:
+				case CodeNodeType.WhileStatement:
 				{
 					return this.VisitWhileStatement((WhileStatement)node);
 				}
-				case 8:
+				case CodeNodeType.DoWhileStatement:
 				{
 					return this.VisitDoWhileStatement((DoWhileStatement)node);
 				}
-				case 9:
+				case CodeNodeType.BreakStatement:
 				{
 					return this.VisitBreakStatement((BreakStatement)node);
 				}
-				case 10:
+				case CodeNodeType.ContinueStatement:
 				{
 					return this.VisitContinueStatement((ContinueStatement)node);
 				}
-				case 11:
+				case CodeNodeType.ForStatement:
 				{
 					return this.VisitForStatement((ForStatement)node);
 				}
-				case 12:
+				case CodeNodeType.ForEachStatement:
 				{
 					return this.VisitForEachStatement((ForEachStatement)node);
 				}
-				case 13:
+				case CodeNodeType.ConditionCase:
 				{
 					return this.VisitConditionCase((ConditionCase)node);
 				}
-				case 14:
+				case CodeNodeType.DefaultCase:
 				{
 					return this.VisitDefaultCase((DefaultCase)node);
 				}
-				case 15:
+				case CodeNodeType.SwitchStatement:
 				{
 					return this.VisitSwitchStatement((SwitchStatement)node);
 				}
-				case 16:
+				case CodeNodeType.CatchClause:
 				{
 					return this.VisitCatchClause((CatchClause)node);
 				}
-				case 17:
+				case CodeNodeType.TryStatement:
 				{
 					return this.VisitTryStatement((TryStatement)node);
 				}
-				case 18:
+				case CodeNodeType.BlockExpression:
 				{
 					return this.VisitBlockExpression((BlockExpression)node);
 				}
-				case 19:
+				case CodeNodeType.MethodInvocationExpression:
 				{
 					return this.VisitMethodInvocationExpression((MethodInvocationExpression)node);
 				}
-				case 20:
+				case CodeNodeType.MethodReferenceExpression:
 				{
 					return this.VisitMethodReferenceExpression((MethodReferenceExpression)node);
 				}
-				case 21:
+				case CodeNodeType.DelegateCreationExpression:
 				{
 					return this.VisitDelegateCreationExpression((DelegateCreationExpression)node);
 				}
-				case 22:
+				case CodeNodeType.LiteralExpression:
 				{
 					return this.VisitLiteralExpression((LiteralExpression)node);
 				}
-				case 23:
+				case CodeNodeType.UnaryExpression:
 				{
 					return this.VisitUnaryExpression((UnaryExpression)node);
 				}
-				case 24:
+				case CodeNodeType.BinaryExpression:
 				{
 					return this.VisitBinaryExpression((BinaryExpression)node);
 				}
-				case 25:
+				case CodeNodeType.ArgumentReferenceExpression:
 				{
 					return this.VisitArgumentReferenceExpression((ArgumentReferenceExpression)node);
 				}
-				case 26:
+				case CodeNodeType.VariableReferenceExpression:
 				{
 					return this.VisitVariableReferenceExpression((VariableReferenceExpression)node);
 				}
-				case 27:
+				case CodeNodeType.VariableDeclarationExpression:
 				{
 					return this.VisitVariableDeclarationExpression((VariableDeclarationExpression)node);
 				}
-				case 28:
+				case CodeNodeType.ThisReferenceExpression:
 				{
 					return this.VisitThisReferenceExpression((ThisReferenceExpression)node);
 				}
-				case 29:
+				case CodeNodeType.BaseReferenceExpression:
 				{
 					return this.VisitBaseReferenceExpression((BaseReferenceExpression)node);
 				}
-				case 30:
+				case CodeNodeType.FieldReferenceExpression:
 				{
 					return this.VisitFieldReferenceExpression((FieldReferenceExpression)node);
 				}
-				case 31:
+				case CodeNodeType.ExplicitCastExpression:
 				{
 					return this.VisitExplicitCastExpression((ExplicitCastExpression)node);
 				}
-				case 32:
+				case CodeNodeType.ImplicitCastExpression:
 				{
 					return this.VisitImplicitCastExpression((ImplicitCastExpression)node);
 				}
-				case 33:
+				case CodeNodeType.SafeCastExpression:
 				{
 					return this.VisitSafeCastExpression((SafeCastExpression)node);
 				}
-				case 34:
+				case CodeNodeType.CanCastExpression:
 				{
 					return this.VisitCanCastExpression((CanCastExpression)node);
 				}
-				case 35:
+				case CodeNodeType.TypeOfExpression:
 				{
 					return this.VisitTypeOfExpression((TypeOfExpression)node);
 				}
-				case 36:
+				case CodeNodeType.ConditionExpression:
 				{
 					return this.VisitConditionExpression((ConditionExpression)node);
 				}
-				case 37:
+				case CodeNodeType.FixedStatement:
 				{
 					return this.VisitFixedStatement((FixedStatement)node);
 				}
-				case 38:
+				case CodeNodeType.ArrayCreationExpression:
 				{
 					return this.VisitArrayCreationExpression((ArrayCreationExpression)node);
 				}
-				case 39:
+				case CodeNodeType.ArrayIndexerExpression:
 				{
 					return this.VisitArrayIndexerExpression((ArrayIndexerExpression)node);
 				}
-				case 40:
+				case CodeNodeType.ObjectCreationExpression:
 				{
 					return this.VisitObjectCreationExpression((ObjectCreationExpression)node);
 				}
-				case 41:
+				case CodeNodeType.DefaultObjectExpression:
 				{
 					return this.VisitDefaultObjectExpression((DefaultObjectExpression)node);
 				}
-				case 42:
+				case CodeNodeType.PropertyReferenceExpression:
 				{
 					return this.VisitPropertyReferenceExpression((PropertyReferenceExpression)node);
 				}
-				case 43:
+				case CodeNodeType.TypeReferenceExpression:
 				{
 					return this.VisitTypeReferenceExpression((TypeReferenceExpression)node);
 				}
-				case 44:
+				case CodeNodeType.UsingStatement:
 				{
 					return this.VisitUsingStatement((UsingStatement)node);
 				}
-				case 45:
+				case CodeNodeType.StackAllocExpression:
 				{
 					return this.VisitStackAllocExpression((StackAllocExpression)node);
 				}
-				case 46:
+				case CodeNodeType.SizeOfExpression:
 				{
 					return this.VisitSizeOfExpression((SizeOfExpression)node);
 				}
-				case 47:
+				case CodeNodeType.MakeRefExpression:
 				{
 					return this.VisitMakeRefExpression((MakeRefExpression)node);
 				}
-				case 48:
+				case CodeNodeType.EventReferenceExpression:
 				{
 					return this.VisitEventReferenceExpression((EventReferenceExpression)node);
 				}
-				case 49:
+				case CodeNodeType.EnumExpression:
 				{
 					return this.VisitEnumExpression((EnumExpression)node);
 				}
-				case 50:
+				case CodeNodeType.LambdaExpression:
 				{
 					return this.VisitLambdaExpression((LambdaExpression)node);
 				}
-				case 51:
+				case CodeNodeType.DelegateInvokeExpression:
 				{
 					return this.VisitDelegateInvokeExpression((DelegateInvokeExpression)node);
 				}
-				case 52:
+				case CodeNodeType.BaseCtorExpression:
 				{
 					return this.VisitBaseCtorExpression((BaseCtorExpression)node);
 				}
-				case 53:
+				case CodeNodeType.ThisCtorExpression:
 				{
 					return this.VisitThisCtorExpression((ThisCtorExpression)node);
 				}
-				case 54:
+				case CodeNodeType.YieldReturnExpression:
 				{
 					return this.VisitYieldReturnExpression((YieldReturnExpression)node);
 				}
-				case 55:
+				case CodeNodeType.YieldBreakExpression:
 				{
 					return this.VisitYieldBreakExpression((YieldBreakExpression)node);
 				}
-				case 56:
+				case CodeNodeType.LockStatement:
 				{
 					return this.VisitLockStatement((LockStatement)node);
 				}
-				case 57:
+				case CodeNodeType.ReturnExpression:
 				{
 					return this.VisitReturnExpression((ReturnExpression)node);
 				}
-				case 58:
+				case CodeNodeType.EmptyStatement:
 				{
 					return this.VisitEmptyStatement((EmptyStatement)node);
 				}
-				case 59:
+				case CodeNodeType.DynamicMemberReferenceExpression:
 				{
 					return this.VisitDynamicMemberReferenceExpression((DynamicMemberReferenceExpression)node);
 				}
-				case 60:
+				case CodeNodeType.DynamicConstructorInvocationExpression:
 				{
 					return this.VisitDynamicConstructorInvocationExpression((DynamicConstructorInvocationExpression)node);
 				}
-				case 61:
+				case CodeNodeType.DynamicIndexerExpression:
 				{
 					return this.VisitDynamicIndexerExpression((DynamicIndexerExpression)node);
 				}
-				case 62:
+				case CodeNodeType.BoxExpression:
 				{
 					return this.VisitBoxExpression((BoxExpression)node);
 				}
-				case 63:
+				case CodeNodeType.AnonymousPropertyInitializerExpression:
 				{
 					return this.VisitAnonymousPropertyInitializerExpression((AnonymousPropertyInitializerExpression)node);
 				}
-				case 64:
+				case CodeNodeType.LambdaParameterExpression:
 				{
 					return this.VisitLambdaParameterExpression((LambdaParameterExpression)node);
 				}
-				case 65:
+				case CodeNodeType.AwaitExpression:
 				{
 					return this.VisitAwaitExpression((AwaitExpression)node);
 				}
-				case 66:
+				case CodeNodeType.ArrayLengthExpression:
 				{
 					return this.VisitArrayLengthExpression((ArrayLengthExpression)node);
 				}
-				case 67:
+				case CodeNodeType.ExceptionStatement:
 				{
 					return this.VisitExceptionStatement((ExceptionStatement)node);
 				}
-				case 68:
+				case CodeNodeType.BreakSwitchCaseStatement:
 				{
 					return this.VisitBreakSwitchCaseStatement((BreakSwitchCaseStatement)node);
 				}
-				case 69:
+				case CodeNodeType.CaseGotoStatement:
 				{
 					return this.VisitCaseGotoStatement((CaseGotoStatement)node);
 				}
-				case 70:
+				case CodeNodeType.FinallyClause:
 				{
 					return this.VisitFinallyClause((FinallyClause)node);
 				}
-				case 71:
+				case CodeNodeType.ShortFormReturnExpression:
 				{
 					return this.VisitShortFormReturnExpression((ShortFormReturnExpression)node);
 				}
-				case 72:
+				case CodeNodeType.AnonymousObjectCreationExpression:
 				{
 					return this.VisitAnonymousObjectCreationExpression((AnonymousObjectCreationExpression)node);
 				}
-				case 73:
+				case CodeNodeType.FromClause:
 				{
 					return this.VisitFromClause((FromClause)node);
 				}
-				case 74:
+				case CodeNodeType.SelectClause:
 				{
 					return this.VisitSelectClause((SelectClause)node);
 				}
-				case 75:
+				case CodeNodeType.WhereClause:
 				{
 					return this.VisitWhereClause((WhereClause)node);
 				}
-				case 76:
+				case CodeNodeType.GroupClause:
 				{
 					return this.VisitGroupClause((GroupClause)node);
 				}
-				case 77:
+				case CodeNodeType.OrderByClause:
 				{
 					return this.VisitOrderByClause((OrderByClause)node);
 				}
-				case 78:
+				case CodeNodeType.JoinClause:
 				{
 					return this.VisitJoinClause((JoinClause)node);
 				}
-				case 79:
+				case CodeNodeType.LetClause:
 				{
 					return this.VisitLetClause((LetClause)node);
 				}
-				case 80:
+				case CodeNodeType.IntoClause:
 				{
 					return this.VisitIntoClause((IntoClause)node);
 				}
-				case 81:
+				case CodeNodeType.LinqQueryExpression:
 				{
 					return this.VisitLinqQueryExpression((LinqQueryExpression)node);
 				}
-				case 82:
+				case CodeNodeType.ArrayVariableCreationExpression:
 				{
 					return this.VisitArrayVariableDeclarationExpression((ArrayVariableDeclarationExpression)node);
 				}
-				case 83:
+				case CodeNodeType.ArrayAssignmentVariableReferenceExpression:
 				{
 					return this.VisitArrayAssignmentVariableReferenceExpression((ArrayVariableReferenceExpression)node);
 				}
-				case 84:
+				case CodeNodeType.ArrayAssignmentFieldReferenceExpression:
 				{
 					return this.VisitArrayAssignmentFieldReferenceExpression((ArrayAssignmentFieldReferenceExpression)node);
 				}
-				case 85:
+				case CodeNodeType.PropertyInitializerExpression:
 				{
 					return this.VisitPropertyInitializerExpression((PropertyInitializerExpression)node);
 				}
-				case 86:
+				case CodeNodeType.FieldInitializerExpression:
 				{
 					return this.VisitFieldInitializerExpression((FieldInitializerExpression)node);
 				}
-				case 87:
+				case CodeNodeType.ParenthesesExpression:
 				{
 					return this.VisitParenthesesExpression((ParenthesesExpression)node);
 				}
-				case 88:
+				case CodeNodeType.InitializerExpression:
 				{
 					return this.VisitInitializerExpression((InitializerExpression)node);
 				}
-				case 89:
+				case CodeNodeType.CheckedExpression:
 				{
 					return this.VisitCheckedExpression((CheckedExpression)node);
 				}
-				case 90:
+				case CodeNodeType.MemberHandleExpression:
 				{
 					return this.VisitMemberHandleExpression((MemberHandleExpression)node);
 				}
-				case 91:
+				case CodeNodeType.AutoPropertyConstructorInitializerExpression:
 				{
 					return this.VisitAutoPropertyConstructorInitializerExpression((AutoPropertyConstructorInitializerExpression)node);
 				}
-				case 92:
+				case CodeNodeType.RaiseEventExpression:
 				{
 					return this.VisitRaiseEventExpression((RaiseEventExpression)node);
 				}
-				case 93:
+				case CodeNodeType.RefVariableDeclarationExpression:
 				{
 					return this.VisitRefVariableDeclarationExpression((RefVariableDeclarationExpression)node);
 				}
-				case 94:
+				case CodeNodeType.RefReturnExpression:
 				{
 					return this.VisitRefReturnExpression((RefReturnExpression)node);
 				}
 				default:
 				{
-					goto Label0;
+					throw new ArgumentException();
 				}
 			}
 		}
 
 		public virtual ICodeNode Visit(ICodeNode node)
 		{
-			this.visitsOnStack = this.visitsOnStack + (long)1;
+			this.visitsOnStack += (long)1;
 			if (this.visitsOnStack == (long)0x24e)
 			{
 				this.visitsOnStack = (long)0;
 				throw new Exception("Stack overflow while traversing code tree in transform.");
 			}
-			stackVariable12 = this.DoVisit(node);
-			this.visitsOnStack = this.visitsOnStack - (long)1;
-			return stackVariable12;
+			ICodeNode codeNode = this.DoVisit(node);
+			this.visitsOnStack -= (long)1;
+			return codeNode;
 		}
 
 		protected virtual TCollection Visit<TCollection, TElement>(TCollection original)
 		where TCollection : class, IList<TElement>, new()
 		where TElement : class, ICodeNode
 		{
-			V_0 = default(TCollection);
-			V_1 = 0;
-			while (V_1 < original.get_Count())
+			TCollection tCollection = default(TCollection);
+			for (int i = 0; i < original.Count; i++)
 			{
-				V_2 = (TElement)this.Visit(original.get_Item(V_1));
-				if (V_0 == null)
+				TElement tElement = (TElement)this.Visit(original[i]);
+				if (tCollection != null)
 				{
-					if ((object)V_2 != (object)original.get_Item(V_1))
+					if (tElement != null)
 					{
-						V_0 = Activator.CreateInstance<TCollection>();
-						V_3 = 0;
-						while (V_3 < V_1)
-						{
-							V_0.Add(original.get_Item(V_3));
-							V_3 = V_3 + 1;
-						}
-						if (V_2 != null)
-						{
-							V_0.Add(V_2);
-						}
+						tCollection.Add(tElement);
 					}
 				}
-				else
+				else if ((object)tElement != (object)original[i])
 				{
-					if (V_2 != null)
+					tCollection = Activator.CreateInstance<TCollection>();
+					for (int j = 0; j < i; j++)
 					{
-						V_0.Add(V_2);
+						tCollection.Add(original[j]);
+					}
+					if (tElement != null)
+					{
+						tCollection.Add(tElement);
 					}
 				}
-				V_1 = V_1 + 1;
 			}
-			stackVariable49 = V_0;
-			if (stackVariable49 == null)
+			TCollection tCollection1 = tCollection;
+			if (tCollection1 == null)
 			{
-				dummyVar0 = stackVariable49;
-				stackVariable49 = original;
+				tCollection1 = original;
 			}
-			return stackVariable49;
+			return tCollection1;
 		}
 
 		public virtual ICollection<Statement> Visit(StatementCollection node)
@@ -490,7 +480,7 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpression node)
 		{
-			node.set_Initializer((InitializerExpression)this.Visit(node.get_Initializer()));
+			node.Initializer = (InitializerExpression)this.Visit(node.Initializer);
 			return node;
 		}
 
@@ -506,22 +496,22 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitArrayAssignmentFieldReferenceExpression(ArrayAssignmentFieldReferenceExpression node)
 		{
-			node.set_Field((FieldReferenceExpression)this.Visit(node.get_Field()));
-			node.set_Dimensions((ExpressionCollection)this.Visit(node.get_Dimensions()));
+			node.Field = (FieldReferenceExpression)this.Visit(node.Field);
+			node.Dimensions = (ExpressionCollection)this.Visit(node.Dimensions);
 			return node;
 		}
 
 		public virtual ICodeNode VisitArrayAssignmentVariableReferenceExpression(ArrayVariableReferenceExpression node)
 		{
-			node.set_Variable((VariableReferenceExpression)this.Visit(node.get_Variable()));
-			node.set_Dimensions((ExpressionCollection)this.Visit(node.get_Dimensions()));
+			node.Variable = (VariableReferenceExpression)this.Visit(node.Variable);
+			node.Dimensions = (ExpressionCollection)this.Visit(node.Dimensions);
 			return node;
 		}
 
 		public virtual ICodeNode VisitArrayCreationExpression(ArrayCreationExpression node)
 		{
-			node.set_Dimensions((ExpressionCollection)this.Visit(node.get_Dimensions()));
-			node.set_Initializer((InitializerExpression)this.Visit(node.get_Initializer()));
+			node.Dimensions = (ExpressionCollection)this.Visit(node.Dimensions);
+			node.Initializer = (InitializerExpression)this.Visit(node.Initializer);
 			return node;
 		}
 
@@ -532,14 +522,14 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitArrayLengthExpression(ArrayLengthExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
+			node.Target = (Expression)this.Visit(node.Target);
 			return node;
 		}
 
 		public virtual ICodeNode VisitArrayVariableDeclarationExpression(ArrayVariableDeclarationExpression node)
 		{
-			node.set_Variable((VariableDeclarationExpression)this.Visit(node.get_Variable()));
-			node.set_Dimensions((ExpressionCollection)this.Visit(node.get_Dimensions()));
+			node.Variable = (VariableDeclarationExpression)this.Visit(node.Variable);
+			node.Dimensions = (ExpressionCollection)this.Visit(node.Dimensions);
 			return node;
 		}
 
@@ -550,7 +540,7 @@ namespace Telerik.JustDecompiler.Ast
 
 		public ICodeNode VisitAwaitExpression(AwaitExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
@@ -566,26 +556,26 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitBinaryExpression(BinaryExpression node)
 		{
-			node.set_Left((Expression)this.Visit(node.get_Left()));
-			node.set_Right((Expression)this.Visit(node.get_Right()));
+			node.Left = (Expression)this.Visit(node.Left);
+			node.Right = (Expression)this.Visit(node.Right);
 			return node;
 		}
 
 		public virtual ICodeNode VisitBlockExpression(BlockExpression node)
 		{
-			node.set_Expressions((ExpressionCollection)this.Visit(node.get_Expressions()));
+			node.Expressions = (ExpressionCollection)this.Visit(node.Expressions);
 			return node;
 		}
 
 		public virtual ICodeNode VisitBlockStatement(BlockStatement node)
 		{
-			node.set_Statements((StatementCollection)this.Visit(node.get_Statements()));
+			node.Statements = (StatementCollection)this.Visit(node.Statements);
 			return node;
 		}
 
 		public virtual ICodeNode VisitBoxExpression(BoxExpression node)
 		{
-			node.set_BoxedExpression((Expression)this.Visit(node.get_BoxedExpression()));
+			node.BoxedExpression = (Expression)this.Visit(node.BoxedExpression);
 			return node;
 		}
 
@@ -601,7 +591,7 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitCanCastExpression(CanCastExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
@@ -612,30 +602,30 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitCatchClause(CatchClause node)
 		{
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
-			node.set_Variable((VariableDeclarationExpression)this.Visit(node.get_Variable()));
-			node.set_Filter((Statement)this.Visit(node.get_Filter()));
+			node.Body = (BlockStatement)this.Visit(node.Body);
+			node.Variable = (VariableDeclarationExpression)this.Visit(node.Variable);
+			node.Filter = (Statement)this.Visit(node.Filter);
 			return node;
 		}
 
 		public virtual ICodeNode VisitCheckedExpression(CheckedExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitConditionCase(ConditionCase node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Condition = (Expression)this.Visit(node.Condition);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public virtual ICodeNode VisitConditionExpression(ConditionExpression node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			node.set_Then((Expression)this.Visit(node.get_Then()));
-			node.set_Else((Expression)this.Visit(node.get_Else()));
+			node.Condition = (Expression)this.Visit(node.Condition);
+			node.Then = (Expression)this.Visit(node.Then);
+			node.Else = (Expression)this.Visit(node.Else);
 			return node;
 		}
 
@@ -646,13 +636,13 @@ namespace Telerik.JustDecompiler.Ast
 
 		private ICodeNode VisitCtorExpression(MethodInvocationExpression node)
 		{
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
 			return node;
 		}
 
 		public virtual ICodeNode VisitDefaultCase(DefaultCase node)
 		{
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
@@ -663,28 +653,28 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitDelegateCreationExpression(DelegateCreationExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
-			node.set_MethodExpression((Expression)this.Visit(node.get_MethodExpression()));
+			node.Target = (Expression)this.Visit(node.Target);
+			node.MethodExpression = (Expression)this.Visit(node.MethodExpression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitDelegateInvokeExpression(DelegateInvokeExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
+			node.Target = (Expression)this.Visit(node.Target);
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
 			return node;
 		}
 
 		public virtual ICodeNode VisitDoWhileStatement(DoWhileStatement node)
 		{
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
+			node.Body = (BlockStatement)this.Visit(node.Body);
+			node.Condition = (Expression)this.Visit(node.Condition);
 			return node;
 		}
 
 		public virtual ICodeNode VisitDynamicConstructorInvocationExpression(DynamicConstructorInvocationExpression node)
 		{
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
 			return node;
 		}
 
@@ -695,10 +685,10 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitDynamicMemberReferenceExpression(DynamicMemberReferenceExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
-			if (node.get_IsMethodInvocation())
+			node.Target = (Expression)this.Visit(node.Target);
+			if (node.IsMethodInvocation)
 			{
-				node.set_InvocationArguments((ExpressionCollection)this.Visit(node.get_InvocationArguments()));
+				node.InvocationArguments = (ExpressionCollection)this.Visit(node.InvocationArguments);
 			}
 			return node;
 		}
@@ -715,7 +705,7 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitEventReferenceExpression(EventReferenceExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
+			node.Target = (Expression)this.Visit(node.Target);
 			return node;
 		}
 
@@ -726,13 +716,13 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitExplicitCastExpression(ExplicitCastExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitExpressionStatement(ExpressionStatement node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
@@ -743,44 +733,44 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitFieldReferenceExpression(FieldReferenceExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
+			node.Target = (Expression)this.Visit(node.Target);
 			return node;
 		}
 
 		public ICodeNode VisitFinallyClause(FinallyClause node)
 		{
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public virtual ICodeNode VisitFixedStatement(FixedStatement node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Expression = (Expression)this.Visit(node.Expression);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public virtual ICodeNode VisitForEachStatement(ForEachStatement node)
 		{
-			node.set_Variable((VariableDeclarationExpression)this.Visit(node.get_Variable()));
-			node.set_Collection((Expression)this.Visit(node.get_Collection()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Variable = (VariableDeclarationExpression)this.Visit(node.Variable);
+			node.Collection = (Expression)this.Visit(node.Collection);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public virtual ICodeNode VisitForStatement(ForStatement node)
 		{
-			node.set_Initializer((Expression)this.Visit(node.get_Initializer()));
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			node.set_Increment((Expression)this.Visit(node.get_Increment()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Initializer = (Expression)this.Visit(node.Initializer);
+			node.Condition = (Expression)this.Visit(node.Condition);
+			node.Increment = (Expression)this.Visit(node.Increment);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public ICodeNode VisitFromClause(FromClause node)
 		{
-			node.set_Identifier((Expression)this.Visit(node.get_Identifier()));
-			node.set_Collection((Expression)this.Visit(node.get_Collection()));
+			node.Identifier = (Expression)this.Visit(node.Identifier);
+			node.Collection = (Expression)this.Visit(node.Collection);
 			return node;
 		}
 
@@ -791,74 +781,72 @@ namespace Telerik.JustDecompiler.Ast
 
 		public ICodeNode VisitGroupClause(GroupClause node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
-			node.set_GroupKey((Expression)this.Visit(node.get_GroupKey()));
+			node.Expression = (Expression)this.Visit(node.Expression);
+			node.GroupKey = (Expression)this.Visit(node.GroupKey);
 			return node;
 		}
 
 		public virtual ICodeNode VisitIfElseIfStatement(IfElseIfStatement node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_ConditionBlocks().get_Count())
+			for (int i = 0; i < node.ConditionBlocks.Count; i++)
 			{
-				V_3 = node.get_ConditionBlocks().get_Item(V_0);
-				V_1 = (Expression)this.Visit(V_3.get_Key());
-				V_3 = node.get_ConditionBlocks().get_Item(V_0);
-				V_2 = (BlockStatement)this.Visit(V_3.get_Value());
-				V_2.set_Parent(node);
-				node.get_ConditionBlocks().set_Item(V_0, new KeyValuePair<Expression, BlockStatement>(V_1, V_2));
-				V_0 = V_0 + 1;
+				KeyValuePair<Expression, BlockStatement> item = node.ConditionBlocks[i];
+				Expression expression = (Expression)this.Visit(item.Key);
+				item = node.ConditionBlocks[i];
+				BlockStatement blockStatement = (BlockStatement)this.Visit(item.Value);
+				blockStatement.Parent = node;
+				node.ConditionBlocks[i] = new KeyValuePair<Expression, BlockStatement>(expression, blockStatement);
 			}
-			node.set_Else((BlockStatement)this.Visit(node.get_Else()));
+			node.Else = (BlockStatement)this.Visit(node.Else);
 			return node;
 		}
 
 		public virtual ICodeNode VisitIfStatement(IfStatement node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			node.set_Then((BlockStatement)this.Visit(node.get_Then()));
-			node.set_Else((BlockStatement)this.Visit(node.get_Else()));
+			node.Condition = (Expression)this.Visit(node.Condition);
+			node.Then = (BlockStatement)this.Visit(node.Then);
+			node.Else = (BlockStatement)this.Visit(node.Else);
 			return node;
 		}
 
 		private ICodeNode VisitIIndexerExpression(IIndexerExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
-			node.set_Indices((ExpressionCollection)this.Visit(node.get_Indices()));
+			node.Target = (Expression)this.Visit(node.Target);
+			node.Indices = (ExpressionCollection)this.Visit(node.Indices);
 			return (ICodeNode)node;
 		}
 
 		public virtual ICodeNode VisitImplicitCastExpression(ImplicitCastExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitInitializerExpression(InitializerExpression node)
 		{
-			node.set_Expression((BlockExpression)this.Visit(node.get_Expression()));
+			node.Expression = (BlockExpression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public ICodeNode VisitIntoClause(IntoClause node)
 		{
-			node.set_Identifier((VariableReferenceExpression)this.Visit(node.get_Identifier()));
+			node.Identifier = (VariableReferenceExpression)this.Visit(node.Identifier);
 			return node;
 		}
 
 		public ICodeNode VisitJoinClause(JoinClause node)
 		{
-			node.set_InnerIdentifier((Expression)this.Visit(node.get_InnerIdentifier()));
-			node.set_InnerCollection((Expression)this.Visit(node.get_InnerCollection()));
-			node.set_OuterKey((Expression)this.Visit(node.get_OuterKey()));
-			node.set_InnerKey((Expression)this.Visit(node.get_InnerKey()));
+			node.InnerIdentifier = (Expression)this.Visit(node.InnerIdentifier);
+			node.InnerCollection = (Expression)this.Visit(node.InnerCollection);
+			node.OuterKey = (Expression)this.Visit(node.OuterKey);
+			node.InnerKey = (Expression)this.Visit(node.InnerKey);
 			return node;
 		}
 
 		public virtual ICodeNode VisitLambdaExpression(LambdaExpression node)
 		{
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
@@ -869,18 +857,16 @@ namespace Telerik.JustDecompiler.Ast
 
 		public ICodeNode VisitLetClause(LetClause node)
 		{
-			node.set_Identifier((VariableReferenceExpression)this.Visit(node.get_Identifier()));
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Identifier = (VariableReferenceExpression)this.Visit(node.Identifier);
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitLinqQueryExpression(LinqQueryExpression node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_Clauses().get_Count())
+			for (int i = 0; i < node.Clauses.Count; i++)
 			{
-				node.get_Clauses().set_Item(V_0, (QueryClause)this.Visit(node.get_Clauses().get_Item(V_0)));
-				V_0 = V_0 + 1;
+				node.Clauses[i] = (QueryClause)this.Visit(node.Clauses[i]);
 			}
 			return node;
 		}
@@ -892,14 +878,14 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitLockStatement(LockStatement node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Expression = (Expression)this.Visit(node.Expression);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
 		public virtual ICodeNode VisitMakeRefExpression(MakeRefExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
@@ -910,39 +896,37 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitMethodInvocationExpression(MethodInvocationExpression node)
 		{
-			node.set_MethodExpression((MethodReferenceExpression)this.Visit(node.get_MethodExpression()));
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
+			node.MethodExpression = (MethodReferenceExpression)this.Visit(node.MethodExpression);
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
 			return node;
 		}
 
 		public virtual ICodeNode VisitMethodReferenceExpression(MethodReferenceExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
+			node.Target = (Expression)this.Visit(node.Target);
 			return node;
 		}
 
 		public virtual ICodeNode VisitObjectCreationExpression(ObjectCreationExpression node)
 		{
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
-			node.set_Initializer((InitializerExpression)this.Visit(node.get_Initializer()));
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
+			node.Initializer = (InitializerExpression)this.Visit(node.Initializer);
 			return node;
 		}
 
 		public ICodeNode VisitOrderByClause(OrderByClause node)
 		{
-			V_0 = 0;
-			while (V_0 < node.get_ExpressionToOrderDirectionMap().get_Count())
+			for (int i = 0; i < node.ExpressionToOrderDirectionMap.Count; i++)
 			{
-				V_1 = node.get_ExpressionToOrderDirectionMap().get_Item(V_0);
-				node.get_ExpressionToOrderDirectionMap().set_Item(V_0, new KeyValuePair<Expression, OrderDirection>((Expression)this.Visit(V_1.get_Key()), V_1.get_Value()));
-				V_0 = V_0 + 1;
+				KeyValuePair<Expression, OrderDirection> item = node.ExpressionToOrderDirectionMap[i];
+				node.ExpressionToOrderDirectionMap[i] = new KeyValuePair<Expression, OrderDirection>((Expression)this.Visit(item.Key), item.Value);
 			}
 			return node;
 		}
 
 		public virtual ICodeNode VisitParenthesesExpression(ParenthesesExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
@@ -953,20 +937,20 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitPropertyReferenceExpression(PropertyReferenceExpression node)
 		{
-			node.set_Target((Expression)this.Visit(node.get_Target()));
-			node.set_Arguments((ExpressionCollection)this.Visit(node.get_Arguments()));
+			node.Target = (Expression)this.Visit(node.Target);
+			node.Arguments = (ExpressionCollection)this.Visit(node.Arguments);
 			return node;
 		}
 
 		public virtual ICodeNode VisitRaiseEventExpression(RaiseEventExpression node)
 		{
-			dummyVar0 = this.Visit(node.get_Arguments());
+			this.Visit(node.Arguments);
 			return node;
 		}
 
 		public virtual ICodeNode VisitRefReturnExpression(RefReturnExpression node)
 		{
-			node.set_Value((Expression)this.Visit(node.get_Value()));
+			node.Value = (Expression)this.Visit(node.Value);
 			return node;
 		}
 
@@ -977,25 +961,25 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitReturnExpression(ReturnExpression node)
 		{
-			node.set_Value((Expression)this.Visit(node.get_Value()));
+			node.Value = (Expression)this.Visit(node.Value);
 			return node;
 		}
 
 		public virtual ICodeNode VisitSafeCastExpression(SafeCastExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public ICodeNode VisitSelectClause(SelectClause node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitShortFormReturnExpression(ShortFormReturnExpression node)
 		{
-			node.set_Value((Expression)this.Visit(node.get_Value()));
+			node.Value = (Expression)this.Visit(node.Value);
 			return node;
 		}
 
@@ -1006,31 +990,19 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitStackAllocExpression(StackAllocExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitSwitchStatement(SwitchStatement node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			V_0 = new SwitchCaseCollection();
-			V_1 = node.get_Cases().GetEnumerator();
-			try
+			node.Condition = (Expression)this.Visit(node.Condition);
+			SwitchCaseCollection switchCaseCollection = new SwitchCaseCollection();
+			foreach (SwitchCase @case in node.Cases)
 			{
-				while (V_1.MoveNext())
-				{
-					V_2 = V_1.get_Current();
-					V_0.Add(V_2);
-				}
+				switchCaseCollection.Add(@case);
 			}
-			finally
-			{
-				if (V_1 != null)
-				{
-					V_1.Dispose();
-				}
-			}
-			node.set_Cases((SwitchCaseCollection)this.Visit(V_0));
+			node.Cases = (SwitchCaseCollection)this.Visit(switchCaseCollection);
 			return node;
 		}
 
@@ -1046,16 +1018,16 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitThrowExpression(ThrowExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 
 		public virtual ICodeNode VisitTryStatement(TryStatement node)
 		{
-			node.set_Try((BlockStatement)this.Visit(node.get_Try()));
-			node.set_CatchClauses((CatchClauseCollection)this.Visit(node.get_CatchClauses()));
-			node.set_Fault((BlockStatement)this.Visit(node.get_Fault()));
-			node.set_Finally((FinallyClause)this.Visit(node.get_Finally()));
+			node.Try = (BlockStatement)this.Visit(node.Try);
+			node.CatchClauses = (CatchClauseCollection)this.Visit(node.CatchClauses);
+			node.Fault = (BlockStatement)this.Visit(node.Fault);
+			node.Finally = (FinallyClause)this.Visit(node.Finally);
 			return node;
 		}
 
@@ -1071,14 +1043,14 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitUnaryExpression(UnaryExpression node)
 		{
-			node.set_Operand((Expression)this.Visit(node.get_Operand()));
+			node.Operand = (Expression)this.Visit(node.Operand);
 			return node;
 		}
 
 		public virtual ICodeNode VisitUsingStatement(UsingStatement node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Expression = (Expression)this.Visit(node.Expression);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
@@ -1094,14 +1066,14 @@ namespace Telerik.JustDecompiler.Ast
 
 		public ICodeNode VisitWhereClause(WhereClause node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
+			node.Condition = (Expression)this.Visit(node.Condition);
 			return node;
 		}
 
 		public virtual ICodeNode VisitWhileStatement(WhileStatement node)
 		{
-			node.set_Condition((Expression)this.Visit(node.get_Condition()));
-			node.set_Body((BlockStatement)this.Visit(node.get_Body()));
+			node.Condition = (Expression)this.Visit(node.Condition);
+			node.Body = (BlockStatement)this.Visit(node.Body);
 			return node;
 		}
 
@@ -1112,7 +1084,7 @@ namespace Telerik.JustDecompiler.Ast
 
 		public virtual ICodeNode VisitYieldReturnExpression(YieldReturnExpression node)
 		{
-			node.set_Expression((Expression)this.Visit(node.get_Expression()));
+			node.Expression = (Expression)this.Visit(node.Expression);
 			return node;
 		}
 	}

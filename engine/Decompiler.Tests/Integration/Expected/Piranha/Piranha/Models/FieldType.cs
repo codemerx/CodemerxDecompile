@@ -44,8 +44,6 @@ namespace Piranha.Models
 
 		public FieldType()
 		{
-			base();
-			return;
 		}
 	}
 }

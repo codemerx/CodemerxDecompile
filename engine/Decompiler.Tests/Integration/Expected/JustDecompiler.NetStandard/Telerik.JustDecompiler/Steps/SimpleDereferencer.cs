@@ -8,21 +8,19 @@ namespace Telerik.JustDecompiler.Steps
 	{
 		public SimpleDereferencer()
 		{
-			base();
-			return;
 		}
 
 		public override ICodeNode VisitUnaryExpression(UnaryExpression node)
 		{
-			if (node.get_Operator() == 8)
+			if (node.Operator == UnaryOperator.AddressDereference)
 			{
-				V_0 = node.get_Operand() as UnaryExpression;
-				if (V_0 != null && V_0.get_Operator() == 7 || V_0.get_Operator() == 9)
+				UnaryExpression operand = node.Operand as UnaryExpression;
+				if (operand != null && (operand.Operator == UnaryOperator.AddressReference || operand.Operator == UnaryOperator.AddressOf))
 				{
-					return this.Visit(V_0.get_Operand());
+					return this.Visit(operand.Operand);
 				}
 			}
-			return this.VisitUnaryExpression(node);
+			return base.VisitUnaryExpression(node);
 		}
 	}
 }

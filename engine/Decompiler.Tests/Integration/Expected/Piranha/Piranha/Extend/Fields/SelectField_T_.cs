@@ -3,6 +3,7 @@ using Piranha.Extend;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -22,29 +23,21 @@ namespace Piranha.Extend.Fields
 		{
 			get
 			{
-				return Type.GetTypeFromHandle(// 
-				// Current member / type: System.Type Piranha.Extend.Fields.SelectField`1::EnumType()
-				// Exception in: System.Type EnumType()
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				return typeof(T);
+			}
+		}
 
 		public override string EnumValue
 		{
 			get
 			{
-				return this.get_Value().ToString();
+				return this.Value.ToString();
 			}
 			set
 			{
-				this.set_Value((T)Enum.Parse(Type.GetTypeFromHandle(// 
-				// Current member / type: System.String Piranha.Extend.Fields.SelectField`1::EnumValue()
-				// Exception in: System.String EnumValue()
-				// Specified method is not supported.
-				// 
-				// mailto: JustDecompilePublicFeedback@telerik.com
-
+				this.Value = (T)Enum.Parse(typeof(T), value);
+			}
+		}
 
 		public override List<SelectFieldItem> Items
 		{
@@ -65,58 +58,62 @@ namespace Piranha.Extend.Fields
 		{
 			SelectField<T>._items = new List<SelectFieldItem>();
 			SelectField<T>.Mutex = new Object();
-			return;
 		}
 
 		public SelectField()
 		{
-			base();
-			return;
 		}
 
 		public override bool Equals(object obj)
 		{
-			V_0 = obj as SelectField<T>;
-			if (V_0 == null)
+			SelectField<T> selectField = obj as SelectField<T>;
+			if (selectField == null)
 			{
 				return false;
 			}
-			return this.Equals(V_0);
+			return this.Equals(selectField);
 		}
 
 		public virtual bool Equals(SelectField<T> obj)
 		{
-			if (SelectField<T>.op_Equality(obj, null))
+			if (obj == null)
 			{
 				return false;
 			}
-			return EqualityComparer<T>.get_Default().Equals(this.get_Value(), obj.get_Value());
+			return EqualityComparer<T>.Default.Equals(this.Value, obj.Value);
 		}
 
 		private string GetEnumTitle(Enum val)
 		{
-			V_0 = Type.GetTypeFromHandle(// 
-			// Current member / type: System.String Piranha.Extend.Fields.SelectField`1::GetEnumTitle(System.Enum)
-			// Exception in: System.String GetEnumTitle(System.Enum)
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			MemberInfo[] member = typeof(T).GetMember(val.ToString());
+			if (member != null && member.Length != 0)
+			{
+				object[] customAttributes = member[0].GetCustomAttributes(false);
+				for (int i = 0; i < (int)customAttributes.Length; i++)
+				{
+					object obj = customAttributes[i];
+					if (obj is DisplayAttribute)
+					{
+						return ((DisplayAttribute)obj).get_Description();
+					}
+				}
+			}
+			return val.ToString();
+		}
 
 		public override int GetHashCode()
 		{
-			return this.get_Value().GetHashCode();
+			return this.Value.GetHashCode();
 		}
 
 		public override string GetTitle()
 		{
-			return this.GetEnumTitle((Enum)(object)this.get_Value());
+			return this.GetEnumTitle((Enum)(object)this.Value);
 		}
 
 		public override void Init(IApi api)
 		{
 			this.InitMetaData();
-			return;
 		}
 
 		private void InitMetaData()
@@ -125,20 +122,22 @@ namespace Piranha.Extend.Fields
 			{
 				return;
 			}
-			V_0 = SelectField<T>.Mutex;
-			V_1 = false;
-			try
+			lock (SelectField<T>.Mutex)
 			{
-				Monitor.Enter(V_0, ref V_1);
 				if (!SelectField<T>.IsInitialized)
 				{
-					V_2 = Enum.GetValues(Type.GetTypeFromHandle(// 
-					// Current member / type: System.Void Piranha.Extend.Fields.SelectField`1::InitMetaData()
-					// Exception in: System.Void InitMetaData()
-					// Specified method is not supported.
-					// 
-					// mailto: JustDecompilePublicFeedback@telerik.com
-
+					foreach (object value in Enum.GetValues(typeof(T)))
+					{
+						SelectField<T>._items.Add(new SelectFieldItem()
+						{
+							Title = this.GetEnumTitle((Enum)value),
+							Value = (Enum)value
+						});
+					}
+					SelectField<T>.IsInitialized = true;
+				}
+			}
+		}
 
 		public static bool operator ==(SelectField<T> field1, SelectField<T> field2)
 		{
@@ -155,7 +154,7 @@ namespace Piranha.Extend.Fields
 
 		public static bool operator !=(SelectField<T> field1, SelectField<T> field2)
 		{
-			return !SelectField<T>.op_Equality(field1, field2);
+			return !(field1 == field2);
 		}
 	}
 }

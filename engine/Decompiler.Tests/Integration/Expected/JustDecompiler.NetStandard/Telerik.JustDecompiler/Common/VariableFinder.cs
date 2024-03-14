@@ -13,9 +13,7 @@ namespace Telerik.JustDecompiler.Common
 
 		public VariableFinder(VariableReference variable)
 		{
-			base();
 			this.variable = variable;
-			return;
 		}
 
 		public bool FindVariable(ICodeNode node)
@@ -29,31 +27,28 @@ namespace Telerik.JustDecompiler.Common
 		{
 			if (!this.found)
 			{
-				this.Visit(node);
+				base.Visit(node);
 			}
-			return;
 		}
 
 		public override void VisitVariableDeclarationExpression(VariableDeclarationExpression node)
 		{
-			if (node.get_Variable() == this.variable)
+			if (node.Variable == this.variable)
 			{
 				this.found = true;
 				return;
 			}
-			this.VisitVariableDeclarationExpression(node);
-			return;
+			base.VisitVariableDeclarationExpression(node);
 		}
 
 		public override void VisitVariableReferenceExpression(VariableReferenceExpression node)
 		{
-			if ((object)node.get_Variable() == (object)this.variable)
+			if ((object)node.Variable == (object)this.variable)
 			{
 				this.found = true;
 				return;
 			}
-			this.VisitVariableReferenceExpression(node);
-			return;
+			base.VisitVariableReferenceExpression(node);
 		}
 	}
 }

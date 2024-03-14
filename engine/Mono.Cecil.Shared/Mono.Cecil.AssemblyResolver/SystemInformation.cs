@@ -66,7 +66,7 @@ namespace Mono.Cecil.AssemblyResolver
         public static string[] SILVERLIGHT_VERSIONS = new string[] { "v4.0", "v5.0", "v3.0", "v2.0" };
 
         /* AGPL */
-		public static string[] NETCORE_VERSIONS = new string[] { "1.0", "1.1", "2.0", "2.1", "2.2", "3.0", "3.1", "5.0" };
+        public static string[] NETCORE_VERSIONS = new string[] { "1.0", "1.1", "2.0", "2.1", "2.2", "3.0", "3.1", "5.0", "6.0" };
         /* End AGPL */
 
         public static readonly string[] CoreAssemblies = { 
@@ -182,11 +182,14 @@ namespace Mono.Cecil.AssemblyResolver
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                directories.Add(Path.Combine("/", "usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "lib", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                directories.Add(Path.Combine("/", "usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "local", "share", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
+                // based on https://learn.microsoft.com/en-us/dotnet/core/install/macos#path-differences
+                directories.Add(Path.Combine(Path.DirectorySeparatorChar.ToString(), "usr", "local", "share", "dotnet", "x64", NETCORE_SHAREDASSEMBLIES_RELATIVE_PATH));
             }
 
             return directories;

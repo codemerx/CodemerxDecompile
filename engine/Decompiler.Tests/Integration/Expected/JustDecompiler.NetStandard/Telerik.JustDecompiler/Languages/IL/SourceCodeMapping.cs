@@ -19,8 +19,6 @@ namespace Telerik.JustDecompiler.Languages.IL
 
 		public SourceCodeMapping()
 		{
-			base();
-			return;
 		}
 	}
 }

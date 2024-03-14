@@ -35,15 +35,14 @@ namespace Piranha.Models
 
 		public Taxonomy()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator Taxonomy(string str)
 		{
-			stackVariable0 = new Taxonomy();
-			stackVariable0.set_Title(str);
-			return stackVariable0;
+			return new Taxonomy()
+			{
+				Title = str
+			};
 		}
 	}
 }

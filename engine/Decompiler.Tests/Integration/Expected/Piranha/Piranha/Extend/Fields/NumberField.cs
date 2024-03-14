@@ -8,20 +8,19 @@ namespace Piranha.Extend.Fields
 	{
 		public NumberField()
 		{
-			base();
-			return;
 		}
 
 		public static implicit operator NumberField(int number)
 		{
-			stackVariable0 = new NumberField();
-			stackVariable0.set_Value(new int?(number));
-			return stackVariable0;
+			return new NumberField()
+			{
+				Value = new int?(number)
+			};
 		}
 
 		public static implicit operator Nullable<Int32>(NumberField field)
 		{
-			return field.get_Value();
+			return field.Value;
 		}
 	}
 }

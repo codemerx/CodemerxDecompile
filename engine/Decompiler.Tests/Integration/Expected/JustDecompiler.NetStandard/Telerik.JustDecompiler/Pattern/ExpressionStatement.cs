@@ -14,13 +14,11 @@ namespace Telerik.JustDecompiler.Pattern
 
 		public ExpressionStatement()
 		{
-			base();
-			return;
 		}
 
 		protected override bool OnMatch(MatchContext context, Telerik.JustDecompiler.Ast.Statements.ExpressionStatement node)
 		{
-			return this.get_Expression().TryMatch(context, node.get_Expression());
+			return this.Expression.TryMatch(context, node.Expression);
 		}
 	}
 }

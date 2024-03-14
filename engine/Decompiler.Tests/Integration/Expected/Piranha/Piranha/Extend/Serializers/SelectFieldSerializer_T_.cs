@@ -9,36 +9,33 @@ namespace Piranha.Extend.Serializers
 	{
 		public SelectFieldSerializer()
 		{
-			base();
-			return;
 		}
 
 		public object Deserialize(string str)
 		{
-			V_0 = Activator.CreateInstance<T>();
+			T t = Activator.CreateInstance<T>();
 			if (!String.IsNullOrWhiteSpace(str))
 			{
 				try
 				{
-					V_0.set_EnumValue(str);
+					t.EnumValue = str;
 				}
 				catch
 				{
-					dummyVar0 = exception_0;
-					V_0.set_EnumValue(null);
+					t.EnumValue = null;
 				}
 			}
-			return V_0;
+			return t;
 		}
 
 		public string Serialize(object obj)
 		{
-			V_0 = obj as SelectFieldBase;
-			if (V_0 == null)
+			SelectFieldBase selectFieldBase = obj as SelectFieldBase;
+			if (selectFieldBase == null)
 			{
 				throw new ArgumentException("The given object doesn't match the serialization type");
 			}
-			return V_0.get_EnumValue();
+			return selectFieldBase.EnumValue;
 		}
 	}
 }

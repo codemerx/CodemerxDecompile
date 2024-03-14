@@ -26,11 +26,7 @@ namespace Piranha.Models
 			set;
 		}
 
-		public IList<string> Permissions
-		{
-			get;
-			set;
-		}
+		public IList<string> Permissions { get; set; } = new List<string>();
 
 		[StringLength(128)]
 		public string Title
@@ -48,9 +44,6 @@ namespace Piranha.Models
 
 		protected ContentBase()
 		{
-			this.u003cPermissionsu003ek__BackingField = new List<string>();
-			base();
-			return;
 		}
 	}
 }

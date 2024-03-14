@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
+using System.IO;
 
 namespace OrchardCore.Environment.Shell
 {
@@ -16,24 +17,21 @@ namespace OrchardCore.Environment.Shell
 
 		public ShellOptionsSetup(IHostEnvironment hostingEnvironment)
 		{
-			base();
 			this._hostingEnvironment = hostingEnvironment;
-			return;
 		}
 
 		public void Configure(ShellOptions options)
 		{
-			V_0 = Environment.GetEnvironmentVariable("ORCHARD_APP_DATA");
-			if (string.IsNullOrEmpty(V_0))
+			string environmentVariable = Environment.GetEnvironmentVariable("ORCHARD_APP_DATA");
+			if (string.IsNullOrEmpty(environmentVariable))
 			{
 				options.set_ShellsApplicationDataPath(Path.Combine(this._hostingEnvironment.get_ContentRootPath(), "App_Data"));
 			}
 			else
 			{
-				options.set_ShellsApplicationDataPath(Path.Combine(this._hostingEnvironment.get_ContentRootPath(), V_0));
+				options.set_ShellsApplicationDataPath(Path.Combine(this._hostingEnvironment.get_ContentRootPath(), environmentVariable));
 			}
 			options.set_ShellsContainerName("Sites");
-			return;
 		}
 	}
 }

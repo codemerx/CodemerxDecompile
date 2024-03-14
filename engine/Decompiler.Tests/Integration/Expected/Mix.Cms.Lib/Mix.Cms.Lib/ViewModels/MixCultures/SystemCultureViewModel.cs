@@ -4,6 +4,7 @@ using Mix.Cms.Lib.Models.Cms;
 using Mix.Cms.Lib.ViewModels.MixConfigurations;
 using Mix.Cms.Lib.ViewModels.MixLanguages;
 using Mix.Domain.Core.ViewModels;
+using Mix.Domain.Data.Repository;
 using Mix.Domain.Data.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -110,25 +111,61 @@ namespace Mix.Cms.Lib.ViewModels.MixCultures
 
 		public SystemCultureViewModel()
 		{
-			base();
-			return;
 		}
 
-		public SystemCultureViewModel(MixCulture model, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
+		public SystemCultureViewModel(MixCulture model, MixCmsContext _context = null, IDbContextTransaction _transaction = null) : base(model, _context, _transaction)
 		{
-			base(model, _context, _transaction);
-			return;
 		}
 
 		public override async Task<RepositoryResponse<bool>> RemoveRelatedModelsAsync(SystemCultureViewModel view, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			V_0.view = view;
-			V_0._context = _context;
-			V_0._transaction = _transaction;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<SystemCultureViewModel.u003cRemoveRelatedModelsAsyncu003ed__54>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			bool flag;
+			bool flag1;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixConfiguration, SystemConfigurationViewModel>.Repository;
+			RepositoryResponse<List<SystemConfigurationViewModel>> modelListByAsync = await repository.GetModelListByAsync((MixConfiguration c) => c.Specificulture == view.Specificulture, _context, _transaction);
+			if (modelListByAsync.get_IsSucceed())
+			{
+				foreach (SystemConfigurationViewModel datum in modelListByAsync.get_Data())
+				{
+					RepositoryResponse<MixConfiguration> repositoryResponse2 = await datum.RemoveModelAsync(false, _context, _transaction);
+					RepositoryResponse<bool> repositoryResponse3 = repositoryResponse1;
+					flag1 = (!repositoryResponse1.get_IsSucceed() ? false : repositoryResponse2.get_IsSucceed());
+					repositoryResponse3.set_IsSucceed(flag1);
+					if (repositoryResponse1.get_IsSucceed())
+					{
+						continue;
+					}
+					repositoryResponse1.get_Errors().AddRange(repositoryResponse2.get_Errors());
+					repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+					break;
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				DefaultRepository<!0, !1, !2> defaultRepository = ViewModelBase<MixCmsContext, MixLanguage, SystemLanguageViewModel>.Repository;
+				RepositoryResponse<List<SystemLanguageViewModel>> modelListByAsync1 = await defaultRepository.GetModelListByAsync((MixLanguage c) => c.Specificulture == view.Specificulture, _context, _transaction);
+				if (modelListByAsync1.get_IsSucceed())
+				{
+					foreach (SystemLanguageViewModel systemLanguageViewModel in modelListByAsync1.get_Data())
+					{
+						RepositoryResponse<MixLanguage> repositoryResponse4 = await systemLanguageViewModel.RemoveModelAsync(false, _context, _transaction);
+						RepositoryResponse<bool> repositoryResponse5 = repositoryResponse1;
+						flag = (!repositoryResponse1.get_IsSucceed() ? false : repositoryResponse4.get_IsSucceed());
+						repositoryResponse5.set_IsSucceed(flag);
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.get_Errors().AddRange(repositoryResponse4.get_Errors());
+						repositoryResponse1.set_Exception(repositoryResponse4.get_Exception());
+						break;
+					}
+				}
+			}
+			return repositoryResponse1;
 		}
 	}
 }

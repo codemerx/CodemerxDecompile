@@ -32,16 +32,15 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 		{
 			get
 			{
-				stackVariable1 = this.dynamicArgumentIndices;
-				if (stackVariable1 == null)
+				List<int> nums = this.dynamicArgumentIndices;
+				if (nums == null)
 				{
-					dummyVar0 = stackVariable1;
-					stackVariable3 = new List<int>();
-					V_0 = stackVariable3;
-					this.dynamicArgumentIndices = stackVariable3;
-					stackVariable1 = V_0;
+					List<int> nums1 = new List<int>();
+					List<int> nums2 = nums1;
+					this.dynamicArgumentIndices = nums1;
+					nums = nums2;
 				}
-				return stackVariable1;
+				return nums;
 			}
 		}
 
@@ -65,59 +64,57 @@ namespace Telerik.JustDecompiler.Steps.DynamicVariables
 
 		public CallSiteInfo(FieldDefinition callSiteField, string binderMethodName)
 		{
-			base();
-			this.set_CallSiteField(callSiteField);
-			this.set_BinderType(this.GetBinderTypeFromName(binderMethodName));
-			return;
+			this.CallSiteField = callSiteField;
+			this.BinderType = this.GetBinderTypeFromName(binderMethodName);
 		}
 
 		private CallSiteBinderType GetBinderTypeFromName(string name)
 		{
 			if (name != null)
 			{
-				if (String.op_Equality(name, "BinaryOperation"))
+				if (name == "BinaryOperation")
 				{
-					return 0;
+					return CallSiteBinderType.BinaryOperation;
 				}
-				if (String.op_Equality(name, "Convert"))
+				if (name == "Convert")
 				{
-					return 1;
+					return CallSiteBinderType.Convert;
 				}
-				if (String.op_Equality(name, "GetIndex"))
+				if (name == "GetIndex")
 				{
-					return 2;
+					return CallSiteBinderType.GetIndex;
 				}
-				if (String.op_Equality(name, "GetMember"))
+				if (name == "GetMember")
 				{
-					return 3;
+					return CallSiteBinderType.GetMember;
 				}
-				if (String.op_Equality(name, "Invoke"))
+				if (name == "Invoke")
 				{
-					return 4;
+					return CallSiteBinderType.Invoke;
 				}
-				if (String.op_Equality(name, "InvokeConstructor"))
+				if (name == "InvokeConstructor")
 				{
-					return 5;
+					return CallSiteBinderType.InvokeConstructor;
 				}
-				if (String.op_Equality(name, "InvokeMember"))
+				if (name == "InvokeMember")
 				{
-					return 6;
+					return CallSiteBinderType.InvokeMember;
 				}
-				if (String.op_Equality(name, "IsEvent"))
+				if (name == "IsEvent")
 				{
-					return 7;
+					return CallSiteBinderType.IsEvent;
 				}
-				if (String.op_Equality(name, "SetIndex"))
+				if (name == "SetIndex")
 				{
-					return 8;
+					return CallSiteBinderType.SetIndex;
 				}
-				if (String.op_Equality(name, "SetMember"))
+				if (name == "SetMember")
 				{
-					return 9;
+					return CallSiteBinderType.SetMember;
 				}
-				if (String.op_Equality(name, "UnaryOperation"))
+				if (name == "UnaryOperation")
 				{
-					return 10;
+					return CallSiteBinderType.UnaryOperation;
 				}
 			}
 			throw new Exception("Unknown CallSite binder.");

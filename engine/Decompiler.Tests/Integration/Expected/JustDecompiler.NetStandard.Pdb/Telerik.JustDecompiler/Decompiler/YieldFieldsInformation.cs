@@ -41,7 +41,6 @@ namespace Telerik.JustDecompiler.Decompiler
 			this.stateHolderField = stateHolderField;
 			this.currentItemField = currentItemField;
 			this.returnFlagVariable = returnFlagVariable;
-			return;
 		}
 	}
 }

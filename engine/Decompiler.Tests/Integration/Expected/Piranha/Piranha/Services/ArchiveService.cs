@@ -2,6 +2,7 @@ using Piranha;
 using Piranha.Models;
 using Piranha.Repositories;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -19,11 +20,9 @@ namespace Piranha.Services
 
 		public ArchiveService(IArchiveRepository repo, IParamService paramService, IPostService postService)
 		{
-			base();
 			this._repo = repo;
 			this._paramService = paramService;
 			this._postService = postService;
-			return;
 		}
 
 		public Task<PostArchive<DynamicPost>> GetByIdAsync(Guid archiveId, int? currentPage = 1, Guid? categoryId = null, Guid? tagId = null, int? year = null, int? month = null, int? pageSize = null)
@@ -34,18 +33,65 @@ namespace Piranha.Services
 		public async Task<PostArchive<T>> GetByIdAsync<T>(Guid archiveId, int? currentPage = 1, Guid? categoryId = null, Guid? tagId = null, int? year = null, int? month = null, int? pageSize = null)
 		where T : PostBase
 		{
-			V_0.u003cu003e4__this = this;
-			V_0.archiveId = archiveId;
-			V_0.currentPage = currentPage;
-			V_0.categoryId = categoryId;
-			V_0.tagId = tagId;
-			V_0.year = year;
-			V_0.month = month;
-			V_0.pageSize = pageSize;
-			V_0.u003cu003et__builder = AsyncTaskMethodBuilder<PostArchive<T>>.Create();
-			V_0.u003cu003e1__state = -1;
-			V_0.u003cu003et__builder.Start<ArchiveService.u003cGetByIdAsyncu003ed__5<T>>(ref V_0);
-			return V_0.u003cu003et__builder.get_Task();
+			Taxonomy taxonomy;
+			ConfiguredTaskAwaitable<Taxonomy> configuredTaskAwaitable;
+			int num;
+			PostArchive<T> postArchive = new PostArchive<T>();
+			if (!pageSize.HasValue)
+			{
+				using (Config config = new Config(this._paramService))
+				{
+					pageSize = new int?(config.ArchivePageSize);
+					if (pageSize.HasValue)
+					{
+						int? nullable = pageSize;
+						if (!(nullable.GetValueOrDefault() == 0 & nullable.HasValue))
+						{
+							goto Label0;
+						}
+					}
+					pageSize = new int?(5);
+				Label0:
+				}
+			}
+			postArchive.Year = year;
+			postArchive.Month = month;
+			PostArchive<T> postArchive1 = postArchive;
+			ConfiguredTaskAwaitable<int> configuredTaskAwaitable1 = this._repo.GetPostCount(archiveId, categoryId, tagId, year, month).ConfigureAwait(false);
+			postArchive1.TotalPosts = await configuredTaskAwaitable1;
+			postArchive1 = null;
+			postArchive.TotalPages = Math.Max(Convert.ToInt32(Math.Ceiling((double)postArchive.TotalPosts / (double)pageSize.Value)), 1);
+			PostArchive<T> postArchive2 = postArchive;
+			num = (currentPage.HasValue ? currentPage.Value : 1);
+			postArchive2.CurrentPage = Math.Min(Math.Max(1, num), postArchive.TotalPages);
+			if (categoryId.HasValue)
+			{
+				postArchive1 = postArchive;
+				configuredTaskAwaitable = this._postService.GetCategoryByIdAsync(categoryId.Value).ConfigureAwait(false);
+				taxonomy = await configuredTaskAwaitable;
+				postArchive1.Category = taxonomy;
+				postArchive1 = null;
+			}
+			if (tagId.HasValue)
+			{
+				postArchive1 = postArchive;
+				configuredTaskAwaitable = this._postService.GetTagByIdAsync(tagId.Value).ConfigureAwait(false);
+				taxonomy = await configuredTaskAwaitable;
+				postArchive1.Tag = taxonomy;
+				postArchive1 = null;
+			}
+			ConfiguredTaskAwaitable<IEnumerable<Guid>> configuredTaskAwaitable2 = this._repo.GetPosts(archiveId, pageSize.Value, postArchive.CurrentPage, categoryId, tagId, year, month).ConfigureAwait(false);
+			foreach (Guid guid in await configuredTaskAwaitable2)
+			{
+				ConfiguredTaskAwaitable<T> configuredTaskAwaitable3 = this._postService.GetByIdAsync<T>(guid).ConfigureAwait(false);
+				T t = await configuredTaskAwaitable3;
+				if (t == null)
+				{
+					continue;
+				}
+				postArchive.Posts.Add(t);
+			}
+			return postArchive;
 		}
 	}
 }

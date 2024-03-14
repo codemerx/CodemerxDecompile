@@ -10,10 +10,7 @@ namespace Piranha.Security
 
 		public static string[] All()
 		{
-			stackVariable1 = new String[2];
-			stackVariable1[0] = "PiranhaPagePreview";
-			stackVariable1[1] = "PiranhaPostPreview";
-			return stackVariable1;
+			return new String[] { "PiranhaPagePreview", "PiranhaPostPreview" };
 		}
 	}
 }

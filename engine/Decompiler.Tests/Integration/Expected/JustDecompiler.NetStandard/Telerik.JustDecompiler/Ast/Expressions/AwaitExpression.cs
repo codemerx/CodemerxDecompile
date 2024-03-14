@@ -17,9 +17,8 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				stackVariable1 = new AwaitExpression.u003cget_Childrenu003ed__11(-2);
-				stackVariable1.u003cu003e4__this = this;
-				return stackVariable1;
+				AwaitExpression awaitExpression = null;
+				yield return awaitExpression.expression;
 			}
 		}
 
@@ -27,7 +26,7 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 		{
 			get
 			{
-				return 65;
+				return Telerik.JustDecompiler.Ast.CodeNodeType.AwaitExpression;
 			}
 		}
 
@@ -44,35 +43,32 @@ namespace Telerik.JustDecompiler.Ast.Expressions
 					throw new ArgumentNullException("expression");
 				}
 				this.expression = value;
-				return;
 			}
 		}
 
-		public AwaitExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference type, IEnumerable<Instruction> instructions)
+		public AwaitExpression(Telerik.JustDecompiler.Ast.Expressions.Expression expression, TypeReference type, IEnumerable<Instruction> instructions) : base(instructions)
 		{
-			base(instructions);
 			if (expression == null)
 			{
 				throw new ArgumentNullException("expression");
 			}
 			this.expression = expression;
-			this.set_ExpressionType(type);
-			return;
+			this.ExpressionType = type;
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression Clone()
 		{
-			return new AwaitExpression(this.get_Expression().Clone(), this.get_ExpressionType(), this.instructions);
+			return new AwaitExpression(this.Expression.Clone(), this.ExpressionType, this.instructions);
 		}
 
 		public override Telerik.JustDecompiler.Ast.Expressions.Expression CloneExpressionOnly()
 		{
-			return new AwaitExpression(this.get_Expression().CloneExpressionOnly(), this.get_ExpressionType(), null);
+			return new AwaitExpression(this.Expression.CloneExpressionOnly(), this.ExpressionType, null);
 		}
 
 		public override bool Equals(Telerik.JustDecompiler.Ast.Expressions.Expression other)
 		{
-			if (other.get_CodeNodeType() != 65)
+			if (other.CodeNodeType != Telerik.JustDecompiler.Ast.CodeNodeType.AwaitExpression)
 			{
 				return false;
 			}

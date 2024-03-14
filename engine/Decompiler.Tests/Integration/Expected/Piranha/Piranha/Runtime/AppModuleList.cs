@@ -7,25 +7,28 @@ namespace Piranha.Runtime
 	{
 		public AppModuleList()
 		{
-			base();
-			return;
 		}
 
 		public T Get<T>()
 		where T : IModule
 		{
-			stackVariable3 = this.GetByType(Type.GetTypeFromHandle(// 
-			// Current member / type: T Piranha.Runtime.AppModuleList::Get()
-			// Exception in: T Get()
-			// Specified method is not supported.
-			// 
-			// mailto: JustDecompilePublicFeedback@telerik.com
-
+			object instance;
+			AppModule byType = this.GetByType(typeof(T));
+			if (byType != null)
+			{
+				instance = byType.Instance;
+			}
+			else
+			{
+				instance = null;
+			}
+			return (T)instance;
+		}
 
 		protected override AppModule OnRegister<TValue>(AppModule item)
 		where TValue : IModule
 		{
-			item.set_Instance(Activator.CreateInstance<TValue>());
+			item.Instance = Activator.CreateInstance<TValue>();
 			return item;
 		}
 	}

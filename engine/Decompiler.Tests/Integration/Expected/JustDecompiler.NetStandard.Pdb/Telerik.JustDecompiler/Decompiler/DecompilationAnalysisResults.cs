@@ -22,10 +22,8 @@ namespace Telerik.JustDecompiler.Decompiler
 
 		public DecompilationAnalysisResults()
 		{
-			base();
-			this.set_TypesDependingOn(new HashSet<TypeReference>());
-			this.set_AmbiguousCastsToObject(new HashSet<ExplicitCastExpression>());
-			return;
+			this.TypesDependingOn = new HashSet<TypeReference>();
+			this.AmbiguousCastsToObject = new HashSet<ExplicitCastExpression>();
 		}
 	}
 }

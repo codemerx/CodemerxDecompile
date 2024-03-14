@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-defaultgrey{fill: #212121; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightAssembly</title>
+  <g id="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <path class="light-defaultgrey-10" d="M9.5,5.5v8h-8v-8Z" />
+    <path class="light-defaultgrey" d="M9.5,5h-8L1,5.5v8l.5.5h8l.5-.5v-8ZM9,13H2V6H9Z" />
+    <g class="cls-1">
+      <path class="light-defaultgrey-10" d="M13.5,9.5h-2v2H10v-6L9.5,5h-6V3.5h2v-2h8Z" />
+      <path class="light-defaultgrey" d="M13.5,1h-8L5,1.5V3H3.5L3,3.5V5H4V4h7v7H10v1h1.5l.5-.5V10h1.5l.5-.5v-8ZM13,9H12V3.5L11.5,3H6V2h7Z" />
+    </g>
+  </g>
+</svg>

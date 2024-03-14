@@ -14,7 +14,7 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 
-name: Package
+name: Package-old
 
 env:
   NODE_VERSION: 10.22.1

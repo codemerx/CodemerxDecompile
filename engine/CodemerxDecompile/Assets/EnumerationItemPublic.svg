@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>.canvas{fill: none; opacity: 0;}.light-blue-10{fill: #005dba; opacity: 0.1;}.light-blue{fill: #005dba; opacity: 1;}.white{fill: #ffffff; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title>IconLightEnumerationItemPublic</title>
+  <g id="canvas" class="canvas">
+    <path class="canvas" d="M16,16H0V0H16Z" />
+  </g>
+  <g id="level-1">
+    <g class="cls-1">
+      <path class="light-blue-10" d="M14.5,2.5v6H9V7H6.5V2.5Z" />
+      <path class="light-blue" d="M12.5,4V5h-4V4Zm-4,3h4V6h-4ZM15,2.5v6l-.5.5H10V8h4V3H7V7H6V2.5L6.5,2h8Z" />
+    </g>
+    <path class="light-blue" d="M9.5,7h-8L1,7.5v6l.5.5h8l.5-.5v-6Z" />
+    <path class="white" d="M8,11H3V10H8Z" />
+  </g>
+</svg>

@@ -292,6 +292,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\DisposingStateControllerRemover.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\StateControllerRemover.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\StateMachineCFGCleaner.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\StateMachineCFGCleanerV2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\StateMachineDisposeAnalyzer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\StateMachineDoFinallyCheckRemover.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Decompiler\StateMachines\StateMachineFinallyCheckRemoverBase.cs" />

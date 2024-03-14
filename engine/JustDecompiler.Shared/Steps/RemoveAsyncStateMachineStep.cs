@@ -4,7 +4,9 @@ using Telerik.JustDecompiler.Cil;
 using Mono.Cecil.Cil;
 using System.Collections.Generic;
 using Mono.Cecil;
-using Telerik.JustDecompiler.Decompiler;
+/* AGPL */
+using JustDecompiler.Shared.Decompiler.StateMachines;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Steps
 {
@@ -76,17 +78,28 @@ namespace Telerik.JustDecompiler.Steps
             }
             toBeRemoved.UnionWith(asyncControllerRemover.BlocksMarkedForRemoval);
 
-            SwitchData controllerSwitchData;
-            if (asyncControllerRemover.SwitchData != null)
+            /* AGPL */
+            SwitchData[] controllerSwitchData;
+            if (asyncControllerRemover.SwitchDataList != null && asyncControllerRemover.SwitchDataList.Count > 0)
             {
-                controllerSwitchData = asyncControllerRemover.SwitchData;
+                controllerSwitchData = asyncControllerRemover.SwitchDataList.ToArray();
             }
-            else if (!CreateFakeSwitchData(out controllerSwitchData))
+            else if (asyncControllerRemover.SwitchData != null)
             {
-                return false;
+                controllerSwitchData = new SwitchData[1] { asyncControllerRemover.SwitchData };
+            }
+            else
+            {
+                SwitchData s;
+                if (!CreateFakeSwitchData(out s))
+                {
+                    return false;
+                }
+                controllerSwitchData = new SwitchData[1] { s };
             }
 
-            StateMachineCFGCleaner cfgCleaner = new StateMachineCFGCleaner(this.theCFG, controllerSwitchData, controllerSwitchData.DefaultCase);
+            StateMachineCFGCleanerV2 cfgCleaner = new StateMachineCFGCleanerV2(this.theCFG, controllerSwitchData, asyncControllerRemover.DefaultStateEntry ?? controllerSwitchData[0].DefaultCase);
+            /* End AGPL */
             if (!cfgCleaner.CleanUpTheCFG(toBeRemoved))
             {
                 return false;

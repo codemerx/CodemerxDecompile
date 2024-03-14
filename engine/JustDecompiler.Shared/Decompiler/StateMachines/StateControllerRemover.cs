@@ -15,6 +15,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
         private FieldDefinition stateField;
 
         private SwitchData switchData;
+        /* AGPL */
+        private List<SwitchData> switchDataList;
+        /* End AGPL */
         private InstructionBlock defaultStateEntry;
         protected VariableReference stateVariable;
 
@@ -32,6 +35,24 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 return this.switchData;
             }
         }
+
+        /* AGPL */
+        public List<SwitchData> SwitchDataList
+        {
+            get
+            {
+                return this.switchDataList;
+            }
+        }
+
+        public InstructionBlock DefaultStateEntry
+        {
+            get
+            {
+                return this.defaultStateEntry;
+            }
+        }
+        /* End AGPL */
 
         /// <summary>
         /// Gets the field that holds the number of the current state of the state machine.
@@ -231,6 +252,183 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             return true;
         }
 
+        /* AGPL */
+        /// <summary>
+        /// Removes all chains of blocks that represents the state machine controller.
+        /// </summary>
+        /// <remarks>
+        /// The idea is to remove each chain and to create a fake switch data (for each of them) that represents the state machine controller.
+        /// </remarks>
+        protected bool RemoveControllerChainV2()
+        {
+            Queue<InstructionBlock> controllerTraversalQueue = new Queue<InstructionBlock>();
+            this.switchDataList = new List<SwitchData>();
+            HashSet<string> vis = new HashSet<string>();
+
+            foreach (var block in theCFG.Blocks)
+            {
+                string blockId = block.First.ToString() + block.Last.ToString();
+                if (vis.Contains(blockId) || toBeRemoved.Contains(block))
+                {
+                    continue;
+                }
+                vis.Add(blockId);
+
+                InstructionBlock _currentBlock = block;
+                int _stateNumber;
+                StateMachineControllerType _controllerType;
+                if (IsStateMachineControllerBlock(ref _currentBlock, out _controllerType, out _stateNumber))
+                {
+                    InstructionBlock currentStateEntry = null;
+                    controllerTraversalQueue.Enqueue(block);
+                    while (controllerTraversalQueue.Count > 0)
+                    {
+                        InstructionBlock initialBlock = controllerTraversalQueue.Dequeue();
+                        vis.Add(initialBlock.First.ToString() + initialBlock.Last.ToString());
+                        InstructionBlock currentBlock = initialBlock;
+                        int stateNumber;
+                        StateMachineControllerType controllerType;
+                        while (IsStateMachineControllerBlock(ref currentBlock, out controllerType, out stateNumber))
+                        {
+                            switch (controllerType)
+                            {
+                                case StateMachineControllerType.Switch:
+                                    {
+                                        InstructionBlock actualSuccessor;
+                                        SwitchData switchData = theCFG.SwitchBlocksInformation[currentBlock];
+                                        InstructionBlock[] switchCasesArray = switchData.OrderedCasesArray;
+                                        for (int i = 0; i < switchCasesArray.Length; i++)
+                                        {
+                                            if (toBeRemoved.Contains(switchCasesArray[i]))
+                                            {
+                                                continue;
+                                            }
+
+
+                                            switch (TryGetStateEntry(switchCasesArray[i], out actualSuccessor))
+                                            {
+                                                case ControllerTraversalSearchResult.FoundStateEntry:
+                                                    stateToStartBlock[i + stateNumber] = actualSuccessor;
+                                                    break;
+                                                case ControllerTraversalSearchResult.FoundControllerCandidate:
+                                                    stateToStartBlock[i + stateNumber] = actualSuccessor;
+                                                    controllerTraversalQueue.Enqueue(actualSuccessor);
+                                                    break;
+                                                case ControllerTraversalSearchResult.PatternFailed:
+                                                    return false;
+                                            }
+                                        }
+
+                                        controllerTraversalQueue.Enqueue(SkipBranchChain(switchData.DefaultCase));
+                                        break;
+                                    }
+                                case StateMachineControllerType.Condition:
+                                    {
+                                        InstructionBlock actualSuccessor;
+                                        switch (TryGetStateEntry(currentBlock.Successors[0], out actualSuccessor))
+                                        {
+                                            case ControllerTraversalSearchResult.FoundStateEntry:
+                                                stateToStartBlock[stateNumber] = actualSuccessor;
+                                                break;
+                                            case ControllerTraversalSearchResult.FoundControllerCandidate:
+                                                stateToStartBlock[stateNumber] = actualSuccessor;
+                                                controllerTraversalQueue.Enqueue(actualSuccessor);
+                                                break;
+                                            case ControllerTraversalSearchResult.PatternFailed:
+                                                return false;
+                                        }
+                                        break;
+                                    }
+                                case StateMachineControllerType.ConditionV2:
+                                    {
+                                        // both successors should be preserved. we don't need to skip branch chain since it will be skipped during cleanup.
+                                        stateToStartBlock[stateNumber] = SkipBranchChain(currentBlock.Successors[0]);
+
+                                        //InstructionBlock actualSuccessor;
+                                        //switch (TryGetStateEntry(currentBlock.Successors[0], out actualSuccessor))
+                                        //{
+                                        //    case ControllerTraversalSearchResult.FoundStateEntry:
+                                        //        stateToStartBlock[stateNumber] = actualSuccessor;
+                                        //        break;
+                                        //    case ControllerTraversalSearchResult.FoundControllerCandidate:
+                                        //        stateToStartBlock[stateNumber] = actualSuccessor;
+                                        //        controllerTraversalQueue.Enqueue(actualSuccessor);
+                                        //        break;
+                                        //    case ControllerTraversalSearchResult.PatternFailed:
+                                        //        return false;
+                                        //}
+                                        break;
+                                    }
+                                case StateMachineControllerType.NegativeCondition:
+                                    {
+                                        InstructionBlock actualSuccessor;
+                                        int successorIndex = 1;
+                                        if (stateNumber == -1)
+                                        {
+                                            stateNumber = 0;
+                                            successorIndex = 0;
+                                        }
+
+                                        switch (TryGetStateEntry(currentBlock.Successors[successorIndex], out actualSuccessor))
+                                        {
+                                            case ControllerTraversalSearchResult.FoundStateEntry:
+                                            case ControllerTraversalSearchResult.FoundControllerCandidate:
+                                                stateToStartBlock[stateNumber] = actualSuccessor;
+                                                break;
+                                            case ControllerTraversalSearchResult.PatternFailed:
+                                                return false;
+                                        }
+                                        break;
+                                    }
+                            }
+
+                            toBeRemoved.Add(currentBlock);
+                            if (controllerType == StateMachineControllerType.NegativeCondition)
+                            {
+                                currentBlock = currentBlock.Successors[0];
+                            }
+                            else
+                            {
+                                currentBlock = currentBlock.Successors[currentBlock.Successors.Length - 1];
+                            }
+                            foreach(var nxtBlock in GetBranchChain(currentBlock))
+                            {
+                                vis.Add(nxtBlock.First.ToString() + nxtBlock.Last.ToString());
+                            }
+                            currentBlock = SkipBranchChain(currentBlock);
+                        }
+
+                        if(currentStateEntry == null)
+                        {
+                            currentStateEntry = currentBlock;
+                        }
+
+                        ReattachDefaultSuccessor(initialBlock, currentBlock); //Redirect the predecessors of the first controller block to it's default successor
+
+                        while (controllerTraversalQueue.Count > 0 && toBeRemoved.Contains(controllerTraversalQueue.Peek()))
+                        {
+                            controllerTraversalQueue.Dequeue();
+                        }
+                    }
+
+                    if (defaultStateEntry == null)
+                    {
+                        defaultStateEntry = currentStateEntry;
+                    }
+
+                    if (toBeRemoved.Count == 0)
+                    {
+                        return false;
+                    }
+
+                    CreateControllerSwitchDataV2(currentStateEntry);
+                    this.switchDataList.Add(this.switchData);
+                }
+            }
+            return true;
+        }
+        /* End AGPL */
+
         /// <summary>
         /// Initializes the queue that is used for traversing the state controller blocks.
         /// </summary>
@@ -286,6 +484,31 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             this.switchData = new SwitchData(null, defaultStateEntry, finalCasesArray);
         }
 
+        /* AGPL */
+        /// <summary>
+        /// Creates a controller switch data using the information gathered during the traversal of the state controller blocks.
+        /// </summary>
+        private void CreateControllerSwitchDataV2(InstructionBlock stateEntry)
+        {
+            int index = GetIndexOfLastNonNullElement(stateToStartBlock);
+            InstructionBlock[] finalCasesArray = new InstructionBlock[++index];
+            //Trim the excess elements of the cases array.
+            for (int i = 0; i < index; i++)
+            {
+                if (stateToStartBlock[i] == null)
+                {
+                    finalCasesArray[i] = stateEntry;
+                }
+                else
+                {
+                    finalCasesArray[i] = stateToStartBlock[i];
+                }
+            }
+
+            this.switchData = new SwitchData(null, stateEntry, finalCasesArray);
+        }
+        /* End AGPL */
+
         protected virtual ControllerTraversalSearchResult TryGetStateEntry(InstructionBlock theBlock, out InstructionBlock actualSuccessor)
         {
             actualSuccessor = SkipBranchChain(theBlock);
@@ -325,6 +548,18 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
 
             return currentBlock;
         }
+
+        /* AGPL */
+        private IEnumerable<InstructionBlock> GetBranchChain(InstructionBlock initialBlock)
+        {
+            InstructionBlock currentBlock = initialBlock;
+            while (IsUnconditionalBranchBlock(currentBlock))
+            {
+                yield return currentBlock;
+                currentBlock = currentBlock.Successors[0];
+            }
+        }
+        /* End AGPL */
 
         /// <summary>
         /// Checks whether the specified block contains usage of the state field.
@@ -523,6 +758,15 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 currentInstruction = theBlock.Last;
                 stateNumber = 0;
             }
+            /* AGPL */
+            else if (IsBleUnInstruction(theBlock.Last))
+            {
+                controllerType = StateMachineControllerType.ConditionV2;
+
+                currentInstruction = theBlock.First.Next; // we can also skip setting currentInstruction and just return true here
+                stateNumber = 0;
+            }
+            /* End AGPL */
             else if (IsBneInstruction(theBlock.Last))
             {
                 controllerType = StateMachineControllerType.NegativeCondition;
@@ -552,7 +796,9 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
                 //In rare cases the state variable is used in a regular switch block. That's why we check whether there is an assignment of the variable
                 //in theBlock. If so then the block is not a controller block.
             {
-                return true;
+                /* AGPL */
+                return true; // this check may fail for ble if currentInstruction is not set properly
+                /* End AGPL */
             }
 
             stateNumber = 0;
@@ -588,6 +834,13 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
         {
             return theInstruction.OpCode.Code == Code.Brfalse || theInstruction.OpCode.Code == Code.Brfalse_S;
         }
+
+        /* AGPL */
+        private bool IsBleUnInstruction(Instruction theInstruction)
+        {
+            return theInstruction.OpCode.Code == Code.Ble_Un || theInstruction.OpCode.Code == Code.Ble_Un_S;
+        }
+        /* End AGPL */
 
         /// <summary>
         /// Checks whether the specified block is a controller block generated by the compiler in debug mode.
@@ -730,7 +983,10 @@ namespace Telerik.JustDecompiler.Decompiler.StateMachines
             None,
             Switch,
             Condition,
-            NegativeCondition
+            NegativeCondition,
+            /* AGPL */
+            ConditionV2
+            /* End AGPL */
         }
     }
 }

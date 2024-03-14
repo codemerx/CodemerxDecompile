@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{F0B649D0-787E-4909-A69D-212CF84EA669}</ProjectGuid>
+    <ProjectGuid>{A14001AC-5E7D-403E-BAED-C1180872DD4B}</ProjectGuid>
     <SchemaVersion>2</SchemaVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -72,7 +72,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\Core.Gateways\IPromoGateway.cs">
+    <Compile Include="ShoppingCart\Infrastructure.Gateways\ShippingGateway.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -84,14 +84,6 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\Infrastructure.Gateways\ShippingGateway.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="ShoppingCart\Core.Gateways\IShippingGateway.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="ShoppingCart\Anchor.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
@@ -100,15 +92,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\UseCases.UpdateAmountOfProductInShoppingCart\UpdateAmountOfProductInShoppingCartCommand.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="ShoppingCart\UseCases.CreateShoppingCartWithProduct\CreateShoppingCartWithProductValidator.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\Core.Exceptions\ProductNotFoundException.cs">
+    <Compile Include="ShoppingCart\Core.Gateways\IPromoGateway.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ShoppingCart\Core.Gateways\IShippingGateway.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -116,7 +108,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\UseCases.UpdateAmountOfProductInShoppingCart\UpdateAmountOfProductInShoppingCartValidator.cs">
+    <Compile Include="ShoppingCart\UseCases.UpdateAmountOfProductInShoppingCart\UpdateAmountOfProductInShoppingCartCommand.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -124,7 +116,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\Core.Events\ShoppingCartCheckedOut.cs">
+    <Compile Include="ShoppingCart\Core.Exceptions\ProductNotFoundException.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -132,7 +124,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ShoppingCart\Core.Events\ShoppingCartCheckedOut.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ShoppingCart\UseCases.UpdateAmountOfProductInShoppingCart\UpdateAmountOfProductInShoppingCartValidator.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="ShoppingCart\UseCases.CreateShoppingCartWithProduct\CreateShoppingCartWithProductHandler.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ShoppingCart\UseCases.Checkout\CheckOutHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -144,11 +148,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\UseCases.Checkout\CheckOutHandler.cs">
+    <Compile Include="ShoppingCart\Core.Dtos\CartDto.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\Core.Dtos\CartDto.cs">
+    <Compile Include="ShoppingCart\UseCases.UpdateAmountOfProductInShoppingCart\UpdateAmountOfProductInShoppingCartHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -157,10 +161,6 @@
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ShoppingCart\Core.Dtos\ProductDto.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="ShoppingCart\UseCases.UpdateAmountOfProductInShoppingCart\UpdateAmountOfProductInShoppingCartHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -176,11 +176,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\UseCases.GetCartByUserId\GetCartByUserIdQuery.cs">
+    <Compile Include="ShoppingCart\Infrastructure.Extensions\CartDtoExtensions.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ShoppingCart\Infrastructure.Extensions\CartDtoExtensions.cs">
+    <Compile Include="ShoppingCart\UseCases.GetCartByUserId\GetCartByUserIdQuery.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>

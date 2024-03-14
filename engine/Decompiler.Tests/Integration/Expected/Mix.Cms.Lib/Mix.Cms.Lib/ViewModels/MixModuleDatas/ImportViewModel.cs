@@ -290,12 +290,56 @@ namespace Mix.Cms.Lib.ViewModels.MixModuleDatas
 
 		public static async Task<RepositoryResponse<List<ReadViewModel>>> UpdateInfosAsync(List<ReadViewModel> data)
 		{
-			ImportViewModel.u003cUpdateInfosAsyncu003ed__78 variable = new ImportViewModel.u003cUpdateInfosAsyncu003ed__78();
-			variable.data = data;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<List<ReadViewModel>>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ImportViewModel.u003cUpdateInfosAsyncu003ed__78>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<List<ReadViewModel>> repositoryResponse;
+			MixCmsContext mixCmsContext = new MixCmsContext();
+			IDbContextTransaction dbContextTransaction = mixCmsContext.get_Database().BeginTransaction();
+			RepositoryResponse<List<ReadViewModel>> repositoryResponse1 = new RepositoryResponse<List<ReadViewModel>>();
+			try
+			{
+				try
+				{
+					foreach (ReadViewModel datum in data)
+					{
+						DbSet<MixModuleData> mixModuleData = mixCmsContext.MixModuleData;
+						MixModuleData priority = mixModuleData.FirstOrDefault<MixModuleData>((MixModuleData m) => m.Id == datum.Id && m.Specificulture == datum.Specificulture);
+						if (priority == null)
+						{
+							continue;
+						}
+						priority.Priority = datum.Priority;
+						mixCmsContext.Entry<MixModuleData>(priority).set_State(3);
+					}
+					RepositoryResponse<List<ReadViewModel>> repositoryResponse2 = repositoryResponse1;
+					MixCmsContext mixCmsContext1 = mixCmsContext;
+					CancellationToken cancellationToken = new CancellationToken();
+					int num = await ((DbContext)mixCmsContext1).SaveChangesAsync(cancellationToken);
+					repositoryResponse2.set_IsSucceed(num > 0);
+					repositoryResponse2 = null;
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						repositoryResponse1.get_Errors().Add("Nothing changed");
+					}
+					UnitOfWorkHelper<MixCmsContext>.HandleTransaction(repositoryResponse1.get_IsSucceed(), true, dbContextTransaction);
+					repositoryResponse = repositoryResponse1;
+				}
+				catch (Exception exception1)
+				{
+					Exception exception = exception1;
+					UnitOfWorkHelper<MixCmsContext>.HandleException<ReadViewModel>(exception, true, dbContextTransaction);
+					RepositoryResponse<List<ReadViewModel>> repositoryResponse3 = new RepositoryResponse<List<ReadViewModel>>();
+					repositoryResponse3.set_IsSucceed(false);
+					repositoryResponse3.set_Data(null);
+					repositoryResponse3.set_Exception(exception);
+					repositoryResponse = repositoryResponse3;
+				}
+			}
+			finally
+			{
+				RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+				dbContextTransaction.Dispose();
+				mixCmsContext.Dispose();
+			}
+			return repositoryResponse;
 		}
 
 		public override void Validate(MixCmsContext _context = null, IDbContextTransaction _transaction = null)

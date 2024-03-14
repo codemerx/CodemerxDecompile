@@ -36,6 +36,11 @@
     <Compile Remove="Integration\Expected\Mono.Cecil\**" />
     <Compile Remove="Integration\Expected\OrchardCore\**" />
     <Compile Remove="Integration\Expected\Piranha\**" />
+    <Compile Remove="Integration\Expected\AsyncEnumTest\**" />
+	<Compile Remove="Integration\Expected\AsyncTestCollectionNet45VS2013Debug\**" />
+	<Compile Remove="Integration\Expected\AsyncTestCollectionNet45VS2013Release\**" />
+	<Compile Remove="Integration\Expected\AsyncTestCollectionNet6VS2022Debug\**" />
+	<Compile Remove="Integration\Expected\AsyncTestCollectionNet6VS2022Release\**" />
     <Compile Remove="Integration\Expected\Squidex.7.2.0.Net6\**" />
     <Compile Remove="Integration\Expected\coolstore.ShoppingCart.Net6\**" />
     <Compile Remove="Integration\Expected\clean-architecture-manga.accounts-api.Net7\**" />
@@ -48,6 +53,11 @@
     <EmbeddedResource Remove="Integration\Expected\Mono.Cecil\**" />
     <EmbeddedResource Remove="Integration\Expected\OrchardCore\**" />
     <EmbeddedResource Remove="Integration\Expected\Piranha\**" />
+    <EmbeddedResource Remove="Integration\Expected\AsyncEnumTest\**" />
+    <EmbeddedResource Remove="Integration\Expected\AsyncTestCollectionNet45VS2013Debug\**" />
+    <EmbeddedResource Remove="Integration\Expected\AsyncTestCollectionNet45VS2013Release\**" />
+    <EmbeddedResource Remove="Integration\Expected\AsyncTestCollectionNet6VS2022Debug\**" />
+    <EmbeddedResource Remove="Integration\Expected\AsyncTestCollectionNet6VS2022Release\**" />
     <EmbeddedResource Remove="Integration\Expected\Squidex.7.2.0.Net6\**" />
     <EmbeddedResource Remove="Integration\Expected\coolstore.ShoppingCart.Net6\**" />
     <EmbeddedResource Remove="Integration\Expected\clean-architecture-manga.accounts-api.Net7\**" />
@@ -60,6 +70,11 @@
     <None Remove="Integration\Expected\Mono.Cecil\**" />
     <None Remove="Integration\Expected\OrchardCore\**" />
     <None Remove="Integration\Expected\Piranha\**" />
+    <None Remove="Integration\Expected\AsyncEnumTest\**" />
+    <None Remove="Integration\Expected\AsyncTestCollectionNet45VS2013Debug\**" />
+    <None Remove="Integration\Expected\AsyncTestCollectionNet45VS2013Release\**" />
+    <None Remove="Integration\Expected\AsyncTestCollectionNet6VS2022Debug\**" />
+    <None Remove="Integration\Expected\AsyncTestCollectionNet6VS2022Release\**" />
     <None Remove="Integration\Expected\Squidex.7.2.0.Net6\**" />
     <None Remove="Integration\Expected\coolstore.ShoppingCart.Net6\**" />
     <None Remove="Integration\Expected\clean-architecture-manga.accounts-api.Net7\**" />
@@ -76,6 +91,11 @@
     <None Remove="Integration\Resources\Mix.Cms.Lib\Mix.Cms.Lib.dll" />
     <None Remove="Integration\Resources\OrchardCore\OrchardCore.dll" />
     <None Remove="Integration\Resources\Piranha\Piranha.dll" />
+    <None Remove="Integration\Resources\AsyncEnumTest\AsyncEnumTest.dll" />
+    <None Remove="Integration\Resources\AsyncTestCollectionNet45VS2013Debug\AsyncTestCollectionNet45VS2013.dll" />
+    <None Remove="Integration\Resources\AsyncTestCollectionNet45VS2013Release\AsyncTestCollectionNet45VS2013.dll" />
+    <None Remove="Integration\Resources\AsyncTestCollectionNet6VS2022Debug\AsyncTestCollectionNet6VS2022.dll" />
+    <None Remove="Integration\Resources\AsyncTestCollectionNet6VS2022Release\AsyncTestCollectionNet6VS2022.dll" />
     <None Remove="Integration\Resources\Squidex.7.2.0.Net6\Squidex.dll" />
     <None Remove="Integration\Resources\coolstore.ShoppingCart.Net6\ShoppingCart.dll" />
     <None Remove="Integration\Resources\clean-architecture-manga.accounts-api.Net7\Application.dll" />
@@ -114,6 +134,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Integration\Resources\Piranha\Piranha.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Resources\AsyncEnumTest\AsyncEnumTest.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Integration\Resources\AsyncTestCollectionNet45VS2013Debug\AsyncTestCollectionNet45VS2013.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Integration\Resources\AsyncTestCollectionNet45VS2013Release\AsyncTestCollectionNet45VS2013.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Integration\Resources\AsyncTestCollectionNet6VS2022Debug\AsyncTestCollectionNet6VS2022.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Integration\Resources\AsyncTestCollectionNet6VS2022Release\AsyncTestCollectionNet6VS2022.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Integration\Resources\Squidex.7.2.0.Net6\Squidex.dll">

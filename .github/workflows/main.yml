@@ -17,10 +17,10 @@
 name: Build in Release
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
+  pull_request:
 
 jobs:
   test-on-windows:

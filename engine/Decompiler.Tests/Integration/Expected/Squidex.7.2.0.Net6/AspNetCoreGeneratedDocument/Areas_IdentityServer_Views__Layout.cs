@@ -139,11 +139,6 @@ namespace AspNetCoreGeneratedDocument
 			this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("head", 0, "85fc3c0474348f253e633bddac705b95a29ecf682dc381e0e011137390411ec65877", async () => {
 				this.WriteLiteral("\n    ");
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("base", 2, "85fc3c0474348f253e633bddac705b95a29ecf682dc381e0e011137390411ec66159", async () => {
-					Areas_IdentityServer_Views__Layout.u003cu003ec.u003cu003cExecuteAsyncu003eb__16_2u003ed _ = new Areas_IdentityServer_Views__Layout.u003cu003ec.u003cu003cExecuteAsyncu003eb__16_2u003ed();
-					_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-					_.u003cu003e1__state = -1;
-					_.u003cu003et__builder.Start<Areas_IdentityServer_Views__Layout.u003cu003ec.u003cu003cExecuteAsyncu003eb__16_2u003ed>(ref _);
-					return _.u003cu003et__builder.Task;
 				});
 				this.__Microsoft_AspNetCore_Mvc_Razor_TagHelpers_UrlResolutionTagHelper = base.CreateTagHelper<UrlResolutionTagHelper>();
 				this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_Razor_TagHelpers_UrlResolutionTagHelper);
@@ -161,11 +156,6 @@ namespace AspNetCoreGeneratedDocument
 				this.Write(T.Get("common.product", null));
 				this.WriteLiteral("</title>\n\n    ");
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("link", 1, "85fc3c0474348f253e633bddac705b95a29ecf682dc381e0e011137390411ec67813", async () => {
-					Areas_IdentityServer_Views__Layout.u003cu003ec.u003cu003cExecuteAsyncu003eb__16_3u003ed _ = new Areas_IdentityServer_Views__Layout.u003cu003ec.u003cu003cExecuteAsyncu003eb__16_3u003ed();
-					_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-					_.u003cu003e1__state = -1;
-					_.u003cu003et__builder.Start<Areas_IdentityServer_Views__Layout.u003cu003ec.u003cu003cExecuteAsyncu003eb__16_3u003ed>(ref _);
-					return _.u003cu003et__builder.Task;
 				});
 				this.__Microsoft_AspNetCore_Mvc_TagHelpers_LinkTagHelper = base.CreateTagHelper<LinkTagHelper>();
 				this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_TagHelpers_LinkTagHelper);

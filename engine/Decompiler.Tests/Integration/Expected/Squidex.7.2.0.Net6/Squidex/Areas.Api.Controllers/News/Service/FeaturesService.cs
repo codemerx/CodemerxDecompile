@@ -37,14 +37,52 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 
 		public async Task<FeaturesDto> GetFeaturesAsync(int version = 0, CancellationToken ct = null)
 		{
-			FeaturesService.u003cGetFeaturesAsyncu003ed__5 variable = new FeaturesService.u003cGetFeaturesAsyncu003ed__5();
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<FeaturesDto>.Create();
-			variable.u003cu003e4__this = this;
-			variable.version = version;
-			variable.ct = ct;
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<FeaturesService.u003cGetFeaturesAsyncu003ed__5>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			DefaultInterpolatedStringHandler defaultInterpolatedStringHandler;
+			FeaturesDto featuresDto = new FeaturesDto()
+			{
+				Version = version
+			};
+			if (this.client != null && version < 21)
+			{
+				try
+				{
+					ContentQuery contentQuery = new ContentQuery();
+					if (version != 0)
+					{
+						defaultInterpolatedStringHandler = new DefaultInterpolatedStringHandler(43, 2);
+						defaultInterpolatedStringHandler.AppendLiteral("data/version/iv le ");
+						defaultInterpolatedStringHandler.AppendFormatted<int>(21);
+						defaultInterpolatedStringHandler.AppendLiteral(" and data/version/iv gt ");
+						defaultInterpolatedStringHandler.AppendFormatted<int>(version);
+						contentQuery.set_Filter(defaultInterpolatedStringHandler.ToStringAndClear());
+					}
+					else
+					{
+						defaultInterpolatedStringHandler = new DefaultInterpolatedStringHandler(19, 1);
+						defaultInterpolatedStringHandler.AppendLiteral("data/version/iv eq ");
+						defaultInterpolatedStringHandler.AppendFormatted<int>(21);
+						contentQuery.set_Filter(defaultInterpolatedStringHandler.ToStringAndClear());
+					}
+					ContentsResult<FeaturesService.NewsEntity, FeatureDto> async = await this.client.GetAsync(contentQuery, this.flatten, ct);
+					List<FeatureDto> features = featuresDto.Features;
+					List<FeaturesService.NewsEntity> items = async.get_Items();
+					features.AddRange((
+						from x in items
+						select x.get_Data()).ToList<FeatureDto>());
+					if (async.get_Items().Count > 0)
+					{
+						FeaturesDto featuresDto1 = featuresDto;
+						List<FeaturesService.NewsEntity> newsEntities = async.get_Items();
+						featuresDto1.Version = newsEntities.Max<FeaturesService.NewsEntity>((FeaturesService.NewsEntity x) => x.get_Version());
+					}
+				}
+				catch
+				{
+				}
+			}
+			FeaturesDto featuresDto2 = featuresDto;
+			featuresDto = null;
+			return featuresDto2;
 		}
 
 		[Nullable(new byte[] { 0, 1 })]

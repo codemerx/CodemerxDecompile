@@ -28,6 +28,9 @@
 using System;
 using Mono.Cecil.Cil;
 using System.Collections.Generic;
+/* AGPL */
+using System.Linq;
+/* End AGPL */
 
 namespace Telerik.JustDecompiler.Ast.Statements
 {
@@ -102,8 +105,10 @@ namespace Telerik.JustDecompiler.Ast.Statements
         {
             using (System.IO.StringWriter statementDecompilerStrWriter = new System.IO.StringWriter())
             {
-                Telerik.JustDecompiler.Languages.ILanguageTestCaseWriter statementDecompilerLanguageWriter = 
-					new Telerik.JustDecompiler.Languages.TestCaseWriters.IntermediateDecompilationCSharpLanguageWriter(new Telerik.JustDecompiler.Languages.PlainTextFormatter(statementDecompilerStrWriter));
+                /* AGPL */
+                Languages.ILanguageTestCaseWriter statementDecompilerLanguageWriter = 
+                    new Languages.TestCaseWriters.IntermediateDecompilationCSharpLanguageWriter(new Languages.PlainTextFormatter(statementDecompilerStrWriter), this.UnderlyingSameMethodInstructions.First().ContainingMethod);
+                /* End AGPL */
                 statementDecompilerLanguageWriter.Write(this);
                 return statementDecompilerStrWriter.ToString();
             }

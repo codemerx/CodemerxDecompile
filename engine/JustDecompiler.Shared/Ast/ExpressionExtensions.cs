@@ -1,7 +1,5 @@
 ﻿using Telerik.JustDecompiler.Ast.Expressions;
 using Mono.Cecil;
-using Telerik.JustDecompiler.Decompiler.Caching;
-using Telerik.JustDecompiler.Decompiler.WriterContextServices;
 using Telerik.JustDecompiler.Languages;
 using System.IO;
 using Telerik.JustDecompiler.Languages.TestCaseWriters;
@@ -14,7 +12,9 @@ namespace Telerik.JustDecompiler.Ast
         public static string ToCodeString(this Expression expression)
         {
             var writer = new StringWriter();
-            ILanguageTestCaseWriter languageWriter = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(writer));
+            /* AGPL */
+            ILanguageTestCaseWriter languageWriter = new IntermediateDecompilationCSharpLanguageWriter(new PlainTextFormatter(writer), expression.UnderlyingSameMethodInstructions.First().ContainingMethod);
+            /* End AGPL */
 			languageWriter.SetContext(expression.UnderlyingSameMethodInstructions.First().ContainingMethod);
 			languageWriter.Write(expression);
 

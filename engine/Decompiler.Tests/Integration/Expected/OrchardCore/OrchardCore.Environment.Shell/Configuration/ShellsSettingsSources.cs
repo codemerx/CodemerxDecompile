@@ -30,14 +30,52 @@ namespace OrchardCore.Environment.Shell.Configuration
 
 		public async Task SaveAsync(string tenant, IDictionary<string, string> data)
 		{
-			ShellsSettingsSources.u003cSaveAsyncu003ed__3 variable = new ShellsSettingsSources.u003cSaveAsyncu003ed__3();
-			variable.u003cu003e4__this = this;
-			variable.tenant = tenant;
-			variable.data = data;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ShellsSettingsSources.u003cSaveAsyncu003ed__3>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			JObject jObject;
+			if (!File.Exists(this._tenants))
+			{
+				jObject = new JObject();
+			}
+			else
+			{
+				using (StreamReader streamReader = File.OpenText(this._tenants))
+				{
+					using (JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+					{
+						jObject = await JObject.LoadAsync(jsonTextReader, new CancellationToken());
+					}
+					jsonTextReader = null;
+				}
+				streamReader = null;
+			}
+			JObject value = jObject.GetValue(tenant) as JObject;
+			if (value == null)
+			{
+				value = new JObject();
+			}
+			JObject jObject1 = value;
+			foreach (string key in data.Keys)
+			{
+				if (data[key] == null)
+				{
+					jObject1.Remove(key);
+				}
+				else
+				{
+					jObject1.set_Item(key, data[key]);
+				}
+			}
+			jObject.set_Item(tenant, jObject1);
+			using (StreamWriter streamWriter = File.CreateText(this._tenants))
+			{
+				JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter);
+				jsonTextWriter.set_Formatting(1);
+				using (JsonTextWriter jsonTextWriter1 = jsonTextWriter)
+				{
+					await jObject.WriteToAsync(jsonTextWriter1, Array.Empty<JsonConverter>());
+				}
+				jsonTextWriter1 = null;
+			}
+			streamWriter = null;
 		}
 	}
 }

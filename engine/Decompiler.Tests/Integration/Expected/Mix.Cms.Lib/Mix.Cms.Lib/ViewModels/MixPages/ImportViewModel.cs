@@ -282,15 +282,59 @@ namespace Mix.Cms.Lib.ViewModels.MixPages
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPage parent, MixCmsContext _context = null, IDbContextTransaction _transaction = null)
 		{
-			Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel.u003cSaveSubModelsAsyncu003ed__135 variable = new Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel.u003cSaveSubModelsAsyncu003ed__135();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPages.ImportViewModel.u003cSaveSubModelsAsyncu003ed__135>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed() && this.ModuleNavs != null)
+			{
+				DefaultRepository<!0, !1, !2> repository = ViewModelBase<MixCmsContext, MixPageModule, Mix.Cms.Lib.ViewModels.MixPageModules.ImportViewModel>.Repository;
+				int data = repository.Max((MixPageModule m) => m.Id, null, null).get_Data();
+				foreach (Mix.Cms.Lib.ViewModels.MixPageModules.ImportViewModel moduleNav in this.ModuleNavs)
+				{
+					if (!ViewModelBase<MixCmsContext, MixModule, Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>.Repository.CheckIsExists((MixModule m) => {
+						if (m.Name != moduleNav.Module.Name)
+						{
+							return false;
+						}
+						return m.Specificulture == parent.Specificulture;
+					}, _context, _transaction))
+					{
+						moduleNav.Module.Specificulture = parent.Specificulture;
+						if (!string.IsNullOrEmpty(moduleNav.Image))
+						{
+							moduleNav.Image = moduleNav.Image.Replace(string.Concat("content/templates/", this.ThemeName), string.Concat("content/templates/", MixService.GetConfig<string>("ThemeFolder", parent.Specificulture)));
+						}
+						if (!string.IsNullOrEmpty(moduleNav.Module.Image))
+						{
+							moduleNav.Module.Image = moduleNav.Module.Image.Replace(string.Concat("content/templates/", this.ThemeName), string.Concat("content/templates/", MixService.GetConfig<string>("ThemeFolder", parent.Specificulture)));
+						}
+						if (!string.IsNullOrEmpty(moduleNav.Module.Thumbnail))
+						{
+							moduleNav.Module.Thumbnail = moduleNav.Module.Thumbnail.Replace("content/templates/default", string.Concat("content/templates/", MixService.GetConfig<string>("ThemeFolder", parent.Specificulture)));
+						}
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel> repositoryResponse2 = await moduleNav.Module.SaveModelAsync(true, _context, _transaction);
+						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixModules.ImportViewModel>(repositoryResponse2, ref repositoryResponse1);
+						if (!repositoryResponse1.get_IsSucceed())
+						{
+							break;
+						}
+						data++;
+						moduleNav.Id = data;
+						moduleNav.PageId = parent.Id;
+						moduleNav.ModuleId = repositoryResponse2.get_Data().Id;
+						moduleNav.Specificulture = parent.Specificulture;
+						moduleNav.Description = repositoryResponse2.get_Data().Title;
+						moduleNav.CreatedDateTime = DateTime.UtcNow;
+						moduleNav.CreatedBy = this.CreatedBy;
+						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixPageModules.ImportViewModel>(await moduleNav.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+						if (!repositoryResponse1.get_IsSucceed())
+						{
+							break;
+						}
+					}
+				}
+			}
+			return repositoryResponse1;
 		}
 	}
 }

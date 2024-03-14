@@ -200,12 +200,50 @@ namespace Mix.Cms.Lib.ViewModels.Account.MixRoles
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(AspNetRoles parent, MixCmsAccountContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.Account.MixRoles.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__25 variable = new Mix.Cms.Lib.ViewModels.Account.MixRoles.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__25();
-			variable.u003cu003e4__this = this;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.Account.MixRoles.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__25>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse;
+			MixCmsContext mixCmsContext = new MixCmsContext();
+			RepositoryResponse<bool> repositoryResponse1 = new RepositoryResponse<bool>();
+			repositoryResponse1.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse2 = repositoryResponse1;
+			IDbContextTransaction dbContextTransaction = mixCmsContext.get_Database().BeginTransaction();
+			try
+			{
+				try
+				{
+					foreach (UpdateRolePermissionViewModel permission in this.Permissions)
+					{
+						if (!repositoryResponse2.get_IsSucceed())
+						{
+							break;
+						}
+						repositoryResponse2 = await this.HandlePermission(permission, mixCmsContext, dbContextTransaction);
+					}
+					if (!repositoryResponse2.get_IsSucceed())
+					{
+						dbContextTransaction.Rollback();
+					}
+					else
+					{
+						dbContextTransaction.Commit();
+					}
+					repositoryResponse = repositoryResponse2;
+				}
+				catch (Exception exception1)
+				{
+					Exception exception = exception1;
+					dbContextTransaction.Rollback();
+					repositoryResponse2.set_IsSucceed(false);
+					repositoryResponse2.set_Exception(exception);
+					repositoryResponse = repositoryResponse2;
+				}
+			}
+			finally
+			{
+				RelationalDatabaseFacadeExtensions.CloseConnection(mixCmsContext.get_Database());
+				dbContextTransaction.Dispose();
+				mixCmsContext.Dispose();
+			}
+			return repositoryResponse;
 		}
 	}
 }

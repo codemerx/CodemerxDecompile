@@ -235,15 +235,34 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSets
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixAttributeSet parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__93 variable = new Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__93();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixAttributeSets.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__93>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				foreach (Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel field in this.Fields)
+				{
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						break;
+					}
+					field.AttributeSetId = parent.Id;
+					field.AttributeSetName = parent.Name;
+					ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeFields.UpdateViewModel>(await field.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				foreach (Mix.Cms.Lib.ViewModels.MixAttributeFields.DeleteViewModel removeAttribute in this.RemoveAttributes)
+				{
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						break;
+					}
+					ViewModelHelper.HandleResult<MixAttributeField>(await removeAttribute.RemoveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+				}
+			}
+			return repositoryResponse1;
 		}
 
 		public override void Validate(MixCmsContext _context, IDbContextTransaction _transaction)

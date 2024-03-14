@@ -70,14 +70,42 @@ namespace OrchardCore.Modules
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			ModularBackgroundService.u003cExecuteAsyncu003ed__8 variable = new ModularBackgroundService.u003cExecuteAsyncu003ed__8();
-			variable.u003cu003e4__this = this;
-			variable.stoppingToken = stoppingToken;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ModularBackgroundService.u003cExecuteAsyncu003ed__8>(ref variable);
-			return variable.u003cu003et__builder.Task;
-		}
+			Exception exception = null;
+			bool flag;
+			stoppingToken.Register(() => LoggerExtensions.LogInformation(this._logger, "'{ServiceName}' is stopping.", new object[] { "ModularBackgroundService" }));
+			while (this.GetRunningShells().Count<ShellContext>() < 1)
+			{
+				try
+				{
+					await Task.Delay(ModularBackgroundService.MinIdleTime, stoppingToken);
+				}
+				catch (TaskCanceledException taskCanceledException)
+				{
+					break;
+				}
+			}
+			IEnumerable<ShellContext> shellContexts = Enumerable.Empty<ShellContext>();
+			try
+			{
+				while (!stoppingToken.IsCancellationRequested)
+				{
+					IEnumerable<ShellContext> runningShells = this.GetRunningShells();
+					await this.UpdateAsync(shellContexts, runningShells, stoppingToken);
+					shellContexts = runningShells;
+					Task task = Task.Delay(ModularBackgroundService.PollingTime, stoppingToken);
+					await this.RunAsync(runningShells, stoppingToken);
+					await this.WaitAsync(task, stoppingToken);
+					runningShells = null;
+					task = null;
+				}
+			}
+			catch// 
+			// Current member / type: System.Threading.Tasks.Task OrchardCore.Modules.ModularBackgroundService::ExecuteAsync(System.Threading.CancellationToken)
+			// Exception in: System.Threading.Tasks.Task ExecuteAsync(System.Threading.CancellationToken)
+			// Object reference not set to an instance of an object.
+			// 
+			// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		private IEnumerable<ShellContext> GetRunningShells()
 		{
@@ -146,15 +174,41 @@ namespace OrchardCore.Modules
 		private async Task RunAsync(IEnumerable<ShellContext> runningShells, CancellationToken stoppingToken)
 		{
 			await EnumerableExtensions.ForEachAsync<ShellContext>(this.GetShellsToRun(runningShells), async (ShellContext shell) => {
-				ModularBackgroundService.u003cu003ec__DisplayClass9_0.u003cu003cRunAsyncu003eb__0u003ed _ = new ModularBackgroundService.u003cu003ec__DisplayClass9_0.u003cu003cRunAsyncu003eb__0u003ed();
-				_.u003cu003e4__this = this;
-				_.shell = shell;
-				_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-				_.u003cu003e1__state = -1;
-				_.u003cu003et__builder.Start<ModularBackgroundService.u003cu003ec__DisplayClass9_0.u003cu003cRunAsyncu003eb__0u003ed>(ref _);
-				return _.u003cu003et__builder.Task;
-			});
-		}
+				string str = shell.get_Settings().get_Name();
+				IEnumerable<BackgroundTaskScheduler> schedulersToRun = this.GetSchedulersToRun(str);
+				this._httpContextAccessor.set_HttpContext(shell.CreateHttpContext());
+				foreach (BackgroundTaskScheduler backgroundTaskScheduler in schedulersToRun)
+				{
+					if (stoppingToken.IsCancellationRequested)
+					{
+						break;
+					}
+					ShellScope scopeAsync = await this._shellHost.GetScopeAsync(shell.get_Settings());
+					if (scopeAsync.get_ShellContext().get_Pipeline() == null)
+					{
+						break;
+					}
+					await scopeAsync.UsingAsync(async (ShellScope scope) => {
+						Exception exception = null;
+						bool flag;
+						string name = backgroundTaskScheduler.Name;
+						IBackgroundTask taskByName = BackgroundTaskExtensions.GetTaskByName(ServiceProviderServiceExtensions.GetServices<IBackgroundTask>(scope.get_ServiceProvider()), name);
+						if (taskByName != null)
+						{
+							try
+							{
+								LoggerExtensions.LogInformation(this._logger, "Start processing background task '{TaskName}' on tenant '{TenantName}'.", new object[] { name, str });
+								backgroundTaskScheduler.Run();
+								await taskByName.DoWorkAsync(scope.get_ServiceProvider(), stoppingToken);
+								LoggerExtensions.LogInformation(this._logger, "Finished processing background task '{TaskName}' on tenant '{TenantName}'.", new object[] { name, str });
+							}
+							catch// 
+							// Current member / type: System.Threading.Tasks.Task OrchardCore.Modules.ModularBackgroundService::RunAsync(System.Collections.Generic.IEnumerable`1<OrchardCore.Environment.Shell.Builders.ShellContext>,System.Threading.CancellationToken)
+							// Exception in: System.Threading.Tasks.Task RunAsync(System.Collections.Generic.IEnumerable<OrchardCore.Environment.Shell.Builders.ShellContext>,System.Threading.CancellationToken)
+							// Object reference not set to an instance of an object.
+							// 
+							// mailto: JustDecompilePublicFeedback@telerik.com
+
 
 		private async Task UpdateAsync(IEnumerable<ShellContext> previousShells, IEnumerable<ShellContext> runningShells, CancellationToken stoppingToken)
 		{
@@ -186,13 +240,14 @@ namespace OrchardCore.Modules
 
 		private async Task WaitAsync(Task pollingDelay, CancellationToken stoppingToken)
 		{
-			ModularBackgroundService.u003cWaitAsyncu003ed__11 variable = new ModularBackgroundService.u003cWaitAsyncu003ed__11();
-			variable.pollingDelay = pollingDelay;
-			variable.stoppingToken = stoppingToken;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<ModularBackgroundService.u003cWaitAsyncu003ed__11>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			try
+			{
+				await Task.Delay(ModularBackgroundService.MinIdleTime, stoppingToken);
+				await pollingDelay;
+			}
+			catch (OperationCanceledException operationCanceledException)
+			{
+			}
 		}
 	}
 }

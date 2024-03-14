@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{D5AC542D-4BE2-446A-A134-4E05C3024BFA}</ProjectGuid>
+    <ProjectGuid>{A9DC4A61-A00B-488C-9B21-34991B6DD63F}</ProjectGuid>
     <SchemaVersion>2</SchemaVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -65,15 +65,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Common.Mappings\IMapFrom_T_.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Application\Common.Exceptions\NotFoundException.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Common.Mappings\MappingProfile.cs">
+    <Compile Include="Application\Common.Mappings\IMapFrom_T_.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -81,11 +77,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Common.Exceptions\ValidationException.cs">
+    <Compile Include="Application\Customers.Commands.UpdateCustomer\UpdateCustomerCommand.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Commands.UpdateCustomer\UpdateCustomerCommand.cs">
+    <Compile Include="Application\Customers.Queries.GetCustomersList\CustomersListVm.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Common.Mappings\MappingProfile.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -94,6 +94,14 @@
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Application\Common.Interfaces\ICurrentUserService.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Customers.Queries.GetCustomersList\GetCustomersListQuery.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Common.Exceptions\ValidationException.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -113,19 +121,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Queries.GetCustomersList\CustomersListVm.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Application\Categories.Queries.GetCategoriesList\CategoriesListVm.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Queries.GetCustomersList\GetCustomersListQuery.cs">
+    <Compile Include="Application\Employees.Queries.GetEmployeesList\EmployeeLookupDto.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Employees.Queries.GetEmployeesList\EmployeeLookupDto.cs">
+    <Compile Include="Application\Customers.Queries.GetCustomersList\GetCustomersListQueryHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -134,10 +138,6 @@
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Application\Products.Queries.GetProductsList\ProductDto.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\Products.Queries.GetProductDetail\ProductDetailVm.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -153,15 +153,23 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Products.Commands.UpdateProduct\UpdateProductCommand.cs">
+    <Compile Include="Application\Products.Queries.GetProductDetail\ProductDetailVm.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Queries.GetCustomersList\GetCustomersListQueryHandler.cs">
+    <Compile Include="Application\Customers.Commands.UpdateCustomer\UpdateCustomerCommandValidator.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Application\Common.Behaviours\RequestValidationBehavior_TRequest, TResponse_.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Customers.Commands.DeleteCustomer\DeleteCustomerCommand.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Products.Commands.UpdateProduct\UpdateProductCommand.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -173,15 +181,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Categories.Queries.GetCategoriesList\CategoryDto.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Application\Products.Queries.GetProductsFile\GetProductsFileQueryHandler.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\Categories.Queries.GetCategoriesList\GetCategoriesListQuery.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -189,15 +189,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Commands.UpdateCustomer\UpdateCustomerCommandValidator.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\Products.Commands.UpdateProduct\UpdateProductCommandHandler.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\DependencyInjection.cs">
+    <Compile Include="Application\Categories.Queries.GetCategoriesList\CategoryDto.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -205,15 +197,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Commands.DeleteCustomer\DeleteCustomerCommand.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\System.Commands.SeedSampleData\SeedSampleDataCommand.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\Products.Commands.DeleteProduct\DeleteProductCommand.cs">
+    <Compile Include="Application\DependencyInjection.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -221,15 +205,23 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Application\Categories.Queries.GetCategoriesList\GetCategoriesListQuery.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\System.Commands.SeedSampleData\SeedSampleDataCommand.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
     <Compile Include="Application\System.Commands.SeedSampleData\SeedSampleDataCommandHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Products.Queries.GetProductsList\GetProductsListQuery.cs">
+    <Compile Include="Application\Products.Commands.UpdateProduct\UpdateProductCommandHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Queries.GetCustomerDetail\GetCustomerDetailQueryHandler.cs">
+    <Compile Include="Application\Products.Commands.DeleteProduct\DeleteProductCommand.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -237,11 +229,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Queries.GetCustomerDetail\GetCustomerDetailQueryValidator.cs">
+    <Compile Include="Application\Customers.Queries.GetCustomerDetail\GetCustomerDetailQueryHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Commands.CreateCustomer\CustomerCreated.cs">
+    <Compile Include="Application\Products.Queries.GetProductsList\GetProductsListQuery.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -249,11 +241,19 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Products.Queries.GetProductsList\GetProductsListQueryHandler.cs">
+    <Compile Include="Application\Customers.Queries.GetCustomerDetail\GetCustomerDetailQueryValidator.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Products.Commands.DeleteProduct\DeleteProductCommandHandler.cs">
+    <Compile Include="Application\Customers.Commands.DeleteCustomer\DeleteCustomerCommandValidator.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Customers.Commands.CreateCustomer\CustomerCreated.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Products.Queries.GetProductsFile\ProductRecordDto.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -261,7 +261,7 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Products.Queries.GetProductsFile\ProductRecordDto.cs">
+    <Compile Include="Application\Products.Queries.GetProductsList\GetProductsListQueryHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -273,11 +273,15 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Commands.DeleteCustomer\DeleteCustomerCommandValidator.cs">
+    <Compile Include="Application\Products.Queries.GetProductDetail\GetProductDetailQuery.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Products.Queries.GetProductDetail\GetProductDetailQuery.cs">
+    <Compile Include="Application\Customers.Commands.CreateCustomer\CreateCustomerCommand.cs">
+      <AutoGen>false</AutoGen>
+      <DesignTimeSharedInput>false</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Application\Products.Commands.DeleteProduct\DeleteProductCommandHandler.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
@@ -301,15 +305,11 @@
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Application\Customers.Commands.CreateCustomer\CreateCustomerCommand.cs">
+    <Compile Include="Application\Customers.Commands.CreateCustomer\CreateCustomerCommandValidator.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Application\Employees.Queries.GetEmployeeDetail\EmployeeDetailVm.cs">
-      <AutoGen>false</AutoGen>
-      <DesignTimeSharedInput>false</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Application\Customers.Commands.CreateCustomer\CreateCustomerCommandValidator.cs">
       <AutoGen>false</AutoGen>
       <DesignTimeSharedInput>false</DesignTimeSharedInput>
     </Compile>

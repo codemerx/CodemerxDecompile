@@ -264,15 +264,68 @@ namespace Mix.Cms.Lib.ViewModels.MixPortalPages
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixPortalPage parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72 variable = new Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixPortalPages.UpdateViewModel.u003cSaveSubModelsAsyncu003ed__72>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				foreach (Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel parentNav in this.ParentNavs)
+				{
+					parentNav.Id = parent.Id;
+					if (!parentNav.IsActived)
+					{
+						RepositoryResponse<MixPortalPageNavigation> repositoryResponse2 = await parentNav.RemoveModelAsync(true, _context, _transaction);
+						repositoryResponse1.set_IsSucceed(repositoryResponse2.get_IsSucceed());
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_Exception(repositoryResponse2.get_Exception());
+						base.get_Errors().AddRange(repositoryResponse2.get_Errors());
+					}
+					else
+					{
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> repositoryResponse3 = await parentNav.SaveModelAsync(true, _context, _transaction);
+						repositoryResponse1.set_IsSucceed(repositoryResponse3.get_IsSucceed());
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_Exception(repositoryResponse3.get_Exception());
+						base.get_Errors().AddRange(repositoryResponse3.get_Errors());
+					}
+				}
+			}
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				foreach (Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel childNav in this.ChildNavs)
+				{
+					childNav.ParentId = parent.Id;
+					if (!childNav.IsActived)
+					{
+						RepositoryResponse<MixPortalPageNavigation> repositoryResponse4 = await childNav.RemoveModelAsync(true, _context, _transaction);
+						repositoryResponse1.set_IsSucceed(repositoryResponse4.get_IsSucceed());
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_Exception(repositoryResponse4.get_Exception());
+						base.get_Errors().AddRange(repositoryResponse4.get_Errors());
+					}
+					else
+					{
+						RepositoryResponse<Mix.Cms.Lib.ViewModels.MixPortalPagePortalPages.UpdateViewModel> repositoryResponse5 = await childNav.SaveModelAsync(true, _context, _transaction);
+						repositoryResponse1.set_IsSucceed(repositoryResponse5.get_IsSucceed());
+						if (repositoryResponse1.get_IsSucceed())
+						{
+							continue;
+						}
+						repositoryResponse1.set_Exception(repositoryResponse5.get_Exception());
+						base.get_Errors().AddRange(repositoryResponse5.get_Errors());
+					}
+				}
+			}
+			return repositoryResponse1;
 		}
 	}
 }

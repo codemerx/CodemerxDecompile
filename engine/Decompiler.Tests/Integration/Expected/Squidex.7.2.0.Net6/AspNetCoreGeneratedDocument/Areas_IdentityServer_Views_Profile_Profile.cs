@@ -244,11 +244,6 @@ namespace AspNetCoreGeneratedDocument
 				this.u003cExecuteAsyncu003eg__RenderValidationu007c31_0("Email");
 				this.WriteLiteral("\n        ");
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("input", 1, "f69c10b5b1aab911f22074791651cdd1f0154dc25cfb10ea378c274b57f83b5d18098", async () => {
-					Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_8u003ed _ = new Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_8u003ed();
-					_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-					_.u003cu003e1__state = -1;
-					_.u003cu003et__builder.Start<Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_8u003ed>(ref _);
-					return _.u003cu003et__builder.Task;
 				});
 				this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = base.CreateTagHelper<InputTagHelper>();
 				this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper);
@@ -270,11 +265,6 @@ namespace AspNetCoreGeneratedDocument
 				this.u003cExecuteAsyncu003eg__RenderValidationu007c31_0("DisplayName");
 				this.WriteLiteral("\n        ");
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("input", 1, "f69c10b5b1aab911f22074791651cdd1f0154dc25cfb10ea378c274b57f83b5d20422", async () => {
-					Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_10u003ed _ = new Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_10u003ed();
-					_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-					_.u003cu003e1__state = -1;
-					_.u003cu003et__builder.Start<Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_10u003ed>(ref _);
-					return _.u003cu003et__builder.Task;
 				});
 				this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = base.CreateTagHelper<InputTagHelper>();
 				this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper);
@@ -292,11 +282,6 @@ namespace AspNetCoreGeneratedDocument
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.End();
 				this.WriteLiteral("\n    </div>\n\n    <div class=\"form-group\">\n        <div class=\"form-check\">\n            ");
 				this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("input", 1, "f69c10b5b1aab911f22074791651cdd1f0154dc25cfb10ea378c274b57f83b5d22295", async () => {
-					Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_12u003ed _ = new Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_12u003ed();
-					_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-					_.u003cu003e1__state = -1;
-					_.u003cu003et__builder.Start<Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_12u003ed>(ref _);
-					return _.u003cu003et__builder.Task;
 				});
 				this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = base.CreateTagHelper<InputTagHelper>();
 				this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper);
@@ -591,11 +576,6 @@ namespace AspNetCoreGeneratedDocument
 					this.u003cExecuteAsyncu003eg__RenderValidationu007c31_0(defaultInterpolatedStringHandler.ToStringAndClear());
 					this.WriteLiteral("\n                        ");
 					this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("input", 1, "f69c10b5b1aab911f22074791651cdd1f0154dc25cfb10ea378c274b57f83b5d53465", async () => {
-						Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_19u003ed _ = new Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_19u003ed();
-						_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-						_.u003cu003e1__state = -1;
-						_.u003cu003et__builder.Start<Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_19u003ed>(ref _);
-						return _.u003cu003et__builder.Task;
 					});
 					this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = base.CreateTagHelper<InputTagHelper>();
 					this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper);
@@ -619,11 +599,6 @@ namespace AspNetCoreGeneratedDocument
 					this.u003cExecuteAsyncu003eg__RenderValidationu007c31_0(defaultInterpolatedStringHandler.ToStringAndClear());
 					this.WriteLiteral("\n                        ");
 					this.__tagHelperExecutionContext = this.__tagHelperScopeManager.Begin("input", 1, "f69c10b5b1aab911f22074791651cdd1f0154dc25cfb10ea378c274b57f83b5d55603", async () => {
-						Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_21u003ed _ = new Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_21u003ed();
-						_.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-						_.u003cu003e1__state = -1;
-						_.u003cu003et__builder.Start<Areas_IdentityServer_Views_Profile_Profile.u003cu003ec.u003cu003cExecuteAsyncu003eb__31_21u003ed>(ref _);
-						return _.u003cu003et__builder.Task;
 					});
 					this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = base.CreateTagHelper<InputTagHelper>();
 					this.__tagHelperExecutionContext.Add(this.__Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper);

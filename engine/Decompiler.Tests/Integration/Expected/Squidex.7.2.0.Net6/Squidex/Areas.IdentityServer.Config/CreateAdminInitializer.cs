@@ -54,13 +54,72 @@ namespace Squidex.Areas.IdentityServer.Config
 
 		public async Task InitializeAsync(CancellationToken ct)
 		{
-			CreateAdminInitializer.u003cInitializeAsyncu003ed__5 variable = new CreateAdminInitializer.u003cInitializeAsyncu003ed__5();
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e4__this = this;
-			variable.ct = ct;
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<CreateAdminInitializer.u003cInitializeAsyncu003ed__5>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			object obj;
+			IdentityModelEventSource.set_ShowPII(this.identityOptions.ShowPII);
+			if (this.identityOptions.IsAdminConfigured())
+			{
+				AsyncServiceScope asyncServiceScope = ServiceProviderServiceExtensions.CreateAsyncScope(this.serviceProvider);
+				object obj1 = null;
+				try
+				{
+					IUserService requiredService = ServiceProviderServiceExtensions.GetRequiredService<IUserService>(asyncServiceScope.get_ServiceProvider());
+					string adminEmail = this.identityOptions.AdminEmail;
+					string adminPassword = this.identityOptions.AdminPassword;
+					if (await CreateAdminInitializer.IsEmptyAsync(requiredService) || this.identityOptions.AdminRecreate)
+					{
+						try
+						{
+							IUser user = await requiredService.FindByEmailAsync(adminEmail, ct);
+							if (user == null)
+							{
+								PermissionSet permissionSet = this.CreatePermissions(PermissionSet.Empty);
+								UserValues userValue = new UserValues();
+								userValue.set_Password(adminPassword);
+								userValue.set_Permissions(permissionSet);
+								userValue.set_DisplayName(adminEmail);
+								UserValues userValue1 = userValue;
+								await requiredService.CreateAsync(adminEmail, userValue1, false, ct);
+							}
+							else if (this.identityOptions.AdminRecreate)
+							{
+								PermissionSet permissionSet1 = this.CreatePermissions(SquidexClaimsExtensions.Permissions(user.get_Claims()));
+								UserValues userValue2 = new UserValues();
+								userValue2.set_Password(adminPassword);
+								userValue2.set_Permissions(permissionSet1);
+								UserValues userValue3 = userValue2;
+								await requiredService.UpdateAsync(user.get_Id(), userValue3, false, ct);
+							}
+						}
+						catch (Exception exception1)
+						{
+							Exception exception = exception1;
+							ILogger<CreateAdminInitializer> logger = ServiceProviderServiceExtensions.GetRequiredService<ILogger<CreateAdminInitializer>>(this.serviceProvider);
+							LoggerExtensions.LogError(logger, exception, "Failed to create administrator.", Array.Empty<object>());
+						}
+					}
+					requiredService = null;
+					adminEmail = null;
+					adminPassword = null;
+				}
+				catch
+				{
+					obj = obj2;
+					obj1 = obj;
+				}
+				await asyncServiceScope.DisposeAsync();
+				obj = obj1;
+				if (obj != null)
+				{
+					Exception exception2 = obj as Exception;
+					if (exception2 == null)
+					{
+						throw obj;
+					}
+					ExceptionDispatchInfo.Capture(exception2).Throw();
+				}
+				obj1 = null;
+				asyncServiceScope = new AsyncServiceScope();
+			}
 		}
 
 		private static async Task<bool> IsEmptyAsync(IUserService userService)

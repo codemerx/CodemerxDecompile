@@ -35,24 +35,62 @@ namespace Piranha.Extend.Fields
 
 		public async Task Init(IServiceProvider services)
 		{
-			DataSelectField<T>.u003cInitu003ed__4 variable = new DataSelectField<T>.u003cInitu003ed__4();
-			variable.u003cu003e4__this = this;
-			variable.services = services;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<DataSelectField<T>.u003cInitu003ed__4>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			if (!String.IsNullOrWhiteSpace(base.Id))
+			{
+				MethodInfo method = typeof(T).GetMethod("GetById", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (method != null)
+				{
+					using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(services))
+					{
+						List<object> objs = new List<object>()
+						{
+							base.Id
+						};
+						foreach (ParameterInfo parameterInfo in method.GetParameters().Skip<ParameterInfo>(1))
+						{
+							objs.Add(serviceScope.get_ServiceProvider().GetService(parameterInfo.ParameterType));
+						}
+						if (!typeof(Task<T>).IsAssignableFrom(method.ReturnType))
+						{
+							await Task.Run(() => this.Value = (T)method.Invoke(null, objs.ToArray()));
+						}
+						else
+						{
+							ConfiguredTaskAwaitable<T> configuredTaskAwaitable = ((Task<T>)method.Invoke(null, objs.ToArray())).ConfigureAwait(false);
+							this.Value = await configuredTaskAwaitable;
+						}
+					}
+					serviceScope = null;
+				}
+			}
 		}
 
 		public async Task InitManager(IServiceProvider services)
 		{
-			DataSelectField<T>.u003cInitManageru003ed__5 variable = new DataSelectField<T>.u003cInitManageru003ed__5();
-			variable.u003cu003e4__this = this;
-			variable.services = services;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<DataSelectField<T>.u003cInitManageru003ed__5>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			MethodInfo method = typeof(T).GetMethod("GetList", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+			if (method != null)
+			{
+				using (IServiceScope serviceScope = ServiceProviderServiceExtensions.CreateScope(services))
+				{
+					List<object> objs = new List<object>();
+					ParameterInfo[] parameters = method.GetParameters();
+					for (int i = 0; i < (int)parameters.Length; i++)
+					{
+						ParameterInfo parameterInfo = parameters[i];
+						objs.Add(serviceScope.get_ServiceProvider().GetService(parameterInfo.ParameterType));
+					}
+					if (!typeof(Task<IEnumerable<DataSelectFieldItem>>).IsAssignableFrom(method.ReturnType))
+					{
+						await Task.Run(() => this.Items = ((IEnumerable<DataSelectFieldItem>)method.Invoke(null, objs.ToArray())).ToArray<DataSelectFieldItem>());
+					}
+					else
+					{
+						ConfiguredTaskAwaitable<IEnumerable<DataSelectFieldItem>> configuredTaskAwaitable = ((Task<IEnumerable<DataSelectFieldItem>>)method.Invoke(null, objs.ToArray())).ConfigureAwait(false);
+						base.Items = await configuredTaskAwaitable.ToArray<DataSelectFieldItem>();
+					}
+				}
+				serviceScope = null;
+			}
 		}
 	}
 }

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex", "Squidex.csproj", "{C1F8FEE5-CDDA-4B23-AE56-96F33F2AD56D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex", "Squidex.csproj", "{2537E2E8-D0C6-4CD3-8D94-347DCAA62747}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,10 +8,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C1F8FEE5-CDDA-4B23-AE56-96F33F2AD56D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1F8FEE5-CDDA-4B23-AE56-96F33F2AD56D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1F8FEE5-CDDA-4B23-AE56-96F33F2AD56D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1F8FEE5-CDDA-4B23-AE56-96F33F2AD56D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2537E2E8-D0C6-4CD3-8D94-347DCAA62747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2537E2E8-D0C6-4CD3-8D94-347DCAA62747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2537E2E8-D0C6-4CD3-8D94-347DCAA62747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2537E2E8-D0C6-4CD3-8D94-347DCAA62747}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -305,15 +305,31 @@ namespace Mix.Cms.Lib.ViewModels.MixAttributeSetDatas
 
 		public override async Task<RepositoryResponse<bool>> SaveSubModelsAsync(MixAttributeSetData parent, MixCmsContext _context, IDbContextTransaction _transaction)
 		{
-			Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cSaveSubModelsAsyncu003ed__61 variable = new Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cSaveSubModelsAsyncu003ed__61();
-			variable.u003cu003e4__this = this;
-			variable.parent = parent;
-			variable._context = _context;
-			variable._transaction = _transaction;
-			variable.u003cu003et__builder = AsyncTaskMethodBuilder<RepositoryResponse<bool>>.Create();
-			variable.u003cu003e1__state = -1;
-			variable.u003cu003et__builder.Start<Mix.Cms.Lib.ViewModels.MixAttributeSetDatas.NavigationViewModel.u003cSaveSubModelsAsyncu003ed__61>(ref variable);
-			return variable.u003cu003et__builder.Task;
+			RepositoryResponse<bool> repositoryResponse = new RepositoryResponse<bool>();
+			repositoryResponse.set_IsSucceed(true);
+			RepositoryResponse<bool> repositoryResponse1 = repositoryResponse;
+			if (repositoryResponse1.get_IsSucceed())
+			{
+				foreach (Mix.Cms.Lib.ViewModels.MixAttributeSetValues.NavigationViewModel value in this.Values)
+				{
+					if (!repositoryResponse1.get_IsSucceed())
+					{
+						break;
+					}
+					if (!this.Fields.Any<Mix.Cms.Lib.ViewModels.MixAttributeFields.ReadViewModel>((Mix.Cms.Lib.ViewModels.MixAttributeFields.ReadViewModel f) => f.Id == value.AttributeFieldId))
+					{
+						ViewModelHelper.HandleResult<MixAttributeSetValue>(await value.RemoveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+					}
+					else
+					{
+						value.Priority = value.Field.Priority;
+						value.DataId = parent.Id;
+						value.Specificulture = parent.Specificulture;
+						ViewModelHelper.HandleResult<Mix.Cms.Lib.ViewModels.MixAttributeSetValues.NavigationViewModel>(await value.SaveModelAsync(false, _context, _transaction), ref repositoryResponse1);
+					}
+				}
+			}
+			return repositoryResponse1;
 		}
 	}
 }

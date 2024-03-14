@@ -43,8 +43,8 @@ namespace Decompiler.Tests.Integration
         [InlineData("clean-architecture-manga.accounts-api.Net7", "Application", false)]
         [InlineData("NorthwindTraders.NetStandard2.1", "Northwind.Application", false)]
         [InlineData("AsyncEnumTest", "AsyncEnumTest", false)]
-        [InlineData("AsyncTestCollectionNet45VS2013Debug", "AsyncTestCollectionNet45VS2013", false)]
-        [InlineData("AsyncTestCollectionNet45VS2013Release", "AsyncTestCollectionNet45VS2013", false)]
+        [InlineData("AsyncTestCollectionNet45VS2013Debug", "AsyncTestCollectionNet45VS2013", true)]
+        [InlineData("AsyncTestCollectionNet45VS2013Release", "AsyncTestCollectionNet45VS2013", true)]
         [InlineData("AsyncTestCollectionNet6VS2022Debug", "AsyncTestCollectionNet6VS2022", false)]
         [InlineData("AsyncTestCollectionNet6VS2022Release", "AsyncTestCollectionNet6VS2022", false)]
         public void BuildProject_ShouldGenerateCorrectOutput(string assemblyFolder, string assemblyName, bool windowsOnly)

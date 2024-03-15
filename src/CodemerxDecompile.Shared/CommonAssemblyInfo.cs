@@ -1,4 +1,4 @@
-﻿//    Copyright CodeMerx 2020
+﻿//    Copyright CodeMerx 2020, 2024
 //    This file is part of CodemerxDecompile.
 
 //    CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -18,5 +18,5 @@
 using System.Reflection;
 
 [assembly: AssemblyCompany("CodeMerx")]
-[assembly: AssemblyCopyright("Copyright © 2020 CodeMerx Ltd. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2020, 2024 CodeMerx Ltd. All rights reserved.")]
 [assembly: AssemblyProduct("CodemerxDecompile")]

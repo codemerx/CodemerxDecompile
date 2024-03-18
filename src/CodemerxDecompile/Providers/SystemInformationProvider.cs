@@ -23,19 +23,14 @@ namespace CodemerxDecompile.Providers;
 
 public class SystemInformationProvider : ISystemInformationProvider
 {
-    private const string Unknown = "unknown";
-    
     private readonly Lazy<SystemInformation> systemInformationHolder = new(() =>
     {
         return new SystemInformation
         {
-            AppVersion = GetAppVersion(),
             OsPlatform = GetOsPlatform(),
             OsArchitecture = GetOsArchitecture(),
             OsRelease = GetOsRelease()
         };
-
-        string GetAppVersion() => AssemblyProvider.Assembly.GetName().Version?.ToString() ?? Unknown;
 
         string GetOsPlatform()
         {
@@ -48,7 +43,7 @@ public class SystemInformationProvider : ISystemInformationProvider
             if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
                 return "FreeBSD";
 
-            return Unknown;
+            return "unknown";
         }
 
         string GetOsArchitecture() => RuntimeInformation.OSArchitecture.ToString();

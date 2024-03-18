@@ -38,8 +38,7 @@ public static class ServiceCollectionExtensions
     {
         var configuration = GetConfiguration();
 
-        if (EnvironmentProvider.Environment == Environment.Production)
-            services.Configure<MatomoAnalyticsOptions>(configuration.GetSection(MatomoAnalyticsOptions.Key));
+        services.Configure<MatomoAnalyticsOptions>(configuration.GetSection(MatomoAnalyticsOptions.Key));
 
         return services;
     }
@@ -67,7 +66,7 @@ public static class ServiceCollectionExtensions
             .AddSingleton<INotificationService, NotificationService>()
             .AddTransient<IProjectGenerationService, ProjectGenerationService>()
             .AddTransient<IAutoUpdateService, AutoUpdateService>()
-            .AddTransient<IAnalyticsService, LoggerAnalyticsService>(Environment.Development)
+            .AddTransient<IAnalyticsService, MatomoDevelopmentAnalyticsService>(Environment.Development)
             .AddTransient<IAnalyticsService, MatomoAnalyticsService>(Environment.Production)
             .AddTransient<IDialogService, DialogService>();
 

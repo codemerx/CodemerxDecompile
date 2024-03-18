@@ -35,39 +35,43 @@ public class MatomoAnalyticsService : IAnalyticsService
     private readonly HttpClient httpClient;
     private readonly IDeviceIdentifierProvider deviceIdentifierProvider;
     private readonly ISystemInformationProvider systemInformationProvider;
+    private readonly IAppInformationProvider appInformationProvider;
 
     public MatomoAnalyticsService(IOptions<MatomoAnalyticsOptions> options, HttpClient httpClient,
-        IDeviceIdentifierProvider deviceIdentifierProvider, ISystemInformationProvider systemInformationProvider)
+        IDeviceIdentifierProvider deviceIdentifierProvider, ISystemInformationProvider systemInformationProvider,
+        IAppInformationProvider appInformationProvider)
     {
         this.options = options;
         this.httpClient = httpClient;
         this.deviceIdentifierProvider = deviceIdentifierProvider;
         this.systemInformationProvider = systemInformationProvider;
+        this.appInformationProvider = appInformationProvider;
     }
 
-    public void TrackEvent(AnalyticsEvent @event)
+    public virtual void TrackEvent(AnalyticsEvent @event)
     {
         httpClient.Send(new HttpRequestMessage(HttpMethod.Get, CreateRequestUri(@event)));
     }
 
-    public Task TrackEventAsync(AnalyticsEvent @event) => Task.Run(async () =>
+    public virtual Task TrackEventAsync(AnalyticsEvent @event) => Task.Run(async () =>
     {
         await httpClient.GetAsync(CreateRequestUri(@event));
     });
 
-    private string CreateRequestUri(AnalyticsEvent @event) => $"{options.Value.Endpoint}{CreateQueryString(@event)}";
+    protected string CreateRequestUri(AnalyticsEvent @event) => $"{options.Value.Endpoint}{CreateQueryString(@event)}";
 
     private string CreateQueryString(AnalyticsEvent @event)
     {
         var deviceIdentifier = deviceIdentifierProvider.GetDeviceIdentifier();
         var systemInformation = systemInformationProvider.GetSystemInformation();
+        var appVersion = appInformationProvider.Version;
 
         var queryParams = new Dictionary<string, object>
         {
             { "idsite", options.Value.SiteId },
             { "rec", 1 },
             { "cid", ConvertVisitorId(deviceIdentifier) },
-            { "dimension5", systemInformation.AppVersion },
+            { "dimension5", appVersion },
             { "dimension6", systemInformation.OsPlatform },
             { "dimension7", systemInformation.OsArchitecture },
             { "dimension8", systemInformation.OsRelease },

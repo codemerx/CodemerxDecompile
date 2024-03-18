@@ -16,34 +16,33 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
+using System.Net.Http;
 using System.Threading.Tasks;
+using CodemerxDecompile.Options;
 using CodemerxDecompile.Providers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CodemerxDecompile.Services;
 
-public class LoggerAnalyticsService : IAnalyticsService
+public class MatomoDevelopmentAnalyticsService : MatomoAnalyticsService
 {
-    private readonly ILogger<LoggerAnalyticsService> logger;
-    private readonly IDeviceIdentifierProvider deviceIdentifierProvider;
-    private readonly ISystemInformationProvider systemInformationProvider;
-    
-    public LoggerAnalyticsService(ILogger<LoggerAnalyticsService> logger,
-        IDeviceIdentifierProvider deviceIdentifierProvider, ISystemInformationProvider systemInformationProvider)
+    private readonly ILogger<MatomoDevelopmentAnalyticsService> logger;
+
+    public MatomoDevelopmentAnalyticsService(IOptions<MatomoAnalyticsOptions> options, HttpClient httpClient,
+        IDeviceIdentifierProvider deviceIdentifierProvider, ISystemInformationProvider systemInformationProvider,
+        IAppInformationProvider appInformationProvider, ILogger<MatomoDevelopmentAnalyticsService> logger)
+        : base(options, httpClient, deviceIdentifierProvider, systemInformationProvider, appInformationProvider)
     {
         this.logger = logger;
-        this.deviceIdentifierProvider = deviceIdentifierProvider;
-        this.systemInformationProvider = systemInformationProvider;
     }
 
-    public void TrackEvent(AnalyticsEvent @event)
+    public override void TrackEvent(AnalyticsEvent @event)
     {
-        logger.LogInformation(
-            "Event: {Event}; Device identifier: {DeviceIdentifier}; System information: {SystemInformation}",
-            @event, deviceIdentifierProvider.GetDeviceIdentifier(), systemInformationProvider.GetSystemInformation());
+        logger.LogInformation("Request: {Request}", CreateRequestUri(@event));
     }
 
-    public Task TrackEventAsync(AnalyticsEvent @event)
+    public override Task TrackEventAsync(AnalyticsEvent @event)
     {
         TrackEvent(@event);
         

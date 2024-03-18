@@ -53,11 +53,13 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddViews(this IServiceCollection services) =>
         services
-            .AddTransient<MainWindow>();
+            .AddSingleton<MainWindow>()
+            .AddTransient<AboutWindow>();
 
     public static IServiceCollection AddViewModels(this IServiceCollection services) =>
         services
             .AddSingleton<MainWindowViewModel>()
+            .AddTransient<IAboutWindowViewModel, AboutWindowViewModel>()
             .AddSingleton<INotificationsViewModel, NotificationsViewModel>();
 
     public static IServiceCollection AddServices(this IServiceCollection services) =>
@@ -66,12 +68,14 @@ public static class ServiceCollectionExtensions
             .AddTransient<IProjectGenerationService, ProjectGenerationService>()
             .AddTransient<IAutoUpdateService, AutoUpdateService>()
             .AddTransient<IAnalyticsService, LoggerAnalyticsService>(Environment.Development)
-            .AddTransient<IAnalyticsService, MatomoAnalyticsService>(Environment.Production);
+            .AddTransient<IAnalyticsService, MatomoAnalyticsService>(Environment.Production)
+            .AddTransient<IDialogService, DialogService>();
 
     public static IServiceCollection AddProviders(this IServiceCollection services) =>
         services
             .AddSingleton<ISystemInformationProvider, SystemInformationProvider>()
-            .AddSingleton<IDeviceIdentifierProvider, DeviceIdentifierProvider>();
+            .AddSingleton<IDeviceIdentifierProvider, DeviceIdentifierProvider>()
+            .AddSingleton<IAppInformationProvider, AppInformationProvider>();
 
     public static IServiceCollection AddHttpClients(this IServiceCollection services)
     {

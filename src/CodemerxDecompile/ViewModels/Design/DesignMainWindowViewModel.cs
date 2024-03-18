@@ -17,6 +17,7 @@
 */
 
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using CodemerxDecompile.Notifications;
 using CodemerxDecompile.Services;
 using JustDecompile.Tools.MSBuildProjectBuilder;
@@ -28,7 +29,7 @@ namespace CodemerxDecompile.ViewModels.Design;
 public class DesignMainWindowViewModel : MainWindowViewModel
 {
     public DesignMainWindowViewModel()
-        : base(new DesignProjectGenerationService(), new DesignNotificationService(), new DesignAnalyticsService())
+        : base(new DesignProjectGenerationService(), new DesignNotificationService(), new DesignAnalyticsService(), new DesignDialogService())
     {
     }
 }
@@ -65,5 +66,13 @@ file class DesignAnalyticsService : IAnalyticsService
     public Task TrackEventAsync(AnalyticsEvent @event)
     {
         return Task.CompletedTask;
+    }
+}
+
+file class DesignDialogService : IDialogService
+{
+    public void ShowDialog<TWindow>()
+        where TWindow : Window
+    {
     }
 }

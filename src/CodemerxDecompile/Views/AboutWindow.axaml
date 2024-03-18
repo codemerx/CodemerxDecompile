@@ -1,0 +1,65 @@
+<!--
+    Copyright CodeMerx 2024
+    This file is part of CodemerxDecompile.
+
+    CodemerxDecompile is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    CodemerxDecompile is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
+-->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:CodemerxDecompile.ViewModels"
+        xmlns:design="clr-namespace:CodemerxDecompile.ViewModels.Design"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="400"
+        x:Class="CodemerxDecompile.Views.AboutWindow"
+        x:DataType="viewModels:IAboutWindowViewModel"
+        Width="500"
+        Height="400"
+        Padding="30"
+        WindowStartupLocation="CenterOwner">
+
+    <Design.DataContext>
+        <design:DesignAboutWindowViewModel />
+    </Design.DataContext>
+
+    <StackPanel VerticalAlignment="Center" Spacing="30">
+        <Svg Path="/Assets/codemerx-logo.svg"
+             Height="128" />
+        
+        <StackPanel>
+            <TextBlock HorizontalAlignment="Center"
+                       FontWeight="Bold"
+                       FontSize="18"
+                       Text="{Binding Name}" />
+        
+            <TextBlock HorizontalAlignment="Center"
+                       Text="{Binding Version, StringFormat='Version {0}'}" />
+        </StackPanel>
+        
+        <StackPanel>
+            <TextBlock FontWeight="Bold">
+                About CodeMerx
+            </TextBlock>
+            <TextBlock TextWrapping="Wrap">
+                CodeMerx is an outsourcing company founded by the team that created the fastest .NET decompiler - JustDecompile.
+            </TextBlock>
+        </StackPanel>
+        
+        <TextBlock HorizontalAlignment="Center"
+                   Text="{Binding Copyright}"
+                   TextWrapping="Wrap"
+                   FontSize="10" />
+    </StackPanel>
+</Window>

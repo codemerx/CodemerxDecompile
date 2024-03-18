@@ -4,6 +4,7 @@
     <option name="projectPerEditor">
       <map>
         <entry key="CodemerxDecompile/App.axaml" value="CodemerxDecompile/CodemerxDecompile.csproj" />
+        <entry key="CodemerxDecompile/Views/AboutWindow.axaml" value="CodemerxDecompile/CodemerxDecompile.csproj" />
         <entry key="CodemerxDecompile/Views/MainWindow.axaml" value="CodemerxDecompile/CodemerxDecompile.csproj" />
         <entry key="CodemerxDecompile/Views/NotificationsView.axaml" value="CodemerxDecompile/CodemerxDecompile.csproj" />
       </map>

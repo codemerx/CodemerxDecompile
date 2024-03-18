@@ -59,6 +59,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly IProjectGenerationService projectGenerationService;
     private readonly INotificationService notificationService;
     private readonly IAnalyticsService analyticsService;
+    private readonly IDialogService dialogService;
 
     private readonly Language cSharp = new(CSharpName, LanguageFactory.GetLanguage(CSharpVersion.V7));
     private readonly Language visualBasic = new(VisualBasicName, LanguageFactory.GetLanguage(VisualBasicVersion.V10));
@@ -111,11 +112,12 @@ public partial class MainWindowViewModel : ObservableObject
     private bool isSearching;
 
     public MainWindowViewModel(IProjectGenerationService projectGenerationService,
-        INotificationService notificationService, IAnalyticsService analyticsService)
+        INotificationService notificationService, IAnalyticsService analyticsService, IDialogService dialogService)
     {
         this.projectGenerationService = projectGenerationService;
         this.notificationService = notificationService;
         this.analyticsService = analyticsService;
+        this.dialogService = dialogService;
 
         Languages = new()
         {
@@ -790,6 +792,13 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanGenerateProject() =>
         SelectedNode != null && SelectedLanguage != intermediateLanguage;
+
+    [RelayCommand]
+    private void OpenAboutDialog()
+    {
+        _ = analyticsService.TrackEventAsync(AnalyticsEvents.About);
+        dialogService.ShowDialog<AboutWindow>();
+    }
 
     public record Language(string Name, ILanguage Instance);
 }

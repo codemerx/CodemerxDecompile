@@ -68,4 +68,10 @@ public partial class App : Application
             .AddProviders()
             .AddHttpClients()
             .BuildServiceProvider();
+
+    private void About_OnClick(object? sender, EventArgs e)
+    {
+        _ = Services.GetRequiredService<IAnalyticsService>().TrackEventAsync(AnalyticsEvents.About);
+        Services.GetRequiredService<IDialogService>().ShowDialog<AboutWindow>();
+    }
 }

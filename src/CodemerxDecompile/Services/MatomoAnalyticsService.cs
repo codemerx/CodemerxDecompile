@@ -67,10 +67,10 @@ public class MatomoAnalyticsService : IAnalyticsService
             { "idsite", options.Value.SiteId },
             { "rec", 1 },
             { "cid", ConvertVisitorId(deviceIdentifier) },
-            { "dimension1", systemInformation.AppVersion },
-            { "dimension2", systemInformation.OsPlatform },
-            { "dimension3", systemInformation.OsArchitecture },
-            { "dimension4", systemInformation.OsRelease },
+            { "dimension5", systemInformation.AppVersion },
+            { "dimension6", systemInformation.OsPlatform },
+            { "dimension7", systemInformation.OsArchitecture },
+            { "dimension8", systemInformation.OsRelease },
             { "e_c", @event.Category },
             { "e_a", @event.Action }
         };

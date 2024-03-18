@@ -23,6 +23,8 @@ namespace CodemerxDecompile.Providers;
 
 public class SystemInformationProvider : ISystemInformationProvider
 {
+    private const string Unknown = "unknown";
+    
     private readonly Lazy<SystemInformation> systemInformationHolder = new(() =>
     {
         return new SystemInformation
@@ -33,20 +35,20 @@ public class SystemInformationProvider : ISystemInformationProvider
             OsRelease = GetOsRelease()
         };
 
-        string GetAppVersion() => AssemblyProvider.Assembly.GetName().Version?.ToString() ?? "unknown";
+        string GetAppVersion() => AssemblyProvider.Assembly.GetName().Version?.ToString() ?? Unknown;
 
         string GetOsPlatform()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return "windows";
+                return "Windows";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return "linux";
+                return "Linux";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                return "macos";
+                return "MacOS";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
-                return "freebsd";
+                return "FreeBSD";
 
-            return "unknown";
+            return Unknown;
         }
 
         string GetOsArchitecture() => RuntimeInformation.OSArchitecture.ToString();

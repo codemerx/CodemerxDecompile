@@ -38,9 +38,9 @@ public static class ServiceCollectionExtensions
     {
         var configuration = GetConfiguration();
 
-        services.Configure<MatomoAnalyticsOptions>(configuration.GetSection(MatomoAnalyticsOptions.Key));
-
-        return services;
+        return services
+            .Configure<MatomoAnalyticsOptions>(configuration.GetSection(MatomoAnalyticsOptions.Key))
+            .Configure<AppInformationProviderOptions>(configuration.GetSection(AppInformationProviderOptions.Key));
     }
 
     public static IServiceCollection ConfigureLogging(this IServiceCollection services)
@@ -96,15 +96,25 @@ public static class ServiceCollectionExtensions
             .AddPolicyHandler(policy);
 
         if (EnvironmentProvider.Environment == Environment.Production)
+        {
             services
-                .AddHttpClient<IAnalyticsService, MatomoAnalyticsService>()
-                .ConfigureHttpClient((services, httpClient) =>
+                .AddHttpClient<IAnalyticsService, MatomoAnalyticsService>((services, httpClient) =>
                 {
                     var options = services.GetRequiredService<IOptions<MatomoAnalyticsOptions>>();
 
                     httpClient.BaseAddress = new Uri(options.Value.ServerUrl);
                 })
                 .AddPolicyHandler(policy);
+        }
+
+        services
+            .AddHttpClient(nameof(AppInformationProvider), (services, httpClient) =>
+            {
+                var options = services.GetRequiredService<IOptions<AppInformationProviderOptions>>();
+            
+                httpClient.BaseAddress = new Uri(options.Value.ServerUrl);
+            })
+            .AddPolicyHandler(policy);
 
         return services;
     }

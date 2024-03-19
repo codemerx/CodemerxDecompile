@@ -16,6 +16,8 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
+using CodemerxDecompile.Providers;
+
 namespace CodemerxDecompile.ViewModels;
 
 public interface IAboutWindowViewModel
@@ -25,4 +27,6 @@ public interface IAboutWindowViewModel
     string Version { get; }
 
     string Copyright { get; }
+    
+    AdditionalInfo AdditionalInfo { get; }
 }

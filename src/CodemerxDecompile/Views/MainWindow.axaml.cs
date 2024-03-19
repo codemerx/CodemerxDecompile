@@ -27,6 +27,7 @@ using AvaloniaEdit.Document;
 using AvaloniaEdit.Rendering;
 using AvaloniaEdit.TextMate;
 using CodemerxDecompile.Extensions;
+using CodemerxDecompile.Providers;
 using CodemerxDecompile.Services;
 using CodemerxDecompile.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -43,7 +44,7 @@ public partial class MainWindow : Window
     private static MainWindowViewModel viewModel;
     
     public MainWindow(ILogger<MainWindow> logger, MainWindowViewModel mainWindowViewModel,
-        IAnalyticsService analyticsService, IAutoUpdateService autoUpdateService)
+        IAnalyticsService analyticsService, IAutoUpdateService autoUpdateService, IAppInformationProvider appInformationProvider)
     {
         InitializeComponent();
 
@@ -56,8 +57,9 @@ public partial class MainWindow : Window
         DataContext = viewModel;
 
         _ = analyticsService.TrackEventAsync(AnalyticsEvents.Startup);
-        // Swallowing the exceptions on purpose to avoid problems in the auto-update taking down the entire app
+        // Swallowing the exceptions on purpose to avoid problems in the auto-update or remote additional info taking down the entire app
         _ = autoUpdateService.CheckForNewerVersionAsync();
+        _ = appInformationProvider.TryLoadRemoteAdditionalInfoAsync();
         
         TextEditor.TextArea.TextView.ElementGenerators.Add(new ReferenceElementGenerator());
         

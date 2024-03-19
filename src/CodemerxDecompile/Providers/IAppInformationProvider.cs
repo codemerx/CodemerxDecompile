@@ -16,6 +16,8 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
+using System.Threading.Tasks;
+
 namespace CodemerxDecompile.Providers;
 
 public interface IAppInformationProvider
@@ -23,4 +25,7 @@ public interface IAppInformationProvider
     string Name { get; }
     string Version { get; }
     string Copyright { get; }
+    AdditionalInfo AdditionalInfo { get; }
+
+    Task TryLoadRemoteAdditionalInfoAsync();
 }

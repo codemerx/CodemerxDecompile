@@ -18,12 +18,20 @@
 
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Reflection;
+using System.Threading.Tasks;
+using CodemerxDecompile.Options;
+using Microsoft.Extensions.Options;
 
 namespace CodemerxDecompile.Providers;
 
 public class AppInformationProvider : IAppInformationProvider
 {
+    private readonly IOptions<AppInformationProviderOptions> options;
+    private readonly IHttpClientFactory httpClientFactory;
+
     private readonly Lazy<string> versionHolder = new(() =>
         AssemblyProvider.Assembly.GetName().Version?.ToString(3) ?? "unknown");
     
@@ -33,10 +41,30 @@ public class AppInformationProvider : IAppInformationProvider
         var copyrightAttribute = customAttributes.OfType<AssemblyCopyrightAttribute>().FirstOrDefault();
         return copyrightAttribute?.Copyright ?? string.Empty;
     });
+
+    public AppInformationProvider(IOptions<AppInformationProviderOptions> options, IHttpClientFactory httpClientFactory)
+    {
+        this.options = options;
+        this.httpClientFactory = httpClientFactory;
+    }
     
     public string Name => "CodemerxDecompile";
 
     public string Version => versionHolder.Value;
 
     public string Copyright => copyrightHolder.Value;
+
+    public AdditionalInfo AdditionalInfo { get; private set; } = new()
+    {
+        Title = "About CodeMerx",
+        Text = "CodeMerx is an outsourcing company founded by the team that created the fastest .NET decompiler - JustDecompile."
+    };
+
+    public async Task TryLoadRemoteAdditionalInfoAsync()
+    {
+        using var httpClient = httpClientFactory.CreateClient(nameof(AppInformationProvider));
+        var remoteAdditionalInfo = await httpClient.GetFromJsonAsync<AdditionalInfo?>(options.Value.AdditionalInfoPath);
+        if (remoteAdditionalInfo.HasValue)
+            AdditionalInfo = remoteAdditionalInfo.Value;
+    }
 }

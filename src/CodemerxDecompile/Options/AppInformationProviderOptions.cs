@@ -16,24 +16,12 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
-using CodemerxDecompile.Providers;
+namespace CodemerxDecompile.Options;
 
-namespace CodemerxDecompile.ViewModels;
-
-public class AboutWindowViewModel : IAboutWindowViewModel
+public class AppInformationProviderOptions
 {
-    private readonly IAppInformationProvider appInformationProvider;
+    public const string Key = "AppInformationProvider";
 
-    public AboutWindowViewModel(IAppInformationProvider appInformationProvider)
-    {
-        this.appInformationProvider = appInformationProvider;
-    }
-
-    public string Name => appInformationProvider.Name;
-
-    public string Version => appInformationProvider.Version;
-
-    public string Copyright => appInformationProvider.Copyright;
-
-    public AdditionalInfo AdditionalInfo => appInformationProvider.AdditionalInfo;
+    public required string ServerUrl { get; init; }
+    public required string AdditionalInfoPath { get; init; }
 }

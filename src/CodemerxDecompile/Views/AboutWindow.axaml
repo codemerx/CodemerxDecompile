@@ -26,9 +26,9 @@
         x:Class="CodemerxDecompile.Views.AboutWindow"
         x:DataType="viewModels:IAboutWindowViewModel"
         Width="500"
-        Height="400"
         Padding="30"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="Height">
 
     <Design.DataContext>
         <design:DesignAboutWindowViewModel />
@@ -49,12 +49,11 @@
         </StackPanel>
         
         <StackPanel>
-            <TextBlock FontWeight="Bold">
-                About CodeMerx
-            </TextBlock>
-            <TextBlock TextWrapping="Wrap">
-                CodeMerx is an outsourcing company founded by the team that created the fastest .NET decompiler - JustDecompile.
-            </TextBlock>
+            <TextBlock FontWeight="Bold"
+                       Text="{Binding AdditionalInfo.Title}" />
+            
+            <TextBlock TextWrapping="Wrap"
+                       Text="{Binding AdditionalInfo.Text}" />
         </StackPanel>
         
         <TextBlock HorizontalAlignment="Center"

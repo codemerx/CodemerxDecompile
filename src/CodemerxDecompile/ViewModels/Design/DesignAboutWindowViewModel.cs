@@ -16,6 +16,7 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
+using System.Threading.Tasks;
 using CodemerxDecompile.Providers;
 
 namespace CodemerxDecompile.ViewModels.Design;
@@ -23,7 +24,25 @@ namespace CodemerxDecompile.ViewModels.Design;
 public class DesignAboutWindowViewModel : AboutWindowViewModel
 {
     public DesignAboutWindowViewModel()
-        : base(new AppInformationProvider())
+        : base(new DesignAppInformationProvider())
     {
+    }
+}
+
+file class DesignAppInformationProvider : IAppInformationProvider
+{
+    public string Name { get; } = "CodemerxDecompile";
+    public string Version { get; } = "1.69.0";
+    public string Copyright { get; } = "Copyright \u00a9 CodeMerx Ltd. All rights reserved.";
+
+    public AdditionalInfo AdditionalInfo { get; } = new()
+    {
+        Title = "Additional info",
+        Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    };
+
+    public Task TryLoadRemoteAdditionalInfoAsync()
+    {
+        return Task.CompletedTask;
     }
 }

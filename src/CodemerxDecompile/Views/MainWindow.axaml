@@ -39,17 +39,17 @@
     
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="File">
+            <NativeMenuItem Header="Assembly">
                 <NativeMenu>
-                    <NativeMenuItem Header="Open file..."
+                    <NativeMenuItem Header="Open Assembly..."
                                     Command="{Binding OpenFileCommand}"
                                     Gesture="Cmd+O" />
                     <NativeMenuItemSeparator />
-                    <NativeMenuItem Header="Close all"
+                    <NativeMenuItem Header="Close All"
                                     Command="{Binding ClearAssemblyListCommand}" />
                 </NativeMenu>
             </NativeMenuItem>
-            <NativeMenuItem Header="Go">
+            <NativeMenuItem Header="Navigate">
                 <NativeMenu>
                     <NativeMenuItem Header="Back"
                                     Command="{Binding BackCommand}"
@@ -65,15 +65,15 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Tools">
                 <NativeMenu>
-                    <NativeMenuItem Header="Create project">
+                    <NativeMenuItem Header="Create Project">
                         <NativeMenu>
-                            <NativeMenuItem Header="Visual Studio 2019"
+                            <NativeMenuItem Header="Visual Studio 2019..."
                                             Command="{Binding GenerateProjectCommand}"
                                             CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}" />
-                            <NativeMenuItem Header="Visual Studio 2017"
+                            <NativeMenuItem Header="Visual Studio 2017..."
                                             Command="{Binding GenerateProjectCommand}"
                                             CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2017}" />
-                            <NativeMenuItem Header="Visual Studio 2015"
+                            <NativeMenuItem Header="Visual Studio 2015..."
                                             Command="{Binding GenerateProjectCommand}"
                                             CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2015}" />
                         </NativeMenu>
@@ -87,16 +87,16 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top"
                   IsVisible="{OnPlatform Windows='true', Linux='true', macOS='false'}">
-                <MenuItem Header="_File">
-                    <MenuItem Header="_Open file..."
+                <MenuItem Header="_Assembly">
+                    <MenuItem Header="_Open Assembly..."
                               Command="{Binding OpenFileCommand}"
                               HotKey="Ctrl+O"
                               InputGesture="Ctrl+O" />
                     <Separator/>
-                    <MenuItem Header="_Close all"
+                    <MenuItem Header="_Close All"
                               Command="{Binding ClearAssemblyListCommand}" />
                 </MenuItem>
-                <MenuItem Header="_Go">
+                <MenuItem Header="_Navigate">
                     <MenuItem Header="_Back"
                               Command="{Binding BackCommand}"
                               HotKey="Ctrl+-"
@@ -112,14 +112,14 @@
                               InputGesture="Ctrl+Shift+F" />
                 </MenuItem>
                 <MenuItem Header="_Tools">
-                    <MenuItem Header="_Create project">
-                        <MenuItem Header="Visual Studio 2019"
+                    <MenuItem Header="_Create Project">
+                        <MenuItem Header="Visual Studio 2019..."
                                   Command="{Binding GenerateProjectCommand}"
                                   CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}" />
-                        <MenuItem Header="Visual Studio 2017"
+                        <MenuItem Header="Visual Studio 2017..."
                                   Command="{Binding GenerateProjectCommand}"
                                   CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2017}" />
-                        <MenuItem Header="Visual Studio 2015"
+                        <MenuItem Header="Visual Studio 2015..."
                                   Command="{Binding GenerateProjectCommand}"
                                   CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2015}" />
                     </MenuItem>
@@ -164,17 +164,17 @@
                     <Border Classes="separator" />
                 
                     <Button Command="{Binding OpenFileCommand}">
-                        Open file
+                        Open Assembly
                     </Button>
                     <Button Command="{Binding ClearAssemblyListCommand}">
-                        Close all
+                        Close All
                     </Button>
 
                     <Border Classes="separator" />
 
                     <Button Command="{Binding GenerateProjectCommand}"
                             CommandParameter="{x:Static msBuildProjectBuilder:VisualStudioVersion.VS2019}">
-                        Create project
+                        Create Project
                     </Button>
 
                     <Border Classes="separator" />

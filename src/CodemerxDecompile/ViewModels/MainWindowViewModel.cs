@@ -226,7 +226,7 @@ public partial class MainWindowViewModel : ObservableObject
         var storageProvider = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow!.StorageProvider;
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
-            Title = "Load assemblies",
+            Title = "Open Assembly",
             AllowMultiple = true,
             FileTypeFilter = new []
             {

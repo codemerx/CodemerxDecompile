@@ -457,7 +457,7 @@
                     <avaloniaEdit:TextEditor Grid.Column="2"
                                              Name="TextEditor"
                                              ShowLineNumbers="True"
-                                             FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                             FontFamily="Consolas,Menlo,Courier New,Monospace"
                                              IsReadOnly="True"
                                              Document="{Binding Document}"
                                              IsVisible="{Binding Document, Converter={x:Static ObjectConverters.IsNotNull}}" />

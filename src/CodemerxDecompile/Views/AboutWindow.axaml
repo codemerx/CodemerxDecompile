@@ -28,7 +28,9 @@
         Width="500"
         Padding="30"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="Height">
+        SizeToContent="Height"
+        Icon="/Assets/codemerx-logo.ico"
+        CanResize="False">
 
     <Design.DataContext>
         <design:DesignAboutWindowViewModel />

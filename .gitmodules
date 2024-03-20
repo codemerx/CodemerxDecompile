@@ -1,3 +1,6 @@
 [submodule "engine/AvaloniaEdit"]
 	path = src/AvaloniaEdit
 	url = ../AvaloniaEdit.git
+[submodule "src/JustDecompileEngine"]
+	path = src/JustDecompileEngine
+	url = ../JustDecompileEngine.git

@@ -1,9 +1,0 @@
-   =========================================================================
-   ==  NOTICE file corresponding to section 4 d of                        ==
-   ==  the Apache License, Version 2.0,                                   ==
-   ==  in this case for the Telerik JustDecompile Engine                  ==
-   =========================================================================
-Telerik JustDecompile Engine
-Copyright (c) 2011 - 2018 Telerik ЕAD
-For license information see the LICENSE.md file which accompanies this NOTICE.txt file.
-Any open source software that may be delivered by Telerik embedded in or in association with Telerik JustDecompile Engine is provided pursuant to the open source license applicable to the software and subject to the disclaimers and limitations on liability set forth in such license.

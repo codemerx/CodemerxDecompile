@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright CodeMerx 2020, 2024
+    Copyright 2020, 2021, 2024 CodeMerx
     This file is part of CodemerxDecompile.
 
     CodemerxDecompile is free software: you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 ﻿<!--
-    Copyright CodeMerx 2024
+    Copyright 2024 CodeMerx
     This file is part of CodemerxDecompile.
 
     CodemerxDecompile is free software: you can redistribute it and/or modify
@@ -59,9 +59,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
-      <ProjectReference Include="..\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj" />
-      <ProjectReference Include="..\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
-      <ProjectReference Include="..\Tools.MSBuildProjectBuilder.NetStandard\Tools.MSBuildProjectBuilder.NetStandard.csproj" />
+      <ProjectReference Include="..\JustDecompileEngine\src\JustDecompiler.NetStandard\JustDecompiler.NetStandard.csproj" />
+      <ProjectReference Include="..\JustDecompileEngine\src\Mono.Cecil.NetStandard\Mono.Cecil.NetStandard.csproj" />
+      <ProjectReference Include="..\JustDecompileEngine\src\Tools.MSBuildProjectBuilder.NetStandard\Tools.MSBuildProjectBuilder.NetStandard.csproj" />
     </ItemGroup>
 
 

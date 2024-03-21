@@ -16,6 +16,7 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
+using System;
 using System.Threading.Tasks;
 using CodemerxDecompile.Providers;
 
@@ -33,7 +34,7 @@ file class DesignAppInformationProvider : IAppInformationProvider
 {
     public string Name { get; } = "CodemerxDecompile";
     public string Version { get; } = "1.69.0";
-    public string Copyright { get; } = "Copyright \u00a9 CodeMerx Ltd. All rights reserved.";
+    public string Copyright { get; } = $"Copyright {DateTime.Now.Year} CodeMerx";
 
     public AdditionalInfo AdditionalInfo { get; } = new()
     {

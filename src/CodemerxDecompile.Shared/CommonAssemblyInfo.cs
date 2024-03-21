@@ -19,5 +19,5 @@
 using System.Reflection;
 
 [assembly: AssemblyCompany("CodeMerx")]
-[assembly: AssemblyCopyright("Copyright © 2020, 2024 CodeMerx Ltd. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright 2020, 2021, 2024 CodeMerx")]
 [assembly: AssemblyProduct("CodemerxDecompile")]

@@ -126,6 +126,18 @@ public partial class MainWindowViewModel : ObservableObject
             intermediateLanguage
         };
         selectedLanguage = cSharp;
+
+        GlobalAssemblyResolver.Instance.AssemblyDefinitionFailure += (_, exception) =>
+        {
+            if (exception.InnerException is UnauthorizedAccessException)
+            {
+                notificationService.ShowNotification(new Notification
+                {
+                    Message = exception.InnerException.Message,
+                    Level = NotificationLevel.Error
+                });
+            }
+        };
     }
 
     public ObservableCollection<AssemblyNode> AssemblyNodes { get; } = new();
@@ -296,10 +308,32 @@ public partial class MainWindowViewModel : ObservableObject
         // TODO: Invalidate search results
         AssemblyNode? firstLoadedAssemblyNode = null;
         
-        foreach (var file in filePaths)
+        foreach (var filePath in filePaths)
         {
-            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(file);
-            GlobalAssemblyResolver.Instance.AddResolvedAssembly(file);
+            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(filePath);
+            if (assembly == null)
+                return;
+
+            var directoryPath = Path.GetDirectoryName(filePath)!;
+            var hasAccessToDirectory = false;
+            try
+            {
+                Directory.GetFiles(directoryPath);
+                hasAccessToDirectory = true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                notificationService.ShowNotification(new()
+                {
+                    Message = $"Access to the directory \"{directoryPath}\" is denied. This directory will not be included in the automatic assembly resolution process.",
+                    Level = NotificationLevel.Warning
+                });
+            }
+
+            if (hasAccessToDirectory)
+            {
+                GlobalAssemblyResolver.Instance.AddResolvedAssembly(filePath);
+            }
             
             var assemblyNode = new AssemblyNode
             {

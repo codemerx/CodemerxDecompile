@@ -69,7 +69,7 @@ jobs:
         name: CodemerxDecompile-linux-x64
         path: CodemerxDecompile-linux-x64.tar.gz
 
-  package-macos:
+  package-macos-arm64:
     runs-on: macos-14
 
     steps:
@@ -82,7 +82,7 @@ jobs:
       working-directory: ./src/CodemerxDecompile
 
     - name: Build .app bundle
-      run: build/macos/build-application-bundle.sh
+      run: build/macos/build-application-bundle.sh osx-arm64
 
     - name: Archive artifacts
       run: tar -czpf CodemerxDecompile-macos-arm64.tar.gz CodemerxDecompile.app
@@ -92,3 +92,27 @@ jobs:
       with:
         name: CodemerxDecompile-macos-arm64
         path: CodemerxDecompile-macos-arm64.tar.gz
+
+  package-macos-x64:
+    runs-on: macos-13
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Publish
+      run: dotnet publish -r osx-x64 -c Release
+      working-directory: ./src/CodemerxDecompile
+
+    - name: Build .app bundle
+      run: build/macos/build-application-bundle.sh osx-x64
+
+    - name: Archive artifacts
+      run: tar -czpf CodemerxDecompile-macos-x64.tar.gz CodemerxDecompile.app
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-macos-x64
+        path: CodemerxDecompile-macos-x64.tar.gz

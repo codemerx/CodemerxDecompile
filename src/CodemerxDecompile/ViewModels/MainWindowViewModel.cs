@@ -37,6 +37,7 @@ using CodemerxDecompile.Services;
 using CodemerxDecompile.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using JustDecompile.EngineInfrastructure;
 using JustDecompile.Tools.MSBuildProjectBuilder;
 using Mono.Cecil;
 using Mono.Cecil.AssemblyResolver;
@@ -126,18 +127,6 @@ public partial class MainWindowViewModel : ObservableObject
             intermediateLanguage
         };
         selectedLanguage = cSharp;
-
-        GlobalAssemblyResolver.Instance.AssemblyDefinitionFailure += (_, exception) =>
-        {
-            if (exception.InnerException is UnauthorizedAccessException)
-            {
-                notificationService.ShowNotification(new Notification
-                {
-                    Message = exception.InnerException.Message,
-                    Level = NotificationLevel.Error
-                });
-            }
-        };
     }
 
     public ObservableCollection<AssemblyNode> AssemblyNodes { get; } = new();
@@ -310,9 +299,31 @@ public partial class MainWindowViewModel : ObservableObject
         
         foreach (var filePath in filePaths)
         {
-            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(filePath);
-            if (assembly == null)
-                return;
+            try
+            {
+                using var fileStream = File.OpenRead(filePath);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                notificationService.ShowNotification(new Notification
+                {
+                    Message = $"Access to the file \"{filePath}\" is denied.",
+                    Level = NotificationLevel.Error
+                });
+                
+                continue;
+            }
+
+            if (!CLRHelper.IsValidClrFile(filePath))
+            {
+                notificationService.ShowNotification(new Notification
+                {
+                    Message = $"The assembly \"{filePath}\" is not a valid CLR assembly.",
+                    Level = NotificationLevel.Error
+                });
+                
+                continue;
+            }
 
             var directoryPath = Path.GetDirectoryName(filePath)!;
             var hasAccessToDirectory = false;
@@ -329,6 +340,10 @@ public partial class MainWindowViewModel : ObservableObject
                     Level = NotificationLevel.Warning
                 });
             }
+            
+            var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(filePath);
+            if (assembly == null)
+                continue;
 
             if (hasAccessToDirectory)
             {

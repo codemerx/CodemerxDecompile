@@ -39,6 +39,8 @@ public static class AnalyticsEvents
     public static readonly AnalyticsEvent NavigateToSearchResult = new("search", "navigate-to-result");
     public static readonly AnalyticsEvent DownloadNewVersion = new("new-version", "download");
     public static readonly AnalyticsEvent About = new("application", "open-about-dialog");
+    public static readonly AnalyticsEvent CompilerGeneratedMembersOn = new("compiler-generated-options", "on");
+    public static readonly AnalyticsEvent CompilerGeneratedMembersOff = new("compiler-generated-options", "off");
     // TODO: Report the following events to monitor usage of shortcuts
     // public static readonly Event OpenFileShortcut = new("shortcut", "open-file");
     // public static readonly Event GoBackViaKeyboardShortcut = new("shortcut", "go-back-via-keyboard");

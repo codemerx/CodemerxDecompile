@@ -97,6 +97,9 @@ public partial class MainWindowViewModel : ObservableObject
     private Language selectedLanguage;
 
     [ObservableProperty]
+    private bool showCompilerGeneratedMembers;
+
+    [ObservableProperty]
     private string searchText;
 
     [ObservableProperty]
@@ -293,6 +296,7 @@ public partial class MainWindowViewModel : ObservableObject
     internal void LoadAssemblies(IEnumerable<string> filePaths)
     {
         // TODO: Rebuild tree view upon language change
+        // TODO: Rebuild tree view upon toggling compiler generated member visibility
         // TODO: Rebuild all reference nodes upon loading of a new assembly
         // TODO: Invalidate search results
         AssemblyNode? firstLoadedAssemblyNode = null;
@@ -443,7 +447,7 @@ public partial class MainWindowViewModel : ObservableObject
                 _ => throw new NotSupportedException()
             };
             
-            var members = typeDefinition.GetMembersSorted(false, SelectedLanguage.Instance);
+            var members = typeDefinition.GetMembersSorted(ShowCompilerGeneratedMembers, SelectedLanguage.Instance);
             foreach (var memberDefinition in members)
             {
                 MemberNode node = memberDefinition switch
@@ -547,6 +551,11 @@ public partial class MainWindowViewModel : ObservableObject
         Decompile(SelectedNode, true);
     }
 
+    partial void OnShowCompilerGeneratedMembersChanged(bool _)
+    {
+        Decompile(SelectedNode, true);
+    }
+
     private void Decompile(Node? node, bool forceRecompilation)
     {
         var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
@@ -568,7 +577,7 @@ public partial class MainWindowViewModel : ObservableObject
             var stringBuilder = new StringBuilder();
             var stringWriter = new StringWriter(stringBuilder);
             var formatter = new MemberReferenceTrackingFormatter(stringWriter);
-            var writerSettings = new WriterSettings();
+            var writerSettings = new WriterSettings(showCompilerGeneratedMembers: ShowCompilerGeneratedMembers);
             var writer = language.GetAssemblyAttributeWriter(formatter, new SimpleExceptionFormatter(), writerSettings);
             var writerContextService = new SimpleWriterContextService(new DefaultDecompilationCacheService(), true);
             
@@ -596,7 +605,7 @@ public partial class MainWindowViewModel : ObservableObject
             var stringBuilder = new StringBuilder();
             var stringWriter = new StringWriter(stringBuilder);
             var formatter = new MemberReferenceTrackingFormatter(stringWriter);
-            var writerSettings = new WriterSettings();
+            var writerSettings = new WriterSettings(showCompilerGeneratedMembers: ShowCompilerGeneratedMembers);
             var writer = language.GetWriter(formatter, new SimpleExceptionFormatter(), writerSettings);
             var writerContextService = new SimpleWriterContextService(new DefaultDecompilationCacheService(), true);
             List<WritingInfo> writingInfos;
@@ -847,6 +856,14 @@ public partial class MainWindowViewModel : ObservableObject
     {
         _ = analyticsService.TrackEventAsync(AnalyticsEvents.About);
         dialogService.ShowDialog<AboutWindow>();
+    }
+    
+    [RelayCommand]
+    private void ToggleShowCompilerGeneratedMembers()
+    {
+        ShowCompilerGeneratedMembers = !ShowCompilerGeneratedMembers;
+        
+        _ = analyticsService.TrackEventAsync(ShowCompilerGeneratedMembers ? AnalyticsEvents.CompilerGeneratedMembersOn : AnalyticsEvents.CompilerGeneratedMembersOff);
     }
 
     public record Language(string Name, ILanguage Instance);

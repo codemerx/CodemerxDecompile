@@ -27,6 +27,7 @@
         xmlns:views="clr-namespace:CodemerxDecompile.Views"
         xmlns:msBuildProjectBuilder="clr-namespace:JustDecompile.Tools.MSBuildProjectBuilder;assembly=Tools.MSBuildProjectBuilder.NetStandard"
         xmlns:design="clr-namespace:CodemerxDecompile.ViewModels.Design"
+        xmlns:converters="clr-namespace:CodemerxDecompile.Converters"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CodemerxDecompile.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -137,7 +138,7 @@
                         <Setter Property="Padding" Value="5" />
                         <Setter Property="Background" Value="#F6F6F6" />
                         <Setter Property="BorderThickness" Value="0 0 0 1" />
-                        <Setter Property="BorderBrush" Value="#DFDFDF"></Setter>
+                        <Setter Property="BorderBrush" Value="#DFDFDF" />
                     </Style>
                 </Border.Styles>
                 
@@ -188,6 +189,42 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </StackPanel>
+            </Border>
+            
+            <Border DockPanel.Dock="Bottom"
+                    Classes="status-bar">
+                <Border.Styles>
+                    <Style Selector="Border.status-bar">
+                        <Setter Property="Background" Value="#F6F6F6" />
+                        <Setter Property="BorderThickness" Value="0 1 0 0" />
+                        <Setter Property="BorderBrush" Value="#DFDFDF" />
+                        <Setter Property="Padding" Value="10 0" />
+                    </Style>
+                    
+                    <Style Selector="Border.status-bar-item">
+                        <Setter Property="Padding" Value="5" />
+                    </Style>
+                    
+                    <Style Selector="Border.status-bar-item:pointerover">
+                        <Setter Property="Background" Value="#DFDFDF" />
+                        <Setter Property="Cursor" Value="Hand" />
+                    </Style>
+                </Border.Styles>
+                
+                <DockPanel LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Right"
+                                Orientation="Horizontal">
+                        <Border Classes="status-bar-item">
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="PointerPressed">
+                                    <InvokeCommandAction Command="{Binding ToggleShowCompilerGeneratedMembersCommand}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            
+                            <TextBlock Text="{Binding ShowCompilerGeneratedMembers, StringFormat='Compiler generated members: {0}', Converter={x:Static converters:ToStringConverters.BooleanToOnOff}}" />
+                        </Border>
+                    </StackPanel>
+                </DockPanel>
             </Border>
             
             <Grid DragDrop.AllowDrop="True">

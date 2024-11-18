@@ -50,7 +50,7 @@ jobs:
     - name: Archive artifacts (ARM)
       uses: actions/upload-artifact@v4
       with:
-        name: CodemerxDecompile-windows-x64
+        name: CodemerxDecompile-windows-arm64
         path: src/CodemerxDecompile/bin/Release/net7.0/win-arm64/publish
 
   package-linux:

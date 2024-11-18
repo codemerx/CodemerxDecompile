@@ -33,15 +33,25 @@ jobs:
       with:
         dotnet-version: 7.0.x
 
-    - name: Publish
+    - name: Publish (x64)
       run: dotnet publish -r win-x64 -c Release
       working-directory: ./src/CodemerxDecompile
 
-    - name: Archive artifacts
+    - name: Publish (ARM)
+      run: dotnet publish -r win-arm64 -c Release
+      working-directory: ./src/CodemerxDecompile
+
+    - name: Archive artifacts (x64)
       uses: actions/upload-artifact@v4
       with:
         name: CodemerxDecompile-windows-x64
         path: src/CodemerxDecompile/bin/Release/net7.0/win-x64/publish
+
+    - name: Archive artifacts (ARM)
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodemerxDecompile-windows-x64
+        path: src/CodemerxDecompile/bin/Release/net7.0/win-arm64/publish
 
   package-linux:
     runs-on: ubuntu-22.04

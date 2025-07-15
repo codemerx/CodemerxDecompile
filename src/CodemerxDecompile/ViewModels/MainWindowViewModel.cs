@@ -51,7 +51,7 @@ using Telerik.JustDecompiler.Languages.VisualBasic;
 
 namespace CodemerxDecompile.ViewModels;
 
-public partial class MainWindowViewModel : ObservableObject
+public partial class MainWindowViewModel : ObservableObject, IMainWindowViewModel
 {
     private const string CSharpName = "C#";
     private const string VisualBasicName = "VB.NET";
@@ -74,7 +74,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     private readonly SearchService searchService = new();
     private readonly Debouncer searchDebouncer = new(TimeSpan.FromMilliseconds(500));
-
+    
     private TypeDefinition? currentTypeDefinition;
     private DecompiledTypeMetadata? currentDecompiledTypeMetadata;
     private bool isBackForwardNavigation = false;
@@ -138,6 +138,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     public ObservableCollection<SearchResult> SearchResults { get; } = new();
 
+    public bool TreeViewSelected => SelectedPaneIndex == 0;
     public bool SearchPaneSelected => SelectedPaneIndex == 1;
 
     internal void SelectNodeByMemberReference(MemberReference memberReference)
@@ -513,8 +514,46 @@ public partial class MainWindowViewModel : ObservableObject
         
         GlobalAssemblyResolver.Instance.ClearCache();
     }
+    
+    [RelayCommand(CanExecute = nameof(CanRemoveSelectedAssembly))]
+    private void RemoveSelectedAssembly()
+    {
+        var selectedAssemblyNode = SelectedNode as AssemblyNode;
+        var assemblyDefinition = selectedAssemblyNode.AssemblyDefinition;
 
-    private bool CanClearAssemblyList() => assemblies.Any();
+        assemblies.Remove(assemblyDefinition);
+        AssemblyNodes.Remove(selectedAssemblyNode);
+
+        var assemblyTypes = assemblyDefinition.MainModule.Types;
+        foreach (var typeDefinition in assemblyTypes)
+        {
+            ClearMemberToNodeMap(typeDefinition);
+        }
+    
+        SelectedNode = null;
+        ClearAssemblyListCommand.NotifyCanExecuteChanged();
+
+        void ClearMemberToNodeMap(TypeDefinition typeDefinition)
+        {
+            var members = typeDefinition.GetMembersUnordered(ShowCompilerGeneratedMembers);
+            foreach (var member in members)
+            {
+                memberDefinitionToNodeMap.Remove(member);
+            }
+            
+            var nestedTypes = typeDefinition.NestedTypes;
+            foreach (var nestedType in nestedTypes)
+            {
+                ClearMemberToNodeMap(nestedType);
+            }
+            
+            memberDefinitionToNodeMap.Remove(typeDefinition);
+        }
+    }
+    
+    private bool CanRemoveSelectedAssembly() => SelectedNode is AssemblyNode && TreeViewSelected;
+    
+    private bool CanClearAssemblyList() => assemblies.Any() && TreeViewSelected;
 
     partial void OnSelectedNodeChanged(Node? oldNode, Node? newNode)
     {
@@ -536,6 +575,7 @@ public partial class MainWindowViewModel : ObservableObject
         Decompile(newNode, false);
 
         isBackForwardNavigation = false;
+        RemoveSelectedAssemblyCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnSelectedLanguageChanged(Language value)
@@ -717,16 +757,19 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedPaneIndexChanged(int _)
     {
-        if (!SearchPaneSelected)
-            return;
-        
-        // TODO: Nasty hack. Postponing the Focus() call enough to ensure the text box is rendered and can be focused.
-        Dispatcher.UIThread.Post(() =>
+        if (SearchPaneSelected)
         {
-            var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
-            mainWindow.SearchTextBox.SelectAll();
-            mainWindow.SearchTextBox.Focus();
-        });
+            // TODO: Nasty hack. Postponing the Focus() call enough to ensure the text box is rendered and can be focused.
+            Dispatcher.UIThread.Post(() =>
+            {
+                var mainWindow = (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)!.MainWindow as MainWindow;
+                mainWindow.SearchTextBox.SelectAll();
+                mainWindow.SearchTextBox.Focus();
+            });
+        }
+        
+        RemoveSelectedAssemblyCommand.NotifyCanExecuteChanged();
+        ClearAssemblyListCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnSearchTextChanged(string value)

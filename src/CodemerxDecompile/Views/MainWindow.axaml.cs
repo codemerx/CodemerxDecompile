@@ -16,6 +16,7 @@
     along with CodemerxDecompile.  If not, see<https://www.gnu.org/licenses/>.
 */
 
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia.Controls;
@@ -42,7 +43,7 @@ public partial class MainWindow : Window
 {
     internal static readonly TextSegmentCollection<ReferenceTextSegment> references = new();
     private static MainWindowViewModel viewModel;
-    
+
     public MainWindow(ILogger<MainWindow> logger, MainWindowViewModel mainWindowViewModel,
         IAnalyticsService analyticsService, IAutoUpdateService autoUpdateService, IAppInformationProvider appInformationProvider)
     {

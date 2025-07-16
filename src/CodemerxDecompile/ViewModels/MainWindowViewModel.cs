@@ -245,7 +245,7 @@ public partial class MainWindowViewModel : ObservableObject
         
         if (files.Count == 0)
             return;
-
+        
         _ = analyticsService.TrackEventAsync(AnalyticsEvents.OpenFile);
 
         LoadAssemblies(files.Select(file => file.Path.LocalPath));
@@ -300,6 +300,7 @@ public partial class MainWindowViewModel : ObservableObject
         // TODO: Rebuild all reference nodes upon loading of a new assembly
         // TODO: Invalidate search results
         AssemblyNode? firstLoadedAssemblyNode = null;
+        var alreadyLoadedAssemblyNames = new List<string>();
         
         foreach (var filePath in filePaths)
         {
@@ -348,6 +349,13 @@ public partial class MainWindowViewModel : ObservableObject
             var assembly = GlobalAssemblyResolver.Instance.GetAssemblyDefinition(filePath);
             if (assembly == null)
                 continue;
+            
+            var assemblyName = assembly.Name.Name;
+            if (AssemblyNodes.Select(node => node.Name).Contains(assemblyName))
+            {
+                alreadyLoadedAssemblyNames.Add(assemblyName);
+                continue;
+            }
 
             if (hasAccessToDirectory)
             {
@@ -413,8 +421,17 @@ public partial class MainWindowViewModel : ObservableObject
             assemblies.Add(assembly);
             ClearAssemblyListCommand.NotifyCanExecuteChanged();
         }
+        
+        SelectedNode = firstLoadedAssemblyNode ?? SelectedNode;
 
-        SelectedNode = firstLoadedAssemblyNode;
+        if (alreadyLoadedAssemblyNames.Any())
+        {
+            notificationService.ShowNotification(new()
+            {
+                Message = $"The following assemblies are already open:\n" + string.Join(",\n", alreadyLoadedAssemblyNames),
+                Level = NotificationLevel.Error
+            });
+        }
 
         TypeNode BuildTypeSubtree(TypeDefinition typeDefinition, Node parentNode)
         {
